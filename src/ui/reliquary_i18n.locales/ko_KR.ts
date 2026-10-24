@@ -50,9 +50,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: '야생심장 분지',
+    desc: '송곳니 군주 야수조련사, 탐식화, 줄가르에게서 얻는 대표 무기.',
   },
   conquerors_wildheart_basin_heroic: {
     name: '영웅: 야생심장 분지',
+    desc: '송곳니 군주 야수조련사, 탐식화, 분지의 목소리 줄가르에게서 영웅 난이도에서만 얻는 영웅급 장비와 장신구.',
   },
   // The arena entity reads 니트락시스 공격대 투기장; the page collects the raid's
   // spoils rather than naming the room, so the arena noun is dropped and the

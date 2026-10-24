@@ -44,9 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Vildhjärtats bassäng',
+    desc: 'Signaturvapen från Bettherren bestmästaren, Frossblomman och Zulgar.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroisk: Vildhjärtats bassäng',
+    desc: 'Episka föremål och smycken enbart från heroiskt läge, från Bettherren bestmästaren, Frossblomman och Zulgar, bassängens röst.',
   },
   conquerors_nythraxis: {
     name: 'Nythraxis-raid',

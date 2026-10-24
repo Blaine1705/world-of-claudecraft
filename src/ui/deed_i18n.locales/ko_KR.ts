@@ -391,6 +391,7 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: '골짜기 연대기, 제2장',
+    desc: '산적과 멀록, 광산의 해충을 처치하고 성물고에 도전하여 사울의 연대기 두 번째 장을 완료하세요.',
   },
   chr_vale_chapter_iii: {
     name: '골짜기의 연대기',
@@ -1215,5 +1216,114 @@ export const table: DeedLocaleTable = {
     name: '등불 회관의 일원',
     desc: '등불 회관의 병참관 개릭 홀트에게서 등불 인장 24개로 구입했습니다.',
     title: '등불 회관의 일원',
+  },
+  cmb_balgath: {
+    name: '감독관의 종말',
+    desc: '묻힌 감독관을 고분으로 돌려보내세요.',
+  },
+  cmb_balgath_ten: {
+    name: '봉분은 아무것도 지키지 못한다',
+    desc: '묻힌 감독관을 10번 처치하세요.',
+  },
+  cmb_point_taken: {
+    name: '알아들은 창끝',
+    desc: '집결지 훈련장에서 짚 감독관의 등불을 끄고 판자에 온전한 타격을 가하세요.',
+  },
+  dgn_olen_buttress: {
+    name: '성벽을 지켜라',
+    desc: '튕겨 나오는 방벽이 두 번째 플레이어를 한 번도 맞히지 않게 하면서 기사대장 올렌을 처치하세요.',
+  },
+  dgn_ossick_moored: {
+    name: '안전한 항구',
+    desc: '아무도 익사의 구덩이로 끌려가지 않게 하면서 간수 오시크를 처치하세요.',
+  },
+  dgn_vael_beacon: {
+    name: '봉화의 빛으로',
+    desc: '안개 그림자를 하나도 터뜨리지 않고 안개엮는자 바엘을 처치하세요.',
+  },
+  dgn_turretback: {
+    name: '퇴거 통지',
+    desc: '아무도 유령의 측면 포격에 맞지 않게 하면서 난파선 선장을 처치하세요.',
+  },
+  dgn_selthe_pitch: {
+    name: '모든 목소리가 조화롭게',
+    desc: '모든 합창을 2명 이상이 나눠 맞고 독창이 다른 누구에게도 닿지 않게 하면서 성가대모 셀세를 처치하세요.',
+  },
+  dgn_colossus_mirror: {
+    name: '유리를 깨라',
+    desc: '모든 반영을 나타난 후 15초 안에 파괴하고 조수유리 거상을 처치하세요.',
+  },
+  dgn_ysolei_high_and_dry: {
+    name: '물 한 방울 없이',
+    desc: '아무도 조수 충돌에 맞지 않게 하면서 익사한 달의 화신 이솔레이를 처치하세요.',
+  },
+  dgn_mere_hydra: {
+    name: '모든 머리를 쓰러뜨려라',
+    desc: '호수 히드라의 머리 셋을 서로 10초 이내의 간격으로 처치하세요.',
+  },
+  dgn_crypt_knellwyrm: {
+    name: '머리카락 하나 그슬리지 않고',
+    desc: '아무도 장작더미 화염 비행에 타지 않게 하면서 조종룡을 처치하세요.',
+  },
+  dgn_turnkey_cage: {
+    name: '어떤 우리도 우릴 가두지 못한다',
+    desc: '아무도 철창에 짓눌리지 않게 하면서 감옥 열쇠지기를 처치하세요.',
+  },
+  dgn_beastmaster_apart: {
+    name: '접근 금지',
+    desc: '무리의 유대가 활성화된 시간을 합계 10초 미만으로 유지하며 송곳니 군주 야수조련사와 그의 거대 재규어를 처치하세요.',
+  },
+  dgn_gorgebloom_clean: {
+    name: '잡초 제거',
+    desc: '가시 싹이 하나도 자라지 않게 하면서 탐식화를 처치하세요.',
+  },
+  dgn_zulgar_uncaught: {
+    name: '한 번도 잡히지 않고',
+    desc: '아무도 짓이겨지지 않게 하면서 분지의 목소리 줄가르를 처치하세요.',
+  },
+  dgn_great_saurian: {
+    name: '쓰러진 거수',
+    desc: '거대 용각수와 가마 주술사를 서로 20초 이내의 간격으로 처치하세요.',
+  },
+  dgn_korgath_all_chains: {
+    name: '더 자비로운 최후',
+    desc: '사슬 넷을 모두 끊은 상태로 속박된 코르가스를 처치하세요.',
+  },
+  dgn_korgath_still_bound: {
+    name: '자물쇠는 버틴다',
+    desc: '사슬을 최소 2개 이상 한 번도 끊지 않고 영웅 난이도에서 속박된 코르가스를 처치하세요.',
+  },
+  dgn_velkhar_cold: {
+    name: '차가운 위안',
+    desc: '되살아난 뼈보행자가 하나도 두 번째로 일어나지 않게 하면서 대강령술사 벨카르를 처치하세요.',
+  },
+  dgn_korzul_thin_ice: {
+    name: '얇은 얼음',
+    desc: '호수의 얼음판 19개 중 최소 12개를 부수지 않고 무덤고룡 코르줄을 처치하세요.',
+  },
+  dgn_sledge_tusker: {
+    name: '차가운 화물',
+    desc: '아무도 짓밟기에 맞지 않게 하면서 썰매 끄는 거대엄니를 처치하세요.',
+  },
+  dgn_drowned_temple_cantor: {
+    name: '마지막 구절',
+    desc: '창백한 성가대의 마지막 성가대장과 함께 익사한 달의 화신 이솔레이를 처치하세요.',
+    title: '성가대의 증인',
+  },
+  dgn_marrow_tidy: {
+    name: '단정한 교회 묘지',
+    desc: '모든 열린 무덤을 종 마당 가장자리에 배치한 상태로 성구지기 매로우를 처치하세요.',
+  },
+  dgn_lady_nobody_hanging: {
+    name: '아무도 매달린 채 남지 않게',
+    desc: '얼어붙은 포옹에서 아무도 떨어뜨리지 않게 하면서 뼈서리의 귀부인을 처치하세요.',
+  },
+  dgn_ilvane_hush: {
+    name: '이제 조용히',
+    desc: '공허의 진혼곡이 아무도 맞히지 않게 하면서 성가대장 일베인을 처치하세요.',
+  },
+  dgn_morthen_candlelight: {
+    name: '모든 촛불에 불을',
+    desc: '잠들지 못한 결계가 나타난 후 20초 안에 추모의 초 넷을 모두 다시 밝힌 뒤 무덤부름 모르덴을 처치하세요.',
   },
 };

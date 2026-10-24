@@ -49,9 +49,11 @@ export const table: ReliquaryLocaleTable = {
     desc: '墓龍科祖爾身上僅限英雄難度掉落的史詩物品。',
   },
   conquerors_wildheart_basin: {
+    desc: '來自獠牙領主馴獸師、噬花和祖爾加的標誌性武器。',
     name: '荒野之心盆地',
   },
   conquerors_wildheart_basin_heroic: {
+    desc: '來自獠牙領主馴獸師、噬花和盆地之聲祖爾加的英雄難度專屬史詩裝備與飾品。',
     name: '英雄：荒野之心盆地',
   },
   // The arena entity reads 尼思拉克西斯團隊競技場; the page collects the raid's

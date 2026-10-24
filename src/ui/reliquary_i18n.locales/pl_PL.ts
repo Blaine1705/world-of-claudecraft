@@ -44,9 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Kotlina Dzikiego Serca',
+    desc: 'Charakterystyczna broń od Kłolorda, Pogromcy Bestii, Żarłokwiatu i Zulgara.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroiczna: Kotlina Dzikiego Serca',
+    desc: 'Epickie przedmioty i błyskotki dostępne tylko na heroicznym poziomie od Kłolorda, Pogromcy Bestii, Żarłokwiatu i Zulgara, Głosu Kotliny.',
   },
   conquerors_nythraxis: {
     name: 'Rajd Nythraxis',

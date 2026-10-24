@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const tr_TR: Record<string, string> = {
+  'error.buddyGrantFailed': 'Yoldaş verilemedi.',
+  'error.characterAlreadyHasThat': 'Bu karakter zaten bu yoldaşa veya görünüme sahip.',
+  'moderationHistory.actionGrantBuddy': 'Yoldaş verildi',
   'moderationHistory.actionAnnounce': 'Diyar duyurusu',
   'moderationHistory.actionGmInvisible': 'Görünmez oldu',
   'moderationHistory.actionGmVisible': 'Görünür oldu',

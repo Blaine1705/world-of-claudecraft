@@ -29,7 +29,7 @@ import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 // summary the exporter prints.
 
 const REPO_ROOT = path.join(__dirname, '..');
-const SOURCE_FINGERPRINT = 'fc4a3b23df82de86c1347d7b7f29f0132add746827aa5469ec2f0cf4afb7938c';
+const SOURCE_FINGERPRINT = 'ee0f17998356122aae769ca0f3fd472f2cec914ef9fe69ca195eae40d1a2d76c';
 
 interface Pin {
   bytes: number;
@@ -42,7 +42,7 @@ interface Pin {
 const PINS: Record<string, Pin> = {
   musterEffigy: {
     bytes: 182_308,
-    sha256: 'c6047f569725d37bd3b0b61bc537903ff02975d1ff3acd088425ad9f074a9844',
+    sha256: '1982752a896e603be8b80932e096ff959ac31406f699582c78f010777fca8d4a',
     triangles: 8359,
     primitives: 36,
     materials: [
@@ -57,7 +57,7 @@ const PINS: Record<string, Pin> = {
   },
   musterMallet: {
     bytes: 15_344,
-    sha256: '9e1865d69d587893596410a4d7c9d2c04b7364fadd315f065c08dfbd5ee09433',
+    sha256: '722816b223b03b3ac11e386afc2fa59a60d847c0cf220d4072be9bcc7a34605c',
     triangles: 556,
     primitives: 3,
     materials: ['EffigyIron', 'EffigyRope', 'EffigyWood'],

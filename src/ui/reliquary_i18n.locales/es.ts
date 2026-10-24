@@ -44,9 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'La Cuenca del Corazón Salvaje',
+    desc: 'Armas emblemáticas del Maestro de Bestias Señor de los Colmillos, la Flor Devoradora y Zulgar.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroico: La Cuenca del Corazón Salvaje',
+    desc: 'Épicos y abalorios exclusivos del modo heroico del Maestro de Bestias Señor de los Colmillos, la Flor Devoradora y Zulgar, Voz de la Cuenca.',
   },
   conquerors_nythraxis: {
     name: 'Incursión de Nythraxis',

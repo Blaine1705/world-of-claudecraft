@@ -44,9 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Yaban Yürek Çukuru',
+    desc: "Diş Lordu Canavar Efendisi, Obur Çiçek ve Zulgar'dan kendilerine özgü silahlar.",
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Kahramanca: Yaban Yürek Çukuru',
+    desc: "Diş Lordu Canavar Efendisi, Obur Çiçek ve Çukurun Sesi Zulgar'dan yalnızca Kahramanca zorlukta düşen destansı eşyalar ve biblolar.",
   },
   conquerors_nythraxis: {
     name: 'Nythraxis Baskını',

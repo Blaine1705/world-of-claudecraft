@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "34396f8dc5b1dd613d2583441629640da64846660200e6d04165b8f0fdaabbe4",
+  "rendererFingerprint": "149dd5bb6a298b958f90e6be79e3facd6ed6de51778a3db947d85be4c0f7fb52",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -14,7 +14,7 @@
     "gpuVendor": "Google Inc. (Google)",
     "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
     "browserMajor": "155",
-    "browserVersion": "Chrome/155.0.8059.85",
+    "browserVersion": "Chrome/155.0.8059.86",
     "requestedBackend": "swiftshader",
     "fingerprint": "6e67d503663264cff662556c81a9aa6417a8f960b7c3049c729f1444139419c4"
   },
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6447638,
-      "sha256": "3cdfc1c0decc056d0bbd3e07f541d29231a91a936450d56b287280d2345c3d79",
+      "bytes": 6782813,
+      "sha256": "371a8f1b30fb3b9a6da1b4b35dc08b40e086207cc87c0f88abe65ddb14376206",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -7393,7 +7393,7 @@
           "url": "models/creatures/muster_effigy.glb",
           "path": "public/models/creatures/muster_effigy.glb",
           "bytes": 182308,
-          "sha256": "c6047f569725d37bd3b0b61bc537903ff02975d1ff3acd088425ad9f074a9844"
+          "sha256": "1982752a896e603be8b80932e096ff959ac31406f699582c78f010777fca8d4a"
         },
         "idle": "Idle",
         "height": 6.7,
@@ -7410,11 +7410,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "0d93eb5e5f78b2213ee3b476715358ff89ad1ed70afa0d6e40fa499a941dbb8f",
+      "sourceFingerprint": "15816b2425d93602729010e51cb5df2f286ae60f7e02539c8a43e62d017c9417",
       "output": {
         "path": "public/ui/mobs/muster_effigy.webp",
-        "bytes": 3816,
-        "sha256": "f6e2389f82f237b37580aa69c7df258b2321ac0a8b03da11fde20f05039467ba"
+        "bytes": 3978,
+        "sha256": "2ed0ee3eff45ea4d8791830b1f402e7d9b9e7c42c8676f9a17809da81682b42e"
       }
     },
     {

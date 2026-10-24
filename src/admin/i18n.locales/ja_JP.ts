@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const ja_JP: Record<string, string> = {
+  'error.buddyGrantFailed': '仲間を付与できませんでした。',
+  'error.characterAlreadyHasThat': 'そのキャラクターはすでにその仲間または外見を所持しています。',
+  'moderationHistory.actionGrantBuddy': '仲間を付与しました',
   'moderationHistory.actionAnnounce': 'レルム全体への告知',
   'moderationHistory.actionGmInvisible': '不可視状態になった',
   'moderationHistory.actionGmVisible': '可視状態になった',

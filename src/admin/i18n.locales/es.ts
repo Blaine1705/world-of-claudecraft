@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const es: Record<string, string> = {
+  'error.buddyGrantFailed': 'No se pudo conceder el compañero.',
+  'error.characterAlreadyHasThat': 'Ese personaje ya tiene ese compañero o apariencia.',
+  'moderationHistory.actionGrantBuddy': 'Compañero concedido',
   'moderationHistory.actionAnnounce': 'Anuncio del reino',
   'moderationHistory.actionGmInvisible': 'Se hizo invisible',
   'moderationHistory.actionGmVisible': 'Se hizo visible',

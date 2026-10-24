@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const cs_CZ: Record<string, string> = {
+  'error.buddyGrantFailed': 'Společníka se nepodařilo přidělit.',
+  'error.characterAlreadyHasThat': 'Tato postava už tohoto společníka nebo vzhled má.',
+  'moderationHistory.actionGrantBuddy': 'Společník přidělen',
   'moderationHistory.actionAnnounce': 'Oznámení pro celou říši',
   'moderationHistory.actionGmInvisible': 'Stal se neviditelným',
   'moderationHistory.actionGmVisible': 'Stal se viditelným',

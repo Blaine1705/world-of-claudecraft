@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const vi_VN: Record<string, string> = {
+  'error.buddyGrantFailed': 'Không thể cấp bạn đồng hành.',
+  'error.characterAlreadyHasThat': 'Nhân vật đó đã có bạn đồng hành hoặc diện mạo này.',
+  'moderationHistory.actionGrantBuddy': 'Đã cấp bạn đồng hành',
   'moderationHistory.actionAnnounce': 'Thông báo toàn cõi',
   'moderationHistory.actionGmInvisible': 'Đã trở nên vô hình',
   'moderationHistory.actionGmVisible': 'Đã hiện hình',

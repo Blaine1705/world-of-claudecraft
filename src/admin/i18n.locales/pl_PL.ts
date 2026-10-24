@@ -7,6 +7,9 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const pl_PL: Record<string, string> = {
+  'error.buddyGrantFailed': 'Nie udało się przyznać towarzysza.',
+  'error.characterAlreadyHasThat': 'Ta postać ma już tego towarzysza lub ten wygląd.',
+  'moderationHistory.actionGrantBuddy': 'Przyznano towarzysza',
   'moderationHistory.actionAnnounce': 'Ogłoszenie w krainie',
   'moderationHistory.actionGmInvisible': 'Stał się niewidoczny',
   'moderationHistory.actionGmVisible': 'Stał się widoczny',
