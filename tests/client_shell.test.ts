@@ -2507,7 +2507,7 @@ describe('client HTML shell', () => {
 
   it('ships a looping cinematic backdrop with a poster fallback, lazy-loaded for perf', () => {
     expect(html).toContain('id="bg-home"');
-    expect(html).toContain('poster="/home-bg.png"');
+    expect(html).toContain('poster="/home-bg.webp"');
     // The 5.7MB mp4 is NOT eagerly fetched: no <source>/autoplay/preload in the
     // static markup. main.ts attaches data-trailer-src only on capable devices;
     // phones / Save-Data / reduced-motion / high-contrast keep the poster only.

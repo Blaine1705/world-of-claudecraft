@@ -571,7 +571,7 @@
       max-width: 360px;
       aspect-ratio: 978 / 654;
       transform: translateX(-50%);
-      background: url("/worldofclaudecraft-logo.png") center / contain no-repeat;
+      background: url("/worldofclaudecraft-logo.webp") center / contain no-repeat;
       pointer-events: none;
     }
     & :is(#mode-select, #login-panel, #forgot-panel, #reset-panel) > :not(.play-compat-trigger) {
