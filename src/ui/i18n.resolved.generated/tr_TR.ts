@@ -13582,6 +13582,8 @@ export const tr_TR: EnTranslations = {
     "serverOffline": "Çevrimdışı",
     "play": "Oyna",
     "playAria": "World of ClaudeCraft oyna",
+    "playLoading": "Loading",
+    "playStarting": "Starting",
     "serverLabel": "Dünyanı seç",
     "serverAria": "Dünya seç: Çevrimiçi veya Çevrimdışı",
     "serverOfflineSub": "Anında yerel dünya"

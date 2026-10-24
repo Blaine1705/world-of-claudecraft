@@ -13582,6 +13582,8 @@ export const ru_RU: EnTranslations = {
     "serverOffline": "Не в сети",
     "play": "Играть",
     "playAria": "Играть в World of ClaudeCraft",
+    "playLoading": "Загрузка",
+    "playStarting": "Запуск",
     "serverLabel": "Выберите свой мир",
     "serverAria": "Выберите мир: В сети или Не в сети",
     "serverOfflineSub": "Мгновенный локальный мир"

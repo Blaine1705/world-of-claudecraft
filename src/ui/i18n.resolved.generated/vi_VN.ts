@@ -13582,6 +13582,8 @@ export const vi_VN: EnTranslations = {
     "serverOffline": "Ngoại Tuyến",
     "play": "Chơi",
     "playAria": "Chơi World of ClaudeCraft",
+    "playLoading": "Loading",
+    "playStarting": "Starting",
     "serverLabel": "Chọn thế giới của bạn",
     "serverAria": "Chọn thế giới: Trực Tuyến hoặc Ngoại Tuyến",
     "serverOfflineSub": "Thế giới cục bộ tức thì"

@@ -361,8 +361,8 @@ describe('client HTML shell', () => {
   });
 
   it('carries the loading-screen element set, including #ls-slow-hint, in BOTH entries', () => {
-    // main.ts is shared by index.html and play.html (src/CLAUDE.md: "index.html
-    // AND play.html both load src/main.ts"). setSlowConnectionHintVisible is
+    // main.ts runs on both index.html and play.html (src/CLAUDE.md, Entries; index.html
+    // reaches it through src/boot.ts). setSlowConnectionHintVisible is
     // hit on every 1s tick of the slow-connection watch during the whole
     // loading screen, so a missing element on either entry throws (or, with
     // the null-guard, silently never shows) on that entry. #2106's review
@@ -1108,13 +1108,18 @@ describe('client HTML shell', () => {
     // tests/meta_pixel.test.ts. What main.ts owes now is only that it reaches the
     // shared sender rather than re-implementing it: while the duplicate stood, its
     // three events were guarded by nothing behavioral at all.
-    expect(mainTs).toContain("import { trackMetaPixel } from './game/meta_pixel';");
+    expect(mainTs).toContain(
+      "import { trackCommunityLinkClicks, trackMetaPixel } from './game/meta_pixel';",
+    );
     expect(mainTs).not.toContain("fbq('trackCustom'");
     expect(mainTs).toContain(
       'registered.accountId ? { eventID: `acct_$' + '{registered.accountId}` } : undefined',
     );
-    expect(mainTs).toContain("'GitHubClick'");
-    expect(mainTs).toContain("'DiscordClick'");
+    // The GitHub/Discord click events moved with trackCommunityLinkClicks to the shared
+    // sender's module, which the landing-first boot also binds before the client loads.
+    expect(mainTs).toContain('trackCommunityLinkClicks();');
+    expect(metaPixelTs).toContain("'GitHubClick'");
+    expect(metaPixelTs).toContain("'DiscordClick'");
   });
 
   it('keeps the $WOC contract address box off the landing page', () => {
@@ -2507,7 +2512,12 @@ describe('client HTML shell', () => {
 
   it('ships a looping cinematic backdrop with a poster fallback, lazy-loaded for perf', () => {
     expect(html).toContain('id="bg-home"');
-    expect(html).toContain('poster="/home-bg.webp"');
+    // The poster only shows in the native and desktop shells (the website hides the
+    // video), so the markup carries it as data-poster and src/boot.ts applies it there.
+    expect(html).toContain('data-poster="/home-bg.webp"');
+    expect(html).not.toContain(' poster="');
+    const bootTs = readFileSync(new URL('../src/boot.ts', import.meta.url), 'utf8');
+    expect(bootTs).toContain('if (video?.dataset.poster) video.poster = video.dataset.poster;');
     // The 5.7MB mp4 is NOT eagerly fetched: no <source>/autoplay/preload in the
     // static markup. main.ts attaches data-trailer-src only on capable devices;
     // phones / Save-Data / reduced-motion / high-contrast keep the poster only.

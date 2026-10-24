@@ -13582,6 +13582,8 @@ export const zh_CN: EnTranslations = {
     "serverOffline": "离线",
     "play": "开始游戏",
     "playAria": "开始游玩 World of ClaudeCraft",
+    "playLoading": "加载中",
+    "playStarting": "正在启动",
     "serverLabel": "选择你的世界",
     "serverAria": "选择世界：在线或离线",
     "serverOfflineSub": "即时本地世界"

@@ -13582,6 +13582,8 @@ export const nl_NL: EnTranslations = {
     "serverOffline": "Offline",
     "play": "Spelen",
     "playAria": "Speel World of ClaudeCraft",
+    "playLoading": "Loading",
+    "playStarting": "Starting",
     "serverLabel": "Kies je wereld",
     "serverAria": "Kies wereld: Online of Offline",
     "serverOfflineSub": "Directe lokale wereld"

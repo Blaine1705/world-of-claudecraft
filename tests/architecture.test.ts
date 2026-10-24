@@ -800,6 +800,8 @@ const UI_PURE_CORES = [
   'src/ui/heal_landing_feedback_core.ts',
   'src/ui/block_landing_feedback_core.ts',
   'src/ui/boot_splash_core.ts',
+  // Which boot a home page load takes, and the landing's touch-interface answer.
+  'src/ui/landing_first_core.ts',
   'src/ui/window_drag_core.ts',
   'src/ui/window_reflow_core.ts',
   'src/ui/window_resize_core.ts',
@@ -3061,6 +3063,10 @@ const UI_DOM_MODULES = [
   'src/ui/boot_splash.ts',
   // The first-login graphics prompt: a top-level pre-game modal reading the URL and navigator.
   'src/ui/graphics_choice_prompt.ts',
+  // The landing-first boot (body classes, splash lift, prefetch, held clicks) and the
+  // characters-created counter it shares with main.ts.
+  'src/ui/landing_first.ts',
+  'src/ui/project_stats.ts',
   'src/ui/frame_presets_live.ts',
   'src/ui/frame_editor_deps.ts',
   'src/ui/frame_presets_controls.ts',

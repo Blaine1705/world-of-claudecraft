@@ -13582,6 +13582,8 @@ export const en_XA: EnTranslations = {
     "serverOffline": "[Óƒƒļíñé]",
     "play": "[Þļáý]",
     "playAria": "[Þļáý Ŵóŕļð óƒ ÇļáúðéÇŕáƒţ]",
+    "playLoading": "[Ļóáðíñĝ]",
+    "playStarting": "[Šţáŕţíñĝ]",
     "serverLabel": "[Çĥóóšé ýóúŕ ŵóŕļð]",
     "serverAria": "[Šéļéçţ ŵóŕļð: Óñļíñé óŕ Óƒƒļíñé]",
     "serverOfflineSub": "[Íñšţáñţ ļóçáļ ŵóŕļð]"

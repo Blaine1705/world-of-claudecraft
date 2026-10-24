@@ -31,6 +31,7 @@ import {
   diagnosticsCaptureAllowed,
   diagnosticsReadAllowed,
 } from './scripts/lib/diagnostics_capture_guard.mjs';
+import { gameModuleEntries, injectGameModules } from './scripts/lib/landing_game_modules.mjs';
 import { studioDevGuardMiddleware } from './scripts/lib/studio_dev_guard.mjs';
 import { readBase, snapshotBase } from './scripts/lib/studio_map_base.mjs';
 import { vitestBoundedRelatedPlugin } from './scripts/lib/vitest_bounded_related.mjs';
@@ -224,6 +225,41 @@ function bootSplashStylesheetsPlugin() {
           );
         }
       }
+    },
+  };
+}
+
+// The landing-first boot prefetches the game client after the home page has loaded
+// (src/ui/landing_first.ts). The client is a dynamic import of src/boot.ts, so its
+// chunk URLs only exist in the bundle: list them into index.html as JSON. Build-only;
+// in dev the list is absent and the prefetch is skipped.
+function landingGameModulesPlugin() {
+  let base = '/';
+  return {
+    name: 'woc-landing-game-modules',
+    apply: 'build' as const,
+    configResolved(cfg: { base: string }) {
+      base = cfg.base || '/';
+    },
+    transformIndexHtml: {
+      order: 'post' as const,
+      handler(
+        html: string,
+        ctx: {
+          path: string;
+          bundle?: Record<string, { code?: string } & Record<string, unknown>>;
+          chunk?: { fileName: string };
+        },
+      ) {
+        if (!ctx.bundle || !/(^|\/)index\.html$/.test(ctx.path)) return html;
+        const modules = gameModuleEntries(ctx.bundle, ctx.chunk?.fileName, base);
+        if (modules.length === 0) {
+          throw new Error(
+            'index.html: found no src/main.ts chunk to list for the landing prefetch',
+          );
+        }
+        return injectGameModules(html, modules);
+      },
     },
   };
 }
@@ -1278,6 +1314,7 @@ export default defineConfig({
     staticPageAliasPlugin(),
     i18nModulepreloadPlugin(),
     bootSplashStylesheetsPlugin(),
+    landingGameModulesPlugin(),
     musicEditorSavePlugin(),
     studioDevGuardPlugin(),
     dungeonEditorSavePlugin(),
