@@ -7,6 +7,11 @@ slate pavilion roofs, a carved portal and gold trim frame the large steel door.
 Bursar Fernando and all bank storage remain at the Gilded Strongbox. The vault
 occupies most of the screen and closes bags; opening bags closes the vault.
 
+Groups also links to a read-only Weekly Vault preview, available anywhere in the
+world. It shows current progress and the possible-loot catalog without opening
+rewards, claiming items, or changing loot focus. Ready rewards direct the player
+to the Vault Keeper; every reward mutation still requires the living player nearby.
+
 ## Weekly choices
 
 Activities unlock candidate items, not additional item grants. At the Crucible's
@@ -117,6 +122,9 @@ The server saves the item and its actual source in the existing `tableId` field
 before revealing it. The multi-selection is transient, not stored. Retries retain
 both the original item and source. View possible loot groups collapsible tables
 under content categories and difficulty, with item icons, counts and tooltips.
+At the Vault Keeper it lists only tables unlocked by permanent boss-clear history. The
+read-only Dungeon Finder preview lists every class-eligible table instead, so
+players can plan runs before any boss dies; both apply the same level and loot-focus filters.
 
 Older records can prove final-boss kills from lifetime dungeon deeds and legacy
 raid unlocks; they cannot prove intermediate kills. Legacy weeks without a boss

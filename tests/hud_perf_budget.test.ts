@@ -1328,7 +1328,10 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   { file: 'hud/cosmetics/cosmetics_window.ts', reflowAllow: {}, driverAllow: {} },
   // Cold rebuild only, after the unchanged-signature return: preserve the rail
   // and detail scroll positions plus the unified Groups body across structural updates.
-  { file: 'dungeon_finder_window.ts', reflowAllow: { '.scrollTop': 6 }, driverAllow: {} },
+  // The remote Vault adds one scroll read/restore pair when a changed signature
+  // rebuilds its nested panel. Unchanged frames return before these accesses;
+  // the countdown updates in place without reading scroll position.
+  { file: 'dungeon_finder_window.ts', reflowAllow: { '.scrollTop': 8 }, driverAllow: {} },
   // The lockpick clock: a 100ms tick that repaints the remaining-time bar for the duration
   // of one attempt, generation-guarded and cleared on stop. The fastest module-owned driver
   // in the bucket, and the reason setInterval is counted rather than banned.

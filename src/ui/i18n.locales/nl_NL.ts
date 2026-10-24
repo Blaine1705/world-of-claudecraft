@@ -1256,6 +1256,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.rare': 'Zeldzaam',
   'hudChrome.weeklyRewards.readyDescription':
     'Een voltooide week beloningen wacht. Open je verdiende kluizen.',
+  'hudChrome.weeklyRewards.previewClaimNotice':
+    'Er liggen beloningen klaar. Bezoek de Kluisbewaarder in Eastbrook om ze te openen en op te halen.',
   'hudChrome.weeklyRewards.readyTitle': 'Je weeklijkse beloningen zijn klaar',
   'hudChrome.weeklyRewards.readyWeeks':
     'Niet-opgeëiste weken: {count}. Claim eerst de oudste voltooide week.',

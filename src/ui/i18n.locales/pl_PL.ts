@@ -1254,6 +1254,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.rare': 'Rzadki',
   'hudChrome.weeklyRewards.readyDescription':
     'Czeka ukończony tydzień nagród. Otwórz zarobione skarbo, a następnie wybierz jeden przedmiot do odebrania.',
+  'hudChrome.weeklyRewards.previewClaimNotice':
+    'Czekają na ciebie nagrody. Odwiedź Strażnika Skarbca w Eastbrook, aby je otworzyć i odebrać.',
   'hudChrome.weeklyRewards.readyTitle': 'Twoje tygodniowe nagrody są gotowe',
   'hudChrome.weeklyRewards.readyWeeks':
     'Nieodebrane tygodnie: {count}. Najpierw odebrz najstarszy ukończony tydzień.',

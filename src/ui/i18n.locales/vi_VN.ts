@@ -1236,6 +1236,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.rare': 'Hiếm',
   'hudChrome.weeklyRewards.readyDescription':
     'Một tuần hoàn thành phần thưởng đang chờ. Mở những kho đã kiếm được, rồi chọn một vật phẩm để nhận.',
+  'hudChrome.weeklyRewards.previewClaimNotice':
+    'Phần thưởng đang chờ. Hãy đến gặp Người Giữ Kho Báu tại Eastbrook để mở và nhận.',
   'hudChrome.weeklyRewards.readyTitle': 'Phần thưởng hàng tuần của bạn đã sẵn sàng',
   'hudChrome.weeklyRewards.readyWeeks':
     'Những tuần chưa nhận: {count}. Nhận tuần hoàn thành cũ nhất trước.',

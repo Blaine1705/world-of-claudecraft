@@ -648,6 +648,26 @@ describe('weekly vault choices', () => {
     expect(sim.tick().some((event) => event.type === 'weekly_rewards')).toBe(true);
     expect(weeklyRewardInfoFor(sim.ctx, pid)).not.toBeNull();
   });
+  it('allows remote progress previews while keeping reward actions at the Keeper', () => {
+    const { sim, pid, player, meta } = make();
+    const state = emptyWeeklyRewards(WEEK);
+    state.world = 2;
+    state.vaults = [{ resetAtMs: 500, choices: [{ pool: 'world' }] }];
+    meta.weeklyRewards = state;
+    expect(weeklyRewardInfoFor(sim.ctx, pid)?.canClaim).toBe(true);
+    player.pos.x -= 100;
+    const info = weeklyRewardInfoFor(sim.ctx, pid);
+    expect(info?.canClaim).toBe(false);
+    expect(info?.state.world).toBe(2);
+    expect(info?.readyWeeks).toBe(1);
+    const before = JSON.stringify(state);
+    expect(prepareWeeklyRewardOpen(sim.ctx, '500:0', pid)).toBeNull();
+    sim.setWeeklyLootSpec('fire', pid);
+    sim.claimWeeklyReward('500:0', pid);
+    expect(JSON.stringify(state)).toBe(before);
+    player.dead = true;
+    expect(weeklyRewardInfoFor(sim.ctx, pid)?.canClaim).toBe(false);
+  });
   it('Talk opens the keeper menu only while alive and nearby', () => {
     const { sim, pid, player } = make();
     sim.talkToNpc(WEEKLY_KEEPER_ENTITY_ID, pid);

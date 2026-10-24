@@ -1241,6 +1241,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.rare': 'Sjælden',
   'hudChrome.weeklyRewards.readyDescription':
     'En gennemført uge med belønninger venter. Åbn dine opnåede hvælvinger, derefter vælg ét element for at gøre krav.',
+  'hudChrome.weeklyRewards.previewClaimNotice':
+    'Belønninger venter. Besøg Skattekammerkeperen i Eastbrook for at åbne og hente dem.',
   'hudChrome.weeklyRewards.readyTitle': 'Dine ugentlige belønninger er klar',
   'hudChrome.weeklyRewards.readyWeeks':
     'Uafkrævede uger: {count}. Gør krav på den ældste gennemførte uge først.',

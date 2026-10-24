@@ -1235,6 +1235,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.rare': 'Nadir',
   'hudChrome.weeklyRewards.readyDescription':
     'Tamamlanan bir haftalık ödüller bekliyor. Kazanılan kasalarınızı açın, sonra almak için bir öğe seçin.',
+  'hudChrome.weeklyRewards.previewClaimNotice':
+    'Ödüller seni bekliyor. Açıp almak için Eastbrook’taki Hazine Sakçısını ziyaret et.',
   'hudChrome.weeklyRewards.readyTitle': 'Haftalık ödülleriniz hazır',
   'hudChrome.weeklyRewards.readyWeeks':
     'Talep edilmemiş haftalar: {count}. İlk tamamlanan haftayı talep et.',

@@ -1804,6 +1804,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.noTables': '在此难度下已记录的首领击杀中，没有符合条件的装备。',
   'hudChrome.weeklyRewards.tablesExhausted': '所有符合条件的物品均已抽取。请选择一件已揭晓的奖励。',
   'hudChrome.weeklyRewards.worldPoolRule': '普通难度 Nythraxis 装备。无需通关团队副本。',
+  'hudChrome.weeklyRewards.previewPoolRule':
+    '这些宝库可抽取的全部战利品表。击败首领会永久解锁其战利品，供今后的宝库抽取。地下城战利品表仅包含你击败的首领，英雄难度击杀同时解锁普通难度。抽取时排除已抽取过的物品。所需等级比你的等级高出超过 {maxLevelOffset} 级的装备不予显示。',
   'hudChrome.weeklyRewards.selectionPoolRule':
     '团队副本和地下城奖励需在开启前选择一个或多个战利品表。地下城战利品表汇总了你在此难度下击败的首领的战利品。抽取时排除重复物品、传说物品，以及所需等级比你的等级高出超过 {maxLevelOffset} 级的装备。',
   'questUi.worldQuest.puzzleRetry': '重试',
@@ -20184,6 +20186,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.requiredTask.pvpMany': '赢得{count}场评级比赛',
   'hudChrome.weeklyRewards.readyWeeks': '未领取的周次：{count}。请先领取最早完成的那一周。',
   'hudChrome.weeklyRewards.claimLastWeek': '领取上周的奖励',
+  'hudChrome.weeklyRewards.previewClaimNotice':
+    '奖励已就绪。请前往东溪的宝库管理员处开启宝库并领取奖励。',
   'hudChrome.weeklyRewards.readyTitle': '你的每周奖励已就绪',
   'hudChrome.weeklyRewards.readyDescription':
     '有一周已完成的奖励正在等待。打开你获得的宝库，然后选择一件物品领取。',

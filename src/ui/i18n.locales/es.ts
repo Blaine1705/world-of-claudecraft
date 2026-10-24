@@ -1132,6 +1132,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.rare': 'Raro',
   'hudChrome.weeklyRewards.readyDescription':
     'Te espera una semana completa de recompensas. Abre tus bóvedas ganadas y luego elige un objeto para reclamar.',
+  'hudChrome.weeklyRewards.previewClaimNotice':
+    'Tienes recompensas pendientes. Visita al Guardián de la Bóveda en Eastbrook para abrirlas y recogerlas.',
   'hudChrome.weeklyRewards.readyTitle': 'Tus recompensas semanales están listas',
   'hudChrome.weeklyRewards.readyWeeks':
     'Semanas sin reclamar: {count}. Reclama primero la semana completada más antigua.',
