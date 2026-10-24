@@ -195,6 +195,7 @@ const ACTIVITY_SOURCE_KEYS: Readonly<Record<string, TranslationKey>> = {
   buried_hoard: 'hudChrome.reliquary.sourceActivityBuriedHoard',
   referral_cards: 'referralCards.title',
   lantern_hall_quartermaster: 'hudChrome.reliquary.sourceActivityLanternHall',
+  weekly_vault_pvp: 'hudChrome.reliquary.sourceActivityWeeklyVaultPvp',
 };
 
 /** Label key for a page's display-only SECONDARY clear meter, by the

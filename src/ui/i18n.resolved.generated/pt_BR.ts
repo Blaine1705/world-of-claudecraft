@@ -7430,6 +7430,7 @@ export const pt_BR: EnTranslations = {
       "sourceActivityRiftFirstClear": "Concedida a todos os membros do grupo que vence a primeira conquista de uma Fenda classificada",
       "sourceActivityBuriedHoard": "Encontrado no cofre de recompensa de um Tesouro Enterrado, o cofre para o qual um mapa do tesouro leva",
       "sourceActivityLanternHall": "Comprado com selos da lanterna do intendente do Salão da Lanterna",
+      "sourceActivityWeeklyVaultPvp": "Chosen from the PvP row of the Weekly Vault",
       "cellMissingSourceAria": "{name}, ainda não encontrada, {source}",
       "cellOwnedClearsAria": "{name}, catalogada, encontrada pela primeira vez na conquista {count}",
       "searchPlaceholder": "Pesquisar relíquias",
