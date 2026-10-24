@@ -442,6 +442,7 @@ describe('the density model covers the shipped world', () => {
       'tideglass_reflection_warlock',
       'tideglass_reflection_warrior',
       'vael_fog_shade',
+      'wildheart_hunting_spear',
       'yumi_cat',
     ]);
     // Two are camp-spawned: the sac is placed by delve room logic, the cat is a
