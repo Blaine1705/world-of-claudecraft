@@ -28,6 +28,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_stalkglider_snail",
     "hudChrome.mounts.desc_valorsteed",
     "hudChrome.mounts.useToRide",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.vendor.advancedRiding",
     "itemUi.vendor.basicRiding",
     "itemUi.vendor.ridingSpeed"
@@ -51,6 +52,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_stalkglider_snail",
     "hudChrome.mounts.desc_valorsteed",
     "hudChrome.mounts.useToRide",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.vendor.advancedRiding",
     "itemUi.vendor.basicRiding",
     "itemUi.vendor.ridingSpeed"
@@ -74,6 +76,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_stalkglider_snail",
     "hudChrome.mounts.desc_valorsteed",
     "hudChrome.mounts.useToRide",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.vendor.advancedRiding",
     "itemUi.vendor.basicRiding",
     "itemUi.vendor.ridingSpeed"
@@ -97,6 +100,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_stalkglider_snail",
     "hudChrome.mounts.desc_valorsteed",
     "hudChrome.mounts.useToRide",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.vendor.advancedRiding",
     "itemUi.vendor.basicRiding",
     "itemUi.vendor.ridingSpeed"
@@ -121,6 +125,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_stalkglider_snail",
     "hudChrome.mounts.desc_valorsteed",
     "hudChrome.mounts.useToRide",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.vendor.advancedRiding",
     "itemUi.vendor.basicRiding",
     "itemUi.vendor.ridingSpeed"
@@ -144,6 +149,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_stalkglider_snail",
     "hudChrome.mounts.desc_valorsteed",
     "hudChrome.mounts.useToRide",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.vendor.advancedRiding",
     "itemUi.vendor.basicRiding",
     "itemUi.vendor.ridingSpeed"
@@ -171,6 +177,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_stalkglider_snail",
     "hudChrome.mounts.desc_valorsteed",
     "hudChrome.mounts.useToRide",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.vendor.advancedRiding",
     "itemUi.vendor.basicRiding",
     "itemUi.vendor.ridingSpeed"
@@ -195,6 +202,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_stalkglider_snail",
     "hudChrome.mounts.desc_valorsteed",
     "hudChrome.mounts.useToRide",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.vendor.advancedRiding",
     "itemUi.vendor.basicRiding",
     "itemUi.vendor.ridingSpeed"
@@ -218,6 +226,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_stalkglider_snail",
     "hudChrome.mounts.desc_valorsteed",
     "hudChrome.mounts.useToRide",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.vendor.advancedRiding",
     "itemUi.vendor.basicRiding",
     "itemUi.vendor.ridingSpeed"
@@ -241,6 +250,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_stalkglider_snail",
     "hudChrome.mounts.desc_valorsteed",
     "hudChrome.mounts.useToRide",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.vendor.advancedRiding",
     "itemUi.vendor.basicRiding",
     "itemUi.vendor.ridingSpeed"
@@ -264,6 +274,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_stalkglider_snail",
     "hudChrome.mounts.desc_valorsteed",
     "hudChrome.mounts.useToRide",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.vendor.advancedRiding",
     "itemUi.vendor.basicRiding",
     "itemUi.vendor.ridingSpeed"
@@ -287,6 +298,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_stalkglider_snail",
     "hudChrome.mounts.desc_valorsteed",
     "hudChrome.mounts.useToRide",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.vendor.advancedRiding",
     "itemUi.vendor.basicRiding",
     "itemUi.vendor.ridingSpeed"
@@ -310,6 +322,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_stalkglider_snail",
     "hudChrome.mounts.desc_valorsteed",
     "hudChrome.mounts.useToRide",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.vendor.advancedRiding",
     "itemUi.vendor.basicRiding",
     "itemUi.vendor.ridingSpeed"
@@ -333,6 +346,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_stalkglider_snail",
     "hudChrome.mounts.desc_valorsteed",
     "hudChrome.mounts.useToRide",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.vendor.advancedRiding",
     "itemUi.vendor.basicRiding",
     "itemUi.vendor.ridingSpeed"
@@ -356,6 +370,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.desc_stalkglider_snail",
     "hudChrome.mounts.desc_valorsteed",
     "hudChrome.mounts.useToRide",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp",
     "itemUi.vendor.advancedRiding",
     "itemUi.vendor.basicRiding",
     "itemUi.vendor.ridingSpeed"

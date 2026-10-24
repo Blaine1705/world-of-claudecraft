@@ -17494,6 +17494,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.reliquary.sourceActivityLanternHall'
   | 'hudChrome.reliquary.sourceActivityMasterworkCraft'
   | 'hudChrome.reliquary.sourceActivityRiftFirstClear'
+  | 'hudChrome.reliquary.sourceActivityWeeklyVaultPvp'
   | 'hudChrome.reliquary.sourceBoss'
   | 'hudChrome.reliquary.sourceBossDungeon'
   | 'hudChrome.reliquary.sourceBossZone'

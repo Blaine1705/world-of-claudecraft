@@ -7431,6 +7431,7 @@ export const id_ID: EnTranslations = {
       "sourceActivityRiftFirstClear": "Diberikan kepada setiap anggota kelompok yang meraih penyelesaian pertama sebuah Rift berperingkat",
       "sourceActivityBuriedHoard": "Ditemukan dalam peti hadiah Harta Karun Terpendam, pencarian sulit dari struktur angin topan bawah tanah di Drifthaven.",
       "sourceActivityLanternHall": "Dibeli dengan Segel Lentera dari pengurus perbekalan Balai Lentera",
+      "sourceActivityWeeklyVaultPvp": "Chosen from the PvP row of the Weekly Vault",
       "cellMissingSourceAria": "{name}, belum ditemukan, {source}",
       "cellOwnedClearsAria": "{name}, terkatalog, pertama ditemukan pada penyelesaian ke-{count}",
       "searchPlaceholder": "Cari relik",

@@ -7431,6 +7431,7 @@ export const da_DK: EnTranslations = {
       "sourceActivityRiftFirstClear": "Tildeles hvert medlem af den gruppe, der vinder den første gennemførsel af en rangeret Rift",
       "sourceActivityBuriedHoard": "Fundet i belønningskisten i et Begravet skattkammer, hvælven som et skattekort fører til",
       "sourceActivityLanternHall": "Købt for lygtesegl hos Lygtehallens kvartermester",
+      "sourceActivityWeeklyVaultPvp": "Chosen from the PvP row of the Weekly Vault",
       "cellMissingSourceAria": "{name}, endnu ikke fundet, {source}",
       "cellOwnedClearsAria": "{name}, katalogiseret, først fundet ved gennemførsel {count}",
       "searchPlaceholder": "Søg efter relikvier",
