@@ -20,6 +20,7 @@ import {
   delveModuleStackEndRelZ,
   delveOrigin,
   delveSlotAt,
+  dungeonAt,
   getActiveWorldContent,
   INSTANCE_SLOT_COUNT,
   instanceOrigin,
@@ -214,11 +215,13 @@ import {
 import { logAssetMissOnce } from './characters/asset_miss_log';
 import {
   characterResidencySources,
+  dungeonCharacterBodiesResident,
   isWeaponSkinModelUrl,
   mechAssetsReady,
   onCharacterAssetReady,
   preloadMechAssets,
   preloadTrainingDummyAssets,
+  prepareDungeonCharacterBodies,
   trainingDummyAssetsReady,
 } from './characters/assets';
 import {
@@ -3614,11 +3617,15 @@ export class Renderer {
   }
 
   isZonePreparedAt(x: number, z: number): boolean {
+    const dungeon = dungeonAt(x);
+    if (dungeon) return dungeonCharacterBodiesResident(dungeon.interior);
     const id = this.zoneIdAt(x, z);
     return id === null || this.preparedZones.has(id);
   }
 
   isZoneReadyAt(x: number, z: number): boolean {
+    const dungeon = dungeonAt(x);
+    if (dungeon) return dungeonCharacterBodiesResident(dungeon.interior);
     const id = this.zoneIdAt(x, z);
     if (id === null) return true;
     // Sky residency is part of arrival readiness: a false routes the arrival
@@ -3730,6 +3737,10 @@ export class Renderer {
     opts?: { pace?: 'fast' | 'idle' },
   ): Promise<void> {
     if (this.shutdownStarted) return Promise.resolve();
+    const dungeon = dungeonAt(x);
+    if (dungeon) {
+      return prepareDungeonCharacterBodies(dungeon.interior).then(() => onProgress?.(1, 1));
+    }
     const zoneId = this.zoneIdAt(x, z);
     if (zoneId === null || this.preparedZones.has(zoneId)) {
       // The zone build stays skipped, but its SKY may have been released while
@@ -3793,6 +3804,8 @@ export class Renderer {
       // sky behind an opaque loading screen, and its bar stays monotonic.
       if (!idlePace) await skyLane;
       onProgress?.(5, 100);
+      // Features consume the kit and must wait before attaching any model.
+      if (kitLoad) await kitLoad;
       this.lastAttachedFeatureGroups = [];
       this.ensureZoneFeatures(zone);
       const featureGroups = this.lastAttachedFeatureGroups.slice();
@@ -3808,9 +3821,6 @@ export class Renderer {
       freezeStaticMatrices(this.terrainView.group);
       const terrainDone = performance.now();
       onProgress?.(89, 100);
-      // The kit the iOS profile loads on approach: no feature builds before it settles.
-      // Awaited ahead of the water, so a failed load never strands a hidden idle sheet.
-      if (kitLoad) await kitLoad;
       const waterMeshes = await this.waterView.ensureZone(zone, { pace: opts?.pace });
       for (const mesh of waterMeshes) freezeStaticMatrices(mesh);
       const waterDone = performance.now();
@@ -4066,7 +4076,7 @@ export class Renderer {
     // The ACTIVE zone list, not the shipped one: an authored map's background
     // streaming must walk its own rects (the static list's ids never match).
     this.visibleZonePrepareQueue = zonesWithinStreamingHorizon(
-      this.sim.cfg.world?.zones ?? ZONES,
+      zones,
       cameraX,
       cameraZ,
       horizon,
@@ -8786,7 +8796,8 @@ export class Renderer {
 
   private readonly staticInteriors = new StaticInteriorTracker(
     this.builtInteriors,
-    (interior, x, z) => {
+    async (interior, x, z) => {
+      await prepareDungeonCharacterBodies(interior);
       encounterPrewarm.startInteriorEncounterPrewarm(interior, this);
       const layout = this.editor.dungeonLayoutOverrides.get(interior);
       return this.ensureDungeons().buildInterior(interior, x, z, layout ? { layout } : undefined);

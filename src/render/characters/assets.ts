@@ -104,6 +104,7 @@ import {
 } from './paladin_templars_verdict_clip';
 import {
   characterStreamPlan,
+  dungeonCharacterBodyUrls,
   RiftBodyLanes,
   RiftBodyStreamTrigger,
   type RiftBodyStreamWorld,
@@ -881,6 +882,18 @@ function characterAssetResident(url: string): boolean {
 export function ensureCharacterUrl(url: string | null | undefined): void {
   if (!url || characterAssetResident(url)) return;
   void prepareCharacterUrl(url).catch(() => undefined);
+}
+
+/** iOS defers dungeon-only bodies until arrival; every file must settle before reveal. */
+export function dungeonCharacterBodiesResident(interior: string): boolean {
+  return !GFX.iosMemoryProfile || dungeonCharacterBodyUrls(interior).every(characterAssetResident);
+}
+
+export async function prepareDungeonCharacterBodies(interior: string): Promise<void> {
+  if (!GFX.iosMemoryProfile) return;
+  await Promise.all(
+    dungeonCharacterBodyUrls(interior).map((url) => prepareCharacterUrl(assetUrl(url))),
+  );
 }
 
 /** Whether every file a visual key builds from (its body GLB and animation

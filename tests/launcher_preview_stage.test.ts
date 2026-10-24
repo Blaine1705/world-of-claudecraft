@@ -86,7 +86,7 @@ describe('the launcher wiring (src/main.ts)', () => {
 
   it('builds the stage at once, never behind the character boot set', () => {
     // the start-screen wiring, from its head to the next top-level function
-    const start = main.indexOf('function wireStartScreens(): void {');
+    const start = main.indexOf('function wireStartScreens(): Promise<void> {');
     expect(start).toBeGreaterThan(-1);
     const end = main.indexOf('\nfunction ', start + 1);
     const wiring = main.slice(start, end > start ? end : undefined);

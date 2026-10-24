@@ -42,6 +42,7 @@ import {
   spiritVeilLedgerSize,
 } from '../src/render/characters/ghost_veil';
 import { CharacterVisual, type FarBakeGate } from '../src/render/characters/visual';
+import { WocAtlasSwap } from '../src/render/characters/woc_atlas_swap';
 import { disposeRendererContextGeneration } from '../src/render/context_generation';
 import { ContextRestoreHost, type ContextRestoreSurface } from '../src/render/context_restore';
 import {
@@ -403,8 +404,11 @@ const RESET_FIXTURES: Record<ContextRestoreResetId, Fixture> = {
       farWrap: THREE.Group | null;
       farBakeGate: FarBakeGate | null;
       farCompilePending: boolean;
+      wocAtlas: WocAtlasSwap;
     };
     probe.disposed = false;
+    probe.wocAtlas = new WocAtlasSwap();
+    const restartAtlas = vi.spyOn(probe.wocAtlas, 'restart');
     probe.linkedEffectMaterials = new WeakSet([material]);
     probe.farWrap = new THREE.Group();
     probe.farBakeGate = gate as unknown as FarBakeGate;
@@ -413,6 +417,7 @@ const RESET_FIXTURES: Record<ContextRestoreResetId, Fixture> = {
     registerContextRestoreReset('character-visual', visual, (owner) => owner.forgetContext());
     resetFor('character-visual');
     expect(probe.linkedEffectMaterials.has(material)).toBe(false);
+    expect(restartAtlas).toHaveBeenCalledOnce();
     // The baked far mesh goes back behind the gate, the rig standing in.
     expect(probe.farCompilePending).toBe(true);
     expect(gate).toHaveBeenCalledWith(probe.farWrap, expect.any(Function));

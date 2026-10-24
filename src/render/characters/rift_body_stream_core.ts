@@ -27,16 +27,25 @@
 // Pure (RENDER_PURE_CORES): no three.js, no DOM, no clock; tests import it
 // directly.
 
+import { BUDDY_MOBS } from '../../sim/content/buddy_mobs';
+import { DROWNED_TEMPLE_MOBS } from '../../sim/content/drowned_temple';
+import { DUNGEON_MOBS } from '../../sim/content/dungeons';
+import { GRAVEWYRM_SANCTUM_MOBS } from '../../sim/content/gravewyrm_sanctum';
+import { HOLLOW_CRYPT_MOBS } from '../../sim/content/hollow_crypt';
+import { HOLLOW_CRYPT_TRASH_MOBS } from '../../sim/content/hollow_crypt_trash';
 import { HOARD_MOBS, RIFT_MOBS } from '../../sim/content/rift/mobs';
+import { SUNKEN_BASTION_MOBS } from '../../sim/content/sunken_bastion';
+import { TEMPLE_DUNGEON_MOBS } from '../../sim/content/temple';
 import { HOARD_MIN_LEVEL } from '../../sim/content/treasure_maps';
-import { isRiftPos, MOBS } from '../../sim/data';
+import { WILDHEART_MOBS } from '../../sim/content/wildheart';
+import { DUNGEON_LIST, isRiftPos, MOBS } from '../../sim/data';
 import { RIFT_MIN_LEVEL } from '../../sim/rift/portals';
 import {
   HOARD_ENTRANCE_TEMPLATE_ID,
   isRiftEntranceTemplate,
   vaultSeedTier,
 } from '../../sim/rift/vault_seed';
-import { PLAYER_INTEREST_RADIUS } from '../../sim/types';
+import { type MobTemplate, PLAYER_INTEREST_RADIUS } from '../../sim/types';
 import {
   fallbackVisualKeys,
   mobKeyTemplateIds,
@@ -63,6 +72,69 @@ export function riftTemplateIds(): ReadonlySet<string> {
 
 function defUrls(def: VisualDef): string[] {
   return [def.url, ...(def.animUrls ?? []), ...(def.attach ?? []).map((a) => a.url)];
+}
+
+const INTERIOR_MOBS: Readonly<Record<string, Readonly<Record<string, MobTemplate>>>> = {
+  hollow_crypt: { ...HOLLOW_CRYPT_MOBS, ...HOLLOW_CRYPT_TRASH_MOBS },
+  sunken_bastion: SUNKEN_BASTION_MOBS,
+  gravewyrm_sanctum: GRAVEWYRM_SANCTUM_MOBS,
+  drowned_temple: { ...TEMPLE_DUNGEON_MOBS, ...DROWNED_TEMPLE_MOBS },
+  wildheart: WILDHEART_MOBS,
+};
+
+/** Only content-exclusive bodies may leave the automatic overworld stream. */
+function exclusiveBodyUrls(ids: ReadonlySet<string>): Set<string> {
+  const keys = new Set([...ids].map(mobVisualKeyFor));
+  for (const id of new Set([...Object.keys(MOBS), ...mobKeyTemplateIds()]))
+    if (!ids.has(id)) keys.delete(mobVisualKeyFor(id));
+  for (const key of fallbackVisualKeys()) keys.delete(key);
+  const urls = new Set<string>();
+  const shared = new Set<string>();
+  for (const [key, def] of Object.entries(VISUALS))
+    for (const url of defUrls(def)) (keys.has(key) ? urls : shared).add(url);
+  return new Set([...urls].filter((url) => isStreamedBodyUrl(url) && !shared.has(url)));
+}
+
+let demandBodies: ReadonlySet<string> | null = null;
+export function dungeonAndBuddyBodyUrls(): ReadonlySet<string> {
+  if (!demandBodies) {
+    const dungeonIds = new Set([
+      ...Object.keys(DUNGEON_MOBS),
+      ...Object.values(INTERIOR_MOBS).flatMap(Object.keys),
+    ]);
+    const destinations = new Set(
+      DUNGEON_LIST.flatMap((dungeon) => dungeonCharacterBodyUrls(dungeon.interior)),
+    );
+    demandBodies = new Set([
+      // Imperatively spawned actors absent from the arrival inventory stay in core.
+      ...[...exclusiveBodyUrls(dungeonIds)].filter((url) => destinations.has(url)),
+      ...exclusiveBodyUrls(new Set(Object.keys(BUDDY_MOBS))),
+    ]);
+  }
+  return demandBodies;
+}
+
+/** The destination's static actors and encounter summons, loaded behind arrival cover. */
+const dungeonUrlsByInterior = new Map<string, readonly string[]>();
+export function dungeonCharacterBodyUrls(interior: string): readonly string[] {
+  const cached = dungeonUrlsByInterior.get(interior);
+  if (cached) return cached;
+  const ids = new Set(Object.keys(INTERIOR_MOBS[interior] ?? {}));
+  for (const dungeon of DUNGEON_LIST)
+    if (dungeon.interior === interior) for (const spawn of dungeon.spawns) ids.add(spawn.mobId);
+  const visitSummons = (value: unknown): void => {
+    if (!value || typeof value !== 'object') return;
+    for (const [key, child] of Object.entries(value)) {
+      if ((key === 'summon' || key === 'mobId') && typeof child === 'string' && MOBS[child])
+        ids.add(child);
+      else if (typeof child === 'object') visitSummons(child);
+    }
+  };
+  // Set iteration visits newly discovered summons too, with no recursive mob cycles.
+  for (const id of ids) visitSummons(MOBS[id]);
+  const urls = [...new Set([...ids].flatMap((id) => defUrls(VISUALS[mobVisualKeyFor(id)])))];
+  dungeonUrlsByInterior.set(interior, urls);
+  return urls;
 }
 
 let riftKeysMemo: ReadonlySet<string> | null = null;
@@ -116,6 +188,8 @@ export interface CharacterStreamPlan {
   streamed: string[];
   /** Streamed bodies fetched right after the first painted world frame. */
   postEntry: string[];
+  /** Dungeon-only actors await that interior; cosmetic buddies load when seen. */
+  onDemand: string[];
   /** Streamed bodies some Rift template draws (natural Rifts and Buried Hoards). */
   rift: string[];
   /** Streamed bodies only Buried Hoard templates draw. */
@@ -126,7 +200,7 @@ export interface CharacterStreamPlan {
  * Split the character preload set. `onDemandUrls` (the weapon-skin cosmetics)
  * leave the gate on every host and load on demand only. The iOS memory profile
  * also carves out every streamed body folder: the Rift-only bodies into their
- * lane, the rest into the post-entry stream. Any other profile gates every
+ * lane, dungeon-only actors and buddies onto demand, the rest into the post-entry stream. Any other profile gates every
  * body, so every lane is empty there.
  */
 export function characterStreamPlan(
@@ -135,13 +209,21 @@ export function characterStreamPlan(
   iosMemoryProfile: boolean,
 ): CharacterStreamPlan {
   const lanes = riftOnlyBodyLanes();
-  const plan: CharacterStreamPlan = { streamed: [], postEntry: [], rift: [], hoard: [] };
+  const plan: CharacterStreamPlan = {
+    streamed: [],
+    postEntry: [],
+    onDemand: [],
+    rift: [],
+    hoard: [],
+  };
   for (const url of preloadUrls) {
     const body = iosMemoryProfile && isStreamedBodyUrl(url);
     if (!body && !onDemandUrls.has(url)) continue;
     plan.streamed.push(url);
     if (!body) continue;
-    plan[lanes.get(url) ?? 'postEntry'].push(url);
+    plan[lanes.get(url) ?? (dungeonAndBuddyBodyUrls().has(url) ? 'onDemand' : 'postEntry')].push(
+      url,
+    );
   }
   return plan;
 }

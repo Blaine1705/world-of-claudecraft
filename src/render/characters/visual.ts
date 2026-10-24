@@ -3410,6 +3410,7 @@ export class CharacterVisual {
   forgetContext(): void {
     if (this.disposed) return;
     this.linkedEffectMaterials = new WeakSet();
+    this.wocAtlas.restart();
     if (this.farWrap && this.farBakeGate && !this.farCompilePending) this.gateFarMint();
   }
 

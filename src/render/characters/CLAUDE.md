@@ -38,11 +38,15 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   (`tests/preview_direct_build_assets.test.ts`).
   Which GLBs leave that gate is
   `rift_body_stream_core.ts` `characterStreamPlan`: on the iOS memory profile
-  every creature body streams, the overworld ones right after first paint and
+  every creature body streams, the shared overworld ones right after first paint and
   the Rift-only ones (derived from the Rift and Buried Hoard templates, never a
   file name) in two paced lanes (`RiftBodyLanes`: the Rift lane a natural Rift
   needs, the hoard lane only a Buried Hoard needs) that `RiftBodyStreamTrigger`
   opens on a read treasure map, a reachable entrance, or the player inside;
+  dungeon-only actors wait for `prepareDungeonCharacterBodies`, awaited by
+  `prepareZoneAt` under the arrival cover and before static interior construction.
+  Its content-derived inventory includes encounter summons. Cosmetic buddies
+  load on demand through the existing visual build/retry path;
   every other profile gates them all. The client loop polls it through
   `pollRiftCharacterStream`. `tests/ios_rift_body_stream.test.ts` pins the class,
   the lanes, the pacing, and the on-disk budget of the iOS post-entry creature

@@ -394,7 +394,7 @@ describe('live WOC combat event linkage', () => {
     expect(h.peek.current?.getClip().name).toBe('Woc_Attack_1H_Stab');
   }, 30000);
 
-  it('preserves explicit Hunter ranged hits and keeps channel pulses from replacing the held volley', async () => {
+  it('preserves explicit Hunter ranged hits without restarting on ground-zone or channel pulses', async () => {
     const h = await harness();
     for (const [name, id] of [
       ['Splitshot', 'multi_shot'],
@@ -406,6 +406,7 @@ describe('live WOC combat event linkage', () => {
     }
     const before = h.attackCount();
     h.event(damage('Volley'));
+    expect(h.attackCount()).toBe(before);
     h.event(damage('Fevered Draw', 'rapid_fire'));
     expect(h.attackCount()).toBe(before);
   }, 30000);

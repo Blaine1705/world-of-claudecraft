@@ -466,13 +466,23 @@ describe('main.ts wiring', () => {
   });
 
   it('lifts the splash without the landing probes when the boot skips the start screen', () => {
-    const lift = String.raw`void liftBootSplashWhenReady\(\{ landing: false, fadeMs: loadingCurtainFadeDelayMs\(\) \}\);\s*void startOffline\(`;
+    const lift = String.raw`void liftBootSplashWhenReady\(\{ landing: false, fadeMs: loadingCurtainFadeDelayMs\(\) \}\);`;
     expect(main).toMatch(
       new RegExp(String.raw`if \(editorPlaytest\) \{\s*startSitePresence\('home'\);\s*${lift}`),
     );
+    const playtest = main.slice(
+      main.indexOf('if (editorPlaytest) {'),
+      main.indexOf('} else if (studioEntry)'),
+    );
+    expect(playtest.indexOf('void liftBootSplashWhenReady(')).toBeLessThan(
+      playtest.indexOf('void editorPlaytest.then('),
+    );
+    expect(playtest).toContain(
+      'startOffline(req.playerClass, req.playerName, 0, req.content, req.seed)',
+    );
     expect(main).toMatch(
       new RegExp(
-        String.raw`else if \(diagnosticsAutoOffline\) \{\s*startSitePresence\('home'\);\s*${lift}`,
+        String.raw`else if \(diagnosticsAutoOffline\) \{\s*startSitePresence\('home'\);\s*${lift}\s*void startOffline\(`,
       ),
     );
   });

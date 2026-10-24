@@ -559,6 +559,8 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     zoneId: 'willowfen',
     minLevel: 19,
     area: { x: -370, z: 355, radius: 108 },
+    // Clear of Bridgemere's painted building footprint.
+    championAt: { x: -362, z: 372 },
     objective: { type: 'gather', nodeType: 'ore' },
     count: 3,
   },

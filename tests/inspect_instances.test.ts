@@ -264,7 +264,7 @@ describe('inspect_window painter instance threading (source pins)', () => {
     expect(painter).toMatch(
       /this\.deps\.attachTooltip\(row,\s*\(\) =>\s*this\.deps\.itemTooltip\(item, instance \?\? undefined, wearer\)/,
     );
-    expect(painter).toContain('this.buildSlotRow(cell, e)');
+    expect(painter).toContain('this.buildSlotRow(cell, wearer)');
     expect(hud).toMatch(
       /itemTooltip: \(item, instance, wearer\) =>\s*this\.itemTooltip\(item, false, instance, undefined, wearer\)/,
     );

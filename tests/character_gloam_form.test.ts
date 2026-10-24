@@ -94,6 +94,22 @@ function mounted(visual: Visual): THREE.Material[] {
   return out;
 }
 
+/** The veil deliberately hides the halo instead of creating a veil variant for it. */
+function veiledBody(visual: Visual): THREE.Material[] {
+  const meshes = (visual as unknown as { originalMaterials: Map<THREE.Mesh, unknown> })
+    .originalMaterials;
+  const materials: THREE.Material[] = [];
+  for (const mesh of meshes.keys()) {
+    if (mesh.name === 'class_halo') {
+      expect(mesh.visible).toBe(false);
+      continue;
+    }
+    materials.push(...(Array.isArray(mesh.material) ? mesh.material : [mesh.material]));
+  }
+  expect(materials.length).toBeGreaterThan(0);
+  return materials;
+}
+
 const inForm = (material: THREE.Material): boolean =>
   material.userData.wocCharacterEffect === 'shadowform';
 
@@ -219,7 +235,7 @@ describe('CharacterVisual in Gloamveil', () => {
     expect(mounted(visual)).toEqual(originals);
     held.settle();
     visual.update(1 / 60, idleState(), true, false);
-    for (const material of mounted(visual)) {
+    for (const material of veiledBody(visual)) {
       expect(spiritVeilPaletteOf(material)).toBe('spirit');
     }
     visual.dispose();
@@ -263,7 +279,7 @@ describe('CharacterVisual in Gloamveil', () => {
     const settled = mounted(visual);
     expect(settled.every((m) => inForm(m) && m.transparent)).toBe(true);
     visual.setGhost(true, 'stealth-rogue');
-    const ghost = mounted(visual);
+    const ghost = veiledBody(visual);
     for (const material of ghost) expect(spiritVeilPaletteOf(material)).toBe('stealth-rogue');
     // The form's own clones are kept for the way back, not minted again.
     visual.setGhost(false);

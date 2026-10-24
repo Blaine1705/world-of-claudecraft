@@ -309,6 +309,13 @@ describe('the composed-variant cache on each memory profile', () => {
     const manifest = await import('../src/render/characters/manifest');
     const modular = await import('../src/render/characters/modular');
     await assets.charactersReady();
+    // Legacy modular rigs are on demand now that players use WOC bodies.
+    // This cache fixture explicitly loads the legacy rig it exercises.
+    const legacy = manifest.VISUALS[modular.MODULAR_WARRIOR_KEY];
+    for (const url of [legacy.url, ...(legacy.animUrls ?? [])]) assets.ensureCharacterUrl(url);
+    await vi.waitFor(() =>
+      expect(assets.visualAssetsResident(modular.MODULAR_WARRIOR_KEY, false)).toBe(true),
+    );
     // Distinct PART SETS (the cache key), not merely distinct colours.
     const looks: ModularLook[] = [];
     const seen = new Set<string>();
