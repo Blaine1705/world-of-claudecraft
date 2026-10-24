@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.dungeonDifficulty.unappliedHeroic",
+    "hudChrome.dungeonDifficulty.unappliedNormal"
+  ],
+  "es_ES": [
+    "hudChrome.dungeonDifficulty.unappliedHeroic",
+    "hudChrome.dungeonDifficulty.unappliedNormal"
+  ],
+  "fr_FR": [
+    "hudChrome.dungeonDifficulty.unappliedHeroic",
+    "hudChrome.dungeonDifficulty.unappliedNormal"
+  ],
+  "fr_CA": [
+    "hudChrome.dungeonDifficulty.unappliedHeroic",
+    "hudChrome.dungeonDifficulty.unappliedNormal"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.dungeonDifficulty.unappliedHeroic",
+    "hudChrome.dungeonDifficulty.unappliedNormal"
+  ],
+  "de_DE": [
+    "hudChrome.dungeonDifficulty.unappliedHeroic",
+    "hudChrome.dungeonDifficulty.unappliedNormal"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.dungeonDifficulty.unappliedHeroic",
+    "hudChrome.dungeonDifficulty.unappliedNormal"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.dungeonDifficulty.unappliedHeroic",
+    "hudChrome.dungeonDifficulty.unappliedNormal"
+  ],
+  "nl_NL": [
+    "hudChrome.dungeonDifficulty.unappliedHeroic",
+    "hudChrome.dungeonDifficulty.unappliedNormal"
+  ],
+  "pl_PL": [
+    "hudChrome.dungeonDifficulty.unappliedHeroic",
+    "hudChrome.dungeonDifficulty.unappliedNormal"
+  ],
+  "id_ID": [
+    "hudChrome.dungeonDifficulty.unappliedHeroic",
+    "hudChrome.dungeonDifficulty.unappliedNormal"
+  ],
+  "tr_TR": [
+    "hudChrome.dungeonDifficulty.unappliedHeroic",
+    "hudChrome.dungeonDifficulty.unappliedNormal"
+  ],
+  "sv_SE": [
+    "hudChrome.dungeonDifficulty.unappliedHeroic",
+    "hudChrome.dungeonDifficulty.unappliedNormal"
+  ],
+  "vi_VN": [
+    "hudChrome.dungeonDifficulty.unappliedHeroic",
+    "hudChrome.dungeonDifficulty.unappliedNormal"
+  ],
+  "da_DK": [
+    "hudChrome.dungeonDifficulty.unappliedHeroic",
+    "hudChrome.dungeonDifficulty.unappliedNormal"
+  ]
 };

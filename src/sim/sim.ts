@@ -60,6 +60,7 @@ import type { FactionId } from './factions';
 import {
   type PendingDifficultyChange,
   setDungeonDifficulty as setDungeonDifficultyImpl,
+  unappliedDungeonDifficulty as unappliedDungeonDifficultyImpl,
 } from './instances/difficulty_selection';
 import type { ItemCopyAnchor } from './item_copy_anchor';
 import * as membershipMod from './membership';
@@ -10420,6 +10421,14 @@ export class Sim {
     const r = this.resolve(pid),
       claimId = r ? this.instanceClaimIdAt(r.e.pos) : null;
     return this.instances.find((instance) => instance.exitId === claimId)?.difficulty ?? null;
+  }
+
+  unappliedDungeonDifficulty(
+    pid?: number,
+    claims?: ReadonlyMap<string, readonly InstanceSlot[]>,
+  ): DungeonDifficulty | null {
+    const r = this.resolve(pid);
+    return r ? unappliedDungeonDifficultyImpl(this.ctx, r.meta.entityId, claims) : null;
   }
 
   setDungeonDifficulty(difficulty: DungeonDifficulty, pid?: number): void {

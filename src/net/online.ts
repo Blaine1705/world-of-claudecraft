@@ -1197,6 +1197,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   partyInfo: PartyInfo | null = null;
   private selectedDungeonDifficulty: DungeonDifficulty = 'normal';
   private activeInstanceDungeonDifficulty: DungeonDifficulty | null = null;
+  private unappliedInstanceDungeonDifficulty: DungeonDifficulty | null = null;
   // --- IWorldTrade: active trade-window state, mirrored from the snapshot self
   // (`s.trade`, delta-omitted). ---
   tradeInfo: TradeInfo | null = null;
@@ -3171,6 +3172,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
       if (s.adiff === 'normal' || s.adiff === 'heroic')
         this.activeInstanceDungeonDifficulty = s.adiff;
       else if (s.adiff === null) this.activeInstanceDungeonDifficulty = null;
+      if (s.udiff === 'normal' || s.udiff === 'heroic' || s.udiff === null)
+        this.unappliedInstanceDungeonDifficulty = s.udiff;
       if (s.qlog !== undefined || s.qdone !== undefined) this.pendingQuestCommands?.clear();
       const restoreSessionPreferences = this.spectateExitPending;
       const arena = s.arena !== undefined ? s.arena : this.arenaInfo;
@@ -4842,6 +4845,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   activeDungeonDifficulty(): DungeonDifficulty | null {
     return this.activeInstanceDungeonDifficulty ?? null;
+  }
+  unappliedDungeonDifficulty(): DungeonDifficulty | null {
+    return this.unappliedInstanceDungeonDifficulty;
   }
   setDungeonDifficulty(difficulty: DungeonDifficulty): void {
     this.selectedDungeonDifficulty = difficulty;

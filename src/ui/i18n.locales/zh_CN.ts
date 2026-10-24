@@ -5012,6 +5012,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootSettings.menuItem': '拾取设置',
   'hudChrome.dungeonDifficulty.setHeroic': '设置地下城难度：英雄',
   'hudChrome.dungeonDifficulty.setNormal': '设置地下城难度：普通',
+  'hudChrome.dungeonDifficulty.unappliedNormal': '已选择英雄难度。当前副本仍为普通难度。',
+  'hudChrome.dungeonDifficulty.unappliedHeroic': '已选择普通难度。当前副本仍为英雄难度。',
   'hudChrome.dungeonDifficulty.resetAll': '重置所有副本',
   'hudChrome.dungeonDifficulty.resetDone': '所有副本已重置。',
   'hudChrome.dungeonDifficulty.resetNone': '你没有可重置的副本。',

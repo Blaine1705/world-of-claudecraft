@@ -3503,6 +3503,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootSettings.menuItem': '分配設定',
   'hudChrome.dungeonDifficulty.setHeroic': 'ダンジョン難易度をヒロイックに設定',
   'hudChrome.dungeonDifficulty.setNormal': 'ダンジョン難易度をノーマルに設定',
+  'hudChrome.dungeonDifficulty.unappliedNormal':
+    'ヒロイックを選択中です。現在のインスタンスはまだノーマルです。',
+  'hudChrome.dungeonDifficulty.unappliedHeroic':
+    'ノーマルを選択中です。現在のインスタンスはまだヒロイックです。',
   'hudChrome.dungeonDifficulty.resetAll': 'すべてのインスタンスをリセット',
   'hudChrome.dungeonDifficulty.resetDone': 'すべてのインスタンスをリセットしました。',
   'hudChrome.dungeonDifficulty.resetNone': 'リセットできるインスタンスがありません。',

@@ -510,6 +510,7 @@ export const IWORLD_MEMBERS = [
   { name: 'riftEventMsRemaining', kind: 'method' }, // ms until the rift event stops admitting parties
   { name: 'dungeonDifficulty', kind: 'method' }, // read-returning
   { name: 'activeDungeonDifficulty', kind: 'method' }, // active claim read, null outside
+  { name: 'unappliedDungeonDifficulty', kind: 'method' }, // live claim tier the selection missed
   { name: 'setDungeonDifficulty', kind: 'method' },
   { name: 'heroicMarks', kind: 'data' }, // Heroic Marks currency balance
   { name: 'buyHeroicVendorItem', kind: 'method' },
@@ -1004,9 +1005,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // sitOnSeat (method) on feature/mirefen-tavern: 426/127/299 on its own,
     // 451/133/318 merged into the v0.45.0 integration.
     // Lantern Hall's guildContracts (data) and buyGuildCosmetic (method): 453/134/319.
-    expect(IWORLD_MEMBERS.length).toBe(465);
+    // The portrait menu's unappliedDungeonDifficulty (method) adds one: 466/137/329.
+    expect(IWORLD_MEMBERS.length).toBe(466);
     expect(DATA_MEMBERS.length).toBe(137);
-    expect(METHOD_MEMBERS.length).toBe(328);
+    expect(METHOD_MEMBERS.length).toBe(329);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1451,6 +1453,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'trainRecipe',
       'treasureMap',
       'turnInQuest',
+      'unappliedDungeonDifficulty',
       'unbindItem',
       'unequipBag',
       'unequipItem',
@@ -1942,6 +1945,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'tradeSetOffer',
       'trainRecipe',
       'turnInQuest',
+      'unappliedDungeonDifficulty',
       'unbindItem',
       'unequipBag',
       'unequipItem',
@@ -2480,6 +2484,7 @@ const FACET_DUNGEONS = [
   'riftEventMsRemaining',
   'dungeonDifficulty',
   'activeDungeonDifficulty',
+  'unappliedDungeonDifficulty',
   'setDungeonDifficulty',
   'heroicMarks',
   'buyHeroicVendorItem',
@@ -2836,8 +2841,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // the dungeon objectives tracker's dungeonRun (one data member); the tavern
     // adds resting (data) and sitOnSeat (the seating facet's method).
     // Plus Lantern Hall's guildContracts and buyGuildCosmetic.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(465);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(465);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(466);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(466);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

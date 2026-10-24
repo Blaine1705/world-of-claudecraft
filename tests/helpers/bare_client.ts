@@ -206,6 +206,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.nodeCooldowns = new Map();
   c.recipeList = ALL_RECIPES;
   c.activeInstanceDungeonDifficulty = null;
+  c.unappliedInstanceDungeonDifficulty = null;
   // stationPlacements is a getter on ClientWorld (it resolves the active
   // content bundle, which wraps the builtin STATIONS on shipped hosts), so
   // the bare client already reads STATIONS without an assignment here.
