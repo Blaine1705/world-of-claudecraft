@@ -743,12 +743,6 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
       'lastClock is the authoritative world-quest clock in seconds, compared so the bar can re-anchor its wall-clock extrapolation of the forge timer between snapshots. It is a number that never holds text, and the bar repaints its localized labels on every update through the shared action bar painter, so a locale switch lands on the next frame.',
   },
   {
-    file: 'collections/collections_window.ts',
-    memos: ['lastSig', 'paintedTab'],
-    reason:
-      'Retained dormant painter: Hunting has no live HUD instance, shell root or keybind. The lastSig and paintedTab memos cannot gate any player-visible surface. tests/collections_window.test.ts pins that retirement; restoring the menu requires restoring its relocalize fanout arm.',
-  },
-  {
     file: 'movable_frame.ts',
     memos: ['lastBottom', 'lastHoverCursor', 'lastHoverEdge'],
     reason:
