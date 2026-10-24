@@ -24,7 +24,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.courier.vaultCap",
     "hudChrome.courier.vaultEmpty",
     "hudChrome.courier.vaultLocked",
-    "hudChrome.courier.vaultTitle"
+    "hudChrome.courier.vaultTitle",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "es_ES": [
     "hudChrome.courier.accountBank",
@@ -41,7 +42,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.courier.vaultCap",
     "hudChrome.courier.vaultEmpty",
     "hudChrome.courier.vaultLocked",
-    "hudChrome.courier.vaultTitle"
+    "hudChrome.courier.vaultTitle",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "fr_FR": [
     "hudChrome.courier.accountBank",
@@ -58,7 +60,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.courier.vaultCap",
     "hudChrome.courier.vaultEmpty",
     "hudChrome.courier.vaultLocked",
-    "hudChrome.courier.vaultTitle"
+    "hudChrome.courier.vaultTitle",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "fr_CA": [
     "hudChrome.courier.accountBank",
@@ -75,7 +78,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.courier.vaultCap",
     "hudChrome.courier.vaultEmpty",
     "hudChrome.courier.vaultLocked",
-    "hudChrome.courier.vaultTitle"
+    "hudChrome.courier.vaultTitle",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "en_CA": [],
   "it_IT": [
@@ -93,7 +97,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.courier.vaultCap",
     "hudChrome.courier.vaultEmpty",
     "hudChrome.courier.vaultLocked",
-    "hudChrome.courier.vaultTitle"
+    "hudChrome.courier.vaultTitle",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "de_DE": [
     "hudChrome.courier.accountBank",
@@ -110,7 +115,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.courier.vaultCap",
     "hudChrome.courier.vaultEmpty",
     "hudChrome.courier.vaultLocked",
-    "hudChrome.courier.vaultTitle"
+    "hudChrome.courier.vaultTitle",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -131,7 +137,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.courier.vaultCap",
     "hudChrome.courier.vaultEmpty",
     "hudChrome.courier.vaultLocked",
-    "hudChrome.courier.vaultTitle"
+    "hudChrome.courier.vaultTitle",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -149,7 +156,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.courier.vaultCap",
     "hudChrome.courier.vaultEmpty",
     "hudChrome.courier.vaultLocked",
-    "hudChrome.courier.vaultTitle"
+    "hudChrome.courier.vaultTitle",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "nl_NL": [
     "hudChrome.courier.accountBank",
@@ -166,7 +174,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.courier.vaultCap",
     "hudChrome.courier.vaultEmpty",
     "hudChrome.courier.vaultLocked",
-    "hudChrome.courier.vaultTitle"
+    "hudChrome.courier.vaultTitle",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "pl_PL": [
     "hudChrome.courier.accountBank",
@@ -183,7 +192,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.courier.vaultCap",
     "hudChrome.courier.vaultEmpty",
     "hudChrome.courier.vaultLocked",
-    "hudChrome.courier.vaultTitle"
+    "hudChrome.courier.vaultTitle",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "id_ID": [
     "hudChrome.courier.accountBank",
@@ -200,7 +210,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.courier.vaultCap",
     "hudChrome.courier.vaultEmpty",
     "hudChrome.courier.vaultLocked",
-    "hudChrome.courier.vaultTitle"
+    "hudChrome.courier.vaultTitle",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "tr_TR": [
     "hudChrome.courier.accountBank",
@@ -217,7 +228,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.courier.vaultCap",
     "hudChrome.courier.vaultEmpty",
     "hudChrome.courier.vaultLocked",
-    "hudChrome.courier.vaultTitle"
+    "hudChrome.courier.vaultTitle",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "sv_SE": [
     "hudChrome.courier.accountBank",
@@ -234,7 +246,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.courier.vaultCap",
     "hudChrome.courier.vaultEmpty",
     "hudChrome.courier.vaultLocked",
-    "hudChrome.courier.vaultTitle"
+    "hudChrome.courier.vaultTitle",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "vi_VN": [
     "hudChrome.courier.accountBank",
@@ -251,7 +264,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.courier.vaultCap",
     "hudChrome.courier.vaultEmpty",
     "hudChrome.courier.vaultLocked",
-    "hudChrome.courier.vaultTitle"
+    "hudChrome.courier.vaultTitle",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "da_DK": [
     "hudChrome.courier.accountBank",
@@ -268,6 +282,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.courier.vaultCap",
     "hudChrome.courier.vaultEmpty",
     "hudChrome.courier.vaultLocked",
-    "hudChrome.courier.vaultTitle"
+    "hudChrome.courier.vaultTitle",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ]
 };

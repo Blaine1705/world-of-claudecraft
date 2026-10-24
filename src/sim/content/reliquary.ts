@@ -122,6 +122,10 @@ export const RELIQUARY_STORE_SOURCE_ID = 'woc_store' as const;
  *   loot, so a boss hint would name a door that does not hold it. The same
  *   chest always pays a stack of one corpse-harvest specimen (VAULT_MATERIAL_POOL,
  *   content/treasure_maps.ts, rolled by src/sim/rift/hoard_reward_roll.ts).
+ * - weekly_vault_pvp: src/sim/weekly_rewards.ts weeklyLootPool('pvp') rolls Warfare
+ *   Season 2 (content/pvp_honor_season2.ts) and nothing else: a PvP-row choice in
+ *   the Weekly Vault rolls one piece on open and claimWeeklyReward grants it. It
+ *   is the second door to the Vanguard Gallery beside the honor quartermasters.
  */
 export const RELIQUARY_ACTIVITY_SOURCE_IDS = [
   'corpse_harvest',
@@ -133,6 +137,7 @@ export const RELIQUARY_ACTIVITY_SOURCE_IDS = [
   // Lantern Hall's quartermaster (src/sim/guild_quartermaster.ts) sells the guild's horse and
   // sword for Lantern Seals: a seal counter, not a vendorItems shop, so not a vendor hint.
   'lantern_hall_quartermaster',
+  'weekly_vault_pvp',
 ] as const;
 export type ReliquaryActivitySourceId = (typeof RELIQUARY_ACTIVITY_SOURCE_IDS)[number];
 
@@ -1092,8 +1097,11 @@ const WARFARE_ARMORY_ITEM_IDS = [
 ];
 // Warfare Season 2 ("Vanguard", content/pvp_honor_season2.ts) is sold by the same
 // two quartermasters: its 27 spec sets and four weapons fill one page, in stock
-// order (class, then spec, each helmet to gloves, then the weapons).
+// order (class, then spec, each helmet to gloves, then the weapons). The PvP
+// row of the Weekly Vault rolls the same stock, so every slot names both
+// counters and that activity.
 const VANGUARD_GALLERY_ITEM_IDS = [...SEASON2_STOCK];
+const VANGUARD_SOURCE_HINTS = [...WARFARE_VENDOR_HINTS, fromActivity('weekly_vault_pvp')] as const;
 
 /**
  * Freeze the whole page table at its one construction site: the top-level
@@ -2241,7 +2249,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     // completion pairs, the Riftbound precedent, so the Conquerors capstone never
     // needs a character of every class.
     excludeFromCompletion: 'personal',
-    relics: items(...VANGUARD_GALLERY_ITEM_IDS.map((id) => [id, WARFARE_VENDOR_HINTS] as const)),
+    relics: items(...VANGUARD_GALLERY_ITEM_IDS.map((id) => [id, VANGUARD_SOURCE_HINTS] as const)),
   },
 ]);
 

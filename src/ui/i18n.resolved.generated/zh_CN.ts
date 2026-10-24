@@ -7445,6 +7445,7 @@ export const zh_CN: EnTranslations = {
       "sourceActivityRiftFirstClear": "授予率先通关分级裂隙的队伍全体成员",
       "sourceActivityBuriedHoard": "在埋藏宝藏的奖励宝箱中找到，即藏宝图所指引的宝库",
       "sourceActivityLanternHall": "在灯火大厅的军需官处用灯火印章购买",
+      "sourceActivityWeeklyVaultPvp": "从每周宝库的PvP栏位中选取",
       "cellMissingSourceAria": "{name}，尚未获得，{source}",
       "cellOwnedClearsAria": "{name}，已收录，首次获得于第 {count} 次通关",
       "searchPlaceholder": "搜索圣物",
