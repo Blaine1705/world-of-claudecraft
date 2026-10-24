@@ -91,7 +91,8 @@ describe("Balgath's trinkets in the catalog", () => {
       const item = ITEMS[id];
       expect(item.slot, id).toBe('trinket');
       expect(item.quality, id).toBe('epic');
-      expect(item.soulbound, id).toBe(true);
+      // The release makes ordinary trinkets tradeable, including Balgath's drops.
+      expect(item.soulbound, id).toBeUndefined();
       expect(Object.keys(item.stats ?? {}), id).toEqual([attribute[id]]);
       expect(itemLevel(item), id).toBe(26);
       expect(primaryStatSum(item), id).toBe(11);

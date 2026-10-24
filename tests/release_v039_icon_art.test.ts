@@ -500,8 +500,9 @@ describe('release v0.39 icon-art second-pass lineage', () => {
       liveAbilityIds.filter((id) => !paintedAbilityIds.has(id)),
       'every live ability resolves through production to committed painted art',
     ).toEqual([]);
-    expect(paintedAbilityIds.size).toBe(412);
-    expect(aggregate.runtimeClosure.abilities).toEqual({ live: 408, painted: 408 });
+    // Fieldcraft and druid reworks expand the painted production census by eight.
+    expect(paintedAbilityIds.size).toBe(420);
+    expect(aggregate.runtimeClosure.abilities).toEqual({ live: 416, painted: 416 });
 
     expect(new Set(liveHotbarItemIds).size, 'live hotbar item ids remain unique').toBe(
       liveHotbarItemIds.length,

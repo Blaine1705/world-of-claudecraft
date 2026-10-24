@@ -250,19 +250,25 @@ describe('a transparent character effect swaps in only once its programs are lin
     visual.dispose();
   });
 
-  it('never stages the Shadowform tint: it keeps every source program', async () => {
+  it('shows the Gloamveil stand-in immediately and gates its transparent program', async () => {
     const visual = await makeVisual();
     const gateCalls: GateCall[] = [];
     visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
     const opaque = rigMaterials(visual);
     visual.setShadowform(true);
-    expect(gateCalls).toHaveLength(0);
+    expect(gateCalls).toHaveLength(1);
     const tinted = rigMaterials(visual);
     expect(tinted).not.toEqual(opaque);
     tinted.forEach((material, i) => {
       expect(material.transparent).toBe(opaque[i].transparent);
       expect(material.customProgramCacheKey()).toBe(opaque[i].customProgramCacheKey());
     });
+    gateCalls[0].settle();
+    expect(rigMaterials(visual)).toEqual(tinted);
+    visual.update(FRAME, anim(), true);
+    const settled = rigMaterials(visual);
+    expect(settled).not.toEqual(tinted);
+    expect(settled.every((material) => material.transparent && material.depthWrite)).toBe(true);
     visual.setShadowform(false);
     expect(rigMaterials(visual)).toEqual(opaque);
     visual.dispose();

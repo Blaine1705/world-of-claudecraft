@@ -496,22 +496,21 @@ describe('the character overlay caches and the arena walls clone through the hoo
       );
       expect(body, `${name} went back to a bare clone`).not.toContain('.clone(');
     }
-    // Shadowform's opaque tint mints through its own factory module, which owes
-    // the same hook-preserving clone (the veils mount their own unlit
-    // materials and clone nothing).
+    // Gloamveil's transparent body and immediate opaque stand-in both preserve
+    // the live hooks through their shared factory module.
     const shadowform = methodSource(visual, '  private shadowformMaterial(');
     expect(shadowform, 'shadowformMaterial lost its factory').toContain(
-      'createShadowformTintMaterial(material',
+      'createShadowformEffectMaterial(material',
     );
     expect(shadowform, 'shadowformMaterial went back to a bare clone').not.toContain('.clone(');
     const factory = readFileSync(
-      new URL('../src/render/characters/shadowform_tint.ts', import.meta.url),
+      new URL('../src/render/characters/effect_materials.ts', import.meta.url),
       'utf8',
     );
-    expect(factory, 'shadowform_tint lost its hook-preserving clone').toMatch(
+    expect(factory, 'Gloamveil lost its hook-preserving clone').toMatch(
       /cloneMaterialWithHooks\(source\)/,
     );
-    expect(factory, 'shadowform_tint went back to a bare clone').not.toContain('.clone(');
+    expect(factory, 'Gloamveil went back to a bare clone').not.toContain('.clone(');
   });
 
   it('clones the hideable arena wall material through cloneMaterialWithHooks', () => {

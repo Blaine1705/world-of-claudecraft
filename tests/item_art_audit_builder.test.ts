@@ -894,11 +894,12 @@ describe('item-art audit builder', () => {
       // 2,183 owners / 2,212 live with Wobbles the Slime's reins, re-measured with
       // `node scripts/item_art_audit.mjs --verify-only` (catalog +523 bytes).
       // + the sprite buddy's whistle render: 2186 / 2215, re-measured with --verify-only.
-      catalogSha256: '85fc9b38e745436b8d44d304f6d30beb0c5a0505be41b1c7af48d8c91268626b',
-      catalogBytes: 1195493,
+      // Release adds five painted owners; measured with --verify-only on the combined tree.
+      catalogSha256: '7efd5b9ba9c6dc7429ce6a3a4e4193df5629ab4665f521e244386a1004416491',
+      catalogBytes: 1198114,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 2186,
-      liveItemCount: 2215,
+      catalogCount: 2191,
+      liveItemCount: 2220,
       generatedHeroicDefinitions: 116,
       heroicDefinitionsWithOwnWebp: 86,
       heroicWeaponArtAliases: 30,
@@ -916,7 +917,7 @@ describe('item-art audit builder', () => {
         identity: 47,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '5444cf816ed44b7389988fd4be65a860cb803cb196e44cfdcfa0f0f63cfcde23',
+      shippingCatalogSha256: '02c54bf510d8f76cf75daf528760b755510d917c1fc41c36f9c284138ab14cbf',
       machineChecksPassed: true,
       verdict: null,
     });

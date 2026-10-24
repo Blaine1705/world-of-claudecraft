@@ -12,7 +12,9 @@ const expected = [
 
 describe('integration 45 missing skill art', () => {
   it('resolves every former fallback through the action-bar icon route', () => {
-    expect([...ABILITY_ART_PENDING]).toEqual([]);
+    // The release's new Scratch ability remains explicitly pending; this wave
+    // completed the four integration icons listed below.
+    expect([...ABILITY_ART_PENDING]).toEqual(['scratch']);
     for (const [id, cls] of expected) {
       const url = `/ui/skills/${cls}/${id}.webp`;
       expect(abilityImageUrl(id)).toBe(url);

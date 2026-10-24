@@ -706,7 +706,8 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // 352 with Lantern Hall's six after the integration45 backlog supplied all 57 formerly
     // missing crests: only the six, on the pending ledger, have no painting.
     expect(DEED_ORDER).toHaveLength(359);
-    expect(DEED_ART_PENDING.size).toBe(6);
+    // Release adds Titan, five PvP streak titles and the Hard wisp maze (7).
+    expect(DEED_ART_PENDING.size).toBe(13);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(
