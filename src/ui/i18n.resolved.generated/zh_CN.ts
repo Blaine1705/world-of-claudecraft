@@ -13528,7 +13528,8 @@ export const zh_CN: EnTranslations = {
     "whitepaper": "白皮书",
     "terms": "服务条款",
     "privacy": "隐私政策",
-    "discordLabel": "加入Discord社区"
+    "discordLabel": "加入Discord社区",
+    "levyStreet": "Levy Street"
   },
   "settings": {
     "languageLoading": "正在加载语言...",

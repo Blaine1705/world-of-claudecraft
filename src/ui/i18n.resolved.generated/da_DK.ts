@@ -13528,7 +13528,8 @@ export const da_DK: EnTranslations = {
     "whitepaper": "Whitepaper",
     "terms": "Servicevilkår",
     "privacy": "Privatlivspolitik",
-    "discordLabel": "Bliv medlem af Discord"
+    "discordLabel": "Bliv medlem af Discord",
+    "levyStreet": "Levy Street"
   },
   "settings": {
     "languageLoading": "Indlæser sprog...",

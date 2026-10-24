@@ -4236,6 +4236,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'footer.terms': '利用規約',
   'footer.privacy': 'プライバシーポリシー',
   'footer.discordLabel': 'Discordに参加する',
+  'footer.levyStreet': 'Levy Street',
   'highscores.title': 'ハイスコアリーダーボード',
   'highscores.desc': 'ワールドの偉大なチャンピオンたちを確認し、あなたの進行度と比較しましょう。',
   'wiki.title': 'ゲームWiki & ガイド',

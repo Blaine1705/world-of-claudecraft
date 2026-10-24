@@ -13528,7 +13528,8 @@ export const pl_PL: EnTranslations = {
     "whitepaper": "Biała księga",
     "terms": "Warunki korzystania z usługi",
     "privacy": "Polityka prywatności",
-    "discordLabel": "Dołącz do Discorda"
+    "discordLabel": "Dołącz do Discorda",
+    "levyStreet": "Levy Street"
   },
   "settings": {
     "languageLoading": "Wczytywanie języka...",

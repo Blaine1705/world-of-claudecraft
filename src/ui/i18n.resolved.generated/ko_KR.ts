@@ -13528,7 +13528,8 @@ export const ko_KR: EnTranslations = {
     "whitepaper": "백서",
     "terms": "서비스 이용약관",
     "privacy": "개인정보 처리방침",
-    "discordLabel": "Discord 참여하기"
+    "discordLabel": "Discord 참여하기",
+    "levyStreet": "Levy Street"
   },
   "settings": {
     "languageLoading": "언어를 불러오는 중...",

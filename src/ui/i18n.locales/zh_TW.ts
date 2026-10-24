@@ -4071,6 +4071,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'footer.terms': '服務條款',
   'footer.privacy': '隱私權政策',
   'footer.discordLabel': '加入Discord社區',
+  'footer.levyStreet': 'Levy Street',
   'highscores.title': '高分排行榜',
   'highscores.desc': '追蹤這個世界中最偉大的英雄，並對比你的遊戲進度。',
   'wiki.title': '遊戲百科與指南',

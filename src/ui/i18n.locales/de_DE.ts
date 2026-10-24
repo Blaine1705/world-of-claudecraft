@@ -8053,6 +8053,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'footer.terms': 'Nutzungsbedingungen',
   'footer.privacy': 'Datenschutzerklärung',
   'footer.discordLabel': 'Tritt dem Discord bei',
+  'footer.levyStreet': 'Levy Street',
   'highscores.title': 'Bestenliste',
   'highscores.desc': 'Verfolge die größten Champions der Welt und vergleiche deinen Fortschritt.',
   'wiki.title': 'Spiel-Wiki und Guides',

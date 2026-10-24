@@ -8013,6 +8013,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'footer.terms': 'Termini di servizio',
   'footer.privacy': 'Informativa sulla privacy',
   'footer.discordLabel': 'Entra nel Discord',
+  'footer.levyStreet': 'Levy Street',
   'highscores.title': 'Classifica dei punteggi più alti',
   'highscores.desc': 'Segui i più grandi campioni del mondo e confronta i tuoi progressi.',
   'wiki.title': 'Wiki e guida del gioco',

@@ -7815,6 +7815,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'footer.terms': 'Términos de Servicio',
   'footer.privacy': 'Política de Privacidad',
   'footer.discordLabel': 'Únete al Discord',
+  'footer.levyStreet': 'Levy Street',
   'highscores.title': 'Clasificaciones de Puntuación',
   'highscores.desc': 'Sigue a los campeones más grandes del mundo y compara tu progreso.',
   'wiki.title': 'Wiki y Guía del Juego',

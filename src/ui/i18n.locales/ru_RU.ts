@@ -4284,6 +4284,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'footer.terms': 'Условия использования',
   'footer.privacy': 'Политика конфиденциальности',
   'footer.discordLabel': 'Присоединиться к Discord',
+  'footer.levyStreet': 'Levy Street',
   'highscores.title': 'Таблица рекордов',
   'highscores.desc': 'Отслеживайте величайших чемпионов игрового мира и сравнивайте свои успехи.',
   'wiki.title': 'Вики и руководство',

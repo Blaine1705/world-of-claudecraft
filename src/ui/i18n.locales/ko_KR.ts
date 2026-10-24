@@ -4212,6 +4212,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'footer.terms': '서비스 이용약관',
   'footer.privacy': '개인정보 처리방침',
   'footer.discordLabel': 'Discord 참여하기',
+  'footer.levyStreet': 'Levy Street',
   'highscores.title': '최고 점수 순위표',
   'highscores.desc': '월드의 가장 위대한 챔피언들을 확인하고 당신의 진행 상태를 비교해 보세요.',
   'wiki.title': '게임 위키 및 가이드',

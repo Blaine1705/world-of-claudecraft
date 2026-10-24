@@ -13528,7 +13528,8 @@ export const id_ID: EnTranslations = {
     "whitepaper": "Whitepaper",
     "terms": "Ketentuan Layanan",
     "privacy": "Kebijakan Privasi",
-    "discordLabel": "Gabung Discord"
+    "discordLabel": "Gabung Discord",
+    "levyStreet": "Levy Street"
   },
   "settings": {
     "languageLoading": "Memuat bahasa...",

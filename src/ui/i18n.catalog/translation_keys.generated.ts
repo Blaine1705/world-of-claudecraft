@@ -9489,6 +9489,7 @@ export type TranslationKeyFlat =
   | 'footer.discordLabel'
   | 'footer.githubLabel'
   | 'footer.githubLink'
+  | 'footer.levyStreet'
   | 'footer.privacy'
   | 'footer.terms'
   | 'footer.whitepaper'
