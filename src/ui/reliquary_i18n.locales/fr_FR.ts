@@ -44,9 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Le Bassin du Cœur Sauvage',
+    desc: 'Armes emblématiques du Maître des bêtes seigneur des crocs, de la Florengloutissante et de Zulgar.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Héroïque : le Bassin du Cœur Sauvage',
+    desc: 'Épiques et bijoux exclusifs au mode héroïque du Maître des bêtes seigneur des crocs, de la Florengloutissante et de Zulgar, Voix du Bassin.',
   },
   conquerors_nythraxis: {
     name: 'Raid de Nythraxis',

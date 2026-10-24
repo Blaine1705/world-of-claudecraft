@@ -44,9 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Het Wildhartbekken',
+    desc: 'Kenmerkende wapens van de Hoektandheer Beestenmeester, de Vreetbloem en Zulgar.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroïsch: Het Wildhartbekken',
+    desc: 'Alleen op Heroïsch verkrijgbare epische voorwerpen en sieraden van de Hoektandheer Beestenmeester, de Vreetbloem en Zulgar, Stem van het Bekken.',
   },
   conquerors_nythraxis: {
     name: 'Nythraxis-raid',

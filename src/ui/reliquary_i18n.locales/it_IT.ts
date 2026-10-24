@@ -44,9 +44,13 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Il Bacino di Wildheart',
+
+    desc: 'Armi distintive del Signore delle Bestie Signore delle Zanne, del Fiore Vorace e di Zulgar.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Eroico: Il Bacino di Wildheart',
+
+    desc: 'Oggetti epici e monili esclusivi della modalità Eroica del Signore delle Bestie Signore delle Zanne, del Fiore Vorace e di Zulgar, Voce del Bacino.',
   },
   conquerors_nythraxis: {
     name: 'Raid di Nythraxis',

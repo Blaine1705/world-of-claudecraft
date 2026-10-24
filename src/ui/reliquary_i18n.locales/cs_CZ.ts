@@ -44,9 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Kotlina Divokého srdce',
+    desc: 'Typické zbraně od Tesákopána, krotitele zvěře, Hltokvětu a Zulgara.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Hrdinská: Kotlina Divokého srdce',
+    desc: 'Epické předměty a talismany pouze z hrdinské obtížnosti od Tesákopána, krotitele zvěře, Hltokvětu a Zulgara, hlasu Kotliny.',
   },
   conquerors_nythraxis: {
     name: 'Raid Nythraxis',
