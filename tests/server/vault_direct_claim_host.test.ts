@@ -7,6 +7,7 @@ import {
 } from '../../server/vault_direct_claim_host';
 import { VaultRewardService } from '../../server/vault_reward_service';
 import type { VaultRewardClaim, VaultRewardClient } from '../../server/vault_rewards_db';
+import type { CharacterState } from '../../src/sim/character_state';
 import { spendHeroicMarks } from '../../src/sim/heroic_marks';
 import { spawnHoardRewardChest } from '../../src/sim/rift/hoard_reward_chest';
 import type { RiftInstance } from '../../src/sim/rift/types';
@@ -53,6 +54,84 @@ function fixture() {
 }
 
 describe('live vault direct-claim adapter', () => {
+  it('auto-equips a prepared plain epic while retaining its committed identity', async () => {
+    const f = fixture();
+    const meta = f.sim.meta(f.pid)!;
+    meta.autoEquip = true;
+    delete meta.equipment.helmet;
+    delete meta.equipmentInstance.helmet;
+    f.claim.items = [{ itemId: 'slagbreaker_helmet', count: 1 }];
+    let guid: string | undefined;
+    const commit: typeof commitVaultDirectClaim = async (_deps, args) => {
+      guid = args.preparedItems?.[0].instance?.guid;
+      return 'delivered';
+    };
+    expect(await claimVaultRewardForSession(f.host, '7:1', f.claim, true, commit)).toBe(
+      'delivered',
+    );
+    expect(typeof guid).toBe('string');
+    expect(meta.equipment.helmet).toBe('slagbreaker_helmet');
+    expect(f.sim.meta(f.pid)!.equipmentInstance.helmet?.guid).toBe(guid);
+  });
+
+  it('commits the exact tracked copies before granting or publishing their mint events', async () => {
+    const f = fixture();
+    const itemId = 'slagbreaker_helmet';
+    f.sim.meta(f.pid)!.autoEquip = false;
+    f.claim.items = [
+      { itemId, count: 2, lootQuality: { version: 1, tier: 3, weights: [5, 4, 3, 2, 1] } },
+    ];
+    f.sim.drainEvents();
+    const beforeClaim = structuredClone(f.claim);
+    const client: VaultRewardClient = {
+      query: vi.fn(async () => ({ rows: [{ character_id: 7 }], rowCount: 1 })),
+      release: vi.fn(),
+      on: vi.fn(),
+      removeListener: vi.fn(),
+    };
+    let saved: ReturnType<Sim['serializeCharacter']>;
+    const save = vi.fn(async (_client: VaultRewardClient, state: CharacterState) => {
+      saved = structuredClone(state);
+      expect(f.sim.countItem(itemId, f.pid)).toBe(0);
+      expect(f.sim.drainEvents().filter((e) => e.type === 'itemTracked')).toEqual([]);
+      return true;
+    });
+    const commit: typeof commitVaultDirectClaim = (_deps, args) =>
+      commitVaultDirectClaim({ pool: { connect: async () => client }, saveCharacter: save }, args);
+    const next = vi.spyOn(f.sim.rng, 'next');
+    expect(await claimVaultRewardForSession(f.host, '7:1', f.claim, true, commit)).toBe(
+      'delivered',
+    );
+    expect(next).not.toHaveBeenCalled();
+    next.mockRestore();
+    const live = f.sim.serializeCharacter(f.pid)!;
+    expect(saved!.inventory).toEqual(live.inventory);
+    const copies = live.inventory.filter((s) => s.itemId === itemId);
+    expect(copies).toHaveLength(2);
+    const guids = copies.map((s) => s.instance?.guid);
+    expect(new Set(guids).size).toBe(2);
+    expect(guids.every((guid) => typeof guid === 'string')).toBe(true);
+    const minted = f.sim.drainEvents().filter((e) => e.type === 'itemTracked');
+    expect(minted.map((e) => e.guid)).toEqual(guids);
+    expect(minted.every((e) => e.kind === 'mint')).toBe(true);
+    expect(f.claim).toEqual(beforeClaim);
+  });
+
+  it.each(['retry', 'already_claimed', 'lease_lost'] as const)(
+    'does not grant or publish speculative tracked copies on %s',
+    async (result) => {
+      const f = fixture();
+      f.claim.items = [{ itemId: 'slagbreaker_helmet', count: 2 }];
+      f.sim.drainEvents();
+      const before = f.sim.serializeCharacter(f.pid);
+      expect(
+        await claimVaultRewardForSession(f.host, '7:1', f.claim, true, async () => result),
+      ).toBe(result);
+      expect(f.sim.serializeCharacter(f.pid)).toEqual(before);
+      expect(f.sim.drainEvents().filter((e) => e.type === 'itemTracked')).toEqual([]);
+    },
+  );
+
   it('projects one committed reward into the live character and acknowledges the save', async () => {
     const f = fixture();
     const before = f.sim.meta(f.pid)!.copper;
@@ -217,6 +296,8 @@ describe('live vault direct claim capacity refusal', () => {
 describe('live vault direct claim post-write ambiguity', () => {
   it('still quarantines a failed commit after the character save and claim write', async () => {
     const f = fixture();
+    f.claim.items.push({ itemId: 'slagbreaker_helmet', count: 1 });
+    f.sim.drainEvents();
     const before = f.sim.serializeCharacter(f.pid);
     const queries: string[] = [];
     const client: VaultRewardClient = {
@@ -241,5 +322,6 @@ describe('live vault direct claim post-write ambiguity', () => {
     expect(f.host.quarantine).toHaveBeenCalledWith(f.pid, 7, 'ambiguous', 'vault reward');
     expect(f.host.acknowledge).not.toHaveBeenCalled();
     expect(f.sim.serializeCharacter(f.pid)).toEqual(before);
+    expect(f.sim.drainEvents().filter((e) => e.type === 'itemTracked')).toEqual([]);
   });
 });

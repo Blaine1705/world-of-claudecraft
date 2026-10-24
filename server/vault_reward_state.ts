@@ -9,8 +9,9 @@ import {
   creditHeroicMarks,
   isCurrencyGrantId,
 } from '../src/sim/heroic_marks';
-import { cloneLootQuality } from '../src/sim/loot_quality/types';
+import { hoardRewardGrantItems } from '../src/sim/rift/hoard_reward_items';
 import { projectHoardRewardCollections } from '../src/sim/rift/hoard_reward_save';
+import { cloneItemInstancePayload, type InvSlot } from '../src/sim/types';
 import type { VaultRewardClaim } from './vault_rewards_db';
 
 export function addVaultRewardToCharacterState(
@@ -18,20 +19,21 @@ export function addVaultRewardToCharacterState(
   claim: VaultRewardClaim,
   attemptId: string,
   owner: boolean,
+  preparedItems?: readonly InvSlot[],
 ): CharacterState {
   assertHeroicMarksGrantsFit(state, claim.items);
   const capped = claim.items.length === 0 && claim.copper === 0;
   if (!capped) {
     // Heroic Marks land on the saved balance, exactly as the live hub credits them.
-    for (const item of claim.items) {
+    const grants = preparedItems ?? hoardRewardGrantItems(claim.items);
+    for (const item of grants) {
       if (isCurrencyGrantId(item.itemId)) creditHeroicMarks(state, item.count);
       else {
-        const lootQuality = cloneLootQuality(item.lootQuality);
         addStacked(
           state.inventory,
           item.itemId,
           item.count,
-          lootQuality ? { lootQuality } : undefined,
+          item.instance ? cloneItemInstancePayload(item.instance) : undefined,
         );
       }
     }
