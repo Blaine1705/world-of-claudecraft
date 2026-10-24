@@ -7,6 +7,14 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const nl_NL: Record<string, string> = {
+  'error.buddyGrantFailed': 'Het toekennen van de metgezel is mislukt.',
+  'error.characterAlreadyHasThat': 'Dat personage heeft die metgezel of dat uiterlijk al.',
+  'moderationHistory.actionGrantBuddy': 'Metgezel toegekend',
+  'moderationHistory.actionAnnounce': 'Realmaankondiging',
+  'moderationHistory.actionGmInvisible': 'Onzichtbaar geworden',
+  'moderationHistory.actionGmVisible': 'Zichtbaar geworden',
+  'moderationHistory.actionUnwatch': 'Van de volglijst verwijderd',
+  'moderationHistory.actionWatch': 'Aan de volglijst toegevoegd',
   'error.flagActiveExists': 'dit account heeft al een openstaande markering van dat type',
   'wealth.largeMovementsUnavailable':
     'grote bankmutaties konden niet worden geladen (het uitlezen van het grootboek gaf een time-out); het goudoverzicht hierboven is volledig',

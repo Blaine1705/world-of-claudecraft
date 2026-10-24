@@ -7,6 +7,14 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const zh_CN: Record<string, string> = {
+  'error.buddyGrantFailed': '伙伴发放失败。',
+  'error.characterAlreadyHasThat': '该角色已拥有该伙伴或外观。',
+  'moderationHistory.actionGrantBuddy': '已发放伙伴',
+  'moderationHistory.actionAnnounce': '服务器公告',
+  'moderationHistory.actionGmInvisible': '已隐身',
+  'moderationHistory.actionGmVisible': '已现身',
+  'moderationHistory.actionUnwatch': '已从观察名单移除',
+  'moderationHistory.actionWatch': '已加入观察名单',
   'error.flagActiveExists': '该账号已经存在同类型的未处理标记。',
   'wealth.largeMovementsUnavailable':
     '大额银行变动未能加载（账本读取超时），上方的金币明细仍然完整。',
