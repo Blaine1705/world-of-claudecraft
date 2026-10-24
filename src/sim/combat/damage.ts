@@ -71,6 +71,7 @@ import {
   worldPvpOnPlayerDamaged,
   worldPvpOnPlayerDeath,
 } from '../pvp';
+import { worldPvpXpAmount } from '../pvp/world_pvp_rewards_rules';
 import { referralArmourXpActive } from '../referral_armour';
 import { emitReferralBossEvidence } from '../referral_evidence';
 import { resolveRespawnSeconds } from '../respawn_policy';
@@ -2031,6 +2032,7 @@ export function grantXp(
 ): void {
   const p = ctx.entities.get(meta.entityId);
   if (!p || amount <= 0) return;
+  if (!ctx.worldPvpDisabled) amount = worldPvpXpAmount(amount, meta.worldPvp);
   // Rested XP bonus: the classic-era rule only doubles KILL xp (not quests), and
   // never past the cap (no level bar to advance). The bonus equals the rested
   // amount drawn down, so the effective award is up to 2x while the pool lasts.
