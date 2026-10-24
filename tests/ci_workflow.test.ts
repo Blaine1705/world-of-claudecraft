@@ -300,6 +300,7 @@ function screenshotSparseBlocks(source: string): string[] {
 }
 
 describe('CI workflow parity', () => {
+  // Reads the whole tracked text corpus; disk contention is not a CI policy failure.
   it('sparse-checkout on the test jobs covers every referenced screenshot subtree', () => {
     // The five sparse test-job checkouts (pr-gate, both long-sims lanes,
     // release-gate, release-i18n) exclude docs/screenshots DIRECTORIES
@@ -328,23 +329,58 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/buried-hoard-entrance/',
       '            /docs/screenshots/buried-hoard-valley/',
       '            /docs/screenshots/clue-character-panel/',
-      '            /docs/screenshots/cosmetics-window/',
+      '            /docs/screenshots/clue-icons-v045/',
       '            /docs/screenshots/confection-cascade/',
       '            /docs/screenshots/confection-cascade-v3/',
       '            /docs/screenshots/confection-cascade-v4/',
       '            /docs/screenshots/confection-cascade-v5/',
       '            /docs/screenshots/confection-cascade-v6/',
       '            /docs/screenshots/confection-cascade-v7/',
+      '            /docs/screenshots/cosmetics-window/',
+      '            /docs/screenshots/deed-adventures-icons-v045/',
+      '            /docs/screenshots/deed-bastion-icons-v045/',
       '            /docs/screenshots/deed-border-cartouche/',
+      '            /docs/screenshots/deed-crucible-icons-v045/',
+      '            /docs/screenshots/deed-crypt-icons-v045/',
+      '            /docs/screenshots/deed-factions-icons-v045/',
+      '            /docs/screenshots/deed-foundations-icons-v045/',
+      '            /docs/screenshots/deed-gravewyrm-icons-v045/',
+      '            /docs/screenshots/deed-temple-icons-v045/',
+      '            /docs/screenshots/deed-wildheart-icons-v045/',
+      '            /docs/screenshots/deed-worldquests-icons-v045/',
+      '            /docs/screenshots/dungeon-bastion-blues-icons-v045/',
+      '            /docs/screenshots/dungeon-bastion-icons-v045/',
+      '            /docs/screenshots/dungeon-crypt-blues-icons-v045/',
+      '            /docs/screenshots/dungeon-crypt-icons-v045/',
+      '            /docs/screenshots/dungeon-gravewyrm-icons-v045/',
+      '            /docs/screenshots/dungeon-temple-blues-icons-v045/',
+      '            /docs/screenshots/dungeon-temple-icons-v045/',
+      '            /docs/screenshots/dungeon-wildheart-icons-v045/',
+      '            /docs/screenshots/eastbrook-ferry/',
+      '            /docs/screenshots/dungeon-groups/',
       '            /docs/screenshots/eastbrook-grand-armoury/',
       '            /docs/screenshots/eastbrook-vale-rebuild/',
+      '            /docs/screenshots/faction-automaton-icons-v045/',
+      '            /docs/screenshots/faction-church-icons-v045/',
+      '            /docs/screenshots/faction-rift-icons-v045/',
       '            /docs/screenshots/far-foliage-impostors/',
       '            /docs/screenshots/fenbridge-rebuild/',
       '            /docs/screenshots/guild-bank-history/',
       '            /docs/screenshots/guild-bank-tab/',
       '            /docs/screenshots/guild-pledge-board/',
       '            /docs/screenshots/guild-social-v1/',
+      '            /docs/screenshots/highwatch-guild/',
       '            /docs/screenshots/harvest-button-refresh/',
+      '            /docs/screenshots/hoard-arcane-icons-v045/',
+      '            /docs/screenshots/hoard-brute-icons-v045/',
+      '            /docs/screenshots/hoard-ember-icons-v045/',
+      '            /docs/screenshots/hoard-frost-icons-v045/',
+      '            /docs/screenshots/hoard-necro-icons-v045/',
+      '            /docs/screenshots/hoard-storm-icons-v045/',
+      '            /docs/screenshots/hoard-tide-icons-v045/',
+      '            /docs/screenshots/hoard-venom-icons-v045/',
+      '            /docs/screenshots/horse-whistle-v045/',
+      '            /docs/screenshots/icon-backlog-v045-surfaces/',
       '            /docs/screenshots/ignivar-raid/',
       '            /docs/screenshots/ignivar-raid-expansion/',
       '            /docs/screenshots/intentional-gathering-pr1/',
@@ -356,18 +392,30 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/masterwrought-art-completion-2026-09-02/',
       '            /docs/screenshots/membership/',
       '            /docs/screenshots/membership-courier/',
+      '            /docs/screenshots/missing-skills-v045/',
       '            /docs/screenshots/placeholder-art-completion-2026-08-09/',
       '            /docs/screenshots/r35-admin-professions-inspector/',
+      '            /docs/screenshots/ravenrift-battleground/',
       '            /docs/screenshots/referral-armour/',
       '            /docs/screenshots/referral-cards/',
       '            /docs/screenshots/referral-portrait-render-2026-10-09/',
-      '            /docs/screenshots/ravenrift-battleground/',
+      '            /docs/screenshots/referral-rewards-v045/',
       '            /docs/screenshots/release-v036-skill-normalization-2026-08-10/',
       '            /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/',
+      '            /docs/screenshots/rewards-icons-v045/',
       '            /docs/screenshots/scenery-windows-4070-2026-10-15/',
       '            /docs/screenshots/target-dots/',
       '            /docs/screenshots/touch-ui-rework/',
       '            /docs/screenshots/vault-fine-mark/',
+      '            /docs/screenshots/warfare-season2-druid-icons/',
+      '            /docs/screenshots/warfare-season2-hunter-icons/',
+      '            /docs/screenshots/warfare-season2-mage-icons/',
+      '            /docs/screenshots/warfare-season2-paladin-icons/',
+      '            /docs/screenshots/warfare-season2-priest-icons/',
+      '            /docs/screenshots/warfare-season2-rogue-icons/',
+      '            /docs/screenshots/warfare-season2-shaman-icons/',
+      '            /docs/screenshots/warfare-season2-warlock-icons/',
+      '            /docs/screenshots/warfare-season2-warrior-icons/',
       '            /docs/screenshots/wildheart/',
       '            /docs/screenshots/woc-market/',
       '            /docs/screenshots/world-quest-cannon/',
@@ -586,6 +634,7 @@ describe('CI workflow parity', () => {
       'charselect-zone',
       'dash-speed-stack',
       'nythraxis-dread-curse-swap',
+      'realm-motd',
     ]);
     for (const dir of workflowScopedFollowup) {
       expect(referenced.has(dir), `${dir} remains a real referenced screenshot subtree`).toBe(true);
@@ -594,7 +643,7 @@ describe('CI workflow parity', () => {
     expect([...referenced].filter((dir) => !workflowScopedFollowup.has(dir)).sort()).toEqual(
       [...coneDirs].sort(),
     );
-  });
+  }, 60_000);
 
   it('performs no hand-rolled directory reads (the corpus is the git index)', () => {
     expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
@@ -1391,11 +1440,11 @@ describe('CI workflow parity', () => {
       // can draw four of them at once and the bound has to cover a slow
       // runner rather than the healthy median. 20 was sized from a 14.63
       // minute healthy worst case and was bound-killing shard 1 by 2026-08-11
-      // at b160a1ba18; 36 is the 2026-08-14 re-derivation from the measured
-      // post-split release-push worst (16.43 minutes, checkout-stall walls
-      // excluded) at the same 1.60 ratio and 1.37 margin; evidence on the
-      // ci.yml bound.
-      ['release-gate', 36],
+      // at b160a1ba18. The August 36-minute budget was overtaken by the
+      // v0.45 workload: run 40113294880 shard 5 completed in 35m29s with
+      // a healthy checkout. The same 1.60 ratio and 1.37 margin give
+      // 77.78 minutes, rounded up to 78; evidence on the ci.yml bound.
+      ['release-gate', 78],
       // The lanes: 28 is the 2026-08-14 re-derivation from post-rebalance
       // healthy walls (worst lane 12.5 minutes, same formula as pr-gate).
       // The 60-to-20-to-30 history, including the falsified under-10

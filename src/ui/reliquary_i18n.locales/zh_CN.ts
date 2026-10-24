@@ -49,9 +49,11 @@ export const table: ReliquaryLocaleTable = {
     desc: '墓龙科祖尔身上仅限英雄难度掉落的史诗物品。',
   },
   conquerors_wildheart_basin: {
+    desc: '来自獠牙领主驯兽师、噬花和祖尔加的标志性武器。',
     name: '荒野之心盆地',
   },
   conquerors_wildheart_basin_heroic: {
+    desc: '来自獠牙领主驯兽师、噬花和盆地之声祖尔加的英雄难度专属史诗装备与饰品。',
     name: '英雄：荒野之心盆地',
   },
   // The arena entity reads 尼思拉克西斯团队竞技场; the page collects the raid's
@@ -170,7 +172,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_armory: {
     name: '战争兵器库',
-    desc: '以来之不易的荣誉购得的战争饰品与武器。',
+    desc: '以来之不易的荣誉购得的战争饰品、武器与物品。',
   },
   conquerors_vanguard_gallery: {
     name: '先锋展厅',

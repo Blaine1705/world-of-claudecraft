@@ -27,6 +27,7 @@ import {
   transferMembershipBank,
 } from '../server/membership_bank_db';
 import type { CharacterState } from '../src/sim/character_state';
+import { savedMaterialSlot } from '../src/sim/material_slot_load';
 
 const item = { itemId: 'baked_bread', count: 3 };
 function input(): MembershipBankSave {
@@ -156,7 +157,7 @@ describe('membership bank transactional durability', () => {
       10,
       { bank: { inventory: [], purchasedSlots: 0, bonusSlots: 0 }, vault: undefined },
       expect.objectContaining({ rowCount: 1 }),
-      { bank: { inventory: [item], purchasedSlots: 0, bonusSlots: 0 } },
+      { bank: { inventory: [savedMaterialSlot(item)], purchasedSlots: 0, bonusSlots: 0 } },
     );
     expect(fake.release).toHaveBeenCalledOnce();
   });

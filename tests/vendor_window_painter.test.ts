@@ -431,6 +431,34 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
     expect(built[0]).not.toContain('Requires Mining 40');
   });
 
+  it('the Sell Junk tooltip says gray sales skip the buyback list', () => {
+    // The sim keeps plain gray junk out of vendorBuyback (items.ts
+    // skipsVendorBuyback), so the sweep is final and the button must say so.
+    const built: string[] = [];
+    const view: VendorView = {
+      goods: [],
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1,
+    };
+    renderVendorWindow(
+      document.createElement('div'),
+      'Vendor',
+      view,
+      deps({
+        attachTooltip: (_node: HTMLElement, build: () => string) => {
+          built.push(build());
+        },
+      }),
+    );
+    const junkTip = built.find((html) => html.includes('Sells every gray item'));
+    expect(junkTip).toBeDefined();
+    expect(junkTip).toContain(
+      'Unsigned gray items skip the buyback list, so selling them cannot be undone.',
+    );
+  });
+
   it('keeps click-to-buy on an unlocked row TOOLTIP', () => {
     // The counter-example: without it the arm above passes on a painter that
     // dropped the click hint from every row.
@@ -1202,7 +1230,7 @@ describe('vendor window family: hud.ts focus-management wiring (WCAG 2.4.3)', ()
     // gained inspectedWearer with the membership account benefits
     // (6ffc9e3e3ca, PR 4281); the guarded slot line is unchanged.
     const itemTooltipStart = anchor(
-      'private itemTooltip(\n    item: ItemDef,\n    compare = true,\n    instance?: ItemInstancePayload,\n    materialSources?: MaterialComposition,\n    inspectedWearer?: MembershipTooltipWearer,\n  ): string {',
+      "private itemTooltip(\n    item: ItemDef,\n    compare: boolean | 'embedded' | 'noset' = true,\n    instance?: ItemInstancePayload,\n    materialSources?: MaterialComposition,\n    inspectedWearer?: MembershipTooltipWearer,\n  ): string {",
     );
     const itemProcBlockStart = anchor('private itemProcBlock(item: ItemDef): string {');
     expect(itemProcBlockStart).toBeGreaterThan(itemTooltipStart);

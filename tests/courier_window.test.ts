@@ -232,7 +232,7 @@ describe('courier window', () => {
       stock: { copper_ore: 6 },
       special: [],
       upgrades: 1,
-      perMaterialCap: 40,
+      perMaterialCap: 100,
       nextUpgradeCost: 50000,
     };
     replaceBags([

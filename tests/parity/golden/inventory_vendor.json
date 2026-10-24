@@ -11,7 +11,7 @@
     "useItem food/drink (sit + eating/drinking slot), potion (heal + cooldown), elixir (applyAura)",
     "discardItem: removeItem the discarded count",
     "sellItem: vendorInRange gate + recordVendorBuyback + meta.copper payout",
-    "sellAllJunk: bulk gray sweep, per-stack buyback record, one summary line",
+    "sellAllJunk: bulk gray sweep, plain grays skip buyback, one summary line",
     "buyBackItem: meta.copper spend + addItemSilent + onInventoryChangedForQuests"
   ],
   "draws": 0,
@@ -195,7 +195,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "548247dd",
+      "state": "e1a20831",
       "events": "7b079d2f",
       "rng": {
         "draws": 0,
@@ -264,15 +264,33 @@
           "inventory": [
             {
               "count": 10,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 10,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 5,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
-              "itemId": "minor_healing_potion"
+              "itemId": "minor_healing_potion",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             }
           ],
           "mailWelcomed": true,
@@ -365,7 +383,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "7365bdd3",
+      "state": "5b4624b7",
       "events": "9b90e82d",
       "rng": {
         "draws": 0,
@@ -437,15 +455,33 @@
           "inventory": [
             {
               "count": 10,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 10,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 5,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
-              "itemId": "minor_healing_potion"
+              "itemId": "minor_healing_potion",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -549,7 +585,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "bc009ae4",
+      "state": "07f17e02",
       "events": "7bb2d484",
       "rng": {
         "draws": 0,
@@ -621,15 +657,33 @@
           "inventory": [
             {
               "count": 10,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 10,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 5,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
-              "itemId": "minor_healing_potion"
+              "itemId": "minor_healing_potion",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -733,7 +787,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "bede35f6",
+      "state": "0e86f6f2",
       "events": "bf50d54d",
       "rng": {
         "draws": 0,
@@ -804,15 +858,33 @@
           "inventory": [
             {
               "count": 10,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 10,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 5,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 5,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
-              "itemId": "minor_healing_potion"
+              "itemId": "minor_healing_potion",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -920,7 +992,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "8d7bdd08",
+      "state": "e258c033",
       "events": "2d30819f",
       "rng": {
         "draws": 0,
@@ -991,15 +1063,33 @@
           "inventory": [
             {
               "count": 9,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 9,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 4,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 4,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
-              "itemId": "minor_healing_potion"
+              "itemId": "minor_healing_potion",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -1120,7 +1210,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "38615baf",
+      "state": "aa05a73a",
       "events": "ec778e24",
       "rng": {
         "draws": 0,
@@ -1191,11 +1281,23 @@
           "inventory": [
             {
               "count": 9,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 9,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 4,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 4,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -1316,7 +1418,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "54029dd3",
+      "state": "99564366",
       "events": "1a16079d",
       "rng": {
         "draws": 0,
@@ -1388,11 +1490,23 @@
           "inventory": [
             {
               "count": 9,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 9,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 4,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 4,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -1523,7 +1637,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "c4a9edc8",
+      "state": "84a81cd5",
       "events": "f769fd0b",
       "rng": {
         "draws": 0,
@@ -1599,11 +1713,23 @@
           "inventory": [
             {
               "count": 9,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 9,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 4,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 4,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -1734,7 +1860,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "59bf5a74",
+      "state": "8f3b83c3",
       "events": "b5f7ad8a",
       "rng": {
         "draws": 0,
@@ -1811,11 +1937,23 @@
           "inventory": [
             {
               "count": 9,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 9,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 4,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 4,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -1956,7 +2094,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "8ec35610",
+      "state": "9df7ddc9",
       "events": "86f491d4",
       "rng": {
         "draws": 0,
@@ -2033,11 +2171,23 @@
           "inventory": [
             {
               "count": 9,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 9,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 4,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 4,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -2190,7 +2340,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "4bd2824a",
+      "state": "a41039b8",
       "events": "b5a00f90",
       "rng": {
         "draws": 0,
@@ -2268,11 +2418,23 @@
           "inventory": [
             {
               "count": 9,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 9,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 4,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 4,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -2316,10 +2478,6 @@
           },
           "vaultAttemptDurable": true,
           "vendorBuyback": [
-            {
-              "count": 1,
-              "itemId": "soggy_moccasin"
-            },
             {
               "count": 1,
               "itemId": "wolf_fang",
@@ -2429,7 +2587,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "e740ab66",
+      "state": "b38fa9cf",
       "events": "d30c5a4d",
       "rng": {
         "draws": 0,
@@ -2507,11 +2665,23 @@
           "inventory": [
             {
               "count": 9,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 9,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 4,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 4,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -2554,12 +2724,6 @@
             "stock": {}
           },
           "vaultAttemptDurable": true,
-          "vendorBuyback": [
-            {
-              "count": 1,
-              "itemId": "soggy_moccasin"
-            }
-          ],
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
@@ -2658,7 +2822,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "e740ab66",
+      "state": "b38fa9cf",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2736,11 +2900,23 @@
           "inventory": [
             {
               "count": 9,
-              "itemId": "baked_bread"
+              "itemId": "baked_bread",
+              "materialSources": [
+                {
+                  "count": 9,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 4,
-              "itemId": "spring_water"
+              "itemId": "spring_water",
+              "materialSources": [
+                {
+                  "count": 4,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -2783,12 +2959,6 @@
             "stock": {}
           },
           "vaultAttemptDurable": true,
-          "vendorBuyback": [
-            {
-              "count": 1,
-              "itemId": "soggy_moccasin"
-            }
-          ],
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }

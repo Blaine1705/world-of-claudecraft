@@ -20,6 +20,10 @@ import { BalancedSequencer } from './scripts/ci_balanced_sequencer.mjs';
 // vite.config.ts is outside tsconfig `include`, so this import is never type-checked.
 import { templateModulepreload } from './scripts/i18n_modulepreload.mjs';
 import {
+  headStylesheetsBlockingBootSplash,
+  moveHeadStylesheetsBehindBootSplash,
+} from './scripts/lib/boot_splash_stylesheets.mjs';
+import {
   emitCollisionOverridesModule,
   validateOverride,
 } from './scripts/lib/collision_overrides_emit.mjs';
@@ -27,6 +31,7 @@ import {
   diagnosticsCaptureAllowed,
   diagnosticsReadAllowed,
 } from './scripts/lib/diagnostics_capture_guard.mjs';
+import { gameModuleEntries, injectGameModules } from './scripts/lib/landing_game_modules.mjs';
 import { studioDevGuardMiddleware } from './scripts/lib/studio_dev_guard.mjs';
 import { readBase, snapshotBase } from './scripts/lib/studio_map_base.mjs';
 import { vitestBoundedRelatedPlugin } from './scripts/lib/vitest_bounded_related.mjs';
@@ -195,6 +200,66 @@ function i18nModulepreloadPlugin() {
       console.log(
         `[i18n] modulepreload: templated ${Object.keys(map).length} locale chunk URLs into index.html`,
       );
+    },
+  };
+}
+
+// Runs after Vite injects the built CSS <link>s, so those move too; dev and build share it.
+// The build re-reads its own output, so a Vite upgrade that injects CSS later fails loudly.
+function bootSplashStylesheetsPlugin() {
+  let outDir = path.resolve(root, 'dist');
+  return {
+    name: 'woc-boot-splash-stylesheets',
+    transformIndexHtml: { order: 'post' as const, handler: moveHeadStylesheetsBehindBootSplash },
+    configResolved(cfg: { root: string; build: { outDir: string } }) {
+      outDir = path.resolve(cfg.root, cfg.build.outDir);
+    },
+    closeBundle() {
+      for (const entry of ['index.html', 'play.html']) {
+        const file = path.join(outDir, entry);
+        if (!existsSync(file)) continue;
+        const blocking = headStylesheetsBlockingBootSplash(readFileSync(file, 'utf8'));
+        if (blocking.length > 0) {
+          throw new Error(
+            `${entry}: stylesheets left in <head> block the boot splash: ${blocking}`,
+          );
+        }
+      }
+    },
+  };
+}
+
+// The landing-first boot prefetches the game client after the home page has loaded
+// (src/ui/landing_first.ts). The client is a dynamic import of src/boot.ts, so its
+// chunk URLs only exist in the bundle: list them into index.html as JSON. Build-only;
+// in dev the list is absent and the prefetch is skipped.
+function landingGameModulesPlugin() {
+  let base = '/';
+  return {
+    name: 'woc-landing-game-modules',
+    apply: 'build' as const,
+    configResolved(cfg: { base: string }) {
+      base = cfg.base || '/';
+    },
+    transformIndexHtml: {
+      order: 'post' as const,
+      handler(
+        html: string,
+        ctx: {
+          path: string;
+          bundle?: Record<string, { code?: string } & Record<string, unknown>>;
+          chunk?: { fileName: string };
+        },
+      ) {
+        if (!ctx.bundle || !/(^|\/)index\.html$/.test(ctx.path)) return html;
+        const modules = gameModuleEntries(ctx.bundle, ctx.chunk?.fileName, base);
+        if (modules.length === 0) {
+          throw new Error(
+            'index.html: found no src/main.ts chunk to list for the landing prefetch',
+          );
+        }
+        return injectGameModules(html, modules);
+      },
     },
   };
 }
@@ -1248,6 +1313,8 @@ export default defineConfig({
       : []),
     staticPageAliasPlugin(),
     i18nModulepreloadPlugin(),
+    bootSplashStylesheetsPlugin(),
+    landingGameModulesPlugin(),
     musicEditorSavePlugin(),
     studioDevGuardPlugin(),
     dungeonEditorSavePlugin(),

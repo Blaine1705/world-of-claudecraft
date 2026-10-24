@@ -6,7 +6,10 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../server/db', () => ({ insertBankLedgerRow: vi.fn(), insertBankLedgerRows: vi.fn() }));
 
-import { createBankVaultLedgerGuardCoordinator } from '../server/bank_vault_ledger_guard';
+import {
+  BANK_VAULT_LEDGER_ROW_BURST,
+  createBankVaultLedgerGuardCoordinator,
+} from '../server/bank_vault_ledger_guard';
 import {
   type CourierWireSim,
   courierBankExchangeFor,
@@ -23,7 +26,7 @@ const vault = (stock: Record<string, number> = {}): VaultInfo => ({
   stock,
   special: [],
   upgrades: 1,
-  perMaterialCap: 40,
+  perMaterialCap: 100,
   nextUpgradeCost: 50000,
 });
 const info = (): CourierInfo => ({
@@ -60,7 +63,12 @@ function sim(value: CourierInfo | null): CourierWireSim {
     courierWireRevisionFor: () => (value ? '1' : null),
     courierBankInfoFor: () => null,
     ctx: { players: new Map(), resolve: () => null } as never,
-    meta: () => ({ characterId: 10, inventory: [] }),
+    meta: () => ({
+      characterId: 10,
+      inventory: [],
+      bank: { inventory: [] },
+      courier: { cargo: [], withdrawals: [] },
+    }),
   };
 }
 const base = { t: 'cmd', cmd: 'courier_dispatch', deposits: [], withdrawals: [] };
@@ -146,69 +154,86 @@ describe('courier vault wire', () => {
     ).toBe(3);
   });
 
-  it('reserves the vault ledger beside the bank and records both vault legs', () => {
-    const live = { stock: { linen_scrap: 4 } as Record<string, number>, special: [], upgrades: 1 };
-    const bank = { slots: [], purchasedSlots: 0, nextExpansionCost: 500 } as unknown as BankInfo;
-    const meta = {
-      vault: live,
-      courier: {
-        vaultCargo: [{ itemId: 'copper_ore', count: 3 }],
-        vaultWithdrawals: [{ itemId: 'linen_scrap', count: 4 }],
-      },
-    };
-    const host = {
-      ...sim(info()),
-      courierBankInfoFor: () => structuredClone(bank),
-      ctx: {
-        players: new Map([[17, meta]]),
-        resolve: () => ({ meta }),
-        storagePrices: { vaultUpgrades: [20000, 50000, 100000, 200000, 400000] },
-      } as never,
-    };
-    const rows: { surface: string; batch: unknown[] }[] = [];
-    const admission = {
-      tryReserve: vi.fn((_rows: number, _guild: number, surface: string) => ({
-        commit: (batch: readonly unknown[]) => {
-          rows.push({ surface, batch: [...batch] });
-          return true;
+  it.each([false, true])(
+    'settles vault exchanges without stranding oversized saved trips (%s)',
+    (oversized) => {
+      const live = {
+        stock: { linen_scrap: 4 } as Record<string, number>,
+        special: [],
+        upgrades: 1,
+      };
+      const bank = { slots: [], purchasedSlots: 0, nextExpansionCost: 500 } as unknown as BankInfo;
+      const meta = {
+        vault: live,
+        courier: {
+          vaultCargo: oversized
+            ? Array.from({ length: BANK_VAULT_LEDGER_ROW_BURST + 1 }, (_, i) => ({
+                itemId: `material_${i}`,
+                count: 1,
+              }))
+            : [{ itemId: 'copper_ore', count: 3 }],
+          vaultWithdrawals: [{ itemId: 'linen_scrap', count: 4 }],
         },
-        cancel: vi.fn(() => true),
-        failAfterMutation: vi.fn(),
-      })),
-    };
-    const runtime = createBankVaultLedgerGuardCoordinator(() => 0).createRuntime(
-      20,
-      admission as never,
-      vi.fn(),
-    );
-    const session = {
-      pid: 17,
-      characterId: 10,
-      accountId: 20,
-      left: false,
-      escrowQuarantined: false,
-      bankLedgerJournal: { outbox: { owner: { characterId: 10, accountId: 20 } } },
-      bankVaultLedgerGuard: runtime,
-    } as unknown as StorageAdmissionSession;
-    const ok = courierBankExchangeFor(
-      host,
-      session,
-      17,
-      () => {
-        live.stock.copper_ore = 3;
-      },
-      () => {
-        delete live.stock.linen_scrap;
-      },
-    );
-    expect(ok).toBe(true);
-    expect(admission.tryReserve).toHaveBeenCalledWith(2, 0, 'vault');
-    const vaultRows = rows.find((r) => r.surface === 'vault')?.batch;
-    expect(vaultRows).toMatchObject([
-      { op: 'deposit', itemId: 'copper_ore', count: 3, container: 'vault' },
-      { op: 'withdraw', itemId: 'linen_scrap', count: 4, container: 'vault' },
-    ]);
-  });
+      };
+      const host = {
+        ...sim(info()),
+        courierBankInfoFor: () => structuredClone(bank),
+        ctx: {
+          players: new Map([[17, meta]]),
+          resolve: () => ({ meta }),
+          storagePrices: { vaultUpgrades: [20000, 50000, 100000, 200000, 400000] },
+        } as never,
+      };
+      const rows: { surface: string; batch: unknown[] }[] = [];
+      const admission = {
+        tryReserve: vi.fn((_rows: number, _guild: number, surface: string) => ({
+          commit: (batch: readonly unknown[]) => {
+            rows.push({ surface, batch: [...batch] });
+            return true;
+          },
+          cancel: vi.fn(() => true),
+          failAfterMutation: vi.fn(),
+        })),
+      };
+      const runtime = createBankVaultLedgerGuardCoordinator(() => 0).createRuntime(
+        20,
+        admission as never,
+        vi.fn(),
+      );
+      const session = {
+        pid: 17,
+        characterId: 10,
+        accountId: 20,
+        left: false,
+        escrowQuarantined: false,
+        bankLedgerJournal: { outbox: { owner: { characterId: 10, accountId: 20 } } },
+        bankVaultLedgerGuard: runtime,
+      } as unknown as StorageAdmissionSession;
+      const ok = courierBankExchangeFor(
+        host,
+        session,
+        17,
+        () => {
+          live.stock.copper_ore = 3;
+        },
+        () => {
+          delete live.stock.linen_scrap;
+        },
+      );
+      expect(ok).toBe(true);
+      if (oversized) {
+        expect(live.stock).toEqual({ linen_scrap: 4 });
+        expect(rows).toEqual([]);
+        return;
+      }
+      expect(admission.tryReserve).toHaveBeenCalledWith(2, 0, 'vault');
+      const vaultRows = rows.find((r) => r.surface === 'vault')?.batch;
+      expect(vaultRows).toMatchObject([
+        { op: 'deposit', itemId: 'copper_ore', count: 3, container: 'vault' },
+        { op: 'withdraw', itemId: 'linen_scrap', count: 4, container: 'vault' },
+      ]);
+    },
+  );
 
   it('reads the other-character leg strictly and round-trips it on courierStores', () => {
     const account = {

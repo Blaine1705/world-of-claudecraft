@@ -18,6 +18,7 @@ import {
   writeNeedleWindupPlan,
 } from './needle_of_fate_vfx_core';
 import { tagVfxSubtree } from './renderer_diagnostics';
+import { spellEffectsMuted } from './spell_effects_switch';
 import { VisibleChildrenGroup } from './visible_children_group';
 
 const POOL_SIZE = 8;
@@ -672,6 +673,7 @@ export class NeedleOfFateVfx {
 
   beginCast(sourceId: number, duration: number): void {
     this.endCast(sourceId);
+    if (spellEffectsMuted(sourceId)) return;
     const slot =
       this.windups.find((candidate) => !candidate.active) ?? this.windups[this.windupCursor];
     this.windupCursor = (this.windupCursor + 1) % this.windups.length;
@@ -694,6 +696,7 @@ export class NeedleOfFateVfx {
   spawn(sourceId: number, targetId: number): void {
     if (!this.anchor(sourceId, 0.64, this.spawnPoint)) return;
     this.endCast(sourceId);
+    if (spellEffectsMuted(sourceId)) return;
     this.openRelease(sourceId, this.spawnPoint);
     const slot = this.needles[this.needleCursor];
     this.needleCursor = (this.needleCursor + 1) % this.needles.length;

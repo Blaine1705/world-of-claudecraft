@@ -13,6 +13,7 @@ import {
   updateCourier,
 } from '../src/sim/courier';
 import { INSTANCE_X_BASE } from '../src/sim/data';
+import { savedMaterialSlot } from '../src/sim/material_slot_load';
 import { perfectMembershipArmour } from '../src/sim/membership_armour_progression';
 import type { PlayerMeta } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
@@ -60,8 +61,8 @@ const selection = (slots: InvSlot[], index = 0) => ({
   index,
   fingerprint: courierSlotFingerprint(slots[index]),
 });
-const food = (count = 1): InvSlot => ({ itemId: 'baked_bread', count });
-const meat = (count = 1): InvSlot => ({ itemId: 'roasted_boar', count });
+const food = (count = 1): InvSlot => savedMaterialSlot({ itemId: 'baked_bread', count });
+const meat = (count = 1): InvSlot => savedMaterialSlot({ itemId: 'roasted_boar', count });
 
 describe('membership courier custody', () => {
   it('returns legacy waiting cargo into overflow without losing provenance, then vanishes', () => {
@@ -119,8 +120,8 @@ describe('membership courier custody', () => {
   it.each([
     { bank: food(2), deposit: food(3) },
     {
-      bank: { ...food(2), instance: { craftedBy: 'test' } },
-      deposit: { ...food(3), instance: { craftedBy: 'test' } },
+      bank: { ...food(2), materialSources: [{ source: { signer: 'test' }, count: 2 }] },
+      deposit: { ...food(3), materialSources: [{ source: { signer: 'test' }, count: 3 }] },
     },
     {
       bank: {
@@ -386,11 +387,11 @@ describe('membership courier custody', () => {
     const f = fixture();
     f.meta.inventory = [food(2)];
     const stale = selection(f.meta.inventory);
-    f.meta.inventory[0].count = 3;
+    f.meta.inventory[0] = food(3);
     expect(courierDispatch(f.ctx, { deposits: [stale], withdrawals: [] }, 1)).toBe(false);
     f.meta.bank.inventory = [meat()];
     courierDispatch(f.ctx, { deposits: [], withdrawals: [selection(f.meta.bank.inventory)] }, 1);
-    f.meta.bank.inventory[0].count = 2;
+    f.meta.bank.inventory[0] = meat(2);
     f.finish();
     expect(f.meta.bank.inventory).toEqual([meat(2)]);
     expect(f.meta.inventory).toEqual([food(3)]);

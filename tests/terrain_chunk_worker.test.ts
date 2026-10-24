@@ -536,7 +536,8 @@ describe('the worker is told which world it is meshing', () => {
         posted.push(this.log);
       }
       postMessage(message: { kind?: string; id?: number }): void {
-        this.log.push(message);
+        // Match the browser boundary: a Proxy cannot be sent to a worker.
+        this.log.push(structuredClone(message));
         if (message.kind === 'chunk') {
           queueMicrotask(() =>
             this.onmessage?.({ data: { id: message.id, ok: false, error: 'stub' } }),
@@ -557,7 +558,7 @@ describe('the worker is told which world it is meshing', () => {
       await pool?.buildChunk(payload);
       const log = posted.find((entry) => entry.length > 0) ?? [];
       expect((log[0] as { kind: string }).kind).toBe('content');
-      expect((log[0] as { content: WorldContent }).content).toBe(content);
+      expect((log[0] as { content: WorldContent }).content).toEqual(content);
       expect((log[1] as { kind: string }).kind).toBe('chunk');
       // A second job against the same generation must not re-ship it.
       await pool?.buildChunk(payload);

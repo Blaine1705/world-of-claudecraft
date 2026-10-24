@@ -244,6 +244,24 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     detachToUiRoot: true,
     stockHome: { parentId: 'target-frame', slot: 'last' },
   },
+  // The player's resource bar (mana / energy / rage), live only while the
+  // Detach Resource Bar option is on (hud_frame_registry.ts gates it, the
+  // independent target-of-target's shape). The frame is a wrapper around the
+  // bar rather than the bar itself: the bar clips its own box (the bevel's
+  // clip-path, overflow hidden), which would swallow the mover chrome. It sits
+  // inside the player frame, so it re-homes onto #ui while positioned and
+  // returns to the end of the bars column. Its size lives in real settings
+  // (frame_dimensions.ts), so the editor drags and the frame-option sliders
+  // are one state.
+  {
+    id: 'playerResource',
+    elementId: 'pf-resource-frame',
+    storageKey: 'woc_hud_frame_player_resource',
+    labelKey: 'hudChrome.interfaceUnlock.frameNames.playerResource',
+    fallbackSize: { w: 232, h: 11 },
+    detachToUiRoot: true,
+    stockHome: { parentId: 'pf-bars', slot: 'last' },
+  },
   {
     id: 'stanceBar',
     elementId: 'stancebar',
@@ -510,6 +528,19 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
       resizeMode: 'box',
     }),
   ),
+  // The King of the Hill bar (src/ui/hud/hill/), top centre while the player
+  // stands in the hill's zone. A #ui child, so no re-home; hidden outside the
+  // zone, so editing shows it as a dimmed placeholder like the cast bar. Its
+  // painter rebuilds an inner #hill-body, so the mover chrome on the root
+  // survives every skeleton rebuild.
+  {
+    id: 'hillBar',
+    elementId: 'hill-bar',
+    storageKey: 'woc_hud_frame_hill_bar',
+    labelKey: 'hudChrome.hill.title',
+    fallbackSize: { w: 300, h: 92 },
+    detachToUiRoot: false,
+  },
   // The mouseover unit tooltip (the mob and player hover card). The card itself
   // is the shared transient #tooltip box, so the frame is its SEAT: an
   // invisible anchor whose stock spot is the classic bottom-right slot, which

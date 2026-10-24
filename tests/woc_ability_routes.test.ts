@@ -63,6 +63,8 @@ const ROUTES: Record<
       startle_shot: 'Woc_Attack_Rifle',
       concussive_shot: 'Woc_Attack_Rifle',
       multi_shot: 'Woc_Attack_Rifle',
+      phosphor_flask: 'Woc_Attack_Rifle',
+      scatterbolt: 'Woc_Attack_Rifle',
       shrapnel_charge: 'Woc_Attack_Rifle',
     },
     castByAbility: {

@@ -508,8 +508,22 @@ interface BlueSpec {
   slot: Slot;
 }
 const blueSpecs: BlueSpec[] = [];
+// The release's rare tower shield joins this quest on the integration branch.
+// Reuse the existing undead-themed level-23 set for all six armor roles. Its
+// higher source remains authoritative, so this adds no items or stat changes.
+const REUSED_RARE_CHOICES: Readonly<Record<string, readonly string[]>> = {
+  q_revenants: [
+    'cairnking_mantle',
+    'cairnking_shoulderpads',
+    'cairnking_shoulderguards',
+    'cairnking_pauldrons',
+    'cairnking_spaulders',
+    'cairnking_epaulets',
+  ],
+};
 let weaponCursor = 0;
 for (const { q } of quests) {
+  if (REUSED_RARE_CHOICES[q.id]) continue;
   const authored = authoredBlues(q);
   if (authored.length === 0) continue;
   const theme = BLUE_THEMES[q.id];
@@ -556,6 +570,9 @@ for (const b of blueSpecs) {
     b.questId,
     b.roles.map((role) => itemId(b.theme, role, b.slot)),
   );
+}
+for (const [questId, ids] of Object.entries(REUSED_RARE_CHOICES)) {
+  assignment.set(questId, [...ids]);
 }
 
 // ---------------------------------------------------------------------------

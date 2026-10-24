@@ -44,9 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Vildhjärtats bassäng',
+    desc: 'Signaturvapen från Bettherren bestmästaren, Frossblomman och Zulgar.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroisk: Vildhjärtats bassäng',
+    desc: 'Episka föremål och smycken enbart från heroiskt läge, från Bettherren bestmästaren, Frossblomman och Zulgar, bassängens röst.',
   },
   conquerors_nythraxis: {
     name: 'Nythraxis-raid',
@@ -146,7 +148,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_armory: {
     name: 'Krigföringens vapenkammare',
-    desc: 'Smycken och vapen för Krigföring, köpta för hårt vunnen ära.',
+    desc: 'Smycken, vapen och varor för Krigföring, köpta för hårt vunnen ära.',
   },
   conquerors_vanguard_gallery: {
     name: 'Förtruppsgalleri',

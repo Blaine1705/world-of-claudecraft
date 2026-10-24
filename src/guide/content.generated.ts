@@ -924,6 +924,14 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Frostjaw Trap"
       },
       {
+        "id": "bear_trap",
+        "name": "Bear Trap"
+      },
+      {
+        "id": "scatterbolt",
+        "name": "Scatterbolt"
+      },
+      {
         "id": "tame_beast",
         "name": "Wildbond"
       },
@@ -960,8 +968,20 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Bloodtrail Assault"
       },
       {
+        "id": "tactical_camo",
+        "name": "Tactical Camo"
+      },
+      {
+        "id": "play_dead",
+        "name": "Play Dead"
+      },
+      {
         "id": "volley",
         "name": "Volley"
+      },
+      {
+        "id": "phosphor_flask",
+        "name": "Phosphor Flask"
       },
       {
         "id": "counter_shot",
@@ -1956,7 +1976,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "rejuvenation",
-        "name": "Wildbloom"
+        "name": "Sporemending"
       }
     ],
     "abilities": [
@@ -1982,7 +2002,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "rejuvenation",
-        "name": "Wildbloom"
+        "name": "Sporemending"
       },
       {
         "id": "thorns",
@@ -2035,6 +2055,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "claw",
         "name": "Rendclaw"
+      },
+      {
+        "id": "scratch",
+        "name": "Scratch"
       },
       {
         "id": "regrowth",
@@ -2119,6 +2143,18 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "grove_awakening",
         "name": "Grove Awakening"
+      },
+      {
+        "id": "sporemender_form",
+        "name": "Sporemender Form"
+      },
+      {
+        "id": "spore_burst",
+        "name": "Spore Burst"
+      },
+      {
+        "id": "natures_boon",
+        "name": "Nature's Boon"
       }
     ],
     "model": "player_druid",
@@ -2579,6 +2615,11 @@ export const GUIDE_DRUID_FORMS: GuideDruidForm[] = [
     "id": "form_travel",
     "model": "form_travel",
     "still": "/guide-stills/form_travel.webp"
+  },
+  {
+    "id": "form_sporemender",
+    "model": "form_sporemender",
+    "still": "/guide-stills/form_sporemender.webp"
   }
 ];
 
@@ -5678,14 +5719,16 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "The Quiet Halls",
     "category": "exploration",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/exp_the_last_keep.webp"
   },
   {
     "id": "exp_dawnhold_castle",
     "name": "An Open Door in the Garden",
     "category": "exploration",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/exp_dawnhold_castle.webp"
   },
   {
     "id": "prog_jewelcrafting_rare",
@@ -5823,21 +5866,24 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "Strongbox Outfitter",
     "category": "social",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/soc_strongbox_outfitter.webp"
   },
   {
     "id": "soc_four_bags_deep",
     "name": "Four Bags Deep",
     "category": "social",
     "renown": 25,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/soc_four_bags_deep.webp"
   },
   {
     "id": "prog_ready_for_an_adventure",
     "name": "Ready for an Adventure",
     "category": "progression",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_ready_for_an_adventure.webp"
   },
   {
     "id": "prog_legendmaker",
@@ -5860,7 +5906,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "A Steady Hand",
     "category": "exploration",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/exp_arcane_calligraphy.webp"
   },
   {
     "id": "exp_arcane_calligraphy_gold",
@@ -5868,70 +5915,80 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "exploration",
     "renown": 10,
     "feat": false,
-    "rewardTitle": "the Runecaller"
+    "rewardTitle": "the Runecaller",
+    "crest": "/ui/deeds/exp_arcane_calligraphy_gold.webp"
   },
   {
     "id": "exp_forge_helper",
     "name": "A Helping Hammer",
     "category": "exploration",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/exp_forge_helper.webp"
   },
   {
     "id": "exp_last_barricade",
     "name": "The Last Barricade",
     "category": "exploration",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/exp_last_barricade.webp"
   },
   {
     "id": "exp_borrowed_face",
     "name": "A Borrowed Face",
     "category": "exploration",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/exp_borrowed_face.webp"
   },
   {
     "id": "exp_windrider_slalom",
     "name": "Windrider Slalom",
     "category": "exploration",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/exp_windrider_slalom.webp"
   },
   {
     "id": "exp_duskweave_dispatches",
     "name": "Duskweave Dispatches",
     "category": "exploration",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/exp_duskweave_dispatches.webp"
   },
   {
     "id": "exp_wisp_maze",
     "name": "A Light in the Maze",
     "category": "exploration",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/exp_wisp_maze.webp"
   },
   {
     "id": "prog_rift_watch_trusted",
     "name": "Trusted by the Rift Watch",
     "category": "progression",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_rift_watch_trusted.webp"
   },
   {
     "id": "prog_church_order_trusted",
     "name": "Trusted by the Church Order",
     "category": "progression",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_church_order_trusted.webp"
   },
   {
     "id": "prog_automatons_trusted",
     "name": "Trusted by the Automatons",
     "category": "progression",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_automatons_trusted.webp"
   },
   {
     "id": "prog_rift_watch_champion",
@@ -5939,7 +5996,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "progression",
     "renown": 25,
     "feat": false,
-    "rewardTitle": "Riftwarden"
+    "rewardTitle": "Riftwarden",
+    "crest": "/ui/deeds/prog_rift_watch_champion.webp"
   },
   {
     "id": "prog_church_order_champion",
@@ -5947,7 +6005,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "progression",
     "renown": 25,
     "feat": false,
-    "rewardTitle": "Dawnkeeper"
+    "rewardTitle": "Dawnkeeper",
+    "crest": "/ui/deeds/prog_church_order_champion.webp"
   },
   {
     "id": "prog_automatons_champion",
@@ -5955,21 +6014,24 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "progression",
     "renown": 25,
     "feat": false,
-    "rewardTitle": "Forgemaster"
+    "rewardTitle": "Forgemaster",
+    "crest": "/ui/deeds/prog_automatons_champion.webp"
   },
   {
     "id": "prog_faction_champion_all",
     "name": "Champion of Every Banner",
     "category": "progression",
     "renown": 50,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_faction_champion_all.webp"
   },
   {
     "id": "exp_clue_first_casket",
     "name": "Treasure Found",
     "category": "exploration",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/exp_clue_first_casket.webp"
   },
   {
     "id": "exp_clue_ten_caskets",
@@ -5977,20 +6039,78 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "exploration",
     "renown": 25,
     "feat": false,
-    "rewardTitle": "Treasure Hunter"
+    "rewardTitle": "Treasure Hunter",
+    "crest": "/ui/deeds/exp_clue_ten_caskets.webp"
   },
   {
     "id": "cmb_coinsack_caught",
     "name": "Caught Red-Handed",
     "category": "combat",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/cmb_coinsack_caught.webp"
   },
   {
     "id": "exp_harbor_to_harbor",
     "name": "Harbor to Harbor",
     "category": "exploration",
     "renown": 5,
+    "feat": false,
+    "crest": "/ui/deeds/exp_harbor_to_harbor.webp"
+  },
+  {
+    "id": "prog_titan",
+    "name": "Titan",
+    "category": "progression",
+    "renown": 50,
+    "feat": false,
+    "rewardTitle": "Titan"
+  },
+  {
+    "id": "pvp_flag_1h",
+    "name": "Bold",
+    "category": "pvp",
+    "renown": 5,
+    "feat": false,
+    "rewardTitle": "Bold"
+  },
+  {
+    "id": "pvp_flag_3h",
+    "name": "Defiant",
+    "category": "pvp",
+    "renown": 10,
+    "feat": false,
+    "rewardTitle": "Defiant"
+  },
+  {
+    "id": "pvp_flag_6h",
+    "name": "Dauntless",
+    "category": "pvp",
+    "renown": 10,
+    "feat": false,
+    "rewardTitle": "Dauntless"
+  },
+  {
+    "id": "pvp_flag_24h",
+    "name": "Unyielding",
+    "category": "pvp",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Unyielding"
+  },
+  {
+    "id": "pvp_flag_168h",
+    "name": "Indomitable",
+    "category": "pvp",
+    "renown": 50,
+    "feat": false,
+    "rewardTitle": "Indomitable"
+  },
+  {
+    "id": "exp_wisp_maze_hard",
+    "name": "Brighter Than the Shadows",
+    "category": "exploration",
+    "renown": 10,
     "feat": false
   },
   {
@@ -5998,154 +6118,176 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "Foreman No More",
     "category": "combat",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/cmb_balgath.webp"
   },
   {
     "id": "cmb_balgath_ten",
     "name": "The Mound Keeps Nothing",
     "category": "combat",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/cmb_balgath_ten.webp"
   },
   {
     "id": "cmb_point_taken",
     "name": "Point Taken",
     "category": "combat",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/cmb_point_taken.webp"
   },
   {
     "id": "dgn_olen_buttress",
     "name": "Hold the Wall",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_olen_buttress.webp"
   },
   {
     "id": "dgn_ossick_moored",
     "name": "Safe Harbor",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_ossick_moored.webp"
   },
   {
     "id": "dgn_vael_beacon",
     "name": "By the Beacon's Light",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_vael_beacon.webp"
   },
   {
     "id": "dgn_turretback",
     "name": "Eviction Notice",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_turretback.webp"
   },
   {
     "id": "dgn_selthe_pitch",
     "name": "Every Voice in Tune",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_selthe_pitch.webp"
   },
   {
     "id": "dgn_colossus_mirror",
     "name": "Break the Glass",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_colossus_mirror.webp"
   },
   {
     "id": "dgn_ysolei_high_and_dry",
     "name": "High and Dry",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_ysolei_high_and_dry.webp"
   },
   {
     "id": "dgn_mere_hydra",
     "name": "All Heads Down",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_mere_hydra.webp"
   },
   {
     "id": "dgn_crypt_knellwyrm",
     "name": "Not a Hair Singed",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_crypt_knellwyrm.webp"
   },
   {
     "id": "dgn_turnkey_cage",
     "name": "No Cage Can Hold Us",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_turnkey_cage.webp"
   },
   {
     "id": "dgn_beastmaster_apart",
     "name": "Kept at Bay",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_beastmaster_apart.webp"
   },
   {
     "id": "dgn_gorgebloom_clean",
     "name": "Weed Control",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_gorgebloom_clean.webp"
   },
   {
     "id": "dgn_zulgar_uncaught",
     "name": "Never Caught",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_zulgar_uncaught.webp"
   },
   {
     "id": "dgn_great_saurian",
     "name": "Toppled Titan",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_great_saurian.webp"
   },
   {
     "id": "dgn_korgath_all_chains",
     "name": "A Kinder End",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_korgath_all_chains.webp"
   },
   {
     "id": "dgn_korgath_still_bound",
     "name": "The Lock Holds",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_korgath_still_bound.webp"
   },
   {
     "id": "dgn_velkhar_cold",
     "name": "Cold Comfort",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_velkhar_cold.webp"
   },
   {
     "id": "dgn_korzul_thin_ice",
     "name": "Thin Ice",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_korzul_thin_ice.webp"
   },
   {
     "id": "dgn_sledge_tusker",
     "name": "Cold Cargo",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_sledge_tusker.webp"
   },
   {
     "id": "dgn_drowned_temple_cantor",
@@ -6153,35 +6295,85 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "dungeon",
     "renown": 10,
     "feat": false,
-    "rewardTitle": "Witness of the Choir"
+    "rewardTitle": "Witness of the Choir",
+    "crest": "/ui/deeds/dgn_drowned_temple_cantor.webp"
   },
   {
     "id": "dgn_marrow_tidy",
     "name": "A Tidy Churchyard",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_marrow_tidy.webp"
   },
   {
     "id": "dgn_lady_nobody_hanging",
     "name": "Nobody Left Hanging",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_lady_nobody_hanging.webp"
   },
   {
     "id": "dgn_ilvane_hush",
     "name": "Hush Now",
     "category": "dungeon",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/dgn_ilvane_hush.webp"
   },
   {
     "id": "dgn_morthen_candlelight",
     "name": "Every Candle Lit",
     "category": "dungeon",
     "renown": 10,
+    "feat": false,
+    "crest": "/ui/deeds/dgn_morthen_candlelight.webp"
+  },
+  {
+    "id": "dgn_guild_first_contract",
+    "name": "Writ Signed",
+    "category": "dungeon",
+    "renown": 5,
     "feat": false
+  },
+  {
+    "id": "dgn_guild_ten_contracts",
+    "name": "Regular at the Board",
+    "category": "dungeon",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_guild_fifty_contracts",
+    "name": "Contract Veteran",
+    "category": "dungeon",
+    "renown": 25,
+    "feat": false
+  },
+  {
+    "id": "feat_guild_writ_runner",
+    "name": "Writ-Runner",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "Writ-Runner"
+  },
+  {
+    "id": "feat_guild_hallsworn",
+    "name": "Hallsworn",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "Hallsworn"
+  },
+  {
+    "id": "feat_guild_of_lantern_hall",
+    "name": "Of Lantern Hall",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "of Lantern Hall"
   }
 ];
 
@@ -7467,11 +7659,23 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mount",
+        "name": "Lantern Hall Destrier"
+      },
+      {
+        "kind": "mount",
         "name": "Grumbol the Lanternback"
       },
       {
         "kind": "mount",
+        "name": "Wobbles the Slime"
+      },
+      {
+        "kind": "mount",
         "name": "Dreadspark Groundshaker"
+      },
+      {
+        "kind": "mount",
+        "name": "Nightwing Chimaera"
       },
       {
         "kind": "mount",
@@ -7603,6 +7807,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "weapon_skin",
         "name": "Meteorlatch, the Sky's Last Judgment"
+      },
+      {
+        "kind": "weapon_skin",
+        "name": "Blade of Lantern Hall"
       }
     ]
   },
@@ -7810,6 +8018,42 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "Witness of the Choir"
+      },
+      {
+        "kind": "title",
+        "name": "Writ-Runner"
+      },
+      {
+        "kind": "title",
+        "name": "Hallsworn"
+      },
+      {
+        "kind": "title",
+        "name": "of Lantern Hall"
+      },
+      {
+        "kind": "title",
+        "name": "Titan"
+      },
+      {
+        "kind": "title",
+        "name": "Bold"
+      },
+      {
+        "kind": "title",
+        "name": "Defiant"
+      },
+      {
+        "kind": "title",
+        "name": "Dauntless"
+      },
+      {
+        "kind": "title",
+        "name": "Unyielding"
+      },
+      {
+        "kind": "title",
+        "name": "Indomitable"
       }
     ]
   },
@@ -8460,6 +8704,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Duelist's Brand"
+      },
+      {
+        "kind": "item",
+        "name": "Skull Bag"
       }
     ]
   },
@@ -22029,6 +22277,12 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "url": "models/creatures/chicken_cow.glb",
     "idle": "Idle",
     "height": 2.3
+  },
+  "form_sporemender": {
+    "url": "models/creatures/sporemender_form.glb",
+    "idle": "Idle",
+    "height": 2.6,
+    "yaw": -1.5707963267948966
   },
   "mob_emberkin": {
     "url": "models/creatures/emberkin.glb",

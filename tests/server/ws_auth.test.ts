@@ -449,6 +449,9 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     'auth-world',
     'auth-world-42', // previous Farshore salvage layout and model mapping
     'auth-world-43', // hull was still a collectible entity
+    'auth-world-45', // predates chunked Materials Vault snapshots
+    'auth-world-46', // withdrawn stone-foot collision and no vault chunks
+    'auth-world-47', // vault chunks, but still the withdrawn stone-foot collision
     // one epoch AHEAD of the live discriminator, derived so a layout-version
     // bump can never turn this row into the current epoch by accident (the
     // hardcoded 'auth-world-21' row did exactly that when 20 became 21)

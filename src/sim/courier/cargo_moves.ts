@@ -3,7 +3,7 @@
 // same way: its original quantity and identity, even after a deposit topped the
 // same slot up.
 import { moveBetweenContainers } from '../bank';
-import { isMaterialItemId } from '../material_ids';
+import { isStackProvenanceItemId } from '../stack_provenance_ids';
 import { cloneInvSlot, type InvSlot } from '../types';
 import { COURIER_CAPACITY } from './types';
 
@@ -19,7 +19,11 @@ export function withdrawOriginal(
   const current = source[index];
   if (!current || current.itemId !== original.itemId || current.count < original.count) return 0;
   const pools = { general: capacity, materials: 0 };
-  if (original.instance && !isMaterialItemId(original.itemId) && current.count > original.count) {
+  if (
+    original.instance &&
+    !isStackProvenanceItemId(original.itemId) &&
+    current.count > original.count
+  ) {
     const remaining = cloneInvSlot(current);
     remaining.count -= original.count;
     const countBefore = current.count;

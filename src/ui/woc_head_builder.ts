@@ -1,9 +1,18 @@
 // The WOC face builder's painter: a left category menu, the open category's
-// options in a panel beside it, and a Randomize / Reset footer. Every decision
-// (which options a head type offers, what a pick writes, reset and randomize,
-// the slider specs and readouts, which camera focus a category wants) lives in
-// the pure core, woc_head_builder_model.ts; this file only draws that model
-// and forwards input back into it.
+// options in a panel beside it, and a Randomize / Reset / Share footer. Every
+// decision (which options a head type offers, what a pick writes, reset and
+// randomize, the slider specs and readouts, which camera focus a category
+// wants, what a face code says and what importing one does) lives in the pure
+// core, woc_head_builder_model.ts; this file only draws that model and
+// forwards input back into it.
+//
+// Share is the footer's gold button, not a menu tab, so every layout shows it
+// (the phone's tab strip scrolls; the docked menu has no room for an eleventh
+// tab): a toggle that swaps the Share page in for the tab panel, the face as a
+// code with Copy and Import under it, and back to the category the player was
+// in. The page is its own region, named by its title, beside the tab panel;
+// while it is up no tab reads as selected and the tablist keeps its Tab stop
+// on the category the page returns to.
 //
 // Keyboard model: the category menu is a vertical tablist and every option
 // list or swatch grid is a radio group, both with ONE Tab stop that the arrow
@@ -28,10 +37,14 @@ import {
   browsMatchHair,
   categoryLabelKey,
   categorySections,
+  FACE_CODE_ERROR_KEYS,
+  faceCode,
   focusForCategory,
   hexToHsl,
   hslToCss,
   INITIAL_MENU,
+  importedStatusKey,
+  importFaceCode,
   matchBrowsToHair,
   openCategory,
   pickOption,
@@ -49,8 +62,10 @@ import {
   type WocBuilderCategory,
   type WocBuilderFocus,
   type WocBuilderMenuState,
+  type WocBuilderPage,
   type WocBuilderSection,
   type WocFaceAppearance,
+  type WocShareSection,
   type WocSliderSection,
 } from './woc_head_builder_model';
 
@@ -114,6 +129,37 @@ const plainKey = (ev: KeyboardEvent): boolean => !ev.altKey && !ev.ctrlKey && !e
  *  into a horizontal tab strip at (shell.css, the builder's narrow block). */
 const NARROW_LAYOUT_QUERY = '(max-width: 860px)';
 
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+/** The footer Share button's glyph: three linked nodes, tinted by the button's
+ *  own colour. Decorative: the word beside it names the button. */
+function shareGlyph(): SVGSVGElement {
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 16 16');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('focusable', 'false');
+  svg.classList.add('whb-foot-glyph');
+  const links = document.createElementNS(SVG_NS, 'path');
+  links.setAttribute('d', 'M4.6 7.1 11.2 3.9M4.6 8.9l6.6 3.2');
+  links.setAttribute('fill', 'none');
+  links.setAttribute('stroke', 'currentColor');
+  links.setAttribute('stroke-width', '1.5');
+  svg.appendChild(links);
+  for (const [cx, cy] of [
+    [3.6, 8],
+    [12.2, 3.4],
+    [12.2, 12.6],
+  ]) {
+    const node = document.createElementNS(SVG_NS, 'circle');
+    node.setAttribute('cx', String(cx));
+    node.setAttribute('cy', String(cy));
+    node.setAttribute('r', '2.1');
+    node.setAttribute('fill', 'currentColor');
+    svg.appendChild(node);
+  }
+  return svg;
+}
+
 export function mountWocHeadBuilder(
   host: HTMLElement,
   opts: WocHeadBuilderOptions,
@@ -138,6 +184,13 @@ export function mountWocHeadBuilder(
    *  degrade rung when a rebuild drops the exact control that had focus.
    *  Collected as the nodes are minted, cleared at the top of each paint. */
   const tabStops = new Map<string, HTMLButtonElement>();
+  /** The Share page's code box and the code it was painted with, while that
+   *  page is up: set() repaints the panel under the player, and a code half
+   *  pasted into the box must survive that. Cleared at the top of each paint. */
+  let shareBox: { readonly code: HTMLTextAreaElement; readonly painted: string } | null = null;
+  /** The category the Share page goes back to, whose tab keeps the tablist's
+   *  Tab stop while the page is up (the open category otherwise). */
+  let lastCategory: WocBuilderCategory = menu.open === 'share' ? 'bodyType' : menu.open;
 
   host.textContent = '';
   host.classList.add('whb');
@@ -163,9 +216,20 @@ export function mountWocHeadBuilder(
   const panelTitle = el('div', 'whb-panel-title');
   const panelBody = el('div', 'whb-panel-body');
   panel.append(panelTitle, panelBody);
+  // The Share page is its own region beside the tab panel (never a role flip on
+  // one node): the two swap with `hidden`, in the same grid cell.
+  const sharePanel = el('div', 'whb-panel whb-share-panel');
+  sharePanel.id = `${uid}-share`;
+  sharePanel.setAttribute('role', 'region');
+  const shareTitle = el('div', 'whb-panel-title', tk(categoryLabelKey('share')));
+  shareTitle.id = `${uid}-share-title`;
+  sharePanel.setAttribute('aria-labelledby', shareTitle.id);
+  const shareBody = el('div', 'whb-panel-body');
+  sharePanel.append(shareTitle, shareBody);
+  sharePanel.hidden = true;
   const menuWrap = el('div', 'whb-menu-wrap');
   menuWrap.append(navTitle, nav);
-  shell.append(menuWrap, panel);
+  shell.append(menuWrap, panel, sharePanel);
 
   const foot = el('div', 'whb-foot');
   const randomBtn = el('button', 'whb-foot-btn', t('auth.randomizeShort'));
@@ -174,7 +238,14 @@ export function mountWocHeadBuilder(
   randomBtn.title = t('auth.randomize');
   const resetBtn = el('button', 'whb-foot-btn', t('auth.wocBuilder.resetDefault'));
   resetBtn.type = 'button';
-  foot.append(randomBtn, resetBtn);
+  // the way in to the Share page, and back out: a toggle (aria-pressed) that
+  // swaps the Share region in for the tab panel beside the menu
+  const shareBtn = el('button', 'whb-foot-btn whb-foot-share');
+  shareBtn.type = 'button';
+  shareBtn.setAttribute('aria-controls', sharePanel.id);
+  shareBtn.setAttribute('aria-pressed', 'false');
+  shareBtn.append(shareGlyph(), el('span', 'whb-foot-label', t('auth.shareTab')));
+  foot.append(randomBtn, resetBtn, shareBtn);
   host.append(shell, foot);
 
   const catButtons = new Map<WocBuilderCategory, HTMLButtonElement>();
@@ -205,42 +276,58 @@ export function mountWocHeadBuilder(
     emit();
   };
 
-  function open(cat: WocBuilderCategory, focusTab = false): void {
+  function open(page: WocBuilderPage, focusTab = false): void {
     const was = menu.open;
-    menu = openCategory(menu, cat);
+    menu = openCategory(menu, page);
+    if (page !== 'share') lastCategory = page;
     paintMenu();
     paintPanel(false);
-    if (focusTab) catButtons.get(cat)?.focus();
-    if (was !== cat) opts.onOpen?.(cat);
-    if (was !== cat || focusTab) opts.onFocus?.(focusForCategory(cat));
-    if (typeof panelBody.scrollTo === 'function') panelBody.scrollTo({ top: 0 });
+    if (focusTab && page !== 'share') catButtons.get(page)?.focus();
+    // the Share page browses no head files, so it prefetches nothing
+    if (was !== page && page !== 'share') opts.onOpen?.(page);
+    if (was !== page || focusTab) opts.onFocus?.(focusForCategory(page));
+    const shown = page === 'share' ? shareBody : panelBody;
+    if (typeof shown.scrollTo === 'function') shown.scrollTo({ top: 0 });
   }
 
   function paintMenu(): void {
+    const sharing = menu.open === 'share';
     for (const [cat, btn] of catButtons) {
       const sel = cat === menu.open;
       btn.classList.toggle('sel', sel);
       btn.setAttribute('aria-selected', sel ? 'true' : 'false');
-      btn.tabIndex = sel ? 0 : -1;
+      btn.tabIndex = cat === lastCategory ? 0 : -1;
       if (sel) panel.setAttribute('aria-labelledby', btn.id);
     }
+    // While the Share region is up no tab is selected and the footer button
+    // reads as pressed.
+    shareBtn.classList.toggle('sel', sharing);
+    shareBtn.setAttribute('aria-pressed', sharing ? 'true' : 'false');
   }
 
-  /** Redraw the open category's panel. `keepFocus` hands focus back to the
-   *  control that had it (a pick redraws the panel it happened in), degrading
-   *  to its group's Tab stop when the rebuild no longer carries it. */
+  /** Redraw the open page: a category's options in the tab panel, or the Share
+   *  page in its region (the other one emptied and hidden). `keepFocus` hands
+   *  focus back to the control that had it (a pick redraws the panel it
+   *  happened in), degrading to its group's Tab stop when the rebuild no longer
+   *  carries it. */
   function paintPanel(keepFocus: boolean): void {
     if (destroyed) return;
-    const focusKey = keepFocus ? captureFocusKey(panelBody) : null;
+    const sharing = menu.open === 'share';
+    const body = sharing ? shareBody : panelBody;
+    const focusKey = keepFocus ? captureFocusKey(body) : null;
     tabStops.clear();
-    panelTitle.textContent = tk(categoryLabelKey(menu.open));
+    shareBox = null;
+    panel.hidden = sharing;
+    sharePanel.hidden = !sharing;
+    if (!sharing) panelTitle.textContent = tk(categoryLabelKey(menu.open));
     panelBody.textContent = '';
+    shareBody.textContent = '';
     const f = face();
     for (const section of categorySections(menu.open, f)) {
-      panelBody.appendChild(paintSection(section, f));
+      body.appendChild(paintSection(section, f));
     }
     if (focusKey) {
-      restoreFirstEnabled([findFocusKey(panelBody, focusKey), tabStops.get(keyGroup(focusKey))]);
+      restoreFirstEnabled([findFocusKey(body, focusKey), tabStops.get(keyGroup(focusKey))]);
     }
   }
 
@@ -268,6 +355,7 @@ export function mountWocHeadBuilder(
 
   function paintSection(s: WocBuilderSection, f: WocFaceAppearance): HTMLElement {
     const wrap = el('div', `whb-section whb-section-${s.kind}`);
+    if (s.kind === 'share') return paintShare(wrap, s);
     if (s.kind === 'options') {
       if (s.labelKey) wrap.appendChild(el('div', 'whb-section-label', tk(s.labelKey)));
       const list = el('div', s.target === 'bodyType' ? 'whb-opts whb-opts-body' : 'whb-opts');
@@ -418,8 +506,98 @@ export function mountWocHeadBuilder(
     return wrap;
   }
 
+  /** The Share page: the face as a code in a box that is also where a code is
+   *  pasted, Copy and Import under it, and a status line. Import writes the
+   *  face WITHOUT repainting (the status it sets has to stay up) and puts the
+   *  canonical code of what it loaded back in the box. */
+  function paintShare(wrap: HTMLElement, s: WocShareSection): HTMLElement {
+    const hint = el('p', 'whb-share-hint', t('auth.designCodeHint'));
+    hint.id = `${uid}-share-hint`;
+    const code = el('textarea', 'whb-share-code');
+    // most of a face code at a glance on a desktop (the narrow layout caps the
+    // box's height in shell.css, so a phone keeps the buttons in view)
+    code.rows = 8;
+    code.spellcheck = false;
+    code.setAttribute('autocomplete', 'off');
+    code.setAttribute('autocapitalize', 'off');
+    code.setAttribute('aria-label', t('auth.designCode'));
+    // the visible instruction doubles as the box's description
+    code.setAttribute('aria-describedby', hint.id);
+    code.dataset.focusKey = 'share:code';
+    code.value = s.code;
+    shareBox = { code, painted: s.code };
+
+    const btns = el('div', 'whb-share-btns');
+    const copyBtn = el('button', 'whb-share-btn whb-share-copy', t('auth.copyCode'));
+    copyBtn.type = 'button';
+    copyBtn.dataset.focusKey = 'share:copy';
+    const importBtn = el('button', 'whb-share-btn', t('auth.importCode'));
+    importBtn.type = 'button';
+    importBtn.dataset.focusKey = 'share:import';
+    btns.append(copyBtn, importBtn);
+
+    const status = el('div', 'whb-share-status');
+    status.setAttribute('aria-live', 'polite');
+    const setStatus = (key: TranslationKey, isError: boolean) => {
+      if (destroyed) return;
+      status.textContent = t(key);
+      status.classList.toggle('err', isError);
+    };
+
+    copyBtn.addEventListener('click', () => {
+      // what the box shows; an emptied box copies the face on the stage now
+      const text = code.value.trim() || faceCode(face());
+      // Clipboard access can be denied or absent (an iframe, an older engine):
+      // select the code instead, so one keystroke finishes the copy.
+      const manual = () => {
+        if (destroyed) return;
+        code.focus();
+        code.select();
+        // informational, not an error: the copy is one keystroke away
+        setStatus('auth.designCodeCopyManual', false);
+      };
+      const clip = typeof navigator === 'undefined' ? undefined : navigator.clipboard;
+      if (clip?.writeText) {
+        clip.writeText(text).then(() => setStatus('auth.designCodeCopied', false), manual);
+      } else {
+        manual();
+      }
+    });
+
+    importBtn.addEventListener('click', () => {
+      const result = importFaceCode(code.value);
+      if (!result.ok) {
+        setStatus(FACE_CODE_ERROR_KEYS[result.reason], true);
+        return;
+      }
+      const bodyBefore = face().gender;
+      apply(result.face, false);
+      // A code for the other body type put another body on the stage: say the
+      // page's camera focus again, which also tells the host the player chose
+      // the body now there (the mount reads a body switch as browsing).
+      if (face().gender !== bodyBefore) opts.onFocus?.(focusForCategory(menu.open));
+      const loaded = faceCode(face());
+      code.value = loaded;
+      shareBox = { code, painted: loaded };
+      setStatus(importedStatusKey(result.partial), false);
+    });
+
+    wrap.append(hint, code, btns, status);
+    return wrap;
+  }
+
   on(randomBtn, 'click', () => apply(randomizeFace(face(), Math.random)));
   on(resetBtn, 'click', () => apply(resetFace(face())));
+  on(shareBtn, 'click', () => {
+    // pressed again: back to the category the player was in
+    if (menu.open === 'share') {
+      open(lastCategory);
+      return;
+    }
+    open('share');
+    // land on Copy, the page's main action, so Enter or a tap goes on to copy
+    findFocusKey(shareBody, 'share:copy')?.focus();
+  });
 
   paintMenu();
   paintPanel(false);
@@ -434,7 +612,12 @@ export function mountWocHeadBuilder(
     set(next: Partial<ModularAppearance>) {
       const merged = { ...value, ...next } as Partial<ModularAppearance>;
       value = mergeFace(merged, readFace(merged as Partial<WocFaceAppearance>));
+      // a code pasted into the Share box but not imported yet is the player's
+      // text, not a stale copy of the face: it rides the host's repaint
+      const draft =
+        shareBox && shareBox.code.value !== shareBox.painted ? shareBox.code.value : null;
       paintPanel(true);
+      if (draft !== null && shareBox) shareBox.code.value = draft;
     },
     destroy() {
       destroyed = true;

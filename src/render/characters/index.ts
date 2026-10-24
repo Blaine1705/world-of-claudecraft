@@ -36,6 +36,7 @@ export {
   type AppearancePreviewRow,
   type PreviewAppearance,
   previewAppearanceForRow,
+  previewTryOnMainhand,
 } from './preview_appearance';
 export type { PreviewFramingName } from './preview_framing';
 export type { AnimState, FarBakeGate } from './visual';

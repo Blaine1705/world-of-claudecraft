@@ -1,4 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
+import { BankLedgerOutboxAdmission } from '../server/bank_ledger_admission';
+import { BankLedgerOutbox, BankLedgerOutboxBudget } from '../server/bank_ledger_outbox';
+import { REALM } from '../server/realm';
+import { courierSlotFingerprint } from '../src/sim/courier/identity';
+import type { InvSlot } from '../src/sim/types';
 
 vi.mock('../server/db', () => ({ insertBankLedgerRow: vi.fn(), insertBankLedgerRows: vi.fn() }));
 
@@ -93,7 +98,11 @@ function host() {
     courierWireRevisionFor: () => rev,
     courierBankInfoFor: vi.fn(() => null),
     ctx: { players: new Map(), resolve: () => null } as never,
-    meta: () => ({ characterId: 10 }),
+    meta: () => ({
+      characterId: 10,
+      bank: { inventory: [] },
+      courier: { cargo: [], withdrawals: [] },
+    }),
   };
   return {
     sim,
@@ -395,6 +404,58 @@ function ledgerRig() {
   return { sim, session, bank, rows, admission, fail, cancel, commit };
 }
 describe('courier admitted bank exchange', () => {
+  it('reserves and commits forty mixed-maker rows through the real outbox', () => {
+    const rig = ledgerRig();
+    const mixed = (): InvSlot => ({
+      itemId: 'minor_healing_potion',
+      count: 20,
+      materialSources: Array.from({ length: 20 }, (_, i) => ({
+        source: { signer: `Maker${String(i).padStart(3, '0')}` },
+        count: 1,
+      })),
+    });
+    rig.bank.slots = [mixed()];
+    const cargo = mixed();
+    rig.sim.meta = () => ({
+      characterId: 10,
+      bank: { inventory: rig.bank.slots },
+      courier: {
+        cargo: [cargo],
+        withdrawals: [{ index: 0, fingerprint: courierSlotFingerprint(rig.bank.slots[0]) }],
+      },
+    });
+    const limits = { maxRows: 200, maxEncodedBytes: 2 * 1024 * 1024 };
+    const outbox = new BankLedgerOutbox({
+      owner: { realm: REALM, characterId: 10, accountId: 20 },
+      budget: new BankLedgerOutboxBudget(limits),
+      limits,
+      nextBatchKey: () => 'courier-mixed',
+    });
+    const onProjectionFailure = vi.fn();
+    const admission = new BankLedgerOutboxAdmission(outbox, { onProjectionFailure });
+    const reserve = vi.spyOn(admission, 'tryReserve');
+    rig.session.bankVaultLedgerGuard = createBankVaultLedgerGuardCoordinator(() => 0).createRuntime(
+      20,
+      admission,
+      vi.fn(),
+    );
+    expect(
+      courierBankExchangeFor(
+        rig.sim,
+        rig.session,
+        17,
+        () => {
+          rig.bank.slots.push(cargo);
+        },
+        () => {
+          rig.bank.slots.shift();
+        },
+      ),
+    ).toBe(true);
+    expect(reserve).toHaveBeenCalledWith(40, 0, 'personal');
+    expect(outbox.snapshot().rowCount).toBe(40);
+    expect(onProjectionFailure).not.toHaveBeenCalled();
+  });
   it('signals post-mutation failure and never cancels when a reservation rejects commit', () => {
     const rig = ledgerRig();
     const commit = vi.fn(() => false);

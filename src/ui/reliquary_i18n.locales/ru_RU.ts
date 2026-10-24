@@ -49,9 +49,11 @@ export const table: ReliquaryLocaleTable = {
     desc: 'Эпические предметы, которые падают только в героическом режиме с Корзула Могильного Вирма.',
   },
   conquerors_wildheart_basin: {
+    desc: 'Знаковое оружие Повелителя клыков, Цветожора и Зулгара.',
     name: 'Котловина Дикого Сердца',
   },
   conquerors_wildheart_basin_heroic: {
+    desc: 'Эпические предметы и аксессуары, доступные только на героической сложности, от Повелителя клыков, Цветожора и Зулгара, Голоса Котловины.',
     name: 'Героизм: Котловина Дикого Сердца',
   },
   // The arena entity reads Рейдовая арена Нитраксиса; the page collects the
@@ -169,7 +171,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_armory: {
     name: 'Арсенал Боевой мощи',
-    desc: 'Украшения и оружие Войны, купленные за тяжело добытую честь.',
+    desc: 'Украшения, оружие и товары Войны, купленные за тяжело добытую честь.',
   },
   conquerors_vanguard_gallery: {
     name: 'Галерея Авангарда',

@@ -9,8 +9,8 @@
     "acceptQuest -> finalizeQuestAccept -> onInventoryChangedForQuests",
     "turnInQuest (xp + copper reward)"
   ],
-  "draws": 40,
-  "drawDigest": "73f698f7",
+  "draws": 41,
+  "drawDigest": "2c514b20",
   "frames": [
     {
       "tick": 0,
@@ -562,8 +562,8 @@
       "state": "42d00b5a",
       "events": "ee143ce2",
       "rng": {
-        "draws": 40,
-        "digest": "73f698f7"
+        "draws": 41,
+        "digest": "2c514b20"
       },
       "label": "quest-turned-in",
       "players": [
@@ -766,8 +766,8 @@
       "state": "c6d21321",
       "events": "741638a5",
       "rng": {
-        "draws": 40,
-        "digest": "73f698f7"
+        "draws": 41,
+        "digest": "2c514b20"
       },
       "label": "final",
       "players": [

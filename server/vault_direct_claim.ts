@@ -3,6 +3,7 @@
 // per-character save FIFO for the whole operation.
 
 import type { CharacterState } from '../src/sim/character_state';
+import { assertHeroicMarksGrantsFit, HeroicMarksCapacityError } from '../src/sim/heroic_marks';
 import { beginCharacterSaveTx } from './character_save_transaction';
 import { addVaultRewardToCharacterState } from './vault_reward_state';
 import {
@@ -32,6 +33,16 @@ export async function commitVaultDirectClaim(
   deps: VaultDirectClaimDeps,
   args: VaultDirectClaimArgs,
 ): Promise<VaultDirectClaimResult> {
+  // This known capacity refusal is before snapshot mutation, connection or
+  // write. Keep the durable claim pending without quarantining a valid player.
+  // Unknown faults and all ambiguous post-write failures retain their guards.
+  assertHeroicMarksGrantsFit({ heroicMarks: 0 }, args.claim.items);
+  try {
+    assertHeroicMarksGrantsFit(args.state, args.claim.items);
+  } catch (error) {
+    if (error instanceof HeroicMarksCapacityError) return 'retry';
+    throw error;
+  }
   const state = addVaultRewardToCharacterState(args.state, args.claim, args.attemptId, args.owner);
   let client: VaultRewardClient;
   try {

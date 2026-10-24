@@ -230,7 +230,7 @@ export const SPEC_CARD_INFO: Record<PlayerClass, Record<string, SpecCardInfo>> =
     },
     restoration: {
       complexity: 'medium',
-      examples: ['swiftmend', 'rejuvenation', 'regrowth', 'healing_touch'],
+      examples: ['sporemender_form', 'swiftmend', 'rejuvenation', 'regrowth'],
     },
   },
 };

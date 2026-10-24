@@ -729,7 +729,13 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // the renderer and town runtime leaves moved. No capture was retaken.
   // Re-minted for the Mirefen mudfin huts: the torched hut fire's hand-off moved
   // the renderer leaf. No capture was retaken.
-  '495276bfb295d7b4150fb18c87798bbe052d1749ac95b284b8225fd181f754cd';
+  // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
+  // No capture was retaken.
+  // Re-minted after merging v045-integration: guild hall, sprite model VFX and live-world
+  // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
+  // Re-minted for the one-colour market canopies on the current integration base.
+  // No capture was retaken.
+  'e4b0c082ee94a3313569494c41e5dfeff074aa80d341cd64fe4c34c79e21dfbf';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

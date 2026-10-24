@@ -15,7 +15,8 @@ import type { SimContext } from '../src/sim/sim_context';
 import type { InvSlot, VaultConsumptionAdmission } from '../src/sim/types';
 import type { BankInfo, VaultInfo } from '../src/world_api/bank';
 import { buildPersonalBankLedgerRows, buildVaultLedgerRows } from './bank_ledger';
-import { BANK_VAULT_LEDGER_ROW_BURST, bankVaultLedgerMaxRows } from './bank_vault_ledger_guard';
+import { BANK_VAULT_LEDGER_ROW_BURST } from './bank_vault_ledger_guard';
+import { type CourierLedgerState, courierLedgerRowBound } from './courier_ledger_row_bound';
 import {
   type StorageAdmissionSession,
   storageAdmissionSession,
@@ -83,7 +84,12 @@ export interface CourierWireSim {
   courierBankInfoFor(pid: number): BankInfo | null;
   /** The vault leg reads go straight to the courier module (no Sim delegates). */
   readonly ctx: SimContext;
-  meta(pid: number): { characterId?: number; inventory?: readonly InvSlot[] } | null | undefined;
+  meta(
+    pid: number,
+  ):
+    | ({ characterId?: number; inventory?: readonly InvSlot[] } & CourierLedgerState)
+    | null
+    | undefined;
 }
 export interface CourierWireSession {
   pid: number;
@@ -217,13 +223,15 @@ export function courierBankExchangeFor(
   deposit: () => void,
   withdraw: () => void,
 ): boolean {
-  const owner = storageAdmissionSession(session, sim.meta(pid), pid);
-  if (!owner) return false;
-  const reservation = owner.bankVaultLedgerGuard.admission.tryReserve(
-    bankVaultLedgerMaxRows('courier_dispatch'),
-    0,
-    'personal',
-  );
+  const meta = sim.meta(pid);
+  const owner = storageAdmissionSession(session, meta, pid);
+  if (!owner || !meta?.courier) return false;
+  const rowBound = courierLedgerRowBound(meta);
+  // A trip that can never fit the journal's burst returns its cargo unchanged.
+  // Resolving it without either callback lets the sim return home instead of
+  // retrying forever at the bank. Temporary admission pressure still retries.
+  if (rowBound > BANK_VAULT_LEDGER_ROW_BURST) return true;
+  const reservation = owner.bankVaultLedgerGuard.admission.tryReserve(rowBound, 0, 'personal');
   if (!reservation) return false;
   let before: BankInfo | null;
   let vaultBefore: VaultInfo | null = null;
@@ -234,8 +242,13 @@ export function courierBankExchangeFor(
     if (trip?.vaultCargo?.length || trip?.vaultWithdrawals?.length) {
       vaultBefore = courierVaultInfoFor(sim.ctx, pid);
       const rows = courierVaultLedgerRowBound(vaultBefore, trip);
-      // A trip the vault ledger cannot admit waits at the banker, like a full
-      // personal bucket; dispatch already refused any trip above the burst.
+      // A restored trip or changed vault row can outgrow the dispatch bound.
+      // Settle without mutations so its cargo returns home, as for the bank.
+      if (rows > BANK_VAULT_LEDGER_ROW_BURST) {
+        reservation.cancel();
+        return true;
+      }
+      // Temporary admission pressure waits at the banker.
       vaultReservation =
         vaultBefore && rows <= BANK_VAULT_LEDGER_ROW_BURST
           ? owner.bankVaultLedgerGuard.admission.tryReserve(rows, 0, 'vault')

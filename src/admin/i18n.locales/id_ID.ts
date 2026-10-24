@@ -7,6 +7,14 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const id_ID: Record<string, string> = {
+  'error.buddyGrantFailed': 'Gagal memberikan pendamping.',
+  'error.characterAlreadyHasThat': 'Karakter itu sudah memiliki pendamping atau tampilan tersebut.',
+  'moderationHistory.actionGrantBuddy': 'Pendamping diberikan',
+  'moderationHistory.actionAnnounce': 'Pengumuman realm',
+  'moderationHistory.actionGmInvisible': 'Menjadi tak terlihat',
+  'moderationHistory.actionGmVisible': 'Menjadi terlihat',
+  'moderationHistory.actionUnwatch': 'Dihapus dari daftar pantauan',
+  'moderationHistory.actionWatch': 'Ditambahkan ke daftar pantauan',
   'error.flagActiveExists': 'akun ini sudah memiliki penanda terbuka dari jenis tersebut',
   'wealth.largeMovementsUnavailable':
     'pergerakan bank berjumlah besar tidak dapat dimuat (pembacaan buku besar kehabisan waktu); rincian emas di atas tetap lengkap',

@@ -67,6 +67,7 @@ async function pseudoHarness() {
     threat: false,
     comboPips: 0,
     noHealthBar: false,
+    nameOnly: false,
   } satisfies NameplatePlan;
   const resolve = () => painter.resolveContent(state, target, me, plan, false, true);
   return { state, resolve, setLanguage: i18n.setLanguage };

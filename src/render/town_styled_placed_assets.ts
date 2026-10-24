@@ -9,8 +9,11 @@
 //
 // Every model listed here is used by ONE town and nothing else, so restyling
 // by path is exact: any placement of it, promoted or hand-placed from the
-// catalogue, now draws the way the town does. Models shared with the wider
-// world (the plain fence, the dungeon bench) are deliberately absent.
+// catalogue, now draws the way the town does. The one exception is the
+// Eastbrook market stall's canopy colour, which the town takes from each
+// stall's layout row; a placement names only the model, so it wears the
+// default canopy. Models shared with the wider world (the plain fence, the
+// dungeon bench) are deliberately absent.
 
 import type * as THREE from 'three';
 import { eastbrookStyledPlacedObject } from './eastbrook_town';

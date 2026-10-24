@@ -1,4 +1,4 @@
-import { REFERRAL_STAMP_ITEMS } from '../../../sim/content/referral_rewards';
+import { REFERRAL_SLIME_REINS, REFERRAL_STAMP_ITEMS } from '../../../sim/content/referral_rewards';
 import type { ReferralMilestone } from '../../../sim/referral_cards';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
@@ -11,7 +11,7 @@ const REWARD_ITEMS: Partial<Record<ReferralMilestone, string>> = {
   tutorial: 'referral_satchel',
   hollow: 'referral_hollow_charm',
   fogbinder: 'referral_fog_charm',
-  raid: 'reins_referral_tank',
+  raid: REFERRAL_SLIME_REINS,
 };
 
 /** One finite CSS reveal; no animation loop, timers, random particles or automatic dismissal. */

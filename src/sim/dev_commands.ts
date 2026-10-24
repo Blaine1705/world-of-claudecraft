@@ -28,6 +28,7 @@ import { handleFerryDevChat } from './dev/ferry_dev';
 import { handleGravewyrmSanctumDevChat } from './dev/gravewyrm_sanctum_dev';
 import { handleDevHoardTravel } from './dev/hoard_travel';
 import { handleHollowCryptDevChat } from './dev/hollow_crypt_dev';
+import { spawnDevPvpBot } from './dev/pvp_bot';
 import { handleSunkenBastionDevChat } from './dev/sunken_bastion_dev';
 import { devTownLanding, devTownList, resolveDevTown } from './dev/town_teleport';
 import { handleTrashEngineDevChat } from './dev/trash_engine_dev';
@@ -78,6 +79,7 @@ import { bgQueueJoin, bgQueueSize, devEndBg, devStartBg } from './social/battleg
 import { revivePlayerAt } from './spirit';
 import { MAX_LEVEL, type RiftTier } from './types';
 import { setupVarkhulDevRaid } from './varkhul_dev_raid';
+import { recordWeeklyPvpWin } from './weekly_rewards';
 import {
   worldQuestCycleOfferingQuest,
   worldQuestPuzzleVariantForCycle,
@@ -406,7 +408,7 @@ export function handleDevChat(
       return null;
     }
     if (cmd.kind === 'rise' || cmd.kind === 'end') {
-      const hill = cmd.kind === 'rise' ? riseHillNow(ctx) : endHillNow(ctx);
+      const hill = cmd.kind === 'rise' ? riseHillNow(ctx) : endHillNow(ctx, recordWeeklyPvpWin);
       emitDevLog(
         ctx,
         pid,
@@ -418,7 +420,7 @@ export function handleDevChat(
     }
     const hill =
       cmd.kind === 'next'
-        ? warnNextHillNow(ctx)
+        ? warnNextHillNow(ctx, recordWeeklyPvpWin)
         : spawnHillNow(ctx, cmd.zoneId, {
             warn: cmd.kind === 'warn',
             warningSeconds: cmd.kind === 'warn' ? cmd.seconds : undefined,
@@ -825,6 +827,20 @@ export function handleDevChat(
       pid,
       `[dev] Advanced ${advanced} farm plot${advanced === 1 ? '' : 's'} to ready (${meta.farmPlots.size} planted).`,
     );
+    return null;
+  }
+
+  const pvpBotMatch = /^\/(?:dev\s+pvpbot|devpvpbot)(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (pvpBotMatch) {
+    const botName = pvpBotMatch[1] ?? 'Sparring';
+    const spawned = spawnDevPvpBot(ctx, pid, botName);
+    if ('error' in spawned) ctx.error(pid, spawned.error);
+    else
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Spawned ${botName}: flagged for World PvP, your level, 10g in its purse. Raise your own flag with /pvp on contested ground, then kill it and loot the body.`,
+      );
     return null;
   }
 
@@ -1523,7 +1539,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev map [rarity|site|coin], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev buddies, /dev buddy <key>, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev balgath <mechanic|wake|sleep|quests|trophy|weekly|drill|pound|loot|help>, /dev servertime <day|night|dawn|dusk|0..1|auto>, /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev crypt [enter|tp|gates|kill|pack|spawn|reset], /dev bastion [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev temple [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev wildheart [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev sanctum [enter|tp|gates|kill|pack|spawn|trigger|face|reset], /dev trashkit [demo|cast|wall|pool|split|freeze|brand|quench|clear], /dev raid, /dev kill, /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev map [rarity|site|coin], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev buddies, /dev buddy <key>, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev pvpbot [name], /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev balgath <mechanic|wake|sleep|quests|trophy|weekly|drill|pound|loot|help>, /dev servertime <day|night|dawn|dusk|0..1|auto>, /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev crypt [enter|tp|gates|kill|pack|spawn|reset], /dev bastion [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev temple [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev wildheart [enter|tp|gates|kill|pack|spawn|trigger|reset], /dev sanctum [enter|tp|gates|kill|pack|spawn|trigger|face|reset], /dev trashkit [demo|cast|wall|pool|split|freeze|brand|quench|clear], /dev raid, /dev kill, /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
     );
     return null;
   }

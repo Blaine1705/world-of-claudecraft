@@ -249,12 +249,6 @@ export class MembershipGameServices {
       abandonCourierAccountLeg(live);
       live.revision++;
     };
-    const membership = await getMembership(session.accountId);
-    if (!this.valid(session) || !sameLeg()) return;
-    if (!(membership.active && membership.authorizedUntil > Date.now())) {
-      abandon();
-      return;
-    }
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 5_000);
     try {
@@ -263,6 +257,13 @@ export class MembershipGameServices {
         async () => {
           clearTimeout(timer);
           if (!sameLeg()) return;
+          // Membership hydration shares the bounded account and database admission.
+          const membership = await getMembership(session.accountId);
+          if (!this.valid(session) || !sameLeg()) return;
+          if (!(membership.active && membership.authorizedUntil > Date.now())) {
+            abandon();
+            return;
+          }
           const snap = this.host.capture(session.characterId);
           // The captured courier must be the live one, leg and all; a leg that
           // cannot be captured or fenced can never run, so its stacks ride home.

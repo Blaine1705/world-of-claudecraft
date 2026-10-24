@@ -5,6 +5,12 @@ import {
   membershipAnnualRecipient,
 } from '../../server/membership_annual_store';
 import { REALM } from '../../server/realm';
+import {
+  MEMBERSHIP_ANNUAL_MOUNT,
+  MEMBERSHIP_ANNUAL_REINS,
+  MEMBERSHIP_ANNUAL_REWARD_SKU,
+} from '../../src/membership_annual_contract';
+import { ITEMS } from '../../src/sim/data';
 
 const fetchMock = vi.fn();
 const deliver = vi.fn(async () => true);
@@ -36,6 +42,16 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 describe('verified annual membership mount receipt', () => {
+  it('awards the Chimaera while preserving the paid receipt SKU', () => {
+    expect(MEMBERSHIP_ANNUAL_MOUNT).toBe('nightwing_chimera');
+    expect(MEMBERSHIP_ANNUAL_REINS).toBe('reins_nightwing_chimera');
+    expect(MEMBERSHIP_ANNUAL_REWARD_SKU).toBe('membership_annual_tank');
+    expect(ITEMS[MEMBERSHIP_ANNUAL_REINS]).toMatchObject({
+      kind: 'mount',
+      mount: 'nightwing_chimera',
+      soulbound: true,
+    });
+  });
   it('discovers the original paid reward on a new device without a local checkout key', async () => {
     fetchMock.mockResolvedValueOnce(new Response(JSON.stringify(receipt)));
     expect(await gameMembershipAnnualClaim(7, {})).toEqual({ delivered: true });

@@ -157,12 +157,14 @@ describe('questObjectiveAreas reads the active world', () => {
     for (const center of builtin) expect(moved).not.toContain(center);
   });
 
-  it('keeps the built-in world on the shipped tables', () => {
-    // The default world wraps the very tables the old reader used, so the
-    // shipped game draws exactly what it always drew.
+  it('keeps unchanged built-in tables and NPC identities while applying the layout', () => {
     expect(BUILTIN_WORLD.camps).toBe(CAMPS);
     expect(BUILTIN_WORLD.groundObjects).toBe(GROUND_OBJECTS);
-    expect(BUILTIN_WORLD.npcs).toBe(NPCS);
+    expect(Object.keys(BUILTIN_WORLD.npcs)).toEqual(Object.keys(NPCS));
+    for (const [id, npc] of Object.entries(NPCS)) {
+      const { pos: _pos, facing: _facing, ...gameplay } = npc;
+      expect(BUILTIN_WORLD.npcs[id]).toMatchObject(gameplay);
+    }
   });
 });
 
@@ -226,7 +228,7 @@ describe('quest givers and quest NPCs follow the active world', () => {
     expect(centers).not.toContain(at(NPCS[npcId].pos));
   });
 
-  it('routes a ready quest to the moved turn-in NPC', () => {
+  it('routes a ready quest to the moved turn-in NPC when no live entity answers', () => {
     const quest = Object.values(QUESTS).find(
       (q) => NPCS[q.turnInNpcId] && !NPCS[q.turnInNpcId].dynamic,
     );
@@ -240,7 +242,7 @@ describe('quest givers and quest NPCs follow the active world', () => {
         { questId: quest.id, counts: quest.objectives.map(() => 0), state: 'ready' as const },
       ],
     ]);
-    expect(questMapLocation(quest.id, log)).toEqual({
+    expect(questMapLocation(quest.id, log, () => null)).toEqual({
       questId: quest.id,
       ...MOVED_NPC_POS,
     });

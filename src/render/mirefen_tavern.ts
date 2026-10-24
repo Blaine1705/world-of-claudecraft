@@ -46,7 +46,6 @@
 // warm lights into the fire-light budget like the rest (content TAVERN_TERRACE_LIGHTS).
 
 import * as THREE from 'three';
-import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import {
   TAVERN_CHANDELIER,
   TAVERN_FLOOR_Y,
@@ -60,6 +59,7 @@ import {
   tavernToWorld,
 } from '../sim/content/mirefen_tavern';
 import { TAVERN_TERRACE_LIGHTS } from '../sim/content/mirefen_tavern_grounds';
+import type { LoadedGltf } from './assets/loader';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { mediaAssetExists } from './assets/media';
 import { registerDeferredPreload } from './assets/preload';
@@ -110,7 +110,7 @@ import {
 
 const TAVERN_URL = '/models/props/mirefen_tavern.glb';
 
-let loaded: GLTF | null = null;
+let loaded: LoadedGltf | null = null;
 /** The file `loaded` was read from: the model, or one of its texture-tier files. */
 let loadedFile: string | null = null;
 /** The file last asked for (a load that lands after a newer ask is dropped, not adopted). */
@@ -203,7 +203,7 @@ const TAVERN_CAMERA_INTERIOR = mirefenTavernCameraInterior();
 /** Where the tavern stands: the prefetch reach and the fog cull are measured from here. */
 const ANCHOR = tavernToWorld(0, -6);
 
-function buildTemplate(gltf: GLTF, keep: readonly string[]): TavernTemplate {
+function buildTemplate(gltf: LoadedGltf, keep: readonly string[]): TavernTemplate {
   // loader cache results are immutable: read a clone
   const root = gltf.scene.clone(true);
   root.updateMatrixWorld(true);
@@ -405,9 +405,11 @@ export interface TavernFlameSpot {
   depthZ?: number;
 }
 
-/** Where the live flames burn: three tongues over the round hearth's logs and three in the
- *  wall fireplace's mouth (mirefen_tavern_wall_fire_core.ts; props.ts builds them with the
- *  campfires' flame, so they flicker and throw embers like any campfire). */
+/** Where the live flames burn: three tongues over the round hearth's logs, a cooking fire's,
+ *  licking round the cauldron hung over them on its tripod (scripts/assets/mirefen_tavern/
+ *  inn_props.py CAULDRON), and three in the wall fireplace's mouth
+ *  (mirefen_tavern_wall_fire_core.ts; props.ts builds them with the campfires' flame, so they
+ *  flicker and throw embers like any campfire). */
 export const MIREFEN_TAVERN_FLAMES: readonly TavernFlameSpot[] = (() => {
   const at = (lx: number, ly: number, lz: number, scale: number, depthZ?: number) => {
     const w = tavernToWorld(lx, lz);
@@ -415,9 +417,9 @@ export const MIREFEN_TAVERN_FLAMES: readonly TavernFlameSpot[] = (() => {
   };
   const base = -TAVERN_PIT.depth + 0.5;
   return [
-    at(TAVERN_PIT.x, base, TAVERN_PIT.z, 2.1),
-    at(TAVERN_PIT.x + 0.45, base, TAVERN_PIT.z + 0.25, 1.4),
-    at(TAVERN_PIT.x - 0.4, base, TAVERN_PIT.z - 0.3, 1.5),
+    at(TAVERN_PIT.x, base, TAVERN_PIT.z, 1.4),
+    at(TAVERN_PIT.x + 0.45, base, TAVERN_PIT.z + 0.25, 1.0),
+    at(TAVERN_PIT.x - 0.4, base, TAVERN_PIT.z - 0.3, 1.05),
     // the local x axis (across the mouth's depth) is the world z axis (TAVERN_YAW)
     ...TAVERN_WALL_FIRE_FLAMES.map((f) => at(f.x, f.y, f.z, f.scale, f.depth)),
   ];
@@ -590,7 +592,10 @@ export const mirefenTavernInternalsForTest = {
   dog: (): THREE.Group | null => dogGroup,
   smoke: (): TavernSmokeView | null => smoke,
   /** Hand a parsed GLB to the preload slot (Node tests have no fetch path). */
-  setLoadedGltfForTest(gltf: GLTF | null, file: string | null = gltf ? TAVERN_URL : null): void {
+  setLoadedGltfForTest(
+    gltf: LoadedGltf | null,
+    file: string | null = gltf ? TAVERN_URL : null,
+  ): void {
     loaded = gltf;
     loadedFile = file;
     wantedFile = file;

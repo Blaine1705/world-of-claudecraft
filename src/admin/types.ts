@@ -930,6 +930,8 @@ export interface PerfCaptureResult {
   movementRejectedAnchoredWindowTotal: number;
   movementRejectedSanityBoundTotal: number;
   movementResyncsTotal: number;
+  movementPlayoutGrowthsTotal: number;
+  movementPlayoutShrinksTotal: number;
   profile: {
     samples: number;
     windowTicks: number;

@@ -79,7 +79,7 @@ describe('courier Materials Vault leg', () => {
 
   it('brings back what the vault could not hold, and nothing is lost', () => {
     const f = fixture();
-    f.meta.vault.stock.copper_ore = 35;
+    f.meta.vault.stock.copper_ore = 95;
     f.meta.inventory = [ore(12)];
     const request = {
       deposits: [],
@@ -88,7 +88,7 @@ describe('courier Materials Vault leg', () => {
     };
     expect(courierDispatch(f.ctx, request, 1)).toBe(true);
     f.finish();
-    expect(f.meta.vault.stock.copper_ore).toBe(40);
+    expect(f.meta.vault.stock.copper_ore).toBe(100);
     expect(f.meta.inventory).toMatchObject([ore(7)]);
     expect(f.meta.bank.inventory).toEqual([]);
   });
@@ -154,7 +154,7 @@ describe('courier Materials Vault leg', () => {
 
   it('shows the vault only while ready, and saves vault cargo through a reload', () => {
     const f = fixture();
-    expect(courierInfoFor(f.ctx, 1)?.vault).toMatchObject({ upgrades: 1, perMaterialCap: 40 });
+    expect(courierInfoFor(f.ctx, 1)?.vault).toMatchObject({ upgrades: 1, perMaterialCap: 100 });
     f.meta.inventory = [ore(5)];
     // A pooled row the vault does not hold refuses the whole trip.
     const missing = { itemId: 'linen_scrap', count: 2 };

@@ -41,6 +41,7 @@ import { instanceInfoAt } from '../instances/dungeons';
 import { completeKitUse, validateKitUse } from '../mob/trash_kit/encounter_use';
 import { forceDismount } from '../mounts';
 import { canActivateDivineAscension, hasDevotion, spendDevotion } from '../paladin_devotion';
+import { notePetAssistCast } from '../pet/pet_assist';
 import { scalePrimaryHealing } from '../primary_healing';
 import {
   completeCorpseHarvestCast,
@@ -167,7 +168,11 @@ import {
   willAutoUnshift,
 } from './form_auto_unshift';
 import { formRequirementMet, hasFormRequirement, requiredForms } from './form_requirement';
-import { isActionLockingFormAuraKind, isResourceShiftFormAuraKind } from './forms';
+import {
+  isActionLockingFormAuraKind,
+  isMountSafeFormToggle,
+  isResourceShiftFormAuraKind,
+} from './forms';
 import {
   applyBrainFreezeOverride,
   brainFreezeBypassesCooldown,
@@ -185,6 +190,8 @@ import {
 } from './hunter_coldsight_read';
 import { bloodhookStartError } from './hunter_fieldcraft';
 import { packCommandError } from './hunter_packlord';
+import { applyPatchUp } from './hunter_patch_up';
+import { playDeadOnCastAttempt } from './hunter_play_dead';
 import { cancelRecedingShell, noteHunterFocusSpend } from './hunter_shared';
 import {
   hasDeadGroupMember,
@@ -276,6 +283,15 @@ export const COLOSSAL_MIGHT_COOLDOWNS = new Set([
   'shield_slam',
 ]);
 
+// Position spells whose no-aim press (a bare keybind, the RL env) lands on the
+// selected hostile instead of the caster's feet.
+const SELECTED_HOSTILE_AIM_FALLBACK = new Set([
+  'earthquake',
+  'earthbind',
+  'frostjaw_trap',
+  'bear_trap',
+]);
+
 function isStasisToggle(ability: AbilityDef): boolean {
   return ability.effects.some((effect) => effect.type === 'selfBuff' && effect.kind === 'stasis');
 }
@@ -296,6 +312,10 @@ function shellskinBlocksAbility(entity: Entity, meta: PlayerMeta, ability: Abili
       'hunterBloodhook',
       'hunterShrapnel',
       'frostjawTrap',
+      // Volley and Phosphor Flask are instant ground zones since PR 4488.
+      'groundAoE',
+      'hunterBearTrap',
+      'hunterScatterbolt',
     ].includes(effect.type),
   );
 }
@@ -1078,6 +1098,7 @@ export function castAbility(
     return;
   }
   if (cancelStasisToggle(ctx, p, ability)) return;
+  if (playDeadOnCastAttempt(ctx, p, ability.id)) return;
   if (shellskinBlocksAbility(p, meta, ability)) {
     ctx.error(p.id, 'Shellskin prevents attacks.');
     return;
@@ -1400,7 +1421,7 @@ export function castAbility(
     // An armed Nature's Boon window is a form exemption for exactly the two
     // spells it names (combat/druid_natures_boon.ts). Checked here rather than
     // folded into usableInForm because it is aura state, not a property of the
-    // button: with no window armed, Wildbloom refuses and auto-unshifts exactly
+    // button: with no window armed, Sporemending refuses and auto-unshifts exactly
     // as it always has (Oakhide is usableInForm and never reaches this arm).
     !naturesBoonArmedFor(p.auras, ability.id)
   ) {
@@ -1770,11 +1791,12 @@ export function castAbility(
         return;
       }
     } else {
-      // Faultwake's keybind default is the selected hostile; other position
-      // spells retain the canonical at-feet fallback. Clamp the selected point
-      // through the same authoritative range rule as explicit ground input.
+      // Faultwake's (and the hunter traps') keybind default is the selected
+      // hostile; other position spells retain the canonical at-feet fallback.
+      // Clamp the selected point through the same authoritative range rule as
+      // explicit ground input.
       const selected =
-        (ability.id === 'earthquake' || ability.id === 'earthbind') && p.targetId !== null
+        SELECTED_HOSTILE_AIM_FALLBACK.has(ability.id) && p.targetId !== null
           ? (ctx.entities.get(p.targetId) ?? null)
           : null;
       const fallback =
@@ -1885,11 +1907,21 @@ export function castAbility(
   // BEFORE this cast's own effects resolve, so the stealth lands on a cat and
   // the rush leaves as a bear.
   applyDruidFormEntry(ctx, p, meta, ability.id);
-  // Auto-dismount when the player is mounted or mid-summon-channel and casts any ability.
-  if (p.mountKey !== '') forceDismount(ctx, p);
-  if (p.mountCastKey !== '') {
-    p.mountCastRemaining = 0;
-    p.mountCastKey = '';
+  // An Assist-stance pet attacks the enemy this cast is aimed at (pet/pet_assist.ts).
+  // Recorded here, where the cast is certain and before every commit branch,
+  // including the on-swing one below.
+  notePetAssistCast(ctx, p, meta, target);
+  // Auto-dismount when the player is mounted or mid-summon-channel and casts any
+  // ability. The one exception is a mount-safe form toggle (combat/forms.ts:
+  // Moonwing, Gloamveil): it only adorns the rider, so it neither dismounts nor
+  // cancels a summon in flight. Judged on the RESOLVED effects, so a press that
+  // also strikes or heals is a real cast and still dismounts.
+  if (!isMountSafeFormToggle(res)) {
+    if (p.mountKey !== '') forceDismount(ctx, p);
+    if (p.mountCastKey !== '') {
+      p.mountCastRemaining = 0;
+      p.mountCastKey = '';
+    }
   }
   // An instant slipping through a RUNNING cast (usableWhileCasting /
   // Flitstep) must not disturb that cast's aim: castTargetId/castAim belong
@@ -1926,7 +1958,7 @@ export function castAbility(
     return;
   }
   p.castTargetId = target?.id ?? null;
-  // Nature's Boon makes its spell 25% stronger. Scaled on a COPY here, BEFORE
+  // Nature's Boon makes its spell stronger (Sporemending 25%, Oakhide 25%). Scaled on a COPY here, BEFORE
   // the block below spends the window: the instant arm consumes the aura and
   // only then calls applyAbility, so a multiplier read any later is always 1.
   res = scaleNaturesBoonPower(p, res);
@@ -2256,10 +2288,12 @@ function scaleNaturesBoonPower(p: Entity, res: ResolvedAbility): ResolvedAbility
   const effects = res.effects.map((eff) => {
     // A heal or a HoT is NOT scaled here: those sites add a Spell Power rider
     // on top of the authored base, so scaling the base alone would deliver
-    // less than the printed 25% at any real heal power. They take the whole
+    // less than the printed bonus at any real heal power. They take the whole
     // multiplier in runEffects instead, through the cast-scoped heal multiplier
     // that `naturesBoonPower` below feeds (the Stonehearth 2pc shape).
-    if (eff.type === 'heal' || eff.type === 'hot') return eff;
+    // Spore Burst takes it the same way: its rider applies the multiplier to
+    // the whole heal, HoT and damage (combat/druid_spore_burst.ts).
+    if (eff.type === 'heal' || eff.type === 'hot' || eff.type === 'sporeBurst') return eff;
     const scaled: Record<string, unknown> = { ...eff };
     for (const key of ['min', 'max', 'amount', 'total', 'value'] as const) {
       const v = scaled[key];
@@ -2793,31 +2827,15 @@ function applyAbility(
     if (!pet) {
       ctx.error(
         p.id,
-        isDelvePos(p.pos.x) ? 'Pets are not allowed inside the delves.' : 'You have no pet.',
+        isDelvePos(p.pos.x) && ctx.delvePetStash.has(p.id)
+          ? 'Pets are not allowed inside the delves.'
+          : 'You have no pet.',
       );
       return;
     }
     spendResource(p, billableCost());
     armAbilityCooldownWithReflection(ctx, p, meta, res);
-    if (pet.dead) {
-      ctx.revivePet(p.id);
-    } else {
-      const hot = res.effects.find((effect) => effect.type === 'hot');
-      if (hot) {
-        ctx.applyAura(pet, {
-          id: ability.id,
-          name: ability.name,
-          kind: 'hot',
-          remaining: hot.duration,
-          duration: hot.duration,
-          value: Math.max(1, Math.round(hot.total / (hot.duration / hot.interval))),
-          tickInterval: hot.interval,
-          tickTimer: hot.interval,
-          sourceId: p.id,
-          school: ability.school,
-        });
-      }
-    }
+    applyPatchUp(ctx, p, pet, ability);
     if (p.kind === 'player') onCastCompleted(ctx, p, ability.id, pet);
     return;
   }

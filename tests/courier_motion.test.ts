@@ -26,6 +26,7 @@ import {
   travelCourier,
 } from '../src/sim/courier/motion';
 import { INSTANCE_X_BASE } from '../src/sim/data';
+import { savedMaterialSlot } from '../src/sim/material_slot_load';
 import type { PlayerMeta } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import { DT, type Entity } from '../src/sim/types';
@@ -35,7 +36,7 @@ function journey(x = 60, z = 80) {
   const banker = { id: 2, kind: 'npc', pos: { x, y: 0, z }, dead: false } as Entity;
   const meta = {
     entityId: 1,
-    inventory: [{ itemId: 'baked_bread', count: 1 }],
+    inventory: [savedMaterialSlot({ itemId: 'baked_bread', count: 1 })],
     bank: emptyBankState(),
     bags: [null, null, null, null],
     wireRev: 0,
@@ -96,7 +97,9 @@ describe('courier capped-duration flight and grounded endpoints', () => {
       expect(state.travelTicks).toBe(0);
       expect(state.x).toBe(distance * 0.6);
       expect(state.z).toBe(distance * 0.8);
-      expect(f.meta.bank.inventory).toEqual([{ itemId: 'baked_bread', count: 1 }]);
+      expect(f.meta.bank.inventory).toEqual([
+        savedMaterialSlot({ itemId: 'baked_bread', count: 1 }),
+      ]);
       const back = legTicksOf(f);
       expect(back).toBeLessThanOrEqual(COURIER_MAX_LEG_TICKS);
       for (let i = 1; i < back; i++) {

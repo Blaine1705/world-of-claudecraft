@@ -540,13 +540,17 @@ const MONOLITHS: MonolithRow[] = [
     // the Moonbridge banner) moved into log_event_route.ts logEventCue.
     // v0.45.0 integration: 18025 on the merged tree (wc -l); the lower of the two
     // parent pins (18054 and PR 4352's 18069) stands.
+    // LOWERED 18043 -> 18038: the promo card's advert list (Armory, membership,
+    // Refer a Friend) and its locale copy live in store_promo_card.ts storePromoSlides.
+    // wc -l, exact count.
     // LOWERED to 18043 at the v0.45.0 integration merge of #4479's head that moved
     // Deepglass and the Tidehold city out of the Studio import: the integration pin
     // 18054 minus that removal. Exact merged count (wc -l), zero slack.
     // LOWERED 18093 -> 18089 at the release/v0.45.0 merge into feature/mirefen-tavern:
     // the tavern's rest badge read (rest_indicator.ts restStateOf) pays for the tavern's wiring.
     // wc -l on the merged tree. Exact count.
-    ceiling: 18043,
+    // Combined guild extractions and integration changes, measured with wc -l.
+    ceiling: 17996,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1045,7 +1049,16 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 12405 -> 12400 with the torched mudfin hut fire: the burn cue's two
     // inline bursts moved into hut_fire_fx.ts (the particle cloud owns and ticks it),
     // leaving a one-line hand-off plus the light-pool hook. Same headroom as before.
-    ceiling: 12400,
+    // LOWERED 12405 -> 12381 at the merge of feature/lantern-hall-steed into
+    // feature/highwatch-adventurers-guild: Lantern Hall's steed and sword folded the three
+    // fiesta wrappers into one per-frame call (one host instead of three), net of the
+    // weapon-skin swing trail's one-line hook (weapon_skin_trail_core.ts). wc -l on the
+    // merged tree. Exact count.
+    // RE-PINNED at the merge of Lantern Hall (#4530) onto feature/v045-integration
+    // (46f0679547): both parent pins for the record, the integration 12400 and the guild
+    // 12381; the two sides' extractions compose to 12354 by wc -l on the merged tree.
+    // Exact count.
+    ceiling: 12354,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1285,7 +1298,17 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 11642 -> 11639 by the tavern's seats: standUp moved whole into seating.ts
     // (bound straight into the context and the motion deps), paying for the sitOnSeat and
     // resting delegates. Exact count.
-    ceiling: 11594,
+    // LOWERED to 11587 by /unstuck on custom maps: the world's graveyards and
+    // player start became ctx views spirit.ts defaults to, so both
+    // releasePlayerSpirit call sites dropped their explicit arguments. Exact count.
+    // LOWERED to 11582 by Lantern Hall, merged over the v0.45.0 integration: the quest half
+    // of a plain NPC talk moved to quests/npc_quest_talk.ts, paying for the guild's talk
+    // route and two IWorld members. wc -l on the merged tree, exact count.
+    // RE-PINNED at the merge of Lantern Hall (#4530) onto feature/v045-integration
+    // (46f0679547): both parent pins for the record, the integration 11587 and the guild
+    // 11582; the two sides' extractions compose to 11578 by wc -l on the merged tree.
+    // Exact count.
+    ceiling: 11578,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1541,7 +1564,9 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the merge of origin/feature/v045-integration (tip 43f0cfd0c04) into
     // feature/genshin-artstyle: both parents' non-overlapping additions compose to 10934
     // (wc -l < src/main.ts). Exact merged count, zero slack.
-    ceiling: 10934,
+    // Landing-first integration extracts the project counter and community tracking.
+    // Re-pin the combined release entrypoint at its measured size, with zero slack.
+    ceiling: 10785,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1815,7 +1840,9 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 9840 -> 9835 at the release/v0.45.0 merge into feature/mirefen-tavern:
     // the tavern's tick_perf_log.ts mobZonePhase extraction pays for the tavern's wiring. wc -l
     // on the merged tree. Exact count.
-    ceiling: 9758,
+    // Guild purchase wiring is paid for by moving quest/delve resync to quest_snapshot_wire.
+    // Measured after formatting: 9751, below both merged parent ceilings.
+    ceiling: 9751,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -2334,7 +2361,16 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 827 -> 826 at World PvP (PR 4146 review): the state gained the pvpFlag
     // the name row was built with, paid for by three comment trims. Exact count
     // (wc -l < src/render/nameplate_canvas.ts), zero slack.
-    ceiling: 826,
+    // LOWERED 826 -> 823 at World PvP bounties: the state gained the bounty bit
+    // and the name row its blood-red fills, paid for by moving every tag fill
+    // rule (the guild colour tiers included) to nameplate_tag_fill_core.ts.
+    // Exact count (wc -l < src/render/nameplate_canvas.ts), zero slack.
+    // LOWERED 826 -> 792 at the Style of Enemy Highlight options: the text pens
+    // moved to nameplate_text_styles.ts and the new target cues (framed plate,
+    // overhead chevron, screen-edge arrow) draw from nameplate_target_highlight.ts,
+    // leaving only their call sites here. wc -l after biome. Exact count, zero slack.
+    // Keep inherited bounty/tag fills beside the extracted pens and new cues.
+    ceiling: 797,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {

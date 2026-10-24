@@ -7,6 +7,15 @@
 // (tests/i18n_admin_catalog.test.ts).
 
 export const sv_SE: Record<string, string> = {
+  'error.buddyGrantFailed': 'Det gick inte att tilldela följeslagaren.',
+  'error.characterAlreadyHasThat':
+    'Den karaktären har redan den följeslagaren eller det utseendet.',
+  'moderationHistory.actionGrantBuddy': 'Följeslagare tilldelad',
+  'moderationHistory.actionAnnounce': 'Rikesmeddelande',
+  'moderationHistory.actionGmInvisible': 'Blev osynlig',
+  'moderationHistory.actionGmVisible': 'Blev synlig',
+  'moderationHistory.actionUnwatch': 'Borttagen från bevakningslistan',
+  'moderationHistory.actionWatch': 'Tillagd på bevakningslistan',
   'error.flagActiveExists': 'det här kontot har redan en öppen flagga av den typen',
   'wealth.largeMovementsUnavailable':
     'stora bankrörelser kunde inte laddas (inläsningen av liggaren tog för lång tid), guldsammanställningen ovan är fullständig',

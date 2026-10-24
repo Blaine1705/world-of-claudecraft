@@ -2,16 +2,19 @@ import { applyFrameGeometrySetting } from './game/frame_geometry_settings';
 import { createSubscriptionStoreHooks, storeSnapshotForHud } from './net/subscription_sdk';
 import { captureReferralSlug } from './referral_signup';
 import { formatAbilityImbueDamage } from './ui/ability_imbue_text';
+import { liftBootSplashWhenReady } from './ui/boot_splash';
 import { bindChatComposerFocusState, resetChatComposer } from './ui/chat_composer_focus_controller';
 import { dispatchCollectionAction } from './ui/collection_actions_core';
 import { createInterfaceVisibility } from './ui/interface_visibility';
 import { dispatchInterfaceVisibilityAction } from './ui/interface_visibility_core';
+import { loadProjectStats } from './ui/project_stats';
 import { MOBILE_CHAT_REPLY_CLASS, START_SCREEN_OPEN_CLASS } from './ui/root_state_classes';
 // Game-client style barrel (declares the @layer order, loads tokens + base, etc.).
-// index.html and play.html both bootstrap through this module, so this one import
-// styles both game entries; admin/guide use their own entries and inline CSS.
+// play.html boots through this module; index.html boots through src/boot.ts, which
+// imports the same barrel first. admin/guide use their own entries and inline CSS.
 import './styles/index.css';
 import { captureFirstTouch, registerAttributionPayload } from './attribution';
+import { installClientUpdate, searchClientUpdates } from './client_update_search';
 import { markEntryTightMode } from './device_memory_hint';
 import { startDiscordLogin } from './discord_login_start';
 import {
@@ -51,11 +54,14 @@ import { shouldRecoverOnComposerBlur } from './game/chat_keyboard_dismiss';
 import {
   clickMoveBrokenByTeleport,
   clickMoveShouldWalk,
+  clickMoveStalled,
   clickMoveStep,
+  clickMoveTurn,
   distance2d,
   latencyAdjustedStopDistance,
+  newClickMoveWatch,
   resolveClickMoveAction,
-  stepAngleToward,
+  restartClickMoveWatch,
 } from './game/click_move';
 import { paintClickMoveMarker } from './game/click_move_marker';
 import { clientEnvBits, installPageStateTracking, pageStateBits } from './game/client_env';
@@ -172,7 +178,7 @@ import {
   resetLoadProfile,
   summarizeLoadProfile,
 } from './game/load_profiler';
-import { trackMetaPixel } from './game/meta_pixel';
+import { trackCommunityLinkClicks, trackMetaPixel } from './game/meta_pixel';
 import {
   interfaceModeFromSetting,
   isPhoneTouchDevice,
@@ -184,8 +190,11 @@ import {
 import { applyMobileHudLayout } from './game/mobile_hud_layout_applier';
 import { watchMobileMoreState } from './game/mobile_more_diagnostics';
 import { mobilePlatform, mobilePreflightCopy } from './game/mobile_preflight';
+import { installMobileZoomGuard } from './game/mobile_zoom_guard';
+import { applyMouseCameraSetting } from './game/mouse_camera_settings';
 import { mouselookReleaseFacing } from './game/mouselook_release';
 import { music } from './game/music';
+import { applyNameplateRowScales, applyNameplateSetting } from './game/nameplate_settings';
 import { tryNearbyInteraction } from './game/nearby_interaction';
 import { nextNpcTargetForWorld } from './game/npc_cycle';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
@@ -365,6 +374,7 @@ import {
 import {
   ensureCharacterUrl,
   modularCacheStats,
+  pollRiftCharacterStream,
   preloadMechAssets,
   startStreamedCharacterPreloads,
 } from './render/characters/assets';
@@ -394,6 +404,7 @@ import { charselectPreviewAppearance } from './render/characters/preview_appeara
 import { attachContextRecoveryHandlers } from './render/context_loss_recovery';
 import { type RecycledRendererContext, recycleWebGL2Context } from './render/context_recycle';
 import { installWebGLContextRelease } from './render/context_release';
+import { contextRestoreDrawHeld } from './render/context_restore_hold';
 import {
   activateGfxProfile,
   captureGfxCapabilities,
@@ -403,13 +414,13 @@ import {
   graphicsPresetLabel,
   resolveGfxProfile,
 } from './render/gfx';
-import { setNameplateDotScale } from './render/nameplate_dot_scale';
 import { hazardPaletteModeOf } from './render/nythraxis_hazard_palette_core';
 import { createInitialPrewarmResumeStartGate } from './render/prewarm_resume_start_gate';
 import type { Renderer } from './render/renderer';
 import { hasAuthoritativeSelfPositionDiscontinuity } from './render/self_motion';
 import { MovementPredictionPipeline } from './render/self_prediction';
 import { ensureSkyAssetsAt, navigatorSaveData } from './render/sky';
+import { setSpellEffectsEnabled } from './render/spell_effects_switch';
 import { ARRIVAL_NEIGHBOR_STREAM_RADIUS } from './render/zone_streaming';
 import { desktopBridge } from './runtime';
 import { breathFraction, stepBreathUsedSeconds } from './sim/breath';
@@ -518,11 +529,19 @@ import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { showEntryGuardBanner } from './ui/entry_guard_banner';
 import { refreshEpicLinkStatus, wireEpicLink } from './ui/epic_link';
 import { esc } from './ui/esc';
+import { showFatalOverlay } from './ui/fatal_overlay_controller';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
 import {
   attachGatherNodeHoverTooltip,
   gatherNodeToolGateFor,
 } from './ui/gather_node_tooltip_controller';
+import {
+  currentGraphicsChoice,
+  graphicsChoicePatch,
+  parseGraphicsChoice,
+} from './ui/graphics_choice_core';
+import { promptGraphicsChoiceOnFirstLogin } from './ui/graphics_choice_prompt';
+import { installGraphicsRestoreNote } from './ui/graphics_restore_note_controller';
 import { loadHighscoresInto } from './ui/highscore_board';
 import { type ClaudiumHooks, Hud } from './ui/hud';
 import { resolveActionBarVisibility } from './ui/hud/action_bar/action_bar_visibility_core';
@@ -609,12 +628,9 @@ import {
 } from './ui/wallet_reauth_prompt';
 import { type IWorld, ONLINE_WORLD_INCOMPATIBLE_MESSAGE } from './world_api';
 
-const CLICK_MOVE_TURN_RATE = 4.2; // rad/sec; responsive turning while the camera stays decoupled from click spam
 const CLICK_MOVE_WAYPOINT_STOP = 0.8; // yards; intermediate A* corners should roll through, not stutter-stop
 const CLICK_MOVE_REROUTE_DISTANCE = 4; // yards; live entity targets can move this far before we recompute the path
 const CLICK_MOVE_FENCE_JUMP_LOOKAHEAD = 2; // yards ahead; auto-jump when a click-move path is about to cross a fence
-const CLICK_MOVE_STUCK_MS = 1100; // ms of no forward progress before we reroute around (then give up)
-const CLICK_MOVE_PROGRESS_EPSILON = 1.5; // yards of travel that counts as progress (a walking player clears this fast; a player hopping in place at a fence never does)
 const CLICK_MOVE_LATENCY_STOP_CAP_MS = 240; // avoid overshooting hosted click-move targets while preserving offline precision
 const CLICK_MOVE_LATENCY_STOP_MAX_EXTRA = 1.6; // yards; cap high-latency stop padding so clicks do not end obviously short
 const CLICK_MOVE_LATENCY_WAYPOINT_MAX_EXTRA = 0.8; // yards; helps online A* corners roll through despite input echo delay
@@ -628,7 +644,6 @@ const HOMEPAGE_MUSIC_MUTED_KEY = 'woc_homepage_music_muted';
 const HOMEPAGE_MUSIC_VOLUME = 0.225;
 const GRAPHICS_PRESET_HIGH = 3;
 const GRAPHICS_PRESET_ULTRA = 4;
-const LANDING_GRAPHICS_AUTO = 'auto';
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.querySelector(sel) as T;
 document.body.classList.toggle('native-app', NATIVE_APP);
@@ -756,31 +771,6 @@ function saveHomepageMusicMuted(muted: boolean): void {
   }
 }
 
-function trackCommunityLinkClicks(): void {
-  document.querySelectorAll<HTMLAnchorElement>('a[href]').forEach((link) => {
-    let url: URL;
-    try {
-      url = new URL(link.href);
-    } catch {
-      return;
-    }
-    const host = url.hostname.toLowerCase();
-    const isGitHub = host === 'github.com' || host.endsWith('.github.com');
-    const isDiscord =
-      host === 'discord.gg' ||
-      host.endsWith('.discord.gg') ||
-      host === 'discord.com' ||
-      host.endsWith('.discord.com');
-    if (!isGitHub && !isDiscord) return;
-    link.addEventListener('click', () => {
-      trackMetaPixel(isGitHub ? 'GitHubClick' : 'DiscordClick', {
-        url: url.toString(),
-        path: url.pathname,
-      });
-    });
-  });
-}
-
 function localizedSiteUrl(lang: SupportedLanguage): string {
   if (lang === 'en') return SITE_URL;
   const url = new URL(SITE_URL);
@@ -803,34 +793,6 @@ function syncAppViewport(): void {
   syncAppViewportShared();
   applyMobileHudLayout();
   applyMobileKeyboardViewport();
-}
-
-function preventMobileZoom(): void {
-  let lastTouchEnd = 0;
-  const prevent = (e: Event) => e.preventDefault();
-  document.addEventListener('gesturestart', prevent, { passive: false });
-  document.addEventListener('gesturechange', prevent, { passive: false });
-  document.addEventListener('gestureend', prevent, { passive: false });
-  document.addEventListener(
-    'touchend',
-    (e) => {
-      const target = e.target instanceof Element ? e.target : null;
-      // client_shell.test guards this interactive-target allowlist:
-      // target?.closest('button, a, input, textarea, select, [role="button"], [role="option"], [tabindex]')
-      if (
-        target?.closest(
-          'button, a, input, textarea, select, [role="button"], [role="option"], [tabindex]',
-        )
-      ) {
-        lastTouchEnd = Date.now();
-        return;
-      }
-      const now = Date.now();
-      if (now - lastTouchEnd <= 320) e.preventDefault();
-      lastTouchEnd = now;
-    },
-    { passive: false },
-  );
 }
 
 function syncPhoneTouchClass(): void {
@@ -862,9 +824,10 @@ const otaUpdateGate = installOtaUpdateGate({
     hide: hideOtaUpdateOverlay,
   },
   isInWorld: () => document.body.classList.contains('game-active'),
-  onFatalRecoveryFailed: () => fatalOverlay(userFacingApiError(ONLINE_WORLD_INCOMPATIBLE_MESSAGE)),
+  onFatalRecoveryFailed: () =>
+    fatalOverlay(userFacingApiError(ONLINE_WORLD_INCOMPATIBLE_MESSAGE), { searchUpdates: true }),
 });
-preventMobileZoom();
+installMobileZoomGuard();
 syncPhoneTouchClass();
 window.matchMedia(PHONE_TOUCH_QUERY).addEventListener?.('change', syncPhoneTouchClass);
 window.addEventListener('resize', syncAppViewport);
@@ -1167,6 +1130,7 @@ async function prepareWorldEntry(): Promise<boolean> {
   } else {
     requestPreferredFullscreen();
   }
+  await promptGraphicsChoiceOnFirstLogin();
   syncAppViewport();
   window.setTimeout(syncAppViewport, 250);
   window.setTimeout(syncAppViewport, 800);
@@ -1485,6 +1449,7 @@ async function startGame(
       stuckMessage: t('loading.rendererContextLost'),
     }),
   );
+  installGraphicsRestoreNote(document.getElementById('ui') ?? document.body);
   // The probe was armed before the locale/asset awaits above; mark that the await
   // window ended and the synchronous scene build is what runs next.
   entryDiagnostics.checkpoint('scene-build-start', baseEntryDiagnostics());
@@ -1528,7 +1493,7 @@ async function startGame(
     renderer.showOwnNameplate = settings.get('showOwnNameplate');
     renderer.showPlayerNameplates = settings.get('showPlayerNameplates');
     renderer.showPetNames = settings.get('showPetNames');
-    setNameplateDotScale(settings.nameplateDotRenderScale());
+    applyNameplateRowScales(settings);
     if (GFX.standardMaterials) {
       try {
         if (!localStorage.getItem('woc_water_ripples_v2')) {
@@ -1540,6 +1505,7 @@ async function startGame(
       }
     }
     renderer.setWaterRipples(settings.get('waterRipples'));
+    setSpellEffectsEnabled(settings.get('spellEffects'));
     // Dev-only: ?targetcone=1 draws the Tab-target front cone on the ground in
     // front of the player, for tuning the targeting angle/radius (tab_target.ts).
     if (import.meta.env.DEV && new URLSearchParams(location.search).get('targetcone') === '1') {
@@ -2362,16 +2328,7 @@ async function startGame(
   applyBrowserEffects(settings.get('browserEffects'));
 
   function applySetting(key: keyof GameSettings, value: number | boolean): void {
-    if (key === 'mouseCamera') {
-      const v = settings.set('mouseCamera', !!value);
-      input.setMouseCameraEnabled(v);
-      return;
-    }
-    if (key === 'lockCursorOnRotate') {
-      const v = settings.set('lockCursorOnRotate', !!value);
-      input.setLockCursorOnRotate(v);
-      return;
-    }
+    if (applyMouseCameraSetting(settings, input, key, value)) return;
     if (key === 'leftHandedTouch') {
       const v = settings.set('leftHandedTouch', !!value);
       document.body.classList.toggle('mobile-left-handed', v);
@@ -2411,6 +2368,7 @@ async function startGame(
       settings.set('showAttackButton', !!value);
       return;
     }
+    if (applyNameplateSetting(settings, renderer, key, value)) return;
     if (key === 'groundReticle') {
       const v = settings.set('groundReticle', !!value);
       if (!v) hud.cancelGroundAim();
@@ -2420,6 +2378,12 @@ async function startGame(
       // The wake height field lives renderer-side (render modules never read
       // the settings store), so the flip is pushed rather than read live.
       renderer.setWaterRipples(settings.set('waterRipples', !!value));
+      return;
+    }
+    if (key === 'spellEffects') {
+      // Module state (render/spell_effects_switch.ts), so it outlives a
+      // renderer rebuild; the painters read it at their entry points.
+      setSpellEffectsEnabled(settings.set('spellEffects', !!value));
       return;
     }
     if (key === 'partyFrameShowAbsorbs') {
@@ -2528,30 +2492,8 @@ async function startGame(
       return;
     }
     if (applyDesktopShellSetting(key, value, settings, desktopBridge())) return;
-    if (key === 'showDevBadges') {
-      renderer.showDevBadges = settings.set('showDevBadges', !!value);
-      return;
-    }
-    if (key === 'showOwnNameplate') {
-      renderer.showOwnNameplate = settings.set('showOwnNameplate', !!value);
-      return;
-    }
-    if (key === 'showPlayerNameplates') {
-      renderer.showPlayerNameplates = settings.set('showPlayerNameplates', !!value);
-      return;
-    }
     if (key === 'showPetNames') {
       renderer.showPetNames = settings.set('showPetNames', !!value);
-      return;
-    }
-    if (key === 'showNameplateDots') {
-      settings.set('showNameplateDots', !!value);
-      setNameplateDotScale(settings.nameplateDotRenderScale());
-      return;
-    }
-    if (key === 'nameplateDotScale') {
-      settings.set('nameplateDotScale', Number(value));
-      setNameplateDotScale(settings.nameplateDotRenderScale());
       return;
     }
     if (key === 'invertLookY') {
@@ -2592,6 +2534,9 @@ async function startGame(
       case 'sfxVolume':
         audio.setVolume(v);
         sfx.setVolume(v);
+        break;
+      case 'ambientVolume':
+        sfx.setAmbientVolume(v);
         break;
       case 'musicVolume':
         music.setVolume(v);
@@ -2755,7 +2700,8 @@ async function startGame(
     next.showOwnNameplate = settings.get('showOwnNameplate');
     next.showPlayerNameplates = settings.get('showPlayerNameplates');
     next.showPetNames = settings.get('showPetNames');
-    setNameplateDotScale(settings.nameplateDotRenderScale());
+    Object.assign(next.targetHighlight, renderer.targetHighlight);
+    applyNameplateRowScales(settings);
     next.reduceMotionSetting = settings.get('reduceMotion');
     next.setHazardPaletteMode(hazardPaletteModeOf(settings.get('colorblindMode')));
     next.setBrightness(settings.get('brightness'));
@@ -3658,8 +3604,7 @@ async function startGame(
   // hopping forever. We track actual displacement, not distance-to-goal, so a
   // legitimate long detour (e.g. around a building) isn't mistaken for stuck.
   let clickMoveStuckPulse = -1;
-  let clickMoveAnchor = { x: 0, z: 0 };
-  let clickMoveStuckSince = 0;
+  const clickMoveWatch = newClickMoveWatch();
   let clickMoveReroutedAround = false;
 
   let lastClickMoveMarkerPulse = -1;
@@ -3953,6 +3898,7 @@ async function startGame(
     mouselook: boolean,
     playerPos: { x: number; z: number },
     playerFacing: number,
+    stepSeconds: number,
     latencyMs = 0,
   ): { mi: ReturnType<typeof input.readMoveInput>; facing: number | null } {
     const flight = glider.resolveGliderMove(world, input);
@@ -4011,7 +3957,7 @@ async function startGame(
           if (!input.advanceClickMoveWaypoint()) input.clearClickMove();
         } else {
           const fromFacing = input.clickMoveFacing ?? playerFacing;
-          const smoothFacing = stepAngleToward(fromFacing, step.facing, CLICK_MOVE_TURN_RATE * DT);
+          const smoothFacing = clickMoveTurn(fromFacing, step.facing, stepSeconds);
           input.clickMoveFacing = smoothFacing;
           facing = smoothFacing;
           // Walk only when aimed at the destination; otherwise turn in place so
@@ -4033,22 +3979,18 @@ async function startGame(
         // Track displacement so a fence we can't actually clear doesn't trap us
         // in an endless jump loop: if we stop moving, reroute around it, then give up.
         const goal = input.clickMoveGoal;
-        if (goal && mi.forward && !playerImmobilized()) {
+        if (goal) {
           const now = performance.now();
           if (input.clickMovePulse !== clickMoveStuckPulse) {
             clickMoveStuckPulse = input.clickMovePulse;
-            clickMoveAnchor = { x: playerPos.x, z: playerPos.z };
-            clickMoveStuckSince = now;
+            restartClickMoveWatch(clickMoveWatch, playerPos, now);
             clickMoveReroutedAround = false;
           }
-          if (distance2d(playerPos, clickMoveAnchor) > CLICK_MOVE_PROGRESS_EPSILON) {
-            clickMoveAnchor = { x: playerPos.x, z: playerPos.z };
-            clickMoveStuckSince = now;
-          } else if (now - clickMoveStuckSince > CLICK_MOVE_STUCK_MS) {
+          const walking = mi.forward && !playerImmobilized();
+          if (clickMoveStalled(clickMoveWatch, playerPos, now, walking)) {
             if (!clickMoveReroutedAround) {
               clickMoveReroutedAround = true;
-              clickMoveAnchor = { x: playerPos.x, z: playerPos.z };
-              clickMoveStuckSince = now;
+              restartClickMoveWatch(clickMoveWatch, playerPos, now);
               input.rerouteClickMoveTarget(
                 goal,
                 findPlayerPath(
@@ -4206,7 +4148,7 @@ async function startGame(
   // Reused across frames: the rAF hot path must not allocate (the frame
   // allocation guard polices the loop body), and the gate reads it
   // synchronously before returning a shared frozen decision.
-  const gateInput = newPresentationGateInput(DESKTOP_APP);
+  const gateInput = newPresentationGateInput(DESKTOP_APP, contextRestoreDrawHeld);
   function frame(now: number): void {
     if (armFrameAndSkip(frame, now, gateInput)) return;
     // The desktop shell keeps rAF running while hidden (backgroundThrottling is
@@ -4222,6 +4164,7 @@ async function startGame(
     }
     maybeWarmCurrentZone();
     maybeWarmFerryDestination();
+    pollRiftCharacterStream(world);
     const elapsedFrameDt = (now - last) / 1000;
     let frameDt = elapsedFrameDt;
     last = now;
@@ -4361,6 +4304,7 @@ async function startGame(
           mouselook,
           offlineSim.player.pos,
           offlineSim.player.facing,
+          DT,
         );
         Object.assign(offlineSim.moveInput, mi);
         const stepFacing = movementFacing ?? facing;
@@ -4511,6 +4455,7 @@ async function startGame(
       mouselook,
       world.player.pos,
       world.player.facing,
+      frameDt,
       inputEcho.echoMs,
     );
     const pe = world.player;
@@ -6627,7 +6572,7 @@ async function refreshCharacters(): Promise<void> {
 
 function fatalOverlay(
   message: string,
-  opts?: { keepResumeMarker?: boolean; buttonLabel?: string },
+  opts?: { keepResumeMarker?: boolean; buttonLabel?: string; searchUpdates?: boolean },
 ): void {
   // A fatal overlay is a terminal client state whose only exit is a reload, so
   // clearing the resume marker HERE covers every present and future caller: the
@@ -6637,19 +6582,11 @@ function fatalOverlay(
   // clearing would erase THAT session's marker, so the caller opts out.
   if (!opts?.keepResumeMarker) clearPlayMarker();
   hideLoadingScreen(); // its art would bleed through the translucent backdrop
-  if (document.getElementById('disconnect-overlay')) return; // first reason wins
-  const el = document.createElement('div');
-  el.id = 'disconnect-overlay';
-  el.className = 'fatal-overlay';
-  const messageEl = document.createElement('div');
-  messageEl.textContent = message;
-  el.appendChild(messageEl);
-  const btn = document.createElement('button');
-  btn.className = 'btn';
-  btn.textContent = opts?.buttonLabel ?? t('errors.returnToLogin');
-  btn.addEventListener('click', () => location.reload());
-  el.appendChild(btn);
-  document.body.appendChild(el);
+  showFatalOverlay(message, {
+    buttonLabel: opts?.buttonLabel,
+    searchUpdates: opts?.searchUpdates ? () => searchClientUpdates(__APP_VERSION__) : undefined,
+    installUpdate: installClientUpdate,
+  });
 }
 
 // Take over a character that is still online in another session, then enter on
@@ -6804,6 +6741,7 @@ async function enterWorld(c: CharacterSummary, button?: HTMLButtonElement): Prom
     // in resume_play.ts keeps this tab from looping on the overlay forever.
     fatalOverlay(userFacingApiError(reason), {
       keepResumeMarker: reason === RECONNECT_CONFLICT_ERROR,
+      searchUpdates: reason === ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
     });
   };
   // an unexpected drop is not fatal: the server holds the character in-world
@@ -7178,9 +7116,6 @@ function renderClassDetails(
   }
 }
 
-const STATS_CACHE_KEY = 'woc_cached_stats';
-const STATS_CACHE_TTL_MS = 30000; // 30 seconds
-
 function readTranslationKey(value: string | null): TranslationKey | null {
   return value ? (value as TranslationKey) : null;
 }
@@ -7377,77 +7312,6 @@ async function changeLanguage(
   refreshLocalizedDynamicShell();
   document.dispatchEvent(new CustomEvent('woc:languagechange', { detail: { language: selected } }));
   return true;
-}
-
-async function loadProjectStats(): Promise<void> {
-  // Realm status now lives in the realm dropdown, both in the trigger sub-line
-  // and inside the Online option, so update every instance by class.
-  const characterEls = document.querySelectorAll<HTMLElement>('.js-stat-characters');
-  if (!characterEls.length) return;
-  const setAll = (els: NodeListOf<HTMLElement>, text: string): void => {
-    els.forEach((el) => {
-      el.textContent = text;
-    });
-  };
-
-  // 1. Try to read from localStorage first. characters_created is optional:
-  // an entry written before the accounts-to-characters stat swap lacks it, and
-  // the freshness check below treats such an entry as a miss so we re-fetch
-  // rather than render "undefined".
-  let cached: {
-    realm: string;
-    accounts_created: number;
-    characters_created?: number;
-    players_online: number;
-    timestamp: number;
-  } | null = null;
-  if (typeof localStorage !== 'undefined') {
-    const raw = localStorage.getItem(STATS_CACHE_KEY);
-    if (raw) {
-      try {
-        cached = JSON.parse(raw);
-      } catch {}
-    }
-  }
-
-  // If cache exists, is fresh (within TTL), and carries the character count,
-  // use it and skip the API request
-  if (
-    cached &&
-    cached.characters_created != null &&
-    Date.now() - cached.timestamp < STATS_CACHE_TTL_MS
-  ) {
-    setAll(characterEls, String(cached.characters_created));
-    return;
-  }
-
-  // 2. Fetch fresh stats
-  try {
-    const data = await api.projectStats();
-
-    setAll(characterEls, data.characters_created != null ? String(data.characters_created) : '-');
-
-    // Save to cache with timestamp
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(
-        STATS_CACHE_KEY,
-        JSON.stringify({
-          ...data,
-          timestamp: Date.now(),
-        }),
-      );
-    }
-  } catch {
-    // A marketing counter is not worth an error entry: the API being down or
-    // absent (offline play, a dev client with no server) is an ordinary state
-    // and the cache fallback below already handles it.
-    // If API fails, fall back to cached data (even if expired)
-    if (cached) {
-      setAll(characterEls, String(cached.characters_created ?? '-'));
-    } else {
-      setAll(characterEls, '-');
-    }
-  }
 }
 
 // Home-page global (cross-realm) lifetime-XP leaderboard. Server computes the
@@ -9079,13 +8943,14 @@ function applyLandingBackdrop(highContrast: boolean): void {
   });
 }
 
-function wireStartScreens(): void {
+function wireStartScreens(): Promise<void> {
   // Initial page translation and stats load. Lazy locale flip: a stored non-en locale is now
-  // a real chunk fetch, and the homepage IS the first paint (there is no loading screen to sit
-  // behind), so we localize-then-reveal to prevent an English flash + text swap. The start
-  // screen is held with visibility:hidden - which PRESERVES layout, so there is no layout
-  // shift - ONLY when the boot locale is not already resident; English and any already-loaded
-  // locale skip the gate entirely (no blank, no delay). The gate lifts on BOTH resolve and
+  // a real chunk fetch, so we localize-then-reveal to prevent an English flash + text swap.
+  // The returned promise also holds the boot splash; the gate below still covers a splash
+  // its fail-safe lifted early. The start screen is held with visibility:hidden - which
+  // PRESERVES layout, so there is no layout shift - ONLY when the boot locale is not
+  // already resident; English and any already-loaded locale skip the gate entirely (no
+  // blank, no delay). The gate lifts on BOTH resolve and
   // reject (the English fallback still renders), so a failed locale fetch can never strand the
   // homepage hidden. The stored-locale modulepreload will shrink the non-en hold toward zero.
   const bootLang = getLanguage();
@@ -9105,7 +8970,7 @@ function wireStartScreens(): void {
       if (gated && startScreen) startScreen.style.visibility = '';
     }
   };
-  void ensureLocaleLoaded(bootLang).then(revealLocalized, revealLocalized);
+  const localized = ensureLocaleLoaded(bootLang).then(revealLocalized, revealLocalized);
   // The content-channel chunks (deed names, reliquary page names) render no
   // homepage text, so they never gate the reveal; warm them in parallel so
   // entering the world does not pay the fetch. Each rejection is swallowed:
@@ -9113,7 +8978,7 @@ function wireStartScreens(): void {
   // owns the fallback.
   for (const ensure of CONTENT_LOCALE_CHANNEL_ENSURERS) void ensure(bootLang).catch(() => {});
   hydrateIcons();
-  void loadProjectStats();
+  void loadProjectStats(() => api.projectStats());
   wireHomepageMusicToggle();
   void wireWallet();
   wireGithubLink();
@@ -10746,32 +10611,14 @@ function wireStartScreens(): void {
   const graphicsSelect = document.getElementById(
     'landing-graphics-select',
   ) as HTMLSelectElement | null;
-  const normalizedLandingGraphicsChoice = (raw: string | null): string => {
-    if (raw === LANDING_GRAPHICS_AUTO) return raw;
-    const preset = Number(raw);
-    if (
-      Number.isInteger(preset) &&
-      preset >= SETTING_RANGES.graphicsPreset.min &&
-      preset <= SETTING_RANGES.graphicsPreset.max
-    ) {
-      return String(preset);
-    }
-    return LANDING_GRAPHICS_AUTO;
-  };
-  const applyLandingGraphicsChoice = (choice: string): void => {
-    if (choice === LANDING_GRAPHICS_AUTO) {
-      landingSettings.set('graphicsPreset', SETTING_RANGES.graphicsPreset.def);
-      landingSettings.set('graphicsDefaultApplied', false);
-      return;
-    }
-    landingSettings.set('graphicsPreset', Number(choice));
-    landingSettings.set('graphicsDefaultApplied', true);
-  };
   const syncLandingGraphicsSelect = (): void => {
     if (!graphicsSelect) return;
-    graphicsSelect.value = landingSettings.get('graphicsDefaultApplied')
-      ? String(landingSettings.get('graphicsPreset'))
-      : LANDING_GRAPHICS_AUTO;
+    graphicsSelect.value = String(
+      currentGraphicsChoice(
+        landingSettings.get('graphicsDefaultApplied'),
+        landingSettings.get('graphicsPreset'),
+      ),
+    );
   };
   const syncContrastToggle = (on: boolean): void => {
     if (contrastToggle) contrastToggle.setAttribute('aria-pressed', String(on));
@@ -10807,8 +10654,8 @@ function wireStartScreens(): void {
     applyLandingBackdrop(next);
   });
   graphicsSelect?.addEventListener('change', () => {
-    const choice = normalizedLandingGraphicsChoice(graphicsSelect.value);
-    applyLandingGraphicsChoice(choice);
+    const choice = parseGraphicsChoice(graphicsSelect.value, SETTING_RANGES.graphicsPreset);
+    landingSettings.patch(graphicsChoicePatch(choice, SETTING_RANGES.graphicsPreset.def));
     syncLandingGraphicsSelect();
   });
 
@@ -10828,6 +10675,7 @@ function wireStartScreens(): void {
     const sel = $('#charcreate-panel .mini-class.sel') as HTMLElement | null;
     previewClassBody(sel ? (sel.dataset.class as PlayerClass) : 'warrior');
   }
+  return localized;
 }
 
 // Looping home-page theme. Browsers block audio autoplay until a user gesture,
@@ -10904,6 +10752,7 @@ const diagnosticsAutoOffline =
 const studioEntry = resolveStudioEntry(startupParams, editorPlaytest !== null);
 if (editorPlaytest) {
   startSitePresence('home');
+  void liftBootSplashWhenReady({ landing: false, fadeMs: loadingCurtainFadeDelayMs() });
   initAudioOnFirstGesture();
   // Map-maker playtest chrome: the Back-to-Editor pin and the Dev cheat
   // drawer (collision wireframe, god mode, speed, badges).
@@ -10922,6 +10771,7 @@ if (editorPlaytest) {
   studioEntry.boot(startOffline);
 } else if (diagnosticsAutoOffline) {
   startSitePresence('home');
+  void liftBootSplashWhenReady({ landing: false, fadeMs: loadingCurtainFadeDelayMs() });
   void startOffline('warrior', 'Diagnostics', 0);
 } else if (bossTestDrive) {
   // ?boss=... skips the start screens: the point is to be looking at the boss.
@@ -10929,6 +10779,7 @@ if (editorPlaytest) {
   void startOffline('warrior', 'Balgath', 0);
 } else {
   startSitePresence('home');
-  wireStartScreens();
+  const localized = wireStartScreens();
   initHomepageMusic();
+  void liftBootSplashWhenReady({ landing: true, localized, fadeMs: loadingCurtainFadeDelayMs() });
 }

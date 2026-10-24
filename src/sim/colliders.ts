@@ -47,6 +47,7 @@ import {
   instanceOrigin,
   isArenaPos,
   isBgPos,
+  isBuiltinWorldContent,
   isDelvePos,
   isRiftPos,
   isYumiMazePos,
@@ -594,10 +595,9 @@ function staticWorldColliders(seed: number): Collider[] {
       underY: topY(seed, board.x, board.z, 0),
     });
   }
-  // The dedicated Fenbridge renderer is built-in-only. Keep this specialized
-  // service collision under the same authority so a programmatic custom world
-  // cannot create an invisible solid board by supplying musterBoards data.
-  if (content === BUILTIN_WORLD) {
+  // Native Fenbridge service art and collision use the same world predicate.
+  // Standalone custom maps cannot create invisible boards via service data.
+  if (isBuiltinWorldContent(content)) {
     for (const board of content.services?.musterBoards ?? []) {
       out.push({
         type: 'obb',
@@ -618,8 +618,8 @@ function staticWorldColliders(seed: number): Collider[] {
   // PROPS.decorProps row, walk-through without r/hw+hd, standable with standableTop.
   out.push(...buildDecorPropColliders(seed, PROPS.decorProps ?? []));
   // The berths (built-in only); the harbors and the tavern (built_structure_colliders.ts).
-  if (content === BUILTIN_WORLD) out.push(...transportBerthColliders(seed));
-  out.push(...builtStructureColliders(seed, content === BUILTIN_WORLD));
+  if (isBuiltinWorldContent(content)) out.push(...transportBerthColliders(seed));
+  out.push(...builtStructureColliders(seed, isBuiltinWorldContent(content)));
 
   // THE GREAT MAZE's hedges. One box per drawn piece, straight off the same
   // grid the renderer lays the hedge GLBs from, so the blocked ground IS the
@@ -1314,7 +1314,7 @@ function gridFor(seed: number): ColliderGrid {
   // (spacing between lamps is the layout's own minSeparation).
   addStreetlampColliders(grid, seed);
   // The muster camps' pocket seals, vetted against the finished grid the same way.
-  if (content === BUILTIN_WORLD) addLateColliders(grid, musterPocketSeals(seed, isBlocked));
+  if (isBuiltinWorldContent(content)) addLateColliders(grid, musterPocketSeals(seed, isBlocked));
   return grid;
 }
 
@@ -1439,7 +1439,7 @@ function buildStreetlampPlacements(seed: number): PlacedStreetlamp[] {
   // planned before any post stands, so nothing self-blocks. A plan computed
   // against a world that already carries lamps (as colliders or as promoted
   // placements) drops nearly every site to its own clearance probe.
-  if (content === BUILTIN_WORLD) builtinLampPlanBySeed.set(seed, styled);
+  if (isBuiltinWorldContent(content)) builtinLampPlanBySeed.set(seed, styled);
   return styled;
 }
 
@@ -1455,7 +1455,7 @@ const builtinLampPlanBySeed = new Map<number, PlacedStreetlamp[]>();
 export function builtinStreetlampPlan(seed: number): readonly PlacedStreetlamp[] | null {
   const cached = builtinLampPlanBySeed.get(seed);
   if (cached) return cached;
-  if (getActiveWorldContent() !== BUILTIN_WORLD) return null;
+  if (!isBuiltinWorldContent(getActiveWorldContent())) return null;
   return streetlampPlacements(seed);
 }
 

@@ -2218,7 +2218,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "74becd0c",
+      "state": "ea2bc56d",
       "events": "e19b9d05",
       "rng": {
         "draws": 8,
@@ -2320,7 +2320,8 @@
               "instance": {
                 "locked": true
               },
-              "itemId": "sundered_essence"
+              "itemId": "sundered_essence",
+              "slot": 2
             },
             {
               "count": 6,
@@ -2333,14 +2334,16 @@
                   "count": 6,
                   "source": {}
                 }
-              ]
+              ],
+              "slot": 3
             },
             {
               "count": 1,
               "instance": {
                 "locked": true
               },
-              "itemId": "makers_ember"
+              "itemId": "makers_ember",
+              "slot": 4
             }
           ],
           "lifetimeXp": 167200,
@@ -2436,7 +2439,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "74becd0c",
+      "state": "ea2bc56d",
       "events": "32e75385",
       "rng": {
         "draws": 8,
@@ -2538,7 +2541,8 @@
               "instance": {
                 "locked": true
               },
-              "itemId": "sundered_essence"
+              "itemId": "sundered_essence",
+              "slot": 2
             },
             {
               "count": 6,
@@ -2551,14 +2555,16 @@
                   "count": 6,
                   "source": {}
                 }
-              ]
+              ],
+              "slot": 3
             },
             {
               "count": 1,
               "instance": {
                 "locked": true
               },
-              "itemId": "makers_ember"
+              "itemId": "makers_ember",
+              "slot": 4
             }
           ],
           "lifetimeXp": 167200,
@@ -2654,7 +2660,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "74becd0c",
+      "state": "ea2bc56d",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -2756,7 +2762,8 @@
               "instance": {
                 "locked": true
               },
-              "itemId": "sundered_essence"
+              "itemId": "sundered_essence",
+              "slot": 2
             },
             {
               "count": 6,
@@ -2769,14 +2776,16 @@
                   "count": 6,
                   "source": {}
                 }
-              ]
+              ],
+              "slot": 3
             },
             {
               "count": 1,
               "instance": {
                 "locked": true
               },
-              "itemId": "makers_ember"
+              "itemId": "makers_ember",
+              "slot": 4
             }
           ],
           "lifetimeXp": 167200,

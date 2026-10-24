@@ -2,7 +2,6 @@ import type { VaultSpecialRef } from '../../world_api/bank';
 import { bagPools } from '../bags';
 import { bankPools, bumpBankWireRev, moveBetweenContainers } from '../bank';
 import { INSTANCE_X_BASE } from '../data';
-import { isMaterialItemId } from '../material_ids';
 import { normalizeLoadedMaterialSlot } from '../material_slot_load';
 import type { MaterialComposition } from '../material_sources';
 import { vaultDepositFromCourier, vaultWithdrawToCourier } from '../materials_vault';

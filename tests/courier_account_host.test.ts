@@ -24,6 +24,7 @@ vi.mock('../server/membership_service', () => ({
 import type { ClientSession } from '../server/game';
 import { transferCourierAccountLeg } from '../server/membership_bank_db';
 import { MembershipGameServices } from '../server/membership_game_services';
+import { getMembership } from '../server/membership_service';
 import type { CourierState } from '../src/sim/courier';
 
 const transfer = vi.mocked(transferCourierAccountLeg);
@@ -75,6 +76,55 @@ function rig() {
 describe('courier other-character leg on the server', () => {
   beforeEach(() => {
     transfer.mockReset();
+    vi.mocked(getMembership).mockClear();
+  });
+
+  it('admits at most four membership reads across waiting couriers', async () => {
+    const rigs = Array.from({ length: 5 }, (_, i) => {
+      const r = rig();
+      r.session.pid = i + 1;
+      r.session.characterId = i + 11;
+      r.session.accountId = i + 7;
+      r.meta.characterId = i + 11;
+      return r;
+    });
+    const host = {
+      ...rigs[0].host,
+      sim: { ...rigs[0].host.sim, meta: (pid: number) => rigs[pid - 1]?.meta },
+      session: (id: number) => rigs.find((r) => r.session.characterId === id)?.session,
+      capture: (id: number) => rigs.find((r) => r.session.characterId === id)!.host.capture(),
+    };
+    const service = new MembershipGameServices(host as never);
+    let release!: () => void;
+    const waiting = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const membership = vi.mocked(getMembership);
+    const original = membership.getMockImplementation()!;
+    membership.mockImplementation(async (id) => {
+      await waiting;
+      return original(id);
+    });
+    transfer.mockResolvedValue({ ok: false, error: 'online' });
+    try {
+      for (const r of rigs) {
+        service.courierAccountExchange(r.session.pid);
+        service.courierAccountExchange(r.session.pid);
+      }
+      await rigs[0].settle();
+      expect(membership).toHaveBeenCalledTimes(4);
+      expect(host.enqueue).toHaveBeenCalledTimes(4);
+      release();
+      await rigs[0].settle();
+      service.courierAccountExchange(5);
+      await rigs[0].settle();
+      expect(membership).toHaveBeenCalledTimes(5);
+      expect(rigs[4].courier.account).toBeUndefined();
+    } finally {
+      release();
+      membership.mockImplementation(original);
+      await rigs[0].settle();
+    }
   });
 
   it('starts one run, then replaces the live leg with the committed courier', async () => {

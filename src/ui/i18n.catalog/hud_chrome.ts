@@ -10,11 +10,178 @@ import { courierStrings } from './courier';
 
 import { armoryCollectionStrings, armorySkinStrings } from './armory';
 import { cosmeticsStrings } from './cosmetics';
+import { guildHallStrings } from './guild_hall';
 import { professionTrainerStrings } from './profession_trainers';
 import { weeklyRewardStrings } from './weekly_rewards';
 
 export const hudChromeStrings = {
   courier: courierStrings,
+  adventureGuide: {
+    title: 'Adventure Guide',
+    eyebrow: 'The expedition ledger',
+    intro: 'Discover the world. Know your enemy. Choose your next adventure.',
+    dungeons: 'Dungeons',
+    raids: 'Raids',
+    delves: 'Delves',
+    search: 'Search adventures',
+    eligible: 'My level',
+    catalogueCount: '{count} adventures',
+    catalogueCountPlural: { one: '{count} adventure', other: '{count} adventures' },
+    empty: 'No adventures match these filters.',
+    reset: 'Clear filters',
+    delve: 'Delve',
+    delveTravel:
+      'Enter at the delve entrance. Choose your tier at the local board; automatic matchmaking is not available.',
+    dungeonTravel: 'Explore the encounters below, then choose a group or travel to the entrance.',
+    raidTravel: 'Gather your raid, review the encounters and check your lockout before entering.',
+    soloTravel: 'A solo adventure. Travel to the entrance to begin.',
+    browseOnly: 'Travel to entrance',
+    findGroup: 'Find a group',
+    inspectLoot: 'Loot preview',
+    lootClass: 'Class',
+    lootSpec: 'Specialization',
+    allSpecs: 'All specializations',
+    lootHint:
+      "Usable gear with the selected specialization's stat affinity. General rewards remain visible. Drop chances use the full loot table.",
+    lootEmpty: 'No equipment matches this class and specialization.',
+    fullTableRoll: 'One item from the full loot table',
+    encountersCount: '{count} encounters',
+    tiers: 'Available tiers: {tiers}',
+  },
+  expeditions: {
+    bell: 'Open Groups: {count} notifications',
+    bellCount: {
+      one: 'Open Groups: {count} notification',
+      other: 'Open Groups: {count} notifications',
+    },
+    alerts: 'Alerts',
+    groups: 'Groups',
+    rewards: 'Rewards',
+    sections: 'Expedition sections',
+    noAlerts: 'No expedition alerts need your attention.',
+    findGroup: 'Find a Group',
+    recruitPlayers: 'Recruit Players',
+    recruitIntro: 'Choose your dungeon and group goal. Review your listing, then publish it.',
+    recruitDungeon: 'Dungeon',
+    recruitDifficulty: 'Difficulty',
+    recruitPreview: 'Listing preview',
+    recruitPublish: 'Publish Group',
+    recruitPublishing: 'Publishing your group...',
+    recruitBeforeEntry:
+      'You can recruit before entering the dungeon. Publishing does not teleport your group.',
+    recruitUnconfirmed:
+      'Your listing has not been confirmed. Check your connection or chat messages, then try again.',
+    recruitLoading: 'Loading your recruitment options...',
+    recruitAlreadyOpen: 'Your recruitment is already open. Manage your group instead.',
+    recruitExistingRun: 'You already have an expedition. Manage its recruitment from Your Group.',
+    recruitLeaveQueue: 'Leave the matchmaking queue before publishing your own group.',
+    recruitFinishProposal: 'Respond to your matchmaking invitation before publishing a group.',
+    recruitCancelRequests: 'Withdraw your pending join requests before publishing your own group.',
+    recruitNoActivities: 'No dungeons have room for your group at its current levels.',
+    recruitNoRoles: 'No compatible roles are available for your character.',
+    recruitInvalidNote: 'Use up to 120 characters without control characters in your note.',
+    manageRecruitment: 'Manage Recruitment',
+    formingGroup: 'Forming Group',
+    groupGathering: 'Your group is forming. Gather at the dungeon entrance when ready.',
+    groupChooseDungeon: 'Choose a dungeon for your group, then recruit any missing players.',
+    waitForLeader: 'Your group leader can choose a dungeon and open recruitment.',
+    recruitmentNext: 'Recruitment is open. Gather your group at the dungeon entrance when ready.',
+    findGroupNext: 'You are not in a group. Find one to start an expedition.',
+    awaitingReply: 'Waiting for replies from {count} groups.',
+    requestSent: 'Request sent. Waiting for the group leader to respond.',
+    readyToTravel: 'Your group is ready. Travel to the dungeon when you are ready.',
+    groupRecruiting: 'Your expedition is in progress. Recruitment is open.',
+    groupInProgress: 'Your expedition is in progress.',
+    title: 'Open Expeditions',
+    entryTitle: 'Run solo or open your group?',
+    entryBody: 'Start now. You can open your group later at any time.',
+    solo: 'Run Solo',
+    open: 'Open Group',
+    closeRecruitment: 'Close Recruitment',
+    travel: 'Travel to Group',
+    request: '{name} wants to join as {role}.',
+    level: 'Level {level}',
+    accept: 'Accept',
+    decline: 'Decline',
+    acceptPlayer: 'Accept Player',
+    declinePlayer: 'Decline Player',
+    chooseRole: 'Your role',
+    send: 'Send Request',
+    confirmRequest: 'Confirm Request',
+    chooseRoleAction: 'Choose Role',
+    cancel: 'Cancel',
+    pending: 'Request pending',
+    join: 'Request to Join',
+    leader: 'Led by {name}',
+    members: '{current}/{total} players',
+    progress: '{defeated}/{total} bosses defeated',
+    needed: 'Suggested roles: {roles}',
+    close: 'Close',
+    empty: 'No open expeditions right now.',
+    finder: 'Open Dungeon Finder',
+    groupsCount: 'Open groups: {count}',
+    requestsCount: 'Join requests: {count}',
+    yourGroup: 'Your group',
+    otherGroups: 'Other groups',
+    manageGroup: 'Your expedition and join requests',
+    browseGroups: 'Choose a group to help',
+    noCurrentGroup: 'You are not in an expedition.',
+    noCurrentGroupHint: 'Enter a dungeon or request to join a group.',
+    recruitmentOpen: 'Recruitment open',
+    recruitmentClosed: 'Recruitment closed',
+    groupRoster: 'Group members',
+    noRequests: 'No pending join requests.',
+    requestsCombat: 'Requests are waiting. Review them after combat.',
+    expires: 'Expires in {time}',
+    waiting: 'Waiting for {name} to respond.',
+    outcomeAccepted: '{name} accepted your request. Use Travel to Group when ready.',
+    outcomeDeclined: '{name} declined your request.',
+    outcomeExpired: 'Your request expired. You can send a new request.',
+    outcomeCancelled: 'You cancelled your request.',
+    outcomeClosed: 'That group is no longer accepting your request.',
+    editDetails: 'Edit Group Details',
+    purpose: 'Group goal',
+    purposeFirstTime: 'First time',
+    purposeRelaxed: 'Relaxed run',
+    purposeClear: 'Complete the dungeon',
+    purposeNeedsHelp: 'Need help',
+    note: 'Short note (optional, up to 120 characters)',
+    saveDetails: 'Save Details',
+    available: 'Available to Help',
+    stopHelping: 'Stop Helper Alerts',
+    helperRoles: 'Roles you offer',
+    helperOn: 'Helper alerts are on. You still choose which group to join.',
+    helperPaused: 'Helper alerts pause while you are grouped, queued or have a pending request.',
+    helperFound: '{count} compatible groups are looking for help.',
+    viewGroups: 'View Groups',
+    sound: 'Play a sound for new groups and applications',
+    shop: 'Queue Point Shop',
+    backToGroups: 'Back to Groups',
+    shopIntro: 'A reward for every helping hand',
+    shopDescription: 'Spend the points you earn helping other players complete their expeditions.',
+    shopCollection: 'Bell Collection',
+    shopOwned: 'In your collection',
+    shopLocked: 'Available to unlock',
+    shopRules: 'How to earn points',
+    pendingRequests: 'Your pending requests: {count}/5',
+    multiApplyHint: 'Request up to five groups. Joining one withdraws your other requests.',
+    multiApplyLimit: 'You already have five pending requests. Cancel one to request another group.',
+    points: 'Queue Points: {count}',
+    dailyPoints: 'Earned today: {earned}/{cap}',
+    rewardRules:
+      'Helpers earn 5 points per qualifying boss and 10 for completion, paid when they complete the dungeon. Deal, heal or take effective damage worth at least 1% of each boss health to qualify. Each boss and completion pays once per dungeon difficulty per day, up to 60 points per day. Joining or waiting at the entrance gives no points.',
+    rewardScope:
+      'Bell finishes are permanent cosmetics for this character. They do not change gameplay.',
+    bronze: 'Bronze bell',
+    silver: 'Silver bell',
+    gold: 'Gold bell',
+    price: '{count} Queue Points',
+    buy: 'Buy and Equip',
+    equip: 'Equip',
+    equipped: 'Equipped',
+    defaultBell: 'Use Default Bell',
+    dismiss: 'Dismiss',
+  },
   framePresets: {
     apply: 'Apply',
     pickerLabel: 'Frame Presets: {name}',
@@ -60,6 +227,7 @@ export const hudChromeStrings = {
   },
   professionTrainers: professionTrainerStrings,
   weeklyRewards: weeklyRewardStrings,
+  guildHall: guildHallStrings,
   // The scheduled ferries (Eastbrook to Moonrest, Wickharbor to Wyrmwatch;
   // src/ui/hud/transport/):
   // the timetable panel near the docked ship and the sailing line aboard.
@@ -71,6 +239,12 @@ export const hudChromeStrings = {
     castingOff: 'The ferry to {dest} is casting off',
     boardHint: 'Stand on its deck when it sails. The crossing is free.',
     sailing: 'Sailing to {dest}',
+    portLabel: '{port} ferry to {dest}',
+    portTitle: '{port} ferry port',
+    destination: 'Destination: {dest}',
+    boardNow: 'Board now',
+    arrivesIn: 'Ferry arrives in {time}',
+    scheduleUnavailable: 'Ferry timetable unavailable.',
   },
   materialStackSelectionUnavailable: 'That material selection is no longer available.',
   // The Shardpike bar: the second action bar the Mirefen world boss's level-spread
@@ -226,6 +400,18 @@ export const hudChromeStrings = {
   spectate: {
     banner: 'Spectating {name}',
   },
+  // The realm message of the day (/motd, server/realm_motd.ts): the chat line
+  // every player sees at login and whenever an admin changes it ({text} is the
+  // admin's message, spliced verbatim), plus the admin's command feedback.
+  realmMotd: {
+    line: 'Message of the day: {text}',
+    updated: 'Message of the day updated.',
+    cleared: 'Message of the day cleared.',
+    none: 'No message of the day is set.',
+    usage: 'Usage: /motd "<message>" to set it, /motd clear to remove it.',
+    tooLong: 'The message of the day is limited to {max} characters.',
+    saveFailed: 'The message of the day could not be saved and will not survive a restart.',
+  },
   // Raid/party ready-check prompt (the leader ran /ready). The buttons answer the
   // yes/no prompt; the outcome is announced in chat by the sim.
   readyCheck: {
@@ -254,6 +440,17 @@ export const hudChromeStrings = {
   // ghost-state additions shown once the spirit has been released.
   death: {
     resurrectAtCorpse: 'Resurrect at Corpse',
+    // The death screen's PvP Resurrect button (src/sim/pvp/pvp_resurrect.ts): shown
+    // only after a death a hostile player had a hand in, outside instances.
+    pvpResurrect: 'PvP Resurrect',
+    pvpResurrectTitle:
+      "Revive at the nearest graveyard at full health, without a new Keeper's Toll.",
+    // The button and the panel line while the PvP Resurrect wait runs, then once it
+    // is over ({seconds} is a durationText value from PVP_RESURRECT_WAIT_SECONDS).
+    pvpResurrectWaitButton: 'PvP Resurrect ({seconds})',
+    pvpResurrectWaitNote:
+      'You can PvP Resurrect in {seconds}: you will rise at the nearest graveyard.',
+    pvpResurrectReadyNote: 'PvP Resurrect is ready: you will rise at the nearest graveyard.',
     // RETIRED in place: the ghost prompt's Pale Keeper button is gone (the ghost
     // talks to the Keeper instead). The key stays, already filled in all 20
     // locales, per the hud.core.mobileTarget retired-but-translated precedent.
@@ -288,6 +485,13 @@ export const hudChromeStrings = {
       "Are you sure? The Pale Keeper will revive you here. You are below level 10, so the Keeper's Toll will not weaken you this time.",
     healerConfirmAccept: 'Revive Me',
     healerConfirmCancel: 'Cancel',
+  },
+  // The note over the 3D view while a WebGL context restore holds the world
+  // draw (src/ui/graphics_restore_note_controller.ts): the browser lost and
+  // gave back the graphics context, and the visible scene is being prepared
+  // again. A status line, not a warning: the HUD stays live under it.
+  graphicsRestore: {
+    note: 'Restoring graphics',
   },
   // Wiki launcher (#mm-wiki, the Esc-menu row, the mobile More tray). The
   // button label reuses nav.wiki; these are the confirm dialog's strings
@@ -634,7 +838,7 @@ export const hudChromeStrings = {
       annualTerms:
         'Renews yearly at the same price. Pay with fiat through Stripe. Cancel in billing settings.',
       annualMount:
-        'After payment, collect a soulbound tank mount key by mail on the character that purchased this bundle. The tank is a placeholder for the bundle mount.',
+        'After payment, collect the soulbound Nightwing Chimaera reins by mail on the character that purchased this bundle. The mount remains yours after membership expires.',
       trialTerms:
         'Try membership free for {days} days, once per account. A payment method is required. You will be charged {price} when the trial ends unless you cancel.',
       startTrial: 'Start 7-day free trial',
@@ -738,6 +942,20 @@ export const hudChromeStrings = {
     collections: armoryCollectionStrings,
     skins: armorySkinStrings,
     seasonOne: 'Season 1',
+    // The rotating promo card above chat (src/ui/store_promo_card.ts). The
+    // Refer a Friend advert takes its title from the referralCards namespace.
+    membershipPromo: {
+      open: 'Membership in the WOC Store',
+      close: 'Close membership promotion',
+      eyebrow: 'Account perks',
+      title: 'Membership',
+      cta: 'Join now',
+    },
+    referralPromo: {
+      close: 'Close Refer a Friend promotion',
+      eyebrow: 'Adventure together',
+      cta: 'Invite friends',
+    },
     rarity: {
       uncommon: 'Uncommon',
       rare: 'Rare',
@@ -1251,7 +1469,7 @@ export const hudChromeStrings = {
     guidanceOff: 'Turn guidance off',
     guidanceSetting: 'Eastbrook golden guidance',
     bellHomeNote:
-      'Back from the shore already? That was the ferry bell you rang. Its twin hangs just there by the Ravenpost mailbox: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.',
+      'Back from the shore already? That was the ferry bell you rang. Its twin hangs right beside you on the quay: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.',
     // Ferryman Odo's island welcome, shown once for a character's first
     // arrival: the greeting ferry lands beside his pier.
     // Deliberately short (CX: the old note was a wall of text at the exact
@@ -2151,6 +2369,13 @@ export const hudChromeStrings = {
     reportSent: 'Report copied and sent to chat',
     reportNoData: 'No data recorded.',
     noDetailedData: 'No detailed data',
+    // The ability drill-down subtitle. Effective is the healing that landed;
+    // the overheal percent is its share of total output (effective + overheal).
+    // Wordy (M16): the five non-Latin fills land in this same change.
+    detailHealSubtitle:
+      'Effective: {effective} | Overheal: {overheal} ({overhealPercent}) | Hits: {hits} ({critPercent} crit)',
+    detailHitSubtitle:
+      'Hits: {hits} | Crits: {crits} ({critPercent}) | Average: {average} | Min/Max: {min} / {max}',
     noDeathEvents: 'No events logged before death',
     killedBy: 'Killed by {killer} ({ability})',
     lethalHit: 'Lethal Hit',
@@ -2371,8 +2596,11 @@ export const hudChromeStrings = {
     name_avian_strider: 'Viridian Valestrider',
     name_mech_bird: 'Cluckwork Mech Bird',
     name_lanternback_troll: 'Grumbol the Lanternback',
+    name_lantern_hall_destrier: 'Lantern Hall Destrier',
     name_chimeglass_tortoise: 'Tolliver the Chimeglass',
     name_rickshaw_mount: 'Bonebound Rickshaw',
+    name_wobbles_slime: 'Wobbles the Slime',
+    name_nightwing_chimera: 'Nightwing Chimaera',
     desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
     desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
     desc_stalkglider_snail: 'A hearty, slow-burning snail that provides enhanced travel speed.',
@@ -2388,9 +2616,11 @@ export const hudChromeStrings = {
       'A dangerously overbuilt goblin sled propelled by twin rockets and excellent bad judgment.',
     desc_rallycart_rxt: 'A pint-sized rally machine that provides enhanced travel speed.',
     desc_rallycart_skin: 'A tiny rally car with a mighty roar.',
+    desc_wobbles_slime:
+      'A big blue slime broken to the saddle. It hops instead of walking, wobbles under its rider, and carries bubbles drifting up through its jelly.',
     desc_terrorspark_groundshaker:
       'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
-    desc_referral_tank: 'Earned by completing a referral stamp card.',
+    desc_referral_tank: 'Former referral stamp card reward.',
     desc_referral_raptor: 'Earned by helping your first bound friend complete a stamp card.',
     desc_drakemaw_raptor:
       'A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash.',
@@ -2400,6 +2630,10 @@ export const hudChromeStrings = {
       'A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.',
     desc_lanternback_troll:
       'A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.',
+    desc_lantern_hall_destrier:
+      "Lantern Hall's war horse, barded in oak and iron under the guild's blue, with two storm lanterns swinging from his saddle to light the road home.",
+    desc_nightwing_chimera:
+      'A twin-headed dusk wyvern from the ancient boughs, perched on taloned hind legs at rest and skimming above the ground on arcane-etched wings.',
     desc_chimeglass_tortoise:
       'A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.',
     desc_rickshaw_mount:
@@ -2590,6 +2824,7 @@ export const hudChromeStrings = {
     },
   },
   options: {
+    spellTooltipOnHover: 'Spell Tooltips on Hover',
     clickMoveLeft: 'Left Click',
     clickMoveRight: 'Right Click',
     // Running client version + build id, shown as small secondary text at the foot
@@ -2651,6 +2886,9 @@ export const hudChromeStrings = {
     interfaceModeTouch: 'Touch',
     interfaceModeNote:
       'Auto picks desktop or touch controls from your device. Choose Desktop to force keyboard and mouse (useful on a tablet with a keyboard), or Touch for the on-screen controls.',
+    // Audio panel slider for the environment bus (wind, birds, rain, water,
+    // dungeon air, campfires, forges), separate from the Sound Effects slider.
+    ambienceVolume: 'Ambience Volume',
     // Audio panel toggle for the per-footfall step clips (off by default).
     footstepSounds: 'Footstep Sounds',
     // Audio panel toggle for the discrete interface and feedback cues (loot, level,
@@ -2666,6 +2904,11 @@ export const hudChromeStrings = {
     lockCursorOnRotate: 'Lock Cursor While Rotating',
     keybindHelpLockCursorOnRotate:
       'Keeps the mouse cursor inside the window while you drag to rotate the camera, so it cannot reach the screen edge or move to another monitor. Turn off if you prefer a free cursor.',
+    // Keybind panel toggle: request the camera-drag pointer lock with raw
+    // (unadjusted) mouse input. On by default.
+    rawMouseInput: 'Raw Mouse Input',
+    keybindHelpRawMouseInput:
+      'Reads mouse movement straight from the device while you drag to rotate the camera, skipping your system pointer speed and acceleration for steadier turning. Turn off to use your system mouse settings instead. Works only with Lock Cursor While Rotating on, and not on every browser or system.',
     showWalletOnCharacterScreen: 'Show Wallet on Character Screen',
     showWalletOnPlayerCard: 'Show Wallet on Player Card',
     // Interface panel twin of the character sheet's privacy eye: the same
@@ -2839,6 +3082,12 @@ export const hudChromeStrings = {
     confirmVendorSellMinQuality: 'Confirm Sales From Quality',
     confirmVendorSellMinQualityNote:
       'Items below this quality sell with a single click; a mis-sold item can still be bought back from the vendor.',
+    // Successor of confirmVendorSellMinQualityNote, which now has no consumer
+    // and keeps its reviewed overlay rows: plain gray junk no longer records a
+    // buyback row (items.ts skipsVendorBuyback), so the old promise was false
+    // for exactly the items this threshold always sells instantly.
+    confirmVendorSellMinQualityNoteGray:
+      'Items below this quality sell with a single click. A mis-sold item can be bought back from the vendor, except unsigned gray items.',
     itemLevelLine: 'Item Level {level}',
     itemScoreLine: 'Score {score}',
     // Interface panel toggle that reveals the optional second action bar row (off
@@ -2867,11 +3116,32 @@ export const hudChromeStrings = {
     // target-of-target's) own melee/ranged swing timer, under the target
     // frame. Independent of showTargetOfTarget (the portrait mini-frame).
     showTargetSwingTimer: 'Show Target Swing Timer',
+    // Interface > Combat: the "Style of Enemy Highlight" group heading and its
+    // four independent checkboxes (all off by default, any mix allowed), each
+    // adding one cue for a hostile current target.
+    enemyHighlightStyle: 'Style of Enemy Highlight',
+    enemyHighlightEdgeArrow: 'Screen-Edge Arrow Off-Camera',
+    enemyHighlightNameplate: 'Big Framed Target Nameplate',
+    enemyHighlightOverhead: 'Floating Marker Overhead',
+    enemyHighlightReticle: 'Heavier Hostile Reticle',
+    // The distance printed beside the screen-edge arrow, in yards.
+    enemyHighlightDistance: '{yards} yd',
     // Interface panel toggle for the pet health strip under the player frame (on by
     // default; it only appears while you actually have a pet). Phrased from the
     // frame's own accessible name (unitFrame.petLabel) so the value stays NON-WORDY
     // for the M16 guard.
     showPetFrame: 'Show Your Pet',
+    // Interface > Frames toggle (off by default): lifts the player's resource bar
+    // (mana, energy, rage) out of the player frame into a frame of its own. The
+    // two sliders under it size that frame and show only while it is detached.
+    playerFrameResourceDetached: 'Detach Resource Bar',
+    playerFrameResourceWidth: 'Resource Bar Width',
+    playerFrameResourceHeight: 'Resource Bar Height',
+    // Interface > Frames slider: how solid the King of the Hill bar's panel is
+    // behind its text (the text itself never fades).
+    hillBarOpacity: 'King of the Hill Background Opacity',
+    // A pixel-size slider readout, e.g. "232 px".
+    pixelsValue: '{value} px',
     // Interface > Combat toggles (both on by default) for the two dot-tracking
     // surfaces. Both show only the LOCAL player's OWN debuffs, on every class:
     // the icon row on an enemy's nameplate, and the standalone Target dots frame
@@ -2882,6 +3152,13 @@ export const hudChromeStrings = {
     // (plate-native) to 300%. Wordy (M16): the five non-Latin fills land in this
     // same change.
     nameplateDotScale: 'Nameplate Dot Size',
+    // Interface > Combat (on by default), beside the dot tracker: the enemy
+    // offensive/defensive tracker, a hostile player's tracked cooldowns (the PvP
+    // medallion once used, defensives, offensives) as an icon row above their name,
+    // plus its size slider. Wordy (M16): the five non-Latin fills land in this same
+    // change.
+    showNameplateCooldowns: 'Offensive/Defensive Tracker',
+    nameplateCooldownScale: 'Offensive/Defensive Tracker Size',
     showTargetDots: 'Show Target Dots',
     // Interface > Combat rows for the six aura tracks. All wordy (M16): the five
     // non-Latin fills land in this same change.
@@ -2892,11 +3169,18 @@ export const hudChromeStrings = {
     showUtilityModes: 'Include Stealth and Travel Modes',
     showFriendlyTrack: 'Show My Buffs on Allies',
     showShieldTrack: 'Show My Shields',
+    // Interface > Combat opt-out of the vivid floating combat text (school colours,
+    // fan-out, crit and big-hit emphasis) back to the classic white and gold.
+    classicCombatText: 'Classic Combat Text',
     // Graphics-panel opt-in (default off) for the interactive wake/ripple
     // simulation on water surfaces; bubbles and splash particles do not key
     // off it. It sits in the Display card beside Weather because it costs
     // GPU passes, not because it is a comfort toggle.
     waterRipples: 'Water Ripples (Wakes)',
+    // Graphics-panel switch (default on) for the spell visual effects that
+    // players and their pets cast in the 3D world. Off keeps everything an
+    // enemy casts, area telegraph rings, crowd-control bands and cast bars.
+    spellEffects: 'Spell Effects',
     // Camera card opt-in (default off): the over-the-shoulder Action Cam, plus
     // the shoulder slider (full left .. center .. full right) that only shows
     // while it is on. The slider readout: {pct} is a formatted percent.
@@ -2953,6 +3237,13 @@ export const hudChromeStrings = {
     complexityMedium: 'Medium',
     complexityHigh: 'High',
     exampleAbilities: 'Example abilities',
+    // Label for what a spec gets just for being picked (spec_baselines.ts plus
+    // spec_output_tuning.ts), which otherwise never surfaces anywhere.
+    specBonus: 'Specialization bonus',
+    healing: 'healing',
+    absorption: 'absorption',
+    physicalAbilityDamage: 'melee and ranged ability damage',
+    primaryHealingBonus: 'Increases primary healing by {pct} after other healing bonuses.',
     viewTalents: 'View talents',
     selectSpec: 'Select specialization',
     specUnlockBanner: 'Specialization Unlocked!',
@@ -3331,11 +3622,16 @@ export const hudChromeStrings = {
     iconSize: 'Icon Size',
     iconPadding: 'Icon Padding',
     opacity: 'Opacity',
-    visibility: 'Visibility',
-    visAlways: 'Always Visible',
     visCombat: 'In Combat',
-    visHidden: 'Hidden',
     visHiddenHint: 'A hidden group still plays its sounds and lights your action bar.',
+    showWhile: 'Show While',
+    showOutOfCombat: 'Out of Combat',
+    showIn: 'Show In',
+    showInWorld: 'Open World',
+    showInInstances: 'Instances',
+    placeHint:
+      'Instances are dungeons, raids, delves, rifts, battlegrounds, the arena and any other instanced area. Outside the places you tick, the group is hidden and silent.',
+    groupOffHint: 'With no place ticked, this group never shows and never plays its sounds.',
     showTimer: 'Show Timer',
     positionX: 'Horizontal Position',
     positionY: 'Vertical Position',
@@ -3356,7 +3652,6 @@ export const hudChromeStrings = {
     aurasHint:
       'Engine resources and their stacks, procs, and the buffs your spells put on you. Anything else that has been on you shows up here too.',
     auraFallback: 'Aura',
-    onlyWhileActive: 'Only Show While Active',
     alertStacks: 'Alert at Stacks',
     alertStacksAny: 'On gain',
     alertStacksHint:
@@ -3374,7 +3669,19 @@ export const hudChromeStrings = {
     glowWhenReadyHint: 'Brightens and outlines the button while the spell can be cast.',
     hotbarGlow: 'Hotbar Glow',
     hotbarGlowHint: 'Also lights this spell on your action bar while it is ready.',
-    onlyWhenReady: 'Only Show When Ready',
+    showButtonWhen: 'Show Button When',
+    showReady: 'Ready',
+    showNotReady: 'Not Ready',
+    notReadyHint: 'Not ready means on cooldown, or not usable right now.',
+    auraShowWhen: 'Show Button While the Aura Is',
+    auraActive: 'Active',
+    auraMissing: 'Missing',
+    neverShownHint: 'With neither ticked, the button never shows, but its sound still plays.',
+    reminderHint:
+      'Buff reminder: the button lights up while this aura is missing and hides once you have it.',
+    glowWhileMissing: 'Light Up While Missing',
+    reminderGlowHint: 'Brightens, outlines and pulses the button while the aura is missing.',
+    reminderSoundHint: 'Plays when the aura drops off.',
     sound: 'Ready Sound',
     soundHint:
       'Plays when the spell becomes ready, or when its button changes into another spell while ready.',
@@ -3526,6 +3833,8 @@ export const hudChromeStrings = {
       worldKill: 'world kill',
       worldAssist: 'world kill assisted',
       hillHold: 'holding the hill',
+      // The day's Honor world quests (src/sim/world_quest_honor_slots.ts).
+      worldQuest: 'world quest',
     },
     // Short labels for the floating text over your own character. Kept apart from
     // `reasons` above, which are mid-sentence fragments for the chat line.
@@ -3541,6 +3850,12 @@ export const hudChromeStrings = {
   // number is a resolved value from src/sim/pvp/world_pvp_rules.ts, never a
   // literal in the copy, so a retune never strands the text.
   worldPvp: {
+    rewardTitles:
+      'Earn permanent titles after {thresholds} of played time with World PvP on in the open world or in PvP instances. Logout, death, PvE instances and sanctuaries pause the timer. Switching off resets it.',
+    rewardPaused: 'Current PvP streak: {time} played (paused in a sanctuary)',
+    rewardPausedDead: 'Current PvP streak: {time} played (paused while dead)',
+    rewardPausedInstance: 'Current PvP streak: {time} played (paused inside PvE instances)',
+    rewardProgress: 'Current PvP streak: {time} played',
     tab: 'World PvP',
     title: 'World PvP',
     blurb:
@@ -3571,6 +3886,11 @@ export const hudChromeStrings = {
       'Attacking an unflagged player there raises your own flag; attacking a flagged one never does.',
     aidLine: 'Healing, shielding or buffing a flagged player in a world fight raises your flag.',
     stakeLine: 'The loser pays {cap} or {percent} of their purse, whichever is less.',
+    spoilsLine:
+      "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
+    // One looted trophy skull (src/sim/pvp/world_pvp_spoils.ts): {name} is the
+    // defeated player's name, carried on the copy.
+    skullName: "{name}'s Skull",
     noStakeLine: 'An unflagged player killed on free-for-all ground loses no gold.',
     noTakeLine:
       'An unflagged fighter takes no gold either: it only moves between two flagged players.',
@@ -3605,12 +3925,41 @@ export const hudChromeStrings = {
     countsHolding: 'Inside: you {yours}, rival {theirs}',
     contestYou: 'Taking the hill: {seconds} of {total}',
     contestOther: 'Losing the hill: {seconds} of {total}',
+    // The clock while its group is inside but not leading (src/sim/pvp/hill_rules.ts
+    // hillProgressStep): a rival only pauses a capture, it never resets it. Short,
+    // so the line fits the one-line track; the counts row above names the rival.
+    contestYouPaused: 'Paused: {seconds} of {total}',
+    contestOtherPaused: 'Rival paused: {seconds} of {total}',
     contestNone: 'Hold a majority inside for {total} to take it',
     inside: 'You are inside the circle',
     distance: '{yards} yd to the circle',
     rises: 'Rises in {minutes}',
     falls: 'Falls in {minutes}',
     standingRaid: 'Raid members do not count: only parties can hold the hill',
+  },
+  // The World PvP Skull Bag (src/sim/pvp/skull_bag.ts): the sub-inventory pane
+  // docked in the bags window (src/ui/hud/skull_bag/), its bag hint and its
+  // item tooltip line.
+  skullBag: {
+    title: 'Skull Bag',
+    // {count} is the number of skulls held.
+    total: 'Skulls: {count}',
+    close: 'Close the Skull Bag',
+    clickOpen: 'Click to open',
+    notCarried: 'Carry the Skull Bag in your bags to store or take skulls.',
+    empty: 'Empty. While you carry the bag, skulls you loot go straight in.',
+    // A row of skulls whose victim was never recorded.
+    unrecorded: 'Trophy Skull',
+    // {count} is the number of plain skulls carried in the bags.
+    store: 'Store carried skulls ({count})',
+    storeNone: 'No skulls to store',
+    takeOne: 'Take 1',
+    takeAll: 'Take all',
+    // {item} is the row's skull name ("Bet's Skull" or "Trophy Skull").
+    takeOneAria: 'Take 1: {item}',
+    takeAllAria: 'Take all: {item}',
+    tooltip:
+      'Holds any number of Trophy Skulls without using bag space. While it is in your bags, skulls you loot go straight in. Click it in your bags to store or take skulls.',
   },
   // The WARFARE quartermaster's sectioned honor shop (#warfare-window,
   // src/ui/hud/vendor/warfare_vendor_window.ts). Only the SECTIONING strings
@@ -3626,6 +3975,8 @@ export const hudChromeStrings = {
     gossipOptionAria: 'Browse the Warfare set shop offered by {name}',
     jewelry: 'Jewelry',
     weapons: 'Weapons',
+    // Honor goods with nothing to wear (the World PvP Skull Bag).
+    goods: 'Goods',
     // Group headings: Warfare Season 2 (the viewer's class sets and weapons)
     // listed above the Season 1 entry tier (warfare_vendor_window.ts).
     groupSeason2: 'Warfare Season 2: Vanguard',
@@ -3660,6 +4011,9 @@ export const hudChromeStrings = {
     spell: 'Spell',
     defense: 'Defense',
     ratings: 'Ratings',
+    // The average item level of the worn gear (gear_score_view.ts), shown above
+    // the Offense panel and under the inspect window's model stage.
+    gearScore: 'Gearscore',
     // The lifetime "Time Played" line at the foot of the sheet (the same
     // running total the /playtime chat command reports). The value composes
     // the two coarsest units from the plurals.playtime* fragments through
@@ -3703,6 +4057,12 @@ export const hudChromeStrings = {
     upgradeNote:
       "Redrawing it as a {rarity} map takes {inks} Cartographer's Ink (you hold {held}). The faction quartermasters sell it.",
     upgradeMaxed: 'No cartographer could better this map.',
+    inkPickerTitle: "Use Cartographer's Ink on which map?",
+    inkPickerHeld: "You hold {held} Cartographer's Ink.",
+    inkPickerRead: 'Being followed: its X lies in {zone}. The X stays put.',
+    inkPickerUnread: 'Unread ({count} held)',
+    inkPickerCost: 'Redraw to {rarity}: {inks} ink',
+    inkPickerCancel: 'Cancel',
     rarity: {
       common: 'Common',
       rare: 'Rare',
@@ -3718,7 +4078,9 @@ export const hudChromeStrings = {
     delveMark: 'Delve Mark',
     wocToken: 'WoC Token',
     heroicMarkNote: 'Heroic dungeons . spend at the heroic quartermaster',
-    honorNote: 'Battlegrounds and the arena',
+    // Every Honor source a player can reach, the day's Honor world quests
+    // included (src/sim/world_quest_honor_slots.ts).
+    honorNote: 'Battlegrounds, the arena, and world quests',
     delveMarkNote: 'Delves completed',
     wocTokenNote: 'Linked wallet balance',
     walletNotLinked: 'No wallet linked',
@@ -4837,6 +5199,9 @@ export const hudChromeStrings = {
     resetDone: 'All instances have been reset.',
     resetNone: 'You have no instances to reset.',
     resetOccupied: 'You cannot reset instances while someone is still inside.',
+    queuedOccupied:
+      'Difficulty change queued because someone or their corpse is still inside. It will apply when the instances are clear.',
+    queuedCancelled: 'Queued difficulty change cancelled because the party or leader changed.',
     resetSameDifficulty:
       'Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.',
     resetLoot: 'You cannot reset instances while loot remains inside.',
@@ -4876,6 +5241,9 @@ export const hudChromeStrings = {
     // that grid is a derived list, its squares hold no bag position, so honoring the drop
     // would move a stack the player never aimed at. Say so instead of doing nothing.
     reorderNeedsRecent: 'Clear the filter and sort by Recent to rearrange your bags',
+    // Refusal when a drag would move a locked stack, or drop onto one: a locked
+    // item is pinned to its bag slot (src/sim/inventory_order.ts isCellPinned).
+    reorderLocked: 'Locked items stay in their bag slot. Unlock it to move it.',
     // Accessible-name arm of the instanced-slot corner marker: the
     // visual tab is aria-hidden, so the per-copy flag rides the cell's label
     // (the tooltip on focus stays the detail surface).
@@ -5618,7 +5986,7 @@ export const hudChromeStrings = {
     oldBlood:
       'Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Cat Form, Bonecrush becomes Marrowbreak in Bruin Form',
     verdance:
-      'Verdance {stacks}/{max}. Each NEW Wildbloom or Second Bloom you plant adds 1. At {max}, Fleetmend becomes Overbloom',
+      "Verdance {stacks}/{max}. Each Sporemending, Second Bloom, or Wildmend you cast adds 1, and each one shortens Wildmend's cast. At {max}, Fleetmend becomes Overbloom",
     freeExecute: 'Your next eligible execute ability costs nothing',
     resourceSap: 'Restores {value} of your current resource every {interval} sec',
     nextAttackCrit: 'Your next attack is guaranteed to critically strike',
@@ -5784,6 +6152,8 @@ export const hudChromeStrings = {
     formFireball: 'Ember Form: movement speed increased by {pct}%; attacks and spells are disabled',
     formMoonkin:
       'Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%',
+    formSporemender:
+      'Sporemender Form: healing done increased by {pct}%, armor increased by {armorPct}%, and movement speed reduced by {slowPct}%',
     formShadow: 'Gloamveil Form: Shadow damage increased by {pct}%',
     resourceCount: '{value} of {max}',
     formLich: 'Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage',
@@ -5933,6 +6303,10 @@ export const hudChromeStrings = {
     afkTag: 'AFK',
     // The World PvP flag tag, same bracket convention as afkTag.
     pvpTag: 'PvP',
+    // The World PvP bounty tag (src/sim/pvp/world_pvp_bounty.ts), same bracket
+    // convention: the non-colour read of the blood-red bounty name tag. Wordy
+    // (M16), so the five non-Latin fills ship in this same change.
+    bountyTag: 'Bounty',
     // The operator-applied Cheater sanction (src/sim/moderation/), resolved for
     // the nameplate and the target frame through src/ui/cheater_tag.ts. Unlike
     // afkTag the brackets are part of the VALUE, so a locale that punctuates a
@@ -6130,6 +6504,7 @@ export const hudChromeStrings = {
       // aria labels (Your Hero / Your Mark / Your Band), which read as riddles
       // in an arrangement mode.
       playerFrame: 'Player',
+      playerResource: 'Resource Bar',
       targetFrame: 'Target',
       partyFrames: 'Party',
       // The auto-attack swing timer (#swingbar), hidden outside combat like
@@ -6234,6 +6609,48 @@ export const hudChromeStrings = {
     apply: 'Apply',
     imported: 'Hotkey setup imported.',
     wrongKind: 'That code is a settings export, not a hotkey setup.',
+  },
+  // The Key Bindings panel's keyboard-layout converter
+  // (keybind_layout_convert_rows.ts over keyboard_layout_convert_core.ts):
+  // moves every hotkey to the key that prints the same character on another
+  // layout. QWERTY, QWERTZ, AZERTY, Dvorak and Colemak are layout names; the
+  // wordy rows (M16) get their five non-Latin fills in this same change.
+  keybindLayout: {
+    title: 'Keyboard Layout',
+    open: 'Convert',
+    from: 'Hotkeys made for',
+    to: 'Convert to',
+    // The six move and turn actions (the WASD and QE keys); every other hotkey converts.
+    keepMovement: 'Keep movement keys in place',
+    // Shown when the last conversion kept movement in place: those keys are
+    // still on their earlier positions, so they stay put again.
+    keepMovementLocked:
+      'Movement keys stayed in place last time, so they stay in place again. Reset to Defaults to start over.',
+    help: 'Each hotkey moves to the key that prints the same character on the new layout. The number row stays where it is. Key names in this list are QWERTY positions; the keyboard overview shows your own layout.',
+    // {count} is how many hotkeys land on a different key.
+    moves: 'Hotkeys that will move: {count}',
+    noChange: 'No hotkeys change between these layouts.',
+    apply: 'Convert Hotkeys',
+    // {from} and {to} are layout names from layouts.* below.
+    converted: 'Hotkeys converted from {from} to {to}.',
+    layouts: {
+      qwertyUs: 'QWERTY (US)',
+      qwertyUk: 'QWERTY (UK)',
+      qwertzDe: 'QWERTZ (German)',
+      qwertzCh: 'QWERTZ (Swiss)',
+      azertyFr: 'AZERTY (French)',
+      azertyBe: 'AZERTY (Belgian)',
+      qwertyEs: 'QWERTY (Spanish)',
+      qwertyIt: 'QWERTY (Italian)',
+      qwertyNordic: 'QWERTY (Swedish, Finnish)',
+      qwertyDa: 'QWERTY (Danish)',
+      qwertyNo: 'QWERTY (Norwegian)',
+      qwertyBr: 'QWERTY (Brazilian ABNT2)',
+      qwertyPt: 'QWERTY (Portuguese)',
+      qwertyTr: 'QWERTY (Turkish)',
+      dvorak: 'Dvorak',
+      colemak: 'Colemak',
+    },
   },
   // The Key Bindings panel's keyboard overview (src/ui/keyboard_map.ts): a live
   // keyboard with every key in use coloured by category and captioned with its
@@ -6406,6 +6823,8 @@ export const hudChromeStrings = {
     // so it says so plainly and names the signer AS the signer instead of
     // inventing an attribution for units nobody recorded.
     materialSourceGatherer: '{count} × Collected by {name}',
+    // A World PvP trophy skull stack's provenance row: {name} is the victim.
+    trophySkullSource: '{count} × Taken from {name}',
     materialSourceGathererSigned: '{count} × Collected by {name}, signed by {signer}',
     materialSourceUnrecorded: '{count} × No gatherer recorded',
     materialSourceUnrecordedSigned: '{count} × No gatherer recorded, signed by {name}',
@@ -7351,6 +7770,7 @@ export const hudChromeStrings = {
       skeleton: 'Dry bones rattle in step with yours.',
       crystal_lich: 'A cold hum rises from the wreckage, and it is watching you.',
       forgemaw: 'The heat of the forge has not left you. Something walked out with it.',
+      sprites: 'Two small flames have caught on you, and they are not going out.',
       crystal_tide: 'A drop of the sea refuses to fall from your line.',
       phantom: 'The air behind you is a shade too still.',
       emberfall_phoenix: 'A warmth like a banked fire settles at your back.',
@@ -7464,6 +7884,8 @@ export const hudChromeStrings = {
         "Forged in the Crucible of the Last Spring and never quite finished, it walked out of Ignivar's foundry while the hammers were still falling. Only the heroic descent finds it: the molten thing keeps returning to the forge that made it, and follows home whoever survives the fire twice.",
       crystal_tide:
         'A tide sprite that rides its own drop of sea-glass, hooked out of still water by anglers from the Vale to Farshore who were fishing for supper. It keeps the water it came up in, and it will not be talked into going back.',
+      sprites:
+        'Two small fire sprites, one gold and one teal, who never quite agree which of them is leading. Get close enough and they fold into one green flame, then spill apart again, laughing.',
       phantom:
         'A palm-sized haunt out of the Wraithwood barrows, all sheet and no bones, which turns up in a pack that was closed and stays for the company. Nobody has worked out what it wants, and it has never once tried to frighten anyone.',
       emberfall_phoenix:
@@ -8277,9 +8699,9 @@ export const hudChromeStrings = {
   },
   enchantDescription: {
     enchant_weapon_lastflame_zeal:
-      "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead.",
+      "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. In Cat Form, auto attacks roll at the 1 sec paw speed instead. Cat Form and Bruin Form strikes and finishers roll at the weapon's own speed; Sweeping Claws rolls once per cast, not once per target.",
     enchant_weapon_riftwalkers_grace:
-      "Your landed melee attacks can grant 60 Agility and 2% faster melee attacks for 15 sec. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead.",
+      "Your landed melee attacks can grant 60 Agility and 2% faster melee attacks for 15 sec. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. In Cat Form, auto attacks roll at the 1 sec paw speed instead. Cat Form and Bruin Form strikes and finishers roll at the weapon's own speed; Sweeping Claws rolls once per cast, not once per target.",
     enchant_weapon_dawnfire_etching:
       'Permanently etches a weapon with 18 Spell Power. Spell Power also counts toward Healing Power. A flat bonus; it does not scale.',
     enchant_weapon_dawns_benediction:
@@ -8288,19 +8710,24 @@ export const hudChromeStrings = {
       'Permanently etches a two-handed weapon with 12 Strength and 25 Critical Strike Rating. Cannot be applied to a one-handed weapon. A flat bonus; it does not scale.',
   },
   factionRewards: {
+    hearthstoneUnattuned:
+      'Your Allied Hearthstone is not attuned. Speak with an allied quartermaster or use it in an allied hub.',
+    hearthstoneBound: 'Your Allied Hearthstone is now attuned to {hub}.',
+    hearthstoneTransport: 'The hearthstone transports you to {hub}.',
+    itemCooldown: 'That item is not ready yet ({minutes} min remaining).',
     alliedHearthstoneUse:
       'Use: Teleports you to your attuned faction hub. (10 sec cast, 15 min cooldown)',
     alliedHearthstoneAttuned: 'Attuned to: {hub}',
     hub_none: 'None (Use near a faction hub to attune)',
     hub_rift_watch: 'Drifthaven (The Rift Watch)',
     hub_church_order: 'Eastbrook Vale (The Church Order)',
-    hub_automatons: 'South Reach (The Automaton Foundry)',
+    hub_automatons: 'Wyrmwatch (The Automatons)',
     riftGliderUse:
       'Use: Unfolds the glider, slowing falling speed for 30 sec. Landing or taking damage cancels the effect. (2 min cooldown)',
     targetDummyUse:
       'Use: Deploys a mechanical target dummy in the open world for 2 minutes to practice combat abilities. (5 min cooldown)',
     battleStandardUse:
-      'Use: Plants the Consecrated Dawn Battle Standard for 5 minutes, significantly increasing out-of-combat health and mana regeneration for all nearby allies. Remaining near it for 10 seconds also grants Blessing of the Dawn (+5% to all stats for 30 min). (5 min cooldown)',
+      'Use: Plants the Consecrated Dawn Battle Standard for 5 min. Players out of combat within 15 yards of it regenerate 10% more health, and mana users also restore mana equal to 5% of their Spirit, every 2 sec. Staying near it for 10 sec grants Blessing of the Dawn, increasing Strength, Agility, Stamina, Intellect, and Spirit by 5% for 30 min. (5 min cooldown)',
     shockBombUse:
       'Use: Throws a shock bomb up to 30 yards, dealing 120 to 160 Nature damage to all enemies within 5 yards. (1 min cooldown)',
     invisibilityUse: 'Use: Shrouds you in stealth for 6 sec. (2 min cooldown)',
@@ -9052,6 +9479,11 @@ export const hudChromeStrings = {
   pattern: {
     teaches: 'Use: Teaches you how to craft {item}.',
     teachesEnchant: 'Use: Teaches you how to apply {enchant}.',
+    // The materials line under each taught product: {label} is the crafting
+    // window's own crafting.reagentsNeeded ("Requires:") and {list} a
+    // formatList of reagent entries, so neither gets a second wording.
+    reagents: '{label} {list}',
+    reagent: '{name} x{count}',
   },
   // Maker's Bond unbind service window + result lines (Professions 2.0):
   // the station master's second gossip service beside training.
@@ -9275,6 +9707,12 @@ export const hudChromeStrings = {
     acceptedWait: 'Waiting for the others...',
   },
   finder: {
+    groups: 'Groups',
+    dungeonGuide: 'Dungeon Guide',
+    backToGroups: 'Back to Groups',
+    createGroup: 'Create Group',
+    cancelCreate: 'Cancel',
+    activeQueue: 'Your Queue',
     title: 'Dungeon Finder',
     close: 'Close',
     back: 'Back',
@@ -9322,6 +9760,9 @@ export const hudChromeStrings = {
     blockedLevel: 'Levels {min} to {max} only',
     blockedSpec: 'Requires a specialization',
     yourRoles: 'Your roles',
+    yourRole: 'Your role',
+    createQueueLocked: 'Leave matchmaking before publishing.',
+    noCreateActivities: 'No eligible activities in this category.',
     needsSpec: 'Choose a specialization to use the Dungeon Finder.',
     leaderNote: 'Only your party leader can queue the group.',
     chooseActivities: 'Choose activities',
@@ -9362,6 +9803,64 @@ export const hudChromeStrings = {
     tagFullClear: 'Full clear',
     tagLearning: 'Learning welcome',
     tagFastRun: 'Fast run',
+    tagGuildOnly: 'Guild Party',
+    guildPartyToggle: 'Guild Party',
+    guildPartyHint: 'Only members of {guild} can apply.',
+    guildPartyNeedsGuild: 'Join a guild to create a Guild Party.',
+    guildPartyNote: "Guild Parties only accept members of the leader's guild.",
+    guildPartyBadge: '{guild} only',
+    guildPartyLocked: 'Guild members only',
+    filterContent: 'Content',
+    filterAll: 'All content',
+    filterDungeons: 'Dungeons',
+    filterRaids: 'Raids',
+    filterEmpty: 'No listings match this filter.',
+    postHeading: 'Advertise your group',
+    postGeneral: 'Post in General',
+    postDiscord: 'Post in Discord',
+    postReadyIn: 'Ready in {minutes} min',
+    postDiscordOffline: 'Online play only',
+    inspect: 'Inspect',
+    inspectApplicantAria: 'Inspect {name}',
+    partyHeading: 'Bringing your party',
+    partyNote:
+      'Your party joins this group. Choose a role for each member, or let them keep their own.',
+    partyRolesHeading: 'Party roles',
+    partyRolesNote: 'Choose a role for each member, or let them keep their own.',
+    partyRoleOwn: 'Their choice',
+    partyRoleAria: 'Role for {name}',
+    partyMemberMeta: 'Level {level} {cls}',
+    difficultyHeading: 'Difficulty',
+    showGuide: 'Show Guide',
+    hideGuide: 'Hide Guide',
+    levelUnavailable: 'Outside your level range',
+    guideUnavailable: 'A detailed strategy for this encounter is not available yet.',
+    guide: {
+      pulse:
+        'Periodically damages players near the boss. Ranged players and healers can reduce damage taken by keeping their distance. Healers should prepare to restore health to players fighting in melee.',
+      cleave:
+        'Melee swings also damage other players near the current target. Keep space around the tank; standing behind the boss alone does not prevent this splash damage.',
+      adds: 'Reinforcements arrive as the fight progresses. The tank should collect them before they reach the healer. Damage dealers should help clear them so the group does not face several waves at once.',
+      enrage:
+        'At low health, the boss attacks faster and deals more damage. Save defensive and healing cooldowns for this final stretch, and finish the fight without abandoning the other mechanics.',
+      stomp:
+        'A periodic slam damages and briefly stuns nearby players. Healers and ranged players should keep their distance. Keep the tank healthy before the slam, since nearby allies may be unable to act during the stun.',
+      inferno:
+        'The boss stops moving and attacking to channel increasingly strong fire pulses. Leave the area around the boss as soon as the channel begins, then return when it ends. Spreading out inside the fire does not protect you.',
+      mending:
+        'Periodically heals wounded nearby allies, including the caster. Focus damage on the healer and avoid bringing extra enemies into its healing range. This is an instant effect, not a cast to interrupt.',
+      manaBurn:
+        'Landed melee hits can drain mana from a mana-using target. Keep the boss off the healer and other vulnerable casters. Rage and energy users do not lose resources to this effect.',
+      mortalWound:
+        'Melee hits can reduce the healing received by the target. Use defensive cooldowns while the wound is active; the healer will need more healing to restore the same amount of health.',
+      bleed:
+        'Melee hits can leave a bleed that continues damaging the victim. Watch the wounded player even if the enemy changes targets, and restore their health while the bleed runs.',
+      haste:
+        'Periodically increases the attack speed of nearby allies. Avoid fighting additional packs beside the Beastmaster, and prepare defensive cooldowns when several enemies receive the effect.',
+      ward: 'Periodically gives nearby allies an absorb shield. Focus the same target together to break its shield and finish it before the next ward, rather than spreading damage across the pack.',
+      knockback:
+        'Melee hits can knock the target away. Leave safe space behind the tank, avoid positioning near unpulled enemies, and be ready to restore melee range after the knockback.',
+    },
     // Notable encounter mechanics (stable keys authored in
     // src/sim/content/dungeon_finder.ts encounter records).
     mech: {
@@ -9409,7 +9908,7 @@ export const hudChromeStrings = {
         'Reap the Unquiet (below 35 percent health the souls stop; every 14 seconds he sweeps his scythe after a 2 second cast: 55 to 65 shadow damage on normal to everyone in a 120 degree arc 14 yards in front of him. Shadow Pulse then comes every 9 seconds)',
       crypt_morthen_heroic:
         "Heroic: Name the Dead (the Ledger names the order of the candles: a wrong candle snuffs the last one lit and deals 252 to 288 shadow damage to the lighter, and each relight drains 8 percent a second), Grasp of the Grave (every 16 seconds 2 players get a 4 yard ring; 1.5 seconds later hands erupt in it: a 3 second root and 162 to 198 shadow damage) and the Knellwyrm's Burning Knell (it takes flight and marks half of the ring for 4.5 seconds, then pours ghost fire over that half for 1,000 to 1,120 fire damage, 3 halves each flight)",
-      reaping_arc: 'Reaping Arc (frontal cleave)',
+      reaping_arc: 'Reaping Arc (splash around the tank)',
       hallowed_brine:
         'Hallowed Brine (a 9 yard pool of dark holy water, 10 on heroic: 18 damage a second to anyone in it, 26 on heroic, and he takes 40 percent less damage while he stands in it, so drag him out)',
       rebounding_bulwark:
@@ -9441,12 +9940,12 @@ export const hudChromeStrings = {
       undertow: 'Undertow (pulls everyone in, run out before the crash)',
       enrage: 'Enrages at low health',
       shuddering_stomp: 'Shuddering Stomp (area stun)',
-      grave_inferno: 'Grave Inferno (channeled fire AoE, stay spread)',
-      grave_cleaver: 'Grave-Cleaver (frontal cleave)',
+      grave_inferno: 'Grave Inferno (leave the fire pulses)',
+      grave_cleaver: 'Grave-Cleaver (splash around the tank)',
       shadow_nova: 'Shadow Nova (area burst)',
       profane_mending: 'Profane Mending (heals its allies)',
       mana_burn: 'Withered Benediction (burns mana)',
-      deathstalker_cleave: 'Deathstalker Cleave (frontal cleave)',
+      deathstalker_cleave: 'Deathstalker Cleave (splash around the tank)',
       mortal_wound: 'Forgotten Wound (reduces healing taken)',
       sealbreak_shockwave: 'Sealbreak Shockwave (area burst)',
       gravebreaker: 'Gravebreaker (frontal cone, face it away from the raid)',
@@ -9467,7 +9966,7 @@ export const hudChromeStrings = {
       deathless_court:
         'The Deathless Court (heroic only, the royal court rises after Deathless Rage)',
       bloodmane_rend: 'Bloodmane Rend (bleed, watch for target swaps)',
-      tusk_sweep: 'Tusk Sweep (frontal cleave)',
+      tusk_sweep: 'Tusk Sweep (splash around the tank)',
       grave_breath: 'Grave Breath (frontal fire cone, it cracks the ice it covers)',
       plate_floor:
         'Breaking Ice (his fire cracks and sinks the lake plates, stay out of the open water)',
@@ -9906,8 +10405,12 @@ export const hudChromeStrings = {
       "Awarded to every member of the party that wins a ranked Rift's first clear",
     // The Buried Hoard pieces (content/hoard_loot.ts): rolled from the reward
     // chest, never from the keeper's own loot, and at the tier the map buys.
+    // Also the second source of the corpse-harvest specimens the same chest
+    // pays (VAULT_MATERIAL_POOL, content/treasure_maps.ts).
     sourceActivityBuriedHoard:
       'Found in the reward chest of a Buried Hoard, the vault a treasure map leads to',
+    // Lantern Hall's horse and sword (src/sim/guild_quartermaster.ts): bought, not dropped.
+    sourceActivityLanternHall: "Bought for Lantern Seals from Lantern Hall's quartermaster",
     // The aria label folds the lines through formatList (Intl.ListFormat), so
     // there is no join key to translate: CLDR owns the separators per locale,
     // including the final-conjunction shapes a pairwise key cannot express.
@@ -10212,6 +10715,10 @@ export const hudChromeStrings = {
     // hudChrome.deeds.collapseHint / expandHint).
     collapseHint: 'Collapse map sidebar',
     expandHint: 'Expand map sidebar',
+    // The divider between the sidebar and the map (map_rail_resize_controller.ts):
+    // its accessible name, and the hover hint saying how to use it.
+    resizeRailAria: 'Map sidebar width',
+    resizeRailHint: 'Drag to resize the map sidebar. Double-click to reset.',
   },
   // Ranked Arena's minimum-level queue gate (src/sim/social/arena.ts
   // arenaQueueJoin, 1v1/2v2 only): the arena window's disabled-queue note
@@ -10673,6 +11180,8 @@ export const hudChromeStrings = {
     choose: 'Choose quest',
     inProgress: 'In progress ({count}/{required})',
     completed: 'Completed this week',
+    completedLastWeek: 'Completed last week',
+    claimFirst: 'Claim first',
     lockedThisWeek: 'Locked this week',
     footerPick: 'You may hold one weekly charge at a time. Pick a card to read its terms.',
     footerHeld: 'Your charge for the week is set. The other three unlock at the reset.',
@@ -10682,7 +11191,7 @@ export const hudChromeStrings = {
     alsoReceive: 'You will also receive:',
     tally: '{count} / {required}',
     cacheDesc:
-      'Opens into one Normal raid piece for your class (never a tier-set piece), plus {count} x {item}.',
+      'Opens into one Normal raid piece for your class (never an Ignivar tier-set piece), plus {count} x {item}.',
     dialogNote: 'Only one weekly charge can be active. It {reset}',
     accept: 'Accept',
     decline: 'Decline',
@@ -10716,6 +11225,8 @@ export const hudChromeStrings = {
     // claimed from the window once the charge is finished.
     commendHeading: "Emissary's commendation",
     commendNote: '{amount} standing to one faction of your choice, once a week.',
+    commendCarriedNote:
+      '{amount} standing from last week, still unclaimed. Claim it to choose a new charge.',
     commendClaimed: "This week's commendation went to the {faction}.",
     commendRewardLine: '{amount} standing with a faction of your choice',
     // Chat and banner lines for the emissary's events.

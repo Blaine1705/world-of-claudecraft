@@ -17,7 +17,12 @@ import { SceneryIndexCache } from './geometry';
 import { buildGiantSprites, type GiantSprites } from './giants';
 import { lowSceneryBandMaterial } from './material';
 import { SceneryNearSources } from './near';
-import { lowSceneryRepresentation, palmBudgetTree, placementDistance } from './policy_core';
+import {
+  LOW_SCENERY_BUDGET,
+  lowSceneryRepresentation,
+  palmBudgetTree,
+  placementDistance,
+} from './policy_core';
 import type { SceneryPlacement } from './types';
 
 export interface SceneryBandsHost {
@@ -197,10 +202,12 @@ export class LowSceneryBands {
       for (const selected of current.selected) selected.fill(0);
       current.giantSelected.fill(0);
       if (this.active) {
+        const maxDistance =
+          host.scene.fog instanceof THREE.Fog ? host.scene.fog.far : LOW_SCENERY_BUDGET.fadeEnd;
         for (let i = 0; i < current.items.length; i++) {
           const item = current.items[i];
           if (this.sourceOwns(item)) continue;
-          const representation = lowSceneryRepresentation(item, x, z, false);
+          const representation = lowSceneryRepresentation(item, x, z, false, maxDistance);
           const band =
             representation === 'middle'
               ? 0
@@ -213,7 +220,10 @@ export class LowSceneryBands {
         }
         for (let i = 0; i < current.giantItems.length; i++) {
           const item = current.giantItems[i];
-          if (!this.sourceOwns(item) && lowSceneryRepresentation(item, x, z, true) === 'sprite')
+          if (
+            !this.sourceOwns(item) &&
+            lowSceneryRepresentation(item, x, z, true, maxDistance) === 'sprite'
+          )
             current.giantSelected[i] = 1;
         }
       }
@@ -277,6 +287,9 @@ export class LowSceneryBands {
               const matName = part.source.material.name;
               const regional = palmBudgetTree(item.x, item.z, item.owner.name, matName, palm);
               const isBark = /^Bark_/i.test(matName);
+              if (item.owner.name === 'jungle-features' && matName === 'Atlas') {
+                return { triangles: 256, mode: 'palm' };
+              }
               if (index === 0) {
                 if (isBark) return { triangles: 48, mode: 'coarse' };
                 return { triangles: regional ? 256 : 512, mode: regional ? 'palm' : 'quality' };

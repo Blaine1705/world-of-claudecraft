@@ -47,12 +47,12 @@ import {
 } from './mirefen_tavern';
 import { TAVERN_FORECOURT } from './mirefen_tavern_grounds';
 
-/** How much a cushion raises a seat over its board (tavern_furnish.py): the hearth's and
+/** How much a cushion raises a seat over its board (inn_furnish.py): the hearth's and
  *  the nook's benches wear a 0.1 cushion, the settles a 0.13 one. */
 const BENCH_CUSHION = 0.1;
 const SETTLE_CUSHION = 0.13;
 /** A settle's seat board overhangs its carcass by this much at the front
- *  (tavern_furnish.py, the board to `hd + 0.05`). */
+ *  (inn_furnish.py, the board to `hd + 0.05`). */
 const SETTLE_BOARD_LIP = 0.05;
 /** Every seat's anchor stands this far behind the seat's FRONT edge: the chair clips'
  *  hanging calves (the rig is chibi, its feet hang well over the floor from a 0.9 seat) sit

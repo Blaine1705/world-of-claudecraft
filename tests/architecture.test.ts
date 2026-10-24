@@ -211,9 +211,16 @@ const UI_PURE_CORES = [
   'src/ui/hud/referral_cards/referral_reward_core.ts',
   'src/ui/hud/courier/courier_core.ts',
   'src/ui/hud/referral_cards/referral_cards_view.ts',
+  // Whether the "restoring graphics" note shows over the held 3D view.
+  'src/ui/graphics_restore_note_view.ts',
+  'src/ui/ferry_port_map_core.ts',
   'src/ui/frame_presets_core.ts',
+  // The landing select's and first-login prompt's shared graphics-choice policy.
+  'src/ui/graphics_choice_core.ts',
   'src/ui/frame_menu_core.ts',
   'src/ui/loot_quality_view.ts',
+  // A copy's own display name (the World PvP trophy skull's "<name>'s Skull").
+  'src/ui/item_copy_name_core.ts',
   'src/ui/item_combat_tooltip_view.ts',
   'src/ui/trinket_tooltip_view.ts',
   // The trinket auras' tooltip descriptor and their item-icon art map.
@@ -246,6 +253,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/cosmetics/cosmetics_view.ts',
   'src/ui/hud/faction_reward_tooltip_view.ts',
   'src/ui/hud/treasure/treasure_map_view.ts',
+  'src/ui/hud/treasure/ink_map_picker_view.ts',
   'src/ui/hud/vehicle/vehicle_aim_core.ts',
   'src/ui/hud/vehicle/vehicle_action_bar_view.ts',
   'src/ui/hud/vehicle/glider_action_bar_view.ts',
@@ -259,6 +267,8 @@ const UI_PURE_CORES = [
   'src/ui/map_semantic_accessibility_core.ts',
   'src/ui/map_surface_core.ts',
   'src/ui/map_pan_core.ts',
+  // Which per-zone map backgrounds the HUD keeps (map_bg.ts is its DOM half).
+  'src/ui/map_bg_residency_core.ts',
   'src/ui/mouseover_cast_core.ts',
   'src/ui/world_quest_view.ts',
   'src/ui/world_quest_trace_view.ts',
@@ -277,12 +287,21 @@ const UI_PURE_CORES = [
   // Which zone the overworld map frames (dungeon door, frozen last zone,
   // committed zone, override), lifted out of Hud.updateMapWindow.
   'src/ui/hud/map/map_zone_focus_core.ts',
+  // The resizable map's canvas backing side (map_canvas_size_controller.ts
+  // feeds it the ResizeObserver content box).
+  'src/ui/hud/map/map_canvas_size_core.ts',
+  // The atlas rail width: clamp, drag and key steps (map_rail_resize_controller.ts
+  // applies it as --map-rail-width).
+  'src/ui/hud/map/map_rail_width_core.ts',
   'src/ui/world_quest_forge_view.ts',
   'src/ui/world_quest_leaderboard_view.ts',
   'src/ui/leaderboard_podium_view.ts',
   'src/ui/leaderboard_podium_html.ts',
   'src/ui/leaderboard_board_html.ts',
   'src/ui/weekly_quests_view.ts',
+  'src/ui/hud/guild_hall/guild_hall_view.ts',
+  'src/ui/hud/guild_hall/guild_quartermaster_view.ts',
+  'src/ui/hud/quest/weekly_quest_tracker_view.ts',
   'src/ui/world_quest_wisp_maze_view.ts',
   'src/ui/world_quest_shadow_view.ts',
   'src/ui/world_quest_investigation_view.ts',
@@ -317,6 +336,7 @@ const UI_PURE_CORES = [
   'src/ui/daily_rewards_chrome_view.ts',
   'src/ui/daily_rewards_launcher_core.ts',
   'src/ui/death_recap_view.ts',
+  'src/ui/death_screen_view.ts',
   'src/ui/char_bags_pairing_core.ts',
   'src/ui/empower_hold_core.ts',
   'src/ui/equip_drop_core.ts',
@@ -359,17 +379,20 @@ const UI_PURE_CORES = [
   'src/ui/hud/quest/dungeon_guide_dialog_core.ts',
   'src/ui/hud/dungeon/dungeon_guide_speech_view.ts',
   'src/ui/hud/action_bar/trinket_slot_core.ts',
+  'src/ui/hud/action_bar/action_bar_item_core.ts',
   'src/ui/hud/quest/prof_intro_hint_core.ts',
   'src/ui/hud/quest/clue_step_row_view.ts',
   'src/ui/hud/pet_bar_core.ts',
   'src/ui/hud/shardpike/shardpike_bar_view.ts',
   'src/ui/hud/shardpike/shardpike_prompt_view.ts',
   'src/ui/hud/shardpike/shardpike_lean_view.ts',
+  'src/ui/hud/action_bar/pet_slot_core.ts',
   'src/ui/hud/warlock/doom_meter_view.ts',
   'src/ui/hud/aura_tracks/aura_track_catalog.ts',
   'src/ui/hud/aura_tracks/aura_track_descriptors.ts',
   'src/ui/hud/aura_tracks/aura_track_view.ts',
   'src/ui/hud/quest/master_craft_core.ts',
+  'src/ui/hud/quest/hearthstone_attune_row_core.ts',
   // The world quest entry banner model (the #banner 'worldQuest' plate).
   'src/ui/hud/quest/world_quest_banner_view.ts',
   'src/ui/hud/quest/quest_reward_choice_view.ts',
@@ -400,6 +423,7 @@ const UI_PURE_CORES = [
   'src/ui/keybind_action_names_core.ts',
   'src/ui/keybind_device_notes_core.ts',
   'src/ui/keyboard_layout_pref_core.ts',
+  'src/ui/keyboard_layout_convert_core.ts',
   'src/ui/settings_transfer_core.ts',
   'src/ui/meters_frame_core.ts',
   'src/ui/meters_menu_view.ts',
@@ -414,6 +438,8 @@ const UI_PURE_CORES = [
   'src/ui/preview_touch_hint_core.ts',
   'src/ui/talents_view.ts',
   'src/ui/social_view.ts',
+  // Which player menu a Social row right-click opens (self / unit frame / by name).
+  'src/ui/social_row_menu_core.ts',
   'src/ui/guild_ranks_view.ts',
   'src/ui/who_tab_view.ts',
   'src/ui/tab_strip_view.ts',
@@ -581,10 +607,12 @@ const UI_PURE_CORES = [
   'src/ui/hud/professions/professions_view.ts',
   'src/ui/tutorial_greeting_view.ts',
   'src/ui/bootcamp_view.ts',
+  'src/ui/zone_announcement_core.ts',
   'src/ui/coach_prompt_view.ts',
   'src/ui/objective_glow_view.ts',
   'src/ui/vendor_stock_gate_core.ts',
   'src/ui/market_view.ts',
+  'src/ui/market_consumable_sources_view.ts',
   'src/ui/market_price_view.ts',
   'src/ui/market_name_color.ts',
   'src/ui/market_armor_badge.ts',
@@ -618,6 +646,8 @@ const UI_PURE_CORES = [
   'src/ui/mail_parcel_sources_view.ts',
   'src/ui/calendar_view.ts',
   'src/ui/char_view.ts',
+  // Gearscore: the average worn item level (character sheet + inspect).
+  'src/ui/gear_score_view.ts',
   'src/ui/masterwrought_cap_view.ts',
   'src/ui/char_stats_view.ts',
   // The live world -> stat-sheet model bridge (extracted from Hud.statModel).
@@ -647,11 +677,20 @@ const UI_PURE_CORES = [
   'src/ui/pvp_record_core.ts',
   'src/ui/pvp_tabs_view.ts',
   'src/ui/pvp_hostile_core.ts',
+  'src/ui/pvp_risk_core.ts',
   'src/ui/dungeon_finder_view.ts',
+  'src/ui/dungeon_catalogue_view.ts',
+  'src/ui/dungeon_loot_preview_view.ts',
+  'src/ui/hud/expeditions/expedition_view.ts',
   'src/ui/yumi_match_view.ts',
   'src/ui/hud/battleground/battleground_atlas_view.ts',
   'src/ui/hud/battleground/battleground_window_view.ts',
   'src/ui/hud/world_pvp/world_pvp_window_view.ts',
+  // The World PvP Skull Bag pane's rows and signature, and the bag's tooltip line.
+  'src/ui/hud/skull_bag/skull_bag_view.ts',
+  'src/ui/hud/skull_bag/skull_bag_tooltip_view.ts',
+  // The potion Use lines of the item tooltip, moved out of Hud.itemTooltip.
+  'src/ui/potion_tooltip_view.ts',
   'src/ui/hud/hill/hill_bar_view.ts',
   // The Iron Cage escape prompt (the Gaol Turnkey's button-mash).
   'src/ui/hud/dungeon/cage_escape_view.ts',
@@ -682,6 +721,9 @@ const UI_PURE_CORES = [
   // The dungeon objectives tracker (the plate and its boss rows): what it
   // shows, and which rows a kill just lit.
   'src/ui/hud/dungeon/dungeon_tracker_view.ts',
+  // The death screens: which of the Release overlay, PvP Resurrect button and
+  // ghost surfaces show (src/ui/hud/death).
+  'src/ui/hud/death/death_prompt_view.ts',
   'src/ui/hud/battleground/bg_end_banner_view.ts',
   'src/ui/hud/battleground/battleground_scoreboard_view.ts',
   'src/ui/leaderboard_view.ts',
@@ -748,6 +790,7 @@ const UI_PURE_CORES = [
   // class div, nothing else.
   'src/ui/tooltip_line_core.ts',
   'src/ui/fct_core.ts',
+  'src/ui/fct_emphasis_core.ts',
   'src/ui/fct_event.ts',
   // Which authored contact beat a damage floater rides, and how long it waits. The
   // beat table is INJECTED by the painter (it lives in src/game, a layer a pure core
@@ -756,6 +799,9 @@ const UI_PURE_CORES = [
   'src/ui/honor_float_view.ts',
   'src/ui/heal_landing_feedback_core.ts',
   'src/ui/block_landing_feedback_core.ts',
+  'src/ui/boot_splash_core.ts',
+  // Which boot a home page load takes, and the landing's touch-interface answer.
+  'src/ui/landing_first_core.ts',
   'src/ui/window_drag_core.ts',
   'src/ui/window_reflow_core.ts',
   'src/ui/window_resize_core.ts',
@@ -842,6 +888,14 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
   'src/render/courier_visual_core.ts',
+  // the lantern horse's ember rates and hoof-strike weight (mount_embers.ts)
+  'src/render/mount_embers_core.ts',
+  // the destrier's standing rear-up trigger and hop cancel (mount_presentation.ts)
+  'src/render/mount_rear_core.ts',
+  // the per-skin swing trail lookup (renderer.ts triggerAttack)
+  'src/render/weapon_skin_trail_core.ts',
+  // the ambient motes' fade around the local player (motes.ts)
+  'src/render/motes_keepout_core.ts',
   // Was a click aimed at a body: the pick ray against its visible core.
   'src/render/pick_aim_core.ts',
   'src/render/action_cam_core.ts',
@@ -851,6 +905,7 @@ const RENDER_PURE_CORES = [
   'src/render/chase_camera_floor_core.ts',
   // the air of a walk-in placed town building (its rooms and doors) for the indoor camera
   'src/render/placed_town_interior_core.ts',
+  'src/render/highwatch_guild_trophies_core.ts',
   // Which body plays an overhead emote (a player's, or a talking NPC's gesture).
   'src/render/body_emote_core.ts',
   // The rig / frozen-far-mesh handoff with hysteresis (the far-LOD flicker fix).
@@ -1164,13 +1219,13 @@ const RENDER_PURE_CORES = [
   'src/render/quest_beacon_core.ts',
   'src/render/coach_trail_core.ts',
   'src/render/eastbrook_wolves_guidance_core.ts',
+  'src/render/wolf_hunt_area_core.ts',
   'src/render/island_isolation_core.ts',
   'src/render/characters/portrait_prewarm_core.ts',
   'src/render/characters/portrait_readback_core.ts',
   'src/render/characters/preview_open_gate_core.ts',
   'src/render/characters/preview_armor_detail_core.ts',
   'src/render/characters/preview_touch_core.ts',
-  'src/render/characters/soul_rend_prewarm_core.ts',
   'src/render/characters/design_code_core.ts',
   'src/render/view_vfx_pose_core.ts',
   'src/render/live_program_watch_core.ts',
@@ -1188,11 +1243,13 @@ const RENDER_PURE_CORES = [
   'src/render/shader_warmup_gl_core.ts',
   'src/render/realm_builder_monument_fx_core.ts',
   'src/render/reveal_gate_core.ts',
+  // The WebGL context-restore registry and pass sequencing (context_restore.ts
+  // is its host).
+  'src/render/context_restore_core.ts',
   'src/render/stride_audio_core.ts',
   'src/render/town_reveal_core.ts',
   'src/render/foliage_bucket_reveal_core.ts',
   'src/render/foliage_prewarm_twins_core.ts',
-  'src/render/character_effect_prewarm_core.ts',
   'src/render/frame_ms_stats_core.ts',
   'src/render/ability_vfx_core.ts',
   'src/render/characters/player_look_core.ts',
@@ -1312,6 +1369,7 @@ const RENDER_PURE_CORES = [
   'src/render/grass_tuft_cards_core.ts',
   'src/render/step_smooth_core.ts',
   'src/render/eastbrook_town_visibility_core.ts',
+  'src/render/eastbrook_stall_canopy_core.ts',
   'src/render/fenbridge_town_visibility_core.ts',
   'src/render/occluder_fade_core.ts',
   'src/render/point_light_shader_core.ts',
@@ -1332,7 +1390,9 @@ const RENDER_PURE_CORES = [
   'src/render/spirit_grade_core.ts',
   'src/render/nameplate_cadence_core.ts',
   'src/render/nameplate_heraldry_core.ts',
+  'src/render/nameplate_tag_fill_core.ts',
   'src/render/nameplate_dots_core.ts',
+  'src/render/nameplate_cooldowns_core.ts',
   'src/render/nameplate_friendly_core.ts',
   'src/render/net_interp_core.ts',
   'src/render/paladin_ascension_core.ts',
@@ -1369,6 +1429,7 @@ const RENDER_PURE_CORES = [
   'src/render/shadow_pass_gate_core.ts',
   'src/render/shore_water_gate_core.ts',
   'src/render/static_merge_shadow_core.ts',
+  'src/render/target_highlight_core.ts',
   'src/render/terrain_region_core.ts',
   // The chunk grid's world box (shipped box, or an authored map's own rect
   // plus outskirts): pure arithmetic over the active zones and stamps.
@@ -1403,6 +1464,7 @@ const RENDER_PURE_CORES = [
   'src/render/player_aura_rings_core.ts',
   'src/render/warrior_cast_fx_core.ts',
   'src/render/characters/form_visual_selection_core.ts',
+  'src/render/characters/form_visual_slots_core.ts',
   'src/render/characters/metamorph_wing_motion_core.ts',
   'src/render/warlock_meteor_fx_core.ts',
   'src/render/weapon_vfx_apply_queue_core.ts',
@@ -1410,14 +1472,20 @@ const RENDER_PURE_CORES = [
   'src/render/zone_dressing_lod_core.ts',
   'src/render/zone_feature_visibility_core.ts',
   'src/render/zone_eviction_core.ts',
+  'src/render/drakelands_kit_lane_core.ts',
   'src/render/zone_prewarm_templates_core.ts',
   'src/render/cast_vfx_readiness_core.ts',
   'src/render/characters/skeleton_update_core.ts',
   'src/render/characters/material_program_shape_core.ts',
   'src/render/characters/far_bake_groups_core.ts',
+  'src/render/characters/spirit_veil_family_core.ts',
+  'src/render/characters/spirit_veil_palette_core.ts',
+  'src/render/ghost_style_core.ts',
   'src/render/characters/modular_name_facts_core.ts',
   'src/render/characters/morph_union_core.ts',
+  'src/render/characters/rift_body_stream_core.ts',
   'src/render/characters/tinted_material_cache_core.ts',
+  'src/render/characters/composed_variant_residency_core.ts',
   'src/render/characters/weapon_attack_style_core.ts',
   // FORK (Studio) pure cores.
   'src/render/foliage_far_placements_core.ts',
@@ -1439,6 +1507,8 @@ const RENDER_PURE_CORES = [
   'src/render/cut_cavity_core.ts',
   'src/render/grass_edge_taper_core.ts',
   'src/render/grass_interaction_core.ts',
+  'src/render/sprites_buddy_flame_core.ts',
+  'src/render/characters/decal_texture_size_core.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // Bare-named pure cores: registered cores (from UI_PURE_CORES + RENDER_PURE_CORES)
@@ -2980,7 +3050,23 @@ const UI_DOM_MODULES = [
   'src/ui/hud/referral_cards/referral_reward_celebration_window.ts',
   'src/ui/hud/referral_cards/referral_cards_controller.ts',
   'src/ui/hud/referral_cards/referral_cards_hud_controller.ts',
+  'src/ui/hud/expeditions/finder_surfaces.ts',
+  'src/ui/hud/expeditions/expedition_controller.ts',
+  'src/ui/hud/expeditions/notification_sound.ts',
+  // Mints the "restoring graphics" status line and toggles it on the context
+  // restore hold's edges.
+  'src/ui/graphics_restore_note_controller.ts',
+  'src/ui/tooltip_binding.ts',
+  // The Skull Bag sub-inventory pane the bags window docks (createElement only).
+  'src/ui/hud/skull_bag/skull_bag_pane_controller.ts',
   'src/ui/error_toast_controller.ts',
+  'src/ui/boot_splash.ts',
+  // The first-login graphics prompt: a top-level pre-game modal reading the URL and navigator.
+  'src/ui/graphics_choice_prompt.ts',
+  // The landing-first boot (body classes, splash lift, prefetch, held clicks) and the
+  // characters-created counter it shares with main.ts.
+  'src/ui/landing_first.ts',
+  'src/ui/project_stats.ts',
   'src/ui/frame_presets_live.ts',
   'src/ui/frame_editor_deps.ts',
   'src/ui/frame_presets_controls.ts',
@@ -2994,7 +3080,14 @@ const UI_DOM_MODULES = [
   'src/ui/mobile_frame_long_press.ts',
   'src/ui/hud/vehicle/vehicle_action_bar_controller.ts',
   'src/ui/hud/map/minimap_objective_tap.ts',
+  // Owns a ResizeObserver over the map canvas and writes its backing store.
+  'src/ui/hud/map/map_canvas_size_controller.ts',
+  // Hud's map-window sizing wiring: a ResizeObserver over #map-window that
+  // re-reads the stored rail width once settings exist.
+  'src/ui/hud/map/map_window_sizing_wiring.ts',
   'src/ui/hud/treasure/treasure_map_window.ts',
+  // Mounts the Cartographer's Ink map picker into #prompt-stack.
+  'src/ui/hud/treasure/ink_map_picker_controller.ts',
   'src/ui/hud/vehicle/shadow_action_bar_controller.ts',
   'src/ui/hud/vehicle/forge_action_bar_controller.ts',
   'src/ui/account_portal_dom.ts',
@@ -3033,11 +3126,16 @@ const UI_DOM_MODULES = [
   'src/ui/calendar_window.ts',
   'src/ui/hud/action_bar/action_bar_bind_banner.ts',
   'src/ui/weekly_quests_window.ts',
+  'src/ui/hud/guild_hall/guild_hall_window.ts',
+  'src/ui/hud/guild_hall/guild_offer_stage_controller.ts',
   'src/ui/hud/action_bar/bar_editor/bar_editor_window.ts',
   'src/ui/hud/action_bar/consumable_seat_controller.ts',
   'src/ui/hud/action_bar/mobile_action_ring_controller.ts',
   'src/ui/hud/action_bar/radial_gesture_controller.ts',
   'src/ui/hud/menu/menu_control_controller.ts',
+  // The pet-bar button builder (Hud.renderPetBar's sockets, their touch hold
+  // and the drag that copies a pet command onto the action bar).
+  'src/ui/hud/pet_bar_button.ts',
   'src/ui/hud/stance/stance_bar_controller.ts',
   'src/ui/hud/stance/stance_control_controller.ts',
   'src/ui/hud/tap_menu.ts',
@@ -3047,6 +3145,11 @@ const UI_DOM_MODULES = [
   'src/ui/hud/cross_hotbar/cross_hotbar_controller.ts',
   'src/ui/options_window_shell.ts',
   'src/ui/options_interface_rows.ts',
+  // Key Bindings > Keyboard Layout: mints its own nodes; the conversion lives in
+  // the registered pure core src/ui/keyboard_layout_convert_core.ts.
+  'src/ui/keybind_layout_convert_rows.ts',
+  // Interface > Combat: the subhead and checkbox row shapes (createElement).
+  'src/ui/options_check_rows.ts',
   // Options > Performance > System Report: mints its own nodes (createElement)
   // and reads the desktop bridge for its availability gate. Decisions live in
   // the registered pure core src/ui/host_diag_view.ts; this half is nodes, one
@@ -3078,6 +3181,9 @@ const UI_DOM_MODULES = [
   // coverage is the deliberate one this file's own header describes.
   'src/ui/daily_rewards_spin_controller.ts',
   'src/ui/store_subscription.ts',
+  // The rotating promo card above chat: it owns its DOM, a rotation interval,
+  // a retire-guard clock read and the prefers-reduced-motion query.
+  'src/ui/store_promo_card.ts',
   'src/ui/daily_rewards_window.ts',
   'src/ui/deeds_window.ts',
   'src/ui/desktop_update_toast.ts',
@@ -3184,6 +3290,7 @@ const UI_DOM_MODULES = [
   'src/ui/realm_builder_popup.ts',
   'src/ui/options_window.ts',
   'src/ui/ota_update_overlay.ts',
+  'src/ui/fatal_overlay_controller.ts',
   'src/ui/perf_metrics_sampler.ts',
   'src/ui/perf_nudge_toast.ts',
   'src/ui/perf_ornament_svg.ts',
@@ -3279,6 +3386,7 @@ const UI_DOM_MODULES = [
   'src/ui/weekly_reward_claim_controller.ts',
   'src/ui/weekly_reward_table_picker_controller.ts',
   'src/ui/weekly_reward_loot_catalog_controller.ts',
+  'src/ui/weekly_reward_loot_focus_controller.ts',
   'src/ui/weekly_rewards_ready_prompt.ts',
   'src/ui/weekly_vault_reveal_controller.ts',
   'src/ui/wiki_link.ts',

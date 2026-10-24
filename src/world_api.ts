@@ -271,7 +271,15 @@ export type { VehicleSession } from './world_api/vehicles';
 // Above both parents: an epoch-44 client would draw the ship moored and predict
 // a deck the server has sailed away; an epoch-30 client lacks the world-quest
 // wire. Both must fail closed.
-export const ONLINE_WORLD_LAYOUT_VERSION = 45 as const;
+// 46 = Wildheart's entrance gate collision moves from empty grass onto the
+// visible stone feet. Epoch 45 clients predict the misplaced blockers, so
+// mixed binaries must fail closed instead of restoring invisible walls.
+// 47 = Large Materials Vault snapshots stream in bounded, paced chunks.
+// Earlier clients cannot decode the transfer envelope and must fail closed.
+// 48 = Withdraw #4297 and restore the preceding Wildheart gate collision.
+// Epoch 46 and 47 clients still predict the withdrawn stone-foot blockers;
+// reject them while preserving epoch 47's chunked vault envelope.
+export const ONLINE_WORLD_LAYOUT_VERSION = 48 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
@@ -340,6 +348,7 @@ export type {
   ActiveNythraxisGraveEruption,
   ActiveNythraxisGraveFlame,
   ActiveNythraxisGravefire,
+  ActiveSporeBurst,
   ActiveTemporalHourglass,
   ActiveVarkhulAnvilMeteorWarning,
   ActiveVarkhulAssembly,
@@ -382,12 +391,15 @@ export type {
 } from './world_api/duel_arena';
 export type {
   DungeonFinderApplicantView,
+  DungeonFinderApplicationView,
   DungeonFinderBoard,
+  DungeonFinderExpeditionView,
   DungeonFinderInfo,
   DungeonFinderListingView,
   DungeonFinderMyListingView,
   DungeonFinderProposalView,
   DungeonFinderQueueView,
+  ExpeditionSettings,
 } from './world_api/dungeon_finder';
 export type { RaidLockout, RiftFloorView } from './world_api/dungeons';
 export type {
@@ -468,6 +480,8 @@ export type {
   HillPhaseInfo,
   HillSide,
   HillStandingInfo,
+  SkullBagAction,
+  SkullBagInfo,
   WorldPvpInfo,
   WorldPvpZone,
 } from './world_api/world_pvp';
@@ -693,6 +707,7 @@ export const COMMAND_NAMES = [
   'autoloot',
   'resurrect_corpse',
   'resurrect_healer',
+  'pvp_resurrect',
   'bank_deposit',
   'bank_withdraw',
   'bank_buy_slots',
@@ -960,6 +975,16 @@ export const COMMAND_NAMES = [
   // Guild custom ranks (docs/prd/guild-custom-ranks.md): the Guild Master
   // replaces the guild's rank ladder (titles, order, permissions).
   'guild_set_ranks',
+  'df_expedition_open',
+  'df_expedition_travel',
+  'df_expedition_apply',
+  'df_expedition_configure',
+  'weekly_loot_spec',
+  // World PvP Skull Bag: store or take trophy skulls (IWorldWorldPvp.skullBagAction).
+  'skull_bag',
+  // Allied Hearthstone: a faction quartermaster binds the stone to its hub
+  // (IWorldQuests.attuneAlliedHearthstone, the quest dialog's attune row).
+  'allied_hearthstone_attune',
   'account_bank_list',
   'account_bank_select',
   'account_bank_transfer',
@@ -973,6 +998,10 @@ export const COMMAND_NAMES = [
   'referralCards',
   // Sit on a piece of furniture by its seat id (IWorldSeating.sitOnSeat).
   'sit_seat',
+  // Lantern Hall's quartermaster: buy one cosmetic for Lantern Seals
+  // (IWorldQuests.buyGuildCosmetic; src/sim/guild_quartermaster.ts). Appended at the END
+  // because wire tokens are never reordered.
+  'guild_buy_cosmetic',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -1072,6 +1101,7 @@ export type WorldFacet =
 export const COMMAND_FACETS = {
   weekly_reward_claim: 'IWorldBank',
   weekly_reward_open: 'IWorldBank',
+  weekly_loot_spec: 'IWorldBank',
   // IWorldCombat: ability casts, auto-attack, spirit release.
   cast: 'IWorldCombat',
   castSlot: 'IWorldCombat',
@@ -1092,10 +1122,12 @@ export const COMMAND_FACETS = {
   world_quest_start: 'IWorldQuests',
   world_quest_reroll: 'IWorldQuests',
   clue_hunt_abandon: 'IWorldQuests',
+  allied_hearthstone_attune: 'IWorldQuests',
   // Ghost resurrection: run the spirit to its corpse, or accept the Spirit Healer's
   // resurrection (with Resurrection Sickness). Wire strings are snake_case by design.
   resurrect_corpse: 'IWorldCombat',
   resurrect_healer: 'IWorldCombat',
+  pvp_resurrect: 'IWorldCombat',
   resurrect_respond: 'IWorldCombat',
   // IWorldTargeting: target selection + tab cycling.
   target: 'IWorldTargeting',
@@ -1357,6 +1389,10 @@ export const COMMAND_FACETS = {
   df_apply: 'IWorldDungeonFinder',
   df_apply_cancel: 'IWorldDungeonFinder',
   df_app_respond: 'IWorldDungeonFinder',
+  df_expedition_open: 'IWorldDungeonFinder',
+  df_expedition_travel: 'IWorldDungeonFinder',
+  df_expedition_apply: 'IWorldDungeonFinder',
+  df_expedition_configure: 'IWorldDungeonFinder',
   // IWorldDeeds: the Book of Deeds cosmetic selections, title and nameplate
   // border (snake_case wire strings, by design).
   // deedsEarned/deedStats/renown/activeTitle/activeBorder are snapshot reads
@@ -1381,6 +1417,7 @@ export const COMMAND_FACETS = {
   // IWorldWorldPvp: the /pvp flag raise/lower. worldPvpInfo (the `wpvp`
   // self-delta mirror) carries no wire command and stays untagged.
   pvp_flag: 'IWorldWorldPvp',
+  skull_bag: 'IWorldWorldPvp',
   // IWorldDungeons: the dungeon guide's offer answer (the guide's state is a
   // snapshot read off his entity, `gds`).
   dungeon_guide_answer: 'IWorldDungeons',
