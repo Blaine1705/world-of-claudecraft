@@ -6646,17 +6646,18 @@ describe('full self-state snapshot delta fixture', () => {
       // gated null: the two keys are mutually exclusive on one player by
       // design. Its non-null arrival (and the by-reference mirror) is pinned
       // in tests/vault_wire.test.ts instead.
-      // This fixture stands at a different banker; the weekly keeper gate stays closed.
       // dgrun is position-exclusive with drun the same way: the dungeon run is
       // read off the claim the player STANDS in, and this player stands in a
       // delve, so the fresh session's first value is the explicit null. Its
       // non-null arrival is pinned in tests/server/dungeon_run_wire.test.ts.
-      if (key === 'cvault' || key === 'weeklyRewards' || key === 'dgrun') {
+      if (key === 'cvault' || key === 'dgrun') {
         expect(snap.self[key], `self.${key} must arrive as the explicit gated null`).toBeNull();
         continue;
       }
       expect(snap.self[key], `self.${key} arrived null`).not.toBeNull();
     }
+    // The preview is global; this fixture still cannot claim away from the Keeper.
+    expect(snap.self.weeklyRewards).toMatchObject({ canClaim: false });
   });
 
   it('mirrors every dirtied self value onto the correct decode target', () => {

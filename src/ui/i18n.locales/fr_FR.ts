@@ -1292,6 +1292,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.rare': 'Rare',
   'hudChrome.weeklyRewards.readyDescription':
     'Une semaine de récompenses terminée vous attend. Ouvrez vos coffres gagnés, puis choisissez un objet à réclamer.',
+  'hudChrome.weeklyRewards.previewClaimNotice':
+    'Des récompenses vous attendent. Rendez visite au Gardien du Coffre à Eastbrook pour les ouvrir et les récupérer.',
   'hudChrome.weeklyRewards.readyTitle': 'Vos récompenses hebdomadaires sont prêtes',
   'hudChrome.weeklyRewards.readyWeeks':
     "Semaines non réclamées : {count}. Réclamez d'abord la semaine terminée la plus ancienne.",

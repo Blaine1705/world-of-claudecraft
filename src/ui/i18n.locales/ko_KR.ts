@@ -1874,6 +1874,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적격 아이템이 모두 추첨되었습니다. 공개된 보상을 선택하세요.',
   'hudChrome.weeklyRewards.worldPoolRule':
     '일반 난이도 Nythraxis 장비입니다. 공격대 완료는 필요하지 않습니다.',
+  'hudChrome.weeklyRewards.previewPoolRule':
+    '이 금고에서 추첨할 수 있는 모든 전리품 목록입니다. 우두머리를 처치하면 이후 금고에서 해당 전리품이 영구적으로 해제됩니다. 던전 전리품 목록에는 처치한 우두머리만 포함되며, 영웅 난이도 처치는 일반 난이도도 함께 해제합니다. 이미 추첨된 아이템은 추첨에서 제외됩니다. 요구 레벨이 자신의 레벨보다 {maxLevelOffset}레벨을 초과하여 높은 장비는 표시되지 않습니다.',
   'hudChrome.weeklyRewards.selectionPoolRule':
     '공격대와 던전 보상은 열기 전에 전리품 목록을 하나 이상 선택하세요. 던전 전리품 목록에는 해당 난이도에서 처치한 우두머리의 전리품이 합쳐집니다. 중복 아이템, 전설 아이템, 요구 레벨이 자신의 레벨보다 {maxLevelOffset}레벨을 초과하여 높은 장비는 추첨에서 제외됩니다.',
   'questUi.worldQuest.puzzleRetry': '다시 시도',
@@ -21171,6 +21173,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.readyWeeks':
     '받지 않은 주: {count}. 완료된 가장 오래된 주부터 받으세요.',
   'hudChrome.weeklyRewards.claimLastWeek': '지난주 보상 받기',
+  'hudChrome.weeklyRewards.previewClaimNotice':
+    '보상이 기다리고 있습니다. 이스트브룩의 금고 관리인을 찾아가 금고를 열고 보상을 받으세요.',
   'hudChrome.weeklyRewards.readyTitle': '주간 보상이 준비되었습니다',
   'hudChrome.weeklyRewards.readyDescription':
     '완료된 한 주의 보상이 기다리고 있습니다. 얻은 금고를 연 다음 받을 아이템 하나를 고르세요.',

@@ -1439,6 +1439,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.rare': 'Raro',
   'hudChrome.weeklyRewards.readyDescription':
     'Una settimana di ricompense completata ti aspetta. Apri i forzieri guadagnati, poi scegli un oggetto da ritirare.',
+  'hudChrome.weeklyRewards.previewClaimNotice':
+    'Ti aspettano delle ricompense. Visita il Custode del Caveau a Eastbrook per aprirle e ritirarle.',
   'hudChrome.weeklyRewards.readyTitle': 'Le tue ricompense settimanali sono pronte',
   'hudChrome.weeklyRewards.readyWeeks':
     'Settimane non ritirate: {count}. Ritira prima la settimana completata più vecchia.',

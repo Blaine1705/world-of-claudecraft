@@ -1239,6 +1239,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.rare': 'Vzácné',
   'hudChrome.weeklyRewards.readyDescription':
     'Čeká dokončený týden odměn. Otevři získané trezory a poté vyber jeden předmět, který si vyzvedneš.',
+  'hudChrome.weeklyRewards.previewClaimNotice':
+    'Čekají na vás odměny. Navštivte strážce trezoru v Eastbrooku, otevřete je a vyzvedněte si je.',
   'hudChrome.weeklyRewards.readyTitle': 'Tvé týdenní odměny jsou připravené',
   'hudChrome.weeklyRewards.readyWeeks':
     'Nevyzvednuté týdny: {count}. Nejdřív vyzvedni nejstarší dokončený týden.',

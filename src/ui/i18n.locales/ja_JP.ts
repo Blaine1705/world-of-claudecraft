@@ -1886,6 +1886,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '対象アイテムはすべて抽選済みです。公開済みの報酬を選んでください。',
   'hudChrome.weeklyRewards.worldPoolRule':
     'ノーマル難易度のNythraxis装備。レイドのクリアは不要です。',
+  'hudChrome.weeklyRewards.previewPoolRule':
+    'これらの宝物庫で抽選できるすべてのテーブルです。ボスを撃破すると、今後の宝物庫でその戦利品が恒久的に解放されます。ダンジョンのテーブルには撃破したボスの戦利品だけが含まれ、ヒロイックでの撃破はノーマルも解放します。すでに抽選されたアイテムは抽選から除外されます。必要レベルが自分のレベルより{maxLevelOffset}を超えて高い装備は表示されません。',
   'hudChrome.weeklyRewards.selectionPoolRule':
     'レイドとダンジョンの報酬は、開ける前にテーブルを1つ以上選んでください。ダンジョンのテーブルには、この難易度で撃破したボスの戦利品がまとめられています。重複アイテム、レジェンダリーアイテム、必要レベルが自分のレベルより{maxLevelOffset}を超えて高い装備は抽選から除外されます。',
   'questUi.worldQuest.puzzleRetry': 'もう一度',
@@ -21211,6 +21213,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.readyWeeks':
     '未受領の週：{count}。完了した最も古い週から受け取ってください。',
   'hudChrome.weeklyRewards.claimLastWeek': '先週の報酬を受け取る',
+  'hudChrome.weeklyRewards.previewClaimNotice':
+    '報酬が待っています。イーストブルックの宝物庫の番人を訪ね、宝物庫を開けて報酬を受け取ってください。',
   'hudChrome.weeklyRewards.readyTitle': '週間報酬の準備ができました',
   'hudChrome.weeklyRewards.readyDescription':
     '完了した週の報酬が待っています。獲得した宝物庫を開け、受け取る一品を選んでください。',

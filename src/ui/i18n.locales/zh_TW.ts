@@ -1804,6 +1804,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.noTables': '在此難度下已記錄的首領擊殺中，沒有符合條件的裝備。',
   'hudChrome.weeklyRewards.tablesExhausted': '所有符合條件的物品均已抽取。請選擇一件已揭曉的獎勵。',
   'hudChrome.weeklyRewards.worldPoolRule': '普通難度 Nythraxis 裝備。無需通關團隊副本。',
+  'hudChrome.weeklyRewards.previewPoolRule':
+    '這些寶庫可抽取的全部戰利品表。擊敗首領會永久解鎖其戰利品，供今後的寶庫抽取。地城戰利品表僅包含你擊敗的首領，英雄難度擊殺同時解鎖普通難度。抽取時排除已抽取過的物品。所需等級比你的等級高出超過 {maxLevelOffset} 級的裝備不予顯示。',
   'hudChrome.weeklyRewards.selectionPoolRule':
     '團隊副本和地城獎勵需在開啟前選擇一個或多個戰利品表。地城戰利品表彙整了你在此難度下擊敗的首領的戰利品。抽取時排除重複物品、傳說物品，以及所需等級比你的等級高出超過 {maxLevelOffset} 級的裝備。',
   'questUi.worldQuest.puzzleRetry': '重試',
@@ -20191,6 +20193,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.requiredTask.pvpMany': '贏得{count}場積分賽',
   'hudChrome.weeklyRewards.readyWeeks': '未領取的週次：{count}。請先領取最早完成的那一週。',
   'hudChrome.weeklyRewards.claimLastWeek': '領取上週的獎勵',
+  'hudChrome.weeklyRewards.previewClaimNotice':
+    '獎勵已就緒。請前往東溪的寶庫管理員處開啟寶庫並領取獎勵。',
   'hudChrome.weeklyRewards.readyTitle': '你的每週獎勵已就緒',
   'hudChrome.weeklyRewards.readyDescription':
     '有一週已完成的獎勵正在等待。打開你獲得的寶庫，然後選擇一件物品領取。',

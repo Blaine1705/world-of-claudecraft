@@ -1238,6 +1238,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.rare': 'Sällsynt',
   'hudChrome.weeklyRewards.readyDescription':
     'En slutförd vecka av belöningar väntar. Öppna dina intjänade valv, välj sedan ett föremål att hävda.',
+  'hudChrome.weeklyRewards.previewClaimNotice':
+    'Belöningar väntar. Besök Valvförvaltaren i Eastbrook för att öppna och hämta dem.',
   'hudChrome.weeklyRewards.readyTitle': 'Dina veckovisa belöningar är klara',
   'hudChrome.weeklyRewards.readyWeeks':
     'Oinsamlade veckor: {count}. Hävda den äldsta slutförda veckan först.',

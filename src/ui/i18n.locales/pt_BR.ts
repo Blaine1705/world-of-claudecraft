@@ -1276,6 +1276,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.rare': 'Raro',
   'hudChrome.weeklyRewards.readyDescription':
     'Uma semana completa de recompensas está esperando. Abra seus cofres conquistados e escolha um item para resgatar.',
+  'hudChrome.weeklyRewards.previewClaimNotice':
+    'Há recompensas esperando. Visite o Guardião do Cofre em Eastbrook para abri-las e resgatá-las.',
   'hudChrome.weeklyRewards.readyTitle': 'Suas recompensas semanais estão prontas',
   'hudChrome.weeklyRewards.readyWeeks':
     'Semanas não resgatadas: {count}. Resgate primeiro a semana concluída mais antiga.',

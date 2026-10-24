@@ -1362,6 +1362,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.rare': 'Selten',
   'hudChrome.weeklyRewards.readyDescription':
     'Eine abgeschlossene Woche voller Belohnungen wartet. Öffne deine verdienten Tresore und wähle dann einen Gegenstand zum Abholen.',
+  'hudChrome.weeklyRewards.previewClaimNotice':
+    'Belohnungen warten auf dich. Besuche den Tresorhüter in Eastbrook, um sie zu öffnen und abzuholen.',
   'hudChrome.weeklyRewards.readyTitle': 'Deine wöchentlichen Belohnungen sind bereit',
   'hudChrome.weeklyRewards.readyWeeks':
     'Nicht abgeholte Wochen: {count}. Hole zuerst die älteste abgeschlossene Woche ab.',

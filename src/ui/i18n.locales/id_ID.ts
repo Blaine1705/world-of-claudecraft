@@ -1255,6 +1255,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.rare': 'Langka',
   'hudChrome.weeklyRewards.readyDescription':
     'Sebuah minggu hadiah yang selesai sedang menunggu. Buka gudang yang Anda peroleh, lalu pilih satu item untuk diklaim.',
+  'hudChrome.weeklyRewards.previewClaimNotice':
+    'Hadiah menanti. Kunjungi Penjaga Lemari Besi di Eastbrook untuk membuka dan mengambilnya.',
   'hudChrome.weeklyRewards.readyTitle': 'Hadiah mingguan Anda siap',
   'hudChrome.weeklyRewards.readyWeeks':
     'Minggu yang tidak diklaim: {count}. Klaim minggu yang paling tua terlebih dahulu.',
