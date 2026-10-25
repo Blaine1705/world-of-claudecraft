@@ -8,7 +8,9 @@
 // lake) and the Hollow Crypt's (crypt_alert_view.ts on the same family: the
 // grave mark, the Frozen Embrace, the Bride's Lament, the Open Grave, the
 // Burning Knell's half, Grasp of the Grave, the Reap, the Toll and Harmony
-// readouts, the Rite's candles and the Bound Souls), plus the trash engine's
+// readouts, the Rite's candles and the Bound Souls) and the Smith's Heart's
+// Hammer Council's (council_alert_view.ts: the rock, the wake, the Weight,
+// Resonance), plus the trash engine's
 // use prompt (kit_use_prompt_view.ts on the same family: a Soul Brazier to kick
 // over, a Remembrance Candle to relight). It owns no DOM itself; it builds
 // each view from the frame's inputs and hands it to that prompt's painter. The
@@ -34,6 +36,7 @@
 import { BASTION_ALERT_KINDS, buildBastionAlertView } from './bastion_alert_view';
 import { type CageEscapeDeps, CageEscapePrompt } from './cage_escape_painter';
 import { buildCageEscapeView } from './cage_escape_view';
+import { buildCouncilAlertView, COUNCIL_ALERT_KINDS } from './council_alert_view';
 import { CryptAlertSceneScan, type CryptSceneEntity } from './crypt_alert_scene_core';
 import {
   buildCryptAlertView,
@@ -113,6 +116,7 @@ export class DungeonPrompts {
   private readonly sanctum: EncounterAlert;
   private readonly sanctumScene = new SanctumAlertSceneScan();
   private readonly crypt: EncounterAlert;
+  private readonly council: EncounterAlert;
   private readonly cryptScene = new CryptAlertSceneScan();
   private readonly kitUse: EncounterAlert;
   private readonly kitUseScene = new KitUseSceneScan();
@@ -129,6 +133,7 @@ export class DungeonPrompts {
     wildheart: false,
     sanctum: false,
     crypt: false,
+    council: false,
     cryptSoft: false,
   };
 
@@ -154,6 +159,11 @@ export class DungeonPrompts {
       id: 'crypt-alert',
       className: 'ui-panel-strong encounter-alert crypt-alert',
       kinds: CRYPT_ALERT_KINDS,
+    });
+    this.council = new EncounterAlert(deps, {
+      id: 'heart-council-alert',
+      className: 'ui-panel-strong encounter-alert heart-council-alert',
+      kinds: COUNCIL_ALERT_KINDS,
     });
     // A press on the use prompt is the interact key's own 'use' arm: target
     // the body it names, then the ordinary interact.
@@ -228,6 +238,10 @@ export class DungeonPrompts {
         })
       : HINT_HIDDEN;
     const cryptSoft = crypt.visible && CRYPT_SOFT_ALERT_KINDS.has(crypt.kind);
+    const council = dungeonPromptEnabled('council', hints)
+      ? buildCouncilAlertView({ auras: p.auras })
+      : HINT_HIDDEN;
+    this.council.paint(council);
     // The use prompt last: it yields the shared slot to any prompt showing
     // above (a soft Crypt readout yields to it instead).
     const slot = this.slot;
@@ -237,6 +251,7 @@ export class DungeonPrompts {
     slot.wildheart = wildheart.visible;
     slot.sanctum = sanctum.visible;
     slot.crypt = crypt.visible;
+    slot.council = council.visible;
     slot.cryptSoft = cryptSoft;
     const use = usePromptYields(slot)
       ? null
@@ -260,6 +275,7 @@ export class DungeonPrompts {
     this.wildheart.dispose();
     this.sanctum.dispose();
     this.crypt.dispose();
+    this.council.dispose();
     this.kitUse.dispose();
   }
 }

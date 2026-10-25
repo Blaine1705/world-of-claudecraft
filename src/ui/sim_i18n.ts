@@ -1535,6 +1535,18 @@ const baseEnTable = {
   'mechanic.heartHammerfall': 'Hammerfall',
   'mechanic.heartTemperingStrike': 'Tempering Strike',
   'mechanic.heartForgeFist': 'Forge Fist',
+  // The Hammer Council (encounters/smith_heart/council_ids.ts COUNCIL_NAMES):
+  // its damage and aura names. EXACT through the mechanic reverse map
+  // (Falling Rock shares the Buried Hoard's key).
+  'mechanic.heartHammersWeight': "Hammer's Weight",
+  'mechanic.heartWakeTheStone': 'Wake the Stone',
+  'mechanic.heartRockfallTremor': 'Rockfall Tremor',
+  'mechanic.heartSeamBolt': 'Seam Bolt',
+  'mechanic.heartSongOfTheSeam': 'Song of the Seam',
+  'mechanic.heartCrumbledStone': 'Crumbled Stone',
+  'mechanic.heartRestlessStone': 'Restless Stone',
+  'aura.heartResonance': 'Resonance',
+  'aura.heartMemoryOfStone': 'Memory of Stone',
   'log.sanctumTuskerSpill':
     'The sledge tips over! Burning soul braziers spill across the Sledge Road.',
   // The rune wall's lore line (encounters/gravewyrm_sanctum/rune_wall.ts
@@ -18236,6 +18248,16 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Hammerfall': 'mechanic.heartHammerfall',
   'Tempering Strike': 'mechanic.heartTemperingStrike',
   'Forge Fist': 'mechanic.heartForgeFist',
+  // The Hammer Council (encounters/smith_heart/council_ids.ts COUNCIL_NAMES).
+  "Hammer's Weight": 'mechanic.heartHammersWeight',
+  'Wake the Stone': 'mechanic.heartWakeTheStone',
+  'Rockfall Tremor': 'mechanic.heartRockfallTremor',
+  'Seam Bolt': 'mechanic.heartSeamBolt',
+  'Song of the Seam': 'mechanic.heartSongOfTheSeam',
+  'Crumbled Stone': 'mechanic.heartCrumbledStone',
+  'Restless Stone': 'mechanic.heartRestlessStone',
+  Resonance: 'aura.heartResonance',
+  'Memory of Stone': 'aura.heartMemoryOfStone',
   'Creeping Rime': 'aura.sanctumCreepingRime',
   'Iced Over': 'aura.sanctumIcedOver',
   'Ice Slab': 'mechanic.sanctumIceSlab',

@@ -43,13 +43,14 @@ const ALL_IDS: DungeonPromptId[] = [
   'wildheart',
   'sanctum',
   'crypt',
+  'council',
   'kitUse',
 ];
 
 // ---- the pure policy --------------------------------------------------------------
 
 describe('dungeon prompt policy: what the hints setting governs', () => {
-  it('classifies every prompt, the four encounter alerts advisory and no other', () => {
+  it('classifies every prompt, the five encounter alerts advisory and no other', () => {
     // Literal, so reclassifying a prompt is a deliberate edit here too.
     expect(DUNGEON_PROMPT_ADVISORY).toEqual({
       cage: false,
@@ -58,6 +59,7 @@ describe('dungeon prompt policy: what the hints setting governs', () => {
       wildheart: true,
       sanctum: true,
       crypt: true,
+      council: true,
       kitUse: false,
     });
     expect(Object.keys(DUNGEON_PROMPT_ADVISORY).sort()).toEqual([...ALL_IDS].sort());
@@ -72,6 +74,7 @@ describe('dungeon prompt policy: what the hints setting governs', () => {
     expect(dungeonPromptEnabled('wildheart', false)).toBe(false);
     expect(dungeonPromptEnabled('sanctum', false)).toBe(false);
     expect(dungeonPromptEnabled('crypt', false)).toBe(false);
+    expect(dungeonPromptEnabled('council', false)).toBe(false);
     // The prompts a player presses or steers by are never governed by it.
     expect(dungeonPromptEnabled('cage', false)).toBe(true);
     expect(dungeonPromptEnabled('chain', false)).toBe(true);
@@ -87,6 +90,7 @@ describe('dungeon prompt policy: the shared slot', () => {
     wildheart: false,
     sanctum: false,
     crypt: false,
+    council: false,
     cryptSoft: false,
   };
 
@@ -95,7 +99,15 @@ describe('dungeon prompt policy: the shared slot', () => {
   });
 
   it('any prompt showing above holds the slot', () => {
-    for (const id of ['cage', 'chain', 'bastion', 'wildheart', 'sanctum', 'crypt'] as const) {
+    for (const id of [
+      'cage',
+      'chain',
+      'bastion',
+      'wildheart',
+      'sanctum',
+      'crypt',
+      'council',
+    ] as const) {
       expect(usePromptYields({ ...none, [id]: true }), id).toBe(true);
     }
   });

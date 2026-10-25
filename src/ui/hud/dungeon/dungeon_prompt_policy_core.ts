@@ -5,8 +5,8 @@
 // 1. The player's "Dungeon mechanic hints" setting (settings.showDungeonHints).
 //    It governs the ADVISORY prompts only: the encounter alerts whose panel is
 //    text explaining a mechanic (the Sunken Bastion's crown alert, the
-//    Wildheart Basin's, the Gravewyrm Sanctum's and the Hollow Crypt's, soft
-//    readouts included). None of them takes a press. The ACTION prompts are
+//    Wildheart Basin's, the Gravewyrm Sanctum's, the Hollow Crypt's (soft
+//    readouts included) and the Smith's Heart's Hammer Council's). None of them takes a press. The ACTION prompts are
 //    never governed by it: the Iron Cage escape (the panel IS the escape
 //    button), Gaoler Ossick's chain alert (a live gauge the player steers by:
 //    the links left on the anchor and the shackle's reach used, with the
@@ -30,6 +30,7 @@ export type DungeonPromptId =
   | 'wildheart'
   | 'sanctum'
   | 'crypt'
+  | 'council'
   | 'kitUse';
 
 /** Whether a prompt is ADVISORY (the hints setting governs it). A Record over
@@ -41,6 +42,7 @@ export const DUNGEON_PROMPT_ADVISORY: Readonly<Record<DungeonPromptId, boolean>>
   wildheart: true,
   sanctum: true,
   crypt: true,
+  council: true,
   kitUse: false,
 };
 
@@ -59,6 +61,8 @@ export interface DungeonPromptSlotState {
   wildheart: boolean;
   sanctum: boolean;
   crypt: boolean;
+  /** The Smith's Heart's Hammer Council alert. */
+  council: boolean;
   /** The showing Crypt alert is a SOFT readout (ignored while crypt is false). */
   cryptSoft: boolean;
 }
@@ -66,5 +70,13 @@ export interface DungeonPromptSlotState {
 /** Whether a prompt above the use prompt holds the shared slot (the use prompt
  *  is then not built). A soft Crypt readout does not hold it. */
 export function usePromptYields(s: DungeonPromptSlotState): boolean {
-  return s.cage || s.chain || s.bastion || s.wildheart || s.sanctum || (s.crypt && !s.cryptSoft);
+  return (
+    s.cage ||
+    s.chain ||
+    s.bastion ||
+    s.wildheart ||
+    s.sanctum ||
+    s.council ||
+    (s.crypt && !s.cryptSoft)
+  );
 }

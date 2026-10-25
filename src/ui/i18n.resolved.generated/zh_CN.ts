@@ -4229,6 +4229,12 @@ export const zh_CN: EnTranslations = {
         "creepingRime": "移动速度降低{pct}%，每层{per}%。每次霜凇吐息都会叠加一层并将持续时间重置为{seconds}秒。叠到{max}层时你会被冻结（冰封）{freeze}秒，并清除所有层数。",
         "icedOver": "被蔓延霜凇冻结：无法移动或行动。"
       },
+      "council": {
+        "wakeMark": "When this ends, a pillar bursts out of the floor where you stand, dealing {min} to {max} damage to everyone within {radius} yd and throwing them back. Stand where the raid needs cover. Heroic: {heroic}% more damage.",
+        "rockMark": "When this ends, a rock falls on you: {total} damage shared between everyone within {radius} yd. With fewer than {soakers} under it, each takes {penalty}% more and the whole raid takes {tremorMin} to {tremorMax}. Every pillar within {radius} yd loses a piece, so share it away from cover. Heroic: {heroic}% more damage.",
+        "resonance": "Standing within {reach} yd of a pillar for {seconds} sec in a row knocks a piece off it, and again every {seconds} sec you stay. Nothing removes it: wait out the Wrath by the most damaged pillar and keep off the whole ones.",
+        "memory": "Deals {pct}% more damage: {per}% for each fallen member of the Hammer Council."
+      },
       "sharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。",
       "varkhulSharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。每缺少一名玩家，还会对整个团队（包括圈内玩家）造成最大生命值 {missingPenalty}% 的伤害。",
       "makersBrand": "持续 {duration} 秒，每层使你受到瓦尔库尔的伤害提高 {pct}%。最多叠加 {max} 层。坦克应在 {swap} 层时换坦。",
@@ -6655,6 +6661,33 @@ export const zh_CN: EnTranslations = {
       "bondTitle": "兽群羁绊",
       "bondLine": "在一起时它们伤害减半：把它们拉开",
       "timeAria": "剩余{seconds}秒"
+    },
+    "council": {
+      "warn": {
+        "wrath": "Mountain's Wrath! Hide behind a pillar!",
+        "enrage": "The mountain's anger quickens! Mountain's Wrath comes much sooner now.",
+        "weight": "Hammer's Weight on {player}: swap tanks!",
+        "wake": "Wake the Stone: pillars rise under {players}! Stand where the cover should go.",
+        "wakeHeir": "The stone wakes under {players}: move!",
+        "rock": "Falling Rock on {player}! Share the blow, away from your cover!",
+        "song": "Song of the Seam! Interrupt it!",
+        "resonance": "Resonance on {players}: crack the weakest pillar, keep off the whole ones!",
+        "fell_guardian": "The Guardian of the Hammer falls. Its wrath passes into the stone that remains!",
+        "fell_slabwright": "The Slabwright falls. Now the stone rises where it will!",
+        "fell_singer": "The Seam Singer falls. Its song passes on, and no one can stop it now!"
+      },
+      "alert": {
+        "wakeTitle": "Wake the Stone!",
+        "wakeLine": "A pillar rises where you stand: put the cover where the raid needs it",
+        "rockTitle": "Falling Rock!",
+        "rockLine": "Gather at least three allies on you, away from the pillars",
+        "resonanceTitle": "Resonance",
+        "resonanceLine": "Near a pillar you crack it: wait by the most damaged one",
+        "resonanceCracking": "Cracking a pillar: move away to spare it",
+        "weightTitle": "Hammer's Weight",
+        "weightLine": "You take double physical damage: the other tank must take the Guardian",
+        "timeAria": "{seconds} seconds left"
+      }
     },
     "sanctumAlert": {
       "quenchTitle": "身陷淬火之水！",
@@ -15131,6 +15164,12 @@ export const zh_CN: EnTranslations = {
       "heart_gale_bolt": "Gale Bolt",
       "heart_rime_bolt": "Rime Bolt",
       "heart_ember_bolt": "Ember Bolt",
+      "heart_hammers_weight": "Hammer's Weight",
+      "heart_wake_the_stone": "Wake the Stone",
+      "heart_falling_rock": "Falling Rock",
+      "heart_seam_bolt": "Seam Bolt",
+      "heart_song_of_the_seam": "Song of the Seam",
+      "heart_song_of_the_seam_unbroken": "Song of the Seam",
       "kituse_sanctum_topple_brazier": "推倒火盆",
       "trash_demo_nova": "Test Nova",
       "trash_demo_nova_unstoppable": "Test Nova",
@@ -24975,6 +25014,12 @@ export const zh_CN: EnTranslations = {
       },
       "heart_hammer_guardian": {
         "name": "Guardian of the Hammer"
+      },
+      "heart_slabwright": {
+        "name": "The Slabwright"
+      },
+      "heart_seam_singer": {
+        "name": "The Seam Singer"
       },
       "heart_breath_guardian": {
         "name": "Guardian of the Breath"

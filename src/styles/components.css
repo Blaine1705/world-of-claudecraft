@@ -16684,6 +16684,7 @@
   #wildheart-alert,
   #sanctum-alert,
   #crypt-alert,
+  #heart-council-alert,
   #kit-use-prompt {
     bottom: calc(260px + var(--castbar-h) + 14px);
   }
@@ -16693,6 +16694,7 @@
   body.show-actionbar3 #wildheart-alert,
   body.show-actionbar3 #sanctum-alert,
   body.show-actionbar3 #crypt-alert,
+  body.show-actionbar3 #heart-council-alert,
   body.show-actionbar3 #kit-use-prompt {
     bottom: calc(312px + var(--castbar-h) + 14px);
   }
@@ -16702,6 +16704,7 @@
   body.mobile-touch #wildheart-alert,
   body.mobile-touch #sanctum-alert,
   body.mobile-touch #crypt-alert,
+  body.mobile-touch #heart-council-alert,
   body.mobile-touch #kit-use-prompt {
     bottom: 56%;
   }
@@ -17020,6 +17023,82 @@
     }
   }
   body.mobile-touch #wildheart-alert {
+    min-width: min(420px, calc(100vw - 32px));
+  }
+
+  /* ---------- The Smith's Heart's Hammer Council alert (the rock, the wake, the Weight, Resonance) ---------- */
+  /* Self-mounted by the shared encounter alert painter
+     (encounter_alert_painter.ts) under its own id, from src/ui/hud/dungeon/council_alert_view.ts.
+     It never takes the pointer. The state is carried by the text too: the
+     rock to share throbs in the soak gold, the wake sits in the vein's ochre,
+     the Weight in the hostile tone, a climbing crack in the hostile tone. */
+  #heart-council-alert {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    z-index: 30;
+    min-width: 340px;
+    max-width: calc(100vw - 32px);
+    padding: 10px 18px 12px;
+    pointer-events: none;
+    user-select: none;
+    text-align: center;
+    font: inherit;
+    color: var(--color-text-light);
+    border: 2px solid var(--color-gold);
+  }
+  #heart-council-alert .fa-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #heart-council-alert .fa-line {
+    font-size: 14px;
+  }
+  #heart-council-alert .fa-hint {
+    display: none;
+  }
+  #heart-council-alert .fa-bar {
+    --bar-h: 12px;
+    --bar-color: var(--color-gold);
+    width: 100%;
+  }
+  #heart-council-alert .fa-fill {
+    width: 0;
+    transition: width 80ms linear;
+  }
+  #heart-council-alert.is-rock {
+    animation: bce-throb 0.9s ease-in-out infinite alternate;
+  }
+  #heart-council-alert.is-weight,
+  #heart-council-alert.is-cracking {
+    border-color: var(--color-hostile);
+  }
+  #heart-council-alert.is-weight .fa-title,
+  #heart-council-alert.is-cracking .fa-title,
+  #heart-council-alert.is-weight .fa-fill,
+  #heart-council-alert.is-cracking .fa-fill {
+    color: var(--color-hostile);
+    --bar-color: var(--color-hostile);
+  }
+  #heart-council-alert.is-resonance {
+    border-color: var(--color-energy);
+  }
+  #heart-council-alert.is-resonance .fa-title,
+  #heart-council-alert.is-resonance .fa-fill {
+    color: var(--color-energy);
+    --bar-color: var(--color-energy);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #heart-council-alert {
+      animation: none;
+    }
+  }
+  body.mobile-touch #heart-council-alert {
     min-width: min(420px, calc(100vw - 32px));
   }
 

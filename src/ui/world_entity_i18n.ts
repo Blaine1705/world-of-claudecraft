@@ -413,6 +413,9 @@ const MOB_IDS = [
   'heart_heat_warder',
   'heart_heat_caller',
   'heart_hammer_guardian',
+  // The Hammer Council's other two (encounters/smith_heart/council.ts).
+  'heart_slabwright',
+  'heart_seam_singer',
   'heart_breath_guardian',
   'heart_quench_guardian',
   'heart_heat_guardian',

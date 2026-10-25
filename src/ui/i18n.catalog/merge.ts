@@ -770,6 +770,14 @@ const mergeStringsEn = {
       heart_gale_bolt: 'Gale Bolt',
       heart_rime_bolt: 'Rime Bolt',
       heart_ember_bolt: 'Ember Bolt',
+      // The Hammer Council (encounters/smith_heart/council_ids.ts COUNCIL_CASTS).
+      // Seam Bolt and Song of the Seam can be kicked; an heir's song cannot.
+      heart_hammers_weight: "Hammer's Weight",
+      heart_wake_the_stone: 'Wake the Stone',
+      heart_falling_rock: 'Falling Rock',
+      heart_seam_bolt: 'Seam Bolt',
+      heart_song_of_the_seam: 'Song of the Seam',
+      heart_song_of_the_seam_unbroken: 'Song of the Seam',
       // The player's own bar while kicking a Soul Brazier over (the trash
       // engine's G3 use, trash_kit/encounter_use.ts).
       kituse_sanctum_topple_brazier: 'Topple Brazier',

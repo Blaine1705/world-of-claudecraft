@@ -207,6 +207,13 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.heart_gale_bolt': true,
   'abilityUi.cast.heart_rime_bolt': true,
   'abilityUi.cast.heart_ember_bolt': true,
+  // The Hammer Council (encounters/smith_heart/council_ids.ts COUNCIL_CASTS).
+  'abilityUi.cast.heart_hammers_weight': true,
+  'abilityUi.cast.heart_wake_the_stone': true,
+  'abilityUi.cast.heart_falling_rock': true,
+  'abilityUi.cast.heart_seam_bolt': true,
+  'abilityUi.cast.heart_song_of_the_seam': true,
+  'abilityUi.cast.heart_song_of_the_seam_unbroken': true,
   // The Wildheart Basin's three bosses.
   'abilityUi.cast.wildheart_beast_pit_quake': true,
   'abilityUi.cast.wildheart_jaguar_heel': true,

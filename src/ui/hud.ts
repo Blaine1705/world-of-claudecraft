@@ -210,7 +210,7 @@ import {
   resolvePlayerSocialFlags,
   serializeIgnoreList,
 } from './chat_ignore_core';
-import { CHAT_TEMPLATE_KEYS, localizeChatBody } from './chat_templates';
+import { CHAT_TEMPLATE_KEYS, localizeChatBody, raidWarningSpeaker } from './chat_templates';
 import { wireChromeFocus } from './chrome_focus_wiring';
 import { ClaudiumLauncherBalance } from './claudium_launcher_balance_core';
 import { createClaudiumPurchaseFacet } from './claudium_purchase_bridge';
@@ -12308,7 +12308,7 @@ export class Hud {
               {
                 const text = localizeChatBody(ev);
                 this.chatLogFrom(
-                  ev.from,
+                  raidWarningSpeaker(ev, bubbleSpeaker),
                   text,
                   CHAT_TEMPLATE_KEYS.raidWarning,
                   'raidWarning',

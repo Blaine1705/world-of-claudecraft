@@ -5446,6 +5446,16 @@ export const hudChromeStrings = {
         'Reduces movement speed by {pct}%, {per}% for each stack. Each Rime Breath adds a stack and resets the duration to {seconds} sec. Reaching {max} stacks freezes you solid (Iced Over) for {freeze} sec and clears them.',
       icedOver: 'Frozen solid by Creeping Rime: unable to move or act.',
     },
+    // The Smith's Heart's Hammer Council (src/ui/council_aura_effect.ts).
+    council: {
+      wakeMark:
+        'When this ends, a pillar bursts out of the floor where you stand, dealing {min} to {max} damage to everyone within {radius} yd and throwing them back. Stand where the raid needs cover. Heroic: {heroic}% more damage.',
+      rockMark:
+        'When this ends, a rock falls on you: {total} damage shared between everyone within {radius} yd. With fewer than {soakers} under it, each takes {penalty}% more and the whole raid takes {tremorMin} to {tremorMax}. Every pillar within {radius} yd loses a piece, so share it away from cover. Heroic: {heroic}% more damage.',
+      resonance:
+        'Standing within {reach} yd of a pillar for {seconds} sec in a row knocks a piece off it, and again every {seconds} sec you stay. Nothing removes it: wait out the Wrath by the most damaged pillar and keep off the whole ones.',
+      memory: 'Deals {pct}% more damage: {per}% for each fallen member of the Hammer Council.',
+    },
     sharedPyre:
       "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
     varkhulSharedPyre:
@@ -9570,6 +9580,37 @@ export const hudChromeStrings = {
     bondLine:
       'Separate the Beastmaster and jaguar to remove their damage reduction and damage bonus',
     timeAria: '{seconds} seconds left',
+  },
+  // The Smith's Heart's Hammer Council (encounters/smith_heart/council*.ts):
+  // the raid warnings its members call (chat textKey, the banner and the log)
+  // and the personal alert (src/ui/hud/dungeon/council_alert_view.ts).
+  council: {
+    warn: {
+      wrath: "Mountain's Wrath! Hide behind a pillar!",
+      enrage: "The mountain's anger quickens! Mountain's Wrath comes much sooner now.",
+      weight: "Hammer's Weight on {player}: swap tanks!",
+      wake: 'Wake the Stone: pillars rise under {players}! Stand where the cover should go.',
+      wakeHeir: 'The stone wakes under {players}: move!',
+      rock: 'Falling Rock on {player}! Share the blow, away from your cover!',
+      song: 'Song of the Seam! Interrupt it!',
+      resonance: 'Resonance on {players}: crack the weakest pillar, keep off the whole ones!',
+      fell_guardian:
+        'The Guardian of the Hammer falls. Its wrath passes into the stone that remains!',
+      fell_slabwright: 'The Slabwright falls. Now the stone rises where it will!',
+      fell_singer: 'The Seam Singer falls. Its song passes on, and no one can stop it now!',
+    },
+    alert: {
+      wakeTitle: 'Wake the Stone!',
+      wakeLine: 'A pillar rises where you stand: put the cover where the raid needs it',
+      rockTitle: 'Falling Rock!',
+      rockLine: 'Gather at least three allies on you, away from the pillars',
+      resonanceTitle: 'Resonance',
+      resonanceLine: 'Near a pillar you crack it: wait by the most damaged one',
+      resonanceCracking: 'Cracking a pillar: move away to spare it',
+      weightTitle: "Hammer's Weight",
+      weightLine: 'You take double physical damage: the other tank must take the Guardian',
+      timeAria: '{seconds} seconds left',
+    },
   },
   // The Gravewyrm Sanctum's encounter alert (src/ui/hud/dungeon/sanctum_alert_view.ts).
   // Wordy (M16): non-Latin fills in the overlays.
