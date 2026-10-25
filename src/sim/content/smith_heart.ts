@@ -290,8 +290,9 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
       },
     },
   },
-  // The Heat: a faceless smith of embers, a red-hot anvil chained to its arm.
-  // Molten Pour paints a lane; Anvil Clang stuns everyone close.
+  // The Heat: the Hearth's guardian (phase 2I: the vein is the Hearth, never a
+  // forge; the cast's id keeps its old name, its player-facing name is new).
+  // Molten Pour paints a lane; Searing Knell stuns everyone close.
   heart_heat_guardian: {
     ...boss('heart_heat_guardian', 'Guardian of the Heat', 30000, 0xffe6a0, 3),
     trashKit: {
@@ -309,7 +310,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
       },
       screech: {
         castId: C.heatClang,
-        name: 'Anvil Clang',
+        name: 'Searing Knell',
         castTime: 2.5,
         every: 20,
         first: 12,
@@ -502,7 +503,7 @@ export const SMITH_HEART_GATES: DungeonGateDef[] = [
   },
   {
     id: 'anvil_mouth',
-    name: 'Anvil Mouth',
+    name: 'Hearth Mouth',
     kind: 'forge_seal',
     x: -169,
     z: 0,

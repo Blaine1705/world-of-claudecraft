@@ -15125,7 +15125,7 @@ export const en_XA: EnTranslations = {
       "heart_storm_lance": "[Šţóŕɱ Ļáñçé]",
       "heart_quenching_breath": "[Ɋúéñçĥíñĝ Ɓŕéáţĥ]",
       "heart_molten_pour": "[Ɱóļţéñ Þóúŕ]",
-      "heart_anvil_clang": "[Áñʋíļ Çļáñĝ]",
+      "heart_anvil_clang": "[Šéáŕíñĝ Ķñéļļ]",
       "heart_forge_wrath": "[Ƒóŕĝé Ŵŕáţĥ]",
       "heart_forge_pour": "[Ƒóŕĝé Þóúŕ]",
       "heart_gale_bolt": "[Ĝáļé Ɓóļţ]",

@@ -15125,7 +15125,7 @@ export const en: EnTranslations = {
       "heart_storm_lance": "Storm Lance",
       "heart_quenching_breath": "Quenching Breath",
       "heart_molten_pour": "Molten Pour",
-      "heart_anvil_clang": "Anvil Clang",
+      "heart_anvil_clang": "Searing Knell",
       "heart_forge_wrath": "Forge Wrath",
       "heart_forge_pour": "Forge Pour",
       "heart_gale_bolt": "Gale Bolt",
