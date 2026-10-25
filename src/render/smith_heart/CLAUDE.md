@@ -1,7 +1,7 @@
 <!-- src/render/smith_heart/: the Smith's Heart raid's open-air renderer (phase 2A:
      the structure; phase 2B: the Hammer vein's Blender kit, air and light; phase 2C:
      its polish round; phase 2D: its last weak points; phase 2E: the mountain's rock
-     kit and the Gallery's walk; phase 2F: the Ring's kit, the seal and the portal). Presentation only (parent dirs cover the IWorld seam,
+     kit and the Gallery's walk; phase 2F: the Ring's kit, the seal and the portal; phase 2G: the Breath vein's kit, light, sky and weather). Presentation only (parent dirs cover the IWorld seam,
      determinism and the GPU scheduler contract). Don't repeat root / src / render
      CLAUDE.md. -->
 
@@ -36,6 +36,8 @@ bodies live in ONE list, `../characters/smith_heart_placeholder_looks.ts`.
 | `heart_rock_plan_core.ts` / `heart_rock.ts` | PURE plan and painter of the mountain's rock kit (`public/models/props/smith_heart_rock_kit.glb`, from `docs/design/raid/kit/build_smith_heart_rock_kit.py`): the sculpted faces laid in bands along contours of the clearance over the whole main map and the Heart (`planHeartRock`: fronts on their contour, feet sunk, crests reaching the next band, far builds high up), the lips hanging under every walk's brink (`planHeartLips`); one lit material, wide culling cells, no shadow, upper bands shed on the low tier. The loose crags stand in until the kit lands. |
 | `heart_rock_cutaway.ts` | The rock's material discards its fragments near the camera (a camera zoomed out past an arena's rim stands in the mountain), and keeps a shade floor of its own colour (`HEART_ROCK_SHADE_FLOOR`, phase 2F). |
 | `ring_kit_plan_core.ts` / `ring_kit.ts` | PURE plan and painter of the Ring's kit (phase 2F: `public/models/props/smith_heart_ring_kit.glb`, from `docs/design/raid/kit/build_smith_heart_ring_kit.py`): the Ring's paving, curb, foot and channels, both stairs tread by tread with their chutes, every stair's stringers and parapets, the dais, the standing stones, the cairns, the mouths' jambs and sills; the field tops it draws in their place (`RING_KIT_OMIT_TOPS`), the fascias' depth the lips start under, the spires' spots and veins. |
+| `breath_kit_plan_core.ts` / `breath_kit.ts` | PURE plan and painter of the Breath's kit (phase 2G: `public/models/props/smith_heart_breath_kit.glb`, from `docs/design/raid/kit/build_smith_heart_breath_kit.py`): the Cornice's rods (a strike scar at each foot), wind-horns (bells to the rim) and channel cheek stones, the bridge's shelters and the landings' standing stones on the layout's colliders, the Wind Bridge's arch (the field then keeps a shallow keel under it, `BREATH_KIT_SHALLOW`, and no mountain lip hangs there), the low walls walked along every Breath lip over the void (`planBreathWalls`, past the lip, never over a walk), the grooves and cracks flat on the floors. |
+| `breath_air_core.ts` / `breath_air.ts` | PURE plan and painter of the Breath's air and weather (phase 2G): the gale's streaks and grit over every Breath walk, cloud banks under the Cornice's rim and in the bridge's chasm, the bridge's gusts (`breathGustAt`: a band down the ramp and a curtain on its front, the streaks surging), the strikes on the rods in turn (`breathStrikeAt`: a bolt from the cloud, the crown's flash). Shader driven on the shared clock; cosmetic; the low tier a third of the particles (the gusts and strikes stay). |
 | `hammer_walk_plan_core.ts` | PURE: the Gallery's worn kerb and chain rail along its lips over the chasm (the rail never over a walk); the paving is its `paving` ground, the fallen blocks layout props. |
 | `hammer_air_core.ts` / `hammer_air.ts` | PURE plan and painter of the Hammer vein's air: the Cleft's fan of sun shafts with their dust, warm pools and the crystals' halos (the raid's first image), dust motes in the low sun, grit off the terrace lips and the colossi, the collapse spot's heavy trickles, the pit's grey haze, the geodes' halos. Shader-driven quads, cosmetic, a third on the low tier. |
 | `heart_cliff_paint_core.ts` | PURE: the field's cliff faces' vertex paint, the Hammer vein's in its cool quarry granite (never near-black), the shared tint elsewhere; the vein's share at a point (`hammerRockLift`), its granite beds (`hammerRockBed`) and its risers' shade (`hammerRiserShade`) for the mountain and the crags. |
@@ -45,10 +47,10 @@ bodies live in ONE list, `../characters/smith_heart_placeholder_looks.ts`.
 | `heart_portal_core.ts` / `heart_portal.ts` | The opening (`heartPortalStage`: charge, flash, split, ring, swirl), the living portal (vortex, funnel, motes, tine arcs), the return portal, the hop (`heartHopLanding`, `heartHopStage`, the wash) and the area blend. |
 | `heart_fx_materials.ts` | The texture-free VFX shaders (beam, floor ring, vortex, funnel, motes, core, the crystal of the seal and the spires, the rivers' surge). Fresh per call: their uniforms are the slot's state. |
 | `heart_room_core.ts` / `heart_room.ts` | The Heart: the core and its shafts, the four chains (one instanced draw) and their pours, the rune rings, the embers; the keels under every floating island. |
-| `heart_environment.ts` | PURE: the Heart's fog and light state (`smithHeartCore`), the Hammer vein's (`smithHeartHammer`: a warm quarry dusk, the key low from the south-west) and the Ring's (`smithHeartRing`, phase 2F: the same sun over a neutral grey fill), read by `../fog_scene_state.ts` and `../interior_light_rig.ts`. |
+| `heart_environment.ts` | PURE: the Heart's fog and light state (`smithHeartCore`), the Hammer vein's (`smithHeartHammer`: a warm quarry dusk, the key low from the south-west), the Ring's (`smithHeartRing`, phase 2F: the same sun over a neutral grey fill) and the Breath's (`smithHeartBreath`, phase 2G: a cold teal-white key high in the north-west over a neutral grey fill, winning north of the Ring's mouth, `inBreathLight`), read by `../fog_scene_state.ts` and `../interior_light_rig.ts`. |
 | `heart_gates_core.ts` / `heart_gates.ts` | The gate looks on the shared gate memory: `stone_slab` splits and sinks (the kit's carved halves once the Hammer kit has landed); `forge_seal` is a LOW barrier (at most about 3 yd, `HEART_SEAL_BARRIER`). |
 | `heart_sightline_core.ts` | PURE: every crag, prop part (scale included) and gate part as a plain volume, and `heartSightlineHits` to trace a sightline through them. |
-| `heart_sky.ts` | The dome: the storm over the main map, the ember night over the Heart (`setCore`); its `onBeforeRender` is the slot's frame driver and hands it the camera. |
+| `heart_sky.ts` | The dome: the storm over the main map, the Breath's summit storm (`setBreath`, phase 2G: a rolling deck, a rift of light, lightning in the cloud and distant bolts), the ember night over the Heart (`setCore`); its `onBeforeRender` is the slot's frame driver and hands it the camera. |
 
 Rules:
 - Render reads the world, never mutates it: the seal's and the portal's state arrive
@@ -62,8 +64,13 @@ Rules:
   static preset), and the mountain's grid coarsens (the same mountain).
 - No light but the budgeted point lights through the fire-light sink; the Heart's grade
   is its own fog state, the Hammer vein's too (`smithHeartHammer`: warm key, cool
-  slate-violet fill, a neutral dust; never a warm wash over everything), the rest of the
-  main map's is the borrowed `sunkenBastion` state.
+  slate-violet fill, a neutral dust; never a warm wash over everything), the Ring's and
+  the Breath's too (`smithHeartRing`, `smithHeartBreath`); the rest of the main map's (the
+  Quench, the Heat) is the borrowed `sunkenBastion` state.
+- The Breath's weather (its streaks, clouds, gusts and strikes, `breath_air.ts`) is
+  cosmetic: never a telegraph, never thicker than a streak over a walk, its clouds under
+  the Cornice's walk and past its rim. The Breath guardian's footprints are
+  `../smith_heart_fx/breath_fx.ts`'s, on every tier.
 - A point light falls off physically: one that must reach rock 15 to 25 yd away needs a
   strong source (the Cleft's door and fill), a lamp's pool a small one.
 - The Ring kit draws over the field: its paving a breath over the walk, its curbs and
@@ -94,4 +101,6 @@ light budget), `tests/smith_heart_areas.test.ts` (areas, score, the Heart's air)
 `tests/smith_heart_hammer_kit.test.ts` (the Hammer kit's GLB and its plan) and
 `tests/smith_heart_hammer_fx.test.ts` (the vein's air, the guardian's and the Slab's
 effects), `tests/smith_heart_rock_kit.test.ts` (the rock kit and its plan) and
-`tests/smith_heart_ring_kit.test.ts` (the Ring kit, its plan and the seal's moments). Evidence: `scripts/smith_heart_hammer_shot.mjs`.
+`tests/smith_heart_ring_kit.test.ts` (the Ring kit, its plan and the seal's moments),
+`tests/smith_heart_breath_kit.test.ts` (the scoured floor, the Breath kit and its plan) and
+`tests/smith_heart_breath_air.test.ts` (its air, weather and light). Evidence: `scripts/smith_heart_hammer_shot.mjs`.

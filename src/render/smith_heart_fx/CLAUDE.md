@@ -4,20 +4,25 @@
 
 # src/render/smith_heart_fx: the Smith's Heart's encounter effects
 
-The encounter half of the raid's look (`docs/design/raid/smith_heart.md`, sections 5.9
-and 7.1), hosted by `../rift_death_zone.ts` beside the dungeons' own fx. Everything is
+The encounter half of the raid's look (`docs/design/raid/smith_heart.md`, sections 5.9,
+5.14, 7.1 and 7.2), hosted by `../rift_death_zone.ts` beside the dungeons' own fx. Everything is
 read from IWorld (a guardian's cast bar, its events, the mirrored gate memory), so
 offline and online look the same. The interior's static dressing and air are
 `../smith_heart/`.
 
 | Module | Role |
 |---|---|
-| `index.ts` | Public surface: `HammerFx`. |
+| `index.ts` | Public surface: `HammerFx`, `BreathFx`, `SealShake`. |
 | `hammer_fx_core.ts` | PURE (`RENDER_PURE_CORES`): the Hammer guardian's numbers read off its sim template (never tuned here), the crack lines, Mountain's Wrath's charge and blast timelines (the dust wall rides the trash engine's `novaWave` front on the same clock), Hammerfall's heat, the Slab's break timeline and the once-per-change rule (`slabBreakDue`), the pool sizes. |
 | `seal_shake.ts` | `SealShake` (phase 2F): the seal's moments felt in the camera (the arrival's thud, the opening's tremor, jolt and aftershock), read from the slot's seal memory, scaled by distance, through the shake sink (reduced motion honoured). |
+| `breath_fx_core.ts` | PURE (`RENDER_PURE_CORES`, phase 2G): the Breath guardian's numbers read off its sim template (the gust's radius and shove, the lance's length and width, both bars), the gust's charge and wall timelines, the lance's bolt, scorch and charge looks, the bolt's path (always inside the lane's half width), the pool sizes. |
+| `breath_fx.ts` | `BreathFx` (phase 2G): Bellows Gust's and Storm Lance's footprints through the shared floor telegraph (`../floor_telegraph`, every tier: the ring at the gust's exact radius, the lane at the lance's exact length and width, filling with the bar), the gust's breath drawn in, its whirl of stones and funnel, its wall of wind riding out to the shove's end with grit and rings; the lance's crackle and sparks, its bolt from the cloud onto the guardian and down the lane, the scorch smouldering. |
 | `hammer_fx.ts` | `HammerFx`: Mountain's Wrath (molten cracks racing out over its bar, loose stones lifting, dust drawn in; on landing the dust wall, rubble, rings, flash, grit off the terraces, a shake), Hammerfall (a fan of cracks in its arc, rubble, dust), the Slab breaking (the split flaring, the burst both ways, dust, rings, grit off the lintel while the halves part) and the Pit Mouth slamming shut (a dust skirt). |
 
 Rules:
+- The Breath guardian's footprints are actionable and drawn by `BreathFx` itself through
+  the shared floor telegraph on EVERY tier (threat colour `danger`, the vein's teal as
+  the accent); the wind, the lightning and the debris over them are cosmetic and thin.
 - The readable telegraph of Mountain's Wrath is the trash engine's sight field
   (`../trash_engine_fx/engine_nova.ts`), drawn on every tier. Nothing here is
   actionable: the low tier and reduced motion thin the particles, the rubble and the
@@ -30,4 +35,5 @@ Rules:
 - A new raid guardian's effects join here as their own module behind `index.ts`, never
   as a branch in `hammer_fx.ts`.
 
-Tests: `tests/smith_heart_hammer_fx.test.ts` (the core and a smoke run over a fake world).
+Tests: `tests/smith_heart_hammer_fx.test.ts` and `tests/smith_heart_breath_fx.test.ts` (each
+core and a smoke run over a fake world).

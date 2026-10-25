@@ -149,7 +149,7 @@ rather than repeating numbers that would rot.
 Each room reads its theme by shape first (kit placeholders in
 `src/render/smith_heart/heart_plan_core.ts`): the Quarry's kneeling colossi, cut blocks,
 derrick, ochre geodes and the five columns (Mountain's Wrath's line-of-sight cover);
-the Cornice's lightning rods and broken bellows; the Basin's colossal half-sunk blades,
+the Cornice's lightning rods and stone wind-horns (phase 2G, section 5.14); the Basin's colossal half-sunk blades,
 heaped ice shelves, steaming vents and braziers; the Forge's great arched hearth, giant
 anvil (side-on to the door, horn north), bellows, crucibles and casting channels.
 
@@ -385,8 +385,9 @@ heart). The score follows it (`SMITH_HEART_AREA_MUSIC`: each vein and the Heart 
 an existing cue whose brief fits until the raid has its own score). The Heart has its
 own fog and light state, `smithHeartCore` (`heart_environment.ts`), and so does the
 Hammer vein, `smithHeartHammer` (phase 2B: a warm quarry dusk, the key low from the
-south-west raking the terraces, the realm's blue sky light all but off); the rest of the
-main map keeps the borrowed storm grade until the per-room phases.
+south-west raking the terraces, the realm's blue sky light all but off), the Ring
+(`smithHeartRing`, phase 2F) and the Breath (`smithHeartBreath`, phase 2G); the Quench
+and the Heat keep the borrowed storm grade until their phases.
 
 ### 5.9 The Hammer vein dressed (phase 2B)
 
@@ -576,6 +577,48 @@ tier, `heartShardCount`) and the shake (reduced motion).
 | The living portal | the vortex and the funnel in the four colours, a slower wider sleeve round them, the shards turning round the funnel for good over every head, the four spires burning, a thin beam to the sky marking it from the whole main map | `heart_portal.ts`, `heart_seal.ts` |
 | The hop | the arrival's column and ring, and the four colours whirling up round whoever arrives | `heart_portal.ts` |
 
+### 5.14 The Breath vein (phase 2G)
+
+The owner's ask: the Breath to the Hammer's level and above, primal and divine (living
+granite, crystal and storm; nothing metal, no machinery). Before it the vein walked the
+borrowed storm grade on slate, its props boxes and gold poles. Now it is one Blender kit
+(`docs/design/raid/kit/breath_pieces.py`, built by `build_smith_heart_breath_kit.py` and
+shipped as `public/models/props/smith_heart_breath_kit.glb`), its own floor, light, sky and
+weather, and its guardian's effects.
+
+| Piece | Look | Where |
+|---|---|---|
+| The floor | Every Breath walk from the mouth to the Cornice is storm-scoured pale granite: broad slabs parted by narrow cracks, wind flutes polished down the prevailing wind, wet hollows, sparse lichen; cooler and a value paler than the quarry | `scoured` ground (`paintScoured`, `scouredColor`) |
+| The lightning rods | Five great drums of granite stacked and turned, leaning in one arc, the wind's bores through two, the Smith's carved collar of chevrons, a forked crown of two horns cradling a cluster of the vein's crystal, the strikes' fused glass running down in dark veins; a star of fused glass at each foot | `Kit_StormRod`, `Kit_StrikeScar` on `sh_lightning_rod` |
+| The wind-horns | The "broken bellows" became two great stone horns lying on cradles, their bells (rolled lips) open to the rim, two carved bands of chevrons, a slow growth flute, the body curling up and over into a coil; the vein's light deep in the throat. The wind sounds them | `Kit_WindHorn` on `sh_broken_bellows` |
+| The wind channels | Each notch in the Cornice's rim flanked by two cheek stones (tall blades fluted by the updraft, bored near the head, a crystal shard in the crown, on colliders) and a groove the Smith cut in the floor leading the updraft in toward the middle | `Kit_ChannelJamb` on `sh_channel_jamb`, `Kit_WindGroove` |
+| The Wind Bridge | A natural arch of the mountain's granite under the ramp: its rib stepping out bed by bed as it falls, a great wind-eye under its middle, its legs flaring into the mist; the field keeps only a shallow keel under the deck and no mountain lip hangs there. Its two shelters are thick windbreaks on footings, scalloped on the windward face, the Smith's chevron in the lee | `Kit_WindBridge`, `Kit_WindShelter` on `sh_wind_shelter`, `BREATH_KIT_SHALLOW` |
+| The low walls | Every Breath lip over the void, the bridge and the Cornice's rim included, takes a knee-high wall of rough storm granite under rounded pale copings (a coping blown off now and then), walked along the lip in short modules past its bow, never over a walk | `Kit_BreathWallA`, `Kit_BreathWallB`, `planBreathWalls` |
+| The landings | Wind-carved standing stones at the landings' rims (twisted, scalloped, bored, a crystal crown, on colliders), the cracked plateau's fissures on the Cornice and the landings (flat, every telegraph draws over them) | `Kit_StormStone` on `sh_storm_stone`, `Kit_PlateauCrack*` |
+| The light | Its own state, `smithHeartBreath`: a cold teal-white key high in the north-west over a neutral grey fill and a cool storm air, so the pale granite's shade is a cool grey, never navy; it wins north of the Ring's mouth (the first landing and the chimney), the Ring keeps its rim | `heart_environment.ts` (`SMITH_HEART_BREATH_LIGHT`, `inBreathLight`) |
+| The sky | The summit inside the storm: a paler, lower deck racing in from the north-west, a rift where the key breaks through, lightning walking the cloud and, every few seconds, a distant bolt | `heart_sky.ts` (`setBreath`) |
+| The weather | The gale's streaks and the grit it carries over every Breath walk; cloud banks rolling past under the Cornice's rim and through the bridge's chasm; the bridge's gusts in a steady rhythm (a band of wind sweeping down the ramp from the summit, a curtain on its front, the streaks surging); lightning striking the Cornice's rods in turn (a bolt from the cloud, the crown's flash) | `breath_air.ts` (`breathGustAt`, `breathStrikeAt`) |
+
+Effects of the Breath guardian (`src/render/smith_heart_fx/breath_fx.ts`, presentation
+only, the sim untouched):
+
+| Moment | Look |
+|---|---|
+| Bellows Gust, on its bar | its footprint (a ring at the gust's exact radius) fills with the bar; the breath is drawn in along the floor from past the ring, loose stones lift into a whirl that tightens and quickens, a funnel of wind twists up round the guardian |
+| Bellows Gust, landing | a wall of wind rides out past the ring to where the shove ends, the stones and a spray of grit flung outward, streaks bursting out, two rings, a short shake |
+| Storm Lance, on its bar | its footprint (a lane at the lance's exact length and width, aimed where the bar locked it) fills; lightning crackles round the guardian, sparks run down the lane |
+| Storm Lance, landing | a bolt falls from the cloud onto the guardian and a spear of lightning runs down the lane (never past its width), the stone scorched along it, smouldering a few seconds |
+
+Readability: the two footprints are the shared floor telegraph (threat colour `danger`,
+the vein's teal as the accent) on every graphics tier; before 2G these casts had only
+their bars. The wind, the lightning, the debris, the clouds and the gusts are cosmetic:
+the low tier keeps a third of the particles, reduced motion drops the shake. The wind
+bridge's gusts are its set piece's look only (section 6.2's mechanic is not built); the
+strikes on the rods are harmless scenery. Every effect is built with the interior or
+under one compile-gated root, so nothing links on first use. The new cheek stones and
+standing stones stand on layout colliders at the rims, clear of every walking line. No
+boss mechanic and no number changed.
+
 ## 6. Set pieces (phase 2 specs)
 
 None of these is built in phase 1; their floors, props and anchors are. Every
@@ -666,6 +709,8 @@ the meters harness, never shipped unmeasured.
 - Target: chained lightning between players standing close (spread), rhythmic gusts
   that push toward the balustrade (wind always ends at a wall), a phase where the
   bellows inhales and pulls everyone in.
+- Presentation (phase 2G, section 5.14): Bellows Gust and Storm Lance telegraph on every
+  tier and have their wind and lightning. Mechanics and numbers unchanged.
 
 ### 7.3 Guardian of the Quench
 
@@ -794,6 +839,13 @@ on both difficulties (dungeon rework README, goal 4).
   render-only over a walked floor, and the seal's and the portal's moments (the
   arrival's wave, the spire igniting, the quarters parting, the shards over every head,
   the surge, the camera's jolts).
+- `tests/smith_heart_breath_kit.test.ts`: the scoured floor, the Breath kit's GLB
+  (fingerprint, budget, the touchable feet inside their colliders, the walls past the lip,
+  the inlays flat, the arch under its deck) and its plan (every prop fitted, every Breath
+  lip over the void walled and never over a walk, no mountain lip under the bridge).
+- `tests/smith_heart_breath_air.test.ts` and `tests/smith_heart_breath_fx.test.ts`: the
+  gusts' and strikes' schedules, the clouds past the rim, the Breath's light; the guardian's
+  numbers read, the lance's bolt inside its lane, the telegraphs while the bars run.
 - `tests/smith_heart_dev.test.ts`: the `/dev heart` family (the portal forcing and the
   hop included) and the dev-only door.
 - Every new Smith's Heart test follows the path pattern `tests/smith_heart_*.test.ts`
@@ -835,8 +887,9 @@ captures and review before the next:
    own body.
 2. **The Ring and the Seal Dais**: the seal and the tines as real models; the Ring's
    pillars; the Balcony and the Grand Stair carved.
-3. **The Breath**: the cornice's cracked rock, the bellows wrecks, the lightning rods
-   (with strikes), the wind bridge's gusts.
+3. **The Breath**: DRESSED in phase 2G (section 5.14: the kit, the scoured floor, its
+   light, sky and weather, the guardian's effects). Still to build: the wind bridge's
+   gust mechanic (its look is in), the guardian's target kit and its own body.
 4. **The Quench**: ice shelves and blades as models, the singing ice, steam.
 5. **The Heat**: the hearth, anvil, bellows and crucibles as models, the pour.
 6. **The Heart**: the platform, altars, chains and core as models; the final boss's
