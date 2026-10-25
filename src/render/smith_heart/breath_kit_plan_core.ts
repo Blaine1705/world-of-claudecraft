@@ -311,7 +311,6 @@ export function planBreathDressing(): HeartKitPlacement[] {
   const out: HeartKitPlacement[] = [];
   // The cracked plateau: long fissures and stars on the Cornice's floor,
   // more toward its rim, a few on the landings.
-  const C = BREATH.cornice;
   const cracks: { x: number; z: number; piece: string }[] = [];
   for (let k = 0; k < 16; k++) {
     const deg = k * 22.5 + heartHash(k, 71) * 14;

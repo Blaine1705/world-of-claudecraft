@@ -163,8 +163,7 @@ try {
         const g = await page.evaluate(
           ([ox, oz, guardian]) => {
             for (const e of window.__game.world.entities.values())
-              if (e.templateId === guardian && !e.dead)
-                return { x: e.pos.x - ox, z: e.pos.z - oz };
+              if (e.templateId === guardian && !e.dead) return { x: e.pos.x - ox, z: e.pos.z - oz };
             return null;
           },
           [O.x, O.z, GUARDIAN],
