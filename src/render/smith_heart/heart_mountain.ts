@@ -23,6 +23,12 @@ import {
 } from './heart_mountain_core';
 import { heartHash } from './heart_plan_core';
 import { HEART_WALL_CLEAR, HEART_WALL_PATH_CLEAR, heartFloorClearance } from './heart_walls_core';
+import {
+  QUENCH_ROCK_GAIN,
+  QUENCH_ROCK_MIX,
+  QUENCH_ROCK_TONE,
+  quenchFrostWeight,
+} from './quench_frost_core';
 
 // Stormcrag's granite, a cool grey with a breath of violet low down and a
 // warmer grey on the sunlit heights (phase 2C: the warm tan it had washed
@@ -31,6 +37,7 @@ const ROCK_LOW = new THREE.Color(0x24232a);
 const ROCK_MID = new THREE.Color(0x48474c);
 const ROCK_HIGH = new THREE.Color(0x6a6766);
 const HAMMER_ROCK = new THREE.Color(HAMMER_ROCK_TONE);
+const QUENCH_ROCK = new THREE.Color(QUENCH_ROCK_TONE);
 
 /** A Hammer step's shade (a gain): its own tone of the bed, the ledge's
  *  outer lip a touch paler, the crease where the next riser rises darker. */
@@ -90,6 +97,12 @@ export function buildHeartMountain(lowGfx: boolean): THREE.Mesh {
         if (back > 0)
           c.multiplyScalar(1 + lift * hammerStepShade(heartHammerTerraceStep(back, x, z)));
       }
+      // The Quench's frost (phase 2H): its mountain a pale cold granite.
+      const frost = quenchFrostWeight(g.x0 + i * g.cell, g.z0 + j * g.cell);
+      if (frost > 0)
+        c.lerp(QUENCH_ROCK, frost * QUENCH_ROCK_MIX).multiplyScalar(
+          1 + frost * (QUENCH_ROCK_GAIN - 1),
+        );
       colors[k * 3] = c.r;
       colors[k * 3 + 1] = c.g;
       colors[k * 3 + 2] = c.b;

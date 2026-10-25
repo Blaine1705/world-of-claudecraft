@@ -18,10 +18,12 @@ import {
   SMITH_HEART_BREATH_FOG,
   SMITH_HEART_CORE_FOG,
   SMITH_HEART_HAMMER_FOG,
+  SMITH_HEART_QUENCH_FOG,
   SMITH_HEART_RING_FOG,
   smithHeartCameraInBreath,
   smithHeartCameraInHammer,
   smithHeartCameraInHeart,
+  smithHeartCameraInQuench,
   smithHeartCameraInRing,
 } from './smith_heart/heart_environment';
 import { BASIN_FOG_COLOR } from './wildheart_basin/basin_plan_core';
@@ -91,12 +93,21 @@ export function resolveFogScene(
     !inSmithHeartCore &&
     !inSmithHeartHammer &&
     smithHeartCameraInBreath(cam.x, cam.z);
+  // And the Quench its own cold lake light (phase 2H), which wins over the
+  // Ring's east of its mouth.
+  const inSmithHeartQuench =
+    interior === 'smith_heart' &&
+    !inSmithHeartCore &&
+    !inSmithHeartHammer &&
+    !inSmithHeartBreath &&
+    smithHeartCameraInQuench(cam.x, cam.z);
   // And the Ring round the seal its own (phase 2F).
   const inSmithHeartRing =
     interior === 'smith_heart' &&
     !inSmithHeartCore &&
     !inSmithHeartHammer &&
     !inSmithHeartBreath &&
+    !inSmithHeartQuench &&
     smithHeartCameraInRing(cam.x, cam.z);
   // The Sunken Bastion: open-air at storm-tide dusk under its own sky.
   const inSunkenBastion =
@@ -105,7 +116,8 @@ export function resolveFogScene(
       !inSmithHeartCore &&
       !inSmithHeartHammer &&
       !inSmithHeartRing &&
-      !inSmithHeartBreath);
+      !inSmithHeartBreath &&
+      !inSmithHeartQuench);
   // The Drowned Temple: open-air at night over its lagoon, under its own sky.
   const inDrownedTemple = interior === 'drowned_temple';
   // The Gravewyrm Sanctum: open-air at polar dusk under its own sky.
@@ -136,21 +148,23 @@ export function resolveFogScene(
                         ? 'smithHeartRing'
                         : inSmithHeartBreath
                           ? 'smithHeartBreath'
-                          : inSunkenBastion
-                            ? 'sunkenBastion'
-                            : inDrownedTemple
-                              ? 'drownedTemple'
-                              : inGravewyrmSanctum
-                                ? 'gravewyrmSanctum'
-                                : inLastKeep
-                                  ? 'lastkeep'
-                                  : inDawnhold
-                                    ? 'dawnhold'
-                                    : inside
-                                      ? 'dungeon'
-                                      : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
-                                        ? 'underwater'
-                                        : 'outdoor';
+                          : inSmithHeartQuench
+                            ? 'smithHeartQuench'
+                            : inSunkenBastion
+                              ? 'sunkenBastion'
+                              : inDrownedTemple
+                                ? 'drownedTemple'
+                                : inGravewyrmSanctum
+                                  ? 'gravewyrmSanctum'
+                                  : inLastKeep
+                                    ? 'lastkeep'
+                                    : inDawnhold
+                                      ? 'dawnhold'
+                                      : inside
+                                        ? 'dungeon'
+                                        : camY < waterLevelAt(cam.x, cam.z, seed) - 0.05
+                                          ? 'underwater'
+                                          : 'outdoor';
   return { interior, desired };
 }
 
@@ -225,6 +239,12 @@ export function applyFogScenePreset(
     fog.color.setHex(SMITH_HEART_BREATH_FOG.color);
     fog.near = SMITH_HEART_BREATH_FOG.near;
     fog.far = SMITH_HEART_BREATH_FOG.far;
+  } else if (desired === 'smithHeartQuench') {
+    // The Quench: a cold pale-blue mist sinking with the vein, thin across
+    // the lake, the far walls and the falls softening into it.
+    fog.color.setHex(SMITH_HEART_QUENCH_FOG.color);
+    fog.near = SMITH_HEART_QUENCH_FOG.near;
+    fog.far = SMITH_HEART_QUENCH_FOG.far;
   } else if (desired === 'sunkenBastion') {
     // Storm-tide sea fog: grey-green and heavy low over the water, pushed back
     // far enough that the whole headland climbs out of it from the landing and

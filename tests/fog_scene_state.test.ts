@@ -97,9 +97,25 @@ describe('resolveFogScene (the renderer fog resolution, moved verbatim)', () => 
     // The camera standing back past the Ring's rim still sees it in its own light.
     const pastRim = { x: slotOrigin.x, z: slotOrigin.z + 96 };
     expect(resolveFogScene(true, slotOrigin.x, 5, pastRim, SEED).desired).toBe('smithHeartRing');
-    // A vein beyond the Ring keeps the borrowed storm state.
+    // The Quench has its own cold lake light (phase 2H): the Frozen Lake,
+    // the Singing Ice, and east of the Ring past its mouth (the first
+    // landing, a camera standing back from it) over the Ring's.
     const inQuench = { x: slotOrigin.x + QUENCH.lake.x, z: slotOrigin.z + QUENCH.lake.z };
-    expect(resolveFogScene(true, slotOrigin.x, 5, inQuench, SEED).desired).toBe('sunkenBastion');
+    expect(resolveFogScene(true, slotOrigin.x, 5, inQuench, SEED).desired).toBe('smithHeartQuench');
+    for (const [x, z] of [
+      [156, -86],
+      [110, 0],
+      [101, 4],
+    ]) {
+      const at = { x: slotOrigin.x + x, z: slotOrigin.z + z };
+      expect(resolveFogScene(true, slotOrigin.x, 5, at, SEED).desired).toBe('smithHeartQuench');
+    }
+    // The Quench's mouth on the Ring keeps the Ring's light.
+    const atMouth = { x: slotOrigin.x + 84, z: slotOrigin.z };
+    expect(resolveFogScene(true, slotOrigin.x, 5, atMouth, SEED).desired).toBe('smithHeartRing');
+    // The Heat beyond the Ring keeps the borrowed storm state.
+    const inHeat = { x: slotOrigin.x - 214, z: slotOrigin.z };
+    expect(resolveFogScene(true, slotOrigin.x, 5, inHeat, SEED).desired).toBe('sunkenBastion');
     // The Breath has its own storm summit light (phase 2G), the Cornice and
     // the Wind Bridge both.
     const onCornice = { x: slotOrigin.x + BREATH.cornice.x, z: slotOrigin.z + BREATH.cornice.z };
@@ -164,6 +180,7 @@ describe('applyFogScenePreset (the renderer fog presets, moved verbatim)', () =>
     ['smithHeartHammer', 0x6c6c70, 90, 600],
     ['smithHeartRing', 0x686a72, 120, 700],
     ['smithHeartBreath', 0x707b88, 80, 560],
+    ['smithHeartQuench', 0x8899ac, 70, 520],
     ['drownedTemple', 0x252a4c, 140, 1050],
     ['lastkeep', 0x241610, 30, 150],
     ['dawnhold', 0x3d422a, 40, 190],

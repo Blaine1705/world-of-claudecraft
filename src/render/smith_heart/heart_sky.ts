@@ -9,8 +9,12 @@
 //     paler and lower, a rolling deck racing in from the north-west, the
 //     key's light breaking through it in a bright rift, lightning walking
 //     the cloud and, every few seconds, a bolt standing in the distance.
+//   - over the Quench (phase 2H), the sky seen up out of the cold: calm, a
+//     pale overcast thinning to a wash of cold blue overhead, high thin
+//     veils drifting slow, the low pale sun in the south-east behind them
+//     with the ice crystals' ring round it (a 22 degree halo), no storm.
 // `uBreath` blends the storm toward the Breath's as the camera climbs into
-// it (eased like the hop's). `uCore` blends the two (heart_portal_core.ts heartAreaBlend eases it after
+// it, `uQuench` toward the Quench's as it sinks (both eased like the hop's). `uCore` blends the two (heart_portal_core.ts heartAreaBlend eases it after
 // a hop, so the sky turns as the raid arrives). One shader on the dome, no
 // light; the horizon is the area's fog colour.
 //
@@ -22,7 +26,11 @@
 import * as THREE from 'three';
 import { SUNKEN_BASTION_FOG_COLOR } from '../fog_scene_state';
 import { sharedUniforms } from '../gfx';
-import { SMITH_HEART_BREATH_FOG } from './heart_environment';
+import {
+  SMITH_HEART_BREATH_FOG,
+  SMITH_HEART_QUENCH_FOG,
+  SMITH_HEART_QUENCH_LIGHT,
+} from './heart_environment';
 
 export interface HeartSkyOptions {
   lowGfx: boolean;
@@ -54,6 +62,9 @@ uniform float uDetail;
 uniform float uCore;
 uniform float uBreath;
 uniform vec3 uBreathHorizon;
+uniform float uQuench;
+uniform vec3 uQuenchHorizon;
+uniform vec3 uQuenchSun;
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float noise(vec2 p) {
   vec2 i = floor(p); vec2 f = fract(p);
@@ -168,6 +179,33 @@ vec3 breathSky(vec3 d, float up) {
   col += vec3(0.72, 0.9, 1.0) * bolts;
   return col;
 }
+vec3 quenchSky(vec3 d, float up) {
+  // A calm cold sky: the pale mist at the rim, a pale overcast band, a wash
+  // of cold blue overhead (linear values).
+  vec3 zenith = vec3(0.16, 0.22, 0.31);
+  vec3 band = vec3(0.34, 0.39, 0.45);
+  vec3 col = mix(band, zenith, smoothstep(0.06, 0.8, up));
+  col = mix(uQuenchHorizon, col, smoothstep(-0.03, 0.24, up));
+  if (up > -0.05) {
+    vec2 uv = d.xz / (up + 0.22);
+    // High thin veils drifting slow (never a storm deck).
+    vec2 drift = vec2(uTime * 0.004, uTime * 0.0025);
+    float v1 = fbm(uv * 0.22 + drift + 7.0);
+    float v2 = fbm(uv * 0.7 - drift * 1.6 + 2.0);
+    float veil = smoothstep(0.46, 0.78, v1 * 0.75 + v2 * 0.35 * uDetail) * smoothstep(-0.04, 0.18, up);
+    col = mix(col, vec3(0.44, 0.48, 0.53), veil * 0.55);
+    // Streaks of cirrus, long and thin across the sky.
+    float cirrus = smoothstep(0.62, 0.8, fbm(vec2(uv.x * 0.18 + uv.y * 0.05, uv.y * 1.4) + drift * 2.0));
+    col += vec3(0.05, 0.055, 0.06) * cirrus * uDetail * smoothstep(0.1, 0.5, up);
+  }
+  // The low pale sun behind the veil, and the ice crystals' ring round it.
+  float a = acos(clamp(dot(d, uQuenchSun), -1.0, 1.0));
+  col += vec3(0.62, 0.66, 0.7) * exp(-a * a * 90.0) * 1.2;
+  col += vec3(0.24, 0.27, 0.31) * exp(-a * 5.0) * 0.5;
+  float ring = exp(-pow((a - 0.384) * 34.0, 2.0));
+  col += vec3(0.13, 0.15, 0.18) * ring * (0.75 + 0.25 * sin(atan(d.x, d.z) * 3.0));
+  return col;
+}
 vec3 coreSky(vec3 d, float up) {
   // Ember-violet night: warm low (the heart's light on the high air), deep
   // violet-black overhead.
@@ -200,8 +238,9 @@ void main() {
   float up = d.y;
   vec3 col = vec3(0.0);
   if (uCore < 0.999) {
-    col = uBreath < 0.999 ? stormSky(d, up) : vec3(0.0);
+    col = uBreath < 0.999 && uQuench < 0.999 ? stormSky(d, up) : vec3(0.0);
     if (uBreath > 0.001) col = mix(col, breathSky(d, up), uBreath);
+    if (uQuench > 0.001) col = mix(col, quenchSky(d, up), uQuench);
   }
   if (uCore > 0.001) col = mix(col, coreSky(d, up), uCore);
   gl_FragColor = vec4(col, 1.0);
@@ -215,6 +254,8 @@ export interface HeartSky {
   setCore(k: number): void;
   /** Blend the main map's storm toward the Breath's summit storm. */
   setBreath(k: number): void;
+  /** Blend the main map's storm toward the Quench's calm cold sky. */
+  setQuench(k: number): void;
 }
 
 /** The dome (and the slot's frame driver). */
@@ -231,6 +272,11 @@ export function buildHeartSky(opts: HeartSkyOptions): HeartSky {
       uCore: { value: 0 },
       uBreath: { value: 0 },
       uBreathHorizon: { value: new THREE.Color(SMITH_HEART_BREATH_FOG.color) },
+      uQuench: { value: 0 },
+      uQuenchHorizon: { value: new THREE.Color(SMITH_HEART_QUENCH_FOG.color) },
+      uQuenchSun: {
+        value: new THREE.Vector3(...SMITH_HEART_QUENCH_LIGHT.keyDirection).normalize(),
+      },
     },
     depthWrite: false,
     side: THREE.BackSide,
@@ -251,8 +297,15 @@ export function buildHeartSky(opts: HeartSkyOptions): HeartSky {
   };
   let core = -1;
   let breath = -1;
+  let quench = -1;
   return {
     mesh,
+    setQuench(k) {
+      const q = Math.round(k * 200) / 200;
+      if (q === quench) return;
+      quench = q;
+      material.uniforms.uQuench.value = q;
+    },
     setBreath(k) {
       const q = Math.round(k * 200) / 200;
       if (q === breath) return;

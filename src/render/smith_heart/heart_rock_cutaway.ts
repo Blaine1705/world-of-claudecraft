@@ -10,8 +10,19 @@
 // The same layer keeps the rock's shade from sinking to black (phase 2F,
 // HEART_ROCK_SHADE_FLOOR).
 
-import type * as THREE from 'three';
+import * as THREE from 'three';
 import { HEART_ROCK_CUT_FAR, HEART_ROCK_CUT_NEAR, HEART_ROCK_STRATA } from './heart_rock_plan_core';
+import { QUENCH_FROST_NOISE_GLSL, quenchFrostGlsl } from './quench_frost_core';
+
+/** The drawn slot's origin (world x, z), for the rock's regional paint (the
+ *  Quench's frost, phase 2H): one rock material serves every slot, and only
+ *  one Smith's Heart field draws at a time, so its frame driver sets it. */
+const HEART_ROCK_SLOT = { value: new THREE.Vector2() };
+
+/** Tell the rock's material which slot is drawn (the interior's frame driver). */
+export function setHeartRockSlot(ox: number, oz: number): void {
+  HEART_ROCK_SLOT.value.set(ox, oz);
+}
 
 /** The rock's shade floor (phase 2F): a little of its own colour, a breath
  *  cooler, that no occlusion takes away. Deep in the mountain's joints and
@@ -46,7 +57,7 @@ export function heartRockBedGlsl(): string {
         }`;
 }
 
-const KEY = `smith-heart-rock-cutaway|beds2g|${HEART_ROCK_CUT_NEAR}|${HEART_ROCK_CUT_FAR}|${HEART_ROCK_SHADE_FLOOR.join(',')}`;
+const KEY = `smith-heart-rock-cutaway|beds2g|frost2h|${HEART_ROCK_CUT_NEAR}|${HEART_ROCK_CUT_FAR}|${HEART_ROCK_SHADE_FLOOR.join(',')}`;
 
 /** Wire the cutaway into a rock material (before any other layer: those
  *  compose with it). */
@@ -54,21 +65,31 @@ export function applyRockCutaway(mat: THREE.Material): void {
   const prev = mat.onBeforeCompile;
   mat.onBeforeCompile = (shader, renderer) => {
     prev?.call(mat, shader, renderer);
+    shader.uniforms.uHeartSlot = HEART_ROCK_SLOT;
     shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', '#include <common>\nvarying vec3 vRockCutWorld;')
+      .replace(
+        '#include <common>',
+        '#include <common>\nvarying vec3 vRockCutWorld;\nvarying vec3 vRockCutN;',
+      )
       .replace(
         '#include <project_vertex>',
         `#include <project_vertex>
         {
           vec4 rockCut = vec4( transformed, 1.0 );
+          vec4 rockCutN = vec4( objectNormal, 0.0 );
           #ifdef USE_INSTANCING
             rockCut = instanceMatrix * rockCut;
+            rockCutN = instanceMatrix * rockCutN;
           #endif
           vRockCutWorld = ( modelMatrix * rockCut ).xyz;
+          vRockCutN = ( modelMatrix * rockCutN ).xyz;
         }`,
       );
     shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', '#include <common>\nvarying vec3 vRockCutWorld;')
+      .replace(
+        '#include <common>',
+        `#include <common>\nvarying vec3 vRockCutWorld;\nvarying vec3 vRockCutN;\nuniform vec2 uHeartSlot;\n${QUENCH_FROST_NOISE_GLSL}`,
+      )
       .replace(
         '#include <clipping_planes_fragment>',
         `#include <clipping_planes_fragment>
@@ -82,7 +103,8 @@ export function applyRockCutaway(mat: THREE.Material): void {
       .replace(
         '#include <color_fragment>',
         `#include <color_fragment>
-${heartRockBedGlsl()}`,
+${heartRockBedGlsl()}
+${quenchFrostGlsl()}`,
       )
       .replace(
         '#include <emissivemap_fragment>',

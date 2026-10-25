@@ -17,6 +17,7 @@ import {
   SMITH_HEART_BREATH_LIGHT,
   SMITH_HEART_CORE_LIGHT,
   SMITH_HEART_HAMMER_LIGHT,
+  SMITH_HEART_QUENCH_LIGHT,
   SMITH_HEART_RING_LIGHT,
 } from './smith_heart/heart_environment';
 import { BASIN_SUN_DIRECTION } from './wildheart_basin/basin_plan_core';
@@ -44,6 +45,7 @@ export type FogSceneState =
   | 'smithHeartHammer'
   | 'smithHeartRing'
   | 'smithHeartBreath'
+  | 'smithHeartQuench'
   | 'drownedTemple'
   | 'gravewyrmSanctum'
   | 'lastkeep'
@@ -219,6 +221,11 @@ export const SMITH_HEART_BREATH_KEY_DIRECTION = new THREE.Vector3(
   ...SMITH_HEART_BREATH_LIGHT.keyDirection,
 ).normalize();
 
+/** Where the Quench's key comes from: low in the south-east over the lake. */
+export const SMITH_HEART_QUENCH_KEY_DIRECTION = new THREE.Vector3(
+  ...SMITH_HEART_QUENCH_LIGHT.keyDirection,
+).normalize();
+
 /** Where the Hammer vein's key comes from: low in the west down the fissure. */
 export const SMITH_HEART_HAMMER_KEY_DIRECTION = new THREE.Vector3(
   ...SMITH_HEART_HAMMER_LIGHT.keyDirection,
@@ -256,6 +263,10 @@ export function interiorKeyLightDirection(state: FogSceneState, out: THREE.Vecto
   }
   if (state === 'smithHeartBreath') {
     out.copy(SMITH_HEART_BREATH_KEY_DIRECTION);
+    return true;
+  }
+  if (state === 'smithHeartQuench') {
+    out.copy(SMITH_HEART_QUENCH_KEY_DIRECTION);
     return true;
   }
   if (state === 'drownedTemple') {
@@ -421,7 +432,8 @@ export function applyInteriorLightRig(
     state === 'smithHeartCore' ||
     state === 'smithHeartHammer' ||
     state === 'smithHeartRing' ||
-    state === 'smithHeartBreath'
+    state === 'smithHeartBreath' ||
+    state === 'smithHeartQuench'
   ) {
     // The Smith's Heart's final room (lit from below by the heart, a pale
     // key over the oculus, a warm rim) and its Hammer vein (a warm low key
@@ -434,7 +446,9 @@ export function applyInteriorLightRig(
           ? SMITH_HEART_RING_LIGHT
           : state === 'smithHeartBreath'
             ? SMITH_HEART_BREATH_LIGHT
-            : SMITH_HEART_HAMMER_LIGHT;
+            : state === 'smithHeartQuench'
+              ? SMITH_HEART_QUENCH_LIGHT
+              : SMITH_HEART_HAMMER_LIGHT;
     targets.sun.intensity = L.sun;
     targets.hemi.intensity = L.hemi;
     targets.scene.environmentIntensity = L.env;

@@ -13,9 +13,14 @@
 //     high through the cloud from the north-west over a pale neutral grey
 //     fill, a cool blue-grey storm air that thickens with distance, so the
 //     scoured granite reads pale and its shade a cool grey, never navy;
-//   - the rest of the main map keeps the storm-dusk grade it shares with the
-//     Sunken Bastion (`sunkenBastion`) until the per-room phases give each
-//     vein its own;
+//   - the Quench (east, sinking to the Frozen Lake) has its own,
+//     `smithHeartQuench` (phase 2H): a pale cold sun low in the south-east
+//     through a thin high overcast, a pale blue-grey sky fill over a cool
+//     ground bounce, a cold pale-blue mist that softens the far walls, so the
+//     frost and the ice read pale and clean and the braziers' fire is the one
+//     warm thing in it;
+//   - the rest of the main map (the Heat) keeps the storm-dusk grade it
+//     shares with the Sunken Bastion (`sunkenBastion`) until its phase;
 //   - the Heart (the separate final room) gets its own state,
 //     `smithHeartCore`: an ember-violet night air, nearer than the storm's so
 //     the chamber's crown closes round the platform, and a light rig lit from
@@ -145,6 +150,56 @@ export const SMITH_HEART_BREATH_LIGHT = {
    *  the Cornice's floor toward the bridge, so the rods, the horns and the
    *  guardian throw long shadows south-east down the vein. */
   keyDirection: [-0.42, 0.8, 0.43] as const,
+} as const;
+
+/** The fog state of the Quench (phase 2H). */
+export const SMITH_HEART_QUENCH_FOG_STATE = 'smithHeartQuench';
+
+/** Does the Quench's light hold at instance-local (x, z)? East of the Ring
+ *  past its mouth (a camera standing back from a player on the first
+ *  landing stands there), the Quench's light wins over the Ring's;
+ *  elsewhere its area outside the Ring's light. */
+export function inQuenchLight(x: number, z: number): boolean {
+  const ring = Math.hypot(x - RING.x, z - RING.z);
+  if (x <= 64 || z >= 64 || z <= -64)
+    return smithHeartAreaAt(x, z) === 'quench' && ring > SMITH_HEART_RING_LIGHT_R;
+  return x > RING.outerR + 22 || ring > SMITH_HEART_RING_LIGHT_R;
+}
+
+/** Is the camera at world (x, z) in the Quench vein of its Smith's Heart
+ *  slot? (The Ring's own state keeps the Quench's mouth.) */
+export function smithHeartCameraInQuench(x: number, z: number): boolean {
+  const def = DUNGEONS.smith_heart;
+  if (!def) return false;
+  const o = instanceOrigin(def.index, instanceSlotForZ(z));
+  return inQuenchLight(x - o.x, z - o.z);
+}
+
+/** The Quench's air (phase 2H): a cold pale-blue mist, thin across a landing
+ *  and the lake so a telegraph and the guardian read crisp, the far walls
+ *  and the frozen falls softening into it as the vein sinks. */
+export const SMITH_HEART_QUENCH_FOG = { color: 0x8899ac, near: 70, far: 520 } as const;
+
+/** The Quench's light rig (phase 2H): a pale cold sun low in the south-east
+ *  through a thin overcast (a white a breath toward blue), a pale blue-grey
+ *  sky fill over a cool grey ground bounce (the snow's light back up), so
+ *  the frost reads pale and every shade a clean cold blue-grey, never navy;
+ *  a pale ice-blue rim off the lake on every silhouette. The sky's
+ *  reflection a trace. */
+export const SMITH_HEART_QUENCH_LIGHT = {
+  sun: 2.15,
+  hemi: 1.75,
+  env: 0.03,
+  rim: 1.35,
+  sunColor: 0xe6eef8,
+  hemiSky: 0x98a8bc,
+  hemiGround: 0x4e5664,
+  rimColor: 0xa8d8f2,
+  /** Low in the south-east (from the ground toward it): it rakes across the
+   *  lake toward the descent, so the blades, the bowls and the guardian
+   *  throw long cold shadows north-west, and the frozen falls on the east
+   *  walls take it full. */
+  keyDirection: [0.56, 0.56, -0.6] as const,
 } as const;
 
 /** The Hammer's air: a grey quarry dust, thin near (the pit reads crisp

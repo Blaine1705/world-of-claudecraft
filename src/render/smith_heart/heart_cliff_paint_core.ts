@@ -11,6 +11,7 @@
 import { smithHeartAreaAt } from '../../sim/content/smith_heart_layout';
 import type { FieldCliffRun } from '../../sim/instances/authored_field';
 import { cliffColor, fieldNoise, type Rgb } from '../authored_field/field_mesh_core';
+import { inQuenchFrost, quenchCliffPaint } from './quench_frost_core';
 
 /** The quarry granite's beds: a cool grey and a warm grey (sRGB-ish linear
  *  vertex colours, multiplied into the strata texture). Phase 2D lifted them
@@ -79,6 +80,8 @@ export function heartCliffPaint(
   z: number,
   top: number,
 ): Rgb {
+  // The Quench's frost granite (phase 2H), snow along its lips.
+  if (inQuenchFrost(x, z)) return quenchCliffPaint(x, y, z, top);
   if (smithHeartAreaAt(x, z) !== 'hammer') return cliffColor(run, x, y, z, top);
   const depth = Math.max(0, top - y);
   const bed = 0.5 + 0.5 * Math.sin(y * 0.9 + fieldNoise(x * 0.05, z * 0.05, 2) * 5);
