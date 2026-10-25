@@ -23,6 +23,9 @@ import { HEAT_POUR, heatPourPath } from './heat_pour_core';
 
 const f2 = (v: number) => v.toFixed(2);
 
+/** How far the fall leans out per yard it drops (the rock edge's flare). */
+const HEAT_FALL_LEAN = 0.42;
+
 /** The pour's timeline in GLSL (heat_pour_core.ts heatPourLook, the same
  *  arithmetic). */
 const POUR_GLSL = /* glsl */ `
@@ -334,7 +337,9 @@ export function buildHeatPour(lowGfx: boolean): THREE.Group {
   const fallHalves: number[] = [];
   for (let k = 0; k <= 16; k++) {
     const t = k / 16;
-    fall.push(new THREE.Vector3(P.x, P.y + 0.05 - t * 26, P.z0 - 0.4 - t * 1.6 - t * t * 1.2));
+    // Out along the cliff's flare (the rock edge leans out as it falls),
+    // so the fall runs down its face, never inside it.
+    fall.push(new THREE.Vector3(P.x, P.y + 0.05 - t * 26, P.z0 - 0.5 - t * 26 * HEAT_FALL_LEAN));
     fallSides.push(across);
     fallHalves.push(2.0 - t * 0.6);
   }
@@ -357,7 +362,7 @@ export function buildHeatPour(lowGfx: boolean): THREE.Group {
     heartQuadGeometry(
       [
         [P.brim.x, P.brim.y + 1.6, P.brim.z],
-        [P.x, P.y - 24, P.z0 - 3.2],
+        [P.x, P.y - 24, P.z0 - 0.5 - 24 * HEAT_FALL_LEAN],
       ],
       [
         [1, 7, 0, 0],
