@@ -204,8 +204,11 @@ void main() {
   float d = length(vCorner);
   if (d > 1.0) discard;
   vec2 q = vCorner * 2.2 + vec2(uTime * 0.05 + vSeed * 9.0, vSeed * 4.0);
-  float billow = n(q) * 0.6 + n(q * 2.1 + 3.0) * 0.4;
-  float a = (1.0 - smoothstep(0.35 + billow * 0.4, 1.0, d)) * uAlpha * vFade;
+  float billow = n(q) * 0.55 + n(q * 2.3 + 3.0) * 0.3 + n(q * 5.1 - 7.0) * 0.15;
+  // Torn, lumpy edges: the noise eats the card from its rim inward, so it
+  // never reads as a disc.
+  float edge = d + (billow - 0.5) * 0.9;
+  float a = (1.0 - smoothstep(0.15, 0.85, edge)) * smoothstep(0.32, 0.6, billow) * uAlpha * vFade;
   vec3 col = mix(uShade, uColor, clamp(vCorner.y * 0.5 + 0.55 + billow * 0.25, 0.0, 1.0));
   gl_FragColor = vec4(col, a);
   #include <colorspace_fragment>
@@ -530,7 +533,7 @@ export function buildBreathAir(lowGfx: boolean): THREE.Group {
   add(
     'smithHeartBreathClouds',
     quadGeometry(p.clouds, p.cloudP),
-    airMaterial('smithHeartBreathClouds', CLOUD_VERT, CLOUD_FRAG, 0xc4ccd6, 0.5, false, {
+    airMaterial('smithHeartBreathClouds', CLOUD_VERT, CLOUD_FRAG, 0xc4ccd6, 0.42, false, {
       uShade: { value: new THREE.Color(0x6c7684) },
     }),
     3,
