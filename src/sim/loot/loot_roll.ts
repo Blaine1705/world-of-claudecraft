@@ -340,13 +340,7 @@ export function rollLoot(
       questSlots.add(slot);
       continue;
     }
-    // A heroic claim can retune THIS row's odds (LootEntry.heroicChance), the
-    // same value swap on the same single draw that heroicCopper performs for
-    // the money arm below: no extra draw, so the trace and the parity goldens
-    // are untouched on both difficulties.
-    const rowChance =
-      heroicClaim && entry.heroicChance !== undefined ? entry.heroicChance : entry.chance;
-    if (!ctx.rng.chance(rowChance)) continue;
+    if (!ctx.rng.chance(entry.chance)) continue;
     if (entry.copper) {
       // A heroic claim substitutes the raised finale money base (see
       // LootEntry.heroicCopper): a VALUE swap on the same single int draw at

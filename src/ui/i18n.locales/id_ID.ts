@@ -12,20 +12,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.adventureGuide.lootSpec': 'Spesialisasi',
   'hudChrome.bank.accountBagsEmpty': 'Tasmu kosong.',
   'hudChrome.bank.accountRetry': 'Coba lagi',
-  'hudChrome.collections.actions.remove': 'Hapus',
   'hudChrome.collections.actions.summon': 'Panggil',
-  'hudChrome.collections.actions.wear': 'Kenakan',
-  'hudChrome.collections.armor.cloth': 'Kain',
-  'hudChrome.collections.armor.leather': 'Kulit',
-  'hudChrome.collections.detail.honorPrice': '{amount} Kehormatan',
-  'hudChrome.collections.detail.soulbound': 'Terikat Jiwa',
-  'hudChrome.collections.petKind.beast': 'Binatang Buas',
-  'hudChrome.collections.petKind.elemental': 'Elemental',
-  'hudChrome.collections.petKind.humanoid': 'Humanoid',
-  'hudChrome.collections.petKind.undead': 'Mayat Hidup',
-  'hudChrome.collections.stat.agility': 'Kegesitan',
-  'hudChrome.collections.stat.intellect': 'Kecerdasan',
-  'hudChrome.collections.tabs.mounts': 'Tunggangan',
   'hudChrome.courier.empty': 'Tidak ada barang',
   'hudChrome.courier.inventory': 'Inventaris',
   'hudChrome.expeditions.accept': 'Terima',
@@ -21132,8 +21119,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.cantors_hymnal.name': 'Buku Himne Kantor',
   'entities.items.cantors_stole.name': 'Stola Kantor',
   'entities.items.cellwatch_belt.name': 'Sabuk Penjaga Sel',
-  'entities.items.charm_stag_acorn.name': 'Jimat Mahkota Biji Ek',
-  'entities.items.charm_stag_gilded.name': 'Jimat Berlapis Emas',
   'entities.items.choristers_gloves.name': 'Sarung Tangan Penyanyi Paduan Suara',
   'entities.items.choristers_spaulders.name': 'Lempeng Bahu Penyanyi Paduan Suara',
   'entities.items.chorus_conch.name': 'Keong Paduan Suara',
@@ -21217,41 +21202,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.turnkeys_shank.name': 'Pisau Tusuk Sipir',
   'entities.items.unquiet_stalkers_hood.name': 'Tudung Pengintai Gelisah',
   'entities.items.vestments_of_the_waking_rite.name': 'Busana Ritual Kebangkitan',
-  'entities.items.whistle_alon.name': 'Peluit Alon',
-  'entities.items.whistle_alpaca.name': 'Peluit Alpaka',
-  'entities.items.whistle_ansem.name': 'Peluit Ansem',
-  'entities.items.whistle_bull.name': 'Peluit Banteng',
-  'entities.items.whistle_cate_coin.name': 'Peluit Kucing Koin',
-  'entities.items.whistle_crimson_claw_crab.name': 'Peluit Kepiting Capit Merah',
-  'entities.items.whistle_crystal_lich.name': 'Peluit Lich Kristal',
-  'entities.items.whistle_crystal_tide.name': 'Peluit Pasang Kristal',
-  'entities.items.whistle_ember_fox.name': 'Peluit Rubah Bara',
-  'entities.items.whistle_emberfall_phoenix.name': 'Peluit Foniks Hujan Bara',
-  'entities.items.whistle_emerald_wolf.name': 'Peluit Serigala Zamrud',
-  'entities.items.whistle_forgemaw.name': 'Peluit Rahang Tempa yang Meleleh',
-  'entities.items.whistle_frog.name': 'Peluit Katak',
-  'entities.items.whistle_frostfire.name': 'Peluit Api Es',
-  'entities.items.whistle_golden_sentinel.name': 'Peluit Penjaga Emas',
-  'entities.items.whistle_horse.name': 'Peluit Kuda',
-  'entities.items.whistle_kekius.name': 'Peluit Kekius',
-  'entities.items.whistle_loot_goblin.name': 'Peluit Goblin Jarahan',
-  'entities.items.whistle_moss_hare.name': 'Peluit Kelinci Lumut',
-  'entities.items.whistle_nightfang.name': 'Peluit Taring Malam',
-  'entities.items.whistle_penny_goldspark.name': 'Peluit Penny Percik Emas',
-  'entities.items.whistle_phantom.name': 'Peluit Hantu',
-  'entities.items.whistle_proud_grunt.name': 'Peluit Prajurit Bangga',
-  'entities.items.whistle_raptor.name': 'Peluit Raptor',
-  'entities.items.whistle_rocky.name': 'Peluit Si Batu',
-  'entities.items.whistle_sapling.name': 'Peluit Anakan Pohon',
-  'entities.items.whistle_skeleton.name': 'Peluit Kerangka',
-  'entities.items.whistle_solbot.name': 'Peluit Robot Surya',
-  'entities.items.whistle_spider.name': 'Peluit Laba-laba',
-  'entities.items.whistle_sprites.name': 'Peluit Kelip dan Kilau',
-  'entities.items.whistle_stag.name': 'Peluit Rusa Jantan',
-  'entities.items.whistle_tiger.name': 'Peluit Harimau',
-  'entities.items.whistle_triple_t.name': 'Peluit Triple T',
-  'entities.items.whistle_trollface.name': 'Peluit Muka Troll',
-  'entities.items.whistle_tuskhorn_boar.name': 'Peluit Babi Hutan Tanduk Gading',
   'entities.mobs.balgath_cyclops.name': 'Balgath, Mandor Bermata Satu',
   'entities.mobs.barnacle_crawler.name': 'Pelaut Terikat Bangkai Kapal',
   'entities.mobs.basin_raptor.name': 'Raptor Cekungan',
@@ -21283,7 +21233,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.buddy_phantom.name': 'Hantu',
   'entities.mobs.buddy_proud_grunt.name': 'Prajurit Bangga',
   'entities.mobs.buddy_rocky.name': 'Si Batu',
-  'entities.mobs.buddy_sapling.name': 'Anakan Pohon',
   'entities.mobs.buddy_skeleton.name': 'Kerangka',
   'entities.mobs.buddy_solbot.name': 'Robot Surya',
   'entities.mobs.buddy_spider.name': 'Laba-laba',
@@ -23480,122 +23429,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.buddyMenu.nameLabel': 'Nama teman',
   'hudChrome.buddyMenu.rename': 'Ganti Nama Teman',
   'hudChrome.collections.actions.dismiss': 'Panggil pulang',
-  'hudChrome.collections.armor.mail': 'Zirah rantai',
-  'hudChrome.collections.buddyLore.alon':
-    'Maskot pengembara dari jalan yang tak diakui peta mana pun, muncul setiap kali rencana berjalan buruk. Ia mengamati, menyetujui, dan sama sekali tidak membantu.',
-  'hudChrome.collections.buddyLore.alpaca':
-    'Kawanan Galecrest dipelihara untuk wol dan ketenangannya: tak ada yang lebih tenang di tengah badai. Yang ini akan meludahi tepat satu orang per perjalanan.',
-  'hudChrome.collections.buddyLore.ansem':
-    'Ia berbicara tentang pintu dan kegelapan, lalu menolak menjelaskan keduanya. Pemuja Nightbloom mengakuinya sebagai milik mereka; ia pergi setiap kali mereka mengadakan ritus.',
-  'hudChrome.collections.buddyLore.bull':
-    'Banteng Vale sebesar anjing, satu-satunya alasan orang setuju memeliharanya di dalam rumah. Perangainya tidak ikut mengecil.',
-  'hudChrome.collections.buddyLore.cate_coin':
-    'Kucing yang tak mau berpisah dari koin yang didudukinya, dan tak pernah terlihat makan. Pedagang Eastbrook masih berdebat mana di antara keduanya yang merupakan peliharaan.',
-  'hudChrome.collections.buddyLore.crimson_claw_crab':
-    'Kepiting pasang Farshore yang capitnya tetap merah lama setelah keluar dari air. Para pekerja dermaga dahulu mengadunya berlomba di papan untuk uang.',
-  'hudChrome.collections.buddyLore.crystal_lich':
-    'Serpihan Nythraxis sendiri, masih berdengung dengan dingin yang membentuknya. Ia menuruti siapa pun yang menariknya dari puing raid, dan belum memaafkan orang itu.',
-  'hudChrome.collections.buddyLore.crystal_tide':
-    'Roh pasang yang menunggangi tetesan kaca lautnya sendiri, terangkat dari air tenang oleh pemancing dari Vale hingga Farshore yang sedang mencari makan malam. Ia mempertahankan air tempatnya berasal dan tak mau dibujuk kembali.',
-  'hudChrome.collections.buddyLore.ember_fox':
-    'Rubah betina dari pagar semak Eastbrook Vale, dinamai dari bulu merah bara yang terlihat di sela semak musim dingin. Para penjerat menyerah menangkap anaknya beberapa generasi lalu dan mulai meninggalkan makanan.',
-  'hudChrome.collections.buddyLore.emberfall_phoenix':
-    'Setiap musim gugur ia terbakar menjadi bara, lalu bangkit dari abunya sendiri pada musim semi; hanya itulah yang diketahui orang. Tak ada yang pernah menemukan sarangnya, dan tak ada yang pernah menangkapnya dua kali.',
-  'hudChrome.collections.buddyLore.emerald_wolf':
-    'Anak serigala Wraithwood, bulunya hijau dalam cahaya tajuk yang nyaris tak pernah mencapai lantai hutan. Para penjaga membesarkan anak yatim yang ditinggalkan hutan.',
-  'hudChrome.collections.buddyLore.forgemaw':
-    'Ditempa di Kawah Mata Air Terakhir dan tak pernah benar-benar selesai, ia berjalan keluar dari pengecoran Ignivar saat palu masih berdentang. Hanya penjelajahan Heroik yang menemukannya: makhluk cair itu terus kembali ke tungku pembuatnya, lalu mengikuti pulang siapa pun yang selamat dari api dua kali.',
-  'hudChrome.collections.buddyLore.frog':
-    'Mirefen Marsh membesarkannya gemuk dan santai, bernyanyi semalaman dari rumpun gelagah. Pemandu rawa bersumpah perahu yang membawanya tidak pernah kandas.',
-  'hudChrome.collections.buddyLore.frostfire':
-    'Lahir di Frostveil Reach saat mata air panas menembus hamparan es, dan tak pernah memutuskan bagian mana yang menjadi asalnya. Ia beruap di udara dingin dan menggigil di udara hangat.',
-  'hudChrome.collections.buddyLore.golden_sentinel':
-    'Kumbang penjaga Amberfall, disepuh resin tempatnya tumbuh. Namanya lebih tua dari resin: penjaga sejenis telah menjaga hutan itu jauh sebelum orang terpikir membotolkan getahnya.',
-  'hudChrome.collections.buddyLore.horse':
-    'Keturunan poni Vale, dibiakkan kecil untuk lorong kebun dan tak pernah diberi tahu bahwa ia bukan kuda perang. Ia mengimbangi langkah di sisimu dan mengikuti siapa pun yang pernah memberinya apel.',
-  'hudChrome.collections.buddyLore.kekius':
-    'Teman tertawa yang tak jelas asalnya, diadopsi arena pacuan Galecrest sebagai jimat. Ia hidup lebih lama daripada empat kandang yang bersumpah atas tuahnya.',
-  'hudChrome.collections.buddyLore.loot_goblin':
-    'Ia mengikuti siapa pun yang membawa Tanda Heroik dan tak pernah sekalipun tertangkap mencuri. Quartermaster Vex menegaskan bahwa itu sama sekali bukan bukti.',
-  'hudChrome.collections.buddyLore.moss_hare':
-    'Terwelu Willowfen, berbulu hijau karena seumur hidup tidur di gambut basah. Ahli herbal rawa menganggapnya pembawa keberuntungan dan tak mengizinkan siapa pun mengusirnya dari ambang pintu.',
-  'hudChrome.collections.buddyLore.nightfang':
-    'Pemburu muda Nightbloom, senyap bahkan menurut ukuran kaumnya. Ia mengikuti demi kebersamaan dan tidak memburu apa pun yang lebih besar dari ngengat.',
-  'hudChrome.collections.buddyLore.penny_goldspark':
-    'Murid perajin gnome yang dibayar per jam dan pantas menerima setiap keping tembaganya. Armorer Hode menerimanya untuk melunasi utang dan kini menjual kesepakatan itu kepada siapa pun yang memiliki seribu emas.',
-  'hudChrome.collections.buddyLore.phantom':
-    'Hantu seukuran telapak tangan dari makam Wraithwood, hanya kain tanpa tulang, muncul dalam tas tertutup dan bertahan demi kebersamaan. Tak ada yang tahu keinginannya, dan ia tak pernah mencoba menakuti siapa pun.',
-  'hudChrome.collections.buddyLore.proud_grunt':
-    'Veteran dari gudang Warfare yang mempertahankan hormatnya tetapi kehilangan pangkatnya. Warmarshal Draven Kole menyerahkan satu kepada prajurit dengan kehormatan cukup untuk memahami harganya.',
-  'hudChrome.collections.buddyLore.raptor':
-    'Anak raptor Drakelands, dijual sebelum belajar seberapa cepat ia dapat berlari. Setiap pemilik baru diminta memberinya makan, dan tak ada yang perlu diingatkan dua kali.',
-  'hudChrome.collections.buddyLore.rocky':
-    'Makhluk merayap bercangkang batu dari lereng puing Thornpeak, lambat dan sangat santai. Penambang memeliharanya karena ia mendadak diam sesaat sebelum runtuhan.',
-  'hudChrome.collections.buddyLore.sapling':
-    'Pohon muda dengan senyum pada kulit kayunya dan tatapan ungu penuh rasa ingin tahu. Akarnya membawanya berjalan bergoyang ceria ke mana pun kamu mengembara.',
-  'hudChrome.collections.buddyLore.skeleton':
-    'Ia bangkit dari makam Wraithwood, menepuk debu dari tubuhnya, dan sejak itu mengikuti orang ke mana-mana. Tak ada yang memastikan milik siapa tulang-tulang ini dahulu.',
-  'hudChrome.collections.buddyLore.solbot':
-    'Robot kecil bertenaga matahari, digali dari abu Drakelands saat setengah terkubur dan masih berdetak. Bengkel pembuatnya tak meninggalkan tanda apa pun pada cangkang.',
-  'hudChrome.collections.buddyLore.spider':
-    'Penenun Wraithwood seukuran telapak tangan yang menghias ulang tas tempatnya dibawa. Jaringnya lebih kuat daripada benang yang digantikannya.',
-  'hudChrome.collections.buddyLore.sprites':
-    'Dua roh api kecil, satu emas dan satu hijau kebiruan, yang tak pernah sepakat siapa pemimpinnya. Jika cukup dekat, mereka menyatu menjadi satu nyala hijau, lalu terpisah lagi sambil tertawa.',
-  'hudChrome.collections.buddyLore.stag':
-    'Garis keturunan Evergarden, dibiakkan lebih kecil dari rusa besar tunggangan para penjaga dahulu. Ia masih menundukkan kepala pada tangan terangkat, kebiasaan yang lebih tua daripada hewan itu sendiri.',
-  'hudChrome.collections.buddyLore.tiger':
-    'Belang Palmreach pada hewan yang tak pernah melihat Palmreach: keturunannya dipelihara dalam penangkaran sejak kebun binatang lama ditutup. Ia hanya menanggapi siulan.',
-  'hudChrome.collections.buddyLore.triple_t':
-    'Tiga dari sesuatu, atau satu hal sebanyak tiga kali. Kesaksian berbeda-beda, dan makhluk itu tak mau diam cukup lama untuk dihitung.',
-  'hudChrome.collections.buddyLore.trollface':
-    'Makhluk menyeringai yang dikeluarkan Wraithwood dan tak mau diterima kembali. Setiap upaya menggambarkannya berakhir dengan si penggambar tertawa lalu menyerah.',
-  'hudChrome.collections.buddyLore.tuskhorn_boar':
-    'Keturunan Thornpeak, dibiakkan berkaki pendek oleh penggembala yang menginginkan babi hutan yang tak dapat merobohkan pagar. Perangainya tetap sama.',
-  'hudChrome.collections.close': 'Tutup perburuan',
-  'hudChrome.collections.cosmetic.crystal_lich_frostbound': 'Terikat Es',
-  'hudChrome.collections.cosmetic.crystal_lich_voltaic': 'Berlistrik',
-  'hudChrome.collections.cosmetic.forgemaw_ashen': 'Berkelabu Abu',
-  'hudChrome.collections.cosmetic.forgemaw_whitehot': 'Pijar Putih',
-  'hudChrome.collections.cosmetic.frog_sapphire': 'Katak Safir',
-  'hudChrome.collections.cosmetic.moss_hare_verdant': 'Hijau Subur',
-  'hudChrome.collections.cosmetic.proud_grunt_warlord': 'Panglima Perang',
-  'hudChrome.collections.cosmetic.stag_acorn': 'Mahkota Biji Ek',
-  'hudChrome.collections.cosmetic.stag_gilded': 'Bersepuh Emas',
-  'hudChrome.collections.cosmeticUnlocked': 'Tampilan baru untuk {name}: {look}.',
-  'hudChrome.collections.detail.bindLabel': 'Ikatan',
-  'hudChrome.collections.detail.drop': '{mob} ({location}), {chance}% per pembunuhan',
-  'hudChrome.collections.detail.dropLabel': 'Dijatuhkan oleh',
-  'hudChrome.collections.detail.dropWithHeroic':
-    '{mob} ({location}), {chance}% per pembunuhan, {heroicChance}% pada Heroik',
-  'hudChrome.collections.detail.exchangeLabel': 'Bursa $WOC',
-  'hudChrome.collections.detail.exchangeNone': 'Tidak ada penawaran',
-  'hudChrome.collections.detail.exchangeUnavailable': 'Tidak tersedia pada klien ini',
-  'hudChrome.collections.detail.fishingDrop': 'Memancing di mana saja, {chance}% per tangkapan',
-  'hudChrome.collections.detail.globalDrop':
-    'Musuh mana pun, {chance}% per pembunuhan, satu dari {count} pada kelangkaan ini',
-  'hudChrome.collections.detail.heroicDrop':
-    '{mob} ({location}), hanya Heroik, {chance}% per pembunuhan',
-  'hudChrome.collections.detail.marketAtMerchant': 'Ditampilkan di Pedagang',
-  'hudChrome.collections.detail.marketChecking': 'Memeriksa...',
-  'hudChrome.collections.detail.marketLabel': 'Pasar Dunia',
-  'hudChrome.collections.detail.marketNone': 'Tidak ada penawaran',
-  'hudChrome.collections.detail.marksPrice': '{amount} Tanda Heroik',
-  'hudChrome.collections.detail.noItem': 'Belum ada barang yang memberikannya',
-  'hudChrome.collections.detail.noSell': 'Tidak dapat dijual',
-  'hudChrome.collections.detail.noSource': 'Belum ada sumber dalam gim',
-  'hudChrome.collections.detail.sellLabel': 'Harga beli pedagang',
-  'hudChrome.collections.detail.setLabel': 'Dikumpulkan',
-  'hudChrome.collections.detail.tradeable': 'Dapat diperdagangkan',
-  'hudChrome.collections.detail.vendor': '{npc} ({location}) seharga {price}',
-  'hudChrome.collections.detail.vendorLabel': 'Dijual oleh',
-  'hudChrome.collections.keybindLabel': 'Perburuan',
-  'hudChrome.collections.launcherTitle': 'Perburuan: teman, tunggangan, dan set barang',
-  'hudChrome.collections.looks.locked': 'Terkunci',
-  'hudChrome.collections.looks.none': 'Belum ada tampilan yang dibuat untuk teman ini',
-  'hudChrome.collections.looks.title': 'Tampilan',
-  'hudChrome.collections.looks.unlocked': 'Terbuka',
-  'hudChrome.collections.looks.worn': 'Dipakai',
-  'hudChrome.collections.petKind.celebrity': 'Selebritas',
   'hudChrome.collections.presence.alon': 'Kamu merasa diawasi dan diam-diam disetujui.',
   'hudChrome.collections.presence.alpaca': 'Sesuatu yang berbulu wol dan santai memutuskan ikut.',
   'hudChrome.collections.presence.ansem': 'Bisikan tentang pintu dan kegelapan mengikutimu.',
@@ -23645,41 +23478,11 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Dengusan dan hentakan: sesuatu yang keras kepala membuntutimu.',
   'hudChrome.collections.presenceDefault': 'Kamu merasakan sosok yang mengawasimu.',
   'hudChrome.collections.revealed': '{name} memutuskan mengikutimu.',
-  'hudChrome.collections.set.bonusLabel': '{pieces} bagian',
-  'hudChrome.collections.set.itemLevel': 'level barang {level}',
-  'hudChrome.collections.set.owned': '{owned} dari {total} bagian',
-  'hudChrome.collections.source.bossDrop':
-    '{mob} ({location}), {chance}% per pemain per pembunuhan',
-  'hudChrome.collections.source.bossDropHeroicOnly':
-    '{mob} ({location}), hanya Heroik, {chance}% per pemain',
-  'hudChrome.collections.source.bossDropWithHeroic':
-    '{mob} ({location}), {chance}% per pemain, {heroicChance}% pada Heroik',
-  'hudChrome.collections.source.bossLabel': 'Peliharaan bos',
-  'hudChrome.collections.source.challengeDps':
-    'Berikan {dps} kerusakan per detik kepada {mob} sepanjang pertempuran',
-  'hudChrome.collections.source.challengeLabel': 'Tantangan',
-  'hudChrome.collections.source.challengeSpeed':
-    'Kalahkan {mob} dalam {seconds} detik sejak pertempuran dimulai',
-  'hudChrome.collections.source.craft': '{item} (resep {profession})',
-  'hudChrome.collections.source.craftLabel': 'Dibuat',
-  'hudChrome.collections.source.deed': 'Jasa {deed}',
-  'hudChrome.collections.source.deedLabel': 'Diperoleh melalui',
-  'hudChrome.collections.source.grantLabel': 'Dianugerahkan',
-  'hudChrome.collections.source.grantOnly':
-    'Hadiah musiman: peringkat bulanan dan hadiah catatan tempur terbaik',
-  'hudChrome.collections.source.rollNote':
-    'Setiap pemain mengundi sendiri; tak ada yang kehilangan hasil undian karena anggota kelompok.',
-  'hudChrome.collections.source.token': '{item}, digunakan sekali untuk mengikat teman',
-  'hudChrome.collections.source.tokenLabel': 'Token',
-  'hudChrome.collections.stat.mixed': 'Hibrida',
-  'hudChrome.collections.stat.strength': 'Kekuatan',
   'hudChrome.collections.state.notOwned': 'Belum dikumpulkan',
   'hudChrome.collections.state.owned': 'Dikumpulkan',
   'hudChrome.collections.state.pending': 'Suatu sosok mengikutimu',
   'hudChrome.collections.state.unavailable': 'Belum dapat diperoleh',
   'hudChrome.collections.tabs.buddies': 'Teman',
-  'hudChrome.collections.tabs.sets': 'Set Barang',
-  'hudChrome.collections.title': 'Perburuan',
   'hudChrome.cosmetics.buddyActive': 'Dipanggil',
   'hudChrome.cosmetics.buddyDrag': 'Seret ke bilah aksi',
   'hudChrome.courier.bags': 'Kirim ke bank',

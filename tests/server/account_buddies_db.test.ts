@@ -48,35 +48,20 @@ const snapshot = {
 } as unknown as BuddyPurchaseSnapshot;
 
 describe('account buddy persistence', () => {
-  it('accepts only active unique keys and caps the durable row by the catalog', () => {
+  it('accepts only active unique keys and keeps the roster out of the schema', () => {
     expect(normalizeAccountBuddies(['horse', 'horse', 'sapling', 'forgemaw', 17])).toEqual([
       'forgemaw',
       'horse',
-      'sapling',
     ]);
     expect(ACCOUNT_BUDDIES_SCHEMA).toContain(
       'PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE',
     );
-    expect(ACCOUNT_BUDDIES_SCHEMA).toContain('cardinality(owned) <= 5');
-  });
-
-  it('keeps the account CHECK in step with the buddy catalog', () => {
-    // A new buddy that misses the CHECK breaks its online and admin grants at
-    // the database, not in a unit test; tie both copies of the key list and
-    // the cardinality to BUDDY_KEYS so the next one fails here instead.
-    const arrays = [
-      ...ACCOUNT_BUDDIES_SCHEMA.matchAll(
-        /cardinality\(owned\) <= (\d+) AND owned <@ ARRAY\[([^\]]*)\]/g,
-      ),
-    ];
-    expect(arrays).toHaveLength(2);
-    for (const [, cardinality, list] of arrays) {
-      expect(Number(cardinality)).toBe(BUDDY_KEYS.length);
-      expect(list.split(',').map((key) => key.trim().replace(/'/g, ''))).toEqual([...BUDDY_KEYS]);
-    }
-    // The one-time upgrade guard keys on the newest buddy, so a database
-    // still on the previous constraint widens once on boot.
-    expect(ACCOUNT_BUDDIES_SCHEMA).toContain(`NOT LIKE '%''${BUDDY_KEYS.at(-1)}''%'`);
+    // A key list in a CHECK would never reach an existing table; the old one
+    // is retired idempotently and the writers filter on BUDDY_KEYS instead.
+    expect(ACCOUNT_BUDDIES_SCHEMA).toContain('DROP CONSTRAINT account_buddies_active_keys');
+    for (const key of BUDDY_KEYS) expect(ACCOUNT_BUDDIES_SCHEMA).not.toContain(`'${key}'`);
+    expect(ACCOUNT_BUDDIES_SCHEMA).toContain('IF EXISTS (');
+    expect(ACCOUNT_BUDDIES_SCHEMA).toContain('SELECT 1 FROM pg_constraint');
   });
 
   it('coalesces concurrent joins, projects legacy keys in SQL, and releases the flight after failure', async () => {
@@ -94,8 +79,7 @@ describe('account buddy persistence', () => {
     expect(sql).toContain('WHERE c.account_id = $1');
     expect(sql).toContain('DELETE FROM character_buddy_grants');
     expect(sql).toContain('ON CONFLICT (account_id) DO UPDATE');
-    expect(values[0]).toBe(7);
-    expect(values[1]).toEqual([...BUDDY_KEYS]);
+    expect(values).toEqual([7, BUDDY_KEYS]);
     reject(new Error('temporary'));
     await expect(first).rejects.toThrow('temporary');
     db.query.mockResolvedValueOnce({ rows: [{ owned: ['horse'] }] });

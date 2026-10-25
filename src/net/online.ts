@@ -3163,8 +3163,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
           .filter((k): k is MountKey => k !== '');
       }
       if (s.mntRtd !== undefined) this.selfRidingTrained = s.mntRtd === true;
-      // IWorldBuddies self-decode (src/net/buddy_wire.ts): four delta-guarded
-      // keys, omitted keeps the prior mirror, like mntOwn.
+      // IWorldBuddies self-decode (src/net/buddy_wire.ts): the two delta-guarded
+      // keys budOwn and budPend; an omitted key keeps the prior mirror, like mntOwn.
       this.selfBuddies = decodeBuddySelf(s, this.selfBuddies);
       if (s.mntLesson !== undefined) this.mountLessonActiveMirror = s.mntLesson === true;
       if (s.mntRace !== undefined) this.mountRaceMirror = decodeMountRaceView(s.mntRace, now);

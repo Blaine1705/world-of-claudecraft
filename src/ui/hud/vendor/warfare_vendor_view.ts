@@ -1,3 +1,4 @@
+import { type BuddyVendorOffer, TUG_HONOR_OFFER } from '../../../sim/content/buddy_offers';
 // Pure, host-agnostic view model for the WARFARE quartermaster's shop window.
 //
 // The pure-core half of the pure-core + thin-consumer split (reference
@@ -35,8 +36,9 @@ export interface WarfareShopSetSpec {
   spec: string;
 }
 
-/** The two groups the shop lists, top tier first. */
-export type WarfareShopGroup = 'season2' | 'entry';
+/** The groups the shop lists, top tier first, then the cosmetic companions,
+ *  which belong to no Warfare season. */
+export type WarfareShopGroup = 'season2' | 'entry' | 'companions';
 
 /** The five WARFARE armor families, in the order the shop lists them. Any set
  *  the stock carries that is NOT named here still gets a section, appended in
@@ -81,7 +83,7 @@ export function isWarfareVendorNpc(def: WarfareVendorNpcFlags | undefined): bool
 
 export interface WarfareShopOffer {
   itemId: string;
-  item: ItemDef;
+  item: ItemDef | Readonly<BuddyVendorOffer>;
   /** Price in Honor for one purchase (Honor is never stack-multiplied). */
   honor: number;
   /** Advisory only: the purchase resolves server-side against the server's own
@@ -146,6 +148,7 @@ export interface WarfareShopView {
 }
 
 export interface WarfareShopViewer {
+  warfareVendor?: boolean;
   honor: number;
   /** Item ids the viewer wears OR carries in a bag. See warfareShopViewer below
    *  for what "owns" deliberately does NOT cover (the bank). */
@@ -215,10 +218,7 @@ function offerFor(itemId: string, item: ItemDef, viewer: WarfareShopViewer): War
     item,
     honor,
     affordable: viewer.honor >= honor,
-    owned:
-      item.kind === 'buddy'
-        ? viewer.acquiredBuddyKeys.has(item.buddy)
-        : viewer.ownedItemIds.has(itemId),
+    owned: viewer.ownedItemIds.has(itemId),
   };
 }
 
@@ -256,7 +256,17 @@ export function buildWarfareVendorView(
   const weapons: WarfareShopOffer[] = [];
   const seasonWeapons: WarfareShopOffer[] = [];
   const goods: WarfareShopOffer[] = [];
-  const companions: WarfareShopOffer[] = [];
+  const companions: WarfareShopOffer[] = viewer.warfareVendor
+    ? [
+        {
+          itemId: TUG_HONOR_OFFER.id,
+          item: TUG_HONOR_OFFER,
+          honor: TUG_HONOR_OFFER.priceHonor,
+          affordable: viewer.honor >= TUG_HONOR_OFFER.priceHonor,
+          owned: viewer.acquiredBuddyKeys.has(TUG_HONOR_OFFER.buddy),
+        },
+      ]
+    : [];
   for (const itemId of stock) {
     const item = items[itemId];
     if (!item) continue;
@@ -266,10 +276,6 @@ export function buildWarfareVendorView(
     if (SEASON2_IDS.has(itemId) && !wearableBy(item, viewer.viewerClass)) continue;
     if (SEASON2_IDS.has(itemId) && item.kind === 'weapon') {
       seasonWeapons.push(offer);
-    } else if (item.kind === 'buddy') {
-      // Checked before the set arm on purpose: a whistle carries no set tag
-      // today, and if one ever did it would still not be a gear piece.
-      companions.push(offer);
     } else if (item.set) {
       const existing = bySet.get(item.set);
       if (existing) existing.push(offer);
@@ -363,11 +369,12 @@ export function buildWarfareVendorView(
   if (goods.length > 0) {
     sections.push({ kind: 'goods', group: 'entry', key: WARFARE_SHOP_GOODS_KEY, offers: goods });
   }
-  // Last: the cosmetic row never pushes a gear section down the window.
+  // Last: the cosmetic row never pushes a gear section down the window. Its
+  // own group, so a companion never reads as part of the Season 1 tier.
   if (companions.length > 0) {
     sections.push({
       kind: 'companions',
-      group: 'entry',
+      group: 'companions',
       key: WARFARE_SHOP_COMPANIONS_KEY,
       offers: companions,
     });

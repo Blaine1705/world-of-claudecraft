@@ -1,23 +1,21 @@
 import { describe, expect, it } from 'vitest';
 import {
   attachPendingBuddy,
-  buddyItemId,
   grantBuddy,
   restoreBuddyCollection,
   serializeBuddyCollection,
   summonBuddy,
-  useBuddyToken,
 } from '../src/sim/buddies';
 import { BUDDY_KEYS, buddyDef, normalizeBuddyKey } from '../src/sim/content/buddies';
 import { BUDDY_TEMPLATE_IDS } from '../src/sim/content/buddy_mobs';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS, NPCS } from '../src/sim/data';
-import { useItem } from '../src/sim/items';
 import { Sim } from '../src/sim/sim';
 import { VENDOR_TEST_WORLD } from './sim_shared';
 
 const RETIRED_KEYS = [
+  'sapling',
   'ember_fox',
   'moss_hare',
   'frog',
@@ -63,19 +61,17 @@ const RETIRED_TOKENS = [
 ];
 
 describe('retired buddies', () => {
-  it('keeps the core buddies and restores Sapling for referral completion', () => {
-    expect(BUDDY_KEYS).toEqual(['horse', 'crystal_lich', 'forgemaw', 'sapling', 'sprites']);
+  it('keeps only the four supported companions', () => {
+    expect(BUDDY_KEYS).toEqual(['horse', 'crystal_lich', 'forgemaw', 'sprites']);
     expect([...BUDDY_TEMPLATE_IDS]).toEqual([
       'buddy_horse',
       'buddy_crystal_lich',
       'buddy_forgemaw',
-      'buddy_sapling',
       'buddy_sprites',
     ]);
     for (const key of RETIRED_KEYS) {
       expect(buddyDef(key)).toBeNull();
       expect(normalizeBuddyKey(key)).toBe('');
-      expect(buddyItemId(key)).toBeNull();
     }
   });
 
@@ -98,7 +94,7 @@ describe('retired buddies', () => {
     });
   });
 
-  it('refuses retired grants, summons and token use without consuming saved tokens', () => {
+  it('refuses retired grants, summons and pending reveals', () => {
     const sim = new Sim({
       seed: 42,
       playerClass: 'warrior',
@@ -112,17 +108,13 @@ describe('retired buddies', () => {
       expect(summonBuddy(sim.ctx, pid, key)).toBe(false);
       expect(attachPendingBuddy(sim.ctx, pid, key, 'world', { x: 0, z: 0 })).toBe(false);
     }
-    for (const itemId of RETIRED_TOKENS) {
-      expect(ITEMS[itemId]).toBeDefined();
-      sim.addItem(itemId, 1, pid);
-      useItem(sim.ctx, itemId, pid);
-      expect(useBuddyToken(sim.ctx, pid, itemId)).toBe(false);
-      expect(sim.countItem(itemId, pid), itemId).toBe(1);
-      sim.removeItem(itemId, 1, pid);
-    }
     expect(meta.buddies.owned.size).toBe(0);
     expect(meta.buddies.pending).toEqual([]);
     expect(sim.entities.get(pid)!.buddyKey).toBe('');
+  });
+
+  it('deletes the retired whistles and charms outright (they never shipped)', () => {
+    for (const itemId of RETIRED_TOKENS) expect(ITEMS[itemId], itemId).toBeUndefined();
   });
 
   it('has no vendor or recipe acquisition for retired tokens', () => {

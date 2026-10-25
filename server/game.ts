@@ -8665,7 +8665,7 @@ export class GameServer {
       // flag, not the modulo, is what carries correctness here. Wire key
       // `mntOwn`.
       maybe('mntOwn', this.sim.ownedMountsFor(anchorSession.pid));
-      // The buddy collection (IWorldBuddies), four keys (server/buddy_wire.ts).
+      // The buddy collection (IWorldBuddies), budOwn and budPend (server/buddy_wire.ts).
       emitBuddySelfKeys(this.sim, anchorSession.pid, maybe);
       // The viewer's own farm plots (wire key `fplot`): heavy-gated, built by
       // appendFarmPlotsWire in server/farming_commands.ts since the v0.38.0

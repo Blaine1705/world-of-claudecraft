@@ -26,18 +26,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountBagsEmpty': 'Tus bolsas están vacías.',
   'hudChrome.buddyMenu.cancel': 'Cancelar',
   'hudChrome.collections.actions.summon': 'Invocar',
-  'hudChrome.collections.actions.wear': 'Equipar',
-  'hudChrome.collections.armor.cloth': 'Tela',
-  'hudChrome.collections.armor.leather': 'Cuero',
-  'hudChrome.collections.detail.honorPrice': '{amount} de Honor',
-  'hudChrome.collections.detail.soulbound': 'Ligado al alma',
-  'hudChrome.collections.petKind.beast': 'Bestias',
-  'hudChrome.collections.petKind.elemental': 'Elementales',
-  'hudChrome.collections.petKind.humanoid': 'Humanoides',
-  'hudChrome.collections.petKind.undead': 'No-muertos',
-  'hudChrome.collections.stat.agility': 'Agilidad',
-  'hudChrome.collections.stat.intellect': 'Intelecto',
-  'hudChrome.collections.tabs.mounts': 'Monturas',
   'hudChrome.courier.bankTitle': 'Banco',
   'hudChrome.courier.empty': 'Sin objetos',
   'hudChrome.courier.inventory': 'Inventario',
@@ -21475,10 +21463,6 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'editor.sculpt.hardness': 'Dureza del pincel',
   'editor.water.hue': 'Matiz',
   'entities.mobs.thorn_sprout.name': 'Brote Espinoso',
-  'hudChrome.collections.cosmetic.crystal_lich_frostbound': 'Escarcha Eterna',
-  'hudChrome.collections.cosmetic.proud_grunt_warlord': 'Señor de la guerra',
-  'hudChrome.collections.cosmetic.stag_gilded': 'Dorado',
-  'hudChrome.collections.detail.exchangeLabel': 'Bolsa de $WOC',
   'hudChrome.guildHall.done': 'Completado esta semana',
   'hudChrome.guildHall.kinds.boss': 'Recompensa por captura',
   'hudChrome.guildHall.shop.kindTitle': 'Título',
@@ -21509,7 +21493,6 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'referralCards.milestones.gravewyrm': 'Korzul el Gravewyrm',
   'referralCards.milestones.hollow': 'Dentro del Hueco',
   'referralCards.okay': 'Aceptar',
-  'hudChrome.collections.stat.strength': 'Intensidad',
   'editor.city.kitScale': 'Escala de pieza',
   'editor.city.kitTileSnap': 'Conectar teselas',
   'editor.city.prefabCount': '{n} piezas',
@@ -21804,7 +21787,6 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'editor.tunnel.cutShape.box': 'Caja',
   'editor.tunnel.width': 'Anchura',
   'editor.weather.clear': 'Despejar',
-  'hudChrome.collections.actions.remove': 'Quitar',
   'hudChrome.expeditions.close': 'Cerrar',
   'editor.flatten.style.sharpen': 'Agudizar',
   'editor.flatten.style.smooth': 'Suavizar',
@@ -22480,8 +22462,6 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'entities.items.cantors_hymnal.name': 'Himnario del cantor',
   'entities.items.cantors_stole.name': 'Estola del cantor',
   'entities.items.cellwatch_belt.name': 'Cinturón de la guardia de las celdas',
-  'entities.items.charm_stag_acorn.name': 'Amuleto de la corona de bellotas',
-  'entities.items.charm_stag_gilded.name': 'Amuleto dorado',
   'entities.items.choirward_leggings.name': 'Leotardos del resguardo del coro',
   'entities.items.choirward_pauldrons.name': 'Hombreras de placas del resguardo del coro',
   'entities.items.choristers_gloves.name': 'Guantes del corista',
@@ -22880,41 +22860,6 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'entities.items.vestments_of_the_waking_rite.name': 'Vestimentas del rito que despierta',
   'entities.items.warmonger_greaves.name': 'Grebas del belicista',
   'entities.items.warmonger_treads.name': 'Pisadas del belicista',
-  'entities.items.whistle_alon.name': 'Silbato de Alon',
-  'entities.items.whistle_alpaca.name': 'Silbato de alpaca',
-  'entities.items.whistle_ansem.name': 'Silbato de Ansem',
-  'entities.items.whistle_bull.name': 'Silbato de toro',
-  'entities.items.whistle_cate_coin.name': 'Silbato de Cate Coin',
-  'entities.items.whistle_crimson_claw_crab.name': 'Silbato de cangrejo de pinza carmesí',
-  'entities.items.whistle_crystal_lich.name': 'Silbato de liche de cristal',
-  'entities.items.whistle_crystal_tide.name': 'Silbato de marea de cristal',
-  'entities.items.whistle_ember_fox.name': 'Silbato de zorro de ascuas',
-  'entities.items.whistle_emberfall_phoenix.name': 'Silbato de fénix de lluvia de ascuas',
-  'entities.items.whistle_emerald_wolf.name': 'Silbato de lobo esmeralda',
-  'entities.items.whistle_forgemaw.name': 'Silbato de Fauciforja el Fundido',
-  'entities.items.whistle_frog.name': 'Silbato de rana',
-  'entities.items.whistle_frostfire.name': 'Silbato de fuegoescarcha',
-  'entities.items.whistle_golden_sentinel.name': 'Silbato de centinela dorado',
-  'entities.items.whistle_horse.name': 'Silbato de caballo',
-  'entities.items.whistle_kekius.name': 'Silbato de Kekius',
-  'entities.items.whistle_loot_goblin.name': 'Silbato de goblin del botín',
-  'entities.items.whistle_moss_hare.name': 'Silbato de liebre de musgo',
-  'entities.items.whistle_nightfang.name': 'Silbato de Colmillo Nocturno',
-  'entities.items.whistle_penny_goldspark.name': 'Silbato de Penny Chispa Dorada',
-  'entities.items.whistle_phantom.name': 'Silbato de fantasma',
-  'entities.items.whistle_proud_grunt.name': 'Silbato de bruto orgulloso',
-  'entities.items.whistle_raptor.name': 'Silbato de raptor',
-  'entities.items.whistle_rocky.name': 'Silbato de Rocky',
-  'entities.items.whistle_sapling.name': 'Silbato de retoño',
-  'entities.items.whistle_skeleton.name': 'Silbato de esqueleto',
-  'entities.items.whistle_solbot.name': 'Silbato de Solbot',
-  'entities.items.whistle_spider.name': 'Silbato de araña',
-  'entities.items.whistle_sprites.name': 'Silbato de Parpadeo y Destello',
-  'entities.items.whistle_stag.name': 'Silbato de ciervo',
-  'entities.items.whistle_tiger.name': 'Silbato de tigre',
-  'entities.items.whistle_triple_t.name': 'Silbato de Triple T',
-  'entities.items.whistle_trollface.name': 'Silbato de Trollface',
-  'entities.items.whistle_tuskhorn_boar.name': 'Silbato de jabalí Colmillo Cornudo',
   'entities.items.wyrmshadow_chainmail.name': 'Cota de malla de sombra de vermis',
   'entities.items.wyrmshadow_tunic.name': 'Túnica de sombra de vermis',
   'entities.items.wyrmshadow_vest.name': 'Chaleco de sombra de vermis',
@@ -22993,57 +22938,11 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hudChrome.buddyMenu.nameLabel': 'Nombre del compañero',
   'hudChrome.buddyMenu.rename': 'Renombrar compañero',
   'hudChrome.collections.actions.dismiss': 'Despedir',
-  'hudChrome.collections.armor.mail': 'Malla',
-  'hudChrome.collections.close': 'Cerrar cacería',
-  'hudChrome.collections.cosmetic.crystal_lich_voltaic': 'Voltaico',
-  'hudChrome.collections.cosmetic.forgemaw_ashen': 'Ceniciento',
-  'hudChrome.collections.cosmetic.forgemaw_whitehot': 'Blanco incandescente',
-  'hudChrome.collections.cosmetic.frog_sapphire': 'Rana Zafiro',
-  'hudChrome.collections.cosmetic.moss_hare_verdant': 'Verdoso',
-  'hudChrome.collections.cosmetic.stag_acorn': 'Corona de Bellotas',
-  'hudChrome.collections.cosmeticUnlocked': 'Nueva apariencia para {name}: {look}.',
-  'hudChrome.collections.detail.bindLabel': 'Vinculación',
-  'hudChrome.collections.detail.dropLabel': 'Botín de',
-  'hudChrome.collections.detail.exchangeNone': 'No hay anuncios',
-  'hudChrome.collections.detail.exchangeUnavailable': 'No disponible en este cliente',
-  'hudChrome.collections.detail.marketAtMerchant': 'Se muestra en el mercader',
-  'hudChrome.collections.detail.marketChecking': 'Comprobando...',
-  'hudChrome.collections.detail.marketLabel': 'Mercado mundial',
-  'hudChrome.collections.detail.marketNone': 'No hay anuncios',
-  'hudChrome.collections.detail.marksPrice': '{amount} marcas heroicas',
-  'hudChrome.collections.detail.noItem': 'Aún no lo otorga ningún objeto',
-  'hudChrome.collections.detail.noSell': 'No se puede vender',
-  'hudChrome.collections.detail.noSource': 'Aún no tiene una fuente en el juego',
-  'hudChrome.collections.detail.sellLabel': 'El vendedor paga',
-  'hudChrome.collections.detail.setLabel': 'Conseguido',
-  'hudChrome.collections.detail.tradeable': 'Intercambiable',
-  'hudChrome.collections.detail.vendor': '{npc} ({location}) por {price}',
-  'hudChrome.collections.detail.vendorLabel': 'Lo vende',
-  'hudChrome.collections.keybindLabel': 'Cacería',
-  'hudChrome.collections.looks.locked': 'Bloqueado',
-  'hudChrome.collections.looks.title': 'Apariencias',
-  'hudChrome.collections.looks.unlocked': 'Desbloqueado',
-  'hudChrome.collections.looks.worn': 'Equipado',
-  'hudChrome.collections.petKind.celebrity': 'Celebridades',
-  'hudChrome.collections.set.bonusLabel': '{pieces} piezas',
-  'hudChrome.collections.set.itemLevel': 'Nivel de objeto {level}',
-  'hudChrome.collections.set.owned': '{owned} de {total} piezas',
-  'hudChrome.collections.source.bossLabel': 'Mascota de jefe',
-  'hudChrome.collections.source.challengeLabel': 'Desafío',
-  'hudChrome.collections.source.craft': '{item} (receta de {profession})',
-  'hudChrome.collections.source.craftLabel': 'Fabricado',
-  'hudChrome.collections.source.deed': 'La gesta {deed}',
-  'hudChrome.collections.source.deedLabel': 'Se consigue mediante',
-  'hudChrome.collections.source.grantLabel': 'Otorgado',
-  'hudChrome.collections.source.tokenLabel': 'Ficha',
-  'hudChrome.collections.stat.mixed': 'Híbrido',
   'hudChrome.collections.state.notOwned': 'Sin conseguir',
   'hudChrome.collections.state.owned': 'Conseguido',
   'hudChrome.collections.state.pending': 'Una presencia te sigue',
   'hudChrome.collections.state.unavailable': 'Aún no se puede obtener',
   'hudChrome.collections.tabs.buddies': 'Compañeros',
-  'hudChrome.collections.tabs.sets': 'Conjuntos de objetos',
-  'hudChrome.collections.title': 'Cacería',
   'hudChrome.cosmetics.buddyActive': 'Invocado',
   'hudChrome.cosmetics.buddyDrag': 'Arrastrar a la barra de acción',
   'hudChrome.courier.bags': 'Enviar al banco',
@@ -23094,7 +22993,6 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'entities.mobs.buddy_proud_grunt.name': 'Bruto Orgulloso',
   'entities.mobs.buddy_raptor.name': 'Raptor',
   'entities.mobs.buddy_rocky.name': 'Rocky',
-  'entities.mobs.buddy_sapling.name': 'Retoño',
   'entities.mobs.buddy_skeleton.name': 'Esqueleto',
   'entities.mobs.buddy_solbot.name': 'Solbot',
   'entities.mobs.buddy_spider.name': 'Araña',
@@ -24405,85 +24303,6 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
     'Acércate a menos de {range} yardas de tu compañero para que la cadena deje de dañaros a ambos',
   'hudChrome.buddyMenu.autolootHint':
     'Tu compañero recoge el botín de los cadáveres que te corresponden a menos de 30 yardas.',
-  'hudChrome.collections.buddyLore.alon':
-    'Una mascota de viajero de un camino que ningún mapa reconoce, que aparece allí donde un plan va mal. Observa, aprueba y no ofrece absolutamente ninguna ayuda.',
-  'hudChrome.collections.buddyLore.alpaca':
-    'En la Cresta del Vendaval los crían por su lana y su temperamento: nada conserva mejor la calma durante una tormenta. Este escupirá a exactamente una persona por viaje.',
-  'hudChrome.collections.buddyLore.ansem':
-    'Habla de puertas y de oscuridad, pero no se le puede sacar nada más sobre ninguna de las dos. Los cultistas de la Flor Nocturna lo reclaman como suyo; se marcha cada vez que celebran un rito.',
-  'hudChrome.collections.buddyLore.bull':
-    'Un toro del Valle del tamaño de un perro, la única razón por la que alguien aceptó tener uno dentro de casa. Su temperamento no se redujo junto con el resto.',
-  'hudChrome.collections.buddyLore.cate_coin':
-    'Un gato que no se separa de la moneda sobre la que se sienta y al que nadie ha visto comer jamás. Los mercaderes de Eastbrook siguen discutiendo cuál de los dos es la mascota.',
-  'hudChrome.collections.buddyLore.crimson_claw_crab':
-    'Un cangrejo de marea de la Costa Lejana cuya pinza sigue roja mucho después de salir del agua. Las cuadrillas del muelle solían hacerlos correr sobre los tablones para apostar monedas.',
-  'hudChrome.collections.buddyLore.crystal_lich':
-    'Una esquirla del propio Nythraxis, que aún zumba con el frío que le dio forma. Obedece a quien la sacó de los restos de la banda y todavía no se lo ha perdonado.',
-  'hudChrome.collections.buddyLore.crystal_tide':
-    'Un espíritu de marea que viaja sobre su propia gota de cristal marino, pescado en aguas quietas por pescadores desde el Valle hasta la Costa Lejana que buscaban la cena. Conserva el agua de la que salió y no hay quien lo convenza de volver.',
-  'hudChrome.collections.buddyLore.ember_fox':
-    'Una zorra de los setos del Valle de Eastbrook, llamada así por el pelaje rojo como el carbón encendido que asoma entre la maleza invernal. Los tramperos de allí renunciaron a capturar a sus crías hace generaciones y empezaron a dejarles comida.',
-  'hudChrome.collections.buddyLore.emberfall_phoenix':
-    'Se consume hasta quedar en ascuas cada otoño y resurge de sus propias cenizas en primavera; eso es todo lo que se puede contar de él. Nadie ha encontrado un nido y nadie ha atrapado al mismo dos veces.',
-  'hudChrome.collections.buddyLore.emerald_wolf':
-    'Un cachorro del Bosque de los Espectros, con el pelaje verde bajo la luz de las copas que nunca acaba de llegar al suelo. Los guardianes crían a los huérfanos que el bosque deja atrás.',
-  'hudChrome.collections.buddyLore.forgemaw':
-    'Forjado en el Crisol de la Última Fuente y nunca del todo terminado, salió de la fundición de Ignivar mientras los martillos aún golpeaban. Solo el descenso heroico permite encontrarlo: la criatura fundida vuelve una y otra vez a la forja que la creó y sigue a casa a quien sobrevive al fuego dos veces.',
-  'hudChrome.collections.buddyLore.frog':
-    'La Ciénaga de Mirefen los cría gordos y despreocupados, cantando toda la noche entre los juncales. Los guías de la ciénaga juran que una barca que lleve uno nunca encalla.',
-  'hudChrome.collections.buddyLore.frostfire':
-    'Nació en el Velo de Escarcha, donde un manantial caliente emerge entre los hielos, y nunca ha decidido a qué mitad pertenece. Desprende vapor con el aire frío y tiembla con el cálido.',
-  'hudChrome.collections.buddyLore.golden_sentinel':
-    'Un escarabajo centinela de la Cascada de Ámbar, dorado por la resina en la que creció. El nombre es más antiguo que la resina: centinelas de algún tipo custodiaban aquellos bosques mucho antes de que nadie pensara en embotellar su savia.',
-  'hudChrome.collections.buddyLore.horse':
-    'Estirpe de poni del Valle, criada pequeña para los caminos de los huertos y a la que nadie ha dicho que no es un caballo de guerra. Sigue el paso a tu lado y acompañará a cualquiera que le haya dado una manzana una vez.',
-  'hudChrome.collections.buddyLore.kekius':
-    'Un compañero risueño de origen incierto, adoptado como amuleto por las pistas de carreras de la Cresta del Vendaval. Ha sobrevivido a cuatro establos que juraban por su suerte.',
-  'hudChrome.collections.buddyLore.loot_goblin':
-    'Sigue a cualquiera que lleve marcas heroicas y jamás lo han sorprendido robando. El Intendente Vex sostiene que eso no demuestra absolutamente nada.',
-  'hudChrome.collections.buddyLore.moss_hare':
-    'La liebre del Pantano de los Sauces, de pelaje verde tras una vida durmiendo sobre turba húmeda. Los herboristas del pantano la consideran de buena suerte y no permiten que la espanten de una puerta.',
-  'hudChrome.collections.buddyLore.nightfang':
-    'Un joven cazador de la Flor Nocturna, silencioso incluso para los de su especie. Sigue a otros por compañía y no caza nada más grande que una polilla.',
-  'hudChrome.collections.buddyLore.penny_goldspark':
-    'Una aprendiz de inventora gnoma que cobra por horas y vale cada cobre. El armero Hode la contrató para saldar una deuda y ahora vende el acuerdo a cualquiera que tenga mil monedas de oro.',
-  'hudChrome.collections.buddyLore.phantom':
-    'Un pequeño espectro del tamaño de una palma salido de los túmulos del Bosque de los Espectros, todo sábana y nada de huesos, que aparece en una mochila cerrada y se queda por compañía. Nadie ha averiguado qué quiere y jamás ha intentado asustar a nadie.',
-  'hudChrome.collections.buddyLore.proud_grunt':
-    'Un veterano de los almacenes de guerra que conservó el saludo y perdió el rango. El Mariscal de Guerra Draven Kole entrega uno a cualquier soldado con honor suficiente para saber lo que cuesta.',
-  'hudChrome.collections.buddyLore.raptor':
-    'Cría de las Tierras del Dragón, vendida antes de aprender lo rápido que puede correr. A todos sus nuevos dueños les dicen que la mantengan alimentada y a ninguno hace falta decírselo dos veces.',
-  'hudChrome.collections.buddyLore.rocky':
-    'Un reptador de caparazón pétreo de las pedreras de Thornpeak, lento y completamente despreocupado. Los mineros los conservan porque se quedan quietos un instante antes de un derrumbe.',
-  'hudChrome.collections.buddyLore.sapling':
-    'Un árbol joven con una sonrisa en la corteza y una mirada violeta curiosa. Sus raíces lo llevan con un alegre contoneo adondequiera que vayas.',
-  'hudChrome.collections.buddyLore.skeleton':
-    'Salió de los túmulos del Bosque de los Espectros, se sacudió el polvo y desde entonces sigue a la gente. Nadie ha establecido a quién pertenecían esos huesos.',
-  'hudChrome.collections.buddyLore.solbot':
-    'Un pequeño autómata alimentado por el sol, desenterrado de las cenizas de las Tierras del Dragón, donde estaba medio sepultado, y aún en marcha. El taller que lo construyó no dejó marca alguna en su carcasa.',
-  'hudChrome.collections.buddyLore.spider':
-    'Una tejedora del Bosque de los Espectros, del tamaño de una palma, que redecora cualquier mochila en la que viaje. Su telaraña es más resistente que el hilo que sustituye.',
-  'hudChrome.collections.buddyLore.sprites':
-    'Dos pequeños espíritus de fuego, uno dorado y otro verde azulado, que nunca se ponen del todo de acuerdo sobre quién guía. Si se acercan lo suficiente, se funden en una llama verde y luego vuelven a separarse entre risas.',
-  'hudChrome.collections.buddyLore.stag':
-    'Linaje del Jardín Eterno, reducido mediante cría a partir de los grandes ciervos que antaño montaban los guardianes. Aún baja la cabeza ante una mano alzada, por una costumbre más antigua que el propio animal.',
-  'hudChrome.collections.buddyLore.tiger':
-    'Rayas de la Bahía de las Palmeras en un animal que nunca la ha visto: el linaje se ha criado en cautividad desde que cerraron las antiguas casas de fieras. Responde a un silbato y a nada más.',
-  'hudChrome.collections.buddyLore.triple_t':
-    'Tres de algo, o una cosa repetida tres veces. Los relatos no coinciden y la criatura no se queda quieta el tiempo suficiente para contarla.',
-  'hudChrome.collections.buddyLore.trollface':
-    'Una cosa sonriente que el Bosque de los Espectros expulsó y se negó a readmitir. Todos los intentos de describirla terminan con quien lo intenta riéndose y dándose por vencido.',
-  'hudChrome.collections.buddyLore.tuskhorn_boar':
-    'Estirpe de Thornpeak criada con patas cortas por pastores que querían un jabalí incapaz de derribar una valla. Aun así, conservó el temperamento.',
-  'hudChrome.collections.detail.dropWithHeroic':
-    '{mob} ({location}), {chance}% por muerte, {heroicChance}% en heroico',
-  'hudChrome.collections.detail.fishingDrop': 'Pesca en cualquier lugar, {chance}% por captura',
-  'hudChrome.collections.detail.globalDrop':
-    'Cualquier enemigo, {chance}% por muerte, uno de {count} de esta rareza',
-  'hudChrome.collections.detail.heroicDrop':
-    '{mob} ({location}), solo en heroico, {chance}% por muerte',
-  'hudChrome.collections.launcherTitle': 'Cacería: compañeros, monturas y conjuntos de objetos',
-  'hudChrome.collections.looks.none': 'Aún no hay apariencias creadas para este compañero',
   'hudChrome.collections.presence.alon': 'Te sientes observado y aprobado en silencio.',
   'hudChrome.collections.presence.alpaca': 'Algo lanudo y sin prisas ha decidido acompañarte.',
   'hudChrome.collections.presence.ansem': 'Te sigue un susurro de puertas y oscuridad.',
@@ -24536,19 +24355,6 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
     'Un bufido y un pisotón: algo testarudo te sigue.',
   'hudChrome.collections.presenceDefault': 'Sientes una presencia que te observa.',
   'hudChrome.collections.revealed': '{name} ha decidido seguirte.',
-  'hudChrome.collections.source.bossDrop': '{mob} ({location}), {chance}% por jugador y muerte',
-  'hudChrome.collections.source.bossDropHeroicOnly':
-    '{mob} ({location}), solo en heroico, {chance}% por jugador',
-  'hudChrome.collections.source.bossDropWithHeroic':
-    '{mob} ({location}), {chance}% por jugador, {heroicChance}% en heroico',
-  'hudChrome.collections.source.challengeDps':
-    'Inflige {dps} de daño por segundo a {mob} a lo largo del combate',
-  'hudChrome.collections.source.challengeSpeed':
-    'Derrota a {mob} en los {seconds} segundos siguientes al inicio del combate',
-  'hudChrome.collections.source.grantOnly':
-    'Recompensa de temporada: clasificación mensual y premios a los mejores registros de combate',
-  'hudChrome.collections.source.rollNote':
-    'Cada jugador tira por separado; nadie pierde una tirada frente a un miembro del grupo.',
   'hudChrome.courier.cargoSafe':
     'Los objetos devueltos desbordan las bolsas llenas. El mensajero desaparece tras la entrega hasta que vuelvas a invocarlo.',
   'hudChrome.courier.instructions':
@@ -26088,8 +25894,6 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hudChrome.adventureGuide.delve': 'Expedición',
   'hudChrome.auraEffect.trinket.quench':
     'Tus siguientes {stacks} golpes de arma infligen {damage} de daño de Escarcha adicional. El último ralentiza los ataques del objetivo un {slow}%.',
-  'hudChrome.collections.detail.drop': '{mob} ({location}), {chance}% por muerte',
-  'hudChrome.collections.source.token': '{item}, se usa una vez para vincular al compañero',
   'hudChrome.courier.bank': 'Traer del banco',
   'hudChrome.courier.selected': '{count} / {limit} pilas seleccionadas',
   'hudChrome.finder.inspect': 'Inspeccionar',

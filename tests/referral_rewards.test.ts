@@ -199,9 +199,9 @@ describe('referral reward transactions', () => {
 describe('referral buddy ownership', () => {
   it('preserves other owned buddies and does not duplicate the paired sprites', () => {
     const state = blank();
-    state.buddies = { owned: ['horse', 'sapling', 'sprites'] };
+    state.buddies = { owned: ['horse', 'crystal_lich', 'sprites'] };
     const granted = grantReferralInviterReward(state, 5);
-    expect(granted.buddies?.owned).toEqual(['horse', 'sapling', 'sprites']);
+    expect(granted.buddies?.owned).toEqual(['horse', 'crystal_lich', 'sprites']);
     expect(grantReferralInviterReward(granted, 5)).toBe(granted);
   });
 });

@@ -2560,7 +2560,7 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // templates: 298. Plus buddy_sapling, the Sapling companion the referral
     // stamp cards (642100fe8aa) brought back to the roster: 299. Full chain:
     // tests/gathering.test.ts. Plus buddy_sprites, the flame-sprite pair: 300.
-    expect(Object.keys(MOBS).length - tagged.length).toBe(300);
+    expect(Object.keys(MOBS).length - tagged.length).toBe(299);
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(

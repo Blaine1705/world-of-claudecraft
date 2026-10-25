@@ -144,7 +144,7 @@ describe('account buddy ownership coordinator', () => {
     const x = setup();
     const s = x.attach(1);
     admission.mockReturnValueOnce(false);
-    x.service.buy(s, 10, 'whistle_horse', { bulk: false });
+    x.service.buy(s, 10, 'companion_horse', { bulk: false });
     await flush();
     expect(x.host.save).not.toHaveBeenCalled();
     expect(x.db.purchaseAccountBuddy).not.toHaveBeenCalled();
@@ -155,9 +155,9 @@ describe('account buddy ownership coordinator', () => {
     const x = setup();
     const a = x.attach(1);
     const b = x.attach(2);
-    expect(x.service.buy(a, 10, 'whistle_horse', { bulk: false })).toBe(true);
+    expect(x.service.buy(a, 10, 'companion_horse', { bulk: false })).toBe(true);
     expect(x.service.commandBlocked(1)).toBe(true);
-    x.service.buy(b, 10, 'whistle_horse', { bulk: false });
+    x.service.buy(b, 10, 'companion_horse', { bulk: false });
     await flush();
     expect(x.calls).toEqual(['save', 'lock', 'buy', 'commit']);
     expect(x.balances.get(1)).toBe(0);
@@ -174,7 +174,7 @@ describe('account buddy ownership coordinator', () => {
       expect(prepare(['horse'])).toBeNull();
       return ['horse'];
     });
-    x.service.buy(s, 10, 'whistle_horse', { bulk: false });
+    x.service.buy(s, 10, 'companion_horse', { bulk: false });
     await flush();
     expect(x.sim.buyItem).not.toHaveBeenCalled();
     expect(x.balances.get(1)).toBe(100000);
@@ -190,7 +190,7 @@ describe('account buddy ownership coordinator', () => {
       prepare([]);
       throw new Error('connection lost');
     });
-    x.service.buy(s, 10, 'whistle_horse', { bulk: false });
+    x.service.buy(s, 10, 'companion_horse', { bulk: false });
     await flush();
     expect(x.host.quarantine).toHaveBeenCalledWith(s);
     expect(x.balances.get(1)).toBe(0);
@@ -209,7 +209,7 @@ describe('account buddy ownership coordinator', () => {
         reject = fail;
       });
     });
-    x.service.buy(s, 10, 'whistle_horse', { bulk: false });
+    x.service.buy(s, 10, 'companion_horse', { bulk: false });
     await flush();
     const queuedSave = x.host.queue.enqueue(s.characterId, async () => s.escrowQuarantined);
     reject(new Error('commit unknown'));

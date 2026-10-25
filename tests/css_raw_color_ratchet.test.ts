@@ -188,9 +188,6 @@ const ZERO_LITERAL_SECTIONS = [
   'character preview loading silhouette',
   // tokenized as authored (the tab reads --gold, --color-gold-300 and --color-bg-dark)
   'character preview touch hint',
-  // migrated on the v0.45.0 integration: its tab, row, lore, item-level and
-  // owned-piece colors moved to --color-collections-* in tokens.css
-  'Collections (buddies, mounts, item sets)',
 ];
 
 // A section counts zero when it is tokenized AND when it is empty, so the zero pin

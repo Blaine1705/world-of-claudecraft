@@ -6034,8 +6034,7 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
         id in WARFARE_ITEMS ||
           WARFARE_TRINKET_STOCK.includes(id) ||
           WORLD_PVP_GOODS_STOCK.includes(id) ||
-          SEASON2_STOCK.includes(id) ||
-          id === 'whistle_horse',
+          SEASON2_STOCK.includes(id),
         id,
       ).toBe(true);
       expect(ITEMS[id].soulbound, id).toBe(true);

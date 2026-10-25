@@ -5814,14 +5814,8 @@ export const da_DK: EnTranslations = {
       "logAdminPurge": "En administrator fjernede {count} {item}"
     },
     "collections": {
-      "title": "Jagt",
-      "close": "Luk jagt",
-      "keybindLabel": "Jagt",
-      "launcherTitle": "Jagt: ledsagere, ridedyr og genstandssæt",
       "tabs": {
-        "buddies": "Ledsagere",
-        "mounts": "Ridedyr",
-        "sets": "Genstandssæt"
+        "buddies": "Ledsagere"
       },
       "state": {
         "owned": "Samlet",
@@ -5831,7 +5825,6 @@ export const da_DK: EnTranslations = {
       },
       "presenceDefault": "Du mærker et nærvær iagttage dig.",
       "revealed": "{name} har besluttet at følge dig.",
-      "cosmeticUnlocked": "Nyt udseende til {name}: {look}.",
       "presence": {
         "ember_fox": "Noget lille og varmt tasser efter dig.",
         "moss_hare": "En raslen i tørven holder trit med dine skridt.",
@@ -5869,134 +5862,9 @@ export const da_DK: EnTranslations = {
         "phantom": "Luften bag dig er en anelse for stille.",
         "emberfall_phoenix": "En varme som fra en ulmende ild lægger sig bag dig."
       },
-      "cosmetic": {
-        "crystal_lich_frostbound": "Frostbundet",
-        "crystal_lich_voltaic": "Elektrisk",
-        "forgemaw_ashen": "Askegrå",
-        "forgemaw_whitehot": "Hvidglødende",
-        "stag_acorn": "Agernkrans",
-        "stag_gilded": "Forgyldt",
-        "moss_hare_verdant": "Grøn frodighed",
-        "proud_grunt_warlord": "Krigsherre",
-        "frog_sapphire": "Safirfrø"
-      },
       "actions": {
         "summon": "Tilkald",
-        "dismiss": "Afvis",
-        "wear": "Bær",
-        "remove": "Fjern"
-      },
-      "looks": {
-        "title": "Udseender",
-        "unlocked": "Låst op",
-        "locked": "Låst",
-        "worn": "Båret",
-        "none": "Ingen udseender er skabt til denne ledsager endnu"
-      },
-      "source": {
-        "bossLabel": "Bossledsager",
-        "bossDrop": "{mob} ({location}), {chance}% pr. spiller pr. drab",
-        "bossDropWithHeroic": "{mob} ({location}), {chance}% pr. spiller, {heroicChance}% på heroisk",
-        "bossDropHeroicOnly": "{mob} ({location}), kun heroisk, {chance}% pr. spiller",
-        "rollNote": "Hver spiller slår særskilt; ingen mister et slag til et gruppemedlem.",
-        "deedLabel": "Fortjent gennem",
-        "deed": "Bedriften {deed}",
-        "challengeLabel": "Udfordring",
-        "challengeSpeed": "Besejr {mob} inden for {seconds} sekunder fra kampens start",
-        "challengeDps": "Gør {dps} skade i sekundet på {mob} gennem kampen",
-        "craftLabel": "Fremstillet",
-        "craft": "{item} (opskrift til {profession})",
-        "grantLabel": "Tildelt",
-        "grantOnly": "Sæsonbelønning: den månedlige rangliste og belønninger for bedste kamplogge",
-        "tokenLabel": "Polet",
-        "token": "{item}, bruges én gang til at knytte ledsageren til dig"
-      },
-      "buddyLore": {
-        "ember_fox": "En hunræv fra Østbæk Dals levende hegn, opkaldt efter den kulrøde pels, der ses gennem vinterskrubbet. Fældefangerne der opgav ungerne for generationer siden og begyndte at sætte mad ud i stedet.",
-        "moss_hare": "En hare fra Pilekæret, grønpelset efter et liv med leje i våd tørv. Mosens urtekyndige regner dem for lykkebringere og vil ikke have en jaget væk fra en dørtrappe.",
-        "frog": "Mosekær Sump opfostrer dem fede og ubekymrede, kvækkende hele natten fra sivene. Moseguiderne sværger på, at en båd med en ombord aldrig går på grund.",
-        "crimson_claw_crab": "En tidevandskrabbe fra Fjernkysten, hvis klo forbliver rød længe efter, at den forlader vandet. Havnefolk plejede at lade dem løbe om kap på plankerne om penge.",
-        "golden_sentinel": "En vagtbille fra Ravfaldet, forgyldt af harpiksen, den voksede op i. Navnet er ældre end harpiksen: vogtere af en slags holdt de lunde, længe før nogen fandt på at tappe saften på flaske.",
-        "nightfang": "En ung jæger fra Natblomsten, tavs selv efter sin arts målestok. Den følger med for selskabets skyld og jager intet større end et møl.",
-        "tuskhorn_boar": "Et dyr fra Tornetop Højder, avlet kortbenet af hyrder, der ville have et vildsvin, som ikke kunne vælte et hegn. Det beholdt temperamentet alligevel.",
-        "emerald_wolf": "En hvalp fra Genfærdsskoven, hvis pels er grøn i trækronernes lys, som aldrig helt når skovbunden. Vogterne opfostrer de forældreløse unger, skoven efterlader.",
-        "tiger": "Palmebugtens striber på et dyr, der aldrig har set Palmebugten: slægten har været holdt i fangenskab, siden de gamle menagerier lukkede. Den adlyder en fløjten og intet andet.",
-        "cate_coin": "En kat, der ikke vil skilles fra mønten, den sidder på, og som ingen nogensinde har set spise. Købmændene i Østbæk skændes stadig om, hvem af de to der er kæledyret.",
-        "alon": "En rejsendes maskot fra en vej, intet kort vil vedkende sig, som dukker op, hvor en plan går skævt. Den ser til, den billiger, og den tilbyder overhovedet ingen hjælp.",
-        "trollface": "En grinende ting, Genfærdsskoven sendte ud og nægtede at tage tilbage. Ethvert forsøg på at beskrive den ender med, at fortælleren ler og opgiver.",
-        "ansem": "Den taler om døre og mørke og vil ikke uddybe nogen af delene. Natblomstens kultister hævder, at den er deres; den vandrer væk, hver gang de holder et ritual.",
-        "triple_t": "Tre af noget eller én ting tre gange. Beretningerne er uenige, og væsenet vil ikke stå stille længe nok til at blive talt.",
-        "kekius": "En leende ledsager af uklar oprindelse, taget til sig som lykkebringer af Stormkammens væddeløbsstalde. Den har overlevet fire stalde, der svor til den.",
-        "solbot": "En lille soldrevet automat, gravet halvt begravet ud af Dragelandets aske og stadig tikkende. Værkstedet, der byggede den, efterlod intet mærke nogetsteds på hylstret.",
-        "frostfire": "Født i Frostsløret, hvor en varm kilde bryder gennem ismarken, og den har aldrig besluttet, hvilken halvdel den hører til. Den damper i kold luft og ryster i varm.",
-        "rocky": "En stenskallet kryber fra Tornetop Højders skråninger, langsom og fuldstændig ubekymret. Minefolk holder dem, fordi de stivner et øjeblik før et sammenstyrt.",
-        "proud_grunt": "En veteran fra krigsforrådene, som beholdt salutten og mistede graden. Krigsmarskal Draven Kole giver en til enhver soldat med ære nok til at vide, hvad det koster.",
-        "loot_goblin": "Den følger enhver, der bærer heroiske mærker, og er aldrig blevet taget i at stjæle. Kvartermester Vex fastholder, at det overhovedet intet beviser.",
-        "penny_goldspark": "En gnomopfinders lærling, som tager betaling i timen og er hver kobbermønt værd. Rustningsmager Hode tog hende ind for at afvikle en gæld og sælger nu aftalen til enhver med tusind guld.",
-        "stag": "En blodlinje fra Evighaven, avlet ned fra de store hjorte, vogterne engang red. Den sænker stadig hovedet for en løftet hånd af en vane, der er ældre end dyret.",
-        "alpaca": "Hjordene i Stormkammen holder dem for uldens og sindets skyld: intet forbliver roligere i en storm. Denne spytter på præcis én person på hver rejse.",
-        "horse": "En dalpony, avlet lille til frugthavernes stier og aldrig fortalt, at den ikke er en stridshest. Den holder trit ved din skulder og følger enhver, der engang gav den et æble.",
-        "sapling": "Et ungt træ med et smil i barken og et nysgerrigt lilla blik. Dets rødder bærer det i en munter vralt, hvor du end vandrer.",
-        "bull": "En tyr fra Dalen på størrelse med en hund, hvilket er den eneste grund til, at nogen gik med til at holde en indendørs. Temperamentet blev ikke mindre sammen med resten.",
-        "spider": "En håndfladestor væver fra Genfærdsskoven, som indretter enhver oppakning, den bæres i, på ny. Spindet er stærkere end tråden, det erstatter.",
-        "raptor": "En unge fra Dragelandet, solgt videre før den lærer, hvor hurtigt den kan løbe. Hver ny ejer får at vide, at den skal holdes mæt, og ingen behøver høre det to gange.",
-        "skeleton": "Det kom op fra Genfærdsskovens gravhøje, støvede sig af og har fulgt efter folk lige siden. Ingen har fastslået, hvis knogler det var.",
-        "crystal_lich": "Et skår af selve Nythraxis, stadig summende af kulden, der formede det. Det adlyder den, der trak det ud af raidets vrag, og har ikke tilgivet vedkommende for det.",
-        "forgemaw": "Smedet i Den Sidste Kildes Digel og aldrig helt færdig gik den ud af Ignivars støberi, mens hamrene stadig faldt. Kun den heroiske nedstigning finder den: det smeltede væsen vender stadig tilbage til smedjen, der skabte det, og følger hjem med den, der overlever ilden to gange.",
-        "crystal_tide": "En tidevandsånd, der rider på sin egen dråbe havglas, fisket op af stille vand af lystfiskere fra Dalen til Fjernkysten, som ville fange aftensmad. Den beholder vandet, den kom op i, og vil ikke overtales til at vende tilbage.",
-        "sprites": "To små ildånder, én gylden og én blågrøn, som aldrig helt enes om, hvem der fører an. Kom tæt nok på, og de smelter til én grøn flamme, før de igen flyder fra hinanden under latter.",
-        "phantom": "Et håndfladestort genfærd fra Genfærdsskovens gravhøje, helt lagen og ingen knogler, som dukker op i en lukket oppakning og bliver for selskabets skyld. Ingen har fundet ud af, hvad det vil, og det har aldrig prøvet at skræmme nogen.",
-        "emberfall_phoenix": "Den brænder ned til en glød hvert efterår og rejser sig af sin egen aske til foråret, hvilket er alt, nogen kan fortælle om den. Ingen har nogensinde fundet en rede, og ingen har nogensinde fanget en to gange."
-      },
-      "petKind": {
-        "beast": "Bæster",
-        "elemental": "Elementarvæsner",
-        "humanoid": "Humanoider",
-        "undead": "Udøde",
-        "celebrity": "Berømtheder"
-      },
-      "armor": {
-        "cloth": "Stof",
-        "mail": "Ringbrynje",
-        "leather": "Læder"
-      },
-      "stat": {
-        "intellect": "Intellekt",
-        "agility": "Smidighed",
-        "strength": "Styrke",
-        "mixed": "Blandet"
-      },
-      "set": {
-        "owned": "{owned} af {total} dele",
-        "itemLevel": "genstandsniveau {level}",
-        "bonusLabel": "{pieces} dele"
-      },
-      "detail": {
-        "dropLabel": "Bytte fra",
-        "vendorLabel": "Sælges af",
-        "bindLabel": "Binding",
-        "sellLabel": "Handleren betaler",
-        "marketLabel": "Verdensmarked",
-        "exchangeLabel": "$WOC-børsen",
-        "setLabel": "Samlet",
-        "drop": "{mob} ({location}), {chance}% pr. drab",
-        "heroicDrop": "{mob} ({location}), kun heroisk, {chance}% pr. drab",
-        "dropWithHeroic": "{mob} ({location}), {chance}% pr. drab, {heroicChance}% på heroisk",
-        "globalDrop": "Enhver fjende, {chance}% pr. drab, en af {count} med denne sjældenhed",
-        "fishingDrop": "Fiskeri hvor som helst, {chance}% pr. fangst",
-        "vendor": "{npc} ({location}) for {price}",
-        "honorPrice": "{amount} Ære",
-        "marksPrice": "{amount} heroiske mærker",
-        "noSource": "Ingen kilde i spillet endnu",
-        "noItem": "Ingen genstand giver dette endnu",
-        "tradeable": "Kan handles",
-        "soulbound": "Sjælebundet",
-        "noSell": "Kan ikke sælges",
-        "marketAtMerchant": "Vises hos købmanden",
-        "marketChecking": "Kontrollerer...",
-        "marketNone": "Ingen annoncer",
-        "exchangeNone": "Ingen annoncer",
-        "exchangeUnavailable": "Ikke tilgængelig i denne klient"
+        "dismiss": "Afvis"
       }
     },
     "calendar": {
@@ -21210,117 +21078,6 @@ export const da_DK: EnTranslations = {
       "ps_passing_stone": {
         "name": "Hvilesten"
       },
-      "whistle_ember_fox": {
-        "name": "Gløderævens fløjte"
-      },
-      "whistle_moss_hare": {
-        "name": "Mosharens fløjte"
-      },
-      "whistle_frog": {
-        "name": "Frøfløjte"
-      },
-      "whistle_crimson_claw_crab": {
-        "name": "Karmesinkrabbens fløjte"
-      },
-      "whistle_golden_sentinel": {
-        "name": "Den gyldne vogters fløjte"
-      },
-      "whistle_nightfang": {
-        "name": "Nattandens fløjte"
-      },
-      "whistle_tuskhorn_boar": {
-        "name": "Stødhornsvinets fløjte"
-      },
-      "whistle_emerald_wolf": {
-        "name": "Smaragdulvens fløjte"
-      },
-      "whistle_tiger": {
-        "name": "Tigerfløjte"
-      },
-      "whistle_cate_coin": {
-        "name": "Møntkattens fløjte"
-      },
-      "whistle_alon": {
-        "name": "Fløjte til Alon"
-      },
-      "whistle_trollface": {
-        "name": "Troldeansigtets fløjte"
-      },
-      "whistle_ansem": {
-        "name": "Fløjte til Ansem"
-      },
-      "whistle_triple_t": {
-        "name": "Trippel-Ts fløjte"
-      },
-      "whistle_kekius": {
-        "name": "Fløjte til Kekius"
-      },
-      "whistle_solbot": {
-        "name": "Solbottens fløjte"
-      },
-      "whistle_frostfire": {
-        "name": "Frostildens fløjte"
-      },
-      "whistle_rocky": {
-        "name": "Stenklumps fløjte"
-      },
-      "whistle_proud_grunt": {
-        "name": "Den stolte soldats fløjte"
-      },
-      "whistle_loot_goblin": {
-        "name": "Byttegoblinens fløjte"
-      },
-      "whistle_penny_goldspark": {
-        "name": "Penny Guldgnists fløjte"
-      },
-      "whistle_stag": {
-        "name": "Hjortefløjte"
-      },
-      "whistle_alpaca": {
-        "name": "Alpakafløjte"
-      },
-      "whistle_horse": {
-        "name": "Hestefløjte"
-      },
-      "whistle_sapling": {
-        "name": "Træspirens fløjte"
-      },
-      "whistle_bull": {
-        "name": "Tyrefløjte"
-      },
-      "whistle_spider": {
-        "name": "Edderkoppefløjte"
-      },
-      "whistle_raptor": {
-        "name": "Raptorfløjte"
-      },
-      "whistle_skeleton": {
-        "name": "Skeletfløjte"
-      },
-      "whistle_crystal_lich": {
-        "name": "Krystallichens fløjte"
-      },
-      "whistle_forgemaw": {
-        "name": "Fløjte til Smeltekæben"
-      },
-      "whistle_sprites": {
-        "name": "Flimmer og Glimmers fløjte"
-      },
-      "whistle_crystal_tide": {
-        "name": "Krystaltidevandets fløjte"
-      },
-      "whistle_phantom": {
-        "name": "Spøgelsesfløjte"
-      },
-      "whistle_emberfall_phoenix": {
-        "name": "Glødefaldsføniksens fløjte"
-      },
-      "charm_stag_acorn": {
-        "name": "Agernkransens amulet"
-      },
-      "charm_stag_gilded": {
-        "name": "Forgyldt amulet"
-      },
       "lastflame_core": {
         "name": "Den sidste flammes kerne"
       },
@@ -26434,9 +26191,6 @@ export const da_DK: EnTranslations = {
       },
       "buddy_horse": {
         "name": "Træk, stridshesten"
-      },
-      "buddy_sapling": {
-        "name": "Træspire"
       },
       "buddy_bull": {
         "name": "Tyr"
