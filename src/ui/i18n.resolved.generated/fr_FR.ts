@@ -4311,6 +4311,7 @@ export const fr_FR: EnTranslations = {
       "resetConfirmBody": "Cette action abandonne les instances vides de la difficulté précédemment sélectionnée. Tout butin non récupéré empêchera la réinitialisation.",
       "resetConfirm": "Réinitialiser les instances",
       "resetCooldown": "Les instances ne peuvent être réinitialisées qu’une fois toutes les 5 minutes.",
+      "resetAlreadyFresh": "Vos instances sont déjà fraîches. Personne n'y est entré depuis la dernière réinitialisation.",
       "resetUsage": "Utilisez /dungeon reset pour abandonner vos instances vides après avoir changé la difficulté.",
       "entryMismatchNormal": "Cette instance est réglée sur la difficulté Normal. Utilisez Réinitialiser toutes les instances pour commencer une nouvelle partie Héroïque.",
       "entryMismatchHeroic": "Cette instance est réglée sur la difficulté Héroïque. Utilisez Réinitialiser toutes les instances pour commencer une nouvelle partie Normal."

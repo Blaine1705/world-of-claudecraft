@@ -6575,6 +6575,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Instance nelze resetovat, dokud je někdo stále uvnitř.',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     'Před resetováním těchto instancí změň obtížnost dungeonu. Prázdné instance se po 5 minutách resetují samy.',
+  'hudChrome.dungeonDifficulty.resetAlreadyFresh':
+    'Vaše instance jsou již obnovené. Od posledního resetu do nich nikdo nevstoupil.',
   'hudChrome.dungeonDifficulty.resetUsage':
     'Po změně obtížnosti použij /dungeon reset k opuštění prázdných instancí.',
   'hudChrome.dungeonDifficulty.resetLoot': 'Instance nelze resetovat, dokud uvnitř zůstává kořist.',

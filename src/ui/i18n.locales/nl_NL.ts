@@ -6784,6 +6784,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Je kunt instanties niet resetten zolang er nog iemand binnen is.',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     'Wijzig de kerkermoeilijkheid voordat je deze instanties reset. Lege instanties resetten zichzelf na 5 minuten.',
+  'hudChrome.dungeonDifficulty.resetAlreadyFresh':
+    'Je instances zijn al fris. Niemand is ze binnengegaan sinds de laatste reset.',
   'hudChrome.dungeonDifficulty.resetUsage':
     'Gebruik /dungeon reset om je lege instanties te verlaten nadat je de moeilijkheid hebt gewijzigd.',
   'hudChrome.dungeonDifficulty.resetLoot':

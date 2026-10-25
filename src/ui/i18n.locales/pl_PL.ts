@@ -6746,6 +6746,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Nie możesz zresetować instancji, dopóki ktoś nadal znajduje się w środku.',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     'Zmień trudność podziemia przed zresetowaniem tych instancji. Puste instancje resetują się automatycznie po 5 minutach.',
+  'hudChrome.dungeonDifficulty.resetAlreadyFresh':
+    'Twoje instancje są już odświeżone. Nikt do nich nie wszedł od ostatniego resetu.',
   'hudChrome.dungeonDifficulty.resetUsage':
     'Po zmianie trudności użyj /dungeon reset, aby porzucić puste instancje.',
   'hudChrome.dungeonDifficulty.resetLoot':

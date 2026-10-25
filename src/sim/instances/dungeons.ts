@@ -1195,7 +1195,10 @@ export function freeInstance(ctx: SimContext, inst: InstanceSlot): void {
 
 // Explicit classic-style reset for the caller's dungeon AND raid claims. Durable
 // character keys keep relogs attached to the same run; this is the deliberate,
-// server-authoritative way to abandon a claim before selecting another difficulty.
+// server-authoritative way to abandon a claim, either to start the same difficulty
+// fresh (the Reset All Instances button) or, with `transitionOnly`, to move onto a
+// newly selected difficulty (the difficulty toggle, which must never wipe a claim
+// that already matches the selection).
 // Raid claims used to be excluded outright (their lockout and corpse-return rules
 // are stricter), which left disbanding and reforming the party under a fresh key
 // as the only way to switch a raid's difficulty: an UNTHROTTLED escape hatch, since
@@ -1225,7 +1228,11 @@ export type InstanceResetResult =
 export function resetDungeonInstances(
   ctx: SimContext,
   pid?: number,
-  options: { quiet?: boolean; occupied?: ReadonlySet<InstanceSlot> } = {},
+  options: {
+    quiet?: boolean;
+    occupied?: ReadonlySet<InstanceSlot>;
+    transitionOnly?: boolean;
+  } = {},
 ): InstanceResetResult {
   const r = ctx.resolve(pid);
   if (!r) return { status: 'noClaims' };
@@ -1247,16 +1254,24 @@ export function resetDungeonInstances(
     if (!options.quiet) ctx.error(r.meta.entityId, 'You have no instances to reset.');
     return { status: 'noClaims' };
   }
-  // Reset is a difficulty-transition escape hatch, not a same-difficulty farming
-  // loop. The v0.26 durable key intentionally stopped relog from respawning Normal
-  // bosses; require the player to select the other difficulty before abandoning the
-  // old claims so Reset All cannot recreate that exploit with one extra click.
+  // The explicit reset may rebuild a claim at its CURRENT difficulty, so a group
+  // can run a cleared dungeon again without touching the difficulty toggle. It is
+  // rate-limited, not free: the rebuild stamps the five-minute cooldown below (raid
+  // rooms included, see reset_cooldown_policy.ts), so the NEXT reset waits, and
+  // heroic and raid lockouts are read, never moved, so a locked tier still refuses
+  // it. A claim nobody has entered since it was made is already fresh; rebuilding it
+  // again would only charge the cooldown (the "change difficulty, then Reset" flow
+  // the door and chat prompts describe), so the explicit reset leaves it alone. A
+  // difficulty selection (`transitionOnly`) resets only the claims whose difficulty
+  // differs from the new selection, never a matching one.
   const selected = ctx.dungeonDifficulty(r.meta.entityId);
   // Compare against the per-dungeon CLAMPED difficulty (what the replacement
-  // claim below would actually use), so a dungeon without a heroic mode can
-  // never pass the transition guard and loop same-difficulty resets.
+  // claim below would actually use), so a dungeon without a heroic mode never
+  // reads as a transition.
   const directlyResettable = owned.filter(
-    (inst) => inst.difficulty !== claimDifficultyForDungeon(inst.dungeonId, selected),
+    (inst) =>
+      inst.difficulty !== claimDifficultyForDungeon(inst.dungeonId, selected) ||
+      (!options.transitionOnly && inst.enteredBy.size > 0),
   );
   const resettableSet = new Set(directlyResettable);
   if (directlyResettable.some((inst) => isIgnivarRaidRoom(inst.dungeonId))) {
@@ -1269,7 +1284,9 @@ export function resetDungeonInstances(
     if (!options.quiet)
       ctx.error(
         r.meta.entityId,
-        'Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.',
+        options.transitionOnly
+          ? 'Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.'
+          : 'Your instances are already fresh. Nobody has entered them since they were last reset.',
       );
     return { status: 'unchanged' };
   }
@@ -1366,17 +1383,20 @@ export function resetDungeonInstances(
   // group's checkpoint and zone straight into the deepest room on the new
   // difficulty, with none of that room's own trash re-fought.
   for (const inst of resettable) {
+    const previousDifficulty = inst.difficulty;
     freeInstance(ctx, inst);
     if (isIgnivarRaidRoom(inst.dungeonId) && inst.dungeonId !== IGNIVAR_LIFT_ROOM_ID) {
       continue;
     }
-    claimInstance(ctx, inst, key, claimDifficultyForDungeon(inst.dungeonId, selected));
+    const difficulty = claimDifficultyForDungeon(inst.dungeonId, selected);
+    claimInstance(ctx, inst, key, difficulty);
     if (inst.exitId === null) throw new Error('Dungeon reset replacement claim has no identity.');
-    // The raid rooms skip the five-minute cooldown and its per-member locks:
-    // their own daily/weekly lockout (checked above) is the rate limit, and
-    // the cooldown only ever stranded a raid that wanted to switch tier
-    // again (see reset_cooldown_policy.ts).
-    if (!resetCooldownApplies(inst.dungeonId)) continue;
+    // A raid room switching tier skips the five-minute cooldown and its
+    // per-member locks: its own daily/weekly lockout (checked above) is the
+    // rate limit, and the cooldown only ever stranded a raid that wanted to
+    // switch tier again. A same-difficulty rebuild always pays it (see
+    // reset_cooldown_policy.ts).
+    if (!resetCooldownApplies(inst.dungeonId, difficulty === previousDifficulty)) continue;
     inst.resetAvailableAt = ctx.time + INSTANCE_EMPTY_TIMEOUT;
     for (const ownerPid of ownerPids) {
       ctx.dungeonResetLocks.set(resetCooldownKey(ctx, ownerPid, inst.dungeonId), {

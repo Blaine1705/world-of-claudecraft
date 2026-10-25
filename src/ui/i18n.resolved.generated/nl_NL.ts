@@ -4311,6 +4311,7 @@ export const nl_NL: EnTranslations = {
       "resetConfirmBody": "Hiermee verlaat je lege instanties van je eerder geselecteerde moeilijkheid. Niet-opgeëiste buit voorkomt de reset.",
       "resetConfirm": "Instanties resetten",
       "resetCooldown": "Instanties kunnen slechts eenmaal per 5 minuten worden gereset.",
+      "resetAlreadyFresh": "Je instances zijn al fris. Niemand is ze binnengegaan sinds de laatste reset.",
       "resetUsage": "Gebruik /dungeon reset om je lege instanties te verlaten nadat je de moeilijkheid hebt gewijzigd.",
       "entryMismatchNormal": "Deze instantie is ingesteld op de moeilijkheid Normaal. Gebruik Alle instanties resetten om een nieuwe Heroïsche run te starten.",
       "entryMismatchHeroic": "Deze instantie is ingesteld op de moeilijkheid Heroïsch. Gebruik Alle instanties resetten om een nieuwe Normale run te starten."

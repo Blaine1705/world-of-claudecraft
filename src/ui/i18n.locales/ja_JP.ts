@@ -3533,6 +3533,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'パーティーまたはリーダーが変更されたため、予約していた難易度の変更をキャンセルしました。',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     'インスタンスをリセットする前にダンジョン難易度を変更してください。空のインスタンスは5分後に自動的にリセットされます。',
+  'hudChrome.dungeonDifficulty.resetAlreadyFresh':
+    'インスタンスはすでにリセット済みです。前回のリセット以降、誰も入っていません。',
   'hudChrome.dungeonDifficulty.resetUsage':
     '難易度を変更した後、/dungeon reset で空のインスタンスを放棄できます。',
   'hudChrome.dungeonDifficulty.resetLoot':

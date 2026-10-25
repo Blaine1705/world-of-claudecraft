@@ -6763,6 +6763,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Non puoi reimpostare le istanze mentre c'è ancora qualcuno all'interno.",
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     'Cambia la difficoltà del dungeon prima di reimpostare queste istanze. Le istanze vuote si reimpostano automaticamente dopo 5 minuti.',
+  'hudChrome.dungeonDifficulty.resetAlreadyFresh':
+    "Le tue istanze sono già nuove. Nessuno vi è entrato dall'ultimo azzeramento.",
   'hudChrome.dungeonDifficulty.resetUsage':
     'Usa /dungeon reset per abbandonare le istanze vuote dopo aver cambiato difficoltà.',
   'hudChrome.dungeonDifficulty.resetLoot':

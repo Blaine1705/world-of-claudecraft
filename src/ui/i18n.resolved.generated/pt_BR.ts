@@ -4311,6 +4311,7 @@ export const pt_BR: EnTranslations = {
       "resetConfirmBody": "Isso abandona as instâncias vazias da dificuldade selecionada anteriormente. Saques não coletados impedirão a redefinição.",
       "resetConfirm": "Redefinir instâncias",
       "resetCooldown": "As instâncias só podem ser redefinidas uma vez a cada 5 minutos.",
+      "resetAlreadyFresh": "Suas instâncias já estão novas. Ninguém entrou nelas desde a última redefinição.",
       "resetUsage": "Use /dungeon reset para abandonar suas instâncias vazias após alterar a dificuldade.",
       "entryMismatchNormal": "Esta instância está definida na dificuldade Normal. Use Redefinir todas as instâncias para iniciar uma nova sessão Heroica.",
       "entryMismatchHeroic": "Esta instância está definida na dificuldade Heroica. Use Redefinir todas as instâncias para iniciar uma nova sessão Normal."

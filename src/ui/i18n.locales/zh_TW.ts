@@ -5034,6 +5034,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dungeonDifficulty.queuedCancelled': '由於隊伍或隊長發生變更，已取消佇列中的難度變更。',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     '切換地城難度後才能重置這些副本。空置的地城副本會在5分鐘後自動重置。',
+  'hudChrome.dungeonDifficulty.resetAlreadyFresh':
+    '你的副本已經是全新的。自上次重置以來沒有人進入過。',
   'hudChrome.dungeonDifficulty.resetUsage':
     '切換難度後，使用 /dungeon reset 放棄你的空置地城副本。',
   'hudChrome.dungeonDifficulty.resetLoot': '地城副本內仍有戰利品時無法重置。',

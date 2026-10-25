@@ -4311,6 +4311,7 @@ export const it_IT: EnTranslations = {
       "resetConfirmBody": "Questo abbandona le istanze vuote della difficoltà selezionata in precedenza. Il bottino non raccolto impedirà la reimpostazione.",
       "resetConfirm": "Reimposta istanze",
       "resetCooldown": "Le istanze possono essere reimpostate solo una volta ogni 5 minuti.",
+      "resetAlreadyFresh": "Le tue istanze sono già nuove. Nessuno vi è entrato dall'ultimo azzeramento.",
       "resetUsage": "Usa /dungeon reset per abbandonare le istanze vuote dopo aver cambiato difficoltà.",
       "entryMismatchNormal": "Questa istanza è impostata sulla difficoltà Normale. Usa Reimposta tutte le istanze per iniziare una nuova sessione Eroica.",
       "entryMismatchHeroic": "Questa istanza è impostata sulla difficoltà Eroica. Usa Reimposta tutte le istanze per iniziare una nuova sessione Normale."

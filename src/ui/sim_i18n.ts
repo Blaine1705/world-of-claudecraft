@@ -30274,7 +30274,11 @@ const RULES: Rule[] = [
     build: () => t('hudChrome.dungeonDifficulty.resetSameDifficulty'),
   },
   {
-    re: /^Use \/dungeon reset to abandon your empty instances after changing difficulty\.$/,
+    re: /^Your instances are already fresh\. Nobody has entered them since they were last reset\.$/,
+    build: () => t('hudChrome.dungeonDifficulty.resetAlreadyFresh'),
+  },
+  {
+    re: /^Use \/dungeon reset to abandon your empty instances and start them fresh\.$/,
     build: () => t('hudChrome.dungeonDifficulty.resetUsage'),
   },
   {

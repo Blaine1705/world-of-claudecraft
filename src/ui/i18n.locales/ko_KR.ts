@@ -3507,6 +3507,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '파티 또는 파티장이 변경되어 대기 중인 난이도 변경이 취소되었습니다.',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     '인스턴스를 초기화하기 전에 던전 난이도를 변경하세요. 비어 있는 인스턴스는 5분 후 자동으로 초기화됩니다.',
+  'hudChrome.dungeonDifficulty.resetAlreadyFresh':
+    '인스턴스가 이미 초기화된 상태입니다. 마지막 초기화 이후 아무도 입장하지 않았습니다.',
   'hudChrome.dungeonDifficulty.resetUsage':
     '난이도를 변경한 후 /dungeon reset 으로 빈 인스턴스를 포기할 수 있습니다.',
   'hudChrome.dungeonDifficulty.resetLoot':
