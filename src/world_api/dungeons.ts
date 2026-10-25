@@ -157,6 +157,10 @@ export interface IWorldDungeons {
   riftEventMsRemaining(): number | null;
   dungeonDifficulty(): DungeonDifficulty;
   activeDungeonDifficulty(): DungeonDifficulty | null;
+  // The tier the group's existing instances still run on when the selection
+  // above has not reached them (a refused or queued change), else null. The
+  // portrait menu shows it beside the selection. Online it mirrors `udiff`.
+  unappliedDungeonDifficulty(): DungeonDifficulty | null;
   setDungeonDifficulty(difficulty: DungeonDifficulty): void;
   // The viewer's Heroic Marks balance: a currency counter, never a bag stack
   // (src/sim/heroic_marks.ts). Online it mirrors the `hmarks` self key.

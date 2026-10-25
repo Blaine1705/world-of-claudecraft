@@ -4303,6 +4303,8 @@ export const tr_TR: EnTranslations = {
     "dungeonDifficulty": {
       "setHeroic": "Zindan Zorluğunu Ayarla: Kahramanca",
       "setNormal": "Zindan Zorluğunu Ayarla: Normal",
+      "unappliedNormal": "Heroic selected. Current instances are still Normal.",
+      "unappliedHeroic": "Normal selected. Current instances are still Heroic.",
       "resetAll": "Tüm Örnekleri Sıfırla",
       "resetDone": "Tüm örnekler sıfırlandı.",
       "resetNone": "Sıfırlanacak örneğin yok.",

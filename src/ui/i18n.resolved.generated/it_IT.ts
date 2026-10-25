@@ -4303,6 +4303,8 @@ export const it_IT: EnTranslations = {
     "dungeonDifficulty": {
       "setHeroic": "Imposta difficoltà del dungeon: Eroica",
       "setNormal": "Imposta difficoltà del dungeon: Normale",
+      "unappliedNormal": "Heroic selected. Current instances are still Normal.",
+      "unappliedHeroic": "Normal selected. Current instances are still Heroic.",
       "resetAll": "Reimposta tutte le istanze",
       "resetDone": "Tutte le istanze sono state reimpostate.",
       "resetNone": "Non hai istanze da reimpostare.",

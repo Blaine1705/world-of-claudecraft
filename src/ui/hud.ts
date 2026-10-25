@@ -16883,9 +16883,11 @@ export class Hud {
       isRaid: party?.raid ?? false,
       partySize: party?.members.length ?? 1,
       isHeroic: this.sim.dungeonDifficulty() === 'heroic',
+      unappliedDifficulty: this.sim.unappliedDungeonDifficulty(),
     });
     for (const action of actions) {
-      html += `<div class="ctx-item" data-act="${action.id}">${esc(action.label)}</div>`;
+      const attrs = action.inert ? 'aria-disabled="true"' : `data-act="${action.id}"`;
+      html += `<div class="ctx-item" ${attrs}>${esc(action.label)}</div>`;
     }
     el.innerHTML = html;
     hydratePortraits(el);

@@ -5059,6 +5059,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootSettings.menuItem': '拾取設定',
   'hudChrome.dungeonDifficulty.setHeroic': '設定地城難度：英雄',
   'hudChrome.dungeonDifficulty.setNormal': '設定地城難度：普通',
+  'hudChrome.dungeonDifficulty.unappliedNormal': '已選擇英雄難度。目前的地城副本仍為普通難度。',
+  'hudChrome.dungeonDifficulty.unappliedHeroic': '已選擇普通難度。目前的地城副本仍為英雄難度。',
   'hudChrome.dungeonDifficulty.resetAll': '重置所有地城副本',
   'hudChrome.dungeonDifficulty.resetDone': '所有地城副本已重置。',
   'hudChrome.dungeonDifficulty.resetNone': '你沒有可重置的地城副本。',

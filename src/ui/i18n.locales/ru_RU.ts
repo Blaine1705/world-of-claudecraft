@@ -5353,6 +5353,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootSettings.menuItem': 'Настройки добычи',
   'hudChrome.dungeonDifficulty.setHeroic': 'Установить сложность подземелий: героическая',
   'hudChrome.dungeonDifficulty.setNormal': 'Установить сложность подземелий: обычная',
+  'hudChrome.dungeonDifficulty.unappliedNormal': 'Выбрана героическая сложность. Текущие подземелья всё ещё обычные.',
+  'hudChrome.dungeonDifficulty.unappliedHeroic': 'Выбрана обычная сложность. Текущие подземелья всё ещё героические.',
   'hudChrome.dungeonDifficulty.resetAll': 'Сбросить все подземелья',
   'hudChrome.dungeonDifficulty.resetDone': 'Все подземелья сброшены.',
   'hudChrome.dungeonDifficulty.resetNone': 'Нет подземелий для сброса.',

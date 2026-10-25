@@ -5211,6 +5211,10 @@ export const hudChromeStrings = {
   dungeonDifficulty: {
     setHeroic: 'Set Dungeon Difficulty: Heroic',
     setNormal: 'Set Dungeon Difficulty: Normal',
+    // Inert status row while a refused or queued change has not reached the
+    // group's live instances (IWorld.unappliedDungeonDifficulty).
+    unappliedNormal: 'Heroic selected. Current instances are still Normal.',
+    unappliedHeroic: 'Normal selected. Current instances are still Heroic.',
     resetAll: 'Reset All Instances',
     resetDone: 'All instances have been reset.',
     resetNone: 'You have no instances to reset.',

@@ -30,6 +30,7 @@ import {
 import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
 import { gmHiddenFrom } from '../src/sim/gm_presence';
 import type { GuildBankOpDelta } from '../src/sim/guild_bank';
+import { claimsByOwnerKey } from '../src/sim/instances/difficulty_selection';
 import { parseItemCopyAnchor } from '../src/sim/item_copy_anchor';
 import { itemInstancePayloadsEqual } from '../src/sim/item_instance_merge';
 import {
@@ -58,7 +59,7 @@ import type { ToolEffectConfirmMode } from '../src/sim/professions/tools';
 import { selfRelicKeys, syncAccountRelicGrants } from '../src/sim/reliquary';
 import { corpseHasDecayed } from '../src/sim/respawn_policy';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
-import type { CharacterState, MailSave, PetState, PlayerMeta } from '../src/sim/sim';
+import type { CharacterState, InstanceSlot, MailSave, PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
 import { drainBgOutcomes } from '../src/sim/social/battleground_outcomes';
 import { RAID_MAX } from '../src/sim/social/party';
@@ -1493,6 +1494,9 @@ export class GameServer {
   // rules call a defect. Built once per broadcast pass and handed to every
   // bgInfoFor call in that pass instead.
   private readonly bgLadderReadout = createRealmReadoutMemo<BgLadderEntry[]>();
+  // Live dungeon claims by owner key, one slot pass per tick shared by every
+  // viewer's `udiff` read (src/sim/instances/difficulty_selection.ts).
+  private readonly claimsByKeyReadout = createRealmReadoutMemo<Map<string, InstanceSlot[]>>();
   // The /who roster (chat command and the Who tab), rebuilt at most once per tick.
   private readonly whoRosterReadout = createRealmReadoutMemo<WhoRosterEntry<ClientSession>[]>();
   // When the realm-wide Vale Cup readout is next due, tracked realm-global (not
@@ -8228,6 +8232,12 @@ export class GameServer {
       p,
       this.sim.dungeonDifficulty(anchorSession.pid),
       this.sim.activeDungeonDifficulty(anchorSession.pid),
+      this.sim.unappliedDungeonDifficulty(
+        anchorSession.pid,
+        realmReadoutObject(this.claimsByKeyReadout, this.sim.tickCount, () =>
+          claimsByOwnerKey(this.sim.instances),
+        ),
+      ),
     );
     // The viewer's OWN authored look. It cannot come from the entity list (the
     // broadcast loop skips `e.id === anchorEntity.id`), and it is exactly what

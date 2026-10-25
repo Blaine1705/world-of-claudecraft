@@ -4303,6 +4303,8 @@ export const pl_PL: EnTranslations = {
     "dungeonDifficulty": {
       "setHeroic": "Ustaw trudność podziemia: Heroiczna",
       "setNormal": "Ustaw trudność podziemia: Normalna",
+      "unappliedNormal": "Heroic selected. Current instances are still Normal.",
+      "unappliedHeroic": "Normal selected. Current instances are still Heroic.",
       "resetAll": "Zresetuj wszystkie instancje",
       "resetDone": "Wszystkie instancje zostały zresetowane.",
       "resetNone": "Nie masz żadnych instancji do zresetowania.",

@@ -4303,6 +4303,8 @@ export const vi_VN: EnTranslations = {
     "dungeonDifficulty": {
       "setHeroic": "Đặt Độ Khó Hầm Ngục: Anh Hùng",
       "setNormal": "Đặt Độ Khó Hầm Ngục: Thường",
+      "unappliedNormal": "Heroic selected. Current instances are still Normal.",
+      "unappliedHeroic": "Normal selected. Current instances are still Heroic.",
       "resetAll": "Đặt Lại Tất Cả Phụ Bản",
       "resetDone": "Tất cả phụ bản đã được đặt lại.",
       "resetNone": "Bạn không có phụ bản nào để đặt lại.",

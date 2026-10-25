@@ -4303,6 +4303,8 @@ export const da_DK: EnTranslations = {
     "dungeonDifficulty": {
       "setHeroic": "Indstil fangekældersværhedsgrad: Heroisk",
       "setNormal": "Indstil fangekældersværhedsgrad: Normal",
+      "unappliedNormal": "Heroic selected. Current instances are still Normal.",
+      "unappliedHeroic": "Normal selected. Current instances are still Heroic.",
       "resetAll": "Nulstil alle instanser",
       "resetDone": "Alle instanser er blevet nulstillet.",
       "resetNone": "Du har ingen instanser at nulstille.",

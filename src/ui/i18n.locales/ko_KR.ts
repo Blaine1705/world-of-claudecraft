@@ -3532,6 +3532,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootSettings.menuItem': '전리품 설정',
   'hudChrome.dungeonDifficulty.setHeroic': '던전 난이도 설정: 영웅',
   'hudChrome.dungeonDifficulty.setNormal': '던전 난이도 설정: 일반',
+  'hudChrome.dungeonDifficulty.unappliedNormal':
+    '영웅 난이도를 선택했습니다. 현재 인스턴스는 아직 일반입니다.',
+  'hudChrome.dungeonDifficulty.unappliedHeroic':
+    '일반 난이도를 선택했습니다. 현재 인스턴스는 아직 영웅입니다.',
   'hudChrome.dungeonDifficulty.resetAll': '모든 인스턴스 초기화',
   'hudChrome.dungeonDifficulty.resetDone': '모든 인스턴스가 초기화되었습니다.',
   'hudChrome.dungeonDifficulty.resetNone': '초기화할 인스턴스가 없습니다.',

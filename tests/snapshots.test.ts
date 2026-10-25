@@ -1310,6 +1310,7 @@ describe('static combat-rating/progression scalars ride the delta gate', () => {
     'copper',
     'ddiff',
     'adiff',
+    'udiff',
   ] as const;
 
   it('rides the first snapshot, elides once quiet, and resends only the field that actually moved', () => {
@@ -2692,6 +2693,50 @@ describe('dungeon difficulty wire', () => {
     (client as any).applySnapshot(snap);
     expect(client.dungeonDifficulty()).toBe('heroic');
     expect(client.activeDungeonDifficulty()).toBe('normal');
+  });
+
+  it('ships the live tier a refused change has not reached, and clears it after', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Hero');
+    expect(enterDungeon(server.sim.ctx, 'hollow_crypt', session.pid)).toBe(true);
+    server.sim.leaveDungeon(session.pid);
+    const inst = server.sim.instances.find(
+      (i) => i.partyKey !== null && i.dungeonId === 'hollow_crypt',
+    )!;
+    const client = bareClient(session.pid);
+    broadcast(server);
+    expect(lastSnap(fc.sent).self.udiff).toBeNull();
+    (client as any).applySnapshot(lastSnap(fc.sent));
+    expect(client.unappliedDungeonDifficulty()).toBeNull();
+
+    server.sim.entities.get(inst.mobIds[0])!.lootable = true;
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'set_dungeon_difficulty', difficulty: 'heroic' }),
+    );
+    expect(inst.difficulty).toBe('normal');
+    server.sim.tickCount++;
+    broadcast(server);
+    const refused = lastSnap(fc.sent);
+    expect(refused.self.ddiff).toBe('heroic');
+    expect(refused.self.udiff).toBe('normal');
+    (client as any).applySnapshot(refused);
+    expect(client.dungeonDifficulty()).toBe('heroic');
+    expect(client.unappliedDungeonDifficulty()).toBe('normal');
+
+    server.sim.entities.get(inst.mobIds[0])!.lootable = false;
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'set_dungeon_difficulty', difficulty: 'heroic' }),
+    );
+    expect(inst.difficulty).toBe('heroic');
+    server.sim.tickCount++;
+    broadcast(server);
+    const applied = lastSnap(fc.sent);
+    expect(applied.self.udiff).toBeNull();
+    (client as any).applySnapshot(applied);
+    expect(client.unappliedDungeonDifficulty()).toBeNull();
   });
 
   it('dispatches set_dungeon_difficulty through the wire and rejects invalid values', () => {
@@ -5874,6 +5919,7 @@ const ALL_DELTA_KEYS = [
   'tmap',
   'trade',
   'tslot',
+  'udiff',
   'vault',
   'vehicle',
   'wba',
@@ -6019,6 +6065,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   tfpend: 'townFocusPending',
   tmap: 'treasureMap',
   tslot: 'toolEffectSlots',
+  udiff: 'unappliedDungeonDifficulty',
   vault: 'vaultInfo',
   vehicle: 'vehicleSession',
   weeklyRewards: 'weeklyRewardInfo',
@@ -6652,7 +6699,10 @@ describe('full self-state snapshot delta fixture', () => {
       // read off the claim the player STANDS in, and this player stands in a
       // delve, so the fresh session's first value is the explicit null. Its
       // non-null arrival is pinned in tests/server/dungeon_run_wire.test.ts.
-      if (key === 'cvault' || key === 'dgrun') {
+      // udiff is null while the group's claims match the selection, which a
+      // delve-bound fixture always does; its non-null arrival is pinned in the
+      // 'dungeon difficulty wire' block above.
+      if (key === 'cvault' || key === 'dgrun' || key === 'udiff') {
         expect(snap.self[key], `self.${key} must arrive as the explicit gated null`).toBeNull();
         continue;
       }
@@ -7475,9 +7525,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     // +1: the dungeon objectives tracker's dgrun (server/dungeon_run_wire.ts), for 122.
     // +2: the courier's courierTravelTicks and courierLegTicks leg timing (PR 4281), for 124.
     // +1: Lantern Hall's weekly contract board gcon (server/quest_snapshot_wire.ts), for 125.
-    expect(ALL_DELTA_KEYS).toHaveLength(132);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(132);
     // Courier vault and other-character stores add one owner delta key.
+    // +1: the portrait menu's unapplied claim tier udiff (server/self_scalar_wire.ts).
+    expect(ALL_DELTA_KEYS).toHaveLength(133);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(133);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7656,8 +7707,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The dungeon run's dgrun (the game.ts maybeSerialized emit) makes 122.
     // The courier's courierTravelTicks and courierLegTicks make 124.
     // Lantern Hall's contract board gcon (quest_snapshot_wire.ts) makes 125.
-    expect(scraped.size).toBe(132);
     // Courier vault and other-character stores add one owner delta key.
+    // The unapplied claim tier udiff (self_scalar_wire.ts) adds one more.
+    expect(scraped.size).toBe(133);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

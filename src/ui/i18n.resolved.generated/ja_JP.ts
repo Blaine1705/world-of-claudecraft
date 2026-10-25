@@ -4303,6 +4303,8 @@ export const ja_JP: EnTranslations = {
     "dungeonDifficulty": {
       "setHeroic": "ダンジョン難易度をヒロイックに設定",
       "setNormal": "ダンジョン難易度をノーマルに設定",
+      "unappliedNormal": "ヒロイックを選択中です。現在のインスタンスはまだノーマルです。",
+      "unappliedHeroic": "ノーマルを選択中です。現在のインスタンスはまだヒロイックです。",
       "resetAll": "すべてのインスタンスをリセット",
       "resetDone": "すべてのインスタンスをリセットしました。",
       "resetNone": "リセットできるインスタンスがありません。",
