@@ -20,6 +20,7 @@ import { authoredFieldHeight } from '../../sim/instances/authored_field';
 import { buildAuthoredFieldTerrain } from '../authored_field/field_terrain';
 import { sharedUniforms } from '../gfx';
 import type { FireLightSink } from '../point_light_budget';
+import { buildBreathAir } from './breath_air';
 import { BREATH_KIT_KINDS, breathKitReady, dressBreath, ensureBreathKit } from './breath_kit';
 import { BREATH_KIT_KEEL, BREATH_KIT_SHALLOW } from './breath_kit_plan_core';
 import { buildHammerAir } from './hammer_air';
@@ -116,6 +117,7 @@ export async function buildSmithHeartInterior(
   // late (the swap then links nothing in a live frame).
   group.add(heartKitProgramWarmers());
   group.add(buildHammerAir(deps.lowGfx));
+  group.add(buildBreathAir(deps.lowGfx));
   group.add(buildHeartRoom(deps.lowGfx, ringReady ? new Set(['seal_dais']) : new Set()));
   buildHeartLights(group, deps, ground);
   const rivers = buildHeartRivers();
