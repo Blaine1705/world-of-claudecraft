@@ -88,8 +88,8 @@ SOOT = (0.13, 0.12, 0.12)
 SINTER = (0.74, 0.74, 0.68)
 HOAR = (0.78, 0.86, 0.93)
 # Snow and rime.
-RIME = (0.92, 0.955, 0.975)
-SNOW_SHADE = (0.66, 0.76, 0.87)
+RIME = (0.85, 0.89, 0.93)
+SNOW_SHADE = (0.6, 0.7, 0.82)
 # The lake's ice: the dense core, the clear body, the pale worn faces.
 ICE_CORE = (0.09, 0.25, 0.42)
 DEEP_ICE = (0.17, 0.41, 0.6)
@@ -370,8 +370,10 @@ def _ice_slab(p, center, size, colour, yaw=0.0, pitch=0.0, roll=0.0):
 
 
 def _snow_pillow(p, center, size, yaw=0.0):
+    """A soft pillow of snow: a smooth dome (many points, round), so it
+    reads as snow lying, never as a white chip."""
     with p.as_kind(SNOW):
-        faces = crystal(p, center, size, p.vary(RIME, 0.02), n=16, yaw=yaw, boxy=0.9, jitter=0.07)
+        faces = crystal(p, center, size, p.vary(RIME, 0.02), n=26, yaw=yaw, boxy=1.0, jitter=0.05)
     return p.smooth(faces)
 
 
@@ -685,7 +687,7 @@ def ice_shelf(bpy, variant):
         g = f.gradient(np.array([[x, y, z]]))[0]
         if g[2] < 0.75:
             continue
-        _snow_pillow(p, (x + prng.uniform(-0.3, 0.3), y, z - 0.1),
+        _snow_pillow(p, (x + prng.uniform(-0.3, 0.3), y, z + 0.12),
                      (prng.uniform(2.2, 3.4), prng.uniform(1.6, 2.4), prng.uniform(0.5, 0.8)),
                      yaw=prng.uniform(0, TAU))
     # Icicles under the brows facing the lake.
@@ -1046,21 +1048,31 @@ def ice_crack(variant):
     return p
 
 
-def snow_drift(variant):
+def snow_drift(bpy, variant):
     """Low drifts of snow (under a hand: nothing past 0.3 over the floor):
-    A a long drift along a wall's foot or the lake's edge, B a round one."""
+    A a long drift along a wall's foot or the lake's edge, B a round one.
+    One smooth mound each (sculpted), its crest wandering, its ends
+    tapering into the floor."""
     p = QP('SnowDrift' + variant, seed=8001 + ord(variant), ao=0.0, rime=0.0)
-    rng = p.rng
+    rng = np.random.default_rng(8001 + ord(variant))
+    f = Sculpt((-4.6, -2.2, -0.4), (4.6, 2.2, 0.6), 0.06)
     if variant == 'A':
-        for k in range(5):
-            x = -3.0 + k * 1.5 + rng.uniform(-0.3, 0.3)
-            _snow_pillow(p, (x, rng.uniform(-0.2, 0.2), 0.0), (rng.uniform(1.9, 2.6), rng.uniform(1.2, 1.7),
-                                                               rng.uniform(0.38, 0.5)), yaw=rng.uniform(-0.2, 0.2))
+        for k in range(6):
+            x = -3.2 + k * 1.3 + float(rng.uniform(-0.2, 0.2))
+            r = 1.0 - abs(x) / 4.6
+            f.put('snow', Ellipsoid((x, float(rng.uniform(-0.15, 0.15)), -0.05),
+                                    (1.5, 0.75 + 0.35 * r, 0.12 + 0.2 * r)), 0.5)
     else:
-        for k in range(3):
-            a = TAU * k / 3
-            _snow_pillow(p, (math.cos(a) * 0.5, math.sin(a) * 0.5, 0.0), (rng.uniform(1.7, 2.3), rng.uniform(1.5, 2.0),
-                                                                         rng.uniform(0.34, 0.44)), yaw=a)
+        for k in range(4):
+            a = TAU * k / 4 + float(rng.uniform(-0.3, 0.3))
+            f.put('snow', Ellipsoid((math.cos(a) * 0.45, math.sin(a) * 0.4, -0.04),
+                                    (1.3, 1.1, 0.3)), 0.5)
+    n = Noise(8001 + ord(variant))
+    f.displace(lambda X, Y, Z: 0.03 * n.fbm(X * 0.8, Y * 0.8, Z, 2), band=0.15)
+    f.cut_below(0.0)
+    X, Y, Z = _axes(f)
+    _clamp(f, Z - 0.27)
+    _mesh(bpy, p, f, 'SnowDrift' + variant, 320 if variant == 'A' else 220)
     for v in p.bm.verts:
         v.co.z = max(0.0, min(v.co.z, 0.28))
     return p

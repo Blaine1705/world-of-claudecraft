@@ -163,7 +163,9 @@ export function inQuenchLight(x: number, z: number): boolean {
   const ring = Math.hypot(x - RING.x, z - RING.z);
   if (x <= 64 || z >= 64 || z <= -64)
     return smithHeartAreaAt(x, z) === 'quench' && ring > SMITH_HEART_RING_LIGHT_R;
-  return x > RING.outerR + 22 || ring > SMITH_HEART_RING_LIGHT_R;
+  // The descent starts at the Ring's rim: a camera past it down the mouth
+  // already stands in the cold.
+  return x > RING.outerR + 10 || ring > SMITH_HEART_RING_LIGHT_R;
 }
 
 /** Is the camera at world (x, z) in the Quench vein of its Smith's Heart

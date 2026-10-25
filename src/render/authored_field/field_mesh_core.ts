@@ -503,9 +503,11 @@ function scouredColor(base: Rgb, k: number, x: number, z: number, patch: number)
  *  in their hollows), thinned where the walk is trodden; never one flat
  *  colour, never the Gravewyrm's slate. */
 function rimeColor(base: Rgb, k: number, x: number, z: number, onPath: boolean): Rgb {
-  const drift = Math.max(0, fieldNoise(x * 0.045 + 17, z * 0.045 - 23, 3) - 0.56) * 2.6;
-  const powder = Math.max(0, fieldNoise(x * 0.15 - 4, z * 0.15 + 9, 2) - 0.64) * 1.8;
-  const snow = Math.min(1, (drift + powder * 0.5) * (onPath ? 0.5 : 1));
+  // Soft drifts (a gentle ramp: the vertex paint must never draw a hard
+  // white blot), a little powder blown between them.
+  const drift = Math.max(0, fieldNoise(x * 0.045 + 17, z * 0.045 - 23, 3) - 0.5) * 1.7;
+  const powder = Math.max(0, fieldNoise(x * 0.15 - 4, z * 0.15 + 9, 2) - 0.6) * 1.2;
+  const snow = Math.min(0.8, (drift + powder * 0.5) * (onPath ? 0.55 : 1));
   const t = k * 0.86;
   const hollow = Math.max(0, 0.45 - fieldNoise(x * 0.09 + 3, z * 0.09 - 8, 2)) * 1.4;
   const rock: Rgb = [

@@ -102,7 +102,7 @@ export function lakeIceDepthGlsl(layers: number, deepCracks: boolean): string {
           float inside = max( lakeIn, sheetIn );
           // The ice clears paler over the shallows near its shore and sinks
           // to the dark deep water toward the lake's middle.
-          float shallow = 1.0 - smoothstep( 0.0, 12.0, inside );
+          float shallow = ( 1.0 - smoothstep( 0.0, 12.0, lakeIn ) ) * step( 0.0, lakeIn );
           float deepMid = smoothstep( 14.0, 30.0, lakeIn );
           iceDeep = mix( iceDeep, iceDeep * 1.6 + vec3( 0.025, 0.06, 0.08 ), shallow * 0.6 );
           iceDeep *= 1.0 - deepMid * 0.35;
@@ -207,7 +207,7 @@ export function lakeIceMaterial(pair: DetailPair, lowGfx: boolean): THREE.Materi
           `#include <roughnessmap_fragment>
         // The crazed Singing Ice is rougher than the lake's polish (no sun
         // glare washing a telegraph out), the frost and the snow matte.
-        roughnessFactor = mix( roughnessFactor, 0.6, iceSheet );
+        roughnessFactor = mix( roughnessFactor, 0.78, iceSheet );
         roughnessFactor = mix( roughnessFactor, 0.85, max( iceSkin * 0.55, iceSnow ) );`,
         )
         .replace(

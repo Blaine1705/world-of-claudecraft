@@ -50,6 +50,15 @@ export const QUENCH_WALK_SURFACES: ReadonlySet<string> = new Set([
   'frozen_lake',
 ]);
 
+/** The flat Quench floors snow banks on (never a stair: a drift laid flat
+ *  on a slope would hover). */
+export const QUENCH_DRIFT_FLOORS: ReadonlySet<string> = new Set([
+  'quench_q1',
+  'quench_q2',
+  'singing_ice',
+  'lake_shelf',
+]);
+
 /** A wall module's half length at stretch 1, and its span out past the lip
  *  (yards, pinned against the GLB). */
 export const QUENCH_WALL = { half: 3, near: 0.05, far: 1.0, height: 1.05 } as const;
@@ -244,7 +253,8 @@ export function planQuenchDressing(): HeartKitPlacement[] {
     const x = w.x - Math.sin(w.rot) * 1.3;
     const z = w.z - Math.cos(w.rot) * 1.3;
     const surf = authoredFieldSurfaceAt(F, x, z);
-    if (!surf || !QUENCH_WALK_SURFACES.has(surf.id) || surf.id === 'frozen_lake') continue;
+    // Only on the flat floors (a drift laid on a stair would hover).
+    if (!surf || !QUENCH_DRIFT_FLOORS.has(surf.id)) continue;
     out.push({
       piece: heartHash(i, 29) < 0.7 ? 'Kit_SnowDriftA' : 'Kit_SnowDriftB',
       x,
@@ -272,6 +282,7 @@ export function planQuenchDressing(): HeartKitPlacement[] {
       z,
       // Along the edge: local +X on the tangent.
       rot: a + Math.PI / 2 + (heartHash(k, 19) - 0.5) * 0.4,
+      scale: 0.55 + heartHash(k, 21) * 0.35,
       noShadow: true,
       cosmetic: true,
     });

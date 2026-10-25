@@ -48,8 +48,8 @@ BUILDERS = {
     'FrozenFallB': lambda: qp.frozen_fall(bpy, 'B'),
     'IceCrackA': lambda: qp.ice_crack('A'),
     'IceCrackB': lambda: qp.ice_crack('B'),
-    'SnowDriftA': lambda: qp.snow_drift('A'),
-    'SnowDriftB': lambda: qp.snow_drift('B'),
+    'SnowDriftA': lambda: qp.snow_drift(bpy, 'A'),
+    'SnowDriftB': lambda: qp.snow_drift(bpy, 'B'),
 }
 
 

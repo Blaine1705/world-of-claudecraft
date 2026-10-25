@@ -41,6 +41,7 @@ import {
   planQuenchProps,
   planQuenchWalls,
   QUENCH_BRAZIER_FIRE,
+  QUENCH_DRIFT_FLOORS,
   QUENCH_FALLS,
   QUENCH_KIT_KINDS,
   QUENCH_WALK_SURFACES,
@@ -422,7 +423,7 @@ describe('Smith Heart Quench kit: the plan', () => {
       Math.hypot((p.x - L.x) / L.rx, (p.z - L.z) / L.rz);
     for (const p of drifts) {
       const s = authoredFieldSurfaceAt(F, p.x, p.z);
-      expect(QUENCH_WALK_SURFACES.has(s?.id ?? ''), `${p.piece} on ${s?.id}`).toBe(true);
+      expect(QUENCH_DRIFT_FLOORS.has(s?.id ?? ''), `${p.piece} on ${s?.id}`).toBe(true);
       expect(s?.id).not.toBe('frozen_lake');
       expect(p.scale ?? 1).toBeLessThanOrEqual(1.1);
     }
