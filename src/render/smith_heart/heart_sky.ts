@@ -5,7 +5,12 @@
 //   - over the Heart, the sky seen up out of the chamber inside the mountain:
 //     a deep ember-violet night full of slow stars, warm veils drifting where
 //     the heart's light catches the high air, no storm at all.
-// `uCore` blends the two (heart_portal_core.ts heartAreaBlend eases it after
+//   - over the Breath (phase 2G), the storm seen from the summit IN it:
+//     paler and lower, a rolling deck racing in from the north-west, the
+//     key's light breaking through it in a bright rift, lightning walking
+//     the cloud and, every few seconds, a bolt standing in the distance.
+// `uBreath` blends the storm toward the Breath's as the camera climbs into
+// it (eased like the hop's). `uCore` blends the two (heart_portal_core.ts heartAreaBlend eases it after
 // a hop, so the sky turns as the raid arrives). One shader on the dome, no
 // light; the horizon is the area's fog colour.
 //
@@ -17,6 +22,7 @@
 import * as THREE from 'three';
 import { SUNKEN_BASTION_FOG_COLOR } from '../fog_scene_state';
 import { sharedUniforms } from '../gfx';
+import { SMITH_HEART_BREATH_FOG } from './heart_environment';
 
 export interface HeartSkyOptions {
   lowGfx: boolean;
@@ -46,6 +52,8 @@ uniform vec3 uHorizon;
 uniform vec3 uCoreHorizon;
 uniform float uDetail;
 uniform float uCore;
+uniform float uBreath;
+uniform vec3 uBreathHorizon;
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float noise(vec2 p) {
   vec2 i = floor(p); vec2 f = fract(p);
@@ -102,6 +110,64 @@ vec3 stormSky(vec3 d, float up) {
   col += vec3(0.42, 0.48, 0.66) * lit * (0.35 + 0.9 * cloud);
   return col;
 }
+// A distant bolt: a jagged thread standing from the cloud base toward the
+// horizon at a hashed bearing, a flicker or two (cell seconds apart).
+float bolt(vec3 d, float up, float t, float cell, float seed) {
+  float k = floor(t / cell);
+  float h = hash(vec2(k, seed));
+  float x = t - k * cell - h * (cell - 1.0);
+  if (x < 0.0 || x > 0.45) return 0.0;
+  float flick = (1.0 - smoothstep(0.0, 0.06, x)) + step(0.14, x) * (1.0 - smoothstep(0.14, 0.24, x)) * 0.8;
+  float bearing = hash(vec2(k, seed + 3.1));
+  float azim = atan(d.x, d.z) / 6.2831853 + 0.5;
+  float top = 0.16 + 0.14 * hash(vec2(k, seed + 7.7));
+  float along = clamp(up / top, 0.0, 1.0);
+  float wander = (noise(vec2(up * 38.0, k * 3.7)) - 0.5) * 0.022 + (noise(vec2(up * 9.0, k)) - 0.5) * 0.03;
+  float off = abs(azim - bearing - wander * (0.4 + along));
+  float core = 1.0 - smoothstep(0.0, 0.0016, off);
+  float glow = 1.0 - smoothstep(0.0, 0.012, off);
+  float span = step(-0.02, up) * step(up, top);
+  return (core * 2.2 + glow * 0.45) * span * flick;
+}
+vec3 breathSky(vec3 d, float up) {
+  // The summit in the storm: a slate zenith, a pale cold band low down.
+  vec3 zenith = vec3(0.05, 0.058, 0.07);
+  vec3 band = vec3(0.17, 0.19, 0.22);
+  vec3 col = mix(band, zenith, smoothstep(0.05, 0.7, up));
+  col = mix(uBreathHorizon, col, smoothstep(-0.03, 0.18, up));
+  float cloud = 0.0;
+  float lit = 0.0;
+  if (up > -0.08) {
+    vec2 uv = d.xz / (up + 0.14);
+    // The deck races in from the north-west, rolling as it comes.
+    vec2 wind = vec2(uTime * 0.034, -uTime * 0.03);
+    vec2 warp = vec2(fbm(uv * 0.28 + 4.0 + wind * 0.6), fbm(uv * 0.28 - 2.0 - wind * 0.6)) * 1.8;
+    float c1 = fbm(uv * 0.38 + warp + wind);
+    float c2 = fbm(uv * 1.1 - warp * 0.4 + wind * 2.2 + 3.0);
+    float c = c1 * 0.72 + c2 * 0.38 * uDetail;
+    cloud = smoothstep(0.36, 0.7, c) * smoothstep(-0.06, 0.1, up);
+    lit = smoothstep(0.55, 0.8, c1 + 0.12) * (1.0 - smoothstep(0.62, 0.9, c));
+  }
+  vec3 belly = vec3(0.07, 0.08, 0.095);
+  vec3 top = vec3(0.3, 0.33, 0.37);
+  col = mix(col, mix(belly, top, lit), cloud * 0.94);
+  // The rift where the key breaks through (north-west, high).
+  vec3 key = normalize(vec3(-0.42, 0.8, 0.43));
+  float rift = pow(max(0.0, dot(d, key)), 6.0) * (1.0 - cloud * 0.6);
+  col += vec3(0.42, 0.5, 0.54) * rift * 0.7;
+  // Lightning in the cloud, and the distant bolts below it.
+  float ba; float bb;
+  float fa = strike(uTime, 5.0, ba);
+  float fb = strike(uTime + 2.3, 7.0, bb);
+  float azim = atan(d.x, d.z) / 6.2831853 + 0.5;
+  float nearA = 1.0 - smoothstep(0.0, 0.09, abs(azim - ba));
+  float nearB = 1.0 - smoothstep(0.0, 0.08, abs(azim - bb));
+  float flash = (fa * nearA + fb * nearB) * smoothstep(-0.02, 0.1, up);
+  col += vec3(0.5, 0.66, 0.78) * flash * (0.3 + 1.0 * cloud);
+  float bolts = bolt(d, up, uTime, 6.0, 1.7) + bolt(d, up, uTime + 3.1, 9.0, 4.3) * uDetail;
+  col += vec3(0.72, 0.9, 1.0) * bolts;
+  return col;
+}
 vec3 coreSky(vec3 d, float up) {
   // Ember-violet night: warm low (the heart's light on the high air), deep
   // violet-black overhead.
@@ -132,7 +198,11 @@ vec3 coreSky(vec3 d, float up) {
 void main() {
   vec3 d = normalize(vDir);
   float up = d.y;
-  vec3 col = uCore < 0.999 ? stormSky(d, up) : vec3(0.0);
+  vec3 col = vec3(0.0);
+  if (uCore < 0.999) {
+    col = uBreath < 0.999 ? stormSky(d, up) : vec3(0.0);
+    if (uBreath > 0.001) col = mix(col, breathSky(d, up), uBreath);
+  }
   if (uCore > 0.001) col = mix(col, coreSky(d, up), uCore);
   gl_FragColor = vec4(col, 1.0);
   #include <colorspace_fragment>
@@ -143,6 +213,8 @@ export interface HeartSky {
   mesh: THREE.Mesh;
   /** Blend the dome toward the Heart's sky (0 the storm, 1 the Heart). */
   setCore(k: number): void;
+  /** Blend the main map's storm toward the Breath's summit storm. */
+  setBreath(k: number): void;
 }
 
 /** The dome (and the slot's frame driver). */
@@ -157,6 +229,8 @@ export function buildHeartSky(opts: HeartSkyOptions): HeartSky {
       uCoreHorizon: { value: new THREE.Color(HEART_CORE_FOG_COLOR) },
       uDetail: { value: opts.lowGfx ? 0.4 : 1 },
       uCore: { value: 0 },
+      uBreath: { value: 0 },
+      uBreathHorizon: { value: new THREE.Color(SMITH_HEART_BREATH_FOG.color) },
     },
     depthWrite: false,
     side: THREE.BackSide,
@@ -176,8 +250,15 @@ export function buildHeartSky(opts: HeartSkyOptions): HeartSky {
     opts.onFrame(camera);
   };
   let core = -1;
+  let breath = -1;
   return {
     mesh,
+    setBreath(k) {
+      const q = Math.round(k * 200) / 200;
+      if (q === breath) return;
+      breath = q;
+      material.uniforms.uBreath.value = q;
+    },
     setCore(k) {
       const q = Math.round(k * 200) / 200;
       if (q === core) return;

@@ -25,6 +25,7 @@ import { BREATH_KIT_KEEL, BREATH_KIT_SHALLOW } from './breath_kit_plan_core';
 import { buildHammerAir } from './hammer_air';
 import { dressHammerVein, ensureHammerKit, HAMMER_KIT_KINDS, hammerKitReady } from './hammer_kit';
 import { heartCliffPaint } from './heart_cliff_paint_core';
+import { inBreathLight } from './heart_environment';
 import { buildHeartGates } from './heart_gates';
 import { heartKitProgramWarmers } from './heart_kit';
 import { buildHeartLights } from './heart_lights';
@@ -133,6 +134,7 @@ export async function buildSmithHeartInterior(
   let prev: { x: number; z: number } | null = null;
   let lastNow = -1;
   let blend = 0;
+  let breathBlend = 0;
   let hopAt = -1;
   let hopSide: 'heart' | 'ring' | null = null;
   const sky = buildHeartSky({
@@ -159,6 +161,8 @@ export async function buildSmithHeartInterior(
       }
       blend = heartAreaBlend(blend, inSmithHeartRoom(local.x, local.z), dt);
       sky.setCore(blend);
+      breathBlend = heartAreaBlend(breathBlend, inBreathLight(local.x, local.z), dt);
+      sky.setBreath(breathBlend);
       heartSealView(slot, now, view);
       heartPortalStage(view.portalSince, stage);
       heartHopStage(hopAt < 0 ? -1 : now - hopAt, hop);

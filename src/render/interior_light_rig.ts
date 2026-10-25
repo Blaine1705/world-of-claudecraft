@@ -14,6 +14,7 @@ import { SANCTUM_KEY_DIRECTION } from './gravewyrm_sanctum/sanctum_plan_core';
 import { applyIgnivarRaidLighting, type IgnivarRaidFogState } from './ignivar_raid_environment';
 import { RIM_GLOW_DEFAULT_COLOR } from './pbr_fragment_shader';
 import {
+  SMITH_HEART_BREATH_LIGHT,
   SMITH_HEART_CORE_LIGHT,
   SMITH_HEART_HAMMER_LIGHT,
   SMITH_HEART_RING_LIGHT,
@@ -42,6 +43,7 @@ export type FogSceneState =
   | 'smithHeartCore'
   | 'smithHeartHammer'
   | 'smithHeartRing'
+  | 'smithHeartBreath'
   | 'drownedTemple'
   | 'gravewyrmSanctum'
   | 'lastkeep'
@@ -211,6 +213,12 @@ export const SMITH_HEART_RING_KEY_DIRECTION = new THREE.Vector3(
   ...SMITH_HEART_RING_LIGHT.keyDirection,
 ).normalize();
 
+/** Where the Breath's key comes from: high in the north-west, the storm's
+ *  light breaking through. */
+export const SMITH_HEART_BREATH_KEY_DIRECTION = new THREE.Vector3(
+  ...SMITH_HEART_BREATH_LIGHT.keyDirection,
+).normalize();
+
 /** Where the Hammer vein's key comes from: low in the west down the fissure. */
 export const SMITH_HEART_HAMMER_KEY_DIRECTION = new THREE.Vector3(
   ...SMITH_HEART_HAMMER_LIGHT.keyDirection,
@@ -244,6 +252,10 @@ export function interiorKeyLightDirection(state: FogSceneState, out: THREE.Vecto
   }
   if (state === 'smithHeartRing') {
     out.copy(SMITH_HEART_RING_KEY_DIRECTION);
+    return true;
+  }
+  if (state === 'smithHeartBreath') {
+    out.copy(SMITH_HEART_BREATH_KEY_DIRECTION);
     return true;
   }
   if (state === 'drownedTemple') {
@@ -408,7 +420,8 @@ export function applyInteriorLightRig(
   } else if (
     state === 'smithHeartCore' ||
     state === 'smithHeartHammer' ||
-    state === 'smithHeartRing'
+    state === 'smithHeartRing' ||
+    state === 'smithHeartBreath'
   ) {
     // The Smith's Heart's final room (lit from below by the heart, a pale
     // key over the oculus, a warm rim) and its Hammer vein (a warm low key
@@ -419,7 +432,9 @@ export function applyInteriorLightRig(
         ? SMITH_HEART_CORE_LIGHT
         : state === 'smithHeartRing'
           ? SMITH_HEART_RING_LIGHT
-          : SMITH_HEART_HAMMER_LIGHT;
+          : state === 'smithHeartBreath'
+            ? SMITH_HEART_BREATH_LIGHT
+            : SMITH_HEART_HAMMER_LIGHT;
     targets.sun.intensity = L.sun;
     targets.hemi.intensity = L.hemi;
     targets.scene.environmentIntensity = L.env;

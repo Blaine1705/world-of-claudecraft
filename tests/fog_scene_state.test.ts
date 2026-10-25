@@ -6,7 +6,13 @@ import {
 } from '../src/render/fog_scene_state';
 import { IGNIVAR_RAID_ENVIRONMENT } from '../src/render/ignivar_raid_environment';
 import type { FogSceneState } from '../src/render/interior_light_rig';
-import { CLEFT, HAMMER_PIT, HEART_ROOM, QUENCH } from '../src/sim/content/smith_heart_layout';
+import {
+  BREATH,
+  CLEFT,
+  HAMMER_PIT,
+  HEART_ROOM,
+  QUENCH,
+} from '../src/sim/content/smith_heart_layout';
 import {
   battlegroundOrigin,
   DUNGEON_LIST,
@@ -94,6 +100,14 @@ describe('resolveFogScene (the renderer fog resolution, moved verbatim)', () => 
     // A vein beyond the Ring keeps the borrowed storm state.
     const inQuench = { x: slotOrigin.x + QUENCH.lake.x, z: slotOrigin.z + QUENCH.lake.z };
     expect(resolveFogScene(true, slotOrigin.x, 5, inQuench, SEED).desired).toBe('sunkenBastion');
+    // The Breath has its own storm summit light (phase 2G), the Cornice and
+    // the Wind Bridge both.
+    const onCornice = { x: slotOrigin.x + BREATH.cornice.x, z: slotOrigin.z + BREATH.cornice.z };
+    const onBridge = { x: slotOrigin.x - 84, z: slotOrigin.z + 140 };
+    expect(resolveFogScene(true, slotOrigin.x, 5, onCornice, SEED).desired).toBe(
+      'smithHeartBreath',
+    );
+    expect(resolveFogScene(true, slotOrigin.x, 5, onBridge, SEED).desired).toBe('smithHeartBreath');
     expect(resolveFogScene(true, slotOrigin.x, 5, inQuarry, SEED).desired).toBe('smithHeartHammer');
     expect(resolveFogScene(true, slotOrigin.x, 5, atCleft, SEED).desired).toBe('smithHeartHammer');
     expect(resolveFogScene(true, interiorPx('gravewyrm_sanctum'), 5, cam, SEED).desired).toBe(
@@ -140,6 +154,7 @@ describe('applyFogScenePreset (the renderer fog presets, moved verbatim)', () =>
     ['smithHeartCore', 0x1c1424, 80, 520],
     ['smithHeartHammer', 0x6c6c70, 90, 600],
     ['smithHeartRing', 0x686a72, 120, 700],
+    ['smithHeartBreath', 0x707b88, 80, 560],
     ['drownedTemple', 0x252a4c, 140, 1050],
     ['lastkeep', 0x241610, 30, 150],
     ['dawnhold', 0x3d422a, 40, 190],

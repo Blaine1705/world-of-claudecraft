@@ -8,6 +8,11 @@
 //   - the Ring (round the seal) has its own, `smithHeartRing` (phase 2F): the
 //     same low warm sun over a neutral grey sky fill, so its shade is a cool
 //     grey and never the storm's saturated blue;
+//   - the Breath (north, climbing to the Storm Cornice) has its own,
+//     `smithHeartBreath` (phase 2G): a cold teal-white storm light breaking
+//     high through the cloud from the north-west over a pale neutral grey
+//     fill, a cool blue-grey storm air that thickens with distance, so the
+//     scoured granite reads pale and its shade a cool grey, never navy;
 //   - the rest of the main map keeps the storm-dusk grade it shares with the
 //     Sunken Bastion (`sunkenBastion`) until the per-room phases give each
 //     vein its own;
@@ -38,12 +43,13 @@ export function smithHeartCameraInHeart(x: number, z: number): boolean {
 /** The fog state of the Hammer vein. */
 export const SMITH_HEART_HAMMER_FOG_STATE = 'smithHeartHammer';
 
-/** Is the camera at world (x, z) in the Hammer vein of its Smith's Heart slot? */
+/** Is the camera at world (x, z) in the Hammer vein of its Smith's Heart slot?
+ *  (The Breath's own light wins north of the Ring, phase 2G.) */
 export function smithHeartCameraInHammer(x: number, z: number): boolean {
   const def = DUNGEONS.smith_heart;
   if (!def) return false;
   const o = instanceOrigin(def.index, instanceSlotForZ(z));
-  return smithHeartAreaAt(x - o.x, z - o.z) === 'hammer';
+  return smithHeartAreaAt(x - o.x, z - o.z) === 'hammer' && !inBreathLight(x - o.x, z - o.z);
 }
 
 /** The fog state of the Ring (phase 2F). */
@@ -89,6 +95,53 @@ export const SMITH_HEART_RING_LIGHT = {
   hemiGround: 0x645c56,
   rimColor: 0xffb072,
   keyDirection: [-0.42, 0.72, -0.55] as const,
+} as const;
+
+/** The fog state of the Breath (phase 2G). */
+export const SMITH_HEART_BREATH_FOG_STATE = 'smithHeartBreath';
+
+/** Does the Breath's light hold at instance-local (x, z)? Its area, and the
+ *  air south of its first landing a camera standing back from the mouth or
+ *  the chimney stands in (the areas' map names that strip the Hammer's). */
+export function inBreathLight(x: number, z: number): boolean {
+  if (smithHeartAreaAt(x, z) === 'breath') return true;
+  return (
+    z > 64 && x > -140 && x < 90 && Math.hypot(x - RING.x, z - RING.z) > SMITH_HEART_RING_LIGHT_R
+  );
+}
+
+/** Is the camera at world (x, z) in the Breath vein of its Smith's Heart slot?
+ *  (The Ring's own state wins round the Breath's mouth.) */
+export function smithHeartCameraInBreath(x: number, z: number): boolean {
+  const def = DUNGEONS.smith_heart;
+  if (!def) return false;
+  const o = instanceOrigin(def.index, instanceSlotForZ(z));
+  return inBreathLight(x - o.x, z - o.z);
+}
+
+/** The Breath's air (phase 2G): a cool blue-grey storm air, thin across a
+ *  landing and the Cornice so a telegraph and the guardian read crisp, the
+ *  far crests going pale into it (the summit stands IN the weather). */
+export const SMITH_HEART_BREATH_FOG = { color: 0x707b88, near: 80, far: 560 } as const;
+
+/** The Breath's light rig (phase 2G): the storm's light breaking through
+ *  high from the north-west, a cold teal-white key; a pale neutral-grey sky
+ *  fill (never the borrowed storm's saturated blue, which turned the
+ *  scoured rock navy) over a cool grey ground bounce; a teal rim off the
+ *  vein's light on every silhouette. The sky's reflection a trace. */
+export const SMITH_HEART_BREATH_LIGHT = {
+  sun: 2.65,
+  hemi: 2.2,
+  env: 0.03,
+  rim: 1.5,
+  sunColor: 0xe2eef4,
+  hemiSky: 0x9aa2ae,
+  hemiGround: 0x5e6066,
+  rimColor: 0x9ad6ee,
+  /** High in the north-west (from the ground toward it): it rakes across
+   *  the Cornice's floor toward the bridge, so the rods, the horns and the
+   *  guardian throw long shadows south-east down the vein. */
+  keyDirection: [-0.42, 0.8, 0.43] as const,
 } as const;
 
 /** The Hammer's air: a grey quarry dust, thin near (the pit reads crisp
