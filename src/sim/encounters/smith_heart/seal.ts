@@ -10,7 +10,14 @@
 //     vein's three packs);
 //   the seal: each guardian's death lights its vein's colour on the seal;
 //   the portal: with all four lit AND the Ring's eight packs dead, the seal
-//     opens into the portal to the Heart (portal.ts walks the raid through).
+//     opens into the portal to the Heart (portal.ts walks the raid through);
+//   the arrival (phase 2J): the first tick a living player stands in the
+//     Heart, the heart wakes (the renderer's arrival scene: the heart crystal
+//     rises and binds the room's rocks into the Masterless Strength's body).
+//     Presentation only: no mob, no damage, no gate reads it. It is the ONE
+//     bit the markers keep rather than derive (a raid that walks back out
+//     leaves the heart awake), so it lives in the markers' own value and a
+//     fresh claim (markers at `smith_heart_seal_0`) starts asleep.
 //
 // Dead instance mobs stay dead for the claim's life, so a lit vein stays lit,
 // an opened portal stays open for the lockout, and a fresh claim (a reset)
@@ -30,7 +37,11 @@ import {
   SMITH_HEART_PACKS,
   SMITH_HEART_SEAL_PREFIX,
 } from '../../content/smith_heart';
-import { SMITH_HEART_VEINS, type SmithHeartVein } from '../../content/smith_heart_layout';
+import {
+  inSmithHeartRoom,
+  SMITH_HEART_VEINS,
+  type SmithHeartVein,
+} from '../../content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../../data';
 import { dungeonPacksDead, dungeonPlacedBossDead } from '../../instances/dungeon_gates';
 import { instanceHalfWidthOf } from '../../instances/instance_footprint';
@@ -49,8 +60,11 @@ export const SMITH_HEART_VEIN_BITS: Readonly<Record<SmithHeartVein, number>> = {
 export const SMITH_HEART_SEAL_FULL = 15;
 /** The portal's bit: the seal has opened (all four lit and the Ring clear). */
 export const SMITH_HEART_PORTAL_BIT = 16;
+/** The arrival's bit (phase 2J): a living player has stood in the Heart.
+ *  Kept by the markers for the claim's life once set. */
+export const SMITH_HEART_AWAKE_BIT = 32;
 /** Every bit a marker can carry. */
-const MARKER_BITS = SMITH_HEART_SEAL_FULL | SMITH_HEART_PORTAL_BIT;
+const MARKER_BITS = SMITH_HEART_SEAL_FULL | SMITH_HEART_PORTAL_BIT | SMITH_HEART_AWAKE_BIT;
 
 /** The seal marker template id for a marker value (lit veins plus the
  *  portal bit). */
@@ -75,6 +89,11 @@ export function smithHeartVeinLit(mask: number, vein: SmithHeartVein): boolean {
 /** Does a marker value say the portal is open? Pure. */
 export function smithHeartPortalBitSet(mask: number): boolean {
   return (mask & SMITH_HEART_PORTAL_BIT) !== 0;
+}
+
+/** Does a marker value say the heart is awake (the raid has arrived)? Pure. */
+export function smithHeartAwakeBitSet(mask: number): boolean {
+  return (mask & SMITH_HEART_AWAKE_BIT) !== 0;
 }
 
 /** How many veins `mask` lights. Pure. */
@@ -107,6 +126,51 @@ export function setSmithHeartPortalDevOpen(inst: InstanceSlot, open: boolean): v
 
 function devPortalOpen(inst: InstanceSlot): boolean {
   return inst.exitId !== null && devPortal.get(inst) === inst.exitId;
+}
+
+/** Claims whose arrival a dev playtest is replaying (`/dev heart arrival`):
+ *  the sim time until which the heart is held asleep, keyed by the claim's
+ *  identity (and its exit, so a recycled slot never inherits it). */
+const devAsleep = new WeakMap<InstanceSlot, { exitId: number; until: number }>();
+
+/** Seconds a replayed arrival holds the heart asleep: long enough for every
+ *  client to see it asleep before it wakes again (a snapshot or two). */
+export const SMITH_HEART_ARRIVAL_REPLAY_HOLD = 1.5;
+
+/** Put a live claim's heart back to sleep for a dev playtest (it wakes again
+ *  on the first tick past the hold with a living player in the Heart).
+ *  Dev-gated by its one caller (sim/dev/smith_heart_dev.ts). */
+export function replaySmithHeartArrivalForDev(ctx: SimContext, inst: InstanceSlot): void {
+  if (inst.partyKey === null || inst.exitId === null) return;
+  devAsleep.set(inst, { exitId: inst.exitId, until: ctx.time + SMITH_HEART_ARRIVAL_REPLAY_HOLD });
+}
+
+function devHeldAsleep(ctx: SimContext, inst: InstanceSlot): boolean {
+  const h = devAsleep.get(inst);
+  if (!h) return false;
+  if (h.exitId !== inst.exitId || ctx.time >= h.until) {
+    devAsleep.delete(inst);
+    return false;
+  }
+  return true;
+}
+
+/** Is a living player standing in this claim's Heart? Walks the players in
+ *  place (allocation free). */
+export function smithHeartPlayerInHeart(ctx: SimContext, inst: InstanceSlot): boolean {
+  const dungeon = DUNGEONS[inst.dungeonId];
+  if (!dungeon) return false;
+  const o = instanceOrigin(dungeon.index, inst.slot);
+  const half = instanceHalfWidthOf(inst.dungeonId);
+  for (const meta of ctx.players.values()) {
+    const e = ctx.entities.get(meta.entityId);
+    if (!e || e.dead) continue;
+    const lx = e.pos.x - o.x;
+    const lz = e.pos.z - o.z;
+    if (Math.abs(lx) >= half || Math.abs(lz) >= 250) continue;
+    if (inSmithHeartRoom(lx, lz)) return true;
+  }
+  return false;
 }
 
 /** The whole gating readout of one claim (dev tools, tests, the design doc's
@@ -181,7 +245,11 @@ export function tickSmithHeartSeal(ctx: SimContext, inst: InstanceSlot): number 
   const before = markerMask(ctx, inst);
   if (before === null) return null;
   const p = smithHeartProgress(ctx, inst);
-  const value = p.mask | (p.portalOpen ? SMITH_HEART_PORTAL_BIT : 0);
+  // The arrival: kept once set, unless a dev replay holds the heart asleep.
+  const asleep = devHeldAsleep(ctx, inst);
+  const awake = !asleep && (smithHeartAwakeBitSet(before) || smithHeartPlayerInHeart(ctx, inst));
+  const value =
+    p.mask | (p.portalOpen ? SMITH_HEART_PORTAL_BIT : 0) | (awake ? SMITH_HEART_AWAKE_BIT : 0);
   if (value === before) return value;
   const template = smithHeartSealTemplate(value);
   for (const id of inst.objectIds) {
@@ -199,9 +267,9 @@ export function tickSmithHeartSeal(ctx: SimContext, inst: InstanceSlot): number 
   return value;
 }
 
-/** One tick of every Smith's Heart claim (instances/dungeons.ts): the seal,
- *  then the portal hops (the Ring's portal only while the seal stands open). Allocation free: the claim list
- *  is walked in place. */
+/** One tick of every Smith's Heart claim (instances/dungeons.ts): the seal
+ *  (and the arrival), then the portal hops (the Ring's portal only while the
+ *  seal stands open). Allocation free: the claim list is walked in place. */
 export function tickSmithHeart(ctx: SimContext): void {
   for (const inst of ctx.instances) {
     if (inst.partyKey === null || inst.dungeonId !== SMITH_HEART_DUNGEON) continue;

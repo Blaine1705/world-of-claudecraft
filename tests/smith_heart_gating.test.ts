@@ -142,7 +142,8 @@ describe("the Smith's Heart gating", () => {
       expect(smithHeartSealMaskOf(smithHeartSealTemplate(m))).toBe(m);
     }
     expect(smithHeartSealMaskOf('sanctum_story_3')).toBeNull();
-    expect(smithHeartSealMaskOf('smith_heart_seal_32')).toBeNull();
+    // 32 is the arrival's bit (smith_heart_arrival.test.ts); nothing past it.
+    expect(smithHeartSealMaskOf('smith_heart_seal_64')).toBeNull();
     expect(smithHeartPortalBitSet(SMITH_HEART_SEAL_FULL)).toBe(false);
     expect(smithHeartPortalBitSet(SMITH_HEART_SEAL_FULL | SMITH_HEART_PORTAL_BIT)).toBe(true);
     // The portal bit never reads as a lit vein.

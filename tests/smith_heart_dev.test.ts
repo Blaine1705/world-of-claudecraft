@@ -208,12 +208,12 @@ describe('/dev heart', () => {
     dev('/dev heart seal');
     const lines = logs(sim.tick()).filter((t) => t.startsWith('[dev] Heart seal'));
     expect(lines).toEqual([
-      '[dev] Heart seal: mask 0, slabOpen false, sealLit false, ringClear false, portalOpen false.',
+      '[dev] Heart seal: mask 0, slabOpen false, sealLit false, ringClear false, portalOpen false, awake false.',
     ]);
     dev('/dev heart kill all');
     sim.tick();
     expect(smithHeartSealReadout(sim.ctx, inst)).toBe(
-      '[dev] Heart seal: mask 15, slabOpen true, sealLit true, ringClear true, portalOpen true.',
+      '[dev] Heart seal: mask 15, slabOpen true, sealLit true, ringClear true, portalOpen true, awake false.',
     );
   });
 

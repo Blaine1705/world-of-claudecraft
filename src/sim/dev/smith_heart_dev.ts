@@ -14,7 +14,10 @@
 //   /dev heart gates                 open every gate of this run
 //   /dev heart portal                force the seal's portal open for this run
 //   /dev heart seal                  print the gating readout (mask, slabOpen,
-//                                    sealLit, ringClear, portalOpen)
+//                                    sealLit, ringClear, portalOpen, awake)
+//   /dev heart arrival               replay the arrival scene: the heart goes
+//                                    back to sleep a moment and wakes again
+//                                    (with a living player in the Heart)
 //   /dev heart reset                 free the run and claim a fresh one
 //
 // Areas: cleft, gallery, pit (or hammer), balcony, ring, ringse, ringsw,
@@ -32,7 +35,13 @@ import {
 } from '../content/smith_heart';
 import { SMITH_HEART_ANCHORS } from '../content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../data';
-import { setSmithHeartPortalDevOpen, smithHeartProgress } from '../encounters/smith_heart';
+import {
+  replaySmithHeartArrivalForDev,
+  SMITH_HEART_AWAKE_BIT,
+  setSmithHeartPortalDevOpen,
+  smithHeartProgress,
+  smithHeartSealMaskOf,
+} from '../encounters/smith_heart';
 import { setDungeonGatesDevOpen } from '../instances/dungeon_gates';
 import { enterDungeon, freeInstance, leaveDungeon } from '../instances/dungeons';
 import { instanceHalfWidthOf } from '../instances/instance_footprint';
@@ -80,7 +89,7 @@ const BOSS_ALIASES: Readonly<Record<string, string>> = {
 const GUARDIAN_IDS: ReadonlySet<string> = new Set(Object.values(SMITH_HEART_GUARDIANS));
 
 const HELP =
-  '[dev] /dev heart enter [normal] | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | reset';
+  '[dev] /dev heart enter [normal] | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | arrival | reset';
 
 function log(ctx: SimContext, pid: number, text: string): void {
   ctx.emit({ type: 'log', text, pid });
@@ -149,10 +158,20 @@ export function killSmithHeartMatching(
   return killed;
 }
 
+/** Is this claim's heart awake (its seal markers carry the arrival)? */
+function heartAwake(ctx: SimContext, inst: InstanceSlot): boolean {
+  for (const id of inst.objectIds) {
+    const e = ctx.entities.get(id);
+    const m = e ? smithHeartSealMaskOf(e.templateId) : null;
+    if (m !== null) return (m & SMITH_HEART_AWAKE_BIT) !== 0;
+  }
+  return false;
+}
+
 /** The `/dev heart seal` readout line for one claim. */
 export function smithHeartSealReadout(ctx: SimContext, inst: InstanceSlot): string {
   const p = smithHeartProgress(ctx, inst);
-  return `[dev] Heart seal: mask ${p.mask}, slabOpen ${p.slabOpen}, sealLit ${p.sealLit}, ringClear ${p.ringClear}, portalOpen ${p.portalOpen}.`;
+  return `[dev] Heart seal: mask ${p.mask}, slabOpen ${p.slabOpen}, sealLit ${p.sealLit}, ringClear ${p.ringClear}, portalOpen ${p.portalOpen}, awake ${heartAwake(ctx, inst)}.`;
 }
 
 /** Handles `/dev heart ...`; returns false for any other line. */
@@ -219,6 +238,16 @@ export function handleSmithHeartDevChat(ctx: SimContext, raw: string, pid: numbe
       return true;
     }
     log(ctx, pid, smithHeartSealReadout(ctx, inst));
+    return true;
+  }
+  if (verb === 'arrival') {
+    const inst = claimFor(ctx, pid);
+    if (!inst) {
+      ctx.error(pid, "[dev] Not inside a Smith's Heart run (/dev heart enter).");
+      return true;
+    }
+    replaySmithHeartArrivalForDev(ctx, inst);
+    log(ctx, pid, '[dev] The heart sleeps a moment; it wakes again with the raid in the Heart.');
     return true;
   }
   if (verb === 'reset') {

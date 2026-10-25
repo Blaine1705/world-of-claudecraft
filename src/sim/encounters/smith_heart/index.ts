@@ -7,6 +7,9 @@ export {
   tickSmithHeartPortal,
 } from './portal';
 export {
+  replaySmithHeartArrivalForDev,
+  SMITH_HEART_ARRIVAL_REPLAY_HOLD,
+  SMITH_HEART_AWAKE_BIT,
   SMITH_HEART_PORTAL_BIT,
   SMITH_HEART_PORTAL_OPEN_LOG,
   SMITH_HEART_SEAL_FULL,
@@ -14,8 +17,10 @@ export {
   SMITH_HEART_VEIN_LIT_LOG,
   type SmithHeartProgress,
   setSmithHeartPortalDevOpen,
+  smithHeartAwakeBitSet,
   smithHeartEarnedMask,
   smithHeartLitCount,
+  smithHeartPlayerInHeart,
   smithHeartPortalBitSet,
   smithHeartProgress,
   smithHeartSealMaskOf,
