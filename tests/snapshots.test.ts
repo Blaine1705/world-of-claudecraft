@@ -5832,6 +5832,7 @@ const ALL_DELTA_KEYS = [
   'courier',
   'courierData',
   'courierLegTicks',
+  'courierStores',
   'courierTravelTicks',
   'cprof',
   'crat',
@@ -5991,6 +5992,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   courier: 'courierInfo',
   courierData: 'courierInfo',
   courierLegTicks: 'courierInfo',
+  courierStores: 'courierInfo',
   courierTravelTicks: 'courierInfo',
   cprof: 'craftingIdentity',
   crat: 'critRating',
@@ -7523,9 +7525,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     // +1: the dungeon objectives tracker's dgrun (server/dungeon_run_wire.ts), for 122.
     // +2: the courier's courierTravelTicks and courierLegTicks leg timing (PR 4281), for 124.
     // +1: Lantern Hall's weekly contract board gcon (server/quest_snapshot_wire.ts), for 125.
+    // Courier vault and other-character stores add one owner delta key.
     // +1: the portrait menu's unapplied claim tier udiff (server/self_scalar_wire.ts).
-    expect(ALL_DELTA_KEYS).toHaveLength(132);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(132);
+    expect(ALL_DELTA_KEYS).toHaveLength(133);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(133);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7704,8 +7707,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The dungeon run's dgrun (the game.ts maybeSerialized emit) makes 122.
     // The courier's courierTravelTicks and courierLegTicks make 124.
     // Lantern Hall's contract board gcon (quest_snapshot_wire.ts) makes 125.
+    // Courier vault and other-character stores add one owner delta key.
     // The unapplied claim tier udiff (self_scalar_wire.ts) adds one more.
-    expect(scraped.size).toBe(132);
+    expect(scraped.size).toBe(133);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7787,6 +7791,7 @@ describe('delta-key contract pins (anti-drift)', () => {
       courier: 'courierInfo',
       courierData: 'courierInfo',
       courierLegTicks: 'courierInfo',
+      courierStores: 'courierInfo',
       courierTravelTicks: 'courierInfo',
     };
     for (const [terse, iworld] of Object.entries(required)) {
