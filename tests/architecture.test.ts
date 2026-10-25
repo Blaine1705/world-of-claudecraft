@@ -1001,6 +1001,9 @@ const RENDER_PURE_CORES = [
   // The Hammer vein's air and the Hammer guardian's and the Slab's effects.
   'src/render/smith_heart/hammer_air_core.ts',
   'src/render/smith_heart_fx/hammer_fx_core.ts',
+  // The Breath vein (phase 2G): its kit's plan, its air and weather, its
+  // guardian's effects.
+  'src/render/smith_heart/breath_kit_plan_core.ts',
   'src/render/drowned_temple/temple_rising_stair_core.ts',
   // The Mere Hydra's Tsunami: the breaking wave's profile, timeline, spray and foam.
   'src/render/drowned_temple/temple_tsunami_core.ts',

@@ -20,6 +20,8 @@ import { authoredFieldHeight } from '../../sim/instances/authored_field';
 import { buildAuthoredFieldTerrain } from '../authored_field/field_terrain';
 import { sharedUniforms } from '../gfx';
 import type { FireLightSink } from '../point_light_budget';
+import { BREATH_KIT_KINDS, breathKitReady, dressBreath, ensureBreathKit } from './breath_kit';
+import { BREATH_KIT_KEEL, BREATH_KIT_SHALLOW } from './breath_kit_plan_core';
 import { buildHammerAir } from './hammer_air';
 import { dressHammerVein, ensureHammerKit, HAMMER_KIT_KINDS, hammerKitReady } from './hammer_kit';
 import { heartCliffPaint } from './heart_cliff_paint_core';
@@ -68,10 +70,13 @@ export async function buildSmithHeartInterior(
   ox: number,
   oz: number,
 ): Promise<THREE.Group> {
-  await Promise.all([ensureHammerKit(), ensureHeartRockKit(), ensureRingKit()]);
+  await Promise.all([ensureHammerKit(), ensureHeartRockKit(), ensureRingKit(), ensureBreathKit()]);
   // The Ring kit draws the two stairs tread by tread and the dais's keel
   // (phase 2F); without it the field's own ramps and keel stand.
   const ringReady = ringKitReady();
+  // The Breath kit draws the Wind Bridge's arch (phase 2G): the field then
+  // keeps only a shallow keel under its deck.
+  const breathReady = breathKitReady();
   const group = new THREE.Group();
   group.name = 'smithHeartField';
   group.add(
@@ -81,7 +86,13 @@ export async function buildSmithHeartInterior(
       // The Hammer vein's faces in its cool quarry granite (phase 2C).
       cliffPaint: heartCliffPaint,
       // The round islands hang over the void on keels (heart_room.ts).
-      shallow: { surfaces: new Set(SMITH_HEART_FLOATING_SURFACES), depth: 3 },
+      shallow: {
+        surfaces: new Set([
+          ...SMITH_HEART_FLOATING_SURFACES,
+          ...(breathReady ? BREATH_KIT_SHALLOW : []),
+        ]),
+        depth: BREATH_KIT_KEEL,
+      },
       ...(ringReady ? { omitTops: RING_KIT_OMIT_TOPS } : {}),
     }),
   );
@@ -89,15 +100,17 @@ export async function buildSmithHeartInterior(
   // The mountain's rock (phase 2E), the loose crags until its kit lands.
   dressHeartMountain(group, () => buildHeartWalls(deps.lowGfx), deps.lowGfx);
   const kitReady = hammerKitReady();
-  const kitKinds = new Set([...HAMMER_KIT_KINDS, ...RING_KIT_KINDS]);
+  const kitKinds = new Set([...HAMMER_KIT_KINDS, ...RING_KIT_KINDS, ...BREATH_KIT_KINDS]);
   const drawn = new Set([
     ...(kitReady ? HAMMER_KIT_KINDS : []),
     ...(ringReady ? RING_KIT_KINDS : []),
+    ...(breathReady ? BREATH_KIT_KINDS : []),
   ]);
   const props = buildHeartProps(kitKinds, drawn);
   group.add(props.group);
   dressHammerVein(group, props.kitOwned, deps.lowGfx);
   dressRing(group, props.kitOwned, deps.lowGfx);
+  dressBreath(group, props.kitOwned, deps.lowGfx);
   // The kit's slot programs link with the interior even when the kit lands
   // late (the swap then links nothing in a live frame).
   group.add(heartKitProgramWarmers());

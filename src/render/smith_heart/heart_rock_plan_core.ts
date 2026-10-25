@@ -53,6 +53,7 @@ import {
   authoredFieldSurfaceAt,
   type FieldCliffRun,
 } from '../../sim/instances/authored_field';
+import { BREATH_KIT_SHALLOW } from './breath_kit_plan_core';
 import type { HeartKitPlacement } from './heart_kit_core';
 import {
   HEART_MOUNTAIN_CHASM,
@@ -578,10 +579,11 @@ function lipCrossesFloor(
 }
 
 /** The cliff runs of every walk falling into the chasm (not the floating
- *  islands', nor the hidden surfaces'), chained end to end per surface. */
+ *  islands', nor the Wind Bridge's, whose arch the Breath kit draws (phase
+ *  2G), nor the hidden surfaces'), chained end to end per surface. */
 function chasmChains(): FieldCliffRun[][] {
   const F = SMITH_HEART_FIELD;
-  const floating = new Set(SMITH_HEART_FLOATING_SURFACES);
+  const floating = new Set([...SMITH_HEART_FLOATING_SURFACES, ...BREATH_KIT_SHALLOW]);
   const hidden = new Set(F.surfaces.filter((x) => x.hidden).map((x) => x.id));
   // The runs into the chasm, chained end to end per surface (a disc's
   // outline is many short runs: one chain, cut into modules along it).

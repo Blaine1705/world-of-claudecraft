@@ -930,6 +930,30 @@ const LIGHTNING_RODS: FieldProp[] = [0, 50, 104, 155, 210, 305].map((deg) => {
   return { kind: 'sh_lightning_rod', ...p, rot: 0, r: 1.3, h: 24 };
 });
 
+/** The wind channels' cheek stones (phase 2G): two flanking each notch's
+ *  mouth on the Cornice's rim, on colliders, clear of the walk to it. */
+const CHANNEL_JAMBS: FieldProp[] = CORNICE_CHANNELS.flatMap((ch) =>
+  [-1, 1].map((s) => {
+    const p = around(BREATH.cornice, ch.deg + s * (ch.halfDeg + 2.5), -2.4);
+    return { kind: 'sh_channel_jamb', ...p, rot: 0, r: 1.3, h: 9 };
+  }),
+);
+
+/** Wind-carved standing stones at the Breath's landings' rims (phase 2G), on
+ *  colliders, between the walks that leave each landing. */
+const STORM_STONES: FieldProp[] = (
+  [
+    [BREATH.b1, [62, 138]],
+    [BREATH.b2, [160, 232]],
+    [BREATH.b3, [250, 302]],
+  ] as const
+).flatMap(([c, degs]) =>
+  degs.map((deg) => {
+    const p = around({ x: c.x, z: c.z, rx: c.r, rz: c.r }, deg, -2.4);
+    return { kind: 'sh_storm_stone', ...p, rot: 0, r: 1.6, h: 8 };
+  }),
+);
+
 const PROPS: FieldProp[] = [
   // The Cleft: the crack's mouth behind the landing (render only), its
   // doorway's steps starting just past the landing's lip.
@@ -998,6 +1022,8 @@ const PROPS: FieldProp[] = [
   { kind: 'sh_wind_shelter', x: -80, z: 140, rot: -0.75, hw: 2.4, hd: 0.7, h: 2 },
   { kind: 'sh_wind_shelter', x: -91, z: 152, rot: -0.75, hw: 2.4, hd: 0.7, h: 2 },
   ...LIGHTNING_RODS,
+  ...CHANNEL_JAMBS,
+  ...STORM_STONES,
   {
     kind: 'sh_broken_bellows',
     ...around(BREATH.cornice, 240, -12),

@@ -238,6 +238,13 @@ export const HEART_PROP_RECIPES: Readonly<Record<string, readonly HeartPart[]>> 
     part('box', 'stone', 'breath', [4.8, 2, 1.4], [0, 1, 0]),
     part('box', 'glow', 'breath', [4.2, 0.2, 0.2], [0, 1.6, 0.72]),
   ],
+  // A wind channel's cheek stone and a landing's standing stone (phase 2G
+  // stand-ins until the Breath kit lands).
+  sh_channel_jamb: [part('box', 'stone', 'breath', [2.4, 9, 1.4], [0, 4.5, 0])],
+  sh_storm_stone: [
+    part('box', 'stone', 'breath', [2.6, 7.5, 1.8], [0, 3.75, 0]),
+    part('gem', 'glow', 'breath', [0.6, 1, 0.6], [0.3, 5.3, 0]),
+  ],
   sh_lightning_rod: [
     part('cyl', 'stone', 'breath', [2.6, 2, 2.4], [0, 1, 0]),
     part('cyl', 'bronze', 'breath', [0.9, 20, 0.5], [0, 12, 0]),
