@@ -3701,7 +3701,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.dungeonMode':
     'Wissel je kerkers tussen de normale en heroïsche moeilijkheidsgraad.',
   'guide.commandsPage.dungeonReset':
-    'Reset je eigen lege instanties, wat je doet na het wijzigen van de moeilijkheidsgraad.',
+    'Verlaat je lege instanties zodat je volgende poging opnieuw begint, op dezelfde of een nieuwe moeilijkheid.',
   'guide.commandsPage.dungeons':
     'Elke kerker met de zone waarin de deur staat en de groepsgrootte waarvoor hij is gebouwd, plus de moeilijkheidsgraad die je nu hebt ingesteld.',
   'guide.commandsPage.emotesBody':
@@ -6770,12 +6770,12 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dungeonDifficulty.resetAlreadyFresh':
     'Je instances zijn al fris. Niemand is ze binnengegaan sinds de laatste reset.',
   'hudChrome.dungeonDifficulty.resetUsage':
-    'Gebruik /dungeon reset om je lege instanties te verlaten nadat je de moeilijkheid hebt gewijzigd.',
+    'Gebruik /dungeon reset om je lege instanties te verlaten en opnieuw te beginnen.',
   'hudChrome.dungeonDifficulty.resetLoot':
     'Je kunt instanties niet resetten zolang er nog buit binnen ligt.',
   'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Alle instanties resetten?',
   'hudChrome.dungeonDifficulty.resetConfirmBody':
-    'Hiermee verlaat je lege instanties van je eerder geselecteerde moeilijkheid. Niet-opgeëiste buit voorkomt de reset.',
+    'Dit verlaat je lege instanties zodat de volgende poging opnieuw begint op de gekozen moeilijkheid. Vergrendelingen veranderen niet. Spelers binnen of niet opgehaalde buit voorkomen de reset.',
   'hudChrome.dungeonDifficulty.resetConfirm': 'Instanties resetten',
   'hudChrome.dungeonDifficulty.resetCooldown':
     'Instanties kunnen slechts eenmaal per 5 minuten worden gereset.',
@@ -15020,7 +15020,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Je groep heeft de heroïsche beproeving doorstaan terwijl jij in de achterhoede vocht of verslagen op de grond lag. Ook jouw binding is vastgelegd, dus je aandeel heroïsche marken is hierheen gestuurd in plaats van verloren te gaan. Gebruik ze goed.\n\n- Heroïsche kwartiermeester',
   'guide.dungeonsPage.resetTitle': 'Je instanties resetten',
   'guide.dungeonsPage.resetBody':
-    'Wissel van moeilijkheid terwijl je groep nog opgeëiste tochten aanhoudt en de oude claims blijven een tijdje hangen voordat ze vanzelf loslaten. De groepsleider kan ze in plaats daarvan meteen loslaten: kies Alle instanties herstellen in het menu van zijn eigen portret, of typ /dungeon reset. Een herstel werkt pas nadat de moeilijkheid echt is gewijzigd, alleen zolang er niemand, levend of gevallen, binnen is, alleen zodra elk lijk daarbinnen helemaal is leeggehaald, en een korte afkoeltijd scheidt het ene herstel van het volgende. Kom je bij de deur met de verkeerde moeilijkheid, dan zegt het spel het voor de tocht begint. De raid wordt zo nooit hersteld; zijn eigen vergrendelingsregels blijven staan.',
+    'Lege geclaimde pogingen blijven een tijdje bestaan voordat ze vanzelf verdwijnen. De groepsleider kan ze meteen opgeven: kies Alle instanties resetten in het menu van het eigen portret of typ /dungeon reset. De volgende poging begint opnieuw op de huidige moeilijkheid. Van moeilijkheid wisselen doet hetzelfde voor pogingen op de oude moeilijkheid. Resetten kan alleen als niemand, levend of dood, binnen blijft en alle lijken volledig zijn geplunderd. Het verkort nooit een vergrendeling: een vergrendelde heroïsche kerker of raid blijft gesloten tot de eigen reset. Een korte wachttijd scheidt de resets. Kom je met de verkeerde moeilijkheid bij de deur, dan meldt het spel dat voor het begin. De raid reset op dezelfde manier, met behoud van de regels voor vergrendeling en terugkeer naar het lijk. Een raid die van moeilijkheid wisselt slaat de wachttijd over: wie de verkeerde stand koos of op Heroïsch vastliep, kan meteen terugwisselen, omdat de eigen vergrendeling herhalingen beperkt.',
   'guide.dungeonsPage.wildheartBody':
     'Een regennatte junglecaldera waar twee verhoogde jachtpaden om een jaden cenote cirkelen. Doorkruis beestenholen en voorouderruines, en beklim dan de rituele piramide om te zien wie er op de top wacht.',
   'guide.gear.itemLevelBody':
@@ -23020,7 +23020,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Teruggebrachte voorwerpen mogen volle tassen laten overlopen. De koerier verdwijnt na bezorging totdat je hem opnieuw oproept.',
   'hudChrome.courier.close': 'Koerier sluiten',
   'hudChrome.courier.instructions':
-    'Kies volledige stapels. Je koerier stort ze eerst en haalt daarna de gevraagde voorwerpen op. Missievoorwerpen kunnen niet worden verstuurd.',
+    'Selecteer hele stapels voor je bank, de Materialenkluis of een ander personage. Je koerier stort ze eerst en haalt daarna de gevraagde voorwerpen op. Missievoorwerpen kunnen niet worden verstuurd.',
   'hudChrome.courier.membership': 'Verleng je lidmaatschap om nog een reis te starten.',
   'hudChrome.courier.outbound': 'Vliegt naar de bank',
   'hudChrome.courier.ready': 'Klaar voor bezorging',
@@ -25693,4 +25693,205 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'editor.zoneTool.namePrompt': 'Locatienaam',
   'editor.zoneTool.none': 'Nog geen benoemde locaties.',
   'editor.zoneTool.title': 'Benoemde locaties',
+
+  'abilityUi.cast.kituse_wildheart_pull_spear': 'De speer uittrekken',
+  'abilityUi.cast.temple_score': 'De partituur',
+  'abilityUi.cast.temple_score_answer': 'Beantwoord de partituur',
+  'abilityUi.cast.wildheart_idols_breath': 'Adem van het idool',
+  'abilityUi.cast.wildheart_sun_glyph_cold': 'Afkoelen',
+  'abilityUi.cast.wildheart_sun_glyph_kindle': 'Ontsteken',
+  'abilityUi.cast.wildheart_zulgar_hunting_spear': 'Jachtspeer',
+  'abilityUi.cast.wildheart_zulgar_idol_wakes': 'Het idool ontwaakt',
+  'bossJournal.temple.selthe.boltResponseRework':
+    'Houd de tank in haar zichtlijn. Bewaar onderbrekingen voor Verdrinkingsaria.',
+  'bossJournal.temple.selthe.boltSummaryRework':
+    'Tussen andere spreuken landt elke {every} sec een schicht na een zichtbare waarschuwing van {windup} sec en doet {mult} keer haar wapenschade als vorstschade. Verdrinkingsaria onderbreken stopt schichten en de aria {quiet} sec.',
+  'bossJournal.temple.selthe.overviewRework':
+    'Selthe beweegt nooit en valt nooit in de melee aan. Groepeer voor Koorzang, verlaat de groep voor Eenstemmige zang, onderbreek Verdrinkingsaria en ontwijk Meergolf. Herhaal bij twee gezondheidsgrenzen haar melodie op de maantegels met afwisselende zangers.',
+  'bossJournal.temple.selthe.phaseSummaryRework':
+    'Haar andere aanvallen pauzeren terwijl de groep de partituur beantwoordt. Maanwaterschichten hebben geen spreukbalk en kunnen niet worden onderbroken.',
+  'bossJournal.temple.selthe.scoreHeroic':
+    'Tijdens het antwoord worden de tegels donker. Onthoud de melodie en wissel elkaar af.',
+  'bossJournal.temple.selthe.scoreResponse':
+    'Bekijk de melodie en betreed de tegels in volgorde. Wissel juiste noten af met een andere levende speler; de enige overlevende kan alleen afronden. Geblokkeerde stappen zijn onschadelijk. Stap van een tegel af en weer erop om hem te laten klinken, ook als je er voor het antwoord al op stond.',
+  'bossJournal.temple.selthe.scoreSummary':
+    'Bij {first} en {second} gezondheid wordt ze immuun en speelt ze {notes}, daarna {finalNotes} noten. Herhaal ze binnen {answer}, daarna {finalAnswer} sec. Een verkeerde tegel doet {falseNote} vorstschade en zet de voortgang terug, maar niet de tijd. Bij tijdsoverschrijding krijgt iedereen {min} tot {max} vorstschade. Succes verdooft haar {stun} sec en verhoogt haar ontvangen schade met {vulnerability} gedurende {bonusSeconds} sec.',
+  'bossJournal.temple.selthe.tipHealerRework':
+    'Let op het doelwit van de aria en spelers die alleen staan bij Koorzang. Help tijdens de partituur de volgende noot zingen en genees fouten.',
+  'bossJournal.wildheart.zulgar.breathResponse':
+    'Steek voor het einde van de waarschuwing over naar de ongemarkeerde helft. De middenlijn is veilig. Op Heroïsch dooft de adem ook brandende runen in zijn helft; die kunnen meteen opnieuw worden ontstoken.',
+  'bossJournal.wildheart.zulgar.breathSummary':
+    'Elke {every} sec wordt een terrashelft {warning} sec gemarkeerd, waarna iedereen in die helft {min} tot {max} natuurschade krijgt. De adem wisselt van helft.',
+  'bossJournal.wildheart.zulgar.glyphResponseRework':
+    'Ongemarkeerde spelers ontsteken runen voor de Prooi. Leid hem eroverheen en val aan tijdens Door de zon getroffen. De runen doven wanneer de jacht eindigt.',
+  'bossJournal.wildheart.zulgar.glyphSummaryRework':
+    'De {count} runen beginnen donker. Tijdens de jacht ontsteekt een ongemarkeerde speler een rune door er {kindle} sec op te staan. Als niemand ongemarkeerd is, kan de Prooi hem in {alone} sec ontsteken. Afstappen zet de voortgang terug. Een brandende rune vertraagt hem met {slow} en verhoogt zijn ontvangen schade met {vulnerability} gedurende {seconds} sec. De rune kan {dark} sec niet opnieuw worden ontstoken; een andere rune kan hem {wary} sec niet treffen. Tijdens de jacht duren verdovingen half zo lang.',
+  'bossJournal.wildheart.zulgar.idolHuntHeroicSummary':
+    'Hij markeert elke {pair} sec een nieuw paar en wisselt elke {switch} sec tussen hen. Elke wissel geeft de nieuwe Prooi {turn} sec voordat hij achtervolgt.',
+  'bossJournal.wildheart.zulgar.idolHuntSummary':
+    'Hij kiest elke {every} sec een nieuwe Prooi en draait zich {turn} sec naar die speler voordat hij achtervolgt.',
+  'bossJournal.wildheart.zulgar.idolSummary':
+    'Bij {health} gezondheid blijft hij een jaguargeest tot hij is verslagen. Ook de tank kan Prooi worden.',
+  'bossJournal.wildheart.zulgar.pulseSummaryRework':
+    'Elke {every} sec raakt een spreuk van {cast} sec iedereen binnen {radius} m voor {min} tot {max} schade. Vastgespieste spelers krijgen op elke afstand {pinMult} keer deze schade.',
+  'bossJournal.wildheart.zulgar.spearResponse':
+    'Selecteer de speer en gebruik interactie binnen {range} m om hem in {pull} sec uit te trekken. Schade onderbreekt het trekken niet. Als niemand anders vrij is op het terras, kan het slachtoffer zichzelf met interactie in {self} sec bevrijden.',
+  'bossJournal.wildheart.zulgar.spearSummary':
+    'Een spreuk van {cast} sec spiest een speler vast die niet de tank is, of de tank als niemand anders overblijft. Het vastzetten duurt maximaal {seconds} sec en doet elke {tick} sec {bleed} schade.',
+  'entities.mobs.wildheart_hunting_spear.name': 'Jachtspeer',
+  'hudChrome.auraEffect.temple.brokenVoice':
+    'Haar stem is gebroken: ze krijgt {pct}% meer schade tot dit eindigt.',
+  'hudChrome.auraEffect.temple.scoreWard':
+    'Ze zingt de partituur: ze krijgt geen schade tot die eindigt. Betreed de maantegels in de volgorde waarin ze klonken voordat het vers eindigt om haar stem te breken. Wissel elkaar af: wacht na een noot totdat een andere speler de volgende juiste noot speelt. De enige overlevende kan alleen afronden. Als het vers eerder eindigt, doet Wanklank {min} tot {max} vorstschade ({heroicMin} tot {heroicMax} op Heroïsch) aan iedereen op het hof.',
+  'hudChrome.auraEffect.temple.spentVoice':
+    'Je kunt geen andere maantegel laten klinken totdat een andere speler de volgende juiste noot speelt. Op een tegel stappen tijdens dit effect zet het antwoord niet terug en doet je geen pijn. Kan niet worden verdreven. Verwijderd als je de enige levende speler in je instantie bent of de partituur eindigt.',
+  'hudChrome.auraEffect.wildheart.idolAwake':
+    'De stenen jaguar is wakker. Elke {every} sec ademt hij over een terrashelft en daarna de andere, na een waarschuwing van {warning} sec op de vloer: {min} tot {max} natuurschade ({heroicMin} tot {heroicMax} op Heroïsch) aan iedereen in die helft. Zulgar blijft de Jaguaravatar tot zijn dood en kiest elke {seconds} sec een nieuwe Prooi ({heroicSeconds} sec op Heroïsch).',
+  'hudChrome.auraEffect.wildheart.pinned':
+    'Een Jachtspeer houdt je vast. Je bloedt voor {bleed} fysieke schade ({heroicBleed} op Heroïsch) elke {every} sec en Wildhartpuls raakt je overal voor {pulse}% meer schade. Een teamgenoot kan de speer in {pull} sec uittrekken. Als niemand anders vrij is, trek hem zelf uit in {wrench} sec. Na {seconds} sec laat hij los.',
+  'hudChrome.auraEffect.wildheart.sunWary':
+    'Geen zonnerune kan hem raken tot dit eindigt. Een brandende rune die hij oversteekt blijft branden.',
+  'hudChrome.auraEffect.wildheart.sunstruck':
+    'Geraakt door een brandende zonnerune: beweegt {pct}% langzamer.',
+  'hudChrome.auraEffect.wildheart.sunstruckExposed':
+    'Geraakt door een brandende zonnerune: krijgt {pct}% meer schade.',
+  'hudChrome.courier.accountBank':
+    'Haal uit deze bank. Dat personage moet uitgelogd zijn wanneer de koerier aankomt.',
+  'hudChrome.courier.accountPlanned':
+    'Gepland voor {name}: {count} stapels. Kiezen voor een ander personage vervangt ze.',
+  'hudChrome.courier.accountTitle': 'Andere personages',
+  'hudChrome.courier.bagsAccount': 'Stuur naar de bank van {name}',
+  'hudChrome.courier.bagsAccountNone': 'Kies een personage om voorwerpen naartoe te sturen.',
+  'hudChrome.courier.bagsVault': 'Stuur materialen naar de kluis',
+  'hudChrome.courier.boundAccount': 'Onderweg naar de bank van een ander personage',
+  'hudChrome.courier.boundBank': 'Onderweg naar de bank',
+  'hudChrome.courier.boundVault': 'Onderweg naar de Materialenkluis',
+  'hudChrome.courier.storeTabs': 'Koerieropslag',
+  'hudChrome.courier.vault': 'Haal uit de kluis. Elke keuze haalt de hele rij op.',
+  'hudChrome.courier.vaultCap': 'Bewaart {cap} van elk materiaal',
+  'hudChrome.courier.vaultEmpty': 'Je kluis is leeg.',
+  'hudChrome.courier.vaultLocked':
+    'Ontgrendel de Materialenkluis bij een bankier om hem met je koerier te gebruiken.',
+  'hudChrome.courier.vaultTitle': 'Materialenkluis',
+  'hudChrome.dungeonDifficulty.unappliedHeroic':
+    'Normaal geselecteerd. Huidige instanties zijn nog Heroïsch.',
+  'hudChrome.dungeonDifficulty.unappliedNormal':
+    'Heroïsch geselecteerd. Huidige instanties zijn nog Normaal.',
+  'hudChrome.finder.mech.the_score':
+    'De partituur (ze zingt tweemaal een melodie op de maantegels: betreed ze in de gespeelde volgorde om haar stem te breken)',
+  'hudChrome.itemHistory.close': 'Sluiten',
+  'hudChrome.itemHistory.noTransfers': 'Dit voorwerp is nooit van eigenaar veranderd.',
+  'hudChrome.itemHistory.openAria': 'Voorwerpgeschiedenis van {item}',
+  'hudChrome.itemHistory.passedTo': 'Doorgegeven aan {name} op {date}',
+  'hudChrome.itemHistory.title': '{item}: geschiedenis',
+  'hudChrome.itemMenu.itemHistory': 'Voorwerpgeschiedenis',
+  'hudChrome.itemTooltip.lootedBy': 'Geplunderd door {name} op {date}',
+  'hudChrome.itemTooltip.obtainedBy': 'Verkregen door {name} op {date}',
+  'hudChrome.itemTooltip.questRewardTo': 'Missiebeloning voor {name} op {date}',
+  'hudChrome.kitUse.freeAria': 'Trek {name} uit',
+  'hudChrome.kitUse.freeClick': 'Klik hier om {name} uit te trekken',
+  'hudChrome.kitUse.freeFar': 'Kom binnen {range} m om hem uit te trekken',
+  'hudChrome.kitUse.freeKey': 'Trek {name} uit',
+  'hudChrome.kitUse.freeLine':
+    'Trek de speer uit de grond om het slachtoffer te bevrijden. Schade stopt je niet; bewegen of verdoving wel',
+  'hudChrome.kitUse.freeTap': 'Tik hier om {name} uit te trekken',
+  'hudChrome.kitUse.freeUsingLine':
+    'Sta stil om de speer uit te trekken: bewegen of verdoving stopt je',
+  'hudChrome.options.firstPersonBody': 'Lichaam tonen',
+  'hudChrome.options.firstPersonMode': 'Eerste persoon (volledig ingezoomd)',
+  'hudChrome.options.firstPersonNoBody': 'Geen lichaam',
+  'hudChrome.options.firstPersonOff': 'Uit',
+  'hudChrome.plurals.itemHistoryEarlierHidden.few':
+    '{count} eerdere overdrachten worden niet getoond.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.many':
+    '{count} eerdere overdrachten worden niet getoond.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.one':
+    '{count} eerdere overdracht wordt niet getoond.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.other':
+    '{count} eerdere overdrachten worden niet getoond.',
+  'hudChrome.reliquary.sourceActivityWeeklyVaultPvp':
+    'Gekozen uit de PvP-rij van de Wekelijkse Kluis',
+  'hudChrome.templeAlert.answerDarkLine':
+    'Wissel elkaar af en herhaal de volgorde uit het hoofd. Stap af voordat je een tegel opnieuw betreedt. Noten: {done} van {total}',
+  'hudChrome.templeAlert.answerLine':
+    'Wissel elkaar af: betreed de maantegel met {place}. Noten: {done} van {total}',
+  'hudChrome.templeAlert.answerTitle': 'Beantwoord de partituur!',
+  'hudChrome.templeAlert.brokenLine':
+    'Ze krijgt {pct}% meer schade tot dit eindigt: gebruik nu je sterkste aanvallen',
+  'hudChrome.templeAlert.brokenTitle': 'Selthes stem is gebroken!',
+  'hudChrome.templeAlert.falseLine':
+    'Die tegel was niet aan de beurt. Het antwoord begint opnieuw bij de eerste tegel',
+  'hudChrome.templeAlert.falseTitle': 'Valse noot!',
+  'hudChrome.templeAlert.melodyDarkLine':
+    'Onthoud de volgorde voordat de tegels donker worden. Herhaal die om de beurt met een andere speler',
+  'hudChrome.templeAlert.melodyLine':
+    'Kijk hoe de maantegels na elkaar klinken. Herhaal de volgorde om de beurt met een andere speler',
+  'hudChrome.templeAlert.melodyTitle': 'De partituur',
+  'hudChrome.templeAlert.spentLine':
+    'Je kunt geen tegel laten klinken totdat een andere speler de volgende juiste noot speelt. Noten: {done} van {total}',
+  'hudChrome.templeAlert.spentTitle': 'Een andere stem moet antwoorden',
+  'hudChrome.templeAlert.stepOffLine':
+    'Een maantegel klinkt alleen wanneer iemand erop stapt. Stap van deze tegel af en weer erop',
+  'hudChrome.templeAlert.stepOffTitle': 'Stap eraf en weer erop',
+  'hudChrome.templeAlert.timeAria': 'Nog {seconds} seconden',
+  'hudChrome.wildheartAlert.breathLine':
+    'De stenen jaguar gaat over deze terrashelft ademen. Steek over naar de andere helft',
+  'hudChrome.wildheartAlert.breathTitle': 'Adem van het idool!',
+  'hudChrome.wildheartAlert.glyphLightingLine':
+    'Blijf op de rune tot die brandt. Afstappen begint opnieuw',
+  'hudChrome.wildheartAlert.glyphLightingTitle': 'De zonnerune ontsteken',
+  'hudChrome.wildheartAlert.glyphLine':
+    'Sta {seconds} sec op een donkere zonnerune om die te ontsteken. Wanneer Zulgar oversteekt, krijgt hij {duration} sec {pct}% meer schade',
+  'hudChrome.wildheartAlert.glyphTitle': 'Ontsteek de zonnerunen',
+  'hudChrome.wildheartAlert.pinnedLine':
+    'Een teamgenoot moet de Jachtspeer uittrekken. Wildhartpuls raakt je harder zolang je vastgespiest bent',
+  'hudChrome.wildheartAlert.pinnedSelfLine':
+    'Niemand is vrij om te helpen: trek de Jachtspeer zelf uit voordat Wildhartpuls raakt',
+  'hudChrome.wildheartAlert.pinnedTitle': 'Vastgespiest!',
+  'hudChrome.wildheartAlert.preyAloneLine':
+    'Niemand anders kan de zonnerunen ontsteken. Sta {seconds} sec op een donkere rune om die te ontsteken en lok Zulgar eroverheen',
+  'hudChrome.wildheartAlert.spearLine':
+    'Ren naar de Jachtspeer en trek hem uit voordat Wildhartpuls raakt',
+  'hudChrome.wildheartAlert.spearTitle': 'Een bondgenoot is vastgespiest!',
+  'hudChrome.wildheartAlert.sunstruckLine':
+    'Hij krijgt {pct}% meer schade tot dit eindigt: gebruik nu je sterkste aanvallen',
+  'hudChrome.wildheartAlert.sunstruckTitle': 'Zulgar is door de zon geraakt!',
+  'itemUi.errors.orderTrackedItem':
+    'De Koopman neemt geen bestellingen voor unieke uitrusting aan.',
+
+  'hudChrome.cosmetics.mountsIntro':
+    'Kies hier het uiterlijk van je rijdier. Je rijopleiding bepaalt de snelheid. Bewaar het rijdiervoorwerp in de tassen of bank van een willekeurig personage om het uiterlijk met je hele account te delen.',
+  'hudChrome.cosmetics.mountsNoMount':
+    'Leer rijden bij stalmeester Marla om een rijdier op te roepen.',
+  'hudChrome.cosmetics.notCollected': 'Niet verzameld',
+  'hudChrome.guildHall.mountPreview':
+    'Rijdieruiterlijk voor elk personage op je account. Je rijopleiding bepaalt de snelheid.',
+  'hudChrome.mountTraining.ownedMountPrompt':
+    'Kies je rijdier onder Uiterlijk. Gebruik Opstijgen / Afstijgen om te rijden.',
+  'hudChrome.mounts.desc_grag_bear': 'Een sterke, tredzekere beer met een zwaar zadel.',
+  'hudChrome.mounts.desc_stalkglider_snail': 'Een stevige, rustige slak met een bemoste schelp.',
+  'hudChrome.mounts.desc_valorsteed': 'Een sterk, tredzeker ros met een leren zadel.',
+  'hudChrome.mounts.useToRide':
+    'Gebruik om dit uiterlijk te dragen en je rijdier op te roepen. Bewaar dit voorwerp in de tassen of bank van een willekeurig personage om het uiterlijk met je hele account te delen. Je rijopleiding bepaalt de snelheid.',
+  'itemUi.vendor.advancedRiding': 'Gevorderde rijtraining',
+  'itemUi.vendor.basicRiding': 'Rijtraining',
+  'itemUi.vendor.ridingSpeed':
+    'Verhoogt je bewegingssnelheid tijdens het rijden met {speed}%. Geldt voor elk rijdier.',
+  'guide.mountsPage.firstBody':
+    'Marla verkoopt de Teugels van het Moedros voor 10 goud nadat je hebt leren rijden. De teugels bewaren ontgrendelt het paardenuiterlijk onder Uiterlijk voor elk personage op je account. Je opleiding laat je al een rijdier oproepen zonder teugels te dragen, dus kies het paard of een ander beschikbaar uiterlijk als je iets anders wilt.',
+  'guide.mountsPage.goodsBody':
+    'Verzamelbare rijdieruiterlijken blijven op je hele account beschikbaar zolang minstens één passend teugelvoorwerp in de tassen of persoonlijke bank van een willekeurig personage ligt. Het laatste geschikte voorwerp ruilen, versturen, aanbieden, verkopen of anders verwijderen haalt het uiterlijk uit Uiterlijk. Een rijder die het draagt krijgt het standaardpaardenuiterlijk terug en blijft rijden op de snelheid van zijn opleiding.\n\nTeugels van spelers kunnen worden geruild, verstuurd en op de Wereldmarkt aangeboden, tenzij het voorwerp anders vermeldt. De paardenteugels kunnen ook voor 10 goud aan een handelaar worden verkocht. Andere teugels behouden hun eigen verkoopbeperkingen. Rijdieruiterlijken uit de winkel blijven accountcosmetica die onafhankelijk zijn van teugelvoorwerpen.',
+  'guide.mountsPage.intro':
+    'Kies een rijdieruiterlijk, leer rijden bij de stallen en reis sneller door de wereld. Je opleiding bepaalt het tempo; elk rijdieruiterlijk is cosmetisch.',
+  'guide.mountsPage.learnBody':
+    "Rijden komt beschikbaar op niveau {level}. Stalmeester Marla Hitchen verkoopt Rijtraining voor 80 goud bij de Windkam-Stallen. De basisopleiding geeft {basicSpeed}% sneller bewegen op een rijdier. Daarna verkoopt Marla ook Gevorderde rijtraining voor {advancedFee} goud, wat de bonus verhoogt naar {advancedSpeed}%. Elke rang hoort bij het personage dat die leert.\n\nNeem na de basisopleiding Marla's missie Rijlessen aan en volg de markering naar het lichtgevende vierkant achter de startboog. Druk op Race starten om het trainings-Moedros te lenen. Voltooi de baan en keer terug voor munten en ervaring. Het geleende paard keert terug naar de stal wanneer de les eindigt.",
+  'guide.mountsPage.rideBody':
+    'Open Uiterlijk en kies een uiterlijk op het tabblad Rijdieren. De toets Opstijgen / Afstijgen, standaard het accent grave, roept je getrainde rijdier op met dat uiterlijk. De mobiele knop Opstijgen doet hetzelfde. Oproepen duurt een korte kanalisering; afstijgen is direct. Je kunt het uiterlijk tijdens het rijden wijzigen zonder je snelheid te veranderen.\n\nJe kunt ook teugels vanuit je tassen of een actiebalk gebruiken om het uiterlijk te kiezen en op te roepen. Het uiterlijk gebruiken waarop je al rijdt bergt het rijdier op. Teugels in de bank of bij een ander personage ontgrendelen dezelfde cosmetica zonder dat de rijder ze hoeft te dragen.',
+  'guide.mountsPage.speedBody':
+    'De basisrijopleiding geeft {basicSpeed}% sneller bewegen op een rijdier. Gevorderde rijtraining geeft {advancedSpeed}% sneller bewegen en kost {advancedFee} goud bij Marla. Elk rijdieruiterlijk gebruikt dezelfde snelheid voor de opleidingsrang van het personage, ongeacht zeldzaamheid of herkomst. Winkeluiterlijken gebruiken die snelheid ook.',
+  'guide.mountsPage.speedHeading': 'Rijsnelheid en opleiding',
+  'guide.mountsPage.whatBody':
+    'Rijdieren zijn cosmetische uiterlijken voor je getrainde rit. Ze geven geen pantser, schade of gevechtswaarden. De rijopleiding verhoogt de reissnelheid over de grond en sprongen op een rijdier komen hoger. Elk rijdier blijft op de grond en geen enkel kan zwemmen.',
+  'guide.progression.ridingBody':
+    'Op niveau {level} leert stalmeester Marla je tegen goud de basis van het rijden en biedt daarna een gevorderde rang aan. De opleiding bepaalt de rijsnelheid. Kies je rijdieruiterlijk onder Uiterlijk; verzamelbare uiterlijken worden gedeeld zolang hun teugels in de tassen of bank van een willekeurig personage blijven.',
 };

@@ -3622,7 +3622,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.doesHeader': 'Ne yaptığı',
   'guide.commandsPage.dungeonMode': 'Zindanlarını Normal ve Kahramanca zorluk arasında değiştir.',
   'guide.commandsPage.dungeonReset':
-    'Kendi boş örneklerinden vazgeç, zorluğu değiştirdikten sonra yapılması gereken de budur.',
+    'Sonraki seferin aynı veya yeni zorlukta baştan başlaması için kendi boş örneklerinden vazgeç.',
   'guide.commandsPage.dungeons':
     'Kapısının bulunduğu bölge ve tasarlandığı grup boyutuyla birlikte her zindan, artı şu anda ayarlı olduğun zorluk.',
   'guide.commandsPage.emotesBody':
@@ -6608,12 +6608,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dungeonDifficulty.resetAlreadyFresh':
     'Zindanların zaten sıfırlanmış durumda. Son sıfırlamadan beri kimse girmedi.',
   'hudChrome.dungeonDifficulty.resetUsage':
-    'Zorluğu değiştirdikten sonra boş örneklerinden vazgeçmek için /dungeon reset kullan.',
+    'Boş örneklerinden vazgeçip baştan başlatmak için /dungeon reset kullan.',
   'hudChrome.dungeonDifficulty.resetLoot':
     'İçeride ganimet kaldığı sürece örnekleri sıfırlayamazsın.',
   'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Tüm Örnekler Sıfırlansın mı?',
   'hudChrome.dungeonDifficulty.resetConfirmBody':
-    'Bu işlem, daha önce seçtiğin zorluktaki boş örneklerden vazgeçer. Alınmamış ganimet sıfırlamayı engeller.',
+    'Bu işlem boş örneklerinden vazgeçerek sonraki seferi seçtiğin zorlukta baştan başlatır. Kilitler değişmez. İçeride kalan biri veya alınmamış ganimet sıfırlamayı engeller.',
   'hudChrome.dungeonDifficulty.resetConfirm': 'Örnekleri Sıfırla',
   'hudChrome.dungeonDifficulty.resetCooldown': 'Örnekler yalnızca 5 dakikada bir sıfırlanabilir.',
   'hudChrome.dungeonDifficulty.entryMismatchNormal':
@@ -15026,7 +15026,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Birliğin kahramanlık sınavını temizlerken sen arka saflarda savaşıyor ya da yerde yatıyordun. Kilidin yine de kaydedildi, bu yüzden Kahramanlık Nişanlarından payın kaybolmak yerine buraya gönderildi. Onları iyi kullan.\n\n- Kahraman levazım subayı',
   'guide.dungeonsPage.resetTitle': 'Örneklerini sıfırlama',
   'guide.dungeonsPage.resetBody':
-    "Grubun hâlâ üstlenilmiş seferler tutarken zorluğu değiştir, eski üstlenmeler kendiliğinden bırakılmadan önce bir süre asılı kalır. Grup lideri bunun yerine hepsini bir anda bırakabilir: kendi portre menüsünden Tüm Instance'ları Sıfırla'yı seçin ya da /dungeon reset yazın. Sıfırlama yalnızca zorluk gerçekten değiştirildikten sonra, yalnızca içeride canlı ya da düşmüş kimse kalmadığı sürece, yalnızca içerideki her ceset tertemiz yağmalandıktan sonra çalışır ve bir sıfırlamayı diğerinden kısa bir bekleme süresi ayırır. Kapıya yanlış zorlukla gelirseniz oyun bunu sefer başlamadan söyler. Akın bu şekilde asla sıfırlanmaz; kendi kilit kuralları geçerlidir.",
+    "Sahiplenilmiş boş örnekler kendiliğinden bırakılmadan önce bir süre kalır. Grup lideri bunları hemen bırakabilir: kendi portre menüsünde Tüm Instance'ları Sıfırla seçeneğini seç veya /dungeon reset yaz; sonraki sefer mevcut zorlukta baştan başlar. Zorluğu değiştirmek de eski zorluktaki örnekleri bırakır. Sıfırlama yalnızca içeride canlı ya da düşmüş kimse kalmadığında ve her ceset tamamen yağmalandığında çalışır. Kilidi asla kısaltmaz: kilitli Kahramanlık örneği veya akın kendi sıfırlamasına kadar kilitli kalır ve sıfırlamalar arasında kısa bir bekleme süresi vardır. Kapıya yanlış zorlukta gelirsen oyun sefer başlamadan bildirir. Akın da aynı şekilde sıfırlanır; kendi kilit ve cesede dönüş kuralları geçerlidir. Akın zorluğu değiştirilirken bekleme süresi atlanır: yanlış zorluk seçildiyse veya Kahramanlık aşılamadıysa hemen geri dönülebilir, çünkü tekrarları kendi kilidi sınırlar.",
   'guide.dungeonsPage.wildheartBody':
     'İki yükseltilmiş av patikasının yeşim rengi bir cenoteyi çevrelediği, yağmurla ıslanmış bir orman kalderası. Canavar inlerini ve ata kalıntılarını geç, ardından zirvede kimin seni beklediğini görmek için ritüel piramidine tırman.',
   'guide.gear.itemLevelBody':
@@ -24191,7 +24191,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bastionChain.anchoredLine':
     'Zinciri bağlamak için yanan bağlama direğine koş veya vinç seni çukura çekmeden grubun kırsın',
   'hudChrome.courier.instructions':
-    'Tam yığınları seç. Kuryen önce onları yatırır, sonra istediğin eşyaları alır. Görev eşyaları gönderilemez.',
+    'Bankan, Malzeme Kasası veya başka bir karakter için tam yığınları seç. Kuryen önce onları yatırır, sonra istediğin eşyaları alır. Görev eşyaları gönderilemez.',
   'hudChrome.cryptAlert.riteNamedLine':
     "Morthen'in bağışıklığını kırmak için mumları Defter sırasıyla yeniden yak: yanlış mum ilerlemeyi geri alır ({lit}/{total})",
   'hudChrome.finder.guide.adds':
@@ -25343,4 +25343,194 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Vahşi Yürek Atımı halkada kalanlara vurur. Parçalama tek ve ağır bir darbedir: Avın canını doldurun.',
   'bossJournal.wildheart.zulgar.tipTank':
     'Jaguar Kükreyişi için arkanızda boş alan bırakın. Av bitince size döner: onu karşılamaya hazır olun.',
+  'abilityUi.cast.kituse_wildheart_pull_spear': 'Mızrağı Çek',
+  'abilityUi.cast.temple_score': 'Partisyon',
+  'abilityUi.cast.temple_score_answer': 'Partisyona Yanıt Ver',
+  'abilityUi.cast.wildheart_idols_breath': 'Putun Nefesi',
+  'abilityUi.cast.wildheart_sun_glyph_cold': 'Soğuyor',
+  'abilityUi.cast.wildheart_sun_glyph_kindle': 'Yanıyor',
+  'abilityUi.cast.wildheart_zulgar_hunting_spear': 'Av Mızrağı',
+  'abilityUi.cast.wildheart_zulgar_idol_wakes': 'Put Uyanıyor',
+  'bossJournal.temple.selthe.boltResponseRework':
+    'Tankı onun görüş alanında tut. Kesintileri Boğulma Aryası için sakla.',
+  'bossJournal.temple.selthe.boltSummaryRework':
+    "Diğer büyüler arasında, {windup} sn görsel uyarının ardından her {every} sn bir ok isabet eder ve silah hasarının {mult} katı Don hasarı verir. Boğulma Aryası'yı kesmek okları ve Arya'yı {quiet} sn durdurur.",
+  'bossJournal.temple.selthe.overviewRework':
+    "Selthe asla hareket etmez veya yakın dövüş saldırısı yapmaz. Koro için toplan, Solo için gruptan ayrıl, Boğulma Aryası'yı kes ve Göl Akını'ndan kaç. İki sağlık eşiğinde, ay karolarındaki melodisini sırayla söyleyerek tekrarla.",
+  'bossJournal.temple.selthe.phaseSummaryRework':
+    'Grup Partisyona yanıt verirken diğer saldırıları durur. Ay Suyu Oklarının büyü çubuğu yoktur ve kesilemezler.',
+  'bossJournal.temple.selthe.scoreHeroic':
+    'Yanıt sırasında karolar kararır. Melodiyi hatırla ve sırayla söyle.',
+  'bossJournal.temple.selthe.scoreResponse':
+    'Melodiyi izle, sonra karolara sırayla bas. Doğru notaları başka bir yaşayan oyuncuyla dönüşümlü çal; hayatta kalan tek kişi yalnız tamamlayabilir. Engellenen adımlar zararsızdır. Yanıt başlamadan önce üzerinde durulan karo dahil, karoyu çalmak için üzerinden çıkıp yeniden gir.',
+  'bossJournal.temple.selthe.scoreSummary':
+    '{first} ve {second} sağlıkta bağışıklık kazanıp önce {notes}, sonra {finalNotes} nota çalar. Bunları önce {answer}, sonra {finalAnswer} sn içinde tekrarla. Yanlış karo {falseNote} Don hasarı verir ve ilerlemeyi sıfırlar, süreyi değil. Süre dolarsa herkese {min} ile {max} Don hasarı verir. Başarı onu {stun} sn sersemletir ve {bonusSeconds} sn boyunca aldığı hasarı {vulnerability} artırır.',
+  'bossJournal.temple.selthe.tipHealerRework':
+    "Arya hedefini ve Koro'ya yalnız yakalananları izle. Partisyon sırasında sonraki notayı söylemeye yardım et ve hataları iyileştir.",
+  'bossJournal.wildheart.zulgar.breathResponse':
+    'Uyarı bitmeden işaretsiz yarıya geç. Orta çizgi güvenlidir. Kahramanlıkta nefes, kendi yarısındaki yanan glifleri de söndürür; hemen yeniden yakılabilirler.',
+  'bossJournal.wildheart.zulgar.breathSummary':
+    'Her {every} sn, terasın bir yarısı {warning} sn işaretlenir, sonra o yarıdaki herkes {min} ile {max} Doğa hasarı alır. Nefesler iki yarı arasında dönüşümlüdür.',
+  'bossJournal.wildheart.zulgar.glyphResponseRework':
+    'İşaretsiz oyuncular Avın önündeki glifleri yakar. Onu gliflerden geçir, sonra Güneş Çarpması sırasında saldır. Av bitince glifler kararır.',
+  'bossJournal.wildheart.zulgar.glyphSummaryRework':
+    '{count} glif başlangıçta karanlıktır. Avlanırken işaretsiz bir oyuncu birinin üzerinde {kindle} sn durarak onu yakar. İşaretsiz oyuncu kalmadıysa Av {alone} sn içinde yakabilir. Üzerinden ayrılmak ilerlemeyi sıfırlar. Yanan gliften geçmek onu {seconds} sn boyunca {slow} yavaşlatır ve aldığı hasarı {vulnerability} artırır. Glif {dark} sn yeniden yakılamaz; başka bir glif onu {wary} sn etkileyemez. Av sırasında sersemletmeler yarı süreyle işler.',
+  'bossJournal.wildheart.zulgar.idolHuntHeroicSummary':
+    'Her {pair} sn yeni bir çifti işaretler ve her {switch} sn aralarında geçiş yapar. Her geçiş yeni Ava kovalanmadan önce {turn} sn verir.',
+  'bossJournal.wildheart.zulgar.idolHuntSummary':
+    'Her {every} sn yeni bir Av seçer, sonra kovalamadan önce {turn} sn ona döner.',
+  'bossJournal.wildheart.zulgar.idolSummary':
+    '{health} sağlıkta yenilene kadar jaguar ruhu olarak kalır. Tank da Av olabilir.',
+  'bossJournal.wildheart.zulgar.pulseSummaryRework':
+    'Her {every} sn, {cast} sn süren büyü {radius} yd içindeki herkese {min} ile {max} hasar verir. Saplanan oyuncular her mesafeden bu hasarın {pinMult} katını alır.',
+  'bossJournal.wildheart.zulgar.spearResponse':
+    'Mızrağı hedefle ve {range} yd içinde etkileşerek {pull} sn içinde çek. Hasar çekmeyi kesmez. Terasta başka kimse serbest değilse kurban etkileşerek {self} sn içinde kurtulabilir.',
+  'bossJournal.wildheart.zulgar.spearSummary':
+    '{cast} sn süren büyü tank olmayan bir oyuncuyu, başka kimse kalmadıysa tankı saplar. Sabitleme en fazla {seconds} sn sürer ve her {tick} sn {bleed} hasar verir.',
+  'entities.mobs.wildheart_hunting_spear.name': 'Av Mızrağı',
+  'hudChrome.auraEffect.temple.brokenVoice':
+    'Sesi kırıldı: bu etki bitene kadar {pct}% daha fazla hasar alır.',
+  'hudChrome.auraEffect.temple.scoreWard':
+    'Partisyonu söylüyor: bitene kadar hasar almaz. Dize bitmeden ay karolarına çaldıkları sırayla basarak sesini kır. Sırayla yap: bir nota çaldıktan sonra başka bir oyuncunun sonraki doğru notayı çalmasını bekle. Hayatta kalan tek kişi yalnız tamamlayabilir. Dize önce biterse Uyumsuzluk avludaki herkese {min} ile {max} Don hasarı (Kahramanlıkta {heroicMin} ile {heroicMax}) verir.',
+  'hudChrome.auraEffect.temple.spentVoice':
+    'Başka bir oyuncu sonraki doğru notayı çalana kadar başka bir ay karosu çalamazsın. Bu etki sürerken karoya basmak yanıtı sıfırlamaz veya sana zarar vermez. Giderilemez. Kendi örneğindeki tek yaşayan oyuncu olduğunda veya Partisyon bittiğinde kalkar.',
+  'hudChrome.auraEffect.wildheart.idolAwake':
+    'Taş jaguar uyandı. Her {every} sn, yerde {warning} sn uyarıdan sonra terasın bir yarısına, ardından diğerine nefes üfler: o yarıdaki herkese {min} ile {max} Doğa hasarı (Kahramanlıkta {heroicMin} ile {heroicMax}). Zulgar ölene kadar Jaguar Avatarı olarak kalır ve her {seconds} sn (Kahramanlıkta {heroicSeconds} sn) yeni Av seçer.',
+  'hudChrome.auraEffect.wildheart.pinned':
+    'Av Mızrağı seni olduğun yere sapladı. Her {every} sn {bleed} Fiziksel hasar (Kahramanlıkta {heroicBleed}) kanarsın ve Vahşi Yürek Atımı her konumda sana {pulse}% daha fazla hasar verir. Bir takım arkadaşı mızrağı {pull} sn içinde çekebilir. Başka kimse serbest değilse {wrench} sn içinde kendin çek. {seconds} sn sonra serbest bırakır.',
+  'hudChrome.auraEffect.wildheart.sunWary':
+    'Bu etki bitene kadar hiçbir güneş glifi onu vuramaz. Üzerinden geçtiği yanan glif yanmaya devam eder.',
+  'hudChrome.auraEffect.wildheart.sunstruck':
+    'Yanan bir güneş glifi vurdu: {pct}% daha yavaş hareket eder.',
+  'hudChrome.auraEffect.wildheart.sunstruckExposed':
+    'Yanan bir güneş glifi vurdu: {pct}% daha fazla hasar alır.',
+  'hudChrome.courier.accountBank':
+    'Bu bankadan getir. Kurye geldiğinde o karakterin oturumu kapalı olmalı.',
+  'hudChrome.courier.accountPlanned':
+    '{name} için planlanan: {count} yığın. Başka bir karakter için seçim yapmak bunları değiştirir.',
+  'hudChrome.courier.accountTitle': 'Diğer karakterler',
+  'hudChrome.courier.bagsAccount': '{name} adlı karakterin bankasına gönder',
+  'hudChrome.courier.bagsAccountNone': 'Eşya göndermek için bir karakter seç.',
+  'hudChrome.courier.bagsVault': 'Malzemeleri kasaya gönder',
+  'hudChrome.courier.boundAccount': 'Başka bir karakterin bankasına gidiyor',
+  'hudChrome.courier.boundBank': 'Bankaya gidiyor',
+  'hudChrome.courier.boundVault': 'Malzeme Kasasına gidiyor',
+  'hudChrome.courier.storeTabs': 'Kurye deposu',
+  'hudChrome.courier.vault': 'Kasadan getir. Her seçim satırın tamamını getirir.',
+  'hudChrome.courier.vaultCap': 'Her malzemeden {cap} tutar',
+  'hudChrome.courier.vaultEmpty': 'Kasan boş.',
+  'hudChrome.courier.vaultLocked': 'Kuryenle kullanmak için bir bankacıda Malzeme Kasasını aç.',
+  'hudChrome.courier.vaultTitle': 'Malzeme Kasası',
+  'hudChrome.dungeonDifficulty.unappliedHeroic':
+    'Normal seçildi. Mevcut örnekler hâlâ Kahramanlıkta.',
+  'hudChrome.dungeonDifficulty.unappliedNormal':
+    'Kahramanlık seçildi. Mevcut örnekler hâlâ Normalde.',
+  'hudChrome.finder.mech.the_score':
+    'Partisyon (ay karolarında iki kez bir melodi söyler: sesini kırmak için karolara çaldıkları sırayla bas)',
+  'hudChrome.itemHistory.close': 'Kapat',
+  'hudChrome.itemHistory.noTransfers': 'Bu eşya hiç el değiştirmedi.',
+  'hudChrome.itemHistory.openAria': '{item} için eşya geçmişi',
+  'hudChrome.itemHistory.passedTo': '{date} tarihinde {name} adlı kişiye verildi',
+  'hudChrome.itemHistory.title': '{item}: geçmiş',
+  'hudChrome.itemMenu.itemHistory': 'Eşya geçmişi',
+  'hudChrome.itemTooltip.lootedBy': '{date} tarihinde {name} tarafından yağmalandı',
+  'hudChrome.itemTooltip.obtainedBy': '{date} tarihinde {name} tarafından elde edildi',
+  'hudChrome.itemTooltip.questRewardTo': '{date} tarihinde {name} adlı kişiye görev ödülü',
+  'hudChrome.kitUse.freeAria': '{name} çıkar',
+  'hudChrome.kitUse.freeClick': '{name} çıkarmak için buraya tıkla',
+  'hudChrome.kitUse.freeFar': 'Çıkarmak için {range} yd yakına gel',
+  'hudChrome.kitUse.freeKey': '{name} çıkar',
+  'hudChrome.kitUse.freeLine':
+    'Sapladığı kişiyi kurtarmak için mızrağı yerden çek. Darbe almak seni durdurmaz; hareket etmek veya sersemlemek durdurur',
+  'hudChrome.kitUse.freeTap': '{name} çıkarmak için buraya dokun',
+  'hudChrome.kitUse.freeUsingLine':
+    'Mızrağı çekmek için hareketsiz kal: hareket etmek veya sersemlemek seni durdurur',
+  'hudChrome.options.firstPersonBody': 'Gövdeyi Göster',
+  'hudChrome.options.firstPersonMode': 'Birinci Şahıs (Tam Yakınlaştırma)',
+  'hudChrome.options.firstPersonNoBody': 'Gövdesiz',
+  'hudChrome.options.firstPersonOff': 'Kapalı',
+  'hudChrome.plurals.itemHistoryEarlierHidden.few': 'Önceki {count} aktarım gösterilmiyor.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.many': 'Önceki {count} aktarım gösterilmiyor.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.one': 'Önceki {count} aktarım gösterilmiyor.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.other': 'Önceki {count} aktarım gösterilmiyor.',
+  'hudChrome.reliquary.sourceActivityWeeklyVaultPvp': 'Haftalık Kasanın PvP satırından seçildi',
+  'hudChrome.templeAlert.answerDarkLine':
+    'Sırayla yapıp diziyi hafızandan tekrarla. Karoya tekrar basmadan önce üzerinden çık. Çalınan: {done} / {total}',
+  'hudChrome.templeAlert.answerLine':
+    'Sırayla: {place} işaretli ay karosuna bas. Çalınan: {done} / {total}',
+  'hudChrome.templeAlert.answerTitle': 'Partisyona Yanıt Ver!',
+  'hudChrome.templeAlert.brokenLine':
+    'Bu etki bitene kadar {pct}% daha fazla hasar alır: en güçlü saldırılarını şimdi kullan',
+  'hudChrome.templeAlert.brokenTitle': "Selthe'nin sesi kırıldı!",
+  'hudChrome.templeAlert.falseLine': 'Bu karo sırada değildi. Yanıt ilk karodan yeniden başlar',
+  'hudChrome.templeAlert.falseTitle': 'Yanlış Nota!',
+  'hudChrome.templeAlert.melodyDarkLine':
+    'Karolar kararmadan sırayı hatırla. Başka bir oyuncuyla sırayla tekrarla',
+  'hudChrome.templeAlert.melodyLine':
+    'Ay karolarının birer birer çalmasını izle. Başka bir oyuncuyla sırayla diziyi tekrarla',
+  'hudChrome.templeAlert.melodyTitle': 'Partisyon',
+  'hudChrome.templeAlert.spentLine':
+    'Başka bir oyuncu sonraki doğru notayı çalana kadar karo çalamazsın. Çalınan: {done} / {total}',
+  'hudChrome.templeAlert.spentTitle': 'Başka bir ses yanıt vermeli',
+  'hudChrome.templeAlert.stepOffLine':
+    'Ay karosu yalnızca biri üzerine basınca çalar. Bu karodan çıkıp tekrar bas',
+  'hudChrome.templeAlert.stepOffTitle': 'Çık, sonra tekrar bas',
+  'hudChrome.templeAlert.timeAria': '{seconds} saniye kaldı',
+  'hudChrome.wildheartAlert.breathLine':
+    'Taş jaguar terasın bu yarısına nefes üfleyecek. Diğer yarıya geç',
+  'hudChrome.wildheartAlert.breathTitle': 'Putun Nefesi!',
+  'hudChrome.wildheartAlert.glyphLightingLine':
+    'Yanana kadar glifin üzerinde kal. Ayrılmak baştan başlatır',
+  'hudChrome.wildheartAlert.glyphLightingTitle': 'Güneş glifi yakılıyor',
+  'hudChrome.wildheartAlert.glyphLine':
+    'Yakmak için karanlık bir güneş glifinde {seconds} sn dur. Zulgar üzerinden geçince {duration} sn {pct}% daha fazla hasar alır',
+  'hudChrome.wildheartAlert.glyphTitle': 'Güneş gliflerini yak',
+  'hudChrome.wildheartAlert.pinnedLine':
+    'Bir takım arkadaşı Av Mızrağını çekmeli. Saplanmışken Vahşi Yürek Atımı sana daha sert vurur',
+  'hudChrome.wildheartAlert.pinnedSelfLine':
+    'Yardım edebilecek kimse yok: Vahşi Yürek Atımı vurmadan Av Mızrağını kendin çek',
+  'hudChrome.wildheartAlert.pinnedTitle': 'Saplandın!',
+  'hudChrome.wildheartAlert.preyAloneLine':
+    "Güneş gliflerini yakabilecek başka kimse yok. Karanlık birinde {seconds} sn durup yak, sonra Zulgar'ı üzerinden geçir",
+  'hudChrome.wildheartAlert.spearLine': 'Av Mızrağına koş ve Vahşi Yürek Atımı vurmadan çek',
+  'hudChrome.wildheartAlert.spearTitle': 'Bir dost saplandı!',
+  'hudChrome.wildheartAlert.sunstruckLine':
+    'Bu etki bitene kadar {pct}% daha fazla hasar alır: en güçlü saldırılarını şimdi kullan',
+  'hudChrome.wildheartAlert.sunstruckTitle': "Zulgar'ı Güneş Çarptı!",
+  'itemUi.errors.orderTrackedItem': 'Tüccar eşsiz teçhizat için sipariş kabul etmez.',
+  'hudChrome.cosmetics.mountsIntro':
+    'Binek görünümünü burada seç. Binicilik eğitimi hızı belirler. Görünümü hesabın genelinde paylaşmak için binek eşyasını herhangi bir karakterin çantasında veya bankasında tut.',
+  'hudChrome.cosmetics.mountsNoMount': "Binek çağırmak için Ahır Ustası Marla'dan binicilik öğren.",
+  'hudChrome.cosmetics.notCollected': 'Toplanmadı',
+  'hudChrome.guildHall.mountPreview':
+    'Hesabındaki tüm karakterler için binek görünümü. Hızını binicilik eğitimin belirler.',
+  'hudChrome.mountTraining.ownedMountPrompt':
+    "Bineğini Kozmetikler'den seç. Binmek için Bin / İn kullan.",
+  'hudChrome.mounts.desc_grag_bear': 'Ağır eyer takılmış, dayanıklı ve sağlam adımlı bir ayı.',
+  'hudChrome.mounts.desc_stalkglider_snail':
+    'Yosunlu kabuğu olan, dayanıklı ve enerjisini yavaş tüketen bir salyangoz.',
+  'hudChrome.mounts.desc_valorsteed': 'Deri eyerli, dayanıklı ve sağlam adımlı bir küheylan.',
+  'hudChrome.mounts.useToRide':
+    'Bu görünümü kuşanmak ve bineğini çağırmak için kullan. Görünümü hesabın genelinde paylaşmak için bu eşyayı herhangi bir karakterin çantasında veya bankasında tut. Binicilik eğitimi hızı belirler.',
+  'itemUi.vendor.advancedRiding': 'İleri Binicilik Eğitimi',
+  'itemUi.vendor.basicRiding': 'Binicilik Eğitimi',
+  'itemUi.vendor.ridingSpeed':
+    'Binekteyken hareket hızını {speed}% artırır. Tüm binekler için geçerlidir.',
+  'guide.mountsPage.firstBody':
+    "Marla, Binicilik öğrendikten sonra Yiğit Küheylan Dizginlerini 10 altına satar. Dizginleri elinde tutmak, hesabındaki her karakter için Kozmetikler'de at görünümünü açar. Binicilik eğitimi dizgin taşımadan da binek çağırmanı sağlar; farklı bir görünüm istediğinde atı veya sahip olduğun başka bir görünümü seç.",
+  'guide.mountsPage.goodsBody':
+    "Koleksiyonluk binek görünümleri, eşleşen en az bir dizgin eşyası herhangi bir karakterin çantasında veya kişisel bankasında kaldığı sürece hesabın genelinde kullanılabilir. Son uygun eşyayı takas etmek, postalamak, satışa koymak, satmak veya başka bir şekilde elden çıkarmak görünümü Kozmetikler'den kaldırır. O görünümü kullanan binici varsayılan at görünümüne döner ve eğitimli hızında binekte kalır.\n\nEşya aksini belirtmedikçe oyuncu dizginleri takas edilebilir, postalanabilir ve Dünya Pazarı'nda listelenebilir. At dizginleri ayrıca bir tüccara 10 altına satılabilir. Diğer dizginler kendi eşya satış kısıtlamalarına tabidir. Mağaza binek görünümleri, dizgin eşyalarından bağımsız hesap kozmetikleri olarak kalır.",
+  'guide.mountsPage.intro':
+    'Bir binek görünümü seç, ahırlarda binicilik öğren ve dünyayı daha hızlı dolaş. Hızı eğitimin belirler; tüm binek görünümleri kozmetiktir.',
+  'guide.mountsPage.learnBody':
+    "Binicilik {level}. seviyede açılır. Ahır Ustası Marla Hitchen, Galecrest Ahırları'nda Binicilik Eğitimini 80 altına satar. Temel eğitim binekte {basicSpeed}% daha hızlı hareket sağlar. Öğrendikten sonra Marla, {advancedFee} altına İleri Binicilik Eğitimi de satar; bu, binekte hareketi {advancedSpeed}% daha hızlı yapar. Her rütbe onu öğrenen karaktere aittir.\n\nTemel biniciliği öğrendikten sonra Marla'nın Binicilik Dersleri görevini al ve başlangıç kemerinin arkasındaki parlayan kareye giden işareti izle. Eğitim Yiğit Küheylanını ödünç almak için Yarışı Başlat'a bas. Parkuru bitir ve para ile deneyimini almak için geri dön. Ders bittiğinde ödünç at ahıra döner.",
+  'guide.mountsPage.rideBody':
+    "Kozmetikler'i aç ve Binekler sekmesinde bir görünüm seç. Varsayılan olarak ters tırnak tuşu olan Bin / İn tuşu, eğitimli bineğini o görünümle çağırır. Mobil Binek düğmesi de aynısını yapar. Çağırmak kısa bir kanal süresi gerektirir; inmek anlıktır. Binekteyken görünümü değiştirmek binicilik hızını değiştirmez.\n\nGörünümü seçip çağırmak için çantandaki veya eylem çubuğundaki dizginleri de kullanabilirsin. Zaten bindiğin görünümü kullanmak bineği kaldırır. Bankadaki veya başka bir karakterdeki dizginler, binicinin taşıması gerekmeden aynı kozmetiği açar.",
+  'guide.mountsPage.speedBody':
+    "Temel Binicilik Eğitimi binekte {basicSpeed}% daha hızlı hareket sağlar. İleri Binicilik Eğitimi binekte {advancedSpeed}% daha hızlı hareket sağlar ve Marla'da {advancedFee} altın tutar. Nadirliği veya kaynağı ne olursa olsun tüm binek görünümleri karakterin eğitim rütbesine göre aynı hızı kullanır. Mağaza görünümleri de bu eğitim hızını kullanır.",
+  'guide.mountsPage.speedHeading': 'Binicilik hızı ve eğitimi',
+  'guide.mountsPage.whatBody':
+    'Binekler, eğitimli sürüşünün üzerine giyilen kozmetik görünümlerdir. Zırh, hasar veya savaş niteliği sağlamazlar. Binicilik eğitimi yerde yolculuk hızını artırır ve binekteki sıçramalar daha yüksek engelleri aşar. Tüm binekler yerde kalır ve hiçbiri yüzemez.',
+  'guide.progression.ridingBody':
+    "{level}. seviyede Ahır Ustası Marla altın karşılığında temel binicilik öğretir ve ardından ileri bir rütbe sunar. Binekteki hızı eğitim belirler. Binek görünümünü Kozmetikler'den seç; koleksiyonluk görünümler, dizginleri herhangi bir karakterin çantasında veya bankasında kaldığı sürece paylaşılır.",
 };

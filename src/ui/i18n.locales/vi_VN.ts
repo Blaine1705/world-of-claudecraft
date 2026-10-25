@@ -3647,7 +3647,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.doesHeader': 'Tác dụng',
   'guide.commandsPage.dungeonMode': 'Chuyển hầm ngục của bạn giữa độ khó thường và Anh Hùng.',
   'guide.commandsPage.dungeonReset':
-    'Từ bỏ những instance trống của riêng bạn, việc bạn cần làm sau khi đổi độ khó.',
+    'Từ bỏ các phụ bản trống của bạn để lượt tiếp theo bắt đầu lại từ đầu ở cùng độ khó hoặc độ khó mới.',
   'guide.commandsPage.dungeons':
     'Mọi hầm ngục cùng vùng đất chứa cửa vào của nó và quy mô tổ đội nó được thiết kế cho, cộng với độ khó bạn đang chọn hiện tại.',
   'guide.commandsPage.emotesBody':
@@ -6669,12 +6669,12 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dungeonDifficulty.resetAlreadyFresh':
     'Các phó bản của bạn đã được làm mới. Chưa ai vào kể từ lần đặt lại gần nhất.',
   'hudChrome.dungeonDifficulty.resetUsage':
-    'Dùng /dungeon reset để từ bỏ các phụ bản trống sau khi đổi độ khó.',
+    'Dùng /dungeon reset để từ bỏ các phụ bản trống và bắt đầu lại từ đầu.',
   'hudChrome.dungeonDifficulty.resetLoot':
     'Bạn không thể đặt lại phụ bản khi vẫn còn chiến lợi phẩm bên trong.',
   'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Đặt Lại Tất Cả Phụ Bản?',
   'hudChrome.dungeonDifficulty.resetConfirmBody':
-    'Thao tác này sẽ từ bỏ các phụ bản trống thuộc độ khó bạn đã chọn trước đó. Chiến lợi phẩm chưa nhận sẽ ngăn việc đặt lại.',
+    'Thao tác này từ bỏ các phụ bản trống để lượt tiếp theo bắt đầu lại từ đầu ở độ khó đã chọn. Khóa lượt không thay đổi. Có người còn ở trong hoặc chiến lợi phẩm chưa nhận sẽ ngăn đặt lại.',
   'hudChrome.dungeonDifficulty.resetConfirm': 'Đặt Lại Phụ Bản',
   'hudChrome.dungeonDifficulty.resetCooldown': 'Chỉ có thể đặt lại phụ bản một lần mỗi 5 phút.',
   'hudChrome.dungeonDifficulty.entryMismatchNormal':
@@ -14950,7 +14950,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Đội của bạn đã vượt qua thử thách Anh Hùng khi bạn chiến đấu ở hậu tuyến hoặc đã ngã xuống. Khóa lượt của bạn vẫn được ghi nhận, vì vậy phần Dấu Ấn Anh Hùng của bạn được gửi đến đây thay vì thất lạc. Hãy sử dụng chúng thật tốt.\n\n- Quân nhu Anh Hùng',
   'guide.dungeonsPage.resetTitle': 'Đặt lại phụ bản của bạn',
   'guide.dungeonsPage.resetBody':
-    'Hãy đổi độ khó khi nhóm bạn vẫn đang giữ những lượt chạy đã nhận, và các lượt nhận cũ còn nấn ná một lúc trước khi tự buông. Nhóm trưởng có thể buông hết ngay lập tức thay vì vậy: chọn Đặt Lại Mọi Thực Thể trong trình đơn chân dung của chính mình, hoặc gõ /dungeon reset. Việc đặt lại chỉ hiệu nghiệm sau khi độ khó đã thực sự đổi, chỉ khi không còn ai, còn sống hay đã ngã, ở bên trong, chỉ khi mọi cái xác trong đó đã bị nhặt sạch, và một thời gian hồi ngắn ngăn cách lần đặt lại này với lần kế tiếp. Đến cửa với sai độ khó thì trò chơi sẽ báo trước khi lượt chạy bắt đầu. Trận đột kích không bao giờ được đặt lại theo cách này; luật khóa của riêng nó vẫn giữ nguyên.',
+    'Các phụ bản trống đã được giữ sẽ tồn tại một lúc trước khi tự giải phóng. Trưởng nhóm có thể giải phóng ngay: chọn Đặt Lại Mọi Phụ Bản trong trình đơn chân dung của mình, hoặc nhập /dungeon reset, và lượt tiếp theo sẽ bắt đầu lại từ đầu ở độ khó hiện tại. Đổi độ khó cũng giải phóng các phụ bản ở độ khó cũ. Chỉ có thể đặt lại khi không còn ai, dù sống hay đã ngã, ở bên trong và mọi xác đều đã được nhặt sạch chiến lợi phẩm. Đặt lại không bao giờ rút ngắn khóa lượt: phụ bản Anh Hùng hoặc đột kích đã khóa vẫn khóa đến giờ đặt lại của nó, và có thời gian hồi ngắn giữa các lần đặt lại. Nếu đến cửa với độ khó sai, trò chơi sẽ thông báo trước khi bắt đầu. Đột kích đặt lại theo cùng cách, vẫn giữ các quy tắc khóa lượt và trở về xác riêng. Đột kích đổi cấp độ sẽ bỏ qua thời gian hồi: nếu chọn sai cấp hoặc không vượt được Anh Hùng thì có thể đổi lại ngay, vì khóa lượt riêng đã giới hạn việc chạy lại.',
   'guide.dungeonsPage.wildheartBody':
     'Một miệng núi lửa rừng rậm đẫm mưa, nơi hai lối đi săn bắn trên cao vòng quanh một hố sụt ngọc bích. Băng qua những hang thú và tàn tích tổ tiên, rồi leo lên kim tự tháp nghi lễ để xem ai đang chờ trên đỉnh.',
   'guide.gear.itemLevelBody':
@@ -22553,7 +22553,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Vật phẩm trả về sẽ tràn ra nếu túi đầy. Người chuyển đồ biến mất sau giao hàng cho đến khi được triệu hồi lại.',
   'hudChrome.courier.close': 'Đóng Người Chuyển Đồ',
   'hudChrome.courier.instructions':
-    'Chọn cả chồng. Người chuyển đồ gửi chúng trước rồi lấy những vật phẩm bạn yêu cầu. Không thể gửi vật phẩm nhiệm vụ.',
+    'Chọn cả chồng cho ngân hàng của bạn, Kho Nguyên Liệu hoặc nhân vật khác. Người chuyển đồ gửi chúng trước rồi lấy những vật phẩm bạn yêu cầu. Không thể gửi vật phẩm nhiệm vụ.',
   'hudChrome.courier.membership': 'Gia hạn tư cách thành viên để bắt đầu chuyến khác.',
   'hudChrome.courier.outbound': 'Đang Bay Tới Ngân Hàng',
   'hudChrome.courier.ready': 'Sẵn Sàng Giao Hàng',
@@ -25330,4 +25330,197 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'referralCards.waiting': 'Đang chờ bạn gắn kết chấp nhận.',
   'referralCards.yourCard': 'Thẻ Tem Của {name}',
   'worldContent.musterRackName': 'Giá Vũ Khí Tập Kết',
+  'abilityUi.cast.kituse_wildheart_pull_spear': 'Rút Giáo',
+  'abilityUi.cast.temple_score': 'Bản Nhạc',
+  'abilityUi.cast.temple_score_answer': 'Đáp Lại Bản Nhạc',
+  'abilityUi.cast.wildheart_idols_breath': 'Hơi Thở Tượng Thần',
+  'abilityUi.cast.wildheart_sun_glyph_cold': 'Đang nguội',
+  'abilityUi.cast.wildheart_sun_glyph_kindle': 'Đang thắp',
+  'abilityUi.cast.wildheart_zulgar_hunting_spear': 'Giáo Săn',
+  'abilityUi.cast.wildheart_zulgar_idol_wakes': 'Tượng Thần Thức Giấc',
+  'bossJournal.temple.selthe.boltResponseRework':
+    'Giữ người đỡ đòn trong tầm nhìn của cô ta. Dành ngắt chiêu cho Khúc Ca Chết Đuối.',
+  'bossJournal.temple.selthe.boltSummaryRework':
+    'Giữa các lần dùng phép khác, một tia đánh trúng mỗi {every} giây sau cảnh báo hình ảnh {windup} giây, gây sát thương Băng bằng {mult} lần sát thương vũ khí của cô ta. Ngắt Khúc Ca Chết Đuối sẽ dừng cả tia lẫn Khúc Ca trong {quiet} giây.',
+  'bossJournal.temple.selthe.overviewRework':
+    'Selthe không bao giờ di chuyển hay đánh cận chiến. Tụ lại cho Hợp Xướng, rời nhóm cho Đơn Ca, ngắt Khúc Ca Chết Đuối và tránh Hồ Dâng. Ở hai ngưỡng máu, lặp lại giai điệu trên ô trăng của cô ta bằng cách thay phiên hát.',
+  'bossJournal.temple.selthe.phaseSummaryRework':
+    'Các đòn khác của cô ta tạm dừng khi nhóm đáp lại Bản Nhạc. Tia Nước Trăng không có thanh niệm và không thể bị ngắt.',
+  'bossJournal.temple.selthe.scoreHeroic':
+    'Khi đáp lại, các ô tắt sáng. Hãy nhớ giai điệu và thay phiên nhau.',
+  'bossJournal.temple.selthe.scoreResponse':
+    'Quan sát giai điệu rồi bước lên các ô theo thứ tự. Thay phiên phát đúng nốt với một người chơi còn sống khác; người sống sót duy nhất có thể hoàn thành một mình. Bước bị chặn không gây hại. Bước ra rồi vào lại để phát tiếng ô, kể cả ô đã có người đứng trước khi bắt đầu đáp lại.',
+  'bossJournal.temple.selthe.scoreSummary':
+    'Ở mức máu {first} và {second}, cô ta miễn nhiễm và chơi {notes}, rồi {finalNotes} nốt. Lặp lại trong {answer}, rồi {finalAnswer} giây. Ô sai gây {falseNote} sát thương Băng và đặt lại tiến độ, không đặt lại thời gian. Hết giờ gây {min} đến {max} sát thương Băng cho mọi người. Thành công làm cô ta choáng {stun} giây và tăng sát thương nhận vào thêm {vulnerability} trong {bonusSeconds} giây.',
+  'bossJournal.temple.selthe.tipHealerRework':
+    'Theo dõi mục tiêu Khúc Ca và ai bị Hợp Xướng bắt trúng khi đứng một mình. Trong Bản Nhạc, giúp hát nốt tiếp theo và hồi máu khi mắc lỗi.',
+  'bossJournal.wildheart.zulgar.breathResponse':
+    'Sang nửa không bị đánh dấu trước khi cảnh báo kết thúc. Đường giữa an toàn. Ở Anh Hùng, hơi thở cũng dập tắt các ký tự đang sáng ở nửa đó; có thể thắp lại ngay.',
+  'bossJournal.wildheart.zulgar.breathSummary':
+    'Mỗi {every} giây, một nửa sân thượng bị đánh dấu trong {warning} giây, sau đó mọi người ở nửa đó nhận {min} đến {max} sát thương Thiên Nhiên. Hơi thở luân phiên hai nửa.',
+  'bossJournal.wildheart.zulgar.glyphResponseRework':
+    'Người chơi không bị đánh dấu thắp ký tự phía trước Con Mồi. Dẫn hắn qua đó, rồi tấn công trong lúc Trúng Nắng. Ký tự tắt khi cuộc săn kết thúc.',
+  'bossJournal.wildheart.zulgar.glyphSummaryRework':
+    '{count} ký tự ban đầu đều tối. Trong cuộc săn, người chơi không bị đánh dấu đứng trên một ký tự {kindle} giây để thắp sáng. Nếu không còn người không bị đánh dấu, Con Mồi có thể thắp trong {alone} giây. Bước ra sẽ đặt lại tiến độ. Đi qua ký tự sáng làm hắn chậm {slow} và tăng sát thương nhận vào thêm {vulnerability} trong {seconds} giây. Không thể thắp lại ký tự trong {dark} giây; hắn không thể trúng ký tự khác trong {wary} giây. Trong cuộc săn, thời gian choáng giảm một nửa.',
+  'bossJournal.wildheart.zulgar.idolHuntHeroicSummary':
+    'Hắn đánh dấu một cặp mới mỗi {pair} giây và đổi giữa họ mỗi {switch} giây. Mỗi lần đổi cho Con Mồi mới {turn} giây trước khi hắn đuổi theo.',
+  'bossJournal.wildheart.zulgar.idolHuntSummary':
+    'Hắn chọn Con Mồi mới mỗi {every} giây, rồi quay về phía họ trong {turn} giây trước khi đuổi theo.',
+  'bossJournal.wildheart.zulgar.idolSummary':
+    'Ở mức máu {health}, hắn giữ dạng linh hồn báo đốm đến khi bị đánh bại. Người đỡ đòn cũng có thể thành Con Mồi.',
+  'bossJournal.wildheart.zulgar.pulseSummaryRework':
+    'Mỗi {every} giây, chiêu niệm {cast} giây đánh mọi người trong {radius} thước, gây {min} đến {max} sát thương. Người bị Ghim nhận gấp {pinMult} lần sát thương này ở mọi khoảng cách.',
+  'bossJournal.wildheart.zulgar.spearResponse':
+    'Chọn giáo và tương tác trong {range} thước để rút ra trong {pull} giây. Sát thương không ngắt việc rút. Nếu không còn ai khác đứng tự do trên sân thượng, nạn nhân có thể tương tác để thoát trong {self} giây.',
+  'bossJournal.wildheart.zulgar.spearSummary':
+    'Chiêu niệm {cast} giây ghim một người không đỡ đòn, hoặc người đỡ đòn nếu không còn ai khác. Trói chân kéo dài tối đa {seconds} giây và gây {bleed} sát thương mỗi {tick} giây.',
+  'entities.mobs.wildheart_hunting_spear.name': 'Giáo Săn',
+  'hudChrome.auraEffect.temple.brokenVoice':
+    'Giọng hát của cô ta đã vỡ: nhận thêm {pct}% sát thương đến khi hiệu ứng kết thúc.',
+  'hudChrome.auraEffect.temple.scoreWard':
+    'Đang hát Bản Nhạc: cô ta không nhận sát thương đến khi kết thúc. Bước lên các ô trăng theo thứ tự chúng đã vang trước khi câu hát kết thúc để phá giọng cô ta. Thay phiên nhau: sau khi phát một nốt, đợi người khác phát nốt đúng tiếp theo. Người sống sót duy nhất có thể hoàn thành một mình. Nếu câu hát kết thúc trước, Nghịch Âm gây {min} đến {max} sát thương Băng ({heroicMin} đến {heroicMax} ở Anh Hùng) cho mọi người trong sân.',
+  'hudChrome.auraEffect.temple.spentVoice':
+    'Bạn không thể phát tiếng ô trăng khác cho đến khi người khác phát nốt đúng tiếp theo. Bước lên ô trong thời gian này không đặt lại câu trả lời hay gây hại cho bạn. Không thể giải trừ. Bị xóa khi bạn là người chơi còn sống duy nhất trong phụ bản hoặc Bản Nhạc kết thúc.',
+  'hudChrome.auraEffect.wildheart.idolAwake':
+    'Báo đốm đá đã thức giấc. Mỗi {every} giây nó thở lên một nửa sân thượng, rồi nửa kia, sau cảnh báo sàn {warning} giây: gây {min} đến {max} sát thương Thiên Nhiên ({heroicMin} đến {heroicMax} ở Anh Hùng) cho mọi người ở nửa đó. Zulgar giữ dạng Hóa Thân Báo Đốm đến khi chết và chọn Con Mồi mới mỗi {seconds} giây ({heroicSeconds} giây ở Anh Hùng).',
+  'hudChrome.auraEffect.wildheart.pinned':
+    'Giáo Săn ghim bạn tại chỗ. Bạn chảy máu nhận {bleed} sát thương Vật Lý ({heroicBleed} ở Anh Hùng) mỗi {every} giây, và Nhịp Tim Hoang Dã đánh bạn ở mọi vị trí với thêm {pulse}% sát thương. Đồng đội có thể rút giáo trong {pull} giây. Nếu không còn ai tự do, tự rút trong {wrench} giây. Giáo nhả ra sau {seconds} giây.',
+  'hudChrome.auraEffect.wildheart.sunWary':
+    'Không ký tự mặt trời nào có thể đánh hắn đến khi hiệu ứng này kết thúc. Ký tự sáng hắn đi qua vẫn sáng.',
+  'hudChrome.auraEffect.wildheart.sunstruck':
+    'Trúng ký tự mặt trời sáng: di chuyển chậm hơn {pct}%.',
+  'hudChrome.auraEffect.wildheart.sunstruckExposed':
+    'Trúng ký tự mặt trời sáng: nhận thêm {pct}% sát thương.',
+  'hudChrome.courier.accountBank':
+    'Lấy từ ngân hàng này. Nhân vật đó phải đăng xuất khi người chuyển đồ đến.',
+  'hudChrome.courier.accountPlanned':
+    'Đã lên kế hoạch cho {name}: {count} chồng. Chọn cho nhân vật khác sẽ thay thế chúng.',
+  'hudChrome.courier.accountTitle': 'Nhân vật khác',
+  'hudChrome.courier.bagsAccount': 'Gửi đến ngân hàng của {name}',
+  'hudChrome.courier.bagsAccountNone': 'Chọn nhân vật để gửi vật phẩm.',
+  'hudChrome.courier.bagsVault': 'Gửi nguyên liệu vào kho',
+  'hudChrome.courier.boundAccount': 'Đang đến ngân hàng nhân vật khác',
+  'hudChrome.courier.boundBank': 'Đang đến ngân hàng',
+  'hudChrome.courier.boundVault': 'Đang đến Kho Nguyên Liệu',
+  'hudChrome.courier.storeTabs': 'Kho người chuyển đồ',
+  'hudChrome.courier.vault': 'Lấy từ kho. Mỗi lần chọn lấy về cả hàng.',
+  'hudChrome.courier.vaultCap': 'Chứa {cap} mỗi loại nguyên liệu',
+  'hudChrome.courier.vaultEmpty': 'Kho của bạn trống.',
+  'hudChrome.courier.vaultLocked':
+    'Mở khóa Kho Nguyên Liệu tại nhân viên ngân hàng để dùng cùng người chuyển đồ.',
+  'hudChrome.courier.vaultTitle': 'Kho Nguyên Liệu',
+  'hudChrome.dungeonDifficulty.unappliedHeroic':
+    'Đã chọn Thường. Các phụ bản hiện tại vẫn là Anh Hùng.',
+  'hudChrome.dungeonDifficulty.unappliedNormal':
+    'Đã chọn Anh Hùng. Các phụ bản hiện tại vẫn là Thường.',
+  'hudChrome.finder.mech.the_score':
+    'Bản Nhạc (hai lần cô ta hát giai điệu trên ô trăng: bước lên theo thứ tự chúng vang để phá giọng cô ta)',
+  'hudChrome.itemHistory.close': 'Đóng',
+  'hudChrome.itemHistory.noTransfers': 'Vật phẩm này chưa bao giờ chuyển chủ.',
+  'hudChrome.itemHistory.openAria': 'Lịch sử vật phẩm {item}',
+  'hudChrome.itemHistory.passedTo': 'Chuyển cho {name} vào {date}',
+  'hudChrome.itemHistory.title': '{item}: lịch sử',
+  'hudChrome.itemMenu.itemHistory': 'Lịch sử vật phẩm',
+  'hudChrome.itemTooltip.lootedBy': 'Được {name} nhặt vào {date}',
+  'hudChrome.itemTooltip.obtainedBy': 'Được {name} nhận vào {date}',
+  'hudChrome.itemTooltip.questRewardTo': 'Thưởng nhiệm vụ cho {name} vào {date}',
+  'hudChrome.kitUse.freeAria': 'Rút {name}',
+  'hudChrome.kitUse.freeClick': 'Nhấp vào đây để rút {name}',
+  'hudChrome.kitUse.freeFar': 'Đến trong {range} thước để rút ra',
+  'hudChrome.kitUse.freeKey': 'Rút {name}',
+  'hudChrome.kitUse.freeLine':
+    'Rút giáo khỏi đất để giải thoát người bị ghim. Trúng đòn không dừng bạn; di chuyển hoặc choáng sẽ dừng',
+  'hudChrome.kitUse.freeTap': 'Chạm vào đây để rút {name}',
+  'hudChrome.kitUse.freeUsingLine': 'Đứng yên để rút giáo: di chuyển hoặc choáng sẽ dừng bạn',
+  'hudChrome.options.firstPersonBody': 'Hiện cơ thể',
+  'hudChrome.options.firstPersonMode': 'Góc Nhìn Thứ Nhất (Phóng To Hết Cỡ)',
+  'hudChrome.options.firstPersonNoBody': 'Ẩn cơ thể',
+  'hudChrome.options.firstPersonOff': 'Tắt',
+  'hudChrome.plurals.itemHistoryEarlierHidden.few':
+    '{count} lần chuyển trước đó không được hiển thị.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.many':
+    '{count} lần chuyển trước đó không được hiển thị.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.one':
+    '{count} lần chuyển trước đó không được hiển thị.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.other':
+    '{count} lần chuyển trước đó không được hiển thị.',
+  'hudChrome.reliquary.sourceActivityWeeklyVaultPvp': 'Được chọn từ hàng PvP của Kho Tuần',
+  'hudChrome.templeAlert.answerDarkLine':
+    'Thay phiên và lặp lại thứ tự từ trí nhớ. Bước ra trước khi bước lên ô lần nữa. Đã phát: {done} trên {total}',
+  'hudChrome.templeAlert.answerLine':
+    'Thay phiên: bước lên ô trăng đánh dấu {place}. Đã phát: {done} trên {total}',
+  'hudChrome.templeAlert.answerTitle': 'Đáp Lại Bản Nhạc!',
+  'hudChrome.templeAlert.brokenLine':
+    'Cô ta nhận thêm {pct}% sát thương đến khi hiệu ứng kết thúc: dùng đòn mạnh nhất ngay',
+  'hudChrome.templeAlert.brokenTitle': 'Giọng hát của Selthe đã vỡ!',
+  'hudChrome.templeAlert.falseLine': 'Ô đó sai lượt. Câu trả lời bắt đầu lại từ ô đầu tiên',
+  'hudChrome.templeAlert.falseTitle': 'Sai Nốt!',
+  'hudChrome.templeAlert.melodyDarkLine':
+    'Nhớ thứ tự trước khi các ô tắt. Lặp lại, thay phiên với người chơi khác',
+  'hudChrome.templeAlert.melodyLine':
+    'Quan sát các ô trăng lần lượt vang lên. Lặp lại thứ tự, thay phiên với người chơi khác',
+  'hudChrome.templeAlert.melodyTitle': 'Bản Nhạc',
+  'hudChrome.templeAlert.spentLine':
+    'Bạn không thể phát tiếng ô cho đến khi người khác phát nốt đúng tiếp theo. Đã phát: {done} trên {total}',
+  'hudChrome.templeAlert.spentTitle': 'Giọng khác phải đáp lại',
+  'hudChrome.templeAlert.stepOffLine':
+    'Ô trăng chỉ phát tiếng khi có người bước lên. Rời ô này rồi bước lên lại',
+  'hudChrome.templeAlert.stepOffTitle': 'Bước ra, rồi bước vào lại',
+  'hudChrome.templeAlert.timeAria': 'Còn {seconds} giây',
+  'hudChrome.wildheartAlert.breathLine':
+    'Báo đốm đá sắp thở lên nửa sân thượng này. Sang nửa còn lại',
+  'hudChrome.wildheartAlert.breathTitle': 'Hơi Thở Tượng Thần!',
+  'hudChrome.wildheartAlert.glyphLightingLine': 'Ở trên ký tự đến khi sáng. Bước ra sẽ bắt đầu lại',
+  'hudChrome.wildheartAlert.glyphLightingTitle': 'Đang thắp ký tự mặt trời',
+  'hudChrome.wildheartAlert.glyphLine':
+    'Đứng trên ký tự mặt trời tối {seconds} giây để thắp sáng. Khi Zulgar đi qua, hắn nhận thêm {pct}% sát thương trong {duration} giây',
+  'hudChrome.wildheartAlert.glyphTitle': 'Thắp các ký tự mặt trời',
+  'hudChrome.wildheartAlert.pinnedLine':
+    'Đồng đội phải rút Giáo Săn. Nhịp Tim Hoang Dã đánh mạnh hơn khi bạn bị Ghim',
+  'hudChrome.wildheartAlert.pinnedSelfLine':
+    'Không ai rảnh để giúp: tự rút Giáo Săn trước khi Nhịp Tim Hoang Dã đánh trúng',
+  'hudChrome.wildheartAlert.pinnedTitle': 'Bị Ghim!',
+  'hudChrome.wildheartAlert.preyAloneLine':
+    'Không ai khác thắp được ký tự mặt trời. Đứng trên một ký tự tối {seconds} giây để thắp sáng, rồi dụ Zulgar đi qua',
+  'hudChrome.wildheartAlert.spearLine':
+    'Chạy đến Giáo Săn và rút ra trước khi Nhịp Tim Hoang Dã đánh trúng',
+  'hudChrome.wildheartAlert.spearTitle': 'Đồng minh bị Ghim!',
+  'hudChrome.wildheartAlert.sunstruckLine':
+    'Hắn nhận thêm {pct}% sát thương đến khi hiệu ứng kết thúc: dùng đòn mạnh nhất ngay',
+  'hudChrome.wildheartAlert.sunstruckTitle': 'Zulgar Trúng Nắng!',
+  'itemUi.errors.orderTrackedItem': 'Thương Nhân không nhận đặt hàng trang bị độc nhất.',
+  'hudChrome.cosmetics.mountsIntro':
+    'Chọn ngoại hình thú cưỡi tại đây. Huấn luyện cưỡi quyết định tốc độ. Giữ vật phẩm thú cưỡi trong túi hoặc ngân hàng của bất kỳ nhân vật nào để chia sẻ ngoại hình trên toàn tài khoản.',
+  'hudChrome.cosmetics.mountsNoMount': 'Học cưỡi từ Quản Chuồng Marla để triệu hồi thú cưỡi.',
+  'hudChrome.cosmetics.notCollected': 'Chưa sưu tầm',
+  'hudChrome.guildHall.mountPreview':
+    'Ngoại hình thú cưỡi cho mọi nhân vật trong tài khoản. Huấn luyện cưỡi quyết định tốc độ.',
+  'hudChrome.mountTraining.ownedMountPrompt':
+    'Chọn thú cưỡi trong Mỹ phẩm. Dùng Lên / Xuống Thú Cưỡi để cưỡi.',
+  'hudChrome.mounts.desc_grag_bear': 'Một con gấu khỏe, bước vững, mang yên nặng.',
+  'hudChrome.mounts.desc_stalkglider_snail': 'Một con ốc sên khỏe, sức bền dẻo dai, có vỏ phủ rêu.',
+  'hudChrome.mounts.desc_valorsteed': 'Một con tuấn mã khỏe, bước vững, mang yên da.',
+  'hudChrome.mounts.useToRide':
+    'Dùng để chọn ngoại hình này và triệu hồi thú cưỡi. Giữ vật phẩm này trong túi hoặc ngân hàng của bất kỳ nhân vật nào để chia sẻ ngoại hình trên toàn tài khoản. Huấn luyện cưỡi quyết định tốc độ.',
+  'itemUi.vendor.advancedRiding': 'Huấn Luyện Cưỡi Nâng Cao',
+  'itemUi.vendor.basicRiding': 'Huấn Luyện Cưỡi',
+  'itemUi.vendor.ridingSpeed':
+    'Tăng tốc độ di chuyển khi cưỡi thêm {speed}%. Áp dụng cho mọi thú cưỡi.',
+  'guide.mountsPage.firstBody':
+    'Marla bán Dây Cương Valorsteed với giá 10 vàng sau khi bạn học Cưỡi. Giữ dây cương sẽ mở khóa ngoại hình ngựa trong Mỹ phẩm cho mọi nhân vật trong tài khoản. Huấn luyện cưỡi đã cho phép triệu hồi thú cưỡi mà không cần mang dây cương, nên hãy chọn ngựa hoặc ngoại hình khác đã sở hữu khi muốn đổi diện mạo.',
+  'guide.mountsPage.goodsBody':
+    'Ngoại hình thú cưỡi sưu tầm vẫn dùng được trên toàn tài khoản khi còn ít nhất một vật phẩm dây cương tương ứng trong túi hoặc ngân hàng cá nhân của bất kỳ nhân vật nào. Trao đổi, gửi thư, đăng bán, bán hoặc loại bỏ vật phẩm đủ điều kiện cuối cùng sẽ xóa ngoại hình khỏi Mỹ phẩm. Người đang cưỡi ngoại hình đó sẽ trở về ngoại hình ngựa mặc định và vẫn cưỡi ở tốc độ đã huấn luyện.\n\nDây cương của người chơi có thể trao đổi, gửi thư và đăng trên Chợ Thế Giới trừ khi vật phẩm ghi khác. Dây cương ngựa cũng có thể bán cho thương nhân với giá 10 vàng. Dây cương khác vẫn giữ giới hạn bán riêng của vật phẩm. Ngoại hình thú cưỡi cửa hàng vẫn là mỹ phẩm tài khoản, độc lập với vật phẩm dây cương.',
+  'guide.mountsPage.intro':
+    'Chọn ngoại hình thú cưỡi, học cưỡi tại chuồng và đi khắp thế giới nhanh hơn. Huấn luyện quyết định tốc độ; mọi ngoại hình thú cưỡi đều chỉ để làm đẹp.',
+  'guide.mountsPage.learnBody':
+    'Kỹ năng cưỡi mở ở cấp {level}. Quản Chuồng Marla Hitchen bán Huấn Luyện Cưỡi với giá 80 vàng tại Chuồng Galecrest. Huấn luyện cơ bản giúp di chuyển khi cưỡi nhanh hơn {basicSpeed}%. Sau khi học, Marla còn bán Huấn Luyện Cưỡi Nâng Cao với giá {advancedFee} vàng, nâng mức tăng tốc khi cưỡi lên {advancedSpeed}%. Mỗi bậc thuộc về nhân vật đã học.\n\nSau khi học cưỡi cơ bản, nhận nhiệm vụ Bài Học Cưỡi của Marla và theo dấu đến ô vuông phát sáng sau cổng vòm xuất phát. Nhấn Bắt Đầu Đua để mượn Valorsteed huấn luyện. Hoàn thành đường đua và quay lại nhận tiền cùng kinh nghiệm. Ngựa mượn trở về chuồng khi bài học kết thúc.',
+  'guide.mountsPage.rideBody':
+    'Mở Mỹ phẩm và chọn ngoại hình trong thẻ Thú Cưỡi. Phím Lên / Xuống Thú Cưỡi, mặc định là phím dấu huyền ngược, triệu hồi thú cưỡi đã huấn luyện với ngoại hình đó. Nút Thú Cưỡi trên di động cũng làm như vậy. Triệu hồi cần vận sức ngắn; xuống cưỡi diễn ra tức thì. Bạn có thể đổi ngoại hình khi đang cưỡi mà không đổi tốc độ.\n\nBạn cũng có thể dùng dây cương từ túi hoặc thanh hành động để chọn ngoại hình đó và triệu hồi. Dùng ngoại hình đang cưỡi sẽ cất thú cưỡi. Dây cương trong ngân hàng hoặc trên nhân vật khác mở khóa cùng mỹ phẩm mà người cưỡi không cần mang theo.',
+  'guide.mountsPage.speedBody':
+    'Huấn Luyện Cưỡi Cơ Bản giúp di chuyển khi cưỡi nhanh hơn {basicSpeed}%. Huấn Luyện Cưỡi Nâng Cao giúp di chuyển khi cưỡi nhanh hơn {advancedSpeed}% và có giá {advancedFee} vàng tại Marla. Mọi ngoại hình thú cưỡi dùng cùng tốc độ theo bậc huấn luyện của nhân vật, bất kể độ hiếm hay nguồn gốc. Ngoại hình cửa hàng cũng dùng tốc độ huấn luyện đó.',
+  'guide.mountsPage.speedHeading': 'Tốc độ cưỡi và huấn luyện',
+  'guide.mountsPage.whatBody':
+    'Thú cưỡi là ngoại hình làm đẹp cho khả năng cưỡi đã được huấn luyện. Chúng không cho giáp, sát thương hay chỉ số chiến đấu. Huấn luyện cưỡi tăng tốc độ đi trên đất và nhảy khi cưỡi vượt được độ cao lớn hơn. Mọi thú cưỡi đều ở trên mặt đất và không con nào bơi được.',
+  'guide.progression.ridingBody':
+    'Ở cấp {level}, Quản Chuồng Marla dạy cưỡi cơ bản bằng vàng và cung cấp bậc nâng cao sau đó. Huấn luyện quyết định tốc độ khi cưỡi. Chọn ngoại hình trong Mỹ phẩm; ngoại hình sưu tầm được chia sẻ khi dây cương còn trong túi hoặc ngân hàng của bất kỳ nhân vật nào.',
 };

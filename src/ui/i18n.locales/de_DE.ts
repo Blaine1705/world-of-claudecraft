@@ -3762,7 +3762,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.dungeonMode':
     'Wechsle deine Dungeons zwischen normalem und heroischem Schwierigkeitsgrad.',
   'guide.commandsPage.dungeonReset':
-    'Gib deine eigenen leeren Instanzen auf, was du nach einem Schwierigkeitswechsel tust.',
+    'Gib deine leeren Instanzen auf, damit der nächste Durchlauf auf derselben oder einer neuen Schwierigkeit frisch beginnt.',
   'guide.commandsPage.dungeons':
     'Jeder Dungeon mit der Zone, in der seine Tür liegt, und der Gruppengröße, für die er gebaut ist, dazu der Schwierigkeitsgrad, auf den du aktuell eingestellt bist.',
   'guide.commandsPage.emotesBody':
@@ -6779,12 +6779,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dungeonDifficulty.resetAlreadyFresh':
     'Deine Instanzen sind bereits frisch. Seit dem letzten Zurücksetzen hat sie niemand betreten.',
   'hudChrome.dungeonDifficulty.resetUsage':
-    'Verwende /dungeon reset, um deine leeren Instanzen nach einer Schwierigkeitsänderung aufzugeben.',
+    'Nutze /dungeon reset, um deine leeren Instanzen aufzugeben und frisch zu beginnen.',
   'hudChrome.dungeonDifficulty.resetLoot':
     'Du kannst Instanzen nicht zurücksetzen, solange sich noch Beute darin befindet.',
   'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Alle Instanzen zurücksetzen?',
   'hudChrome.dungeonDifficulty.resetConfirmBody':
-    'Dadurch werden leere Instanzen deiner zuvor gewählten Schwierigkeit aufgegeben. Nicht beanspruchte Beute verhindert das Zurücksetzen.',
+    'Damit gibst du deine leeren Instanzen auf, sodass der nächste Durchlauf auf der gewählten Schwierigkeit frisch beginnt. Sperren bleiben unverändert. Spieler im Inneren oder nicht abgeholte Beute verhindern das Zurücksetzen.',
   'hudChrome.dungeonDifficulty.resetConfirm': 'Instanzen zurücksetzen',
   'hudChrome.dungeonDifficulty.resetCooldown':
     'Instanzen können nur einmal alle 5 Minuten zurückgesetzt werden.',
@@ -14370,7 +14370,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Deine Gruppe hat die heroische Prüfung gemeistert, während du in der Nachhut gekämpft hast oder bereits am Boden lagst. Auch deine Instanzbindung wurde aktiviert, daher ist dein Anteil an heroischen Marken hier angekommen, statt verloren zu gehen. Setze sie klug ein.\n\n- Heroischer Quartiermeister',
   'guide.dungeonsPage.resetTitle': 'Instanzen zurücksetzen',
   'guide.dungeonsPage.resetBody':
-    'Wenn ihr die Schwierigkeit wechselt, während eure Gruppe noch beanspruchte Läufe hält, bleiben die alten Ansprüche eine Weile bestehen, bevor sie von selbst verfallen. Der Gruppenleiter kann sie stattdessen sofort aufgeben: Wählt im Menü des eigenen Porträts Alle Instanzen zurücksetzen oder gebt /dungeon reset ein. Eine Zurücksetzung funktioniert erst nach einem tatsächlichen Schwierigkeitswechsel, nur solange niemand, ob lebend oder gefallen, drinnen ist, nur wenn jede Leiche dort drinnen sauber geplündert wurde, und zwischen zwei Zurücksetzungen liegt eine kurze Abklingzeit. Kommt ihr mit der falschen Schwierigkeit an die Tür, sagt euch das Spiel das vor dem Start. Der Schlachtzug wird so niemals zurückgesetzt; seine eigenen Sperrregeln bleiben bestehen.',
+    'Leere beanspruchte Durchläufe bleiben eine Weile bestehen, bevor sie von selbst verschwinden. Der Gruppenleiter kann sie sofort aufgeben: Wähle Alle Instanzen zurücksetzen im Menü des eigenen Porträts oder tippe /dungeon reset. Der nächste Durchlauf beginnt auf der aktuellen Schwierigkeit frisch. Ein Schwierigkeitswechsel tut dasselbe für Durchläufe auf der vorherigen Schwierigkeit. Zurücksetzen geht nur, wenn niemand, lebend oder tot, darin bleibt und jede Leiche vollständig geplündert wurde. Es verkürzt niemals eine Sperre: Ein gesperrter heroischer Dungeon oder Schlachtzug bleibt bis zu seiner Freigabe gesperrt. Zwischen Zurücksetzungen liegt eine kurze Abklingzeit. Bei falscher Schwierigkeit meldet sich das Spiel vor dem Betreten. Schlachtzüge werden ebenso zurückgesetzt; ihre Sperren und Regeln zur Leichenrückkehr gelten weiter. Beim Wechsel der Schlachtzugsschwierigkeit entfällt die Abklingzeit: Wer die falsche Stufe gewählt hat oder an Heroisch gescheitert ist, kann sofort zurückwechseln, da die eigene Sperre Wiederholungen begrenzt.',
   'guide.gear.itemLevelBody':
     'Aktiviere Gegenstandsstufe anzeigen in den Optionen, um zwei Ausrüstungsteile schnell zu vergleichen. Ausrüstung bekannter Herkunft, von Gegnern, Quests und Handwerksberufen, zeigt dann eine Gegenstandsstufe: eine einzelne Zahl, die ihre Stärke anhand der Quelle grob angibt und Verbesserungen auch über verschiedene Plätze hinweg vergleichbar macht. Teile ohne solche Herkunft, etwa einfache Händlerware und Startausrüstung, zeigen keine Gegenstandsstufe; eine fehlende Zahl ist normal.',
   'hudChrome.auraEffect.battleStance': 'Kampfhaltung: 10% mehr Wuterzeugung',
@@ -21253,7 +21253,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Zurückgebrachte Gegenstände landen bei vollen Taschen im Überlauf. Nach der Lieferung verschwindet der Kurier bis zur nächsten Beschwörung.',
   'hudChrome.courier.close': 'Kurier schließen',
   'hudChrome.courier.instructions':
-    'Wähle ganze Stapel. Dein Kurier lagert sie zuerst ein und holt dann die gewünschten Gegenstände. Questgegenstände können nicht verschickt werden.',
+    'Wähle ganze Stapel für deine Bank, den Materialtresor oder einen anderen Charakter. Dein Kurier lagert sie zuerst ein und holt dann die angeforderten Gegenstände ab. Questgegenstände können nicht versendet werden.',
   'hudChrome.courier.membership':
     'Erneuere deine Mitgliedschaft, um eine weitere Reise zu beginnen.',
   'hudChrome.courier.outbound': 'Fliegt zur Bank',
@@ -25923,4 +25923,206 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'referralCards.waiting': 'Warte auf die Zustimmung deines verknüpften Freundes.',
   'referralCards.yourCard': 'Stempelkarte von {name}',
   'worldContent.musterRackName': 'Waffenständer des Aufgebots',
+
+  'abilityUi.cast.kituse_wildheart_pull_spear': 'Speer herausziehen',
+  'abilityUi.cast.temple_score': 'Die Partitur',
+  'abilityUi.cast.temple_score_answer': 'Die Partitur beantworten',
+  'abilityUi.cast.wildheart_idols_breath': 'Atem des Idols',
+  'abilityUi.cast.wildheart_sun_glyph_cold': 'Abkühlen',
+  'abilityUi.cast.wildheart_sun_glyph_kindle': 'Entzünden',
+  'abilityUi.cast.wildheart_zulgar_hunting_spear': 'Jagdspeer',
+  'abilityUi.cast.wildheart_zulgar_idol_wakes': 'Das Idol erwacht',
+  'bossJournal.temple.selthe.boltResponseRework':
+    'Haltet den Tank in ihrer Sichtlinie. Hebt Unterbrechungen für Arie des Ertrinkens auf.',
+  'bossJournal.temple.selthe.boltSummaryRework':
+    'Zwischen anderen Zaubern trifft alle {every} Sek. nach einer sichtbaren Warnung von {windup} Sek. ein Geschoss und verursacht das {mult}-Fache ihres Waffenschadens als Frostschaden. Das Unterbrechen von Arie des Ertrinkens stoppt Geschosse und Arie für {quiet} Sek.',
+  'bossJournal.temple.selthe.overviewRework':
+    'Selthe bewegt sich nie und greift nie im Nahkampf an. Steht für Chor zusammen, verlasst für Solo die Gruppe, unterbrecht Arie des Ertrinkens und weicht Seeschwall aus. Wiederholt bei zwei Gesundheitsschwellen ihre Mondplattenmelodie mit abwechselnden Sängern.',
+  'bossJournal.temple.selthe.phaseSummaryRework':
+    'Ihre anderen Angriffe pausieren, während die Gruppe die Partitur beantwortet. Mondwassergeschosse haben keinen Zauberbalken und lassen sich nicht unterbrechen.',
+  'bossJournal.temple.selthe.scoreHeroic':
+    'Während der Antwort werden die Platten dunkel. Merkt euch die Melodie und wechselt euch ab.',
+  'bossJournal.temple.selthe.scoreResponse':
+    'Beobachtet die Melodie und betretet die Platten in der richtigen Reihenfolge. Wechselt richtige Noten mit einem anderen lebenden Spieler ab; ein einziger Überlebender kann allein abschließen. Blockierte Schritte sind harmlos. Verlasst eine Platte und betretet sie erneut, damit sie erklingt, auch wenn ihr schon vor Beginn der Antwort darauf standet.',
+  'bossJournal.temple.selthe.scoreSummary':
+    'Bei {first} und {second} Gesundheit wird sie immun und spielt {notes}, dann {finalNotes} Noten. Wiederholt sie innerhalb von {answer}, dann {finalAnswer} Sek. Eine falsche Platte verursacht {falseNote} Frostschaden und setzt den Fortschritt zurück, aber nicht den Timer. Bei Zeitablauf erleiden alle {min} bis {max} Frostschaden. Erfolg betäubt sie für {stun} Sek. und erhöht ihren erlittenen Schaden für {bonusSeconds} Sek. um {vulnerability}.',
+  'bossJournal.temple.selthe.tipHealerRework':
+    'Achtet auf das Ziel der Arie und auf Spieler, die bei Chor allein stehen. Helft während der Partitur bei der nächsten Note und heilt Fehler.',
+  'bossJournal.wildheart.zulgar.breathResponse':
+    'Wechselt vor Ablauf der Warnung in die unmarkierte Hälfte. Die Mittellinie ist sicher. Auf Heroisch löscht der Atem auch entzündete Glyphen in seiner Hälfte; sie können sofort neu entzündet werden.',
+  'bossJournal.wildheart.zulgar.breathSummary':
+    'Alle {every} Sek. wird eine Terrassenhälfte für {warning} Sek. markiert. Danach erleiden alle darin {min} bis {max} Naturschaden. Der Atem wechselt zwischen den Hälften.',
+  'bossJournal.wildheart.zulgar.glyphResponseRework':
+    'Unmarkierte Spieler entzünden Glyphen vor der Beute. Führt ihn darüber und greift während Sonnengetroffen an. Die Glyphen erlöschen, wenn die Jagd endet.',
+  'bossJournal.wildheart.zulgar.glyphSummaryRework':
+    'Die {count} Glyphen sind anfangs dunkel. Während der Jagd entzündet ein unmarkierter Spieler eine Glyphe, indem er {kindle} Sek. darauf steht. Ist niemand unmarkiert, kann die Beute sie in {alone} Sek. entzünden. Heruntergehen setzt den Fortschritt zurück. Eine entzündete Glyphe verlangsamt ihn um {slow} und erhöht seinen erlittenen Schaden für {seconds} Sek. um {vulnerability}. Die Glyphe kann {dark} Sek. lang nicht erneut entzündet werden; eine andere Glyphe kann ihn {wary} Sek. lang nicht treffen. Während der Jagd dauern Betäubungen halb so lang.',
+  'bossJournal.wildheart.zulgar.idolHuntHeroicSummary':
+    'Er markiert alle {pair} Sek. ein neues Paar und wechselt alle {switch} Sek. zwischen beiden. Jeder Wechsel gibt der neuen Beute {turn} Sek., bevor er sie verfolgt.',
+  'bossJournal.wildheart.zulgar.idolHuntSummary':
+    'Er wählt alle {every} Sek. neue Beute und dreht sich {turn} Sek. zu ihr, bevor er sie verfolgt.',
+  'bossJournal.wildheart.zulgar.idolSummary':
+    'Bei {health} Gesundheit bleibt er bis zu seiner Niederlage ein Jaguargeist. Auch der Tank kann zur Beute werden.',
+  'bossJournal.wildheart.zulgar.pulseSummaryRework':
+    'Alle {every} Sek. trifft ein Zauber mit {cast} Sek. Zauberzeit alle innerhalb von {radius} m für {min} bis {max} Schaden. Aufgespießte Spieler erleiden in jeder Entfernung das {pinMult}-Fache dieses Schadens.',
+  'bossJournal.wildheart.zulgar.spearResponse':
+    'Wählt den Speer als Ziel und interagiert innerhalb von {range} m, um ihn in {pull} Sek. herauszuziehen. Schaden unterbricht das Herausziehen nicht. Ist sonst niemand auf der Terrasse frei, kann das Opfer interagieren und sich in {self} Sek. befreien.',
+  'bossJournal.wildheart.zulgar.spearSummary':
+    'Ein Zauber mit {cast} Sek. Zauberzeit spießt einen Spieler außer dem Tank auf, oder den Tank, wenn sonst niemand übrig ist. Die Bewegungsunfähigkeit dauert bis zu {seconds} Sek. und verursacht alle {tick} Sek. {bleed} Schaden.',
+  'entities.mobs.wildheart_hunting_spear.name': 'Jagdspeer',
+  'hudChrome.auraEffect.temple.brokenVoice':
+    'Ihre Stimme ist gebrochen: Sie erleidet bis zum Ende dieses Effekts {pct}% mehr Schaden.',
+  'hudChrome.auraEffect.temple.scoreWard':
+    'Sie singt die Partitur: Bis zum Ende erleidet sie keinen Schaden. Betretet die Mondplatten vor Ende der Strophe in der Reihenfolge ihres Erklingens, um ihre Stimme zu brechen. Wechselt euch ab: Wartet nach einer Note, bis ein anderer Spieler die nächste richtige Note spielt. Ein einziger Überlebender kann allein abschließen. Endet die Strophe vorher, verursacht Dissonanz bei allen im Hof {min} bis {max} Frostschaden ({heroicMin} bis {heroicMax} auf Heroisch).',
+  'hudChrome.auraEffect.temple.spentVoice':
+    'Du kannst keine weitere Mondplatte erklingen lassen, bis ein anderer Spieler die nächste richtige Note spielt. Das Betreten einer Platte während dieses Effekts setzt die Antwort nicht zurück und verletzt dich nicht. Nicht bannbar. Endet, wenn du der einzige lebende Spieler in deiner Instanz bist oder die Partitur endet.',
+  'hudChrome.auraEffect.wildheart.idolAwake':
+    'Der steinerne Jaguar ist erwacht. Alle {every} Sek. haucht er erst über eine Terrassenhälfte, dann über die andere, nach einer Bodenwarnung von {warning} Sek.: {min} bis {max} Naturschaden ({heroicMin} bis {heroicMax} auf Heroisch) für alle in dieser Hälfte. Zulgar bleibt bis zu seinem Tod der Jaguaravatar und wählt alle {seconds} Sek. neue Beute ({heroicSeconds} Sek. auf Heroisch).',
+  'hudChrome.auraEffect.wildheart.pinned':
+    'Ein Jagdspeer hält dich fest. Du erleidest alle {every} Sek. {bleed} körperlichen Blutungsschaden ({heroicBleed} auf Heroisch), und Wildherzimpuls trifft dich überall für {pulse}% mehr Schaden. Ein Mitspieler kann den Speer in {pull} Sek. herausziehen. Ist sonst niemand frei, ziehe ihn selbst in {wrench} Sek. heraus. Nach {seconds} Sek. lässt er los.',
+  'hudChrome.auraEffect.wildheart.sunWary':
+    'Bis zum Ende dieses Effekts kann ihn keine Sonnenglyphe treffen. Entzündete Glyphen, die er überquert, bleiben entzündet.',
+  'hudChrome.auraEffect.wildheart.sunstruck':
+    'Von einer entzündeten Sonnenglyphe getroffen: bewegt sich {pct}% langsamer.',
+  'hudChrome.auraEffect.wildheart.sunstruckExposed':
+    'Von einer entzündeten Sonnenglyphe getroffen: erleidet {pct}% mehr Schaden.',
+  'hudChrome.courier.accountBank':
+    'Aus dieser Bank holen. Dieser Charakter muss bei Ankunft des Kuriers abgemeldet sein.',
+  'hudChrome.courier.accountPlanned':
+    'Für {name} geplant: {count} Stapel. Eine Auswahl für einen anderen Charakter ersetzt sie.',
+  'hudChrome.courier.accountTitle': 'Andere Charaktere',
+  'hudChrome.courier.bagsAccount': 'An die Bank von {name} senden',
+  'hudChrome.courier.bagsAccountNone': 'Wähle einen Charakter als Empfänger.',
+  'hudChrome.courier.bagsVault': 'Materialien in den Tresor senden',
+  'hudChrome.courier.boundAccount': 'Unterwegs zur Bank eines anderen Charakters',
+  'hudChrome.courier.boundBank': 'Unterwegs zur Bank',
+  'hudChrome.courier.boundVault': 'Unterwegs zum Materialtresor',
+  'hudChrome.courier.storeTabs': 'Kurierlager',
+  'hudChrome.courier.vault': 'Aus dem Tresor holen. Jede Auswahl holt die gesamte Zeile.',
+  'hudChrome.courier.vaultCap': 'Platz für {cap} von jedem Material',
+  'hudChrome.courier.vaultEmpty': 'Dein Tresor ist leer.',
+  'hudChrome.courier.vaultLocked':
+    'Schalte den Materialtresor bei einem Bankier frei, um ihn mit deinem Kurier zu nutzen.',
+  'hudChrome.courier.vaultTitle': 'Materialtresor',
+  'hudChrome.dungeonDifficulty.unappliedHeroic':
+    'Normal ausgewählt. Aktuelle Instanzen sind noch Heroisch.',
+  'hudChrome.dungeonDifficulty.unappliedNormal':
+    'Heroisch ausgewählt. Aktuelle Instanzen sind noch Normal.',
+  'hudChrome.finder.mech.the_score':
+    'Die Partitur (zweimal singt sie eine Melodie auf den Mondplatten: betretet sie in der gespielten Reihenfolge, um ihre Stimme zu brechen)',
+  'hudChrome.itemHistory.close': 'Schließen',
+  'hudChrome.itemHistory.noTransfers': 'Dieser Gegenstand hat noch nie den Besitzer gewechselt.',
+  'hudChrome.itemHistory.openAria': 'Gegenstandsverlauf für {item}',
+  'hudChrome.itemHistory.passedTo': 'Am {date} an {name} übergeben',
+  'hudChrome.itemHistory.title': '{item}: Verlauf',
+  'hudChrome.itemMenu.itemHistory': 'Gegenstandsverlauf',
+  'hudChrome.itemTooltip.lootedBy': 'Am {date} von {name} erbeutet',
+  'hudChrome.itemTooltip.obtainedBy': 'Am {date} von {name} erhalten',
+  'hudChrome.itemTooltip.questRewardTo': 'Questbelohnung für {name} am {date}',
+  'hudChrome.kitUse.freeAria': '{name} herausziehen',
+  'hudChrome.kitUse.freeClick': 'Hier klicken, um {name} herauszuziehen',
+  'hudChrome.kitUse.freeFar': 'Nähere dich auf {range} m, um ihn herauszuziehen',
+  'hudChrome.kitUse.freeKey': '{name} herausziehen',
+  'hudChrome.kitUse.freeLine':
+    'Ziehe den Speer aus dem Boden, um sein Opfer zu befreien. Schaden stoppt dich nicht; Bewegung oder Betäubung schon',
+  'hudChrome.kitUse.freeTap': 'Hier tippen, um {name} herauszuziehen',
+  'hudChrome.kitUse.freeUsingLine':
+    'Bleib zum Herausziehen des Speers stehen: Bewegung oder Betäubung unterbricht dich',
+  'hudChrome.options.firstPersonBody': 'Körper anzeigen',
+  'hudChrome.options.firstPersonMode': 'Egoansicht (vollständig herangezoomt)',
+  'hudChrome.options.firstPersonNoBody': 'Ohne Körper',
+  'hudChrome.options.firstPersonOff': 'Aus',
+  'hudChrome.plurals.itemHistoryEarlierHidden.few':
+    '{count} frühere Übergaben werden nicht angezeigt.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.many':
+    '{count} frühere Übergaben werden nicht angezeigt.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.one':
+    '{count} frühere Übergabe wird nicht angezeigt.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.other':
+    '{count} frühere Übergaben werden nicht angezeigt.',
+  'hudChrome.reliquary.sourceActivityWeeklyVaultPvp':
+    'Aus der PvP-Zeile des Wöchentlichen Tresors gewählt',
+  'hudChrome.templeAlert.answerDarkLine':
+    'Wechselt euch ab und wiederholt die Reihenfolge aus dem Gedächtnis. Verlasst eine Platte, bevor ihr sie erneut betretet. Noten: {done} von {total}',
+  'hudChrome.templeAlert.answerLine':
+    'Wechselt euch ab: Betretet die mit {place} markierte Mondplatte. Noten: {done} von {total}',
+  'hudChrome.templeAlert.answerTitle': 'Beantwortet die Partitur!',
+  'hudChrome.templeAlert.brokenLine':
+    'Sie erleidet bis zum Ende {pct}% mehr Schaden: Nutzt jetzt eure stärksten Angriffe',
+  'hudChrome.templeAlert.brokenTitle': 'Selthes Stimme ist gebrochen!',
+  'hudChrome.templeAlert.falseLine':
+    'Diese Platte war nicht an der Reihe. Die Antwort beginnt wieder bei der ersten Platte',
+  'hudChrome.templeAlert.falseTitle': 'Falsche Note!',
+  'hudChrome.templeAlert.melodyDarkLine':
+    'Merkt euch die Reihenfolge, bevor die Platten dunkel werden. Wiederholt sie abwechselnd mit einem anderen Spieler',
+  'hudChrome.templeAlert.melodyLine':
+    'Beobachtet, wie die Mondplatten nacheinander erklingen. Wiederholt die Reihenfolge abwechselnd mit einem anderen Spieler',
+  'hudChrome.templeAlert.melodyTitle': 'Die Partitur',
+  'hudChrome.templeAlert.spentLine':
+    'Du kannst keine Platte erklingen lassen, bis ein anderer Spieler die nächste richtige Note spielt. Noten: {done} von {total}',
+  'hudChrome.templeAlert.spentTitle': 'Eine andere Stimme muss antworten',
+  'hudChrome.templeAlert.stepOffLine':
+    'Eine Mondplatte erklingt nur beim Betreten. Verlasse diese Platte und betritt sie erneut',
+  'hudChrome.templeAlert.stepOffTitle': 'Heruntergehen und erneut betreten',
+  'hudChrome.templeAlert.timeAria': 'Noch {seconds} Sekunden',
+  'hudChrome.wildheartAlert.breathLine':
+    'Der steinerne Jaguar haucht gleich über diese Terrassenhälfte. Wechselt in die andere Hälfte',
+  'hudChrome.wildheartAlert.breathTitle': 'Atem des Idols!',
+  'hudChrome.wildheartAlert.glyphLightingLine':
+    'Bleib auf der Glyphe, bis sie leuchtet. Heruntergehen startet den Vorgang neu',
+  'hudChrome.wildheartAlert.glyphLightingTitle': 'Sonnenglyphe entzünden',
+  'hudChrome.wildheartAlert.glyphLine':
+    'Stehe {seconds} Sek. auf einer dunklen Sonnenglyphe, um sie zu entzünden. Überquert Zulgar sie, erleidet er {duration} Sek. lang {pct}% mehr Schaden',
+  'hudChrome.wildheartAlert.glyphTitle': 'Entzündet die Sonnenglyphen',
+  'hudChrome.wildheartAlert.pinnedLine':
+    'Ein Mitspieler muss den Jagdspeer herausziehen. Wildherzimpuls trifft dich stärker, solange du aufgespießt bist',
+  'hudChrome.wildheartAlert.pinnedSelfLine':
+    'Niemand ist frei, um zu helfen: Ziehe den Jagdspeer selbst heraus, bevor Wildherzimpuls trifft',
+  'hudChrome.wildheartAlert.pinnedTitle': 'Aufgespießt!',
+  'hudChrome.wildheartAlert.preyAloneLine':
+    'Niemand sonst kann die Sonnenglyphen entzünden. Stehe {seconds} Sek. auf einer dunklen Glyphe, um sie zu entzünden, und locke Zulgar darüber',
+  'hudChrome.wildheartAlert.spearLine':
+    'Lauf zum Jagdspeer und ziehe ihn heraus, bevor Wildherzimpuls trifft',
+  'hudChrome.wildheartAlert.spearTitle': 'Ein Verbündeter ist aufgespießt!',
+  'hudChrome.wildheartAlert.sunstruckLine':
+    'Er erleidet bis zum Ende {pct}% mehr Schaden: Nutzt jetzt eure stärksten Angriffe',
+  'hudChrome.wildheartAlert.sunstruckTitle': 'Zulgar wurde von der Sonne getroffen!',
+  'itemUi.errors.orderTrackedItem':
+    'Der Händler nimmt keine Bestellungen für einzigartige Ausrüstung an.',
+
+  'hudChrome.cosmetics.mountsIntro':
+    'Wähle hier das Aussehen deines Reittiers. Die Reitausbildung bestimmt das Tempo. Bewahre den Reittiergegenstand in den Taschen oder der Bank eines beliebigen Charakters auf, um das Aussehen accountweit zu teilen.',
+  'hudChrome.cosmetics.mountsNoMount':
+    'Lerne Reiten bei Stallmeisterin Marla, um ein Reittier zu beschwören.',
+  'hudChrome.cosmetics.notCollected': 'Nicht gesammelt',
+  'hudChrome.guildHall.mountPreview':
+    'Reittieraussehen für alle Charaktere deines Accounts. Deine Reitausbildung bestimmt das Tempo.',
+  'hudChrome.mountTraining.ownedMountPrompt':
+    'Wähle dein Reittier unter Kosmetik. Nutze Aufsitzen / Absitzen zum Reiten.',
+  'hudChrome.mounts.desc_grag_bear': 'Ein zäher, trittsicherer Bär mit einem schweren Sattel.',
+  'hudChrome.mounts.desc_stalkglider_snail':
+    'Eine robuste, gemächliche Schnecke mit moosigem Gehäuse.',
+  'hudChrome.mounts.desc_valorsteed': 'Ein zähes, trittsicheres Ross mit einem Ledersattel.',
+  'hudChrome.mounts.useToRide':
+    'Benutzen, um dieses Aussehen anzulegen und dein Reittier zu beschwören. Bewahre den Gegenstand in den Taschen oder der Bank eines beliebigen Charakters auf, um das Aussehen accountweit zu teilen. Die Reitausbildung bestimmt das Tempo.',
+  'itemUi.vendor.advancedRiding': 'Fortgeschrittene Reitausbildung',
+  'itemUi.vendor.basicRiding': 'Reitausbildung',
+  'itemUi.vendor.ridingSpeed':
+    'Erhöht dein Bewegungstempo beim Reiten um {speed}%. Gilt für jedes Reittier.',
+  'guide.mountsPage.firstBody':
+    'Marla verkauft die Zügel des Valorrosses für 10 Gold, nachdem du Reiten gelernt hast. Der Besitz der Zügel schaltet das Pferdeaussehen unter Kosmetik für alle Charaktere deines Accounts frei. Die Reitausbildung erlaubt bereits das Beschwören ohne mitgeführte Zügel. Wähle das Pferd oder ein anderes verfügbares Aussehen, wenn du etwas anderes sehen möchtest.',
+  'guide.mountsPage.goodsBody':
+    'Sammelbare Reittieraussehen bleiben accountweit verfügbar, solange mindestens ein passender Zügelgegenstand in den Taschen oder der persönlichen Bank eines beliebigen Charakters liegt. Wird der letzte geeignete Gegenstand gehandelt, verschickt, angeboten, verkauft oder anderweitig entfernt, verschwindet das Aussehen aus Kosmetik. Wer es gerade trägt, erhält das Standardpferdeaussehen zurück und bleibt mit dem erlernten Tempo aufgesessen.\n\nZügel von Spielern können gehandelt, verschickt und auf dem Weltmarkt angeboten werden, sofern der Gegenstand nichts anderes angibt. Die Pferdezügel können außerdem für 10 Gold an einen Händler verkauft werden. Andere Zügel behalten ihre eigenen Verkaufsbeschränkungen. Reittierskins aus dem Shop bleiben von Zügelgegenständen unabhängige Accountkosmetik.',
+  'guide.mountsPage.intro':
+    'Wähle ein Reittieraussehen, lerne Reiten im Stall und reise schneller durch die Welt. Deine Ausbildung bestimmt das Tempo; jedes Reittieraussehen ist rein kosmetisch.',
+  'guide.mountsPage.learnBody':
+    'Reiten wird auf Stufe {level} verfügbar. Stallmeisterin Marla Hitchen verkauft die Reitausbildung für 80 Gold in den Galecrest-Ställen. Die Grundausbildung erhöht das Reittempo um {basicSpeed}%. Danach verkauft Marla die Fortgeschrittene Reitausbildung für {advancedFee} Gold, die den Bonus auf {advancedSpeed}% erhöht. Jeder Rang gehört dem Charakter, der ihn erlernt.\n\nNimm nach der Grundausbildung Marlas Quest Reitstunden an und folge der Markierung zum leuchtenden Quadrat hinter dem Startbogen. Drücke Rennen starten, um das Ausbildungs-Valorross auszuleihen. Beende die Strecke und kehre für Münzen und Erfahrung zurück. Das geliehene Pferd kehrt am Ende der Unterrichtsstunde in den Stall zurück.',
+  'guide.mountsPage.rideBody':
+    'Öffne Kosmetik und wähle im Reittiere-Tab ein Aussehen. Die Taste Aufsitzen / Absitzen, standardmäßig der Gravis, beschwört dein ausgebildetes Reittier mit diesem Aussehen. Die mobile Schaltfläche Aufsitzen tut dasselbe. Das Beschwören erfordert eine kurze Kanalisierung; Absitzen geschieht sofort. Du kannst das Aussehen beim Reiten ändern, ohne dein Tempo zu ändern.\n\nDu kannst auch Zügel aus den Taschen oder einer Aktionsleiste benutzen, um das Aussehen zu wählen und aufzusitzen. Benutzt du das bereits gerittene Aussehen, verschwindet das Reittier. Zügel in der Bank oder bei anderen Charakteren schalten dieselbe Kosmetik frei, ohne dass der Reiter sie mitführen muss.',
+  'guide.mountsPage.speedBody':
+    'Die grundlegende Reitausbildung erhöht das Reittempo um {basicSpeed}%. Die Fortgeschrittene Reitausbildung erhöht es um {advancedSpeed}% und kostet bei Marla {advancedFee} Gold. Jedes Reittieraussehen nutzt das Tempo des Ausbildungsrangs des Charakters, unabhängig von Seltenheit oder Herkunft. Shopskins nutzen ebenfalls dieses Tempo.',
+  'guide.mountsPage.speedHeading': 'Reittempo und Ausbildung',
+  'guide.mountsPage.whatBody':
+    'Reittiere sind kosmetische Aussehen für dein ausgebildetes Reittier. Sie gewähren keine Rüstung, keinen Schaden und keine Kampfwerte. Die Reitausbildung erhöht das Reisetempo am Boden, und berittene Sprünge erreichen mehr Höhe. Jedes Reittier bleibt am Boden und keines kann schwimmen.',
+  'guide.progression.ridingBody':
+    'Auf Stufe {level} lehrt Stallmeisterin Marla grundlegendes Reiten gegen Gold und bietet danach einen fortgeschrittenen Rang an. Die Ausbildung bestimmt das Reittempo. Wähle dein Aussehen unter Kosmetik; sammelbare Aussehen werden geteilt, solange ihre Zügel in den Taschen oder der Bank eines beliebigen Charakters bleiben.',
 };

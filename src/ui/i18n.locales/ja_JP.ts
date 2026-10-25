@@ -384,7 +384,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.courier.select': '{item}、{count}を選択',
   'hudChrome.courier.selectedItem': '{item}、{count}の選択を解除',
   'hudChrome.courier.instructions':
-    'スタック全体を自分の銀行、保管庫、またはほかのキャラクター向けに選択してください。配達員は預け入れた後、指定したアイテムを引き出します。クエストアイテムは送れません。',
+    '自分の銀行、保管庫、またはほかのキャラクター向けにスタック全体を選択してください。配達員は先に預け入れ、その後で指定のアイテムを引き出します。クエストアイテムは送れません。',
   'hudChrome.courier.membership': '次の配達にはメンバーシップの更新が必要です。',
   'hudChrome.courier.unavailable': '配達員を召喚して配達を計画しましょう。',
   'hudChrome.courier.bagsVault': '素材を保管庫へ送る',
@@ -3575,12 +3575,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dungeonDifficulty.resetAlreadyFresh':
     'インスタンスはすでにリセット済みです。前回のリセット以降、誰も入っていません。',
   'hudChrome.dungeonDifficulty.resetUsage':
-    '難易度を変更した後、/dungeon reset で空のインスタンスを放棄できます。',
+    '/dungeon reset で空のインスタンスを放棄し、最初から始められます。',
   'hudChrome.dungeonDifficulty.resetLoot':
     '中に戦利品が残っている間はインスタンスをリセットできません。',
   'hudChrome.dungeonDifficulty.resetConfirmTitle': 'すべてのインスタンスをリセットしますか？',
   'hudChrome.dungeonDifficulty.resetConfirmBody':
-    '以前選択していた難易度の空のインスタンスを放棄します。未取得の戦利品がある場合はリセットできません。',
+    '空のインスタンスを放棄し、次の攻略を選択した難易度で最初から始めます。ロックアウトは変わりません。中に誰かが残っている場合や未取得の戦利品がある場合はリセットできません。',
   'hudChrome.dungeonDifficulty.resetConfirm': 'インスタンスをリセット',
   'hudChrome.dungeonDifficulty.resetCooldown': 'インスタンスをリセットできるのは5分に1回だけです。',
   'hudChrome.dungeonDifficulty.entryMismatchNormal':
@@ -9848,7 +9848,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '沼地の道から外れた場所に沈む祠。好奇心旺盛で、しっかり備えた者のための寄り道です。',
   'guide.dungeonsPage.sanctumName': '墓守竜の聖域',
   'guide.dungeonsPage.resetBody':
-    'パーティがまだ確保した周回を抱えたまま難易度を切り替えると、古い確保はしばらく居座ってから自然に解けます。パーティリーダーは代わりに一度に手放せます。自分の肖像メニューから「すべてのインスタンスをリセット」を選ぶか、/dungeon reset と入力してください。リセットが働くのは、難易度が実際に変更された後だけ、中に誰も、生者も倒れた者も残っていない間だけ、そして中の亡骸がすべて拾い尽くされた後だけで、リセットの間には短いクールダウンが挟まります。誤った難易度で扉に着けば、周回が始まる前にゲームが知らせます。レイドはこのやり方では決してリセットされません。レイド自身のロックアウト規則が働きます。',
+    '確保した空のインスタンスはしばらく残り、その後自然に解放されます。パーティリーダーは自分の肖像メニューから「すべてのインスタンスをリセット」を選ぶか、/dungeon reset と入力してすぐに解放できます。次の攻略は現在の難易度で最初から始まります。難易度の変更でも以前の難易度のインスタンスが解放されます。リセットには、生者も倒れた者も中に残っておらず、すべての亡骸から戦利品を回収済みであることが必要です。ロックアウトは短縮されません。ロック中のヒロイックやレイドはその解除までロックされたままで、リセットの間には短いクールダウンがあります。誤った難易度で入口に着くと攻略前に通知されます。レイドも同様にリセットでき、固有のロックアウトと亡骸への帰還の規則は引き続き適用されます。レイドの難易度変更ではクールダウンが省かれるため、難易度を間違えたりヒロイックで行き詰まったりした場合はすぐに戻せます。再挑戦を制限するのはレイド自体のロックアウトです。',
   'guide.dungeonsPage.resetTitle': 'インスタンスのリセット',
   'guide.dungeonsPage.sanctumBody':
     'ソーンピークの高みに隠された氷河。一頭の竜が氷の中に囚われ、カルトは盗んだ魂を燃やしてその氷を解かそうとしている。高い峠から氷の塔、鍛冶神の砕けた鎖、カルトの炎を越えて、氷河の麓の凍った湖へと下っていきます。',
@@ -17786,7 +17786,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.doesHeader': '働き',
   'guide.commandsPage.dungeonMode': 'ダンジョンの難易度をノーマルとヒロイックで切り替えます。',
   'guide.commandsPage.dungeonReset':
-    '誰も残っていない自分のインスタンスを破棄します。難易度を変えた後にすることです。',
+    '自分の空のインスタンスを放棄し、次の攻略を同じ難易度または新しい難易度で最初から始めます。',
   'guide.commandsPage.dungeons':
     'すべてのダンジョンを、扉のある地方と想定パーティ人数つきで一覧し、今設定している難易度もあわせて表示します。',
   'guide.commandsPage.emotesBody':
@@ -25390,4 +25390,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '別のプレイヤーが次の正しい音を鳴らすまで、タイルを鳴らせない。鳴らした数：{total}枚中{done}枚',
   'hudChrome.auraEffect.temple.spentVoice':
     '別のプレイヤーが次の正しい音を鳴らすまで、月のタイルを鳴らせない。この間にタイルを踏んでも答えはリセットされず、ダメージも受けない。解除不可。同じインスタンスで生きているプレイヤーが自分だけになるか、楽譜が終了すると解除される。',
+  'hudChrome.options.firstPersonBody': '体を表示',
+  'hudChrome.options.firstPersonNoBody': '体を非表示',
+  'hudChrome.options.firstPersonOff': 'オフ',
 };

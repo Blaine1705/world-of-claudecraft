@@ -3730,7 +3730,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.dungeonMode':
     'Alterna suas masmorras entre as dificuldades normal e heroica.',
   'guide.commandsPage.dungeonReset':
-    'Abandona suas próprias instâncias vazias, o que você faz depois de trocar de dificuldade.',
+    'Abandone suas instâncias vazias para que a próxima tentativa comece do zero, na mesma dificuldade ou em outra.',
   'guide.commandsPage.dungeons':
     'Cada masmorra com a zona onde sua porta fica e o tamanho de grupo para o qual foi feita, além da dificuldade em que você está configurado atualmente.',
   'guide.commandsPage.emotesBody':
@@ -6699,12 +6699,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dungeonDifficulty.resetAlreadyFresh':
     'Suas instâncias já estão novas. Ninguém entrou nelas desde a última redefinição.',
   'hudChrome.dungeonDifficulty.resetUsage':
-    'Use /dungeon reset para abandonar suas instâncias vazias após alterar a dificuldade.',
+    'Use /dungeon reset para abandonar suas instâncias vazias e começá-las do zero.',
   'hudChrome.dungeonDifficulty.resetLoot':
     'Você não pode redefinir instâncias enquanto houver saque dentro delas.',
   'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Redefinir todas as instâncias?',
   'hudChrome.dungeonDifficulty.resetConfirmBody':
-    'Isso abandona as instâncias vazias da dificuldade selecionada anteriormente. Saques não coletados impedirão a redefinição.',
+    'Isso abandona suas instâncias vazias para que a próxima tentativa comece do zero na dificuldade selecionada. Os bloqueios não mudam. Qualquer jogador ainda dentro ou saque não recolhido impede a redefinição.',
   'hudChrome.dungeonDifficulty.resetConfirm': 'Redefinir instâncias',
   'hudChrome.dungeonDifficulty.resetCooldown':
     'As instâncias só podem ser redefinidas uma vez a cada 5 minutos.',
@@ -15261,7 +15261,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Seu grupo venceu a provação heroica enquanto você lutava na retaguarda ou jazia caído. Seu vínculo também foi registrado, então sua parte das Marcas heroicas chegou aqui em vez de se perder. Use-as bem.\n\n- Intendente heroico',
   'guide.dungeonsPage.resetTitle': 'Redefinindo suas instâncias',
   'guide.dungeonsPage.resetBody':
-    'Se vocês trocarem de dificuldade enquanto o grupo ainda mantém sessões reivindicadas, as reivindicações antigas permanecem um tempo antes de se soltarem sozinhas. O líder do grupo pode soltá-las de uma vez: escolham Redefinir todas as instâncias no menu do próprio retrato, ou digitem /dungeon reset. Uma redefinição só funciona depois de a dificuldade ter sido de fato trocada, só enquanto ninguém, vivo ou tombado, permanecer lá dentro, só depois de todo cadáver lá dentro ter sido saqueado por completo, e um breve tempo de recarga separa uma redefinição da seguinte. Cheguem à porta com a dificuldade errada e o jogo avisa antes de a sessão começar. A incursão nunca é redefinida assim; valem as regras de bloqueio dela.',
+    'Tentativas reservadas vazias permanecem por um tempo antes de desaparecer sozinhas. O líder do grupo pode abandoná-las imediatamente: escolha Redefinir todas as instâncias no menu do próprio retrato ou digite /dungeon reset. A próxima tentativa começa do zero na dificuldade atual. Mudar a dificuldade faz o mesmo com tentativas da dificuldade anterior. Só é possível redefinir quando ninguém, vivo ou morto, está dentro e todos os cadáveres foram completamente saqueados. Isso nunca reduz um bloqueio: uma masmorra heroica ou raide bloqueada permanece assim até sua reinicialização. Há um breve intervalo entre redefinições. Se você chegar à porta com a dificuldade errada, o jogo avisa antes de começar. A raide é redefinida da mesma forma, mantendo suas regras de bloqueio e retorno ao cadáver. Uma raide que muda de dificuldade ignora o intervalo: se o grupo escolheu errado ou não venceu o Heroico, pode voltar imediatamente, pois o próprio bloqueio limita as repetições.',
   'guide.dungeonsPage.wildheartBody':
     'Uma caldeira de selva encharcada de chuva, onde duas trilhas de caça elevadas circundam um cenote de jade. Atravesse covis de feras e ruínas ancestrais, depois suba a pirâmide ritual para ver quem espera no topo.',
   'guide.gear.itemLevelBody':
@@ -24251,7 +24251,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.courier.cargoSafe':
     'Itens devolvidos transbordam as bolsas cheias. O mensageiro desaparece após entregar até ser invocado de novo.',
   'hudChrome.courier.instructions':
-    'Selecione pilhas inteiras. Seu mensageiro deposita primeiro e depois coleta os itens solicitados. Itens de missão não podem ser enviados.',
+    'Selecione pilhas inteiras para seu banco, o Depósito de Materiais ou outro personagem. Seu mensageiro deposita tudo primeiro e depois coleta os itens solicitados. Itens de missão não podem ser enviados.',
   'hudChrome.courier.membership': 'Renove sua assinatura para iniciar outra viagem.',
   'hudChrome.courier.selected': '{count} / {limit} pilhas selecionadas',
   'hudChrome.courier.unavailable': 'Invoque seu mensageiro para planejar uma entrega.',
@@ -25673,4 +25673,204 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Pulso do Coração Selvagem atinge quem fica no círculo. Dilacerar é um golpe individual grande: encha a vida da Presa.',
   'bossJournal.wildheart.zulgar.tipTank':
     'Mantenha chão livre atrás para Rugido de jaguar. Após a caçada ele volta a você: prepare-se para segurá-lo.',
+
+  'abilityUi.cast.kituse_wildheart_pull_spear': 'Puxar a lança',
+  'abilityUi.cast.temple_score': 'A partitura',
+  'abilityUi.cast.temple_score_answer': 'Responder à partitura',
+  'abilityUi.cast.wildheart_idols_breath': 'Sopro do ídolo',
+  'abilityUi.cast.wildheart_sun_glyph_cold': 'Resfriamento',
+  'abilityUi.cast.wildheart_sun_glyph_kindle': 'Acendimento',
+  'abilityUi.cast.wildheart_zulgar_hunting_spear': 'Lança de caça',
+  'abilityUi.cast.wildheart_zulgar_idol_wakes': 'O ídolo desperta',
+  'bossJournal.temple.selthe.boltResponseRework':
+    'Mantenha o tanque na linha de visão dela. Guarde as interrupções para Ária de afogamento.',
+  'bossJournal.temple.selthe.boltSummaryRework':
+    'Entre outras conjurações, uma descarga acerta a cada {every} s após um aviso visual de {windup} s, causando {mult} vezes o dano da arma dela como dano de Gelo. Interromper Ária de afogamento para as descargas e a ária por {quiet} s.',
+  'bossJournal.temple.selthe.overviewRework':
+    'Selthe nunca se move nem ataca corpo a corpo. Agrupem-se para Coro, saia do grupo para Solo, interrompa Ária de afogamento e desvie de Surto da lagoa. Em dois limiares de vida, repitam a melodia dos pisos lunares alternando os cantores.',
+  'bossJournal.temple.selthe.phaseSummaryRework':
+    'Os outros ataques dela param enquanto o grupo responde à partitura. Descargas de água lunar não têm barra de conjuração e não podem ser interrompidas.',
+  'bossJournal.temple.selthe.scoreHeroic':
+    'Durante a resposta, os pisos apagam. Lembre-se da melodia e alternem as vezes.',
+  'bossJournal.temple.selthe.scoreResponse':
+    'Observe a melodia e pise nos pisos em ordem. Alterne notas corretas com outro jogador vivo; o único sobrevivente pode terminar sozinho. Passos bloqueados são inofensivos. Saia do piso e entre de novo para fazê-lo soar, mesmo que já o ocupasse antes da resposta.',
+  'bossJournal.temple.selthe.scoreSummary':
+    'Com {first} e {second} de vida, ela fica imune e toca {notes} e depois {finalNotes} notas. Repitam em {answer} e depois {finalAnswer} s. Um piso errado causa {falseNote} de dano de Gelo e reinicia o progresso, mas não o tempo. Se o tempo acabar, todos recebem de {min} a {max} de dano de Gelo. O sucesso a atordoa por {stun} s e aumenta o dano recebido em {vulnerability} por {bonusSeconds} s.',
+  'bossJournal.temple.selthe.tipHealerRework':
+    'Observe o alvo da ária e quem ficar sozinho no Coro. Durante a partitura, ajude a cantar a próxima nota e cure os erros.',
+  'bossJournal.wildheart.zulgar.breathResponse':
+    'Vá para a metade sem marca antes do fim do aviso. A linha central é segura. No Heroico, o sopro também apaga os glifos acesos daquela metade; eles podem ser reacendidos imediatamente.',
+  'bossJournal.wildheart.zulgar.breathSummary':
+    'A cada {every} s, metade do terraço fica marcada por {warning} s, depois todos nessa metade recebem de {min} a {max} de dano de Natureza. Os sopros alternam as metades.',
+  'bossJournal.wildheart.zulgar.glyphResponseRework':
+    'Jogadores sem marca acendem glifos à frente da Presa. Conduza-o por eles e ataque durante o efeito Atingido pelo sol. Os glifos apagam quando a caçada termina.',
+  'bossJournal.wildheart.zulgar.glyphSummaryRework':
+    'Os {count} glifos começam apagados. Durante a caçada, um jogador sem marca acende um ficando sobre ele por {kindle} s. Se não houver ninguém sem marca, a Presa pode acendê-lo em {alone} s. Sair reinicia o progresso. Cruzar um glifo aceso reduz a velocidade dele em {slow} e aumenta o dano recebido em {vulnerability} por {seconds} s. O glifo não pode ser reacendido por {dark} s; outro glifo não pode atingi-lo por {wary} s. Durante a caçada, atordoamentos duram metade do tempo.',
+  'bossJournal.wildheart.zulgar.idolHuntHeroicSummary':
+    'Ele marca uma nova dupla a cada {pair} s e alterna entre os dois a cada {switch} s. Cada troca dá à nova Presa {turn} s antes da perseguição.',
+  'bossJournal.wildheart.zulgar.idolHuntSummary':
+    'Ele escolhe uma nova Presa a cada {every} s, depois se vira para ela por {turn} s antes de perseguir.',
+  'bossJournal.wildheart.zulgar.idolSummary':
+    'Com {health} de vida, ele permanece como espírito de jaguar até ser derrotado. O tanque também pode virar Presa.',
+  'bossJournal.wildheart.zulgar.pulseSummaryRework':
+    'A cada {every} s, uma conjuração de {cast} s atinge todos em um raio de {radius} m, causando de {min} a {max} de dano. Jogadores empalados recebem {pinMult} vezes esse dano a qualquer distância.',
+  'bossJournal.wildheart.zulgar.spearResponse':
+    'Selecione a lança e interaja a até {range} m para puxá-la em {pull} s. Dano não interrompe a retirada. Se ninguém mais estiver livre no terraço, a vítima pode interagir para escapar em {self} s.',
+  'bossJournal.wildheart.zulgar.spearSummary':
+    'Uma conjuração de {cast} s empala um jogador que não seja o tanque, ou o tanque se não houver mais ninguém. A imobilização dura até {seconds} s e causa {bleed} de dano a cada {tick} s.',
+  'entities.mobs.wildheart_hunting_spear.name': 'Lança de caça',
+  'hudChrome.auraEffect.temple.brokenVoice':
+    'A voz dela está quebrada: ela recebe {pct}% a mais de dano até isto terminar.',
+  'hudChrome.auraEffect.temple.scoreWard':
+    'Cantando a partitura: ela não recebe dano até terminar. Pise nos pisos lunares na ordem em que soaram antes do fim do verso para quebrar a voz dela. Alternem as vezes: após uma nota, espere outro jogador tocar a próxima nota correta. O único sobrevivente pode terminar sozinho. Se o verso acabar antes, Discórdia causa de {min} a {max} de dano de Gelo ({heroicMin} a {heroicMax} no Heroico) a todos no pátio.',
+  'hudChrome.auraEffect.temple.spentVoice':
+    'Você não pode soar outro piso lunar até outro jogador tocar a próxima nota correta. Pisar em um piso durante este efeito não reinicia a resposta nem causa dano a você. Não pode ser dissipado. Removido quando você é o único jogador vivo na instância ou a partitura termina.',
+  'hudChrome.auraEffect.wildheart.idolAwake':
+    'O jaguar de pedra está desperto. A cada {every} s, ele sopra sobre uma metade do terraço e depois a outra, após um aviso de {warning} s no chão: de {min} a {max} de dano de Natureza ({heroicMin} a {heroicMax} no Heroico) a todos naquela metade. Zulgar permanece como Avatar do Jaguar até morrer e escolhe nova Presa a cada {seconds} s ({heroicSeconds} s no Heroico).',
+  'hudChrome.auraEffect.wildheart.pinned':
+    'Uma Lança de caça prende você. Você sangra, recebendo {bleed} de dano Físico ({heroicBleed} no Heroico) a cada {every} s, e Pulso do Coração Selvagem atinge você em qualquer lugar com {pulse}% a mais de dano. Um aliado pode puxar a lança em {pull} s. Se ninguém mais estiver livre, puxe-a em {wrench} s. Ela se solta após {seconds} s.',
+  'hudChrome.auraEffect.wildheart.sunWary':
+    'Nenhum glifo solar pode atingi-lo até isto terminar. Um glifo aceso que ele cruzar continua aceso.',
+  'hudChrome.auraEffect.wildheart.sunstruck':
+    'Atingido por um glifo solar aceso: move-se {pct}% mais devagar.',
+  'hudChrome.auraEffect.wildheart.sunstruckExposed':
+    'Atingido por um glifo solar aceso: recebe {pct}% a mais de dano.',
+  'hudChrome.courier.accountBank':
+    'Trazer deste banco. O personagem deve estar desconectado quando o mensageiro chegar.',
+  'hudChrome.courier.accountPlanned':
+    'Planejado para {name}: {count} pilhas. Escolher outro personagem substitui essas pilhas.',
+  'hudChrome.courier.accountTitle': 'Outros personagens',
+  'hudChrome.courier.bagsAccount': 'Enviar ao banco de {name}',
+  'hudChrome.courier.bagsAccountNone': 'Escolha um personagem para receber os itens.',
+  'hudChrome.courier.bagsVault': 'Enviar materiais ao depósito',
+  'hudChrome.courier.boundAccount': 'Indo ao banco de outro personagem',
+  'hudChrome.courier.boundBank': 'Indo ao banco',
+  'hudChrome.courier.boundVault': 'Indo ao Depósito de Materiais',
+  'hudChrome.courier.storeTabs': 'Armazenamento do mensageiro',
+  'hudChrome.courier.vault': 'Trazer do depósito. Cada seleção traz a linha inteira.',
+  'hudChrome.courier.vaultCap': 'Guarda {cap} de cada material',
+  'hudChrome.courier.vaultEmpty': 'Seu depósito está vazio.',
+  'hudChrome.courier.vaultLocked':
+    'Desbloqueie o Depósito de Materiais em um banqueiro para usá-lo com seu mensageiro.',
+  'hudChrome.courier.vaultTitle': 'Depósito de Materiais',
+  'hudChrome.dungeonDifficulty.unappliedHeroic':
+    'Normal selecionado. As instâncias atuais continuam no Heroico.',
+  'hudChrome.dungeonDifficulty.unappliedNormal':
+    'Heroico selecionado. As instâncias atuais continuam no Normal.',
+  'hudChrome.finder.mech.the_score':
+    'A partitura (ela canta uma melodia duas vezes nos pisos lunares: pise neles na ordem em que soaram para quebrar a voz dela)',
+  'hudChrome.itemHistory.close': 'Fechar',
+  'hudChrome.itemHistory.noTransfers': 'Este item nunca mudou de mãos.',
+  'hudChrome.itemHistory.openAria': 'Histórico de {item}',
+  'hudChrome.itemHistory.passedTo': 'Passado para {name} em {date}',
+  'hudChrome.itemHistory.title': '{item}: histórico',
+  'hudChrome.itemMenu.itemHistory': 'Histórico do item',
+  'hudChrome.itemTooltip.lootedBy': 'Saqueado por {name} em {date}',
+  'hudChrome.itemTooltip.obtainedBy': 'Obtido por {name} em {date}',
+  'hudChrome.itemTooltip.questRewardTo': 'Recompensa de missão para {name} em {date}',
+  'hudChrome.kitUse.freeAria': 'Puxar {name}',
+  'hudChrome.kitUse.freeClick': 'Clique aqui para puxar {name}',
+  'hudChrome.kitUse.freeFar': 'Chegue a até {range} m para puxar',
+  'hudChrome.kitUse.freeKey': 'Puxar {name}',
+  'hudChrome.kitUse.freeLine':
+    'Puxe a lança do chão para libertar quem ela prende. Receber dano não impede você; mover-se ou ficar atordoado impede',
+  'hudChrome.kitUse.freeTap': 'Toque aqui para puxar {name}',
+  'hudChrome.kitUse.freeUsingLine':
+    'Fique parado para puxar a lança: mover-se ou ficar atordoado interrompe',
+  'hudChrome.options.firstPersonBody': 'Mostrar corpo',
+  'hudChrome.options.firstPersonMode': 'Primeira pessoa (zoom máximo)',
+  'hudChrome.options.firstPersonNoBody': 'Sem corpo',
+  'hudChrome.options.firstPersonOff': 'Desativado',
+  'hudChrome.plurals.itemHistoryEarlierHidden.few':
+    '{count} transferências anteriores não são exibidas.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.many':
+    '{count} transferências anteriores não são exibidas.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.one': '{count} transferência anterior não é exibida.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.other':
+    '{count} transferências anteriores não são exibidas.',
+  'hudChrome.reliquary.sourceActivityWeeklyVaultPvp': 'Escolhido na linha JxJ do Cofre Semanal',
+  'hudChrome.templeAlert.answerDarkLine':
+    'Alternem as vezes e repitam a ordem de memória. Saia do piso antes de pisar nele novamente. Notas: {done} de {total}',
+  'hudChrome.templeAlert.answerLine':
+    'Alternem as vezes: pise no piso lunar marcado com {place}. Notas: {done} de {total}',
+  'hudChrome.templeAlert.answerTitle': 'Responda à partitura!',
+  'hudChrome.templeAlert.brokenLine':
+    'Ela recebe {pct}% a mais de dano até isto terminar: use seus ataques mais fortes agora',
+  'hudChrome.templeAlert.brokenTitle': 'A voz de Selthe está quebrada!',
+  'hudChrome.templeAlert.falseLine':
+    'Esse piso estava fora de ordem. A resposta recomeça no primeiro piso',
+  'hudChrome.templeAlert.falseTitle': 'Nota falsa!',
+  'hudChrome.templeAlert.melodyDarkLine':
+    'Lembre a ordem antes que os pisos apaguem. Repita alternando com outro jogador',
+  'hudChrome.templeAlert.melodyLine':
+    'Observe os pisos lunares soarem um após o outro. Repita a ordem alternando com outro jogador',
+  'hudChrome.templeAlert.melodyTitle': 'A partitura',
+  'hudChrome.templeAlert.spentLine':
+    'Você não pode soar um piso até outro jogador tocar a próxima nota correta. Notas: {done} de {total}',
+  'hudChrome.templeAlert.spentTitle': 'Outra voz deve responder',
+  'hudChrome.templeAlert.stepOffLine':
+    'Um piso lunar só soa quando alguém pisa nele. Saia deste piso e pise nele novamente',
+  'hudChrome.templeAlert.stepOffTitle': 'Saia e entre de novo',
+  'hudChrome.templeAlert.timeAria': 'Restam {seconds} segundos',
+  'hudChrome.wildheartAlert.breathLine':
+    'O jaguar de pedra vai soprar sobre esta metade do terraço. Atravesse para a outra metade',
+  'hudChrome.wildheartAlert.breathTitle': 'Sopro do ídolo!',
+  'hudChrome.wildheartAlert.glyphLightingLine':
+    'Fique no glifo até ele acender. Sair reinicia o processo',
+  'hudChrome.wildheartAlert.glyphLightingTitle': 'Acendendo o glifo solar',
+  'hudChrome.wildheartAlert.glyphLine':
+    'Fique num glifo solar apagado por {seconds} s para acendê-lo. Quando Zulgar cruzar, ele receberá {pct}% a mais de dano por {duration} s',
+  'hudChrome.wildheartAlert.glyphTitle': 'Acenda os glifos solares',
+  'hudChrome.wildheartAlert.pinnedLine':
+    'Um aliado precisa puxar a Lança de caça. Pulso do Coração Selvagem causa mais dano enquanto você está empalado',
+  'hudChrome.wildheartAlert.pinnedSelfLine':
+    'Ninguém está livre para ajudar: puxe a Lança de caça antes que Pulso do Coração Selvagem atinja você',
+  'hudChrome.wildheartAlert.pinnedTitle': 'Empalado!',
+  'hudChrome.wildheartAlert.preyAloneLine':
+    'Ninguém mais pode acender os glifos solares. Fique num apagado por {seconds} s para acender e atraia Zulgar por ele',
+  'hudChrome.wildheartAlert.spearLine':
+    'Corra até a Lança de caça e puxe-a antes de Pulso do Coração Selvagem',
+  'hudChrome.wildheartAlert.spearTitle': 'Um aliado está empalado!',
+  'hudChrome.wildheartAlert.sunstruckLine':
+    'Ele recebe {pct}% a mais de dano até isto terminar: use seus ataques mais fortes agora',
+  'hudChrome.wildheartAlert.sunstruckTitle': 'Zulgar foi atingido pelo sol!',
+  'itemUi.errors.orderTrackedItem': 'O Mercador não aceita pedidos de equipamentos únicos.',
+
+  'hudChrome.cosmetics.mountsIntro':
+    'Escolha a aparência da montaria aqui. O treinamento de montaria determina a velocidade. Mantenha o item de montaria nas bolsas ou no banco de qualquer personagem para compartilhar a aparência pela conta.',
+  'hudChrome.cosmetics.mountsNoMount':
+    'Aprenda montaria com a cavalariça-mor Marla para invocar uma montaria.',
+  'hudChrome.cosmetics.notCollected': 'Não coletado',
+  'hudChrome.guildHall.mountPreview':
+    'Aparência de montaria para todos os personagens da conta. Seu treinamento de montaria define a velocidade.',
+  'hudChrome.mountTraining.ownedMountPrompt':
+    'Escolha sua montaria em Cosméticos. Use Montar / Desmontar para cavalgar.',
+  'hudChrome.mounts.desc_grag_bear': 'Um urso resistente de passos firmes com uma sela pesada.',
+  'hudChrome.mounts.desc_stalkglider_snail':
+    'Um caracol robusto de ritmo tranquilo com uma concha musgosa.',
+  'hudChrome.mounts.desc_valorsteed':
+    'Um corcel resistente de passos firmes com uma sela de couro.',
+  'hudChrome.mounts.useToRide':
+    'Use para vestir esta aparência e invocar sua montaria. Mantenha este item nas bolsas ou no banco de qualquer personagem para compartilhar a aparência pela conta. O treinamento de montaria determina a velocidade.',
+  'itemUi.vendor.advancedRiding': 'Treinamento avançado de Equitação',
+  'itemUi.vendor.basicRiding': 'Treinamento de Equitação',
+  'itemUi.vendor.ridingSpeed':
+    'Aumenta sua velocidade de movimento montado em {speed}%. Aplica-se a todas as montarias.',
+  'guide.mountsPage.firstBody':
+    'Marla vende as Rédeas do Corcel do Valor por 10 de ouro após você aprender montaria. Guardar as rédeas desbloqueia a aparência do cavalo em Cosméticos para todos os personagens da conta. O treinamento já permite invocar uma montaria sem carregar rédeas; escolha o cavalo ou outra aparência que possua quando quiser mudar o visual.',
+  'guide.mountsPage.goodsBody':
+    'As aparências de montaria colecionáveis ficam disponíveis pela conta enquanto ao menos um item de rédeas correspondente estiver nas bolsas ou no banco pessoal de qualquer personagem. Trocar, enviar por correio, anunciar, vender ou remover de outra forma o último item válido remove a aparência de Cosméticos. Quem a estiver usando volta à aparência do cavalo padrão e continua montado na velocidade do treinamento.\n\nRédeas de jogadores podem ser trocadas, enviadas por correio e anunciadas no Mercado Mundial, salvo indicação contrária no item. As rédeas do cavalo também podem ser vendidas a um mercador por 10 de ouro. Outras rédeas mantêm suas próprias restrições de venda. Visuais de montaria da loja continuam sendo cosméticos de conta independentes dos itens de rédeas.',
+  'guide.mountsPage.intro':
+    'Escolha uma aparência de montaria, aprenda a montar nos estábulos e viaje mais rápido pelo mundo. Seu treinamento define o ritmo; toda aparência de montaria é cosmética.',
+  'guide.mountsPage.learnBody':
+    'Montaria é liberada no nível {level}. A cavalariça-mor Marla Hitchen vende Treinamento de Equitação por 80 de ouro nos Estábulos de Galecrest. O treinamento básico concede {basicSpeed}% a mais de velocidade montado. Depois de aprendê-lo, Marla também vende Treinamento avançado de Equitação por {advancedFee} de ouro, aumentando o bônus para {advancedSpeed}%. Cada graduação pertence ao personagem que a aprende.\n\nApós aprender a montaria básica, aceite a missão Aulas de Equitação de Marla e siga o marcador até o quadrado brilhante atrás do arco de largada. Pressione Iniciar corrida para pegar emprestado o Corcel do Valor de treino. Termine o percurso e volte para receber moedas e experiência. O cavalo emprestado volta ao celeiro quando a lição termina.',
+  'guide.mountsPage.rideBody':
+    'Abra Cosméticos e escolha uma aparência na aba Montarias. A tecla Montar / Desmontar, por padrão o acento grave, invoca sua montaria treinada usando essa aparência. O botão Montar no celular faz o mesmo. Invocar exige uma breve canalização; desmontar é instantâneo. Você pode mudar a aparência enquanto está montado sem alterar a velocidade.\n\nVocê também pode usar rédeas das bolsas ou de uma barra de ação para escolher a aparência e invocar. Usar a aparência em que já está montado guarda a montaria. Rédeas no banco ou em outro personagem liberam o mesmo cosmético sem que o cavaleiro precise carregá-las.',
+  'guide.mountsPage.speedBody':
+    'O Treinamento de Equitação básico concede {basicSpeed}% a mais de velocidade montado. O Treinamento avançado de Equitação concede {advancedSpeed}% a mais e custa {advancedFee} de ouro com Marla. Todas as aparências usam a mesma velocidade conforme a graduação do personagem, independentemente da raridade ou origem. Visuais da loja também usam essa velocidade.',
+  'guide.mountsPage.speedHeading': 'Velocidade e treinamento de montaria',
+  'guide.mountsPage.whatBody':
+    'Montarias são aparências cosméticas sobre sua montaria treinada. Não concedem armadura, dano nem atributos de combate. O treinamento aumenta a velocidade por terra, e saltos montados alcançam mais altura. Toda montaria fica no chão, e nenhuma pode nadar.',
+  'guide.progression.ridingBody':
+    'No nível {level}, a cavalariça-mor Marla ensina montaria básica por ouro e oferece uma graduação avançada depois. O treinamento determina a velocidade montado. Escolha a aparência em Cosméticos; aparências colecionáveis são compartilhadas enquanto suas rédeas estiverem nas bolsas ou no banco de qualquer personagem.',
 };

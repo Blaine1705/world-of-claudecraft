@@ -3633,7 +3633,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.doesHeader': 'Hvad den gør',
   'guide.commandsPage.dungeonMode': 'Skift dine fangekældre mellem normal og heroisk sværhedsgrad.',
   'guide.commandsPage.dungeonReset':
-    'Opgiv dine egne tomme instanser, hvilket er det, du gør efter at have skiftet sværhedsgrad.',
+    'Opgiv dine egne tomme instanser, så næste tur starter forfra på samme eller en ny sværhedsgrad.',
   'guide.commandsPage.dungeons':
     'Hver fangekælder med den zone, dens dør sidder i, og den gruppestørrelse, den er bygget til, samt den sværhedsgrad, du er indstillet til nu.',
   'guide.commandsPage.emotesBody':
@@ -6523,12 +6523,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dungeonDifficulty.resetAlreadyFresh':
     'Dine instanser er allerede nulstillet. Ingen har været inde i dem siden sidste nulstilling.',
   'hudChrome.dungeonDifficulty.resetUsage':
-    'Brug /dungeon reset til at forlade dine tomme instanser efter at have ændret sværhedsgrad.',
+    'Brug /dungeon reset til at opgive dine tomme instanser og starte dem forfra.',
   'hudChrome.dungeonDifficulty.resetLoot':
     'Du kan ikke nulstille instanser, mens der stadig er bytte derinde.',
   'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Nulstil alle instanser?',
   'hudChrome.dungeonDifficulty.resetConfirmBody':
-    'Dette forlader tomme instanser fra din tidligere valgte sværhedsgrad. Uhentet bytte forhindrer nulstillingen.',
+    'Dette opgiver dine tomme instanser, så næste tur starter forfra på den valgte sværhedsgrad. Låsninger ændres ikke. Nogen, der stadig er inde, eller uhentet bytte forhindrer nulstillingen.',
   'hudChrome.dungeonDifficulty.resetConfirm': 'Nulstil instanser',
   'hudChrome.dungeonDifficulty.resetCooldown':
     'Instanser kan kun nulstilles én gang hvert 5. minut.',
@@ -14852,7 +14852,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Din gruppe klarede den heroiske prøve, mens du kæmpede i bagtroppen eller lå faldet. Din låsning blev også registreret, så din andel af de heroiske mærker blev sendt hertil i stedet for at gå tabt. Brug dem godt.\n\n- Heroisk kvartermester',
   'guide.dungeonsPage.resetTitle': 'Nulstilling af dine instanser',
   'guide.dungeonsPage.resetBody':
-    'Skift sværhedsgrad, mens din gruppe stadig holder ture, den har gjort krav på, og de gamle krav bliver hængende et stykke tid, før de slipper af sig selv. Gruppelederen kan slippe dem på én gang i stedet: vælg Nulstil alle instanser i menuen for eget portræt, eller skriv /dungeon reset. En nulstilling virker først, efter sværhedsgraden faktisk er ændret, kun så længe ingen, levende eller faldne, er tilbage derinde, kun når hvert lig derinde er plyndret rent, og en kort nedkølingstid adskiller den ene nulstilling fra den næste. Kommer I til døren med den forkerte sværhedsgrad, siger spillet det, før turen begynder. Raidet nulstilles aldrig sådan; dets egne spærreregler står ved magt.',
+    'Tomme instanser, der er gjort krav på, bliver hængende en stund, før de frigives automatisk. Gruppelederen kan frigive dem straks: vælg Nulstil alle instanser i menuen for eget portræt, eller skriv /dungeon reset, så starter næste tur forfra på den aktuelle sværhedsgrad. Et skift i sværhedsgrad gør det samme for instanser på den gamle sværhedsgrad. En nulstilling virker kun, når ingen, levende eller faldne, er tilbage inde, og hvert lig er plyndret helt. Den forkorter aldrig en låsning: en låst Heroisk instans eller raid forbliver låst indtil sin nulstilling, og en kort nedkøling adskiller nulstillingerne. Kommer I til døren på forkert sværhedsgrad, siger spillet til, før turen starter. Raidet nulstilles på samme måde, mens dets egne regler for låsning og tilbagevenden til lig stadig gælder. Et raid, der skifter sværhedsgrad, springer nedkølingen over: valgte raidet forkert niveau, eller kunne det ikke klare Heroisk, kan det straks skifte tilbage, da dets egen låsning begrænser gentagne ture.',
   'guide.dungeonsPage.wildheartBody':
     'En regnvåd jungle-caldera hvor to hævede jagtstier omkranser en jade-cenote. Kryds bæstenes huler og forfædrenes ruiner, og bestig derefter ritualpyramiden for at se, hvem der venter på toppen.',
   'guide.gear.itemLevelBody':
@@ -21385,7 +21385,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Returnerede genstande opbevares som overskud i fulde tasker. Kureren forsvinder efter levering, indtil den fremkaldes igen.',
   'hudChrome.courier.close': 'Luk kureren',
   'hudChrome.courier.instructions':
-    'Vælg hele stakke. Kureren indsætter dem først og henter så de ønskede genstande. Opgavegenstande kan ikke sendes.',
+    'Vælg hele stakke til din bank, Materialehvælvet eller en anden figur. Kureren indsætter dem først og henter så de ønskede genstande. Opgavegenstande kan ikke sendes.',
   'hudChrome.courier.membership': 'Forny dit medlemskab for at starte en ny tur.',
   'hudChrome.courier.outbound': 'Flyver til banken',
   'hudChrome.courier.ready': 'Klar til levering',
@@ -25361,4 +25361,199 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.socketwright_skerrit.name': 'Maben Skerrit',
   'entities.zones.goldcrest_harbor.name': 'Goldcrest Harbor',
   'referralCards.okay': 'OK',
+  'abilityUi.cast.kituse_wildheart_pull_spear': 'Træk spyddet ud',
+  'abilityUi.cast.temple_score': 'Partituret',
+  'abilityUi.cast.temple_score_answer': 'Besvar partituret',
+  'abilityUi.cast.wildheart_idols_breath': 'Idolens ånde',
+  'abilityUi.cast.wildheart_sun_glyph_cold': 'Køler af',
+  'abilityUi.cast.wildheart_sun_glyph_kindle': 'Tændes',
+  'abilityUi.cast.wildheart_zulgar_hunting_spear': 'Jagtspyd',
+  'abilityUi.cast.wildheart_zulgar_idol_wakes': 'Idolet vågner',
+  'bossJournal.temple.selthe.boltResponseRework':
+    'Hold tanken i hendes synsfelt. Gem afbrydelser til Drukningens arie.',
+  'bossJournal.temple.selthe.boltSummaryRework':
+    'Mellem andre besværgelser rammer et projektil hvert {every} sek. efter en synlig advarsel på {windup} sek. og giver Frostskade svarende til {mult} gange hendes våbenskade. Afbrydelse af Drukningens arie stopper projektiler og arien i {quiet} sek.',
+  'bossJournal.temple.selthe.overviewRework':
+    'Selthe bevæger sig aldrig og angriber ikke i nærkamp. Saml jer til Kor, forlad gruppen til Solo, afbryd Drukningens arie, og undvig Søbølge. Ved to helbredsgrænser skal I gentage hendes melodi på månefliserne med sangere, der skiftes.',
+  'bossJournal.temple.selthe.phaseSummaryRework':
+    'Hendes andre angreb holder pause, mens gruppen besvarer partituret. Månevandsprojektiler har ingen kastebjælke og kan ikke afbrydes.',
+  'bossJournal.temple.selthe.scoreHeroic':
+    'Under svaret bliver fliserne mørke. Husk melodien, og skift tur.',
+  'bossJournal.temple.selthe.scoreResponse':
+    'Se melodien, og træd så på fliserne i rækkefølge. Skift med en anden levende spiller om at spille de rigtige toner; en enlig overlevende kan afslutte alene. Blokerede trin er harmløse. Træd af og på igen for at spille en flise, også en der var optaget, før svaret begyndte.',
+  'bossJournal.temple.selthe.scoreSummary':
+    'Ved {first} og {second} helbred bliver hun immun og spiller {notes}, derefter {finalNotes} toner. Gentag dem inden for {answer}, derefter {finalAnswer} sek. En forkert flise giver {falseNote} Frostskade og nulstiller fremskridtet, men ikke tiden. Udløbet tid giver {min} til {max} Frostskade til alle. Succes bedøver hende i {stun} sek. og øger skaden, hun tager, med {vulnerability} i {bonusSeconds} sek.',
+  'bossJournal.temple.selthe.tipHealerRework':
+    'Hold øje med ariens mål og alle, der fanges alene af Kor. Hjælp med at synge næste tone under partituret, og hel fejlene.',
+  'bossJournal.wildheart.zulgar.breathResponse':
+    'Gå til den umarkerede halvdel, før advarslen slutter. Midterlinjen er sikker. På Heroisk slukker ånden også tændte glyffer i sin halvdel; de kan tændes igen straks.',
+  'bossJournal.wildheart.zulgar.breathSummary':
+    'Hvert {every} sek. markeres den ene halvdel af terrassen i {warning} sek., hvorefter alle i den halvdel tager {min} til {max} Naturskade. Ånden skifter mellem halvdelene.',
+  'bossJournal.wildheart.zulgar.glyphResponseRework':
+    'Umarkerede spillere tænder glyffer foran Byttet. Før ham gennem dem, og angrib under Solramt. Glyfferne slukkes, når jagten slutter.',
+  'bossJournal.wildheart.zulgar.glyphSummaryRework':
+    'De {count} glyffer starter slukkede. Mens han jager, tænder en umarkeret spiller en ved at stå på den i {kindle} sek. Hvis ingen umarkerede spillere er tilbage, kan Byttet tænde den på {alone} sek. At træde væk nulstiller fremskridtet. Når han krydser en tændt glyf, sænkes hans fart med {slow}, og skaden, han tager, øges med {vulnerability} i {seconds} sek. Glyffen kan ikke tændes igen i {dark} sek.; han kan ikke rammes af en anden glyf i {wary} sek. Under jagten varer bedøvelser halvt så længe.',
+  'bossJournal.wildheart.zulgar.idolHuntHeroicSummary':
+    'Han markerer et nyt par hvert {pair} sek. og skifter mellem dem hvert {switch} sek. Hvert skift giver det nye Bytte {turn} sek., før han jager.',
+  'bossJournal.wildheart.zulgar.idolHuntSummary':
+    'Han vælger nyt Bytte hvert {every} sek. og vender sig så mod det i {turn} sek., før han jager.',
+  'bossJournal.wildheart.zulgar.idolSummary':
+    'Ved {health} helbred forbliver han en jaguarånd, indtil han besejres. Tanken kan også blive Bytte.',
+  'bossJournal.wildheart.zulgar.pulseSummaryRework':
+    'Hvert {every} sek. rammer en besværgelse med {cast} sek. kastetid alle inden for {radius} yd for {min} til {max} skade. Fastspiddede spillere tager {pinMult} gange denne skade uanset afstand.',
+  'bossJournal.wildheart.zulgar.spearResponse':
+    'Vælg spyddet, og interager inden for {range} yd for at trække det ud på {pull} sek. Skade afbryder ikke udtrækningen. Hvis ingen andre står frit på terrassen, kan offeret interagere og slippe fri på {self} sek.',
+  'bossJournal.wildheart.zulgar.spearSummary':
+    'En besværgelse med {cast} sek. kastetid fastspidder en spiller, der ikke er tank, eller tanken, hvis ingen andre er tilbage. Rodfæstelsen varer op til {seconds} sek. og giver {bleed} skade hvert {tick} sek.',
+  'entities.mobs.wildheart_hunting_spear.name': 'Jagtspyd',
+  'hudChrome.auraEffect.temple.brokenVoice':
+    'Hendes stemme er brudt: hun tager {pct}% mere skade, indtil dette slutter.',
+  'hudChrome.auraEffect.temple.scoreWard':
+    'Synger partituret: hun tager ingen skade, før det slutter. Træd på månefliserne i den rækkefølge, de lød, før verset slutter, for at bryde hendes stemme. Skift tur: efter en tone skal en anden spiller spille næste rigtige tone. En enlig overlevende kan afslutte alene. Hvis verset slutter først, giver Disharmoni {min} til {max} Frostskade ({heroicMin} til {heroicMax} på Heroisk) til alle i gården.',
+  'hudChrome.auraEffect.temple.spentVoice':
+    'Du kan ikke spille en ny måneflise, før en anden spiller spiller næste rigtige tone. At træde på en flise imens nulstiller ikke svaret og skader dig ikke. Kan ikke ophæves. Fjernes, når du er den eneste levende spiller i din instans, eller partituret slutter.',
+  'hudChrome.auraEffect.wildheart.idolAwake':
+    'Stenjaguaren er vågen. Hvert {every} sek. ånder den over den ene halvdel af terrassen, derefter den anden, efter en gulvadvarsel på {warning} sek.: {min} til {max} Naturskade ({heroicMin} til {heroicMax} på Heroisk) til alle i den halvdel. Zulgar forbliver Jaguaravataren, til han dør, og vælger nyt Bytte hvert {seconds} sek. ({heroicSeconds} sek. på Heroisk).',
+  'hudChrome.auraEffect.wildheart.pinned':
+    'Et Jagtspyd holder dig fast. Du bløder for {bleed} Fysisk skade ({heroicBleed} på Heroisk) hvert {every} sek., og Vildhjertets puls rammer dig overalt for {pulse}% mere skade. En holdkammerat kan trække spyddet ud på {pull} sek. Hvis ingen andre står frit, kan du selv trække det ud på {wrench} sek. Det slipper efter {seconds} sek.',
+  'hudChrome.auraEffect.wildheart.sunWary':
+    'Ingen solglyf kan ramme ham, indtil dette slutter. En tændt glyf, han krydser, forbliver tændt.',
+  'hudChrome.auraEffect.wildheart.sunstruck':
+    'Ramt af en tændt solglyf: bevæger sig {pct}% langsommere.',
+  'hudChrome.auraEffect.wildheart.sunstruckExposed':
+    'Ramt af en tændt solglyf: tager {pct}% mere skade.',
+  'hudChrome.courier.accountBank':
+    'Hent fra denne bank. Den figur skal være logget ud, når kureren ankommer.',
+  'hudChrome.courier.accountPlanned':
+    'Planlagt til {name}: {count} stakke. Valg til en anden figur erstatter dem.',
+  'hudChrome.courier.accountTitle': 'Andre figurer',
+  'hudChrome.courier.bagsAccount': 'Send til {name}s bank',
+  'hudChrome.courier.bagsAccountNone': 'Vælg en figur at sende genstande til.',
+  'hudChrome.courier.bagsVault': 'Send materialer til boksen',
+  'hudChrome.courier.boundAccount': 'På vej til en anden figurs bank',
+  'hudChrome.courier.boundBank': 'På vej til banken',
+  'hudChrome.courier.boundVault': 'På vej til Materialehvælvet',
+  'hudChrome.courier.storeTabs': 'Kurerens lager',
+  'hudChrome.courier.vault': 'Hent fra boksen. Hvert valg henter hele rækken.',
+  'hudChrome.courier.vaultCap': 'Rummer {cap} af hvert materiale',
+  'hudChrome.courier.vaultEmpty': 'Din boks er tom.',
+  'hudChrome.courier.vaultLocked':
+    'Lås Materialehvælvet op hos en bankmand for at bruge den med kureren.',
+  'hudChrome.courier.vaultTitle': 'Materialehvælv',
+  'hudChrome.dungeonDifficulty.unappliedHeroic':
+    'Normal valgt. Nuværende instanser er stadig Heroiske.',
+  'hudChrome.dungeonDifficulty.unappliedNormal':
+    'Heroisk valgt. Nuværende instanser er stadig Normale.',
+  'hudChrome.finder.mech.the_score':
+    'Partituret (to gange synger hun en melodi på månefliserne: træd på dem i den rækkefølge, de lød, for at bryde hendes stemme)',
+  'hudChrome.itemHistory.close': 'Luk',
+  'hudChrome.itemHistory.noTransfers': 'Denne genstand har aldrig skiftet ejer.',
+  'hudChrome.itemHistory.openAria': 'Genstandshistorik for {item}',
+  'hudChrome.itemHistory.passedTo': 'Overdraget til {name} den {date}',
+  'hudChrome.itemHistory.title': '{item}: historik',
+  'hudChrome.itemMenu.itemHistory': 'Genstandshistorik',
+  'hudChrome.itemTooltip.lootedBy': 'Plyndret af {name} den {date}',
+  'hudChrome.itemTooltip.obtainedBy': 'Erhvervet af {name} den {date}',
+  'hudChrome.itemTooltip.questRewardTo': 'Opgavebelønning til {name} den {date}',
+  'hudChrome.kitUse.freeAria': 'Træk {name} ud',
+  'hudChrome.kitUse.freeClick': 'Klik her for at trække {name} ud',
+  'hudChrome.kitUse.freeFar': 'Kom inden for {range} yd for at trække det ud',
+  'hudChrome.kitUse.freeKey': 'Træk {name} ud',
+  'hudChrome.kitUse.freeLine':
+    'Træk spyddet op af jorden for at befri den fastspiddede. Slag stopper dig ikke; bevægelse eller bedøvelse gør',
+  'hudChrome.kitUse.freeTap': 'Tryk her for at trække {name} ud',
+  'hudChrome.kitUse.freeUsingLine':
+    'Stå stille for at trække spyddet ud: bevægelse eller bedøvelse stopper dig',
+  'hudChrome.options.firstPersonBody': 'Vis krop',
+  'hudChrome.options.firstPersonMode': 'Førsteperson (Helt zoomet ind)',
+  'hudChrome.options.firstPersonNoBody': 'Ingen krop',
+  'hudChrome.options.firstPersonOff': 'Fra',
+  'hudChrome.plurals.itemHistoryEarlierHidden.few': '{count} tidligere overdragelser vises ikke.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.many': '{count} tidligere overdragelser vises ikke.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.one': '{count} tidligere overdragelse vises ikke.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.other': '{count} tidligere overdragelser vises ikke.',
+  'hudChrome.reliquary.sourceActivityWeeklyVaultPvp':
+    'Valgt fra PvP-rækken i den ugentlige hvælving',
+  'hudChrome.templeAlert.answerDarkLine':
+    'Skift tur, og gentag rækkefølgen fra hukommelsen. Træd af, før du træder på en flise igen. Spillet: {done} af {total}',
+  'hudChrome.templeAlert.answerLine':
+    'Skift tur: træd på måneflisen mærket {place}. Spillet: {done} af {total}',
+  'hudChrome.templeAlert.answerTitle': 'Besvar partituret!',
+  'hudChrome.templeAlert.brokenLine':
+    'Hun tager {pct}% mere skade, indtil dette slutter: brug dine stærkeste angreb nu',
+  'hudChrome.templeAlert.brokenTitle': 'Selthes stemme er brudt!',
+  'hudChrome.templeAlert.falseLine':
+    'Den flise var uden for tur. Svaret starter forfra fra første flise',
+  'hudChrome.templeAlert.falseTitle': 'Falsk tone!',
+  'hudChrome.templeAlert.melodyDarkLine':
+    'Husk rækkefølgen, før fliserne slukkes. Gentag den på skift med en anden spiller',
+  'hudChrome.templeAlert.melodyLine':
+    'Se månefliserne lyde en efter en. Gentag rækkefølgen på skift med en anden spiller',
+  'hudChrome.templeAlert.melodyTitle': 'Partituret',
+  'hudChrome.templeAlert.spentLine':
+    'Du kan ikke spille en flise, før en anden spiller spiller næste rigtige tone. Spillet: {done} af {total}',
+  'hudChrome.templeAlert.spentTitle': 'En anden stemme skal svare',
+  'hudChrome.templeAlert.stepOffLine':
+    'En måneflise lyder kun, når nogen træder på den. Forlad denne flise, og træd på den igen',
+  'hudChrome.templeAlert.stepOffTitle': 'Træd af og så på igen',
+  'hudChrome.templeAlert.timeAria': '{seconds} sekunder tilbage',
+  'hudChrome.wildheartAlert.breathLine':
+    'Stenjaguaren vil ånde over denne halvdel af terrassen. Gå til den anden halvdel',
+  'hudChrome.wildheartAlert.breathTitle': 'Idolens ånde!',
+  'hudChrome.wildheartAlert.glyphLightingLine':
+    'Bliv på glyffen, indtil den tændes. At træde væk starter forfra',
+  'hudChrome.wildheartAlert.glyphLightingTitle': 'Tænder solglyffen',
+  'hudChrome.wildheartAlert.glyphLine':
+    'Stå på en slukket solglyf i {seconds} sek. for at tænde den. Når Zulgar krydser den, tager han {pct}% mere skade i {duration} sek.',
+  'hudChrome.wildheartAlert.glyphTitle': 'Tænd solglyfferne',
+  'hudChrome.wildheartAlert.pinnedLine':
+    'En holdkammerat skal trække Jagtspyddet ud. Vildhjertets puls rammer hårdere, mens du er fastspiddet',
+  'hudChrome.wildheartAlert.pinnedSelfLine':
+    'Ingen er fri til at hjælpe: træk selv Jagtspyddet ud, før Vildhjertets puls rammer',
+  'hudChrome.wildheartAlert.pinnedTitle': 'Fastspiddet!',
+  'hudChrome.wildheartAlert.preyAloneLine':
+    'Ingen andre kan tænde solglyfferne. Stå på en slukket glyf i {seconds} sek. for at tænde den, og lok så Zulgar over den',
+  'hudChrome.wildheartAlert.spearLine':
+    'Løb til Jagtspyddet, og træk det ud, før Vildhjertets puls rammer',
+  'hudChrome.wildheartAlert.spearTitle': 'En allieret er fastspiddet!',
+  'hudChrome.wildheartAlert.sunstruckLine':
+    'Han tager {pct}% mere skade, indtil dette slutter: brug dine stærkeste angreb nu',
+  'hudChrome.wildheartAlert.sunstruckTitle': 'Zulgar er solramt!',
+  'itemUi.errors.orderTrackedItem': 'Købmanden tager ikke imod bestillinger på unikt udstyr.',
+  'hudChrome.cosmetics.mountsIntro':
+    'Vælg dit ridedyrs udseende her. Ridetræning bestemmer hastigheden. Behold ridedyrsgenstanden i en vilkårlig figurs tasker eller bank for at dele udseendet på hele kontoen.',
+  'hudChrome.cosmetics.mountsNoMount':
+    'Lær at ride hos staldmester Marla for at tilkalde et ridedyr.',
+  'hudChrome.cosmetics.notCollected': 'Ikke samlet',
+  'hudChrome.guildHall.mountPreview':
+    'Ridedyrsudseende til alle figurer på din konto. Din ridetræning bestemmer hastigheden.',
+  'hudChrome.mountTraining.ownedMountPrompt':
+    'Vælg dit ridedyr i Kosmetik. Brug Stig op / Stig af for at ride.',
+  'hudChrome.mounts.desc_grag_bear': 'En hårdfør bjørn med sikre skridt og en tung sadel.',
+  'hudChrome.mounts.desc_stalkglider_snail':
+    'En robust snegl med langvarig energi og en mosbegroet skal.',
+  'hudChrome.mounts.desc_valorsteed': 'En hårdfør ganger med sikre skridt og lædersadel.',
+  'hudChrome.mounts.useToRide':
+    'Brug til at vælge dette udseende og tilkalde dit ridedyr. Behold genstanden i en vilkårlig figurs tasker eller bank for at dele udseendet på hele kontoen. Ridetræning bestemmer hastigheden.',
+  'itemUi.vendor.advancedRiding': 'Avanceret ridetræning',
+  'itemUi.vendor.basicRiding': 'Ridetræning',
+  'itemUi.vendor.ridingSpeed':
+    'Øger din bevægelseshastighed til hest med {speed}%. Gælder alle ridedyr.',
+  'guide.mountsPage.firstBody':
+    'Marla sælger Modgangers tøjler for 10 guld, når du har lært at ride. At have tøjlerne låser hesteudseendet op i Kosmetik for alle figurer på din konto. Ridetræningen lader dig allerede tilkalde et ridedyr uden at bære tøjler, så vælg hesten eller et andet ejet udseende, når du vil skifte stil.',
+  'guide.mountsPage.goodsBody':
+    'Samlede ridedyrsudseender er tilgængelige på hele kontoen, så længe mindst én tilsvarende tøjlegenstand findes i en vilkårlig figurs tasker eller personlige bank. Hvis den sidste gyldige genstand byttes, sendes, udbydes, sælges eller på anden måde fjernes, forsvinder udseendet fra Kosmetik. En rytter, der bruger det, skifter til standardhestens udseende og forbliver til hest med sin trænede hastighed.\n\nSpillertøjler kan byttes, sendes med post og udbydes på Verdensmarkedet, medmindre genstanden siger andet. Hestens tøjler kan også sælges til en købmand for 10 guld. Andre tøjler beholder deres egne begrænsninger for salg. Ridedyrsskins fra butikken forbliver kontokosmetik uafhængigt af tøjlegenstande.',
+  'guide.mountsPage.intro':
+    'Vælg et ridedyrsudseende, lær at ride i stalden, og rejs hurtigere gennem verden. Din træning bestemmer farten; alle ridedyrsudseender er kosmetiske.',
+  'guide.mountsPage.learnBody':
+    'Ridning åbnes på niveau {level}. Staldmester Marla Hitchen sælger Ridetræning for 80 guld i Galecrest-staldene. Grundtræningen giver {basicSpeed}% hurtigere bevægelse til hest. Når du har lært den, sælger Marla også Avanceret ridetræning for {advancedFee} guld, så bevægelsen til hest bliver {advancedSpeed}% hurtigere. Hver rang tilhører den figur, der lærer den.\n\nEfter grundtræningen tager du Marlas opgave Ridelektioner og følger markøren til den lysende firkant bag startbuen. Tryk på Start løb for at låne træningens Modganger. Gennemfør banen, og vend tilbage efter mønter og erfaring. Lånehesten vender tilbage til stalden, når lektionen slutter.',
+  'guide.mountsPage.rideBody':
+    'Åbn Kosmetik, og vælg et udseende på fanen Ridedyr. Tasten Stig op / Stig af, som normalt er tasten for grav accent, tilkalder dit trænede ridedyr med det udseende. Knappen Ridedyr på mobilen gør det samme. Tilkaldelse kræver en kort kanalisering; afstigning er øjeblikkelig. Du kan skifte udseende, mens du rider, uden at ændre hastigheden.\n\nDu kan også bruge tøjler fra taskerne eller en handlingsbjælke til at vælge udseendet og tilkalde. Brug af det udseende, du allerede rider på, fjerner ridedyret. Tøjler i banken eller på andre figurer låser samme kosmetik op, uden at rytteren skal bære dem.',
+  'guide.mountsPage.speedBody':
+    'Grundlæggende ridetræning giver {basicSpeed}% hurtigere bevægelse til hest. Avanceret ridetræning giver {advancedSpeed}% hurtigere bevægelse til hest og koster {advancedFee} guld hos Marla. Alle ridedyrsudseender bruger samme hastighed for figurens træningsrang, uanset sjældenhed eller kilde. Butiksskins bruger også denne trænede hastighed.',
+  'guide.mountsPage.speedHeading': 'Ridehastighed og træning',
+  'guide.mountsPage.whatBody':
+    'Ridedyr er kosmetiske udseender til din trænede ridning. De giver ingen rustning, skade eller kampstatistik. Ridetræning øger rejsehastigheden på land, og spring til hest klarer større højder. Alle ridedyr bliver på jorden, og ingen kan svømme.',
+  'guide.progression.ridingBody':
+    'På niveau {level} lærer staldmester Marla dig grundlæggende ridning for guld og tilbyder derefter en avanceret rang. Træning bestemmer hastigheden til hest. Vælg dit ridedyrsudseende i Kosmetik; samlede udseender deles, så længe tøjlerne ligger i en vilkårlig figurs tasker eller bank.',
 };

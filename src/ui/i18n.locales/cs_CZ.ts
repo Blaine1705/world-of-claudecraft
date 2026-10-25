@@ -3647,7 +3647,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.doesHeader': 'Co dělá',
   'guide.commandsPage.dungeonMode': 'Přepne tvé dungeony mezi normální a hrdinskou obtížností.',
   'guide.commandsPage.dungeonReset':
-    'Opustí tvé vlastní prázdné instance, což uděláš po změně obtížnosti.',
+    'Opusťte své prázdné instance, aby další průchod začal znovu na stejné nebo nové obtížnosti.',
   'guide.commandsPage.dungeons':
     'Všechny dungeony se zónou, ve které leží jejich dveře, a velikostí skupiny, pro kterou jsou stavěné, plus obtížnost, na kterou máš aktuálně nastaveno.',
   'guide.commandsPage.emotesBody':
@@ -6561,11 +6561,11 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dungeonDifficulty.resetAlreadyFresh':
     'Vaše instance jsou již obnovené. Od posledního resetu do nich nikdo nevstoupil.',
   'hudChrome.dungeonDifficulty.resetUsage':
-    'Po změně obtížnosti použij /dungeon reset k opuštění prázdných instancí.',
+    'Pomocí /dungeon reset opusťte své prázdné instance a začněte je znovu.',
   'hudChrome.dungeonDifficulty.resetLoot': 'Instance nelze resetovat, dokud uvnitř zůstává kořist.',
   'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Resetovat všechny instance?',
   'hudChrome.dungeonDifficulty.resetConfirmBody':
-    'Tím opustíš prázdné instance z dříve vybrané obtížnosti. Nevyzvednutá kořist zabrání resetování.',
+    'Opustíte své prázdné instance, aby další průchod začal znovu na zvolené obtížnosti. Uzamčení se nemění. Reset znemožní kdokoli uvnitř nebo nevyzvednutá kořist.',
   'hudChrome.dungeonDifficulty.resetConfirm': 'Resetovat instance',
   'hudChrome.dungeonDifficulty.resetCooldown': 'Instance lze resetovat pouze jednou za 5 minut.',
   'hudChrome.dungeonDifficulty.entryMismatchNormal':
@@ -15033,7 +15033,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Vaše skupina zdolala hrdinskou zkoušku, zatímco jste bojovali v týlu nebo leželi poraženi. Také vaše uzamčení bylo zaznamenáno, takže váš podíl hrdinských marek dorazil sem, místo aby se ztratil. Využijte je dobře.\n\n- Hrdinský zásobovač',
   'guide.dungeonsPage.resetTitle': 'Resetování instancí',
   'guide.dungeonsPage.resetBody':
-    'Změň obtížnost, dokud vaše skupina ještě drží nárokované běhy, a staré nároky chvíli přetrvají, než se samy uvolní. Vůdce skupiny je může pustit naráz: vyberte Resetovat všechny instance v nabídce vlastního portrétu, nebo napište /dungeon reset. Reset funguje až po skutečné změně obtížnosti, jen dokud uvnitř nikdo nezůstal, živý ani padlý, jen když každá mrtvola uvnitř byla dočista vyloupena, a jeden reset od dalšího dělí krátká doba obnovy. Přijdete-li ke dveřím se špatnou obtížností, hra to řekne dřív, než běh začne. Raid se takto nikdy neresetuje; platí jeho vlastní pravidla zámků.',
+    'Prázdné zabrané průchody chvíli přetrvají, než se samy vymažou. Vůdce skupiny je může opustit hned: zvolte Resetovat všechny instance v nabídce vlastního portrétu nebo napište /dungeon reset. Další průchod začne znovu na aktuální obtížnosti. Změna obtížnosti udělá totéž s průchody na předchozí obtížnosti. Reset lze provést jen tehdy, když uvnitř nikdo živý ani mrtvý nezůstává a všechny mrtvoly jsou zcela vybrané. Nikdy nezkracuje uzamčení: zamčený hrdinský dungeon či raid zůstane zamčený do svého obnovení. Resety odděluje krátká čekací doba. Pokud dorazíte ke vchodu se špatnou obtížností, hra vás upozorní před začátkem. Raid se resetuje stejně a zachovává pravidla uzamčení a návratu k mrtvole. Raid při změně obtížnosti čekací dobu přeskakuje: skupina, která zvolila špatnou úroveň nebo neuspěla na hrdinské, může ihned přepnout zpět, protože opakování omezuje samotné uzamčení.',
   'guide.dungeonsPage.wildheartBody':
     'Deštěm promáčená džunglová kaldera, kde dvě vyvýšené lovecké stezky obtáčejí nefritovou cenotu. Projdi doupaty šelem a troskami předků, poté vystoupej na rituální pyramidu, abys zjistil, kdo čeká na vrcholu.',
   'guide.gear.itemLevelBody':
@@ -23749,7 +23749,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Vrácené předměty mohou přeplnit plné batohy. Kurýr po doručení zmizí, dokud ho znovu nepřivoláš.',
   'hudChrome.courier.close': 'Zavřít kurýra',
   'hudChrome.courier.instructions':
-    'Vyber celé hromádky. Kurýr je nejprve uloží a pak vyzvedne požadované předměty. Úkolové předměty nelze posílat.',
+    'Vyberte celé stohy pro svou banku, Trezor materiálů nebo jinou postavu. Kurýr je nejprve uloží a pak vyzvedne požadované předměty. Úkolové předměty nelze posílat.',
   'hudChrome.courier.membership': 'Před další cestou si obnov členství.',
   'hudChrome.courier.outbound': 'Letí do banky',
   'hudChrome.courier.ready': 'Připraven k doručení',
@@ -25249,4 +25249,198 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Za takové noci s ní zpívá celý Sbor. Držte se, všichni.',
   'editor.mobTool.statArmor': 'Zbroj',
   'editor.topbar.dungeon': 'Podzemí',
+
+  'abilityUi.cast.kituse_wildheart_pull_spear': 'Vytáhnout kopí',
+  'abilityUi.cast.temple_score': 'Partitura',
+  'abilityUi.cast.temple_score_answer': 'Odpovědět na partituru',
+  'abilityUi.cast.wildheart_idols_breath': 'Dech modly',
+  'abilityUi.cast.wildheart_sun_glyph_cold': 'Chladnutí',
+  'abilityUi.cast.wildheart_sun_glyph_kindle': 'Rozsvěcení',
+  'abilityUi.cast.wildheart_zulgar_hunting_spear': 'Lovecké kopí',
+  'abilityUi.cast.wildheart_zulgar_idol_wakes': 'Modla se probouzí',
+  'bossJournal.temple.selthe.boltResponseRework':
+    'Udržujte tanka v jejím zorném poli. Přerušení si nechte na Árii tonutí.',
+  'bossJournal.temple.selthe.boltSummaryRework':
+    'Mezi ostatními kouzly zasáhne každých {every} s střela po viditelném varování trvajícím {windup} s a způsobí {mult}násobek poškození její zbraně jako mrazivé poškození. Přerušení Árie tonutí zastaví střely i árii na {quiet} s.',
+  'bossJournal.temple.selthe.overviewRework':
+    'Selthe se nikdy nehýbe ani neútočí zblízka. Na Sbor se seskupte, na Sólo opusťte skupinu, přerušte Árii tonutí a vyhněte se Přívalu jezera. Při dvou hranicích zdraví opakujte její melodii na měsíčních dlaždicích a střídejte zpěváky.',
+  'bossJournal.temple.selthe.phaseSummaryRework':
+    'Její ostatní útoky se pozastaví, když skupina odpovídá na partituru. Střely měsíční vody nemají ukazatel sesílání a nelze je přerušit.',
+  'bossJournal.temple.selthe.scoreHeroic':
+    'Během odpovědi dlaždice zhasnou. Zapamatujte si melodii a střídejte se.',
+  'bossJournal.temple.selthe.scoreResponse':
+    'Sledujte melodii a vstupujte na dlaždice ve správném pořadí. Ve správných tónech se střídejte s jiným živým hráčem; jediný přeživší může dokončit sám. Zablokované kroky neškodí. Z dlaždice sestupte a vstupte znovu, aby zazněla, i když jste na ní stáli už před začátkem odpovědi.',
+  'bossJournal.temple.selthe.scoreSummary':
+    'Při {first} a {second} zdraví se stane nezranitelnou a zahraje {notes}, poté {finalNotes} tónů. Zopakujte je do {answer}, poté {finalAnswer} s. Chybná dlaždice způsobí {falseNote} mrazivého poškození a vynuluje postup, ale ne časovač. Vypršení času způsobí všem {min} až {max} mrazivého poškození. Úspěch ji omráčí na {stun} s a zvýší utrpěné poškození o {vulnerability} na {bonusSeconds} s.',
+  'bossJournal.temple.selthe.tipHealerRework':
+    'Sledujte cíl árie a každého, kdo zůstane sám při Sboru. Během partitury pomáhejte s dalším tónem a léčte chyby.',
+  'bossJournal.wildheart.zulgar.breathResponse':
+    'Přejděte do neoznačené poloviny, než skončí varování. Středová čára je bezpečná. Na hrdinské obtížnosti dech také zhasne rozsvícené glyfy ve své polovině; lze je ihned znovu rozsvítit.',
+  'bossJournal.wildheart.zulgar.breathSummary':
+    'Každých {every} s se polovina terasy označí na {warning} s, pak všichni v této polovině utrpí {min} až {max} přírodního poškození. Dech střídá poloviny.',
+  'bossJournal.wildheart.zulgar.glyphResponseRework':
+    'Neoznačení hráči rozsvěcují glyfy před Kořistí. Veďte ho přes ně a pak útočte během účinku Zasažený sluncem. Glyfy zhasnou, když lov skončí.',
+  'bossJournal.wildheart.zulgar.glyphSummaryRework':
+    'Všech {count} glyfů začíná zhasnutých. Během lovu neoznačený hráč rozsvítí glyf, když na něm stojí {kindle} s. Pokud žádný neoznačený nezbývá, Kořist ho rozsvítí za {alone} s. Sestoupení vynuluje postup. Přechod přes rozsvícený glyf ho zpomalí o {slow} a zvýší utrpěné poškození o {vulnerability} na {seconds} s. Glyf nelze znovu rozsvítit {dark} s; jiný glyf ho nemůže zasáhnout {wary} s. Během lovu omráčení trvají polovinu doby.',
+  'bossJournal.wildheart.zulgar.idolHuntHeroicSummary':
+    'Každých {pair} s označí novou dvojici a každých {switch} s mezi nimi přepíná. Každá změna dá nové Kořisti {turn} s, než ji začne pronásledovat.',
+  'bossJournal.wildheart.zulgar.idolHuntSummary':
+    'Každých {every} s vybere novou Kořist a {turn} s se k ní otáčí, než začne pronásledovat.',
+  'bossJournal.wildheart.zulgar.idolSummary':
+    'Při {health} zdraví zůstane jaguářím duchem až do porážky. Kořistí se může stát i tank.',
+  'bossJournal.wildheart.zulgar.pulseSummaryRework':
+    'Každých {every} s zasáhne kouzlo sesílané {cast} s všechny do {radius} m za {min} až {max} poškození. Probodnutí hráči utrpí {pinMult}násobek tohoto poškození na jakoukoli vzdálenost.',
+  'bossJournal.wildheart.zulgar.spearResponse':
+    'Zaměřte kopí a interagujte do {range} m, abyste je vytáhli za {pull} s. Poškození vytahování nepřeruší. Pokud na terase není nikdo jiný volný, oběť může interagovat a uniknout za {self} s.',
+  'bossJournal.wildheart.zulgar.spearSummary':
+    'Kouzlo sesílané {cast} s probodne hráče kromě tanka, nebo tanka, pokud nikdo jiný nezbývá. Znehybnění trvá až {seconds} s a způsobuje {bleed} poškození každých {tick} s.',
+  'entities.mobs.wildheart_hunting_spear.name': 'Lovecké kopí',
+  'hudChrome.auraEffect.temple.brokenVoice':
+    'Její hlas je zlomený: do konce účinku utrpí o {pct}% více poškození.',
+  'hudChrome.auraEffect.temple.scoreWard':
+    'Zpívá partituru: do konce neutrpí žádné poškození. Vstupte na měsíční dlaždice v pořadí, v jakém zazněly, než skončí sloka, a zlomte její hlas. Střídejte se: po tónu počkejte, až jiný hráč zahraje další správný tón. Jediný přeživší může dokončit sám. Pokud sloka skončí dřív, Nesoulad způsobí všem na nádvoří {min} až {max} mrazivého poškození ({heroicMin} až {heroicMax} na hrdinské obtížnosti).',
+  'hudChrome.auraEffect.temple.spentVoice':
+    'Nemůžete rozeznít další měsíční dlaždici, dokud jiný hráč nezahraje další správný tón. Vstup na dlaždici během účinku nevynuluje odpověď ani vás nezraní. Nelze rozptýlit. Zmizí, když jste jediným živým hráčem ve své instanci nebo partitura skončí.',
+  'hudChrome.auraEffect.wildheart.idolAwake':
+    'Kamenný jaguár je vzhůru. Každých {every} s dýchne na jednu polovinu terasy a pak na druhou po varování na zemi trvajícím {warning} s: {min} až {max} přírodního poškození ({heroicMin} až {heroicMax} na hrdinské obtížnosti) všem v dané polovině. Zulgar zůstává Avatarem jaguára až do smrti a vybírá novou Kořist každých {seconds} s ({heroicSeconds} s na hrdinské obtížnosti).',
+  'hudChrome.auraEffect.wildheart.pinned':
+    'Lovecké kopí vás drží na místě. Krvácíte za {bleed} fyzického poškození ({heroicBleed} na hrdinské obtížnosti) každých {every} s a Pulz Divokého srdce vás zasahuje kdekoli a způsobuje o {pulse}% více poškození. Spoluhráč vytáhne kopí za {pull} s. Pokud není nikdo jiný volný, vytáhněte je sami za {wrench} s. Uvolní vás po {seconds} s.',
+  'hudChrome.auraEffect.wildheart.sunWary':
+    'Do konce účinku ho nemůže zasáhnout žádný sluneční glyf. Rozsvícený glyf, přes který přejde, zůstane svítit.',
+  'hudChrome.auraEffect.wildheart.sunstruck':
+    'Zasažen rozsvíceným slunečním glyfem: pohybuje se o {pct}% pomaleji.',
+  'hudChrome.auraEffect.wildheart.sunstruckExposed':
+    'Zasažen rozsvíceným slunečním glyfem: utrpí o {pct}% více poškození.',
+  'hudChrome.courier.accountBank':
+    'Přinést z této banky. Postava musí být při příchodu kurýra odhlášená.',
+  'hudChrome.courier.accountPlanned':
+    'Naplánováno pro {name}: {count} stohů. Výběr pro jinou postavu je nahradí.',
+  'hudChrome.courier.accountTitle': 'Ostatní postavy',
+  'hudChrome.courier.bagsAccount': 'Poslat do banky postavy {name}',
+  'hudChrome.courier.bagsAccountNone': 'Vyberte postavu, které chcete poslat předměty.',
+  'hudChrome.courier.bagsVault': 'Poslat materiály do trezoru',
+  'hudChrome.courier.boundAccount': 'Na cestě do banky jiné postavy',
+  'hudChrome.courier.boundBank': 'Na cestě do banky',
+  'hudChrome.courier.boundVault': 'Na cestě do trezoru materiálů',
+  'hudChrome.courier.storeTabs': 'Úložiště kurýra',
+  'hudChrome.courier.vault': 'Přinést z trezoru. Každý výběr přinese celý řádek.',
+  'hudChrome.courier.vaultCap': 'Uchová {cap} kusů každého materiálu',
+  'hudChrome.courier.vaultEmpty': 'Váš trezor je prázdný.',
+  'hudChrome.courier.vaultLocked':
+    'Odemkněte trezor materiálů u bankéře, abyste jej mohli používat s kurýrem.',
+  'hudChrome.courier.vaultTitle': 'Trezor materiálů',
+  'hudChrome.dungeonDifficulty.unappliedHeroic':
+    'Vybrána normální obtížnost. Současné instance jsou stále hrdinské.',
+  'hudChrome.dungeonDifficulty.unappliedNormal':
+    'Vybrána hrdinská obtížnost. Současné instance jsou stále normální.',
+  'hudChrome.finder.mech.the_score':
+    'Partitura (dvakrát zazpívá melodii na měsíčních dlaždicích: vstupte na ně v pořadí, v jakém zazněly, a zlomte její hlas)',
+  'hudChrome.itemHistory.close': 'Zavřít',
+  'hudChrome.itemHistory.noTransfers': 'Tento předmět nikdy nezměnil majitele.',
+  'hudChrome.itemHistory.openAria': 'Historie předmětu {item}',
+  'hudChrome.itemHistory.passedTo': 'Předáno postavě {name} dne {date}',
+  'hudChrome.itemHistory.title': '{item}: historie',
+  'hudChrome.itemMenu.itemHistory': 'Historie předmětu',
+  'hudChrome.itemTooltip.lootedBy': 'Ukořistila postava {name} dne {date}',
+  'hudChrome.itemTooltip.obtainedBy': 'Získala postava {name} dne {date}',
+  'hudChrome.itemTooltip.questRewardTo': 'Odměna za úkol pro {name} dne {date}',
+  'hudChrome.kitUse.freeAria': 'Vytáhnout {name}',
+  'hudChrome.kitUse.freeClick': 'Kliknutím sem vytáhnete {name}',
+  'hudChrome.kitUse.freeFar': 'Přibližte se na {range} m pro vytažení',
+  'hudChrome.kitUse.freeKey': 'Vytáhnout {name}',
+  'hudChrome.kitUse.freeLine':
+    'Vytáhněte kopí ze země a osvoboďte jeho oběť. Zásah vás nezastaví; pohyb nebo omráčení ano',
+  'hudChrome.kitUse.freeTap': 'Klepnutím sem vytáhnete {name}',
+  'hudChrome.kitUse.freeUsingLine': 'Při vytahování kopí stůjte: pohyb nebo omráčení vás přeruší',
+  'hudChrome.options.firstPersonBody': 'Zobrazit tělo',
+  'hudChrome.options.firstPersonMode': 'První osoba (maximální přiblížení)',
+  'hudChrome.options.firstPersonNoBody': 'Bez těla',
+  'hudChrome.options.firstPersonOff': 'Vypnuto',
+  'hudChrome.plurals.itemHistoryEarlierHidden.few': '{count} dřívější předání nejsou zobrazena.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.many': '{count} dřívějších předání není zobrazeno.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.one': '{count} dřívější předání není zobrazeno.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.other': '{count} dřívějších předání není zobrazeno.',
+  'hudChrome.reliquary.sourceActivityWeeklyVaultPvp': 'Vybráno z PvP řádku týdenního trezoru',
+  'hudChrome.templeAlert.answerDarkLine':
+    'Střídejte se a opakujte pořadí zpaměti. Před dalším vstupem z dlaždice sestupte. Tóny: {done} z {total}',
+  'hudChrome.templeAlert.answerLine':
+    'Střídejte se: vstupte na měsíční dlaždici označenou {place}. Tóny: {done} z {total}',
+  'hudChrome.templeAlert.answerTitle': 'Odpovězte na partituru!',
+  'hudChrome.templeAlert.brokenLine':
+    'Do konce utrpí o {pct}% více poškození: použijte své nejsilnější útoky',
+  'hudChrome.templeAlert.brokenTitle': 'Hlas Selthe je zlomený!',
+  'hudChrome.templeAlert.falseLine':
+    'Tato dlaždice nebyla na řadě. Odpověď začíná znovu od první dlaždice',
+  'hudChrome.templeAlert.falseTitle': 'Falešný tón!',
+  'hudChrome.templeAlert.melodyDarkLine':
+    'Zapamatujte si pořadí, než dlaždice zhasnou. Opakujte je střídavě s jiným hráčem',
+  'hudChrome.templeAlert.melodyLine':
+    'Sledujte měsíční dlaždice, jak postupně znějí. Opakujte pořadí střídavě s jiným hráčem',
+  'hudChrome.templeAlert.melodyTitle': 'Partitura',
+  'hudChrome.templeAlert.spentLine':
+    'Nemůžete rozeznít dlaždici, dokud jiný hráč nezahraje další správný tón. Tóny: {done} z {total}',
+  'hudChrome.templeAlert.spentTitle': 'Musí odpovědět jiný hlas',
+  'hudChrome.templeAlert.stepOffLine':
+    'Měsíční dlaždice zazní jen při vstupu. Opusťte tuto dlaždici a vstupte na ni znovu',
+  'hudChrome.templeAlert.stepOffTitle': 'Sestupte a vraťte se',
+  'hudChrome.templeAlert.timeAria': 'Zbývá {seconds} sekund',
+  'hudChrome.wildheartAlert.breathLine':
+    'Kamenný jaguár se chystá dýchnout na tuto polovinu terasy. Přejděte do druhé poloviny',
+  'hudChrome.wildheartAlert.breathTitle': 'Dech modly!',
+  'hudChrome.wildheartAlert.glyphLightingLine':
+    'Zůstaňte na glyfu, dokud se nerozsvítí. Sestoupení začne postup znovu',
+  'hudChrome.wildheartAlert.glyphLightingTitle': 'Rozsvěcení slunečního glyfu',
+  'hudChrome.wildheartAlert.glyphLine':
+    'Stůjte na zhasnutém slunečním glyfu {seconds} s a rozsvítíte jej. Když přes něj Zulgar přejde, utrpí o {pct}% více poškození na {duration} s',
+  'hudChrome.wildheartAlert.glyphTitle': 'Rozsviťte sluneční glyfy',
+  'hudChrome.wildheartAlert.pinnedLine':
+    'Spoluhráč musí vytáhnout Lovecké kopí. Pulz Divokého srdce vás zasahuje silněji, když jste probodnutí',
+  'hudChrome.wildheartAlert.pinnedSelfLine':
+    'Nikdo není volný, aby pomohl: vytáhněte Lovecké kopí sami, než zasáhne Pulz Divokého srdce',
+  'hudChrome.wildheartAlert.pinnedTitle': 'Probodnutí!',
+  'hudChrome.wildheartAlert.preyAloneLine':
+    'Nikdo jiný nemůže rozsvítit sluneční glyfy. Stůjte na zhasnutém {seconds} s, abyste jej rozsvítili, a pak přes něj nalákejte Zulgara',
+  'hudChrome.wildheartAlert.spearLine':
+    'Běžte k Loveckému kopí a vytáhněte je, než zasáhne Pulz Divokého srdce',
+  'hudChrome.wildheartAlert.spearTitle': 'Spojenec je probodnutý!',
+  'hudChrome.wildheartAlert.sunstruckLine':
+    'Do konce utrpí o {pct}% více poškození: použijte své nejsilnější útoky',
+  'hudChrome.wildheartAlert.sunstruckTitle': 'Zulgara zasáhlo slunce!',
+  'itemUi.errors.orderTrackedItem': 'Obchodník nepřijímá objednávky na jedinečnou výbavu.',
+
+  'hudChrome.cosmetics.mountsIntro':
+    'Zde vyberte vzhled svého jízdního zvířete. Rychlost určuje jezdecký výcvik. Ponechte předmět zvířete v brašnách nebo bance libovolné postavy a sdílejte jeho vzhled v celém účtu.',
+  'hudChrome.cosmetics.mountsNoMount':
+    'Naučte se jezdit u stájové mistryně Marly, abyste mohli přivolat jízdní zvíře.',
+  'hudChrome.cosmetics.notCollected': 'Nezískáno',
+  'hudChrome.guildHall.mountPreview':
+    'Vzhled jízdního zvířete pro všechny postavy účtu. Rychlost určuje jezdecký výcvik.',
+  'hudChrome.mountTraining.ownedMountPrompt':
+    'Vyberte jízdní zvíře v Kosmetice. K jízdě použijte Nasednout / Sesednout.',
+  'hudChrome.mounts.desc_grag_bear': 'Odolný medvěd s jistým krokem a těžkým sedlem.',
+  'hudChrome.mounts.desc_stalkglider_snail': 'Statný, rozvážný hlemýžď s mechem porostlou ulitou.',
+  'hudChrome.mounts.desc_valorsteed': 'Odolný oř s jistým krokem a koženým sedlem.',
+  'hudChrome.mounts.useToRide':
+    'Použijte k nasazení tohoto vzhledu a přivolání jízdního zvířete. Ponechte předmět v brašnách nebo bance libovolné postavy a sdílejte vzhled v celém účtu. Rychlost určuje jezdecký výcvik.',
+  'itemUi.vendor.advancedRiding': 'Pokročilý jezdecký výcvik',
+  'itemUi.vendor.basicRiding': 'Jezdecký výcvik',
+  'itemUi.vendor.ridingSpeed':
+    'Zvyšuje rychlost pohybu při jízdě o {speed}%. Platí pro všechna jízdní zvířata.',
+  'guide.mountsPage.firstBody':
+    'Marla prodává Otěže Udatného oře za 10 zlatých po naučení jízdy. Držení otěží odemyká vzhled koně v Kosmetice všem postavám účtu. Výcvik již umožňuje přivolat jízdní zvíře bez nošení otěží, takže při změně vzhledu vyberte koně nebo jiný vlastněný vzhled.',
+  'guide.mountsPage.goodsBody':
+    'Sběratelské vzhledy jízdních zvířat zůstávají dostupné v celém účtu, dokud je alespoň jeden odpovídající předmět otěží v brašnách nebo osobní bance libovolné postavy. Obchodování, odeslání poštou, vystavení, prodej nebo jiné odstranění posledního platného předmětu odebere vzhled z Kosmetiky. Jezdec, který jej používá, se vrátí k výchozímu vzhledu koně a zůstane v sedle rychlostí svého výcviku.\n\nOtěže hráčů lze obchodovat, posílat poštou a nabízet na Světovém trhu, pokud předmět neuvádí jinak. Otěže koně lze také prodat obchodníkovi za 10 zlatých. Ostatní otěže si zachovávají vlastní omezení prodeje. Vzhledy z obchodu zůstávají kosmetikou účtu nezávislou na předmětech otěží.',
+  'guide.mountsPage.intro':
+    'Vyberte vzhled jízdního zvířete, naučte se jezdit ve stájích a cestujte světem rychleji. Tempo určuje výcvik; každý vzhled je kosmetický.',
+  'guide.mountsPage.learnBody':
+    'Jízda se odemyká na úrovni {level}. Stájová mistryně Marla Hitchen prodává Jezdecký výcvik za 80 zlatých ve Stájích Vichrného hřebene. Základní výcvik zvyšuje rychlost jízdy o {basicSpeed}%. Po jeho naučení Marla prodává také Pokročilý jezdecký výcvik za {advancedFee} zlatých, který zvyšuje bonus na {advancedSpeed}%. Každý stupeň patří postavě, která se jej naučí.\n\nPo základním výcviku přijměte Marlin úkol Jezdecké lekce a sledujte značku k zářícímu čtverci za startovním obloukem. Stiskněte Začít závod a vypůjčte si cvičného Udatného oře. Dokončete trať a vraťte se pro mince a zkušenosti. Vypůjčený kůň se po skončení lekce vrací do stáje.',
+  'guide.mountsPage.rideBody':
+    'Otevřete Kosmetiku a na kartě Jízdní zvířata vyberte vzhled. Klávesa Nasednout / Sesednout, ve výchozím nastavení obrácený apostrof, přivolá vaše vycvičené jízdní zvíře s tímto vzhledem. Mobilní tlačítko Nasednout funguje stejně. Přivolání vyžaduje krátké soustředění; sesednutí je okamžité. Vzhled můžete změnit i v sedle beze změny rychlosti.\n\nOtěže lze použít také z brašen nebo akční lišty pro výběr vzhledu a přivolání. Použití vzhledu, na kterém již jedete, zvíře odvolá. Otěže v bance nebo u jiné postavy odemykají stejnou kosmetiku, aniž by je jezdec musel nosit.',
+  'guide.mountsPage.speedBody':
+    'Základní jezdecký výcvik zvyšuje rychlost jízdy o {basicSpeed}%. Pokročilý jezdecký výcvik ji zvyšuje o {advancedSpeed}% a stojí u Marly {advancedFee} zlatých. Každý vzhled používá stejnou rychlost podle stupně výcviku postavy, bez ohledu na vzácnost či původ. Také vzhledy z obchodu používají tuto rychlost.',
+  'guide.mountsPage.speedHeading': 'Rychlost jízdy a výcvik',
+  'guide.mountsPage.whatBody':
+    'Jízdní zvířata jsou kosmetické vzhledy pro vaši vycvičenou jízdu. Nedávají zbroj, poškození ani bojové statistiky. Jezdecký výcvik zvyšuje rychlost cestování po zemi a skoky v sedle dosáhnou výše. Všechna jízdní zvířata zůstávají na zemi a žádné neumí plavat.',
+  'guide.progression.ridingBody':
+    'Na úrovni {level} stájová mistryně Marla učí základní jízdu za zlato a poté nabízí pokročilý stupeň. Výcvik určuje rychlost jízdy. Vzhled vyberte v Kosmetice; sběratelské vzhledy jsou sdílené, dokud jejich otěže zůstávají v brašnách nebo bance libovolné postavy.',
 };

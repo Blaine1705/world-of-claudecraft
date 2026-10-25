@@ -3751,7 +3751,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.doesHeader': 'Cosa fa',
   'guide.commandsPage.dungeonMode': 'Passa i tuoi dungeon tra difficoltà normale ed eroica.',
   'guide.commandsPage.dungeonReset':
-    'Abbandona le tue istanze vuote, cosa che si fa dopo aver cambiato difficoltà.',
+    'Abbandona le tue istanze vuote affinché la prossima partita riparta da zero, alla stessa difficoltà o a una nuova.',
   'guide.commandsPage.dungeons':
     'Ogni dungeon con la zona in cui si trova la sua porta e la dimensione di gruppo per cui è pensato, più la difficoltà attualmente impostata.',
   'guide.commandsPage.emotesBody':
@@ -6749,12 +6749,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dungeonDifficulty.resetAlreadyFresh':
     "Le tue istanze sono già nuove. Nessuno vi è entrato dall'ultimo azzeramento.",
   'hudChrome.dungeonDifficulty.resetUsage':
-    'Usa /dungeon reset per abbandonare le istanze vuote dopo aver cambiato difficoltà.',
+    'Usa /dungeon reset per abbandonare le tue istanze vuote e ricominciarle da zero.',
   'hudChrome.dungeonDifficulty.resetLoot':
     "Non puoi reimpostare le istanze mentre c'è ancora del bottino all'interno.",
   'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Reimpostare tutte le istanze?',
   'hudChrome.dungeonDifficulty.resetConfirmBody':
-    'Questo abbandona le istanze vuote della difficoltà selezionata in precedenza. Il bottino non raccolto impedirà la reimpostazione.',
+    'Abbandona le tue istanze vuote affinché la prossima partita riparta da zero alla difficoltà selezionata. I blocchi non cambiano. Chiunque sia ancora dentro, o il bottino non raccolto, impedisce la reimpostazione.',
   'hudChrome.dungeonDifficulty.resetConfirm': 'Reimposta istanze',
   'hudChrome.dungeonDifficulty.resetCooldown':
     'Le istanze possono essere reimpostate solo una volta ogni 5 minuti.',
@@ -15415,7 +15415,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Il tuo gruppo ha superato la prova eroica mentre combattevi nelle retrovie o giacevi a terra. Anche il tuo vincolo è stato registrato, quindi la tua parte di Marchi eroici è arrivata qui invece di andare perduta. Usali bene.\n\n- Quartiermastro eroico',
   'guide.dungeonsPage.resetTitle': 'Reimpostare le istanze',
   'guide.dungeonsPage.resetBody':
-    "Se cambiate difficoltà mentre il gruppo tiene ancora sessioni rivendicate, le vecchie rivendicazioni restano un poco prima di decadere da sole. Il capogruppo può lasciarle andare subito: scegliete Azzera tutte le istanze nel menu del proprio ritratto, oppure digitate /dungeon reset. Un azzeramento funziona solo dopo che la difficoltà è stata davvero cambiata, solo finché nessuno, vivo o caduto, resta all'interno, solo una volta che ogni cadavere là dentro è stato saccheggiato del tutto, e un breve tempo di recupero separa un azzeramento dal successivo. Arrivate alla porta con la difficoltà sbagliata e il gioco ve lo dice prima che la sessione inizi. L'incursione non si azzera mai così; valgono le sue regole di blocco.",
+    "Le partite riservate vuote restano per un po' prima di scomparire da sole. Il capogruppo può abbandonarle subito: scegli Reimposta tutte le istanze nel menu del proprio ritratto oppure digita /dungeon reset. La prossima partita riparte da zero alla difficoltà attuale. Cambiare difficoltà fa lo stesso per le partite della difficoltà precedente. Si può reimpostare solo quando nessuno, vivo o morto, resta dentro e ogni cadavere è stato depredato completamente. Non si accorcia mai un blocco: una spedizione eroica o incursione bloccata resta tale fino al suo azzeramento. Un breve recupero separa le reimpostazioni. Se arrivi alla porta con la difficoltà sbagliata, il gioco ti avvisa prima di iniziare. Le incursioni si reimpostano allo stesso modo, mantenendo le regole di blocco e ritorno al cadavere. Cambiare difficoltà di incursione salta il recupero: chi ha scelto male o fallito in Eroica può tornare subito indietro, perché il blocco stesso limita le ripetizioni.",
   'guide.dungeonsPage.wildheartBody':
     'Una caldera di giungla battuta dalla pioggia, dove due sentieri di caccia rialzati circondano un cenote di giada. Attraversa tane di bestie e rovine ataviche, poi sali la piramide rituale per scoprire chi ti aspetta in cima.',
   'guide.gear.itemLevelBody':
@@ -21616,7 +21616,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Gli oggetti restituiti possono superare la capienza delle borse piene. Dopo la consegna il corriere scompare finché non viene evocato di nuovo.',
   'hudChrome.courier.close': 'Chiudi corriere',
   'hudChrome.courier.instructions':
-    'Seleziona pile intere. Il corriere prima le deposita, poi ritira gli oggetti richiesti. Gli oggetti di missione non possono essere inviati.',
+    'Seleziona pile intere per la tua banca, il Caveau dei Materiali o un altro personaggio. Il corriere le deposita prima, poi ritira gli oggetti richiesti. Gli oggetti di missione non possono essere inviati.',
   'hudChrome.courier.membership': "Rinnova l'abbonamento per iniziare un altro viaggio.",
   'hudChrome.courier.outbound': 'In volo verso la banca',
   'hudChrome.courier.ready': 'Pronto per una consegna',
@@ -25894,4 +25894,206 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Impulso del Cuore Selvaggio colpisce chi resta nell'anello. Sbranamento è un forte colpo singolo: cura completamente la Preda.",
   'bossJournal.wildheart.zulgar.tipTank':
     'Mantieni terreno libero dietro di te per Ruggito del Giaguaro. Quando termina la caccia torna da te: preparati a riprenderlo.',
+
+  'abilityUi.cast.kituse_wildheart_pull_spear': 'Estrarre la lancia',
+  'abilityUi.cast.temple_score': 'Lo spartito',
+  'abilityUi.cast.temple_score_answer': 'Rispondere allo spartito',
+  'abilityUi.cast.wildheart_idols_breath': "Soffio dell'Idolo",
+  'abilityUi.cast.wildheart_sun_glyph_cold': 'Raffreddamento',
+  'abilityUi.cast.wildheart_sun_glyph_kindle': 'Accensione',
+  'abilityUi.cast.wildheart_zulgar_hunting_spear': 'Lancia da Caccia',
+  'abilityUi.cast.wildheart_zulgar_idol_wakes': "L'Idolo si Risveglia",
+  'bossJournal.temple.selthe.boltResponseRework':
+    "Mantieni il tank nella sua linea di vista. Conserva le interruzioni per Aria dell'Annegamento.",
+  'bossJournal.temple.selthe.boltSummaryRework':
+    "Tra gli altri lanci, un dardo colpisce ogni {every} s dopo un avviso visivo di {windup} s, infliggendo {mult} volte il danno della sua arma come danno da Gelo. Interrompere Aria dell'Annegamento ferma dardi e aria per {quiet} s.",
+  'bossJournal.temple.selthe.overviewRework':
+    "Selthe non si muove né attacca in mischia. Raggruppatevi per Coro, allontanati dal gruppo per Assolo, interrompi Aria dell'Annegamento e schiva Ondata dello Stagno. A due soglie di salute, ripetete la melodia delle piastrelle lunari alternando i cantanti.",
+  'bossJournal.temple.selthe.phaseSummaryRework':
+    "Gli altri attacchi si fermano mentre il gruppo risponde allo spartito. I Dardi d'Acqua Lunare non hanno barra di lancio e non possono essere interrotti.",
+  'bossJournal.temple.selthe.scoreHeroic':
+    'Durante la risposta, le piastrelle si spengono. Ricorda la melodia e alternatevi.',
+  'bossJournal.temple.selthe.scoreResponse':
+    'Osserva la melodia, poi sali sulle piastrelle in ordine. Alterna le note corrette con un altro giocatore vivo; un unico superstite può finire da solo. I passi bloccati sono innocui. Scendi e risali per far suonare una piastrella, anche se la occupavi già prima della risposta.',
+  'bossJournal.temple.selthe.scoreSummary':
+    'A {first} e {second} di salute, diventa immune e suona {notes}, poi {finalNotes} note. Ripetetele entro {answer}, poi {finalAnswer} s. Una piastrella errata infligge {falseNote} danni da Gelo e azzera i progressi, ma non il tempo. Allo scadere, tutti subiscono da {min} a {max} danni da Gelo. Il successo la stordisce per {stun} s e aumenta i danni subiti di {vulnerability} per {bonusSeconds} s.',
+  'bossJournal.temple.selthe.tipHealerRework':
+    "Controlla il bersaglio dell'aria e chi resta solo durante Coro. Durante lo spartito, aiuta a cantare la nota successiva e cura gli errori.",
+  'bossJournal.wildheart.zulgar.breathResponse':
+    "Passa alla metà non contrassegnata prima che finisca l'avviso. La linea centrale è sicura. In Eroica, il soffio spegne anche i glifi accesi nella sua metà; possono essere riaccesi subito.",
+  'bossJournal.wildheart.zulgar.breathSummary':
+    'Ogni {every} s, metà della terrazza viene contrassegnata per {warning} s, poi tutti in quella metà subiscono da {min} a {max} danni da Natura. I soffi alternano le metà.',
+  'bossJournal.wildheart.zulgar.glyphResponseRework':
+    'I giocatori non contrassegnati accendono i glifi davanti alla Preda. Attiralo attraverso i glifi, poi attacca durante il effetto Colpito dal Sole. I glifi si spengono alla fine della caccia.',
+  'bossJournal.wildheart.zulgar.glyphSummaryRework':
+    'I {count} glifi iniziano spenti. Durante la caccia, un giocatore non contrassegnato ne accende uno restando sopra per {kindle} s. Se non ne resta nessuno, la Preda può accenderlo in {alone} s. Allontanarsi azzera i progressi. Attraversare un glifo acceso lo rallenta di {slow} e aumenta i danni subiti di {vulnerability} per {seconds} s. Il glifo non può essere riacceso per {dark} s; nessun altro glifo può colpirlo per {wary} s. Durante la caccia, gli stordimenti durano la metà.',
+  'bossJournal.wildheart.zulgar.idolHuntHeroicSummary':
+    "Contrassegna una nuova coppia ogni {pair} s e alterna i due bersagli ogni {switch} s. Ogni cambio concede alla nuova Preda {turn} s prima dell'inseguimento.",
+  'bossJournal.wildheart.zulgar.idolHuntSummary':
+    'Sceglie una nuova Preda ogni {every} s, poi si gira verso di lei per {turn} s prima di inseguirla.',
+  'bossJournal.wildheart.zulgar.idolSummary':
+    'A {health} di salute, rimane uno spirito di giaguaro fino alla sconfitta. Anche il tank può diventare Preda.',
+  'bossJournal.wildheart.zulgar.pulseSummaryRework':
+    'Ogni {every} s, un lancio di {cast} s colpisce tutti entro {radius} m per {min} a {max} danni. I giocatori impalati subiscono {pinMult} volte questi danni a qualsiasi distanza.',
+  'bossJournal.wildheart.zulgar.spearResponse':
+    "Seleziona la lancia e interagisci entro {range} m per estrarla in {pull} s. I danni non interrompono l'estrazione. Se nessun altro è libero sulla terrazza, la vittima può interagire per liberarsi in {self} s.",
+  'bossJournal.wildheart.zulgar.spearSummary':
+    "Un lancio di {cast} s impala un giocatore diverso dal tank, oppure il tank se non resta nessun altro. L'immobilizzazione dura fino a {seconds} s e infligge {bleed} danni ogni {tick} s.",
+  'entities.mobs.wildheart_hunting_spear.name': 'Lancia da Caccia',
+  'hudChrome.auraEffect.temple.brokenVoice':
+    "La sua voce è spezzata: subisce il {pct}% di danni in più fino alla fine dell'effetto.",
+  'hudChrome.auraEffect.temple.scoreWard':
+    "Canta lo spartito: non subisce danni finché non termina. Sali sulle piastrelle lunari nell'ordine in cui hanno suonato prima della fine del verso per spezzarle la voce. Alternatevi: dopo una nota, aspetta che un altro giocatore suoni la successiva nota corretta. Un unico superstite può finire da solo. Se il verso finisce prima, Discordia infligge da {min} a {max} danni da Gelo ({heroicMin} a {heroicMax} in Eroica) a tutti nella corte.",
+  'hudChrome.auraEffect.temple.spentVoice':
+    "Non puoi far suonare un'altra piastrella lunare finché un altro giocatore non suona la successiva nota corretta. Salire su una piastrella durante l'effetto non azzera la risposta e non ti ferisce. Non può essere dissolto. Rimosso quando sei l'unico giocatore vivo nella tua istanza o termina lo spartito.",
+  'hudChrome.auraEffect.wildheart.idolAwake':
+    "Il giaguaro di pietra è sveglio. Ogni {every} s soffia su una metà della terrazza, poi sull'altra, dopo un avviso a terra di {warning} s: da {min} a {max} danni da Natura ({heroicMin} a {heroicMax} in Eroica) a tutti in quella metà. Zulgar resta l'Avatar del Giaguaro fino alla morte e sceglie una nuova Preda ogni {seconds} s ({heroicSeconds} s in Eroica).",
+  'hudChrome.auraEffect.wildheart.pinned':
+    'Una Lancia da Caccia ti immobilizza. Sanguini per {bleed} danni fisici ({heroicBleed} in Eroica) ogni {every} s e Impulso del Cuore Selvaggio ti colpisce ovunque con il {pulse}% di danni in più. Un alleato può estrarre la lancia in {pull} s. Se nessun altro è libero, estraila da solo in {wrench} s. Si stacca dopo {seconds} s.',
+  'hudChrome.auraEffect.wildheart.sunWary':
+    "Nessun glifo solare può colpirlo fino alla fine dell'effetto. Un glifo acceso che attraversa resta acceso.",
+  'hudChrome.auraEffect.wildheart.sunstruck':
+    'Colpito da un glifo solare acceso: si muove il {pct}% più lentamente.',
+  'hudChrome.auraEffect.wildheart.sunstruckExposed':
+    'Colpito da un glifo solare acceso: subisce il {pct}% di danni in più.',
+  'hudChrome.courier.accountBank':
+    'Preleva da questa banca. Quel personaggio deve essere disconnesso quando arriva il corriere.',
+  'hudChrome.courier.accountPlanned':
+    'Previsto per {name}: {count} pile. Scegliere un altro personaggio le sostituisce.',
+  'hudChrome.courier.accountTitle': 'Altri personaggi',
+  'hudChrome.courier.bagsAccount': 'Invia alla banca di {name}',
+  'hudChrome.courier.bagsAccountNone': 'Scegli un personaggio a cui inviare oggetti.',
+  'hudChrome.courier.bagsVault': 'Invia materiali al caveau',
+  'hudChrome.courier.boundAccount': 'In viaggio verso la banca di un altro personaggio',
+  'hudChrome.courier.boundBank': 'In viaggio verso la banca',
+  'hudChrome.courier.boundVault': 'In viaggio verso il Caveau dei Materiali',
+  'hudChrome.courier.storeTabs': 'Magazzino del corriere',
+  'hudChrome.courier.vault': "Preleva dal caveau. Ogni selezione riporta l'intera riga.",
+  'hudChrome.courier.vaultCap': 'Contiene {cap} unità di ciascun materiale',
+  'hudChrome.courier.vaultEmpty': 'Il tuo caveau è vuoto.',
+  'hudChrome.courier.vaultLocked':
+    'Sblocca il Caveau dei Materiali da un banchiere per usarlo con il corriere.',
+  'hudChrome.courier.vaultTitle': 'Caveau dei Materiali',
+  'hudChrome.dungeonDifficulty.unappliedHeroic':
+    'Normale selezionata. Le istanze attuali sono ancora Eroiche.',
+  'hudChrome.dungeonDifficulty.unappliedNormal':
+    'Eroica selezionata. Le istanze attuali sono ancora Normali.',
+  'hudChrome.finder.mech.the_score':
+    "Lo spartito (canta due volte una melodia sulle piastrelle lunari: sali su di esse nell'ordine in cui hanno suonato per spezzarle la voce)",
+  'hudChrome.itemHistory.close': 'Chiudi',
+  'hudChrome.itemHistory.noTransfers': 'Questo oggetto non ha mai cambiato proprietario.',
+  'hudChrome.itemHistory.openAria': 'Cronologia di {item}',
+  'hudChrome.itemHistory.passedTo': 'Passato a {name} il {date}',
+  'hudChrome.itemHistory.title': '{item}: cronologia',
+  'hudChrome.itemMenu.itemHistory': "Cronologia dell'oggetto",
+  'hudChrome.itemTooltip.lootedBy': 'Depredato da {name} il {date}',
+  'hudChrome.itemTooltip.obtainedBy': 'Ottenuto da {name} il {date}',
+  'hudChrome.itemTooltip.questRewardTo': 'Ricompensa di missione per {name} il {date}',
+  'hudChrome.kitUse.freeAria': 'Estrai {name}',
+  'hudChrome.kitUse.freeClick': 'Fai clic qui per estrarre {name}',
+  'hudChrome.kitUse.freeFar': 'Avvicinati entro {range} m per estrarla',
+  'hudChrome.kitUse.freeKey': 'Estrai {name}',
+  'hudChrome.kitUse.freeLine':
+    'Estrai la lancia dal terreno per liberare chi immobilizza. Subire danni non ti ferma; muoversi o essere storditi sì',
+  'hudChrome.kitUse.freeTap': 'Tocca qui per estrarre {name}',
+  'hudChrome.kitUse.freeUsingLine':
+    'Resta fermo per estrarre la lancia: muoverti o uno stordimento ti interrompono',
+  'hudChrome.options.firstPersonBody': 'Mostra corpo',
+  'hudChrome.options.firstPersonMode': 'Prima persona (zoom massimo)',
+  'hudChrome.options.firstPersonNoBody': 'Senza corpo',
+  'hudChrome.options.firstPersonOff': 'Disattivata',
+  'hudChrome.plurals.itemHistoryEarlierHidden.few':
+    '{count} trasferimenti precedenti non sono mostrati.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.many':
+    '{count} trasferimenti precedenti non sono mostrati.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.one':
+    '{count} trasferimento precedente non è mostrato.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.other':
+    '{count} trasferimenti precedenti non sono mostrati.',
+  'hudChrome.reliquary.sourceActivityWeeklyVaultPvp':
+    'Scelto dalla riga PvP del Forziere Settimanale',
+  'hudChrome.templeAlert.answerDarkLine':
+    "Alternatevi e ripetete l'ordine a memoria. Scendi prima di risalire sulla stessa piastrella. Note: {done} di {total}",
+  'hudChrome.templeAlert.answerLine':
+    'Alternatevi: sali sulla piastrella lunare contrassegnata con {place}. Note: {done} di {total}',
+  'hudChrome.templeAlert.answerTitle': 'Rispondi allo spartito!',
+  'hudChrome.templeAlert.brokenLine':
+    'Subisce il {pct}% di danni in più fino alla fine: usa ora i tuoi attacchi più potenti',
+  'hudChrome.templeAlert.brokenTitle': 'La voce di Selthe è spezzata!',
+  'hudChrome.templeAlert.falseLine':
+    'Quella piastrella era fuori turno. La risposta ricomincia dalla prima piastrella',
+  'hudChrome.templeAlert.falseTitle': 'Nota falsa!',
+  'hudChrome.templeAlert.melodyDarkLine':
+    "Ricorda l'ordine prima che le piastrelle si spengano. Ripetilo alternandoti con un altro giocatore",
+  'hudChrome.templeAlert.melodyLine':
+    "Osserva le piastrelle lunari suonare una dopo l'altra. Ripeti l'ordine alternandoti con un altro giocatore",
+  'hudChrome.templeAlert.melodyTitle': 'Lo spartito',
+  'hudChrome.templeAlert.spentLine':
+    'Non puoi far suonare una piastrella finché un altro giocatore non suona la prossima nota corretta. Note: {done} di {total}',
+  'hudChrome.templeAlert.spentTitle': "Deve rispondere un'altra voce",
+  'hudChrome.templeAlert.stepOffLine':
+    'Una piastrella lunare suona solo quando qualcuno vi sale. Scendi da questa piastrella e risali',
+  'hudChrome.templeAlert.stepOffTitle': 'Scendi e risali',
+  'hudChrome.templeAlert.timeAria': 'Restano {seconds} secondi',
+  'hudChrome.wildheartAlert.breathLine':
+    "Il giaguaro di pietra sta per soffiare su questa metà della terrazza. Passa all'altra metà",
+  'hudChrome.wildheartAlert.breathTitle': "Soffio dell'Idolo!",
+  'hudChrome.wildheartAlert.glyphLightingLine':
+    'Resta sul glifo finché non si accende. Scendere fa ricominciare il processo',
+  'hudChrome.wildheartAlert.glyphLightingTitle': 'Accensione del glifo solare',
+  'hudChrome.wildheartAlert.glyphLine':
+    'Resta su un glifo solare spento per {seconds} s per accenderlo. Quando Zulgar lo attraversa, subisce il {pct}% di danni in più per {duration} s',
+  'hudChrome.wildheartAlert.glyphTitle': 'Accendi i glifi solari',
+  'hudChrome.wildheartAlert.pinnedLine':
+    'Un alleato deve estrarre la Lancia da Caccia. Impulso del Cuore Selvaggio ti colpisce più forte mentre sei impalato',
+  'hudChrome.wildheartAlert.pinnedSelfLine':
+    'Nessuno è libero per aiutarti: estrai la Lancia da Caccia da solo prima di Impulso del Cuore Selvaggio',
+  'hudChrome.wildheartAlert.pinnedTitle': 'Impalato!',
+  'hudChrome.wildheartAlert.preyAloneLine':
+    'Nessun altro può accendere i glifi solari. Resta su uno spento per {seconds} s per accenderlo, poi attira Zulgar attraverso di esso',
+  'hudChrome.wildheartAlert.spearLine':
+    'Corri alla Lancia da Caccia ed estraila prima di Impulso del Cuore Selvaggio',
+  'hudChrome.wildheartAlert.spearTitle': 'Un alleato è impalato!',
+  'hudChrome.wildheartAlert.sunstruckLine':
+    'Subisce il {pct}% di danni in più fino alla fine: usa ora i tuoi attacchi più potenti',
+  'hudChrome.wildheartAlert.sunstruckTitle': 'Zulgar è colpito dal sole!',
+  'itemUi.errors.orderTrackedItem': 'Il Mercante non accetta ordini per equipaggiamento unico.',
+
+  'hudChrome.cosmetics.mountsIntro':
+    "Scegli qui l'aspetto della cavalcatura. L'addestramento di equitazione determina la velocità. Conserva l'oggetto della cavalcatura nelle borse o nella banca di qualsiasi personaggio per condividerne l'aspetto con tutto l'account.",
+  'hudChrome.cosmetics.mountsNoMount':
+    'Impara a cavalcare dalla stalliera Marla per evocare una cavalcatura.',
+  'hudChrome.cosmetics.notCollected': 'Non collezionato',
+  'hudChrome.guildHall.mountPreview':
+    "Aspetto della cavalcatura per tutti i personaggi dell'account. L'addestramento di equitazione determina la velocità.",
+  'hudChrome.mountTraining.ownedMountPrompt':
+    'Scegli la cavalcatura in Cosmetici. Usa Monta / Smonta per cavalcare.',
+  'hudChrome.mounts.desc_grag_bear': 'Un orso robusto dal passo sicuro con una sella pesante.',
+  'hudChrome.mounts.desc_stalkglider_snail':
+    'Una lumaca robusta dal ritmo tranquillo con un guscio muschioso.',
+  'hudChrome.mounts.desc_valorsteed':
+    'Un destriero robusto dal passo sicuro con una sella di cuoio.',
+  'hudChrome.mounts.useToRide':
+    "Usa per indossare questo aspetto ed evocare la cavalcatura. Conserva l'oggetto nelle borse o nella banca di qualsiasi personaggio per condividere l'aspetto con tutto l'account. L'addestramento di equitazione determina la velocità.",
+  'itemUi.vendor.advancedRiding': "Addestramento avanzato all'Equitazione",
+  'itemUi.vendor.basicRiding': "Addestramento all'Equitazione",
+  'itemUi.vendor.ridingSpeed':
+    'Aumenta la velocità di movimento in sella del {speed}%. Si applica a tutte le cavalcature.',
+  'guide.mountsPage.firstBody':
+    "Marla vende le Redini del Destriero del Valore per 10 oro dopo aver imparato a cavalcare. Conservare le redini sblocca l'aspetto del cavallo in Cosmetici per tutti i personaggi dell'account. L'addestramento permette già di evocare una cavalcatura senza portare redini: scegli il cavallo o un altro aspetto posseduto per cambiare look.",
+  'guide.mountsPage.goodsBody':
+    "Gli aspetti di cavalcatura collezionabili restano disponibili per l'account finché almeno un oggetto di redini corrispondente si trova nelle borse o nella banca personale di qualsiasi personaggio. Scambiare, spedire, mettere in vendita, vendere o rimuovere altrimenti l'ultimo oggetto valido rimuove l'aspetto da Cosmetici. Chi lo indossa torna all'aspetto del cavallo predefinito e rimane in sella alla velocità del proprio addestramento.\n\nLe redini dei giocatori possono essere scambiate, spedite e messe in vendita al Mercato Mondiale, salvo diversa indicazione. Le redini del cavallo possono anche essere vendute a un mercante per 10 oro. Le altre redini mantengono le proprie restrizioni di vendita. Gli aspetti di cavalcatura del negozio restano cosmetici dell'account indipendenti dagli oggetti di redini.",
+  'guide.mountsPage.intro':
+    "Scegli un aspetto, impara a cavalcare alle stalle e viaggia più velocemente per il mondo. L'addestramento stabilisce l'andatura; tutti gli aspetti di cavalcatura sono cosmetici.",
+  'guide.mountsPage.learnBody':
+    "L'equitazione si sblocca al livello {level}. La stalliera Marla Hitchen vende Addestramento all'Equitazione per 80 oro alle Stalle di Galecrest. Quello di base aumenta la velocità in sella del {basicSpeed}%. Dopo averlo imparato, Marla vende anche Addestramento avanzato all'Equitazione per {advancedFee} oro, portando il bonus al {advancedSpeed}%. Ogni grado appartiene al personaggio che lo impara.\n\nDopo l'addestramento di base, accetta la missione Lezioni di equitazione di Marla e segui l'indicatore fino al quadrato luminoso dietro l'arco di partenza. Premi Inizia la Corsa per prendere in prestito il Destriero del Valore da addestramento. Completa il percorso e torna per monete ed esperienza. Il cavallo torna alla stalla quando termina la lezione.",
+  'guide.mountsPage.rideBody':
+    "Apri Cosmetici e scegli un aspetto nella scheda Cavalcature. Il tasto Monta / Smonta, l'accento grave per impostazione predefinita, evoca la cavalcatura addestrata con quell'aspetto. Il pulsante Monta su mobile fa lo stesso. L'evocazione richiede una breve canalizzazione; scendere è istantaneo. Puoi cambiare aspetto in sella senza cambiare velocità.\n\nPuoi anche usare redini dalle borse o da una barra azione per selezionare l'aspetto ed evocare. Usare l'aspetto che stai già cavalcando ripone la cavalcatura. Le redini in banca o su un altro personaggio sbloccano lo stesso cosmetico senza dover essere portate dal cavaliere.",
+  'guide.mountsPage.speedBody':
+    "L'Addestramento all'Equitazione di base aumenta la velocità in sella del {basicSpeed}%. Quello avanzato aumenta la velocità del {advancedSpeed}% e costa {advancedFee} oro da Marla. Ogni aspetto usa la stessa velocità in base al grado di addestramento del personaggio, indipendentemente da rarità o origine. Anche gli aspetti del negozio usano quella velocità.",
+  'guide.mountsPage.speedHeading': 'Velocità e addestramento di equitazione',
+  'guide.mountsPage.whatBody':
+    "Le cavalcature sono aspetti cosmetici per la tua cavalcatura addestrata. Non concedono armatura, danni né statistiche di combattimento. L'addestramento aumenta la velocità a terra e i salti in sella raggiungono altezze maggiori. Tutte le cavalcature restano a terra e nessuna può nuotare.",
+  'guide.progression.ridingBody':
+    "Al livello {level}, la stalliera Marla insegna l'equitazione di base in cambio di oro e offre poi un grado avanzato. L'addestramento determina la velocità in sella. Scegli l'aspetto in Cosmetici; gli aspetti collezionabili sono condivisi finché le redini restano nelle borse o nella banca di qualsiasi personaggio.",
 };

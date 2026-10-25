@@ -3550,12 +3550,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dungeonDifficulty.resetAlreadyFresh':
     '인스턴스가 이미 초기화된 상태입니다. 마지막 초기화 이후 아무도 입장하지 않았습니다.',
   'hudChrome.dungeonDifficulty.resetUsage':
-    '난이도를 변경한 후 /dungeon reset 으로 빈 인스턴스를 포기할 수 있습니다.',
+    '/dungeon reset 으로 빈 인스턴스를 포기하고 새로 시작하세요.',
   'hudChrome.dungeonDifficulty.resetLoot':
     '안에 전리품이 남아 있으면 인스턴스를 초기화할 수 없습니다.',
   'hudChrome.dungeonDifficulty.resetConfirmTitle': '모든 인스턴스를 초기화할까요?',
   'hudChrome.dungeonDifficulty.resetConfirmBody':
-    '이전에 선택한 난이도의 빈 인스턴스를 포기합니다. 획득하지 않은 전리품이 있으면 초기화할 수 없습니다.',
+    '빈 인스턴스를 포기하여 다음 도전을 선택한 난이도로 새로 시작합니다. 귀속은 바뀌지 않습니다. 안에 누군가 남아 있거나 획득하지 않은 전리품이 있으면 초기화할 수 없습니다.',
   'hudChrome.dungeonDifficulty.resetConfirm': '인스턴스 초기화',
   'hudChrome.dungeonDifficulty.resetCooldown': '인스턴스는 5분마다 한 번만 초기화할 수 있습니다.',
   'hudChrome.dungeonDifficulty.entryMismatchNormal':
@@ -9810,7 +9810,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '습지 길에서 벗어난 곳에 가라앉은 신전으로, 호기심 많고 만반의 준비를 갖춘 이들을 위한 샛길입니다.',
   'guide.dungeonsPage.sanctumName': '무덤비룡 성소',
   'guide.dungeonsPage.resetBody':
-    "파티가 아직 차지한 여정을 쥐고 있는 동안 난이도를 바꾸면, 예전 차지가 잠시 남았다가 저절로 풀립니다. 파티장은 대신 한꺼번에 놓아 줄 수 있습니다. 자기 초상화 메뉴에서 '모든 인스턴스 초기화'를 고르거나 /dungeon reset 을 입력하세요. 초기화는 난이도가 실제로 바뀐 뒤에만, 산 자든 쓰러진 자든 안에 아무도 남지 않은 동안에만, 그리고 안의 모든 시신을 남김없이 챙긴 뒤에만 작동하며, 초기화 사이에는 짧은 재사용 대기시간이 있습니다. 잘못된 난이도로 문에 이르면 여정이 시작되기 전에 게임이 알려 줍니다. 공격대는 이런 식으로 초기화되는 일이 결코 없으며, 그 자신의 잠금 규칙이 적용됩니다.",
+    '확보한 빈 인스턴스는 잠시 남았다가 저절로 해제됩니다. 파티장은 자기 초상화 메뉴에서 모든 인스턴스 초기화를 선택하거나 /dungeon reset 을 입력해 즉시 해제할 수 있습니다. 다음 도전은 현재 난이도로 새로 시작합니다. 난이도를 바꾸면 이전 난이도의 인스턴스도 해제됩니다. 초기화하려면 살아 있든 쓰러졌든 안에 아무도 남지 않아야 하며 모든 시신의 전리품을 빠짐없이 획득해야 합니다. 귀속 시간은 절대 줄어들지 않습니다. 귀속된 영웅 던전이나 공격대는 귀속 초기화까지 계속 잠겨 있으며 초기화 사이에는 짧은 재사용 대기시간이 있습니다. 잘못된 난이도로 입구에 도착하면 도전 전에 안내합니다. 공격대도 같은 방식으로 초기화되며 자체 귀속 및 시신 복귀 규칙은 그대로 적용됩니다. 공격대 난이도를 바꿀 때는 재사용 대기시간이 없어 난이도를 잘못 골랐거나 영웅 난이도에서 막혔다면 즉시 되돌릴 수 있습니다. 반복 도전은 공격대 자체 귀속으로 제한됩니다.',
   'guide.dungeonsPage.resetTitle': '인스턴스 초기화',
   'guide.dungeonsPage.sanctumBody':
     '가시봉우리 높은 곳에 숨겨진 빙하. 한 마리 용이 얼음 속에 갇혀 있고, 교단은 훔친 영혼을 불태워 그 얼음을 녹이고 있다. 높은 고개에서 얼음 탑과 대장장이의 끊어진 사슬, 교단의 불길을 지나 빙하 발치의 얼어붙은 호수까지 내려간다.',
@@ -17740,7 +17740,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.doesHeader': '하는 일',
   'guide.commandsPage.dungeonMode': '던전 난이도를 일반과 영웅 사이에서 전환합니다.',
   'guide.commandsPage.dungeonReset':
-    '비어 있는 자신의 인스턴스를 버립니다. 난이도를 바꾼 뒤에 하는 일입니다.',
+    '자신의 빈 인스턴스를 포기하여 다음 도전을 같은 난이도 또는 새 난이도로 처음부터 시작합니다.',
   'guide.commandsPage.dungeons':
     '모든 던전을 그 문이 있는 지역과 설계된 파티 인원과 함께 보여 주고, 지금 설정된 난이도도 알려 줍니다.',
   'guide.commandsPage.emotesBody':
@@ -25388,4 +25388,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '다른 플레이어가 다음 올바른 음을 울릴 때까지 타일을 울릴 수 없습니다. 진행: {total}개 중 {done}개',
   'hudChrome.auraEffect.temple.spentVoice':
     '다른 플레이어가 다음 올바른 음을 울릴 때까지 달 타일을 울릴 수 없습니다. 이 동안 타일을 밟아도 답이 초기화되거나 피해를 받지 않습니다. 해제할 수 없습니다. 같은 인스턴스에 살아 있는 플레이어가 자신뿐이거나 악보가 끝나면 사라집니다.',
+  'hudChrome.options.firstPersonBody': '몸 표시',
+  'hudChrome.options.firstPersonNoBody': '몸 숨기기',
+  'hudChrome.options.firstPersonOff': '끄기',
 };

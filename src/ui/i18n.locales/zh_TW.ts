@@ -1995,7 +1995,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.courier.select': '選擇{item}，{count}',
   'hudChrome.courier.selectedItem': '取消選擇{item}，{count}',
   'hudChrome.courier.instructions':
-    '請為你的銀行、倉庫或其他角色選擇整組物品。信使會先存入物品，再取出您指定的物品。任務物品無法寄送。',
+    '為你的銀行、倉庫或其他角色選擇整組物品。信使會先存入物品，再取出你指定的物品。任務物品無法寄送。',
   'hudChrome.courier.membership': '續訂會員後即可開始新的配送。',
   'hudChrome.courier.unavailable': '召喚信使以安排配送。',
   'hudChrome.courier.bagsVault': '將材料送入倉庫',
@@ -5072,12 +5072,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '切換地城難度後才能重置這些副本。空置的地城副本會在5分鐘後自動重置。',
   'hudChrome.dungeonDifficulty.resetAlreadyFresh':
     '你的副本已經是全新的。自上次重置以來沒有人進入過。',
-  'hudChrome.dungeonDifficulty.resetUsage':
-    '切換難度後，使用 /dungeon reset 放棄你的空置地城副本。',
+  'hudChrome.dungeonDifficulty.resetUsage': '使用 /dungeon reset 放棄你的空置副本並重新開始。',
   'hudChrome.dungeonDifficulty.resetLoot': '地城副本內仍有戰利品時無法重置。',
   'hudChrome.dungeonDifficulty.resetConfirmTitle': '重置所有地城副本？',
   'hudChrome.dungeonDifficulty.resetConfirmBody':
-    '此操作會放棄先前所選難度下的空置副本。若有未拾取的戰利品，則無法重置。',
+    '此操作會放棄你的空置副本，讓下一次挑戰以所選難度重新開始。鎖定不會改變。若仍有人在裡面，或有未拾取的戰利品，則無法重置。',
   'hudChrome.dungeonDifficulty.resetConfirm': '重置副本',
   'hudChrome.dungeonDifficulty.resetCooldown': '每5分鐘只能重置一次副本。',
   'hudChrome.dungeonDifficulty.entryMismatchNormal':
@@ -11096,7 +11095,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.templeBody': '沼澤大道旁一座沉沒的神龕，是為好奇且準備充分者預備的支線之路。',
   'guide.dungeonsPage.sanctumName': '墓龍聖所',
   'guide.dungeonsPage.resetBody':
-    '在隊伍仍佔用著副本時切換難度，舊的佔用會滯留一陣，然後自行釋放。隊長也可以讓它們一次性釋放：在自己的頭像選單中選擇「重置所有副本」，或輸入 /dungeon reset。重置只有在難度確實更改之後才生效，只有在裡面不再有任何人（無論活著還是倒下）時才生效，只有在裡面每具屍體都被拾取乾淨之後才生效，而且兩次重置之間隔著一段短暫的冷卻。若你們帶著錯誤的難度來到門口，遊戲會在副本開始前告知。團隊副本從不以這種方式重置；適用的是它自己的鎖定規則。',
+    '已佔用的空置副本會保留一段時間，然後自行釋放。隊長也可以立即釋放它們：在自己的頭像選單中選擇「重置所有副本」，或輸入 /dungeon reset，下一次挑戰就會以目前難度重新開始。切換難度也會釋放舊難度的副本。重置要求裡面沒有任何人，無論活著還是倒下，並且所有屍體上的戰利品都已拾取乾淨。重置絕不會縮短鎖定時間：已鎖定的英雄副本或團隊副本仍須等到鎖定重置，而且兩次重置之間有短暫冷卻。若到達入口時難度不符，遊戲會在挑戰開始前告知。團隊副本也以同樣方式重置，其自身的鎖定和屍體返回規則仍然適用；團隊副本切換難度時沒有冷卻，因此選錯難度或無法通過英雄難度的團隊可以立即切換回來，重複挑戰仍由其自身的鎖定限制。',
   'guide.dungeonsPage.resetTitle': '重置你的地城副本',
   'guide.dungeonsPage.sanctumBody':
     '隱藏在棘峰高處的一座冰川，一條巨龍被封凍在冰中，邪教正焚燒竊取的靈魂將它解凍。從高山隘口一路下行，穿過冰塔、鐵匠斷裂的鎖鏈與邪教的火堆，直到冰川腳下的冰封湖面。',
@@ -18597,7 +18596,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.dnd': '請勿打擾：與離開類似，只是送給你的密語會被留住而不會送達。',
   'guide.commandsPage.doesHeader': '它的作用',
   'guide.commandsPage.dungeonMode': '在普通與英雄難度之間切換你的地城。',
-  'guide.commandsPage.dungeonReset': '放棄你自己那些空無一人的副本，這正是你切換難度之後該做的事。',
+  'guide.commandsPage.dungeonReset': '放棄你自己的空置副本，讓下一次挑戰以相同或新的難度重新開始。',
   'guide.commandsPage.dungeons':
     '每一座地城，附上其入口所在的區域與它所設計的隊伍人數，以及你目前設定的難度。',
   'guide.commandsPage.emotesBody':
@@ -24092,4 +24091,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '另一名玩家奏響下一個正確音符前，你無法奏響地磚。已奏響：{done}/{total}',
   'hudChrome.auraEffect.temple.spentVoice':
     '另一名玩家奏響下一個正確音符前，你無法奏響月亮地磚。在此期間踩上地磚不會重置應答，也不會對你造成傷害。無法驅散。當你成為同一副本內唯一存活的玩家或樂譜結束時移除。',
+  'hudChrome.options.firstPersonBody': '顯示身體',
+  'hudChrome.options.firstPersonNoBody': '不顯示身體',
+  'hudChrome.options.firstPersonOff': '關閉',
 };

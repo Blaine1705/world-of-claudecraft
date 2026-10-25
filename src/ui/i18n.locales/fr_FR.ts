@@ -3812,7 +3812,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.doesHeader': "Ce qu'elle fait",
   'guide.commandsPage.dungeonMode': 'Basculez vos donjons entre la difficulté normale et héroïque.',
   'guide.commandsPage.dungeonReset':
-    'Abandonnez vos propres instances vides, ce que vous faites après avoir changé de difficulté.',
+    'Abandonnez vos instances vides pour recommencer à neuf, à la même difficulté ou à une nouvelle.',
   'guide.commandsPage.dungeons':
     'Chaque donjon avec la zone où se trouve sa porte et la taille de groupe pour laquelle il est conçu, ainsi que la difficulté actuellement sélectionnée.',
   'guide.commandsPage.emotesBody':
@@ -7272,12 +7272,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.dungeonDifficulty.resetAlreadyFresh':
     "Vos instances sont déjà fraîches. Personne n'y est entré depuis la dernière réinitialisation.",
   'hudChrome.dungeonDifficulty.resetUsage':
-    'Utilisez /dungeon reset pour abandonner vos instances vides après avoir changé la difficulté.',
+    'Utilisez /dungeon reset pour abandonner vos instances vides et les recommencer à neuf.',
   'hudChrome.dungeonDifficulty.resetLoot':
     "Vous ne pouvez pas réinitialiser les instances tant qu'il reste du butin à l'intérieur.",
   'hudChrome.dungeonDifficulty.resetConfirmTitle': 'Réinitialiser toutes les instances ?',
   'hudChrome.dungeonDifficulty.resetConfirmBody':
-    'Cette action abandonne les instances vides de la difficulté précédemment sélectionnée. Tout butin non récupéré empêchera la réinitialisation.',
+    "Cela abandonne vos instances vides pour que la prochaine partie reparte à neuf à la difficulté choisie. Les verrouillages ne changent pas. Tout joueur encore à l'intérieur ou butin non récupéré empêche la réinitialisation.",
   'hudChrome.dungeonDifficulty.resetConfirm': 'Réinitialiser les instances',
   'hudChrome.dungeonDifficulty.resetCooldown':
     'Les instances ne peuvent être réinitialisées qu’une fois toutes les 5 minutes.',
@@ -15726,7 +15726,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Votre groupe a triomphé de l’épreuve héroïque pendant que vous combattiez à l’arrière ou gisiez à terre. Votre verrouillage a tout de même été enregistré, alors votre part de Marques héroïques vous est envoyée ici au lieu d’être perdue. Faites-en bon usage.\n\n- Intendant héroïque',
   'guide.dungeonsPage.resetTitle': 'Réinitialiser vos instances',
   'guide.dungeonsPage.resetBody':
-    "Changez de difficulté pendant que votre groupe détient encore des parcours réservés et les anciennes réservations subsistent un moment avant de se libérer d'elles-mêmes. Le chef de groupe peut les lâcher d'un coup à la place : choisissez Réinitialiser toutes les instances dans le menu de son propre portrait, ou tapez /dungeon reset. Une réinitialisation ne fonctionne qu'après un vrai changement de difficulté, seulement tant que personne, vivant ou tombé, ne reste à l'intérieur, seulement une fois que chaque cadavre là-dedans a été entièrement pillé, et un bref temps de recharge sépare une réinitialisation de la suivante. Arrivez à la porte avec la mauvaise difficulté et le jeu vous le dit avant le départ. Le raid ne se réinitialise jamais ainsi ; ses propres règles de verrou tiennent.",
+    "Les parties réservées vides persistent un moment avant de disparaître seules. Le chef de groupe peut les abandonner immédiatement : choisissez Réinitialiser toutes les instances dans le menu de son propre portrait ou saisissez /dungeon reset. La prochaine partie repart à neuf à votre difficulté actuelle. Changer de difficulté fait de même pour les parties de l'ancienne difficulté. Une réinitialisation n'est possible que si personne, vivant ou mort, ne reste à l'intérieur et si tous les cadavres ont été entièrement pillés. Elle ne raccourcit jamais un verrouillage : un donjon héroïque ou raid verrouillé le reste jusqu'à sa remise à zéro. Un court délai sépare les réinitialisations. Si vous arrivez à la porte avec la mauvaise difficulté, le jeu vous prévient avant le début. Le raid se réinitialise de la même façon, avec ses propres règles de verrouillage et de retour au cadavre. Un raid qui change de difficulté ignore le délai : un groupe qui a choisi le mauvais palier ou échoué en Héroïque peut revenir immédiatement, puisque son verrouillage limite déjà les répétitions.",
   'guide.dungeonsPage.wildheartBody':
     'Une caldeira de jungle détrempée par la pluie où deux sentiers de chasse surélevés encerclent un cénote de jade. Traversez tanières de bêtes et ruines ancestrales, puis gravissez la pyramide rituelle pour voir qui vous attend au sommet.',
   'guide.gear.itemLevelBody':
@@ -21315,7 +21315,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Les objets rapportés débordent des sacs pleins. Le messager disparaît après la livraison jusqu'à sa prochaine invocation.",
   'hudChrome.courier.close': 'Fermer le messager',
   'hudChrome.courier.instructions':
-    "Sélectionnez des piles entières. Votre messager les dépose d'abord, puis récupère les objets demandés. Les objets de quête ne peuvent pas être envoyés.",
+    "Sélectionnez des piles entières pour votre banque, la Réserve de matériaux ou un autre personnage. Votre coursier les dépose d'abord, puis récupère les objets demandés. Les objets de quête ne peuvent pas être envoyés.",
   'hudChrome.courier.membership': 'Renouvelez votre abonnement pour commencer un autre trajet.',
   'hudChrome.courier.outbound': 'En vol vers la banque',
   'hudChrome.courier.ready': 'Prêt pour une livraison',
@@ -26008,4 +26008,207 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'referralCards.waiting': "En attente de l'acceptation de votre ami lié.",
   'referralCards.yourCard': 'Carte de tampons de {name}',
   'worldContent.musterRackName': "Râtelier d'armes du rassemblement",
+
+  'abilityUi.cast.kituse_wildheart_pull_spear': 'Retirer la lance',
+  'abilityUi.cast.temple_score': 'La partition',
+  'abilityUi.cast.temple_score_answer': 'Répondre à la partition',
+  'abilityUi.cast.wildheart_idols_breath': "Souffle de l'idole",
+  'abilityUi.cast.wildheart_sun_glyph_cold': 'Refroidissement',
+  'abilityUi.cast.wildheart_sun_glyph_kindle': 'Allumage',
+  'abilityUi.cast.wildheart_zulgar_hunting_spear': 'Lance de chasse',
+  'abilityUi.cast.wildheart_zulgar_idol_wakes': "L'idole s'éveille",
+  'bossJournal.temple.selthe.boltResponseRework':
+    'Gardez le tank dans sa ligne de vue. Réservez les interruptions à Aria de la noyade.',
+  'bossJournal.temple.selthe.boltSummaryRework':
+    "Entre ses autres incantations, un trait frappe toutes les {every} s après un avertissement visuel de {windup} s, infligeant {mult} fois les dégâts de son arme en dégâts de Givre. Interrompre Aria de la noyade arrête les traits et l'aria pendant {quiet} s.",
+  'bossJournal.temple.selthe.overviewRework':
+    'Selthe ne se déplace jamais et ne frappe pas en mêlée. Regroupez-vous pour Chœur, quittez le groupe pour Solo, interrompez Aria de la noyade et esquivez Déferlement du lac. À deux seuils de vie, répétez sa mélodie sur les dalles lunaires en alternant les chanteurs.',
+  'bossJournal.temple.selthe.phaseSummaryRework':
+    "Ses autres attaques s'arrêtent pendant que le groupe répond à la partition. Les traits d'eau lunaire n'ont pas de barre d'incantation et ne peuvent pas être interrompus.",
+  'bossJournal.temple.selthe.scoreHeroic':
+    "Pendant la réponse, les dalles s'éteignent. Mémorisez la mélodie et jouez à tour de rôle.",
+  'bossJournal.temple.selthe.scoreResponse':
+    "Observez la mélodie, puis marchez sur les dalles dans l'ordre. Alternez les notes justes avec un autre joueur vivant ; un unique survivant peut terminer seul. Les pas bloqués sont sans danger. Quittez une dalle et revenez dessus pour la faire sonner, même si vous l'occupiez avant le début de la réponse.",
+  'bossJournal.temple.selthe.scoreSummary':
+    "À {first} et {second} de vie, elle devient insensible et joue {notes}, puis {finalNotes} notes. Répétez-les en {answer}, puis {finalAnswer} s. Une mauvaise dalle inflige {falseNote} dégâts de Givre et réinitialise la progression, mais pas le temps. À l'expiration du délai, tous subissent {min} à {max} dégâts de Givre. Une réussite l'étourdit pendant {stun} s et augmente les dégâts qu'elle subit de {vulnerability} pendant {bonusSeconds} s.",
+  'bossJournal.temple.selthe.tipHealerRework':
+    "Surveillez la cible de l'aria et les joueurs isolés pendant Chœur. Pendant la partition, aidez à chanter la note suivante et soignez les erreurs.",
+  'bossJournal.wildheart.zulgar.breathResponse':
+    "Passez dans la moitié non marquée avant la fin de l'avertissement. La ligne centrale est sûre. En Héroïque, le souffle éteint aussi les glyphes allumés de sa moitié ; ils peuvent être rallumés immédiatement.",
+  'bossJournal.wildheart.zulgar.breathSummary':
+    "Toutes les {every} s, une moitié de la terrasse est marquée pendant {warning} s, puis tous ceux qui s'y trouvent subissent {min} à {max} dégâts de Nature. Le souffle alterne entre les deux moitiés.",
+  'bossJournal.wildheart.zulgar.glyphResponseRework':
+    "Les joueurs non marqués allument les glyphes devant la Proie. Faites-le passer dessus, puis attaquez pendant l'effet Frappé par le soleil. Les glyphes s'éteignent à la fin de la chasse.",
+  'bossJournal.wildheart.zulgar.glyphSummaryRework':
+    "Les {count} glyphes commencent éteints. Pendant la chasse, un joueur non marqué en allume un en restant dessus {kindle} s. S'il ne reste aucun joueur non marqué, la Proie peut l'allumer en {alone} s. S'éloigner réinitialise la progression. Traverser un glyphe allumé le ralentit de {slow} et augmente les dégâts qu'il subit de {vulnerability} pendant {seconds} s. Le glyphe ne peut pas être rallumé pendant {dark} s ; aucun autre glyphe ne peut le frapper pendant {wary} s. Pendant la chasse, les étourdissements durent moitié moins longtemps.",
+  'bossJournal.wildheart.zulgar.idolHuntHeroicSummary':
+    'Il marque une nouvelle paire toutes les {pair} s et alterne entre les deux toutes les {switch} s. Chaque changement laisse {turn} s à la nouvelle Proie avant la poursuite.',
+  'bossJournal.wildheart.zulgar.idolHuntSummary':
+    'Il choisit une nouvelle Proie toutes les {every} s, puis se tourne vers elle pendant {turn} s avant de la poursuivre.',
+  'bossJournal.wildheart.zulgar.idolSummary':
+    "À {health} de vie, il reste un esprit jaguar jusqu'à sa défaite. Le tank peut aussi devenir la Proie.",
+  'bossJournal.wildheart.zulgar.pulseSummaryRework':
+    'Toutes les {every} s, une incantation de {cast} s frappe tous les joueurs à moins de {radius} m pour {min} à {max} dégâts. Les joueurs empalés subissent {pinMult} fois ces dégâts, quelle que soit la distance.',
+  'bossJournal.wildheart.zulgar.spearResponse':
+    "Ciblez la lance et interagissez à moins de {range} m pour la retirer en {pull} s. Les dégâts n'interrompent pas l'extraction. Si personne d'autre n'est libre sur la terrasse, la victime peut interagir pour se libérer en {self} s.",
+  'bossJournal.wildheart.zulgar.spearSummary':
+    "Une incantation de {cast} s empale un joueur autre que le tank, ou le tank s'il ne reste personne d'autre. L'immobilisation dure jusqu'à {seconds} s et inflige {bleed} dégâts toutes les {tick} s.",
+  'entities.mobs.wildheart_hunting_spear.name': 'Lance de chasse',
+  'hudChrome.auraEffect.temple.brokenVoice':
+    "Sa voix est brisée : elle subit {pct}% de dégâts supplémentaires jusqu'à la fin de cet effet.",
+  'hudChrome.auraEffect.temple.scoreWard':
+    "Elle chante la partition : elle ne subit aucun dégât jusqu'à la fin. Marchez sur les dalles lunaires dans l'ordre où elles ont sonné avant la fin du couplet pour briser sa voix. Jouez à tour de rôle : après une note, attendez qu'un autre joueur joue la prochaine note juste. Un unique survivant peut terminer seul. Si le couplet se termine avant, Discordance inflige {min} à {max} dégâts de Givre ({heroicMin} à {heroicMax} en Héroïque) à tous les joueurs de la cour.",
+  'hudChrome.auraEffect.temple.spentVoice':
+    "Vous ne pouvez pas faire sonner une autre dalle lunaire tant qu'un autre joueur n'a pas joué la prochaine note juste. Marcher sur une dalle pendant cet effet ne réinitialise pas la réponse et ne vous blesse pas. Ne peut pas être dissipé. Prend fin quand vous êtes le seul joueur vivant de votre instance ou que la partition se termine.",
+  'hudChrome.auraEffect.wildheart.idolAwake':
+    "Le jaguar de pierre est éveillé. Toutes les {every} s, il souffle sur une moitié de la terrasse, puis l'autre, après un avertissement au sol de {warning} s : {min} à {max} dégâts de Nature ({heroicMin} à {heroicMax} en Héroïque) à tous les joueurs de cette moitié. Zulgar reste l'Avatar du jaguar jusqu'à sa mort et choisit une nouvelle Proie toutes les {seconds} s ({heroicSeconds} s en Héroïque).",
+  'hudChrome.auraEffect.wildheart.pinned':
+    "Une Lance de chasse vous immobilise. Vous saignez pour {bleed} dégâts physiques ({heroicBleed} en Héroïque) toutes les {every} s et l'Impulsion du Cœur sauvage vous frappe où que vous soyez avec {pulse}% de dégâts supplémentaires. Un allié peut retirer la lance en {pull} s. Si personne d'autre n'est libre, retirez-la vous-même en {wrench} s. Elle se détache après {seconds} s.",
+  'hudChrome.auraEffect.wildheart.sunWary':
+    "Aucun glyphe solaire ne peut le frapper jusqu'à la fin de cet effet. Un glyphe allumé qu'il traverse reste allumé.",
+  'hudChrome.auraEffect.wildheart.sunstruck':
+    'Frappé par un glyphe solaire allumé : se déplace {pct}% moins vite.',
+  'hudChrome.auraEffect.wildheart.sunstruckExposed':
+    'Frappé par un glyphe solaire allumé : subit {pct}% de dégâts supplémentaires.',
+  'hudChrome.courier.accountBank':
+    "Rapporter depuis cette banque. Ce personnage doit être déconnecté à l'arrivée du coursier.",
+  'hudChrome.courier.accountPlanned':
+    'Prévu pour {name} : {count} piles. Choisir un autre personnage les remplace.',
+  'hudChrome.courier.accountTitle': 'Autres personnages',
+  'hudChrome.courier.bagsAccount': 'Envoyer à la banque de {name}',
+  'hudChrome.courier.bagsAccountNone': 'Choisissez un personnage à qui envoyer des objets.',
+  'hudChrome.courier.bagsVault': 'Envoyer les matériaux à la réserve',
+  'hudChrome.courier.boundAccount': "En route vers la banque d'un autre personnage",
+  'hudChrome.courier.boundBank': 'En route vers la banque',
+  'hudChrome.courier.boundVault': 'En route vers la Réserve de matériaux',
+  'hudChrome.courier.storeTabs': 'Stockage du coursier',
+  'hudChrome.courier.vault':
+    'Rapporter depuis la réserve. Chaque sélection rapporte toute la ligne.',
+  'hudChrome.courier.vaultCap': 'Contient {cap} unités de chaque matériau',
+  'hudChrome.courier.vaultEmpty': 'Votre réserve est vide.',
+  'hudChrome.courier.vaultLocked':
+    "Débloquez la Réserve de matériaux auprès d'un banquier pour l'utiliser avec votre coursier.",
+  'hudChrome.courier.vaultTitle': 'Réserve de matériaux',
+  'hudChrome.dungeonDifficulty.unappliedHeroic':
+    'Normal sélectionné. Les instances actuelles restent en Héroïque.',
+  'hudChrome.dungeonDifficulty.unappliedNormal':
+    'Héroïque sélectionné. Les instances actuelles restent en Normal.',
+  'hudChrome.finder.mech.the_score':
+    "La partition (elle chante deux fois une mélodie sur les dalles lunaires : marchez dessus dans l'ordre où elles ont sonné pour briser sa voix)",
+  'hudChrome.itemHistory.close': 'Fermer',
+  'hudChrome.itemHistory.noTransfers': "Cet objet n'a jamais changé de mains.",
+  'hudChrome.itemHistory.openAria': 'Historique de {item}',
+  'hudChrome.itemHistory.passedTo': 'Transmis à {name} le {date}',
+  'hudChrome.itemHistory.title': '{item} : historique',
+  'hudChrome.itemMenu.itemHistory': "Historique de l'objet",
+  'hudChrome.itemTooltip.lootedBy': 'Ramassé par {name} le {date}',
+  'hudChrome.itemTooltip.obtainedBy': 'Obtenu par {name} le {date}',
+  'hudChrome.itemTooltip.questRewardTo': 'Récompense de quête pour {name} le {date}',
+  'hudChrome.kitUse.freeAria': 'Retirer {name}',
+  'hudChrome.kitUse.freeClick': 'Cliquez ici pour retirer {name}',
+  'hudChrome.kitUse.freeFar': 'Approchez à moins de {range} m pour la retirer',
+  'hudChrome.kitUse.freeKey': 'Retirer {name}',
+  'hudChrome.kitUse.freeLine':
+    'Retirez la lance du sol pour libérer sa victime. Les dégâts ne vous arrêtent pas ; un déplacement ou un étourdissement vous interrompt',
+  'hudChrome.kitUse.freeTap': 'Touchez ici pour retirer {name}',
+  'hudChrome.kitUse.freeUsingLine':
+    'Restez immobile pour retirer la lance : un déplacement ou un étourdissement vous interrompt',
+  'hudChrome.options.firstPersonBody': 'Afficher le corps',
+  'hudChrome.options.firstPersonMode': 'Première personne (zoom maximal)',
+  'hudChrome.options.firstPersonNoBody': 'Sans corps',
+  'hudChrome.options.firstPersonOff': 'Désactivé',
+  'hudChrome.plurals.itemHistoryEarlierHidden.few':
+    '{count} transferts antérieurs ne sont pas affichés.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.many':
+    '{count} transferts antérieurs ne sont pas affichés.',
+  'hudChrome.plurals.itemHistoryEarlierHidden.one':
+    "{count} transfert antérieur n'est pas affiché.",
+  'hudChrome.plurals.itemHistoryEarlierHidden.other':
+    '{count} transferts antérieurs ne sont pas affichés.',
+  'hudChrome.reliquary.sourceActivityWeeklyVaultPvp':
+    'Choisi dans la ligne JcJ du coffre hebdomadaire',
+  'hudChrome.templeAlert.answerDarkLine':
+    "Répétez l'ordre de mémoire à tour de rôle. Quittez une dalle avant de revenir dessus. Notes : {done} sur {total}",
+  'hudChrome.templeAlert.answerLine':
+    'À tour de rôle : marchez sur la dalle lunaire marquée {place}. Notes : {done} sur {total}',
+  'hudChrome.templeAlert.answerTitle': 'Répondez à la partition !',
+  'hudChrome.templeAlert.brokenLine':
+    "Elle subit {pct}% de dégâts supplémentaires jusqu'à la fin : utilisez vos attaques les plus puissantes maintenant",
+  'hudChrome.templeAlert.brokenTitle': 'La voix de Selthe est brisée !',
+  'hudChrome.templeAlert.falseLine':
+    "Cette dalle n'était pas la suivante. La réponse reprend à la première dalle",
+  'hudChrome.templeAlert.falseTitle': 'Fausse note !',
+  'hudChrome.templeAlert.melodyDarkLine':
+    "Mémorisez l'ordre avant que les dalles s'éteignent. Répétez-le à tour de rôle avec un autre joueur",
+  'hudChrome.templeAlert.melodyLine':
+    "Regardez les dalles lunaires sonner l'une après l'autre. Répétez l'ordre à tour de rôle avec un autre joueur",
+  'hudChrome.templeAlert.melodyTitle': 'La partition',
+  'hudChrome.templeAlert.spentLine':
+    "Vous ne pouvez pas faire sonner une dalle tant qu'un autre joueur n'a pas joué la prochaine note juste. Notes : {done} sur {total}",
+  'hudChrome.templeAlert.spentTitle': 'Une autre voix doit répondre',
+  'hudChrome.templeAlert.stepOffLine':
+    "Une dalle lunaire ne sonne que lorsque quelqu'un y entre. Quittez cette dalle et revenez dessus",
+  'hudChrome.templeAlert.stepOffTitle': 'Éloignez-vous, puis revenez',
+  'hudChrome.templeAlert.timeAria': 'Il reste {seconds} secondes',
+  'hudChrome.wildheartAlert.breathLine':
+    "Le jaguar de pierre va souffler sur cette moitié de la terrasse. Passez dans l'autre moitié",
+  'hudChrome.wildheartAlert.breathTitle': "Souffle de l'idole !",
+  'hudChrome.wildheartAlert.glyphLightingLine':
+    "Restez sur le glyphe jusqu'à son allumage. Le quitter recommence la progression",
+  'hudChrome.wildheartAlert.glyphLightingTitle': 'Allumage du glyphe solaire',
+  'hudChrome.wildheartAlert.glyphLine':
+    "Restez sur un glyphe solaire éteint pendant {seconds} s pour l'allumer. Quand Zulgar le traverse, il subit {pct}% de dégâts supplémentaires pendant {duration} s",
+  'hudChrome.wildheartAlert.glyphTitle': 'Allumez les glyphes solaires',
+  'hudChrome.wildheartAlert.pinnedLine':
+    "Un allié doit retirer la Lance de chasse. L'Impulsion du Cœur sauvage vous inflige plus de dégâts quand vous êtes empalé",
+  'hudChrome.wildheartAlert.pinnedSelfLine':
+    "Personne n'est libre pour vous aider : retirez la Lance de chasse vous-même avant l'Impulsion du Cœur sauvage",
+  'hudChrome.wildheartAlert.pinnedTitle': 'Empalé !',
+  'hudChrome.wildheartAlert.preyAloneLine':
+    "Personne d'autre ne peut allumer les glyphes solaires. Restez sur un glyphe éteint {seconds} s pour l'allumer, puis attirez Zulgar dessus",
+  'hudChrome.wildheartAlert.spearLine':
+    "Courez vers la Lance de chasse et retirez-la avant l'Impulsion du Cœur sauvage",
+  'hudChrome.wildheartAlert.spearTitle': 'Un allié est empalé !',
+  'hudChrome.wildheartAlert.sunstruckLine':
+    "Il subit {pct}% de dégâts supplémentaires jusqu'à la fin : utilisez vos attaques les plus puissantes maintenant",
+  'hudChrome.wildheartAlert.sunstruckTitle': 'Zulgar est frappé par le soleil !',
+  'itemUi.errors.orderTrackedItem': "Le Marchand n'accepte aucune commande d'équipement unique.",
+
+  'hudChrome.cosmetics.mountsIntro':
+    "Choisissez ici l'apparence de votre monture. L'entraînement à l'équitation détermine la vitesse. Gardez l'objet de monture dans les sacs ou la banque d'un personnage pour partager son apparence sur tout votre compte.",
+  'hudChrome.cosmetics.mountsNoMount':
+    "Apprenez l'équitation auprès de la maîtresse des écuries Marla pour invoquer une monture.",
+  'hudChrome.cosmetics.notCollected': 'Non collectionné',
+  'hudChrome.guildHall.mountPreview':
+    "Apparence de monture pour tous les personnages de votre compte. Votre entraînement à l'équitation détermine votre vitesse.",
+  'hudChrome.mountTraining.ownedMountPrompt':
+    'Choisissez votre monture dans Cosmétiques. Utilisez Monter / Descendre pour chevaucher.',
+  'hudChrome.mounts.desc_grag_bear': "Un ours robuste au pied sûr, équipé d'une lourde selle.",
+  'hudChrome.mounts.desc_stalkglider_snail':
+    'Un escargot robuste au rythme paisible, à la coquille moussue.',
+  'hudChrome.mounts.desc_valorsteed':
+    "Un destrier robuste au pied sûr, équipé d'une selle en cuir.",
+  'hudChrome.mounts.useToRide':
+    "Utilisez cet objet pour porter cette apparence et invoquer votre monture. Gardez-le dans les sacs ou la banque d'un personnage pour partager l'apparence sur tout votre compte. L'entraînement à l'équitation détermine la vitesse.",
+  'itemUi.vendor.advancedRiding': "Entraînement avancé d'équitation",
+  'itemUi.vendor.basicRiding': "Entraînement d'équitation",
+  'itemUi.vendor.ridingSpeed':
+    "Augmente votre vitesse de déplacement à monture de {speed}%. S'applique à toutes les montures.",
+  'guide.mountsPage.firstBody':
+    "Marla vend les Rênes du Destrier de Bravoure pour 10 pièces d'or après l'apprentissage de l'équitation. Conserver les rênes débloque l'apparence du cheval dans Cosmétiques pour tous les personnages de votre compte. L'entraînement permet déjà d'invoquer une monture sans porter de rênes : choisissez le cheval ou une autre apparence possédée pour changer d'allure.",
+  'guide.mountsPage.goodsBody':
+    "Les apparences de monture à collectionner restent disponibles sur votre compte tant qu'au moins un objet de rênes correspondant se trouve dans les sacs ou la banque personnelle d'un personnage. Échanger, envoyer par courrier, mettre en vente, vendre ou retirer autrement le dernier objet admissible supprime l'apparence de Cosmétiques. Le cavalier qui la porte retrouve l'apparence du cheval par défaut et reste en selle à la vitesse de son entraînement.\n\nLes rênes des joueurs peuvent être échangées, envoyées par courrier et mises en vente au Marché mondial, sauf indication contraire. Les rênes du cheval peuvent aussi être vendues à un marchand pour 10 pièces d'or. Les autres rênes conservent leurs propres restrictions de vente. Les apparences de monture de la boutique restent des cosmétiques de compte indépendants des objets de rênes.",
+  'guide.mountsPage.intro':
+    "Choisissez une apparence de monture, apprenez l'équitation aux écuries et voyagez plus vite dans le monde. Votre entraînement fixe l'allure ; toutes les apparences de monture sont cosmétiques.",
+  'guide.mountsPage.learnBody':
+    "L'équitation se débloque au niveau {level}. La maîtresse des écuries Marla Hitchen vend l'Entraînement d'équitation pour 80 pièces d'or aux Écuries du Galecrest. L'entraînement de base augmente la vitesse à monture de {basicSpeed}%. Une fois appris, Marla vend aussi l'Entraînement avancé d'équitation pour {advancedFee} pièces d'or, portant le bonus à {advancedSpeed}%. Chaque rang appartient au personnage qui l'apprend.\n\nAprès l'apprentissage de base, acceptez la quête Leçons d'équitation de Marla et suivez le marqueur jusqu'au carré lumineux derrière l'arche de départ. Appuyez sur Démarrer la course pour emprunter le Destrier de Bravoure d'entraînement. Terminez le parcours et revenez chercher vos pièces et votre expérience. Le cheval emprunté retourne à l'écurie à la fin de la leçon.",
+  'guide.mountsPage.rideBody':
+    "Ouvrez Cosmétiques et choisissez une apparence dans l'onglet Montures. La touche Monter / Descendre, l'accent grave par défaut, invoque votre monture entraînée avec cette apparence. Le bouton Monter sur mobile fait de même. L'invocation nécessite une courte canalisation ; descendre est instantané. Vous pouvez changer d'apparence en selle sans changer de vitesse.\n\nVous pouvez aussi utiliser des rênes depuis vos sacs ou une barre d'action pour sélectionner l'apparence et invoquer la monture. Utiliser l'apparence que vous montez déjà range la monture. Les rênes en banque ou sur un autre personnage débloquent le même cosmétique sans que le cavalier ait à les porter.",
+  'guide.mountsPage.speedBody':
+    "L'Entraînement d'équitation de base augmente la vitesse à monture de {basicSpeed}%. L'Entraînement avancé d'équitation l'augmente de {advancedSpeed}% et coûte {advancedFee} pièces d'or auprès de Marla. Toutes les apparences utilisent la même vitesse selon le rang d'entraînement du personnage, quelle que soit leur rareté ou leur origine. Les apparences de la boutique utilisent aussi cette vitesse.",
+  'guide.mountsPage.speedHeading': "Vitesse et entraînement à l'équitation",
+  'guide.mountsPage.whatBody':
+    "Les montures sont des apparences cosmétiques pour votre monture entraînée. Elles ne donnent ni armure, ni dégâts, ni statistiques de combat. L'entraînement à l'équitation augmente la vitesse de déplacement au sol et les sauts à monture montent plus haut. Toutes les montures restent au sol et aucune ne sait nager.",
+  'guide.progression.ridingBody':
+    "Au niveau {level}, la maîtresse des écuries Marla enseigne l'équitation de base contre de l'or, puis propose un rang avancé. L'entraînement détermine la vitesse à monture. Choisissez votre apparence dans Cosmétiques ; les apparences à collectionner sont partagées tant que leurs rênes restent dans les sacs ou la banque d'un personnage.",
 };
