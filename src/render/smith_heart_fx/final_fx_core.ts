@@ -354,7 +354,7 @@ export const COLOSSUS_RELEASE_SECONDS = 1.1;
  *  spiral round the heart, locking with a flash), the shards rising out of
  *  the chasm meanwhile, then the shockwave as the last piece locks. */
 export const ARRIVAL = {
-  hold: 1.4,
+  hold: 1.1,
   riseEnd: 4.9,
   glideEnd: 6.3,
   firstTear: 4.4,

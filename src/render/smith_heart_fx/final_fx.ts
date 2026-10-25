@@ -52,6 +52,7 @@ import { GFX, sharedUniforms } from '../gfx';
 import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
 import { noteHeartFinalDeath } from '../smith_heart/heart_final_core';
+import { heartBeamMaterial } from '../smith_heart/heart_fx_materials';
 import {
   ensureHeartKit,
   heartKitLoaded,
@@ -103,6 +104,7 @@ import {
   FORGE_POUR,
   FORGE_WRATH,
   finalBossKit,
+  HEART_RISE_FROM,
   heartArrivalPoint,
   heartDeathLevel,
   heartSink,
@@ -316,6 +318,8 @@ export class FinalFx {
   private readonly pourMat: THREE.ShaderMaterial;
   private readonly wrathWall: THREE.Mesh;
   private readonly wrathMat: THREE.ShaderMaterial;
+  private readonly riseBeam: THREE.Mesh;
+  private readonly riseMat: THREE.ShaderMaterial;
   private readonly pieces: PieceRig[];
   private readonly view = newHeartSealView();
   private readonly heartPos = new THREE.Vector3();
@@ -528,6 +532,16 @@ export class FinalFx {
     this.wrathWall.visible = false;
     this.wrathWall.frustumCulled = false;
     this.root.add(this.wrathWall);
+    // The pillar of the heart's light it rises up out of the chasm on.
+    const beamGeo = new THREE.CylinderGeometry(1, 1, 1, 24, 1, true).translate(0, 0.5, 0);
+    this.geometries.push(beamGeo);
+    this.riseMat = heartBeamMaterial(0xffdca0, 'smithHeartColossusRise', 1.6);
+    this.materials.push(this.riseMat);
+    this.riseBeam = new THREE.Mesh(beamGeo, this.riseMat);
+    this.riseBeam.name = 'smithHeartColossusRise';
+    this.riseBeam.visible = false;
+    this.riseBeam.frustumCulled = false;
+    this.root.add(this.riseBeam);
     this.body.name = 'smithHeartColossus';
     this.body.visible = false;
     this.root.add(this.body);
@@ -588,7 +602,7 @@ export class FinalFx {
           for (const m of g.children) if (m instanceof THREE.Mesh) m.castShadow = false;
           this.body.add(g);
         }
-        if (p.socket) p.socket.scale.setScalar(0.55 + p.def.size * 0.08);
+        if (p.socket) p.socket.scale.setScalar(0.35 + p.def.size * 0.055);
         if (p.rubble) p.rubble.scale.setScalar(0.6 + p.def.size * 0.1);
       }
     }
@@ -676,6 +690,7 @@ export class FinalFx {
     if (!boss) {
       this.body.visible = false;
       this.heartHalo.visible = false;
+      this.riseBeam.visible = false;
       this.fan.group.visible = false;
       this.particles.update(this.clock);
       return;
@@ -1012,6 +1027,33 @@ export class FinalFx {
       heartLevel = a.glow;
       const w = arrivalWave(t);
       if (w >= 0) flare = Math.max(0, 1 - w * 3) * 0.8;
+      // The pillar of light it rises on, out of its bed: up to the heart,
+      // fading once it glides in.
+      const pillar =
+        t < ARRIVAL.hold
+          ? Math.max(0, t - ARRIVAL.hold + 0.6) / 0.6
+          : t < ARRIVAL.riseEnd
+            ? 1
+            : Math.max(0, 1 - (t - ARRIVAL.riseEnd) / 1.2);
+      if (t >= 0 && pillar > 0.01) {
+        const bx =
+          this.originX + (a.rising || t < ARRIVAL.hold ? this.heartPos.x : HEART_RISE_FROM.x);
+        const bz =
+          this.originZ + (a.rising || t < ARRIVAL.hold ? this.heartPos.z : HEART_RISE_FROM.z);
+        // Its foot a little under the rim (its brightest part in the raid's
+        // view), the chasm's own glow under it.
+        const y0 = HEART_ROOM.h - 14;
+        // A column of the heart's light standing up out of the chasm, far
+        // over the platform's rim, the heart riding up it.
+        const top = HEART_ROOM.h + 70;
+        this.riseBeam.position.set(bx, y0, bz);
+        this.riseBeam.scale.set(4.2, top - y0, 4.2);
+        this.riseMat.uniforms.uK.value = 1.5 * pillar;
+        this.riseBeam.visible = true;
+      } else {
+        this.riseBeam.visible = false;
+      }
+      flare = Math.max(flare, a.rising ? 0.35 : 0);
       if (a.rising && this.rand() < dt * 30 * this.density) {
         const wx = this.originX + this.heartPos.x;
         const wz = this.originZ + this.heartPos.z;
@@ -1027,6 +1069,7 @@ export class FinalFx {
         });
       }
     } else {
+      this.riseBeam.visible = false;
       const c = this.castId === FORGE_WRATH ? wrathGather(this.castProgress).glow : 0;
       flare = c * 0.35 + Math.max(0, 1 - (this.clock - this.wrathAt) / 0.4) * 0.8;
     }
@@ -1039,7 +1082,14 @@ export class FinalFx {
       this.heartMesh.position.copy(this.heartPos);
       _e.set(0, this.clock * 0.3, 0.1 * Math.sin(this.clock * 0.7));
       this.heartMesh.quaternion.setFromEuler(_e);
-      this.heartMesh.scale.setScalar(1.5);
+      // Swollen with light as it rises, settling into the body's socket.
+      const swell =
+        dead || t >= ARRIVAL.glideEnd || t < 0
+          ? 0
+          : t < ARRIVAL.riseEnd
+            ? 1
+            : 1 - (t - ARRIVAL.riseEnd) / (ARRIVAL.glideEnd - ARRIVAL.riseEnd);
+      this.heartMesh.scale.setScalar(1.5 + 1.3 * swell);
     }
     this.heartHalo.visible = true;
     // The halo is in the root's frame (world); the body's group is offset.
@@ -1048,7 +1098,8 @@ export class FinalFx {
       this.heartPos.y,
       this.originZ + this.heartPos.z,
     );
-    const halo = (14 + flare * 30) * Math.max(0.15, heartLevel);
+    const halo =
+      (14 + flare * 30 + (t >= 0 && t < ARRIVAL.glideEnd ? 16 : 0)) * Math.max(0.15, heartLevel);
     this.heartHalo.scale.set(halo, halo, 1);
     (this.heartHalo.material as THREE.SpriteMaterial).opacity = 0.55 * Math.max(0.1, heartLevel);
     // Every piece.
@@ -1128,6 +1179,18 @@ export class FinalFx {
     const c = { x: this.heartPos.x, y: this.heartPos.y, z: this.heartPos.z };
     const f = colossusFlyPoint(from, to, c, ph.k, 1.1 + fxHash(23, p.index) * 0.6);
     h.position.set(f.x, f.y, f.z);
+    // A trail of the veins' light and grit behind it.
+    if (this.rand() < 0.45 * this.density) {
+      this.particles.puff(this.originX + f.x, f.y, this.originZ + f.z, 1, {
+        speed: 0.6,
+        life: 0.9,
+        size: [p.def.joint === 'shard' ? 0.5 : 0.9, 0.1],
+        color: C.spark,
+        alpha: 0.9,
+        pool: 'glow',
+        radius: p.def.size * 0.3,
+      });
+    }
     const spin = colossusSpin(ph.k) * this.clock * Math.PI * 2;
     _e.set(spin * 0.7, spin, spin * 0.4, 'XYZ');
     _q2.setFromEuler(_e);
@@ -1216,9 +1279,25 @@ export class FinalFx {
       const cx = ox + this.heartPos.x;
       const cz = oz + this.heartPos.z;
       for (let i = 0; i < 4; i++)
-        this.particles.shockRing(cx, cz, VEINS[i], 30 + i * 12, 1.0 + i * 0.25);
-      this.particles.shockRing(cx, cz, C.ring, 70, 1.8);
-      this.flash(cx, this.heartPos.y, cz, 46, 0.9);
+        this.particles.shockRing(cx, cz, VEINS[i], 36 + i * 14, 1.2 + i * 0.3);
+      this.particles.shockRing(cx, cz, C.ring, 90, 2.2);
+      this.flash(cx, this.heartPos.y, cz, 80, 1.1);
+      this.flash(cx, this.heartPos.y + 6, cz, 40, 0.5, 0xffffff);
+      // The veins' light flung out of the heart in every direction.
+      for (let i = 0; i < Math.round(70 * this.density) + 10; i++) {
+        const a = this.rand() * Math.PI * 2;
+        this.particles.puff(cx, this.heartPos.y, cz, 1, {
+          speed: 26 + this.rand() * 16,
+          life: 1.1,
+          size: [0.6, 0.12],
+          color: C.spark,
+          alpha: 1,
+          pool: 'glow',
+          dir: [Math.cos(a), -0.15 + this.rand() * 0.5, Math.sin(a)],
+          spread: 0.12,
+          drag: 0.7,
+        });
+      }
       this.particles.puff(cx, this.groundY(cx, cz) + 0.5, cz, 40, {
         speed: 16,
         up: 1,
