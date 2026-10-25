@@ -129,7 +129,7 @@ misted void; cliffs are walls, nobody falls.
  great hearth, anvil                        (-4, portal)   SINGING ICE (-24, q3)  | bridge
                                             GRAND STAIR       QUENCH BASIN (-30)  ANVIL OF THE WORLD (0)
                                             BALCONY (+20)     Quench guardian     final boss, 4 altars,
-                                              |  the Slab                          4 chains, the core
+                                              |  the Slab                          4 roots, the core 
  CLEFT (+44) - h1 (+40) - h2 (+34) - h3 (+28) - SMITH'S QUARRY (+14)
  world entrance           the Hammer Gallery    Hammer guardian (always first)
 ```
@@ -173,18 +173,19 @@ the first flame's crystal and the seams of fire in its floor (phase 2I, section 
 | The return portal | on the terrace's west side, beside the arrival (never behind it) | `HEART_RETURN_PORTAL` |
 | The Heart Bridge | a short bridge from the terrace onto the platform; its gate seals while the final boss fights | `HEART_BRIDGE_GATE`, gate `heart_bridge` |
 | The Anvil of the World | the final boss's round platform (84 yd across), hung over the chasm | `HEART_ROOM` |
-| The four altars | at the platform's compass points, each under its chain | `HEART_ALTARS` |
+| The four altars | at the platform's compass points, each gripped by its root of the mountain | `HEART_ALTARS` |
 | The chasm | open air round the platform, down to the Smith's glowing heart | `HEART_ROOM_CHASM_R` |
 
 **Why a platform over a glowing core.** The brief offered a chamber inside the mountain
-or a platform over a core; the Heart is both: the platform hangs by four colossal
-chains over the Smith's own heart, a molten white-gold core beating deep in the chasm,
-inside a crown of mountain rock open to a sky of embers and stars. It reads as its own
-place (no vein's colours dominate; the four meet here), it keeps the open-air rules
-(no ceiling, the camera never meets rock), the chains give the room its silhouette and
-carry each vein's light down into its altar (the altars' meaning in the final fight),
-and the chasm round the platform gives every drag and every knockback a wall, never a
-fall (the platform's lip is a balustrade cliff).
+or a platform over a core; the Heart is both: the platform is held by four colossal
+roots of the mountain over the Smith's own heart, a bed of white-gold crystal beating
+deep in the chasm, inside a crown of mountain rock open to a sky of embers and stars.
+It reads as its own place (no vein's colours dominate; the four meet here), it keeps
+the open-air rules (no ceiling, the camera never meets rock), the roots give the room
+its silhouette and carry each vein's light down into its altar (the altars' meaning in
+the final fight), and the chasm round the platform gives every drag and every
+knockback a wall, never a fall (the platform's lip is a balustrade cliff). Until phase
+2J the roots were four iron chains; the raid has no metal (section 5.17).
 
 **Separate, not walkable, not visible.** No floor joins the Heart to the main map; the
 portal is the only way in. The mountain's crown round the Heart is deeper and taller
@@ -244,7 +245,7 @@ no walked step exceeds `MAX_STEP_HEIGHT` or `cliffStep` on either area.
   tines charge, a pillar of light stands up, a four-colour shockwave races across the
   chasm to the Ring, and the vortex and its funnel grow out of the parted seal.
 - **The arrival.** The terrace faces the platform across the short bridge: the boss at
-  its centre, the four altars, the chains rising into the crown, the core's light from
+  its centre, the four altars, the roots rising into the crown, the core's light from
   below, the ember sky above.
 - **Lighting.** One light zone per section (`SMITH_HEART_FIELD.lightZones`), each vein
   keyed in its colour; the Heart lit from below by its core.
@@ -267,7 +268,7 @@ any other entry is refused with `SMITH_HEART_CLOSED_TEXT`.
 | One wide stair from the balcony to the Ring | Two curved stairs along the Ring's circle | ONE floor height per point: the Ring cannot pass under the Balcony. |
 | Ring 14 yd wide | 16 yd | Room for packs of three plus a raid passing; see open questions. |
 | The final room on the main map (the heart caldera) | A separate Heart reached by a portal from the seal (owner, phase 2A) | The final fight gets its own identity and room; the seal stays the main map's centrepiece. |
-| One altar before each vein mouth | The four altars ring the Heart's platform under its chains | The altars moved with the final boss. |
+| One altar before each vein mouth | The four altars ring the Heart's platform, each gripped by its root | The altars moved with the final boss. |
 | Map about 420 by 420 yd | the slot's whole width | Bigger themed rooms and the Heart; still one instance slot. |
 | About 22 packs | 20 (3 + 8 + 3 x 3) | The pages' figure was an estimate. |
 
@@ -314,6 +315,19 @@ and while it stays engaged; open otherwise. Every gate is at least 12 yd wide.
 
 `the_slab` carries the `openText` line the raid reads when it opens. Gate entities are
 spawned by `SMITH_HEART_GATE_OBJECTS`.
+
+The `forge_seal` look (phase 2J; it read as a bronze sill with light bars, metal in every
+vein): the Smith's carved granite threshold across the passage with crystal growing in a
+channel down its top, a rough-hewn standing stone with a crystal crown at each end (the
+gate kit, `public/models/props/smith_heart_gate_kit.glb`, from
+`docs/design/raid/kit/build_smith_heart_gate_kit.py`), and a curtain of crystal light
+rising out of the channel in the vein's colour (the Breath's teal, the Quench's ice, the
+Heat's white-gold; the Heart Bridge's braids all four round a white-gold heart,
+`heartGateTint`). Shut it burns, sealed it flares and beats, opening it drains into its
+channel and the threshold sinks. Visual only: the ids, the states, the colliders and the
+timing are the gate engine's as before; the curtain is light (never a solid in the
+sightline pins), blended over the scene so it reads over the pale Breath and the dark
+Hearth alike, and drawn the same on every tier.
 
 ### 5.2 The heart seal and the portal
 
@@ -734,6 +748,75 @@ Player-visible text: the guardian's knell was "Anvil Clang"; it is now "Searing 
 with no other game's). The anvil bridge's gate reads "Hearth Mouth" (it read "Anvil
 Mouth"; its id `anvil_mouth` unchanged). The pour keeps "Molten Pour".
 
+### 5.17 The Heart, the final room (phase 2J)
+
+The owner's ask: the separate final room to the raid's level, primal and divine, its own
+light and sky, and the APPROVED arrival scene (DECISIONES_DISENO.md, "jefe final"): the
+heart rising, tearing rocks out of the room and binding them into the colossus. The room
+is one Blender kit (`docs/design/raid/kit/heart_pieces.py`, built by
+`build_smith_heart_heart_kit.py` and shipped as `public/models/props/smith_heart_heart_kit.glb`;
+three slots: KitStone, KitGlow, KitIce), placed by `heart_room_kit_plan_core.ts` and painted
+by `heart_room_kit.ts`; the body and its effects are `../smith_heart_fx/final_fx.ts`.
+
+| Piece | Look | Where |
+|---|---|---|
+| The Anvil of the World | A vast carved rock disc: dressed granite flags in courses round a basalt hub, three bands of dark basalt where the rune rings burn (14, 26, 38.5), four channels from the hub to the altars carrying each vein's light, a carved fascia two lifts deep and a coped balustrade round the lip (newels crowned with crystal lamps, open where the bridge lands); under it the mountain's rock as an inverted peak, a carved drum of the Smith's chevrons under the fascia, buttressed under each altar, each vein's crystal breaking out of it under its altar, crystal hanging from its root | `Kit_AnvilFloor`, `Kit_AnvilKeel` |
+| The Arrival Terrace | The same carved disc, smaller, its keel, the return portal's basin and kerb with crystal studs, two tall standing stones past the lip behind it | `Kit_TerraceFloor`, `Kit_TerraceKeel` |
+| The Heart Bridge | A carved stone bridge: its deck in courses down the field's own ramp, a coped parapet each side (a gap for the gate's stones), a segmental arch of voussoirs with a crystal keystone, its spandrels in courses, its abutments falling into the keels | `Kit_HeartBridge` |
+| The altars | On a shared stepped plinth carved with chevrons, each in its vein's stone: the Hammer's ochre granite split round a geode, the Breath's twisted storm stone bored by the wind with two blades over its crystal, the Quench's frost granite under three fused columns of clear ice (the ice slot), the Heat's bundled basalt bursting with fire crystal. Taller than their colliders (r 3, never wider), so a body hidden behind one reads hidden from Forge Wrath. Their crystal lights and dims per vein (`setVein`, for the later altar drags) | `Kit_Altar*`, `heart_room_kit.ts` |
+| The roots | The four chains are gone (my call: the raid is primal and divine and has no metal). Four colossal roots of the mountain, braided strands of rock knotted where they bind, rise out of each altar's crown, their fingers gripping it, and arch out over the walk (well over head height) into the crown's rock, their crystal veins carrying the vein's light down into the altar | `Kit_HeartRoot`, `HEART_ROOT_SPINE` |
+| The heart's bed | Deep in the chasm, a crater of the deep's dark rock lined with white-gold crystal round the hollow the heart rises from, drawn past the platform's lip so a raid looking over the balustrade sees it burning; its crystal dims when the heart dies | `Kit_CoreBed`, `HEART_CORE_BED_SCALE` |
+| The crown | The mountain round the chamber in a dark warm granite, a breath of violet in its shade, thin veins of crystal wandering through its faces in each quarter's vein colour, the heart's light from below on every face turned down to it | `heart_crown_core.ts` |
+
+The field omits the tops the kit paves (`HEART_KIT_OMIT_TOPS`), keeps a shallow keel under
+the bridge (`HEART_KIT_SHALLOW`) and drops the lathe keels the kit replaces; without the kit
+the blockout stands as before. Every piece a body can touch is on a layout collider (the
+altars) or past a lip; no new collider.
+
+**Light and sky.** The ember-violet night with its slow stars (`setCore`) stays; the key now
+falls high from the terrace's side (`SMITH_HEART_CORE_LIGHT.keyDirection`), so the raid
+crossing the bridge sees the colossus lit and the crown in shade; each altar's budgeted light
+reaches its quarter; the core's light rises from the bed, the shafts climb out of the chasm.
+
+**The arrival.** The one sim signal: the first tick a living player stands in the Heart the
+seal markers take the arrival bit (`SMITH_HEART_AWAKE_BIT`, 32) and keep it for the claim's
+life (`tickSmithHeartSeal`; no rng, no clock, no mob touched; `/dev heart arrival` replays it).
+The renderer's seal memory reads it (`awakeSince`): seen waking, the scene plays from there;
+first seen awake (a late arrival, a reconnect) it is long past and the body is whole. Online it
+rides the markers' template id like the veins (no wire change). The timeline (`ARRIVAL`,
+`final_fx_core.ts`): a breath while the hop's wash clears; a pillar of the heart's light stands
+up out of the chasm and the heart rides it up past the platform's far rim, swollen with light,
+and glides in over the platform; one by one the room's rocks (eleven resting on the walk
+between the altars and the channels, off the bridge's line, and ten shards under the lip)
+tremble, tear free of the paving with a burst of dust and broken stone (leaving a scar,
+`Kit_TornSocket`), lift, spiral in round the heart tumbling with a trail of light and lock into
+the body with a flash and a thread of a vein's light; as the last locks, the four-colour
+shockwave races over the platform and the chasm and the camera thuds (reduced motion drops
+the shakes). A pull during the scene runs it on to its end in under a second. Nothing is
+attached later than the interior and the effects' own gated root; the kit's pieces draw with
+the kit's own linked slot materials.
+
+**The body.** A bodyless target (`smith_heart_colossus` in the manifest, its nameplate over the
+head) with a colossus of the kit's rock pieces bound to the crystal heart, some twenty yards
+tall: torso, hip, head with a crown of peaks and a cleft of light for eyes, shoulders, two arms
+on a two-bone reach, fists, a skirt of shards and more over its back; it hovers and breathes.
+Its joints and timeline are its own (`COLOSSUS_SLOTS`, `colossusArmIk`), so the final creature
+model (the official pipeline) replaces the pieces and keeps them.
+
+| Moment | Look |
+|---|---|
+| A swing (the tank) | one arm swings down at the tank |
+| Forge Fist (arc cleave) | both fists up and down into the floor ahead: dust, broken stone thrown out across its arc, a ring, a short shake |
+| Forge Wrath, on its bar | the arms flung up, the pieces parting off their joints, the heart blazing, the room's light drawn into it (the sight field telegraph is the trash engine's, every tier: hide behind an altar) |
+| Forge Wrath, landing | a blinding flash from the heart, sparks flung out, a wall of light riding out on the engine's wave clock to the nova's radius, a shake |
+| Forge Pour, on its bar | its cone at the exact range and arc through the shared floor telegraph on EVERY tier (threat colour `danger`, white-gold accent; before 2J it had only its bar); the body leans in, hands cupped |
+| Forge Pour, landing | a torrent of white-gold fire out of the hands down the cone, the floor burning in it behind its front (never past its arc or range), crusting dark and smoking |
+| The death | the threads snapping, every piece falling, crumbling to rubble on the platform or tumbling off the lip into the chasm, the heart flickering as the veins go out and sinking dark into its bed; the room goes dark with it (the bed, the core, the rune rings, the altars, the roots and the channels, `heart_final_core.ts`) |
+
+Readability: the Pour's cone and the Wrath's sight field draw on every tier; the dust, sparks,
+trails and smoke thin on the low tier; the shakes go under reduced motion. No mechanic and no
+number changed; no player-visible text added.
+
 ## 6. Set pieces (phase 2 specs)
 
 None of these is built in phase 1; their floors, props and anchors are. Every
@@ -857,8 +940,9 @@ the meters harness, never shipped unmeasured.
 
 ### 7.5 The Masterless Strength (final)
 
-- Look: the pieces of an unassembled forge body floating over the Anvil of the World,
-  the Smith's heart beating in the chasm below, under the ember sky.
+- Look (phase 2J, section 5.17): the mountain's heart, a great crystal with the four veins
+  turning inside it, binding the room's rocks into a colossus of floating mountain over
+  the Anvil of the World as the raid first arrives; the body until its own model.
 - Phase 1 (`heart_masterless_strength`): Forge Fist (frontal arc cleave); Forge
   Wrath (line-of-sight nova: hide behind an altar); Forge Pour (cast-bar frontal
   cone). One form only.
@@ -982,6 +1066,21 @@ on both difficulties (dungeon rework README, goal 4).
   creaks' schedule and cracks on the sheet, the mist under the walks, the steam and the fire,
   the frost's reach, the Quench's light; the guardian's numbers read, the strike's ice inside
   its arc, the cone telegraphed for its bar, the frost and the ice when it lands.
+- `tests/smith_heart_gate_kit.test.ts`: the gate kit's GLB (fingerprint, the threshold in
+  its sill box, its crystal low and clear of the middle, the standing stone in its post box
+  under three yards); `tests/smith_heart_render_core.test.ts` pins the curtain's light never
+  in a sightline and each gate's vein.
+- `tests/smith_heart_heart_kit.test.ts`: the Heart kit's GLB (fingerprint, budget, no chain,
+  the walks flat inside their lips, the bridge's deck on the field's ramp, the altars inside
+  their colliders and taller than them, the Quench's ice), its plan (every piece on the
+  layout, the roots over the walk and into the crown, the omitted tops) and the crown's paint.
+- `tests/smith_heart_arrival.test.ts`: the arrival bit (asleep on a fresh claim, set by the
+  first living player in the Heart and kept, never by a corpse, no rng, the boss untouched,
+  the dev replay, the readout).
+- `tests/smith_heart_final_fx.test.ts`: the boss's numbers read, the rest spots, the arrival's
+  order and timeline, the heart's rise, the arm's reach, the fist and the pour inside their
+  areas, the fall, the seal memory's arrival (live and late), the room's darkness, FinalFx
+  over a fake world.
 - `tests/smith_heart_dev.test.ts`: the `/dev heart` family (the portal forcing and the
   hop included) and the dev-only door.
 - Every new Smith's Heart test follows the path pattern `tests/smith_heart_*.test.ts`
@@ -1003,7 +1102,8 @@ on both difficulties (dungeon rework README, goal 4).
 | `/dev heart kill <what>` | kill a guardian (hammer, breath, quench, heat), the final boss (final), all four guardians (guardians), one pack (`pack h1` and so on), every pack (trash), or all; kills credit through the normal death path, so gates and seal follow on the next tick |
 | `/dev heart gates` | open every gate of the run |
 | `/dev heart portal` | force the seal's portal open for the run (the hop then works) |
-| `/dev heart seal` | print the `smithHeartProgress` readout |
+| `/dev heart seal` | print the `smithHeartProgress` readout (and whether the heart is awake) |
+| `/dev heart arrival` | replay the arrival scene: the heart sleeps a moment and wakes again with a living player in the Heart |
 | `/dev heart reset` | free the run and claim a fresh one |
 
 Pinned by `tests/smith_heart_dev.test.ts`, including the refusal without
@@ -1034,8 +1134,10 @@ captures and review before the next:
    basalt floors, its light, sky, basalt and weather, the pour's look, the guardian's
    effects). Still to build: the pour's mechanic (its look is in), the guardian's target
    kit and its own body.
-6. **The Heart**: the platform, altars, chains and core as models; the final boss's
-   form choice, altar drags and adds.
+6. **The Heart**: DRESSED in phase 2J (section 5.17: the kit, the roots in place of the
+   chains, the crown, the light, the arrival scene, the colossus and its effects). Still
+   to build: the final boss's form choice, altar drags and adds (the altars light and dim
+   per vein already), and its own model.
 7. Original creature models for every trash and boss body (the official pipeline:
    concept in three T-pose views, Tripo Smart Mesh, a skeleton built for the mesh,
    hand-solved weights, clips from scratch), emptying

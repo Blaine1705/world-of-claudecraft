@@ -12,7 +12,9 @@ offline and online look the same. The interior's static dressing and air are
 
 | Module | Role |
 |---|---|
-| `index.ts` | Public surface: `HammerFx`, `BreathFx`, `QuenchFx`, `HeatFx`, `SealShake`. |
+| `index.ts` | Public surface: `HammerFx`, `BreathFx`, `QuenchFx`, `HeatFx`, `FinalFx`, `SealShake`. |
+| `final_fx_core.ts` | PURE (`RENDER_PURE_CORES`, phase 2J): the Masterless Strength's numbers read off its sim template (Forge Fist's arc and reach, Forge Wrath's radius and bar, Forge Pour's cone), its body's joints (`COLOSSUS_SLOTS`, the two-bone reach `colossusArmIk`, the pieces' rest spots on the walk and in the chasm), the arrival's timeline (`ARRIVAL`: the heart rising, each piece tearing, flying and locking, the shockwave, `ARRIVAL_END`), the poses of its swing, Forge Fist, Forge Wrath and Forge Pour, the fall (`colossusFallPlan`, `heartDeathLevel`), the pools. |
+| `final_fx.ts` | `FinalFx` (phase 2J): the body (the Heart kit's rock pieces round the crystal heart, threads of the veins' light, the heart's own shader) following the bodyless boss; the arrival scene from the seal memory's `awakeSince` (whole for a late arrival, run on to its end by a pull); Forge Pour's cone through the shared floor telegraph on every tier and its fire on the floor, Forge Wrath's gather and wall of light, Forge Fist's strike; the fall and the room going dark (`../smith_heart/heart_final_core.ts`). |
 | `hammer_fx_core.ts` | PURE (`RENDER_PURE_CORES`): the Hammer guardian's numbers read off its sim template (never tuned here), the crack lines, Mountain's Wrath's charge and blast timelines (the dust wall rides the trash engine's `novaWave` front on the same clock), Hammerfall's heat, the Slab's break timeline and the once-per-change rule (`slabBreakDue`), the pool sizes. |
 | `seal_shake.ts` | `SealShake` (phase 2F): the seal's moments felt in the camera (the arrival's thud, the opening's tremor, jolt and aftershock), read from the slot's seal memory, scaled by distance, through the shake sink (reduced motion honoured). |
 | `breath_fx_core.ts` | PURE (`RENDER_PURE_CORES`, phase 2G): the Breath guardian's numbers read off its sim template (the gust's radius and shove, the lance's length and width, both bars), the gust's charge and wall timelines, the lance's bolt, scorch and charge looks, the bolt's path (always inside the lane's half width), the pool sizes. |
@@ -24,6 +26,12 @@ offline and online look the same. The interior's static dressing and air are
 | `hammer_fx.ts` | `HammerFx`: Mountain's Wrath (molten cracks racing out over its bar, loose stones lifting, dust drawn in; on landing the dust wall, rubble, rings, flash, grit off the terraces, a shake), Hammerfall (a fan of cracks in its arc, rubble, dust), the Slab breaking (the split flaring, the burst both ways, dust, rings, grit off the lintel while the halves part) and the Pit Mouth slamming shut (a dust skirt). |
 
 Rules:
+- The Masterless Strength's Forge Pour cone is actionable and drawn by `FinalFx` through the
+  shared floor telegraph on EVERY tier (threat colour `danger`); Forge Wrath's sight field is
+  the trash engine's. The body, the arrival and the fall are presentation only (no sim state
+  but the seal markers' arrival bit); the dust, sparks and trails thin on the low tier, the
+  shakes go under reduced motion. The body's joints and timeline are kept apart from the
+  kit's pieces so the final model replaces the pieces only.
 - The Heat guardian's lane and ring are actionable and drawn by `HeatFx` through the shared
   floor telegraph on EVERY tier (threat colour `danger`, the vein's white-gold as the
   accent); its fire, sparks and smoke are cosmetic and thin. The Heat is the Hearth: its
@@ -47,5 +55,5 @@ Rules:
   as a branch in `hammer_fx.ts`.
 
 Tests: `tests/smith_heart_hammer_fx.test.ts`, `tests/smith_heart_breath_fx.test.ts` and
-`tests/smith_heart_quench_fx.test.ts` and `tests/smith_heart_heat_fx.test.ts` (each
-core and a smoke run over a fake world).
+`tests/smith_heart_quench_fx.test.ts`, `tests/smith_heart_heat_fx.test.ts` and
+`tests/smith_heart_final_fx.test.ts` (each core and a smoke run over a fake world).

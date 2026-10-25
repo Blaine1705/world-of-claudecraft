@@ -1,7 +1,7 @@
 <!-- src/render/smith_heart/: the Smith's Heart raid's open-air renderer (phase 2A:
      the structure; phase 2B: the Hammer vein's Blender kit, air and light; phase 2C:
      its polish round; phase 2D: its last weak points; phase 2E: the mountain's rock
-     kit and the Gallery's walk; phase 2F: the Ring's kit, the seal and the portal; phase 2G: the Breath vein's kit, light, sky and weather; phase 2H: the Quench vein's kit, floors, frost, light, sky and weather; phase 2I: the Heat vein as the Hearth, its kit, floors, basalt, light, sky, weather and the pour). Presentation only (parent dirs cover the IWorld seam,
+     kit and the Gallery's walk; phase 2F: the Ring's kit, the seal and the portal; phase 2G: the Breath vein's kit, light, sky and weather; phase 2H: the Quench vein's kit, floors, frost, light, sky and weather; phase 2I: the Heat vein as the Hearth, its kit, floors, basalt, light, sky, weather and the pour; phase 2J: the Heart, its kit, the roots, the crown, the arrival, and the gates' crystal curtain). Presentation only (parent dirs cover the IWorld seam,
      determinism and the GPU scheduler contract). Don't repeat root / src / render
      CLAUDE.md. -->
 
@@ -11,17 +11,18 @@ The render half of the raid (`docs/design/raid/smith_heart.md`): two areas in on
 The main map: the Cleft, four guardian rooms (the Smith's Quarry, the Storm Cornice, the
 Quench Basin, the Smith's Forge) cut into the mountain as open fissures round the Ring,
 and the heart seal on its floating dais, which opens into a portal. The Heart: the
-Anvil of the World hung by four chains over the Smith's beating core, inside a crown of
-mountain open to an ember sky. The sim layout (`src/sim/content/smith_heart_layout.ts`),
+Anvil of the World held by four roots of the mountain over the Smith's beating heart in
+its bed of crystal, inside a crown of mountain open to an ember sky. The sim layout (`src/sim/content/smith_heart_layout.ts`),
 the gates (`SMITH_HEART_GATES`) and the seal's value (veins plus the portal bit,
 `src/sim/encounters/smith_heart/seal.ts`) are the single source; everything here
 derives from them. The Hammer vein (the Cleft, the Gallery, the Smith's Quarry, the Slab,
 the Balcony's lookouts) is dressed with its Blender kit
 (`public/models/props/smith_heart_hammer_kit.glb`, built from
 `docs/design/raid/kit/build_smith_heart_hammer_kit.py`); the Ring, the Breath and the
-Quench and the Heat (the Hearth, never a forge) have their own kits (phases 2F to 2I); the
-Heart's props are still placeholders composed from boxes, cylinders, cones and gems until its
-own phase. The
+Quench and the Heat (the Hearth, never a forge) have their own kits (phases 2F to 2I), and
+the Heart has its own (phase 2J: `public/models/props/smith_heart_heart_kit.glb`, from
+`docs/design/raid/kit/build_smith_heart_heart_kit.py`), as do the forge seal gates (the gate
+kit, `smith_heart_gate_kit.glb`). The
 Hammer guardian's and the Slab's effects are `../smith_heart_fx/`. The borrowed creature
 bodies live in ONE list, `../characters/smith_heart_placeholder_looks.ts`.
 
@@ -58,10 +59,13 @@ bodies live in ONE list, `../characters/smith_heart_placeholder_looks.ts`.
 | `heart_cliff_paint_core.ts` | PURE: the field's cliff faces' vertex paint, the Hammer vein's in its cool quarry granite (never near-black), the shared tint elsewhere; the vein's share at a point (`hammerRockLift`), its granite beds (`hammerRockBed`) and its risers' shade (`hammerRiserShade`) for the mountain and the crags. |
 | `heart_lights.ts` | The point lights through the fire-light sink (at most eight per light zone), each with a halo card. A light hung past a walked floor's lip (the Cleft's) carries its own height (`HeartLightSpot.y`): the field's height there is the void. |
 | `heart_rivers_core.ts` / `heart_rivers.ts` | The floor light-rivers: a ribbon per vein, dim always, the bright twin's draw range running arena to seal as the vein lights; the last leg leaps the chasm onto the dais. |
-| `heart_seal_core.ts` / `heart_seal.ts` | The seal memory (veins and the portal, fed by `../gate_objects.ts`), the fill timeline (`heartSealQuarterFill`, `heartSealColumn`, the arrival's wave, the spire igniting); the seal from the Ring kit (four quarters of granite and crystal that fill, charge and part like petals, the crystal boss, the shards that burst out and turn round the portal) under a flush additive light, the four crystal spires, the arrival columns and waves. |
+| `heart_seal_core.ts` / `heart_seal.ts` | The seal memory (veins, the portal and, phase 2J, the arrival's bit as `awakeSince`: live when seen waking, long past when first seen awake; fed by `../gate_objects.ts`), the fill timeline (`heartSealQuarterFill`, `heartSealColumn`, the arrival's wave, the spire igniting); the seal from the Ring kit (four quarters of granite and crystal that fill, charge and part like petals, the crystal boss, the shards that burst out and turn round the portal) under a flush additive light, the four crystal spires, the arrival columns and waves. |
 | `heart_portal_core.ts` / `heart_portal.ts` | The opening (`heartPortalStage`: charge, flash, split, ring, swirl), the living portal (vortex, funnel, motes, tine arcs), the return portal, the hop (`heartHopLanding`, `heartHopStage`, the wash) and the area blend. |
 | `heart_fx_materials.ts` | The texture-free VFX shaders (beam, floor ring, vortex, funnel, motes, core, the crystal of the seal and the spires, the rivers' surge). Fresh per call: their uniforms are the slot's state. |
-| `heart_room_core.ts` / `heart_room.ts` | The Heart: the core and its shafts, the four chains (one instanced draw) and their pours, the rune rings, the embers; the keels under every floating island. |
+| `heart_room_core.ts` / `heart_room.ts` | The Heart: the core and its shafts, the rune rings (carved glyphs, never a dashed lane), the embers; with the Heart kit the core in its bed's hollow and each vein's channel light (`setVein`, `setHeart`); without it the blockout's chains (one instanced draw) and their pours and the keels under every floating island. |
+| `heart_room_kit_plan_core.ts` / `heart_room_kit.ts` | PURE plan and painter of the Heart's kit (phase 2J): the platform's and the terrace's walks and keels, the bridge on the field's ramp (the tops it paves omitted, `HEART_KIT_OMIT_TOPS`; a shallow keel under the bridge), the heart's bed drawn past the lip (`HEART_CORE_BED_SCALE`, its crystal dimming with the heart), and each vein's altar (taller than its collider, never wider: `HEART_ALTAR_RISE`) and root (`HEART_ROOT_SPINE`, the chains' replacement) on its vein's glow (`heartVeinGlowMaterial`: lit and dimmed per vein, its light running down the root). |
+| `heart_crown_core.ts` | PURE: the Heart's crown of rock (`heartCrownWeight`, in the Heart alone): the GLSL for the rock material (dark warm granite, crystal veins in each quarter's vein colour, the heart's light from below) and the heightfield's tint. |
+| `heart_final_core.ts` | The memory of each claim's final boss's fall (written by `../smith_heart_fx/final_fx.ts`, read by the interior's frame driver, which has no world): the room goes dark with the heart (`heartFinalDarkness`). |
 | `heart_environment.ts` | PURE: the Heart's fog and light state (`smithHeartCore`), the Hammer vein's (`smithHeartHammer`: a warm quarry dusk, the key low from the south-west), the Ring's (`smithHeartRing`, phase 2F: the same sun over a neutral grey fill) and the Breath's (`smithHeartBreath`, phase 2G: a cold teal-white key high in the north-west over a neutral grey fill, winning north of the Ring's mouth, `inBreathLight`), read by `../fog_scene_state.ts` and `../interior_light_rig.ts`. |
 | `heart_gates_core.ts` / `heart_gates.ts` | The gate looks on the shared gate memory: `stone_slab` splits and sinks (the kit's carved halves once the Hammer kit has landed); `forge_seal` is a LOW barrier (at most about 3 yd, `HEART_SEAL_BARRIER`), nothing metal: the gate kit's carved threshold with crystal in its channel and a standing stone at each end (`public/models/props/smith_heart_gate_kit.glb`, from `docs/design/raid/kit/build_smith_heart_gate_kit.py`), and a curtain of crystal light rising out of the channel in the gate's vein colour (`heartGateTint`; the Heart Bridge's braids all four), never a solid in a sightline. |
 | `heart_sightline_core.ts` | PURE: every crag, prop part (scale included) and gate part as a plain volume, and `heartSightlineHits` to trace a sightline through them. |
@@ -84,6 +88,12 @@ Rules:
   `smithHeartQuench`) and the Heat's (`smithHeartHeat`, phase 2I: a warm key from the
   Hearth's side over a cool slate fill, never a warm wash); whatever no vein's light holds
   keeps the borrowed `sunkenBastion` state.
+- The Heart (phase 2J) has no metal either: its platform is held by four roots of the
+  mountain (the chains are gone), its altars are each its vein's stone, its gates are
+  carved stone with a curtain of crystal light. The arrival scene is presentation only,
+  played from the seal markers' arrival bit (`awakeSince`), whole for a late arrival; the
+  body and its effects are `../smith_heart_fx/final_fx.ts`'s. A piece a body can touch is
+  on a layout collider (the altars) or past a lip; the walks the kit paves stay flat.
 - The Heat is the Hearth, never a forge (the owner's decision, phase 2I): no anvil, bellows,
   crucible, chain, coal or tool in any piece, and white-gold fire, never volcanic red. The
   layout's forge ids stay (frozen); only the look changes. Its weather (`heat_air.ts`) is
@@ -137,5 +147,6 @@ effects), `tests/smith_heart_rock_kit.test.ts` (the rock kit and its plan) and
 plan), `tests/smith_heart_quench_air.test.ts` (its air, creaks, frost and light),
 `tests/smith_heart_heat_kit.test.ts` (the hearth floors, the Heat kit and its plan, the
 renamed knell) and `tests/smith_heart_heat_air.test.ts` (the pour's timeline, its air, basalt
-and light). Evidence:
+and light), `tests/smith_heart_heart_kit.test.ts` (the Heart kit, its plan, the crown) and
+`tests/smith_heart_gate_kit.test.ts` (the gate kit). Evidence:
 `scripts/smith_heart_hammer_shot.mjs` (its `mesh:` action waits on an effect mesh).
