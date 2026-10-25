@@ -12,42 +12,11 @@
 import * as THREE from 'three';
 import { sharedUniforms } from '../gfx';
 import { type HammerAirPlan, planHammerAir } from './hammer_air_core';
+import { heartQuadGeometry } from './heart_air_quads';
 import { heartHash } from './heart_plan_core';
 
-const QUAD = [
-  [-1, -1],
-  [1, -1],
-  [1, 1],
-  [-1, 1],
-] as const;
-
-/** Merged quads: per vertex a corner, the quad's base point and its params. */
-function quadGeometry(
-  bases: readonly (readonly [number, number, number])[],
-  params: readonly (readonly [number, number, number, number])[],
-): THREE.BufferGeometry {
-  const n = bases.length;
-  const corner = new Float32Array(n * 8);
-  const base = new Float32Array(n * 12);
-  const prm = new Float32Array(n * 16);
-  const idx = new Uint32Array(n * 6);
-  for (let i = 0; i < n; i++) {
-    for (let v = 0; v < 4; v++) {
-      corner.set(QUAD[v], (i * 4 + v) * 2);
-      base.set(bases[i], (i * 4 + v) * 3);
-      prm.set(params[i], (i * 4 + v) * 4);
-    }
-    idx.set([i * 4, i * 4 + 1, i * 4 + 2, i * 4, i * 4 + 2, i * 4 + 3], i * 6);
-  }
-  const g = new THREE.BufferGeometry();
-  // `position` carries the base so three's bounds see the system's extent.
-  g.setAttribute('position', new THREE.BufferAttribute(base, 3));
-  g.setAttribute('aCorner', new THREE.BufferAttribute(corner, 2));
-  g.setAttribute('aParams', new THREE.BufferAttribute(prm, 4));
-  g.setIndex(new THREE.BufferAttribute(idx, 1));
-  g.computeBoundingSphere();
-  return g;
-}
+/** Merged quads (heart_air_quads.ts). */
+const quadGeometry = heartQuadGeometry;
 
 const MOTE_VERT = /* glsl */ `
 uniform float uTime;

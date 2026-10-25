@@ -20,45 +20,14 @@ import {
   type BreathAirPlan,
   planBreathAir,
 } from './breath_air_core';
+import { type HeartAirV3, type HeartAirV4, heartQuadGeometry } from './heart_air_quads';
 import { heartHash } from './heart_plan_core';
 
-const QUAD = [
-  [-1, -1],
-  [1, -1],
-  [1, 1],
-  [-1, 1],
-] as const;
+type V3 = HeartAirV3;
+type V4 = HeartAirV4;
 
-type V3 = readonly [number, number, number];
-type V4 = readonly [number, number, number, number];
-
-/** Merged quads: per vertex a corner, the quad's base point, its params and
- *  a second point (a segment's far end, or unused). */
-function quadGeometry(bases: readonly V3[], params: readonly V4[], others?: readonly V3[]) {
-  const n = bases.length;
-  const corner = new Float32Array(n * 8);
-  const base = new Float32Array(n * 12);
-  const other = new Float32Array(n * 12);
-  const prm = new Float32Array(n * 16);
-  const idx = new Uint32Array(n * 6);
-  for (let i = 0; i < n; i++) {
-    for (let v = 0; v < 4; v++) {
-      corner.set(QUAD[v], (i * 4 + v) * 2);
-      base.set(bases[i], (i * 4 + v) * 3);
-      other.set(others ? others[i] : bases[i], (i * 4 + v) * 3);
-      prm.set(params[i], (i * 4 + v) * 4);
-    }
-    idx.set([i * 4, i * 4 + 1, i * 4 + 2, i * 4, i * 4 + 2, i * 4 + 3], i * 6);
-  }
-  const g = new THREE.BufferGeometry();
-  g.setAttribute('position', new THREE.BufferAttribute(base, 3));
-  g.setAttribute('aOther', new THREE.BufferAttribute(other, 3));
-  g.setAttribute('aCorner', new THREE.BufferAttribute(corner, 2));
-  g.setAttribute('aParams', new THREE.BufferAttribute(prm, 4));
-  g.setIndex(new THREE.BufferAttribute(idx, 1));
-  g.computeBoundingSphere();
-  return g;
-}
+/** Merged quads (heart_air_quads.ts). */
+const quadGeometry = heartQuadGeometry;
 
 /** The gust's surge on the shared clock (breath_air_core.ts breathGustAt). */
 const GUST_GLSL = /* glsl */ `

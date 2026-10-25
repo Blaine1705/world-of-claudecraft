@@ -26,7 +26,7 @@ import { BREATH_KIT_KEEL, BREATH_KIT_SHALLOW } from './breath_kit_plan_core';
 import { buildHammerAir } from './hammer_air';
 import { dressHammerVein, ensureHammerKit, HAMMER_KIT_KINDS, hammerKitReady } from './hammer_kit';
 import { heartCliffPaint } from './heart_cliff_paint_core';
-import { inBreathLight } from './heart_environment';
+import { inBreathLight, inQuenchLight } from './heart_environment';
 import { buildHeartGates } from './heart_gates';
 import { heartKitProgramWarmers } from './heart_kit';
 import { buildHeartLights } from './heart_lights';
@@ -41,10 +41,14 @@ import {
 import { buildHeartProps, buildHeartWalls } from './heart_props';
 import { buildHeartRivers } from './heart_rivers';
 import { dressHeartMountain, ensureHeartRockKit } from './heart_rock';
+import { setHeartRockSlot } from './heart_rock_cutaway';
 import { buildHeartRoom } from './heart_room';
 import { buildHeartSeal } from './heart_seal';
 import { heartSealSlotKey, heartSealView, newHeartSealView } from './heart_seal_core';
 import { buildHeartSky } from './heart_sky';
+import { buildQuenchAir } from './quench_air';
+import { dressQuench, ensureQuenchKit, QUENCH_KIT_KINDS, quenchKitReady } from './quench_kit';
+import { lakeIceMaterial } from './quench_lake_ice';
 import {
   dressRing,
   ensureRingKit,
@@ -72,13 +76,20 @@ export async function buildSmithHeartInterior(
   ox: number,
   oz: number,
 ): Promise<THREE.Group> {
-  await Promise.all([ensureHammerKit(), ensureHeartRockKit(), ensureRingKit(), ensureBreathKit()]);
+  await Promise.all([
+    ensureHammerKit(),
+    ensureHeartRockKit(),
+    ensureRingKit(),
+    ensureBreathKit(),
+    ensureQuenchKit(),
+  ]);
   // The Ring kit draws the two stairs tread by tread and the dais's keel
   // (phase 2F); without it the field's own ramps and keel stand.
   const ringReady = ringKitReady();
   // The Breath kit draws the Wind Bridge's arch (phase 2G): the field then
   // keeps only a shallow keel under its deck.
   const breathReady = breathKitReady();
+  const quenchReady = quenchKitReady();
   const group = new THREE.Group();
   group.name = 'smithHeartField';
   group.add(
@@ -96,28 +107,39 @@ export async function buildSmithHeartInterior(
         depth: BREATH_KIT_KEEL,
       },
       ...(ringReady ? { omitTops: RING_KIT_OMIT_TOPS } : {}),
+      // The Frozen Lake and the Singing Ice drawn with the ice's depth
+      // (phase 2H).
+      topMaterial: { lake_ice: (pair) => lakeIceMaterial(pair, deps.lowGfx) },
     }),
   );
   group.add(buildHeartMountain(deps.lowGfx));
   // The mountain's rock (phase 2E), the loose crags until its kit lands.
   dressHeartMountain(group, () => buildHeartWalls(deps.lowGfx), deps.lowGfx);
   const kitReady = hammerKitReady();
-  const kitKinds = new Set([...HAMMER_KIT_KINDS, ...RING_KIT_KINDS, ...BREATH_KIT_KINDS]);
+  const kitKinds = new Set([
+    ...HAMMER_KIT_KINDS,
+    ...RING_KIT_KINDS,
+    ...BREATH_KIT_KINDS,
+    ...QUENCH_KIT_KINDS,
+  ]);
   const drawn = new Set([
     ...(kitReady ? HAMMER_KIT_KINDS : []),
     ...(ringReady ? RING_KIT_KINDS : []),
     ...(breathReady ? BREATH_KIT_KINDS : []),
+    ...(quenchReady ? QUENCH_KIT_KINDS : []),
   ]);
   const props = buildHeartProps(kitKinds, drawn);
   group.add(props.group);
   dressHammerVein(group, props.kitOwned, deps.lowGfx);
   dressRing(group, props.kitOwned, deps.lowGfx);
   dressBreath(group, props.kitOwned, deps.lowGfx);
+  dressQuench(group, props.kitOwned, deps.lowGfx);
   // The kit's slot programs link with the interior even when the kit lands
   // late (the swap then links nothing in a live frame).
   group.add(heartKitProgramWarmers());
   group.add(buildHammerAir(deps.lowGfx));
   group.add(buildBreathAir(deps.lowGfx));
+  group.add(buildQuenchAir(deps.lowGfx));
   group.add(buildHeartRoom(deps.lowGfx, ringReady ? new Set(['seal_dais']) : new Set()));
   buildHeartLights(group, deps, ground);
   const rivers = buildHeartRivers();
@@ -137,6 +159,7 @@ export async function buildSmithHeartInterior(
   let lastNow = -1;
   let blend = 0;
   let breathBlend = 0;
+  let quenchBlend = 0;
   let hopAt = -1;
   let hopSide: 'heart' | 'ring' | null = null;
   const sky = buildHeartSky({
@@ -145,6 +168,8 @@ export async function buildSmithHeartInterior(
       const now = sharedUniforms.uTime.value;
       const dt = lastNow < 0 ? 999 : now - lastNow;
       lastNow = now;
+      // The rock's regional paint (the Quench's frost) reads this slot.
+      setHeartRockSlot(ox, oz);
       local.x = camera.x - ox;
       local.y = camera.y;
       local.z = camera.z - oz;
@@ -165,6 +190,8 @@ export async function buildSmithHeartInterior(
       sky.setCore(blend);
       breathBlend = heartAreaBlend(breathBlend, inBreathLight(local.x, local.z), dt);
       sky.setBreath(breathBlend);
+      quenchBlend = heartAreaBlend(quenchBlend, inQuenchLight(local.x, local.z), dt);
+      sky.setQuench(quenchBlend);
       heartSealView(slot, now, view);
       heartPortalStage(view.portalSince, stage);
       heartHopStage(hopAt < 0 ? -1 : now - hopAt, hop);
