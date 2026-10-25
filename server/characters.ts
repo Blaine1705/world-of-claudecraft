@@ -354,7 +354,8 @@ export function withCreationHelm(state: CharacterState, helmHidden: boolean): Ch
   return state;
 }
 
-/** Whether this character still holds its one-shot redesign token. Two ways in,
+/** Whether this character still holds its one-shot redesign token. An explicit
+ *  release grant overrides an earlier spend. Otherwise there are two legacy ways in,
  *  and the token is what makes it one-shot either way:
  *   - CREATED INSIDE THE FREE WINDOW (before APPEARANCE_REROLL_CUTOFF). Every
  *     character that existed when the creator shipped gets one redesign on the
@@ -367,6 +368,7 @@ export function withCreationHelm(state: CharacterState, helmHidden: boolean): Ch
  *  Mirrors consumeAppearanceReroll's WHERE arm, which is the authority; decided
  *  server-side so the list payload is the single truth the roster button reads. */
 function appearanceRerollAvailable(c: CharacterRow): boolean {
+  if (c.appearance_reroll_granted) return true;
   if (c.appearance_reroll_used) return false;
   if (c.appearance === null || c.appearance === undefined) return true;
   const created = c.created_at ? new Date(c.created_at).getTime() : Number.NaN;
