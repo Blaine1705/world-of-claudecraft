@@ -532,14 +532,16 @@ export function planHeartLights(): HeartLightSpot[] {
       intensity: 6,
       range: 64,
     },
+    // Each altar lights its own quarter of the platform (phase 2J: the
+    // altars stand taller, their vein's light over their quarter).
     ...HEART_ALTARS.map((a) => ({
       id: `altar:${a.vein}`,
       x: a.x,
       z: a.z,
-      lift: 7,
+      lift: 9,
       color: SMITH_HEART_VEIN_COLORS[a.vein],
-      intensity: 5,
-      range: 24,
+      intensity: 11,
+      range: 34,
     })),
     {
       id: 'return_portal',

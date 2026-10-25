@@ -258,6 +258,7 @@ export async function buildSmithHeartInterior(
       // channels with it.
       const dark = heartFinalDarkness(slot, now);
       room.setHeart(1 - dark);
+      heartKit?.setHeart(1 - dark);
       for (const v of SMITH_HEART_VEINS) {
         room.setVein(v, 1 - 0.85 * dark);
         heartKit?.setVein(v, 1 - 0.7 * dark);

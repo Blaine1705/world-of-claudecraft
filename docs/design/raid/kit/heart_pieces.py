@@ -1408,7 +1408,7 @@ def torn_socket(bpy):
     bm.faces.new(vs)
     faces = [f for f in bm.faces if f not in before]
     with p.as_kind(PAINT):
-        p._paint(faces, (0.12, 0.115, 0.12), 0)
+        p._paint(faces, (0.21, 0.2, 0.2), 0)
     p.facing(faces, (0, 0, 1))
     with p.as_kind(RAW):
         for k in range(26):

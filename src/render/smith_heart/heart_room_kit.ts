@@ -30,7 +30,12 @@ import {
   instanceHeartKit,
   SMITH_HEART_HEART_KIT_URL,
 } from './heart_kit';
-import { HEART_KIT_KINDS, planHeartRoomKit, planHeartVeinPieces } from './heart_room_kit_plan_core';
+import {
+  HEART_KIT_KINDS,
+  planHeartCoreBed,
+  planHeartRoomKit,
+  planHeartVeinPieces,
+} from './heart_room_kit_plan_core';
 
 /** Wait (capped) for the Heart kit before the interior is built. */
 export function ensureHeartRoomKit(): Promise<void> {
@@ -88,6 +93,8 @@ export interface HeartRoomKit {
   group: THREE.Group;
   /** Light (1) or dim (0) one vein's altar and root. */
   setVein(vein: SmithHeartVein, level: number): void;
+  /** The heart's bed: its crystal burning (1) or dark (0). */
+  setHeart(level: number): void;
 }
 
 const tmp = new THREE.Matrix4();
@@ -105,6 +112,25 @@ export function buildHeartRoomKit(lowGfx: boolean): HeartRoomKit {
       220,
     ),
   );
+  // The heart's bed, its crystal on its own glow (it dims with the heart).
+  const bedGlow = new THREE.MeshBasicMaterial({
+    vertexColors: true,
+    toneMapped: false,
+    name: 'SmithHeartKitGlow',
+  });
+  const bedPlace = planHeartCoreBed();
+  const bed = heartKitMeshes(SMITH_HEART_HEART_KIT_URL, bedPlace.piece);
+  if (bed) {
+    bed.name = 'Kit_CoreBed:heart';
+    bed.matrixAutoUpdate = false;
+    bed.matrix.copy(heartKitPlacementMatrix(bedPlace, tmp));
+    for (const m of bed.children) {
+      if (!(m instanceof THREE.Mesh)) continue;
+      if (m.name.endsWith(':glow')) m.material = bedGlow;
+      m.castShadow = false;
+    }
+    group.add(bed);
+  }
   const glows = new Map<SmithHeartVein, THREE.ShaderMaterial>();
   for (const vein of SMITH_HEART_VEINS) {
     const glow = heartVeinGlowMaterial(SMITH_HEART_VEIN_COLORS[vein], `smithHeartVeinGlow:${vein}`);
@@ -130,6 +156,10 @@ export function buildHeartRoomKit(lowGfx: boolean): HeartRoomKit {
       const g = glows.get(vein);
       const k = Math.round(Math.max(0, Math.min(1, level)) * 100) / 100;
       if (g && g.uniforms.uLevel.value !== k) g.uniforms.uLevel.value = k;
+    },
+    setHeart(level) {
+      const k = 0.12 + 0.88 * Math.max(0, Math.min(1, level));
+      if (bedGlow.color.r !== k) bedGlow.color.setScalar(k);
     },
   };
 }

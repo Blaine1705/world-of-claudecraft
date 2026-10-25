@@ -58,6 +58,12 @@ export const HEART_ALTAR_PIECES: Readonly<Record<SmithHeartVein, string>> = {
 export const HEART_ALTAR_RISE = 1.4;
 export const HEART_ROOT_LIFT = 4.4;
 
+/** The heart's bed is drawn this much larger than its piece: its crater
+ *  reaches past the platform's lip, so a raid looking over the balustrade
+ *  sees the heart's crystal glowing deep below (the core is never hidden
+ *  under the platform). */
+export const HEART_CORE_BED_SCALE = 2.4;
+
 /** How far the heart's bed sits under the platform (its hollow's rim). */
 export const HEART_CORE_BED_Y = HEART_CORE.y + 2;
 
@@ -146,15 +152,20 @@ export function planHeartRoomKit(): HeartKitPlacement[] {
       z: HEART_TERRACE.z,
       rot: heartBridgeYaw(),
     },
-    {
-      piece: 'Kit_CoreBed',
-      x: HEART_ROOM.x,
-      y: HEART_CORE_BED_Y,
-      z: HEART_ROOM.z,
-      rot: 0,
-      noShadow: true,
-    },
   ];
+}
+
+/** The heart's bed (painted apart: its crystal dims as the heart dies). */
+export function planHeartCoreBed(): HeartKitPlacement {
+  return {
+    piece: 'Kit_CoreBed',
+    x: HEART_ROOM.x,
+    y: HEART_CORE_BED_Y,
+    z: HEART_ROOM.z,
+    rot: 0,
+    scale: HEART_CORE_BED_SCALE,
+    noShadow: true,
+  };
 }
 
 /** One vein's own pieces: its altar and its root, in the altar's frame. */

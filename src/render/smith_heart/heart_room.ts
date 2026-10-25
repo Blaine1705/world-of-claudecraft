@@ -154,9 +154,9 @@ let haloMaterial: THREE.SpriteMaterial | null = null;
  *  the core's material (its beat dims when the heart goes dark). */
 function buildCore(group: THREE.Group, kit: boolean): THREE.ShaderMaterial {
   const material = heartCoreMaterial('smithHeartCore');
-  const r = kit ? 4.8 : HEART_CORE.r;
+  const r = kit ? 10 : HEART_CORE.r;
   const core = new THREE.Mesh(new THREE.SphereGeometry(r, 48, 32), material);
-  core.position.set(HEART_CORE.x, kit ? HEART_CORE_BED_Y - 2.2 : HEART_CORE.y, HEART_CORE.z);
+  core.position.set(HEART_CORE.x, kit ? HEART_CORE_BED_Y - 3.4 : HEART_CORE.y, HEART_CORE.z);
   core.name = 'smithHeartCore';
   group.add(core);
   if (!haloMaterial) {
