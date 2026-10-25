@@ -3,10 +3,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../server/claudium_proxy', () => ({ callService: vi.fn() }));
 
 import { callService } from '../../server/claudium_proxy';
+import { DEFAULT_REALM_NAME } from '../../server/realm';
 import { gameSubscriptionLink } from '../../server/subscription_proxy';
 
 const input = { plan: 'game_annual', rail: 'stripe', idempotencyKey: 'annual-intent-123456' };
-const recipient = { characterId: 42, realm: 'main' };
+const recipient = { characterId: 42, realm: DEFAULT_REALM_NAME };
 beforeEach(() => {
   vi.stubEnv('WOC_SUBSCRIPTIONS_ENABLED', '1');
   vi.mocked(callService).mockReset().mockResolvedValue({
@@ -30,6 +31,20 @@ describe('annual subscription game proxy', () => {
       },
     });
   });
+  it('keeps lowercase realm identities unchanged', async () => {
+    const lower = { characterId: 42, realm: 'main' };
+    expect((await gameSubscriptionLink(7, 'checkout', input, lower)).ok).toBe(true);
+    expect(vi.mocked(callService).mock.calls[0][0].body).toMatchObject(lower);
+  });
+  it.each(['', '../Claudemoon', 'Claudemoon\n', 'a'.repeat(65)])(
+    'refuses malformed realm %j before service IO',
+    async (realm) => {
+      expect(
+        (await gameSubscriptionLink(7, 'checkout', input, { characterId: 42, realm })).ok,
+      ).toBe(false);
+      expect(callService).not.toHaveBeenCalled();
+    },
+  );
   it('refuses missing recipients and client authority overrides before service IO', async () => {
     expect((await gameSubscriptionLink(7, 'checkout', input)).ok).toBe(false);
     for (const extra of [

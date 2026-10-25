@@ -41,7 +41,7 @@ export async function gameSubscriptionLink(
     (!recipient ||
       !Number.isSafeInteger(recipient.characterId) ||
       recipient.characterId <= 0 ||
-      !/^[a-z0-9_-]{1,64}$/.test(recipient.realm))
+      !/^[A-Za-z0-9_-]{1,64}$/.test(recipient.realm))
   )
     return { ...SUBSCRIPTION_LINK_OFF };
   const value = await callService<unknown>({
