@@ -1,7 +1,7 @@
 <!-- src/render/smith_heart/: the Smith's Heart raid's open-air renderer (phase 2A:
      the structure; phase 2B: the Hammer vein's Blender kit, air and light; phase 2C:
      its polish round; phase 2D: its last weak points; phase 2E: the mountain's rock
-     kit and the Gallery's walk; phase 2F: the Ring's kit, the seal and the portal; phase 2G: the Breath vein's kit, light, sky and weather). Presentation only (parent dirs cover the IWorld seam,
+     kit and the Gallery's walk; phase 2F: the Ring's kit, the seal and the portal; phase 2G: the Breath vein's kit, light, sky and weather; phase 2H: the Quench vein's kit, floors, frost, light, sky and weather). Presentation only (parent dirs cover the IWorld seam,
      determinism and the GPU scheduler contract). Don't repeat root / src / render
      CLAUDE.md. -->
 
@@ -18,7 +18,8 @@ the gates (`SMITH_HEART_GATES`) and the seal's value (veins plus the portal bit,
 derives from them. The Hammer vein (the Cleft, the Gallery, the Smith's Quarry, the Slab,
 the Balcony's lookouts) is dressed with its Blender kit
 (`public/models/props/smith_heart_hammer_kit.glb`, built from
-`docs/design/raid/kit/build_smith_heart_hammer_kit.py`); the other veins' props are still
+`docs/design/raid/kit/build_smith_heart_hammer_kit.py`); the Ring, the Breath and the
+Quench have their own kits (phases 2F to 2H); the Heat's and the Heart's props are still
 placeholders composed from boxes, cylinders, cones and gems until their own phases. The
 Hammer guardian's and the Slab's effects are `../smith_heart_fx/`. The borrowed creature
 bodies live in ONE list, `../characters/smith_heart_placeholder_looks.ts`.
@@ -38,6 +39,13 @@ bodies live in ONE list, `../characters/smith_heart_placeholder_looks.ts`.
 | `ring_kit_plan_core.ts` / `ring_kit.ts` | PURE plan and painter of the Ring's kit (phase 2F: `public/models/props/smith_heart_ring_kit.glb`, from `docs/design/raid/kit/build_smith_heart_ring_kit.py`): the Ring's paving, curb, foot and channels, both stairs tread by tread with their chutes, every stair's stringers and parapets, the dais, the standing stones, the cairns, the mouths' jambs and sills; the field tops it draws in their place (`RING_KIT_OMIT_TOPS`), the fascias' depth the lips start under, the spires' spots and veins. |
 | `breath_kit_plan_core.ts` / `breath_kit.ts` | PURE plan and painter of the Breath's kit (phase 2G: `public/models/props/smith_heart_breath_kit.glb`, from `docs/design/raid/kit/build_smith_heart_breath_kit.py`): the Cornice's rods (a strike scar at each foot), wind-horns (bells to the rim) and channel cheek stones, the bridge's shelters and the landings' standing stones on the layout's colliders, the Wind Bridge's arch (the field then keeps a shallow keel under it, `BREATH_KIT_SHALLOW`, and no mountain lip hangs there), the low walls walked along every Breath lip over the void (`planBreathWalls`, past the lip, never over a walk), the grooves and cracks flat on the floors. |
 | `breath_air_core.ts` / `breath_air.ts` | PURE plan and painter of the Breath's air and weather (phase 2G): the gale's streaks and grit over every Breath walk, cloud banks under the Cornice's rim and in the bridge's chasm, the bridge's gusts (`breathGustAt`: a band down the ramp and a curtain on its front, the streaks surging), the strikes on the rods in turn (`breathStrikeAt`: a bolt from the cloud, the crown's flash). Shader driven on the shared clock; cosmetic; the low tier a third of the particles (the gusts and strikes stay). |
+| `lip_walls_core.ts` | PURE: a vein's low walls over the void (the Breath's and the Quench's): modules walked along every lip of its walks that drops to the void, set on their chords past the lip's bow (never over a walk), following a stair's slope, none where the lip bends onto another floor (`planLipWalls`, `lipWallClear`). |
+| `quench_kit_plan_core.ts` / `quench_kit.ts` | PURE plan and painter of the Quench's kit (phase 2H: `public/models/props/smith_heart_quench_kit.glb`, from `docs/design/raid/kit/build_smith_heart_quench_kit.py`): the basin's fire bowls (`QUENCH_BRAZIER_FIRE` where their flame burns), vents, heaped old ice (its face square to the lake), the sunk blades, the Singing Ice's blades and the landings' frost stones on the layout's props and colliders; the low walls along every Quench lip over the void (`planQuenchWalls`); the frozen falls on the first band of rock facing a Quench walk (`planQuenchFalls`); the cracks flat on the ice and the drifts on the flat floors (`planQuenchDressing`, `QUENCH_DRIFT_FLOORS`). |
+| `quench_lake_ice.ts` | The Frozen Lake's and the Singing Ice's surface (the `lake_ice` tops through the field terrain's `topMaterial` seam): a lit standard material over the painted frost skin with depth (dark water, bubbles at three depths and old cracks under parallax, the sky at grazing angles, the shallows paler), snow at every edge, the Singing Ice crazed and rougher. Opaque; the low tier one bubble layer, the Lambert tier the skin alone. |
+| `quench_frost_core.ts` | PURE: the Quench's frost on the mountain (`quenchFrostWeight`, faded in past the Ring and out at the Breath and the Heart), its GLSL for the rock material (a cold film, rime on the ledges, faint glaze; read from the slot's origin, `setHeartRockSlot`), the heightfield's tint and the field cliffs' frost granite (`quenchCliffPaint`). |
+| `quench_air_core.ts` / `quench_air.ts` | PURE plan and painter of the Quench's air (phase 2H): snow and frost motes over every Quench walk, steam off the vents and out of the rock, pale mist in the void under the walks, the braziers' fire (flame, embers, halo, a warm pool on the snow), and the Singing Ice's creaks (`quenchCreakAt`, `quenchCreakLook`: a crack running out across the sheet, bursting into frost). Shader driven on the shared clock; cosmetic; the low tier a third of the particles (the fire and the creaks stay). |
+| `heart_ice_sheen.ts` | The kits' ice slot's touch (phase 2H): a cold sheen at grazing angles and a breath of inner light on a lit vertex-colour material. |
+| `heart_air_quads.ts` | The air systems' one geometry (the Hammer's, the Breath's and the Quench's): merged view-space quads. |
 | `hammer_walk_plan_core.ts` | PURE: the Gallery's worn kerb and chain rail along its lips over the chasm (the rail never over a walk); the paving is its `paving` ground, the fallen blocks layout props. |
 | `hammer_air_core.ts` / `hammer_air.ts` | PURE plan and painter of the Hammer vein's air: the Cleft's fan of sun shafts with their dust, warm pools and the crystals' halos (the raid's first image), dust motes in the low sun, grit off the terrace lips and the colossi, the collapse spot's heavy trickles, the pit's grey haze, the geodes' halos. Shader-driven quads, cosmetic, a third on the low tier. |
 | `heart_cliff_paint_core.ts` | PURE: the field's cliff faces' vertex paint, the Hammer vein's in its cool quarry granite (never near-black), the shared tint elsewhere; the vein's share at a point (`hammerRockLift`), its granite beds (`hammerRockBed`) and its risers' shade (`hammerRiserShade`) for the mountain and the crags. |
@@ -65,8 +73,15 @@ Rules:
 - No light but the budgeted point lights through the fire-light sink; the Heart's grade
   is its own fog state, the Hammer vein's too (`smithHeartHammer`: warm key, cool
   slate-violet fill, a neutral dust; never a warm wash over everything), the Ring's and
-  the Breath's too (`smithHeartRing`, `smithHeartBreath`); the rest of the main map's (the
-  Quench, the Heat) is the borrowed `sunkenBastion` state.
+  the Breath's and the Quench's too (`smithHeartRing`, `smithHeartBreath`,
+  `smithHeartQuench`); the rest of the main map's (the Heat) is the borrowed `sunkenBastion`
+  state.
+- The Quench's weather (snow, motes, steam, mist, fire, creaks, `quench_air.ts`) is
+  cosmetic: never a telegraph (the creaks wear the vein's pale light, never a threat
+  colour, on the ground rung under every telegraph), its mist under the walks and past
+  the rims. The Quench guardian's cone is `../smith_heart_fx/quench_fx.ts`'s, on every tier.
+- A flat effect quad (a creak, a fire's pool) is drawn double sided, and no shader takes
+  `pow()` of a value that can go negative (undefined in GLSL: write the square out).
 - The Breath's weather (its streaks, clouds, gusts and strikes, `breath_air.ts`) is
   cosmetic: never a telegraph, never thicker than a streak over a walk, its clouds under
   the Cornice's walk and past its rim. The Breath guardian's footprints are
@@ -103,4 +118,7 @@ light budget), `tests/smith_heart_areas.test.ts` (areas, score, the Heart's air)
 effects), `tests/smith_heart_rock_kit.test.ts` (the rock kit and its plan) and
 `tests/smith_heart_ring_kit.test.ts` (the Ring kit, its plan and the seal's moments),
 `tests/smith_heart_breath_kit.test.ts` (the scoured floor, the Breath kit and its plan) and
-`tests/smith_heart_breath_air.test.ts` (its air, weather and light). Evidence: `scripts/smith_heart_hammer_shot.mjs`.
+`tests/smith_heart_breath_air.test.ts` (its air, weather and light),
+`tests/smith_heart_quench_kit.test.ts` (the frost and lake-ice floors, the Quench kit and its
+plan) and `tests/smith_heart_quench_air.test.ts` (its air, creaks, frost and light). Evidence:
+`scripts/smith_heart_hammer_shot.mjs` (its `mesh:` action waits on an effect mesh).

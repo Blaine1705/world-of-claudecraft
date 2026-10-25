@@ -4,8 +4,8 @@ Status: phase 1 (playable blockout), phase 2A (the structure: the final boss in 
 separate room reached by a portal, bigger themed guardian rooms, the structural VFX) and
 phase 2B (the Hammer vein dressed: its Blender kit, its floor, air and light, the Hammer
 guardian's and the Slab's effects, section 5.9) and phase 2C (the Hammer vein's polish
-round and the North Stair, section 5.10) implemented on `feature/smith-heart-raid`,
-dev builds only. The per-room phases (Blender
+round and the North Stair, section 5.10), through the Breath (phase 2G, section 5.14) and the
+Quench (phase 2H, section 5.15) implemented on `feature/smith-heart-raid`, dev builds only. The per-room phases (Blender
 kits, own creatures, set pieces, boss kits), the quest and the loot are specified here
 and not built. The name is provisional and has not been IP-checked yet.
 
@@ -41,6 +41,9 @@ Sources of truth, in order:
 | The mountain's rock kit (sources, build, plan, painter) | `docs/design/raid/kit/build_smith_heart_rock_kit.py` (the sculpts: `rock_sculpt.py`), `scripts/assets/smith_heart_rock_kit/build.mjs`, `src/render/smith_heart/heart_rock_plan_core.ts`, `src/render/smith_heart/heart_rock.ts` |
 | The Gallery's walk (paving, kerb, chain rail, fallen blocks) | the `paving` ground (`field_textures.ts` `pavingDetail`), `docs/design/raid/kit/walk_pieces.py`, `src/render/smith_heart/hammer_walk_plan_core.ts`, `sh_fallen_block` in the layout |
 | The Hammer guardian's and the Slab's effects | `src/render/smith_heart_fx/` (`HammerFx`) |
+| The Quench vein's Blender kit (sources, build, plan, painter) | `docs/design/raid/kit/build_smith_heart_quench_kit.py` (the pieces: `quench_pieces.py`), `scripts/assets/smith_heart_quench_kit/build.mjs`, `src/render/smith_heart/quench_kit_plan_core.ts`, `src/render/smith_heart/quench_kit.ts` |
+| The Quench vein's floors, frost, air and light | `rime`, `lake_ice` grounds, `src/render/smith_heart/quench_lake_ice.ts`, `quench_frost_core.ts`, `quench_air_core.ts` / `quench_air.ts`, `heart_environment.ts` (`smithHeartQuench`) |
+| The Quench guardian's effects | `src/render/smith_heart_fx/quench_fx.ts` (`QuenchFx`) |
 | Dev commands | `src/sim/dev/smith_heart_dev.ts` (`/dev heart`) |
 
 ## 1. Summary and lore
@@ -149,8 +152,9 @@ rather than repeating numbers that would rot.
 Each room reads its theme by shape first (kit placeholders in
 `src/render/smith_heart/heart_plan_core.ts`): the Quarry's kneeling colossi, cut blocks,
 derrick, ochre geodes and the five columns (Mountain's Wrath's line-of-sight cover);
-the Cornice's lightning rods and stone wind-horns (phase 2G, section 5.14); the Basin's colossal half-sunk blades,
-heaped ice shelves, steaming vents and braziers; the Forge's great arched hearth, giant
+the Cornice's lightning rods and stone wind-horns (phase 2G, section 5.14); the Basin's great
+blades of ice sunk in the lake, heaped old ice, steaming vents and carved fire bowls (phase 2H,
+section 5.15); the Forge's great arched hearth, giant
 anvil (side-on to the door, horn north), bellows, crucibles and casting channels.
 
 ### 3.2 The Heart (the separate final room)
@@ -386,8 +390,8 @@ an existing cue whose brief fits until the raid has its own score). The Heart ha
 own fog and light state, `smithHeartCore` (`heart_environment.ts`), and so does the
 Hammer vein, `smithHeartHammer` (phase 2B: a warm quarry dusk, the key low from the
 south-west raking the terraces, the realm's blue sky light all but off), the Ring
-(`smithHeartRing`, phase 2F) and the Breath (`smithHeartBreath`, phase 2G); the Quench
-and the Heat keep the borrowed storm grade until their phases.
+(`smithHeartRing`, phase 2F), the Breath (`smithHeartBreath`, phase 2G) and the Quench
+(`smithHeartQuench`, phase 2H); the Heat keeps the borrowed storm grade until its phase.
 
 ### 5.9 The Hammer vein dressed (phase 2B)
 
@@ -619,6 +623,52 @@ under one compile-gated root, so nothing links on first use. The new cheek stone
 standing stones stand on layout colliders at the rims, clear of every walking line. No
 boss mechanic and no number changed.
 
+### 5.15 The Quench vein (phase 2H)
+
+The owner's ask: the Quench to the Breath's and the Hammer's level and above, primal and
+divine (living granite, ice and the cold; nothing metal, no machinery). Before it the vein
+walked the borrowed storm grade on plain snow and ice, its props boxes and steel bars. Now
+it is one Blender kit (`docs/design/raid/kit/quench_pieces.py`, built by
+`build_smith_heart_quench_kit.py` and shipped as
+`public/models/props/smith_heart_quench_kit.glb`), its own floors, light, sky, frost and
+weather, the Singing Ice's look and its guardian's effects. The kits gained a third slot,
+KitIce (`heart_kit.ts`'s ice slot, `heart_ice_sheen.ts`: glossy, a cold sheen at grazing
+angles and a breath of inner light, so thick ice never reads as blue stone).
+
+| Piece | Look | Where |
+|---|---|---|
+| The floors | Every Quench walk from the mouth to the shelf is frost-bound granite: the freeze's slabs parted by joints packed with rime, long frost cracks, a hoar film, soft snow drifts in the vertex paint. The Frozen Lake and the Singing Ice are clear lake ice drawn with depth: dark water under it, bubbles at three depths and old straight-run cracks shifting with the view, the pale sky at grazing angles, paler over the shallows, snow drifted in at every edge; the Singing Ice crazed with fine frost cracks and rougher (no sun glare over a telegraph) | `rime` and `lake_ice` grounds (`paintRime`, `paintLakeIce`, `rimeColor`), `quench_lake_ice.ts` (the field terrain's `topMaterial` seam) |
+| The fire bowls | The four braziers are the Smith's carved fire bowls: a stepped plinth, a fluted pedestal, a wide bowl with a rolled rim, the chevrons cut round it and four lugs, a bed of live coals; the rime melted off its top and its rim sooted, its meltwater frozen under the belly. Body-wide colliders (1.5); a warmer budgeted light each | `Kit_LakeBrazier` on `sh_brazier` (`LAKE_BRAZIERS`) |
+| The sunk blades | The Smith's great blades of ice sunk point first in the lake: a broad flat blade, deep blue in its thick heart and milky at its keen chipped edges, a fuller down both faces with the vein's light in it, a crossguard of two swept horns of ice, a frost-wrapped grip, a crystal pommel; the lake heaved up round each in broken plates | `Kit_SunkBlade` on `sh_sunk_blade` |
+| The heaped ice | Old lake ice shoved up against the basin's walls past the shelf's rim: broken plates lying low in front and upended in a jagged crest behind, dust-banded, snow in their hollows, icicles under their brows, a glacier tongue plunging into the mist | `Kit_IceShelfA`, `B` on `sh_ice_shelf` |
+| The landings | Frost-cracked standing stones on the landings' rims (two blocks, a chevron band, ice grown in three wandering cracks, a crystal deep in one, snow on the head, on colliders), and low walls along every Quench lip over the void (frost granite a knee high under snow-pillowed copings, icicles off the outer face; the Breath's lip planner, now shared: `lip_walls_core.ts`), snow banked at their foot on the flat floors | `Kit_FrostStone` on `sh_frost_stone`, `Kit_QuenchWallA`, `B`, `planQuenchWalls`, `Kit_SnowDriftA`, `B` |
+| The vein's walls | Frozen falls hung on the mountain's first band of rock where it climbs well over a Quench walk: fused columns of ice bulging in freeze rings, deep blue in their grooves, an icicle beard, a frozen splash at the foot, a snowy notch of rock at the head | `Kit_FrozenFallA`, `B`, `planQuenchFalls` (`QUENCH_FALL_RULES`) |
+| The vents and the Singing Ice | The shelf's vents are rings of wet dark stone the steam keeps free of frost, pale mineral crust, a faint light down the throat; the Singing Ice takes crack webs and long cracks (flat inlays) and two clusters of blades heaved up through it | `Kit_SteamVent` on `sh_steam_vent`, `Kit_IceCrackA`, `B`, `Kit_IceBlade` on `sh_ice_blade`, `planQuenchDressing` |
+| The rock's frost | The mountain stays calm (2G's big masses): in the Quench its rock, its heightfield and the field's own cliffs take frost in big value groups only, a cold film a value paler and bluer, rime and old snow on every ledge in broad drifts, faint glaze streaks down the faces | `quench_frost_core.ts` (`quenchFrostWeight`, the rock material's `quenchFrostGlsl` from the slot's origin, `quenchCliffPaint`) |
+| The light | Its own state, `smithHeartQuench`: a pale cold sun low in the south-east through a thin overcast, a pale blue-grey sky fill over a cool ground bounce, so the frost reads pale and every shade a clean cold blue-grey, never navy; a pale-blue mist thin across the lake. It holds east of the Ring as soon as the camera is past its rim | `heart_environment.ts` (`SMITH_HEART_QUENCH_LIGHT`, `SMITH_HEART_QUENCH_FOG`, `inQuenchLight`) |
+| The sky | Calm and cold: a pale overcast thinning to a wash of cold blue overhead, high thin veils and cirrus drifting slowly, the low sun behind them with the ice crystals' 22 degree halo round it | `heart_sky.ts` (`setQuench`) |
+| The weather | Snow drifting down over every Quench walk with frost motes glinting in it, steam rising off the vents and out of the rock past the rim, a pale mist lying in the void under the walks; each fire bowl burning a tall flame with embers, a halo that marks it from across the lake and a warm pool on the snow (the one warm thing in the cold) | `quench_air.ts` (`planQuenchAir`) |
+| The Singing Ice | Its set piece's look (section 6.3's mechanic is not built): every few seconds a crack creaks out across the sheet (a dark seam opening under a white-hot line of the vein's light, brightest at its running front) and bursts into frost at its end; the creaks wear the vein's pale light, never a threat colour, and lie under every telegraph | `quench_air.ts` (`quenchCreakAt`, `quenchCreakLook`, `planSingingCracks`) |
+
+Effects of the Quench guardian (`src/render/smith_heart_fx/quench_fx.ts`, presentation
+only, the sim untouched):
+
+| Moment | Look |
+|---|---|
+| Quenching Breath, on its bar | its footprint (a cone at the breath's exact angle and range, aimed where the bar locked it) fills with the bar; the cold is drawn in to the guardian's maw, frost creeps out over the cone's floor under the fill, glints wink in it |
+| Quenching Breath, landing | a freezing gust of mist sweeps out to the cone's end, ice rips up out of the floor behind its front and shatters, glints are flung out, the floor stays frosted a few seconds (plates of crust, feathers of hoar), a ring, a short shake |
+| Tempering Strike | (a swing cleave with no bar, like Hammerfall) spikes of ice thrust up out of the floor in its arc and reach, hold, then shatter into shards and mist; the floor frosted where it struck, a ring, a short shake |
+
+Readability: the cone is the shared floor telegraph (threat colour `danger`, the vein's pale
+ice as the accent) on every graphics tier; before 2H the breath had only its bar. The frost,
+the mist, the ice, the snow, the steam, the creaks and the fire are cosmetic: the low tier
+keeps a third of the particles (the fire and the creaks stay), reduced motion drops the
+shake. Every effect is built with the interior or under one compile-gated root, so nothing
+links on first use; the creaks and the fire pools are floor marks on the ground rung, the
+frost on the encounter band under the telegraph's fill front. The new stones stand on
+layout colliders at the landings' rims, clear of every walking line; the braziers' colliders
+grew to a body's width. No boss mechanic and no number changed.
+
 ## 6. Set pieces (phase 2 specs)
 
 None of these is built in phase 1; their floors, props and anchors are. Every
@@ -718,6 +768,9 @@ the meters harness, never shipped unmeasured.
   plates; fights in the middle of the Frozen Lake, braziers on the shelf.
 - Phase 1 (`heart_quench_guardian`): Tempering Strike (frontal arc cleave);
   Quenching Breath (cast-bar frontal cone the tank turns away).
+- Presentation (phase 2H, section 5.15): Quenching Breath telegraphs its cone on every tier
+  and has its freezing gust, ice and frost; Tempering Strike thrusts ice up in its arc.
+  Mechanics and numbers unchanged.
 - Target: stacking cold on every player removed only at the shelf braziers
   (`LAKE_BRAZIERS`), slick ice under the boss, cracks that punish bunching.
 
@@ -846,6 +899,17 @@ on both difficulties (dungeon rework README, goal 4).
 - `tests/smith_heart_breath_air.test.ts` and `tests/smith_heart_breath_fx.test.ts`: the
   gusts' and strikes' schedules, the clouds past the rim, the Breath's light; the guardian's
   numbers read, the lance's bolt inside its lane, the telegraphs while the bars run.
+- `tests/smith_heart_quench_kit.test.ts`: the frost-bound and lake-ice floors, the Quench
+  kit's GLB (fingerprint, budget, the ice slot, the touchable feet inside their colliders, the
+  bowl's fire where the plan lights it, the inlays and drifts flat, the walls past the lip, the
+  heaped ice short of the shelf, the falls' heights) and its plan (every prop fitted, the
+  heaped ice never over a walk, every Quench lip over the void walled, the falls on rock
+  facing a Quench walk and never over a floor, the cracks on the ice, the drifts on flat
+  floors).
+- `tests/smith_heart_quench_air.test.ts` and `tests/smith_heart_quench_fx.test.ts`: the
+  creaks' schedule and cracks on the sheet, the mist under the walks, the steam and the fire,
+  the frost's reach, the Quench's light; the guardian's numbers read, the strike's ice inside
+  its arc, the cone telegraphed for its bar, the frost and the ice when it lands.
 - `tests/smith_heart_dev.test.ts`: the `/dev heart` family (the portal forcing and the
   hop included) and the dev-only door.
 - Every new Smith's Heart test follows the path pattern `tests/smith_heart_*.test.ts`
@@ -890,7 +954,10 @@ captures and review before the next:
 3. **The Breath**: DRESSED in phase 2G (section 5.14: the kit, the scoured floor, its
    light, sky and weather, the guardian's effects). Still to build: the wind bridge's
    gust mechanic (its look is in), the guardian's target kit and its own body.
-4. **The Quench**: ice shelves and blades as models, the singing ice, steam.
+4. **The Quench**: DRESSED in phase 2H (section 5.15: the kit, the frost-bound and lake-ice
+   floors, its light, sky, frost and weather, the Singing Ice's look, the guardian's effects).
+   Still to build: the singing ice's mechanic (its look is in), the brazier cold-cleansing
+   mechanic (the bowls are in), the guardian's target kit and its own body.
 5. **The Heat**: the hearth, anvil, bellows and crucibles as models, the pour.
 6. **The Heart**: the platform, altars, chains and core as models; the final boss's
    form choice, altar drags and adds.
