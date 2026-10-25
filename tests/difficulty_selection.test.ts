@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { BUILTIN_WORLD } from '../src/sim/data';
-import { retryPendingDifficultyChanges } from '../src/sim/instances/difficulty_selection';
+import {
+  claimsByOwnerKey,
+  retryPendingDifficultyChanges,
+} from '../src/sim/instances/difficulty_selection';
 import { enterDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 
@@ -393,5 +396,91 @@ describe('difficulty selection through the live Sim', () => {
     sim.entities.get(inst.mobIds[0])!.lootable = false;
     advance(sim);
     expect(inst.difficulty).toBe('heroic');
+  });
+
+  it.each(['loot', 'cooldown', 'lockout'] as const)(
+    'reports the live Normal tier after a %s refusal keeps Heroic selected',
+    (reason) => {
+      const { sim, leader, member, inst } = setup();
+      sim.leaveDungeon(member);
+      expect(sim.unappliedDungeonDifficulty(leader)).toBeNull();
+      if (reason === 'loot') sim.entities.get(inst.mobIds[0])!.lootable = true;
+      if (reason === 'cooldown') inst.resetAvailableAt = sim.time + 60;
+      if (reason === 'lockout')
+        sim.players.get(leader)!.raidLockouts.set('hollow_crypt:heroic', Number.MAX_SAFE_INTEGER);
+      sim.drainEvents();
+      sim.setDungeonDifficulty('heroic', leader);
+      const refusal = {
+        loot: 'You cannot reset instances while loot remains inside.',
+        cooldown: 'Instances can only be reset once every 5 minutes.',
+        lockout: 'You are locked to Heroic The Hollow Crypt.',
+      }[reason];
+      expect(
+        sim
+          .drainEvents()
+          .filter((e) => e.type === 'error')
+          .map((e) => e.text),
+      ).toEqual([refusal]);
+      expect(sim.ctx.pendingDifficultyChanges.size).toBe(0);
+      expect(inst.difficulty).toBe('normal');
+      expect(sim.dungeonDifficulty(leader)).toBe('heroic');
+      expect(sim.unappliedDungeonDifficulty(leader)).toBe('normal');
+      // Members read the same group claim.
+      expect(sim.unappliedDungeonDifficulty(member)).toBe('normal');
+      // The shared per-tick index the server passes gives the same answer.
+      const claims = claimsByOwnerKey(sim.instances);
+      expect(sim.unappliedDungeonDifficulty(leader, claims)).toBe('normal');
+      // A slot freed after the index was built is skipped, not reported.
+      const freedKey = inst.partyKey;
+      inst.partyKey = null;
+      expect(sim.unappliedDungeonDifficulty(leader, claims)).toBeNull();
+      inst.partyKey = freedKey;
+      // Selecting the claim's tier again clears the mismatch.
+      sim.setDungeonDifficulty('normal', leader);
+      expect(sim.unappliedDungeonDifficulty(leader)).toBeNull();
+    },
+  );
+  it('reports the live tier while occupancy queues the change, then clears on apply', () => {
+    const { sim, leader, member, inst } = setup();
+    sim.setDungeonDifficulty('heroic', leader);
+    expect(sim.ctx.pendingDifficultyChanges.has(leader)).toBe(true);
+    expect(sim.unappliedDungeonDifficulty(leader)).toBe('normal');
+    sim.leaveDungeon(member);
+    advance(sim);
+    expect(inst.difficulty).toBe('heroic');
+    expect(sim.unappliedDungeonDifficulty(leader)).toBeNull();
+  });
+  it('reports a live Heroic claim when switching a solo player back to Normal is refused', () => {
+    const sim = new Sim({
+      seed: 99,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] },
+    });
+    const solo = sim.addPlayer('warrior', 'Solo');
+    sim.setDungeonDifficulty('heroic', solo);
+    expect(sim.enterDungeon('hollow_crypt', solo)).toBe(true);
+    const inst = sim.instances.find((i) => i.partyKey !== null && i.dungeonId === 'hollow_crypt')!;
+    expect(inst.difficulty).toBe('heroic');
+    sim.leaveDungeon(solo);
+    sim.entities.get(inst.mobIds[0])!.lootable = true;
+    sim.setDungeonDifficulty('normal', solo);
+    expect(inst.difficulty).toBe('heroic');
+    expect(sim.unappliedDungeonDifficulty(solo)).toBe('heroic');
+  });
+  it('ignores a claim whose dungeon has no Heroic mode (clamped like Reset All)', () => {
+    const { sim, leader, member, inst } = setup();
+    sim.leaveDungeon(member);
+    inst.dungeonId = 'no_such_heroic_dungeon';
+    sim.setDungeonDifficulty('heroic', leader);
+    expect(sim.dungeonDifficulty(leader)).toBe('heroic');
+    expect(sim.unappliedDungeonDifficulty(leader)).toBeNull();
+  });
+  it('has no unapplied tier without a claim', () => {
+    const { sim, leader } = setup();
+    const loner = sim.addPlayer('mage', 'Loner');
+    sim.setDungeonDifficulty('heroic', loner);
+    expect(sim.unappliedDungeonDifficulty(loner)).toBeNull();
+    expect(sim.unappliedDungeonDifficulty(leader)).toBeNull();
   });
 });

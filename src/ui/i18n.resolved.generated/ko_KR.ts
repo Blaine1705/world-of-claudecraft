@@ -4299,6 +4299,8 @@ export const ko_KR: EnTranslations = {
     "dungeonDifficulty": {
       "setHeroic": "던전 난이도 설정: 영웅",
       "setNormal": "던전 난이도 설정: 일반",
+      "unappliedNormal": "영웅 난이도를 선택했습니다. 현재 인스턴스는 아직 일반입니다.",
+      "unappliedHeroic": "일반 난이도를 선택했습니다. 현재 인스턴스는 아직 영웅입니다.",
       "resetAll": "모든 인스턴스 초기화",
       "resetDone": "모든 인스턴스가 초기화되었습니다.",
       "resetNone": "초기화할 인스턴스가 없습니다.",

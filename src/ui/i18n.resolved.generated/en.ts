@@ -4299,6 +4299,8 @@ export const en: EnTranslations = {
     "dungeonDifficulty": {
       "setHeroic": "Set Dungeon Difficulty: Heroic",
       "setNormal": "Set Dungeon Difficulty: Normal",
+      "unappliedNormal": "Heroic selected. Current instances are still Normal.",
+      "unappliedHeroic": "Normal selected. Current instances are still Heroic.",
       "resetAll": "Reset All Instances",
       "resetDone": "All instances have been reset.",
       "resetNone": "You have no instances to reset.",

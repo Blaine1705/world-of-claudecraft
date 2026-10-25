@@ -36,6 +36,7 @@ export const SELF_SCALAR_KEYS = [
   'hirat',
   'ddiff',
   'adiff',
+  'udiff',
   'cbt',
   'mbr',
   'corpse',
@@ -51,6 +52,7 @@ export function emitSelfScalarKeys(
   p: Entity,
   dungeonDifficulty: string,
   activeDungeonDifficulty: string | null = null,
+  unappliedDungeonDifficulty: string | null = null,
 ): void {
   emit('xp', meta.xp);
   emit('lxp', meta.lifetimeXp);
@@ -75,6 +77,10 @@ export function emitSelfScalarKeys(
   emit('hirat', p.hitRating);
   emit('ddiff', dungeonDifficulty);
   emit('adiff', activeDungeonDifficulty);
+  // The tier the group's live claims still run on when the selection has not
+  // reached them (null otherwise), so the portrait menu never shows a tier the
+  // instances are not on. Flips only on a selection change or a claim change.
+  emit('udiff', unappliedDungeonDifficulty);
   // The sim's authoritative in-combat flag (the engaged pass in sim.ts: held on
   // a live mob's hate table, or the player's own 5 s linger). Without it the
   // online SELF mirror stayed at blankEntity's false forever, so the player

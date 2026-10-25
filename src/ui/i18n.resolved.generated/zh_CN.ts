@@ -4299,6 +4299,8 @@ export const zh_CN: EnTranslations = {
     "dungeonDifficulty": {
       "setHeroic": "设置地下城难度：英雄",
       "setNormal": "设置地下城难度：普通",
+      "unappliedNormal": "已选择英雄难度。当前副本仍为普通难度。",
+      "unappliedHeroic": "已选择普通难度。当前副本仍为英雄难度。",
       "resetAll": "重置所有副本",
       "resetDone": "所有副本已重置。",
       "resetNone": "你没有可重置的副本。",

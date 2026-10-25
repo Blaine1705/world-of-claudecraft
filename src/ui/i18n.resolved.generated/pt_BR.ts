@@ -4299,6 +4299,8 @@ export const pt_BR: EnTranslations = {
     "dungeonDifficulty": {
       "setHeroic": "Definir Dificuldade da Masmorra: Heroico",
       "setNormal": "Definir Dificuldade da Masmorra: Normal",
+      "unappliedNormal": "Heroic selected. Current instances are still Normal.",
+      "unappliedHeroic": "Normal selected. Current instances are still Heroic.",
       "resetAll": "Redefinir todas as instâncias",
       "resetDone": "Todas as instâncias foram redefinidas.",
       "resetNone": "Você não tem instâncias para redefinir.",

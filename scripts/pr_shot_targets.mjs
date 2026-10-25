@@ -1391,6 +1391,48 @@ async function stageWheelBinds(page) {
 }
 
 export const TARGETS = [
+  // The self portrait menu's dungeon difficulty rows after a refused change: the
+  // group keeps a live Normal claim on its five-minute reset cooldown, so picking
+  // Heroic is refused but stays selected, and the menu says the instances are
+  // still Normal. The claim is staged on a free slot (the refusal path is what is
+  // under review, not the dungeon walk); the menu opens from the real
+  // contextmenu binding on #player-frame.
+  {
+    key: 'self-menu-unapplied-difficulty',
+    label: 'Portrait menu: selected difficulty not yet applied',
+    when: ['ui/player_context_menu'],
+    variants: [
+      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await dismissEntryOverlays(page);
+      await dismissArrivalGreeting(page);
+      const staged = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        if (!sim?.instances || !sim.ctx) return false;
+        const inst = sim.instances.find(
+          (i) => i.dungeonId === 'hollow_crypt' && i.partyKey === null,
+        );
+        if (!inst) return false;
+        inst.partyKey = sim.ctx.instanceKeyFor(sim.playerId);
+        inst.difficulty = 'normal';
+        inst.resetAvailableAt = sim.time + 300;
+        sim.setDungeonDifficulty('heroic');
+        return inst.difficulty === 'normal';
+      });
+      if (!staged) throw new Error('could not stage the refused difficulty change');
+      const box = await page.evaluate(() => {
+        const r = document.querySelector('#player-frame')?.getBoundingClientRect();
+        return r ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : null;
+      });
+      if (!box) throw new Error('#player-frame missing');
+      await page.mouse.click(box.x, box.y, { button: 'right' });
+      if (!(await pollForSize(page, '#ctx-menu', 10, 200))) throw new Error('menu did not open');
+      await wait(300);
+      return { clip: '#ctx-menu' };
+    },
+  },
   // The leveling quest shields: each quest's detail page, as a paladin (the
   // warrior reward archetype), so the reward row shows the shield. The base
   // shows the same quests with no item reward.

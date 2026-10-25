@@ -4299,6 +4299,8 @@ export const fr_CA: EnTranslations = {
     "dungeonDifficulty": {
       "setHeroic": "Définir la difficulté du donjon : Héroïque",
       "setNormal": "Définir la difficulté du donjon : Normal",
+      "unappliedNormal": "Heroic selected. Current instances are still Normal.",
+      "unappliedHeroic": "Normal selected. Current instances are still Heroic.",
       "resetAll": "Réinitialiser toutes les instances",
       "resetDone": "Toutes les instances ont été réinitialisées.",
       "resetNone": "Vous n'avez aucune instance à réinitialiser.",
