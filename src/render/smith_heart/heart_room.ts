@@ -5,14 +5,28 @@
 // its vein's light down into its altar; the platform's rune rings; and the
 // embers rising out of the chasm toward the open sky.
 //
-// Static geometry with shader-driven motion (the shared clock): nothing here
-// writes a uniform per frame. The chains are one instanced draw; the rune
-// rings ride the floor ladder's ground rung. Every tier draws the core, the
-// chains and the pours (they are the room's identity and point at the
+// Since phase 2J the Heart's Blender kit (heart_room_kit.ts) draws the
+// platform, the terrace, their keels, the altars and the four roots of the
+// mountain that replaced the chains; with it this draws the heart's light in
+// its bed deep in the chasm (the core, smaller, in the bed's hollow), the
+// shafts, the rune rings, the channels' light from each altar to the hub (one
+// per vein, lit and dimmed on its own: `setVein`) and the embers. Without the
+// kit, the blockout's chains, pours and keels stand as before.
+//
+// Static geometry with shader-driven motion (the shared clock): a uniform
+// is written only when a vein's level or the heart's darkness changes. The
+// chains are one instanced draw; the rune rings and the channels ride the
+// floor ladder's ground rung. Every tier draws the core, the chains (or the
+// roots) and the pours (they are the room's identity and point at the
 // altars); only the embers thin on the low tier (cosmetic).
 
 import * as THREE from 'three';
-import { HEART_ROOM, SMITH_HEART_VEIN_COLORS } from '../../sim/content/smith_heart_layout';
+import {
+  HEART_ALTARS,
+  HEART_ROOM,
+  SMITH_HEART_VEIN_COLORS,
+  type SmithHeartVein,
+} from '../../sim/content/smith_heart_layout';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { sharedUniforms, surfaceMat } from '../gfx';
 import { markSharedMaterial } from '../shared_resource';
@@ -33,30 +47,56 @@ import {
   heartEmberCount,
   heartKeels,
 } from './heart_room_core';
+import { HEART_CORE_BED_Y } from './heart_room_kit_plan_core';
 
+// The rune rings: a fine line of light along each ring and, carved in the
+// basalt band either side of it, the Smith's glyphs (chevrons, staves and
+// lozenges, one to a cell, some cells bare), lit faintly from within, the
+// light running slowly round. Never a dashed lane: each glyph is a stroke.
 const RUNE_FRAG = /* glsl */ `
 uniform float uTime;
+uniform float uLevel;
 uniform vec3 uColor;
 varying vec2 vP;
 float h1(float n) { return fract(sin(n) * 43758.5453); }
+float stroke(float d, float w) { return 1.0 - smoothstep(w * 0.6, w, abs(d)); }
+float glyph(float kind, float w, float v) {
+  float c = 0.0;
+  if (kind < 0.33) {
+    // A chevron, its point toward the ring.
+    c = stroke(abs(w - 0.5) * 2.0 - v, 0.16);
+  } else if (kind < 0.66) {
+    // A stave, forked at its far end (the Smith's mark of a vein).
+    float fork = stroke(abs(w - 0.5) * 2.0 - (v - 0.55) * 1.6, 0.14) * step(0.55, v);
+    c = max(stroke(w - 0.5, 0.09) * step(v, 0.62), fork);
+  } else {
+    // A lozenge.
+    c = stroke(abs(w - 0.5) * 2.0 + abs(v - 0.5) * 2.0 - 0.8, 0.12);
+  }
+  return c * step(0.02, v) * step(v, 0.98);
+}
 void main() {
   float r = length(vP);
   float turns = atan(vP.x, vP.y) / 6.2831853 + 0.5;
   float a = 0.0;
   ${HEART_RUNE_RINGS.map(
     (R, i) => `{
-    float d = abs(r - ${R.toFixed(1)});
-    a += smoothstep(0.22, 0.0, d);
-    float cell = floor(turns * ${48 + i * 24}.0);
-    float inCell = fract(turns * ${48 + i * 24}.0);
-    a += step(d, 1.6) * step(1.0, d) * step(0.45, h1(cell * ${(3.1 + i).toFixed(1)}))
-      * step(0.25, inCell) * step(inCell, 0.75) * 0.7;
+    float s = r - ${R.toFixed(1)};
+    float d = abs(s);
+    a += (1.0 - smoothstep(0.05, 0.12, d)) * 0.9;
+    float n = ${Math.round(R * 2.6)}.0;
+    float cell = floor(turns * n);
+    float w = fract(turns * n);
+    float v = (d - 0.42) / 1.0;
+    float h = h1(cell * ${(3.1 + i).toFixed(1)} + step(0.0, s) * 17.0);
+    if (h > 0.28 && v > 0.0 && v < 1.0) a += glyph(fract(h * 7.3), w, v) * 0.42;
   }`,
   ).join('\n  ')}
-  float beat = 0.75 + 0.25 * sin(uTime * 2.856);
-  float run = 0.6 + 0.4 * sin(turns * 25.13 - uTime * 0.8 + r * 0.3);
+  float beat = 0.8 + 0.2 * sin(uTime * 2.856);
+  float run = 0.55 + 0.45 * smoothstep(0.6, 1.0, sin(turns * 12.566 - uTime * 0.45));
+  a *= uLevel;
   if (a < 0.01) discard;
-  gl_FragColor = vec4(uColor * a * beat * run * 1.3, 1.0);
+  gl_FragColor = vec4(uColor * a * beat * run, 1.0);
   #include <colorspace_fragment>
 }`;
 
@@ -109,13 +149,14 @@ function radiusAt(profile: readonly (readonly [number, number])[], y: number): n
 
 let haloMaterial: THREE.SpriteMaterial | null = null;
 
-/** The Smith's heart in the chasm, its halo and its rising shafts. */
-function buildCore(group: THREE.Group): void {
-  const core = new THREE.Mesh(
-    new THREE.SphereGeometry(HEART_CORE.r, 48, 32),
-    heartCoreMaterial('smithHeartCore'),
-  );
-  core.position.set(HEART_CORE.x, HEART_CORE.y, HEART_CORE.z);
+/** The Smith's heart in the chasm, its halo and its rising shafts (with the
+ *  kit: the molten light in the bed's hollow the heart rises from). Returns
+ *  the core's material (its beat dims when the heart goes dark). */
+function buildCore(group: THREE.Group, kit: boolean): THREE.ShaderMaterial {
+  const material = heartCoreMaterial('smithHeartCore');
+  const r = kit ? 4.8 : HEART_CORE.r;
+  const core = new THREE.Mesh(new THREE.SphereGeometry(r, 48, 32), material);
+  core.position.set(HEART_CORE.x, kit ? HEART_CORE_BED_Y - 2.2 : HEART_CORE.y, HEART_CORE.z);
   core.name = 'smithHeartCore';
   group.add(core);
   if (!haloMaterial) {
@@ -132,8 +173,8 @@ function buildCore(group: THREE.Group): void {
     markSharedMaterial(haloMaterial);
   }
   const halo = new THREE.Sprite(haloMaterial);
-  halo.position.set(HEART_CORE.x, HEART_CORE.y + 4, HEART_CORE.z);
-  halo.scale.set(120, 120, 1);
+  halo.position.set(HEART_CORE.x, (kit ? HEART_CORE_BED_Y : HEART_CORE.y) + 4, HEART_CORE.z);
+  halo.scale.set(kit ? 90 : 120, kit ? 90 : 120, 1);
   group.add(halo);
   const shaftMat = heartBeamMaterial(0xffc87a, 'smithHeartCoreShaft');
   shaftMat.uniforms.uK.value = 0.22;
@@ -150,6 +191,7 @@ function buildCore(group: THREE.Group): void {
     shaft.name = 'coreShaft';
     group.add(shaft);
   }
+  return material;
 }
 
 /** The four chains (one instanced draw) and their pours. */
@@ -208,7 +250,7 @@ function buildChains(group: THREE.Group): void {
 }
 
 /** The platform's rune rings (a floor mark on the ground rung). */
-function buildRuneRings(group: THREE.Group): void {
+function buildRuneRings(group: THREE.Group): THREE.ShaderMaterial {
   const material = new THREE.ShaderMaterial({
     name: 'smithHeartRuneRings',
     transparent: true,
@@ -217,6 +259,7 @@ function buildRuneRings(group: THREE.Group): void {
     fog: false,
     uniforms: {
       uTime: sharedUniforms.uTime,
+      uLevel: { value: 1 },
       uColor: { value: new THREE.Color(0xffc878) },
     },
     vertexShader: /* glsl */ `
@@ -232,6 +275,71 @@ function buildRuneRings(group: THREE.Group): void {
   disc.renderOrder = floorVfxRenderOrder('ground', 2);
   disc.name = 'heartRuneRings';
   group.add(disc);
+  return material;
+}
+
+/** Where a channel's light runs (yards from the platform's centre): from
+ *  the hub to the altar's plinth (the kit's channel, heart_pieces.py). */
+const CHANNEL_RUN = { from: 1.8, to: 33.8, half: 0.78 } as const;
+
+const CHANNEL_FRAG = /* glsl */ `
+uniform float uTime;
+uniform float uLevel;
+uniform vec3 uColor;
+varying vec2 vUv;
+void main() {
+  // The vein's light running in from its altar (uv.y 1) to the hub (0), a
+  // bright head every few seconds, the bed's edges dark.
+  float across = abs(vUv.x - 0.5) * 2.0;
+  float core = 1.0 - smoothstep(0.08, 0.3, across);
+  float body = 1.0 - smoothstep(0.3, 1.0, across);
+  float run = fract(vUv.y * 2.2 + uTime * 0.28);
+  float head = smoothstep(0.82, 1.0, run) * (1.0 - smoothstep(0.98, 1.0, run));
+  float a = (core * 0.42 + body * 0.12 + head * body * 0.45) * (0.75 + 0.25 * vUv.y) * uLevel;
+  if (a < 0.004) discard;
+  gl_FragColor = vec4(mix(uColor, vec3(1.0, 0.97, 0.9), head * 0.5) * a, 1.0);
+  #include <colorspace_fragment>
+}`;
+
+/** The four channels' light (a floor mark on the ground rung), one material
+ *  per vein. */
+function buildChannels(group: THREE.Group): Map<SmithHeartVein, THREE.ShaderMaterial> {
+  const out = new Map<SmithHeartVein, THREE.ShaderMaterial>();
+  const len = CHANNEL_RUN.to - CHANNEL_RUN.from;
+  // A strip along +Z from the hub (uv.y 0) to the altar (1).
+  const geo = new THREE.PlaneGeometry(CHANNEL_RUN.half * 2, len, 1, 16)
+    .rotateX(-Math.PI / 2)
+    .translate(0, 0, CHANNEL_RUN.from + len / 2);
+  // PlaneGeometry's uv.y runs +Y to... after the turn, from the far end:
+  // flip so uv.y is 0 at the hub.
+  const uv = geo.attributes.uv as THREE.BufferAttribute;
+  for (let i = 0; i < uv.count; i++) uv.setY(i, 1 - uv.getY(i));
+  for (const a of HEART_ALTARS) {
+    const material = new THREE.ShaderMaterial({
+      name: `smithHeartChannel:${a.vein}`,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      fog: false,
+      uniforms: {
+        uTime: sharedUniforms.uTime,
+        uLevel: { value: 1 },
+        uColor: { value: new THREE.Color(SMITH_HEART_VEIN_COLORS[a.vein]) },
+      },
+      vertexShader: /* glsl */ `
+        varying vec2 vUv;
+        void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+      fragmentShader: CHANNEL_FRAG,
+    });
+    const mesh = new THREE.Mesh(geo, material);
+    mesh.position.set(HEART_ROOM.x, HEART_ROOM.h + 0.045, HEART_ROOM.z);
+    mesh.rotation.y = Math.atan2(a.x - HEART_ROOM.x, a.z - HEART_ROOM.z);
+    mesh.renderOrder = floorVfxRenderOrder('ground', 2);
+    mesh.name = `heartChannel:${a.vein}`;
+    group.add(mesh);
+    out.set(a.vein, material);
+  }
+  return out;
 }
 
 /** The embers rising out of the chasm toward the sky. */
@@ -251,17 +359,46 @@ function buildEmbers(group: THREE.Group, lowGfx: boolean): void {
   group.add(points);
 }
 
-/** The Heart's dressing and every island's keel (instance-local). */
+export interface HeartRoom {
+  group: THREE.Group;
+  /** Light (1) or dim (0) one vein's channel (the kit's only). */
+  setVein(vein: SmithHeartVein, level: number): void;
+  /** The heart's light: 1 beating, toward 0 as it goes dark. */
+  setHeart(level: number): void;
+}
+
+/** The Heart's dressing and every island's keel (instance-local). With the
+ *  Heart kit (`kit`), the roots replace the chains and the channels carry
+ *  each vein's light. */
 export function buildHeartRoom(
   lowGfx: boolean,
   skipKeels: ReadonlySet<string> = new Set(),
-): THREE.Group {
+  kit = false,
+): HeartRoom {
   const group = new THREE.Group();
   group.name = 'smithHeartRoom';
   buildKeels(group, skipKeels);
-  buildCore(group);
-  buildChains(group);
-  buildRuneRings(group);
+  const core = buildCore(group, kit);
+  if (!kit) buildChains(group);
+  const runes = buildRuneRings(group);
+  const channels = kit ? buildChannels(group) : new Map<SmithHeartVein, THREE.ShaderMaterial>();
   buildEmbers(group, lowGfx);
-  return group;
+  let heart = 1;
+  return {
+    group,
+    setVein(vein, level) {
+      const m = channels.get(vein);
+      const k = Math.round(Math.max(0, Math.min(1, level)) * 100) / 100;
+      if (m && m.uniforms.uLevel.value !== k) m.uniforms.uLevel.value = k;
+    },
+    setHeart(level) {
+      const k = Math.round(Math.max(0, Math.min(1, level)) * 100) / 100;
+      if (k === heart) return;
+      heart = k;
+      // A dark heart beats slow and faint.
+      core.uniforms.uBeat.value = 2.2 + (1 - k) * 6;
+      core.uniforms.uLevel.value = k;
+      runes.uniforms.uLevel.value = 0.25 + 0.75 * k;
+    },
+  };
 }

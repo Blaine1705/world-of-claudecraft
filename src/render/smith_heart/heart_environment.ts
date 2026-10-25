@@ -313,6 +313,8 @@ export const SMITH_HEART_CORE_LIGHT = {
   /** The heart's gold from below. */
   hemiGround: 0x8a5424,
   rimColor: 0xffc880,
-  /** High over the oculus, a little north-east (from the ground toward it). */
-  keyDirection: [0.25, 0.92, 0.3] as const,
+  /** High over the terrace's side of the chasm (from the ground toward it,
+   *  phase 2J): the raid crossing the bridge sees the colossus lit, its
+   *  back to the crown in shade. */
+  keyDirection: [-0.38, 0.8, -0.46] as const,
 } as const;

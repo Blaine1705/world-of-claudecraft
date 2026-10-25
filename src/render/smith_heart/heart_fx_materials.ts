@@ -293,6 +293,7 @@ export function heartCoreMaterial(name: string): THREE.ShaderMaterial {
     uniforms: {
       uTime: sharedUniforms.uTime,
       uBeat: { value: 2.2 },
+      uLevel: { value: 1 },
     },
     vertexShader: /* glsl */ `
       varying vec3 vN; varying vec3 vP; varying float vRim;
@@ -304,7 +305,7 @@ export function heartCoreMaterial(name: string): THREE.ShaderMaterial {
       }`,
     fragmentShader: /* glsl */ `
       ${NOISE}
-      uniform float uTime; uniform float uBeat;
+      uniform float uTime; uniform float uBeat; uniform float uLevel;
       varying vec3 vN; varying vec3 vP; varying float vRim;
       void main() {
         vec3 n = normalize(vN);
@@ -320,6 +321,8 @@ export function heartCoreMaterial(name: string): THREE.ShaderMaterial {
         col = mix(col, white, smoothstep(0.7, 0.95, churn) * 0.8);
         col *= 1.1 + beat * 0.9;
         col += hot * pow(1.0 - vRim, 2.0) * (0.8 + beat);
+        // The heart going dark: embers of it, never black.
+        col *= mix(0.1, 1.0, uLevel);
         gl_FragColor = vec4(col, 1.0);
         #include <colorspace_fragment>
       }`,

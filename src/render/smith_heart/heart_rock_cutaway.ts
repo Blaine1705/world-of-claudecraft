@@ -11,6 +11,7 @@
 // HEART_ROCK_SHADE_FLOOR).
 
 import * as THREE from 'three';
+import { heartCrownColorGlsl, heartCrownEmissiveGlsl } from './heart_crown_core';
 import { HEART_ROCK_CUT_FAR, HEART_ROCK_CUT_NEAR, HEART_ROCK_STRATA } from './heart_rock_plan_core';
 import { heatSootGlsl } from './heat_soot_core';
 import { QUENCH_FROST_NOISE_GLSL, quenchFrostGlsl } from './quench_frost_core';
@@ -58,7 +59,7 @@ export function heartRockBedGlsl(): string {
         }`;
 }
 
-const KEY = `smith-heart-rock-cutaway|beds2g|frost2h|soot2i|${HEART_ROCK_CUT_NEAR}|${HEART_ROCK_CUT_FAR}|${HEART_ROCK_SHADE_FLOOR.join(',')}`;
+const KEY = `smith-heart-rock-cutaway|beds2g|frost2h|soot2i|crown2j|${HEART_ROCK_CUT_NEAR}|${HEART_ROCK_CUT_FAR}|${HEART_ROCK_SHADE_FLOOR.join(',')}`;
 
 /** Wire the cutaway into a rock material (before any other layer: those
  *  compose with it). */
@@ -106,12 +107,14 @@ export function applyRockCutaway(mat: THREE.Material): void {
         `#include <color_fragment>
 ${heartRockBedGlsl()}
 ${quenchFrostGlsl()}
-${heatSootGlsl()}`,
+${heatSootGlsl()}
+${heartCrownColorGlsl()}`,
       )
       .replace(
         '#include <emissivemap_fragment>',
         `#include <emissivemap_fragment>
-        totalEmissiveRadiance += diffuseColor.rgb * vec3( ${HEART_ROCK_SHADE_FLOOR.join(', ')} );`,
+        totalEmissiveRadiance += diffuseColor.rgb * vec3( ${HEART_ROCK_SHADE_FLOOR.join(', ')} );
+${heartCrownEmissiveGlsl()}`,
       );
   };
   const prevKey = mat.customProgramCacheKey.bind(mat);

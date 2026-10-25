@@ -15,6 +15,12 @@ import {
   hammerRockLift,
 } from './heart_cliff_paint_core';
 import {
+  HEART_CROWN_GAIN,
+  HEART_CROWN_MIX,
+  HEART_CROWN_TONE,
+  heartCrownWeight,
+} from './heart_crown_core';
+import {
   HAMMER_TERRACE_RISER,
   HEART_MOUNTAIN_CHASM,
   heartHammerTerraceStep,
@@ -40,6 +46,7 @@ const ROCK_HIGH = new THREE.Color(0x6a6766);
 const HAMMER_ROCK = new THREE.Color(HAMMER_ROCK_TONE);
 const QUENCH_ROCK = new THREE.Color(QUENCH_ROCK_TONE);
 const HEAT_ROCK = new THREE.Color(HEAT_ROCK_TONE);
+const CROWN_ROCK = new THREE.Color(HEART_CROWN_TONE);
 
 /** A Hammer step's shade (a gain): its own tone of the bed, the ledge's
  *  outer lip a touch paler, the crease where the next riser rises darker. */
@@ -109,6 +116,12 @@ export function buildHeartMountain(lowGfx: boolean): THREE.Mesh {
       const soot = heatSootWeight(g.x0 + i * g.cell, g.z0 + j * g.cell);
       if (soot > 0)
         c.lerp(HEAT_ROCK, soot * HEAT_ROCK_MIX).multiplyScalar(1 + soot * (HEAT_ROCK_GAIN - 1));
+      // The Heart's crown (phase 2J): a dark warm granite round the chamber.
+      const crown = heartCrownWeight(g.x0 + i * g.cell, g.z0 + j * g.cell);
+      if (crown > 0)
+        c.lerp(CROWN_ROCK, crown * HEART_CROWN_MIX).multiplyScalar(
+          1 + crown * (HEART_CROWN_GAIN - 1),
+        );
       colors[k * 3] = c.r;
       colors[k * 3 + 1] = c.g;
       colors[k * 3 + 2] = c.b;

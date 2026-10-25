@@ -43,6 +43,17 @@ import { buildHeartRivers } from './heart_rivers';
 import { dressHeartMountain, ensureHeartRockKit } from './heart_rock';
 import { setHeartRockSlot } from './heart_rock_cutaway';
 import { buildHeartRoom } from './heart_room';
+import {
+  buildHeartRoomKit,
+  ensureHeartRoomKit,
+  HEART_KIT_KINDS,
+  heartRoomKitReady,
+} from './heart_room_kit';
+import {
+  HEART_KIT_KEELS,
+  HEART_KIT_OMIT_TOPS,
+  HEART_KIT_SHALLOW,
+} from './heart_room_kit_plan_core';
 import { buildHeartSeal } from './heart_seal';
 import { heartSealSlotKey, heartSealView, newHeartSealView } from './heart_seal_core';
 import { buildHeartSky } from './heart_sky';
@@ -89,6 +100,7 @@ export async function buildSmithHeartInterior(
     ensureQuenchKit(),
     ensureHeatKit(),
     ensureHeartKit(SMITH_HEART_GATE_KIT_URL),
+    ensureHeartRoomKit(),
   ]);
   // The Ring kit draws the two stairs tread by tread and the dais's keel
   // (phase 2F); without it the field's own ramps and keel stand.
@@ -100,6 +112,9 @@ export async function buildSmithHeartInterior(
   // The Heat kit draws the anvil bridge's arch (phase 2I): the field then
   // keeps only a shallow keel under its deck.
   const heatReady = heatKitReady();
+  // The Heart kit draws the platform, the terrace, the bridge and their keels,
+  // the altars and the roots (phase 2J); without it the blockout stands.
+  const heartReady = heartRoomKitReady();
   const group = new THREE.Group();
   group.name = 'smithHeartField';
   // The rock's regional paint (the Quench's frost) reads this slot from its
@@ -117,10 +132,18 @@ export async function buildSmithHeartInterior(
           ...SMITH_HEART_FLOATING_SURFACES,
           ...(breathReady ? BREATH_KIT_SHALLOW : []),
           ...(heatReady ? HEAT_KIT_SHALLOW : []),
+          ...(heartReady ? HEART_KIT_SHALLOW : []),
         ]),
         depth: BREATH_KIT_KEEL,
       },
-      ...(ringReady ? { omitTops: RING_KIT_OMIT_TOPS } : {}),
+      ...(ringReady || heartReady
+        ? {
+            omitTops: new Set([
+              ...(ringReady ? RING_KIT_OMIT_TOPS : []),
+              ...(heartReady ? HEART_KIT_OMIT_TOPS : []),
+            ]),
+          }
+        : {}),
       // The Frozen Lake and the Singing Ice drawn with the ice's depth
       // (phase 2H).
       // The Heat's floors with the fire in their joints (phase 2I).
@@ -140,6 +163,7 @@ export async function buildSmithHeartInterior(
     ...BREATH_KIT_KINDS,
     ...QUENCH_KIT_KINDS,
     ...HEAT_KIT_KINDS,
+    ...HEART_KIT_KINDS,
   ]);
   const drawn = new Set([
     ...(kitReady ? HAMMER_KIT_KINDS : []),
@@ -147,6 +171,7 @@ export async function buildSmithHeartInterior(
     ...(breathReady ? BREATH_KIT_KINDS : []),
     ...(quenchReady ? QUENCH_KIT_KINDS : []),
     ...(heatReady ? HEAT_KIT_KINDS : []),
+    ...(heartReady ? HEART_KIT_KINDS : []),
   ]);
   const props = buildHeartProps(kitKinds, drawn);
   group.add(props.group);
@@ -163,7 +188,14 @@ export async function buildSmithHeartInterior(
   group.add(buildQuenchAir(deps.lowGfx));
   group.add(buildHeatAir(deps.lowGfx));
   group.add(buildHeatPour(deps.lowGfx));
-  group.add(buildHeartRoom(deps.lowGfx, ringReady ? new Set(['seal_dais']) : new Set()));
+  const heartKit = heartReady ? buildHeartRoomKit(deps.lowGfx) : null;
+  if (heartKit) group.add(heartKit.group);
+  const room = buildHeartRoom(
+    deps.lowGfx,
+    new Set([...(ringReady ? ['seal_dais'] : []), ...(heartReady ? HEART_KIT_KEELS : [])]),
+    heartReady,
+  );
+  group.add(room.group);
   buildHeartLights(group, deps, ground);
   const rivers = buildHeartRivers();
   group.add(rivers.group);
