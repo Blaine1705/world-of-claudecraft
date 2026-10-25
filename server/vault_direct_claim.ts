@@ -4,6 +4,7 @@
 
 import type { CharacterState } from '../src/sim/character_state';
 import { assertHeroicMarksGrantsFit, HeroicMarksCapacityError } from '../src/sim/heroic_marks';
+import type { InvSlot } from '../src/sim/types';
 import { beginCharacterSaveTx } from './character_save_transaction';
 import { addVaultRewardToCharacterState } from './vault_reward_state';
 import {
@@ -19,6 +20,7 @@ export interface VaultDirectClaimArgs {
   claim: VaultRewardClaim;
   owner: boolean;
   state: CharacterState;
+  preparedItems?: readonly InvSlot[];
 }
 
 export interface VaultDirectClaimDeps {
@@ -43,7 +45,13 @@ export async function commitVaultDirectClaim(
     if (error instanceof HeroicMarksCapacityError) return 'retry';
     throw error;
   }
-  const state = addVaultRewardToCharacterState(args.state, args.claim, args.attemptId, args.owner);
+  const state = addVaultRewardToCharacterState(
+    args.state,
+    args.claim,
+    args.attemptId,
+    args.owner,
+    args.preparedItems,
+  );
   let client: VaultRewardClient;
   try {
     client = await deps.pool.connect();

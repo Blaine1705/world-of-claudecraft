@@ -29,7 +29,7 @@ import { abilityNeedsLineOfSight } from './ability_line_of_sight';
 import { offlineActionBarRestore } from './action_bar_restore';
 import { auraSaveFragment, restorePersistedAuras } from './aura_persist';
 import { playerStartPos, type SpawnSlots, setPlaytestGod } from './authored_world_hooks';
-import { maybeAutoEquip } from './auto_equip';
+import { autoEquipsInstanceGrant, isAutoEquipGearKind, maybeAutoEquip } from './auto_equip';
 import * as bagsMod from './bags';
 import {
   BAG_SOCKETS,
@@ -311,11 +311,7 @@ import * as raidReadouts from './ignivar_raid_readouts';
 import * as interaction from './interaction';
 import * as inventoryConsumption from './inventory_consumption';
 import type { ExtractOutcome, ExtractRef } from './inventory_extract';
-import {
-  grantInventoryInstances,
-  grantPlainStack,
-  type InventoryGrantOptions,
-} from './inventory_grant';
+import { grantPlainStack, type InventoryGrantOptions } from './inventory_grant';
 import { emitInventoryReceipt } from './inventory_receipt';
 import { foldNamedSlotTarget, type NamedSlotTarget } from './item_copy_ref';
 import {
@@ -326,6 +322,7 @@ import {
 } from './item_instance_load';
 import { isChargeBearingPayload } from './item_instance_merge';
 import { countRawInSlots, setItemLocked as setItemLockedCmd } from './item_lock';
+import { grantTrackedInstances, isTrackedItemGrant } from './item_tracking';
 import * as items from './items';
 import { applyKnockback as applyKnockbackImpl } from './knockback';
 import { lanceGuidanceFor } from './lance_guidance';
@@ -2274,6 +2271,7 @@ export class Sim {
       world: cfg.world,
       perfLap: cfg.perfLap,
       idleMobTickRadius: cfg.idleMobTickRadius ?? 0,
+      mintItemGuid: cfg.mintItemGuid,
     };
     const activeWorldContent = getActiveWorldContent();
     this.worldContent = cfg.world ?? activeWorldContent;
@@ -7964,6 +7962,12 @@ export class Sim {
     if (!r) return;
     const { meta } = r;
     const def = ITEMS[itemId];
+    // A tracked (epic or legendary) def takes the instanced arm so every copy
+    // is minted with its guid and provenance (item_tracking.ts).
+    if (isTrackedItemGrant(def)) {
+      this.addItemInstance(itemId, {}, pid, count, opts);
+      return;
+    }
     // Stacks into the bags, or credits a currency counter (Heroic Marks).
     grantPlainStack(meta, itemId, count, opts);
     // Every grant that reaches the hub is an acquisition for the Book of
@@ -7986,12 +7990,7 @@ export class Sim {
     if (!opts?.movement) noteRelicObtain(meta, itemId, count);
     emitInventoryReceipt(this.ctx, meta.entityId, itemId, def?.name ?? itemId, count, opts);
     this.ctx.onInventoryChangedForQuests(meta);
-    if (
-      meta.autoEquip &&
-      (def?.kind === 'weapon' || def?.kind === 'armor' || def?.kind === 'held_offhand')
-    ) {
-      maybeAutoEquip(this.ctx, itemId, meta);
-    }
+    if (meta.autoEquip && isAutoEquipGearKind(def)) maybeAutoEquip(this.ctx, itemId, meta);
   }
 
   // Grant payload-bearing copies. Materials coalesce exact source buckets;
@@ -7999,24 +7998,19 @@ export class Sim {
   // Loot events, discovery and movement accounting match addItem.
   addItemInstance(
     itemId: string,
-    instance: ItemInstancePayload,
+    given: ItemInstancePayload,
     pid?: number,
     count = 1,
     opts?: InventoryGrantOptions,
-  ): void {
+  ): ItemInstancePayload | void {
     const r = this.resolve(pid);
     if (!r) return;
     if (count < 1) return;
     const { meta } = r;
     const def = ITEMS[itemId];
-    grantInventoryInstances(
-      meta.inventory,
-      itemId,
-      count,
-      instance,
-      opts?.craftedRecipeId,
-      opts?.materialSources,
-    );
+    // Tracked copies are stamped (guid + provenance, or a transfer) per copy
+    // on the way in (item_tracking.ts); untracked payloads pack as before.
+    const instance = grantTrackedInstances(this.ctx, meta, itemId, count, given, opts);
     // Discovery ledger: the instance's rolled quality (gathered rares) beats
     // the static def quality for the quality-first marks. `movement` rides
     // along exactly as in addItem above (provenance only, never membership).
@@ -8041,7 +8035,9 @@ export class Sim {
       instance,
     );
     this.ctx.onInventoryChangedForQuests(meta);
-    if (meta.autoEquip && instance.lootQuality) maybeAutoEquip(this.ctx, itemId, meta, instance);
+    if (meta.autoEquip && autoEquipsInstanceGrant(def, given, instance))
+      maybeAutoEquip(this.ctx, itemId, meta, instance);
+    return instance;
   }
 
   // Returns the `instance` payload of every instanced UNIT actually consumed

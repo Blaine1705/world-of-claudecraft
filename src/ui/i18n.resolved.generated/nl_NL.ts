@@ -3841,6 +3841,12 @@ export const nl_NL: EnTranslations = {
       "linkHint": "Shift-klik om dit voorwerp in de chat te delen."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "{count} gilde getoond",
         "few": "{count} gilden getoond",
@@ -5271,6 +5277,9 @@ export const nl_NL: EnTranslations = {
       "partyTradeWindow": "Je kunt dit voorwerp de komende {time} ruilen met spelers die deze buit deelden. Uitrusten beëindigt het ruilvenster.",
       "perfectedBadge": "Geperfectioneerd",
       "perfectingRank": "Perfecteren: rang {rank} van {ranks}",
+      "lootedBy": "Looted by {name} on {date}",
+      "questRewardTo": "Quest reward to {name} on {date}",
+      "obtainedBy": "Obtained by {name} on {date}",
       "materialSourceGatherer": "{count} × Verzameld door {name}",
       "trophySkullSource": "{count} × Afgenomen van {name}",
       "materialSourceGathererSigned": "{count} × Verzameld door {name}, gesigneerd door {signer}",
@@ -6542,7 +6551,15 @@ export const nl_NL: EnTranslations = {
       "viewSources": "Bronnen bekijken",
       "separateByGatherer": "Per verzamelaar scheiden",
       "takeChosenQuantity": "Gekozen aantal uitnemen",
-      "combine": "Materiaalstapels combineren"
+      "combine": "Materiaalstapels combineren",
+      "itemHistory": "Item history"
+    },
+    "itemHistory": {
+      "title": "{item}: history",
+      "passedTo": "Passed to {name} on {date}",
+      "noTransfers": "This item has never changed hands.",
+      "close": "Close",
+      "openAria": "Item history for {item}"
     },
     "enchanting": {
       "recipeNotLearned": "Leer de formule voordat je deze betovering toepast.",
@@ -17147,7 +17164,8 @@ export const nl_NL: EnTranslations = {
       "tooManyOrders": "Je kunt tegelijk maximaal {count} bestellingen open houden.",
       "orderClosed": "Die bestelling is niet langer open.",
       "orderOwn": "Dat is je eigen bestelling. Annuleer deze om hem in te trekken.",
-      "orderNotYours": "Dat is niet jouw bestelling."
+      "orderNotYours": "Dat is niet jouw bestelling.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Alles nemen",

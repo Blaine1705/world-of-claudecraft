@@ -3841,6 +3841,12 @@ export const en_XA: EnTranslations = {
       "linkHint": "[Šĥíƒţ-çļíçķ ţó ļíñķ ţĥíš íţéɱ íñ çĥáţ.]"
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "[{count} éáŕļíéŕ ţŕáñšƒéŕ íš ñóţ šĥóŵñ.]",
+        "few": "[{count} éáŕļíéŕ ţŕáñšƒéŕš áŕé ñóţ šĥóŵñ.]",
+        "many": "[{count} éáŕļíéŕ ţŕáñšƒéŕš áŕé ñóţ šĥóŵñ.]",
+        "other": "[{count} éáŕļíéŕ ţŕáñšƒéŕš áŕé ñóţ šĥóŵñ.]"
+      },
       "guildBoardShown": {
         "one": "[{count} ĝúíļð šĥóŵñ]",
         "few": "[{count} ĝúíļðš šĥóŵñ]",
@@ -5271,6 +5277,9 @@ export const en_XA: EnTranslations = {
       "partyTradeWindow": "[Ýóú ɱáý ţŕáðé ţĥíš íţéɱ ţó þļáýéŕš ŵĥó šĥáŕéð íţš ðŕóþ ƒóŕ ţĥé ñéẋţ {time}. Éɋúíþþíñĝ íţ éñðš ţĥé ţŕáðé ŵíñðóŵ.]",
       "perfectedBadge": "[Þéŕƒéçţéð]",
       "perfectingRank": "[Þéŕƒéçţíñĝ: ŕáñķ {rank} óƒ {ranks}]",
+      "lootedBy": "[Ļóóţéð ƀý {name} óñ {date}]",
+      "questRewardTo": "[Ɋúéšţ ŕéŵáŕð ţó {name} óñ {date}]",
+      "obtainedBy": "[Óƀţáíñéð ƀý {name} óñ {date}]",
       "materialSourceGatherer": "[{count} × Çóļļéçţéð ƀý {name}]",
       "trophySkullSource": "[{count} × Ţáķéñ ƒŕóɱ {name}]",
       "materialSourceGathererSigned": "[{count} × Çóļļéçţéð ƀý {name}, šíĝñéð ƀý {signer}]",
@@ -6542,7 +6551,15 @@ export const en_XA: EnTranslations = {
       "viewSources": "[Ʋíéŵ šóúŕçéš]",
       "separateByGatherer": "[Šéþáŕáţé ƀý ĝáţĥéŕéŕ]",
       "takeChosenQuantity": "[Ţáķé óúţ çĥóšéñ ɋúáñţíţý]",
-      "combine": "[Çóɱƀíñé ɱáţéŕíáļ šţáçķš]"
+      "combine": "[Çóɱƀíñé ɱáţéŕíáļ šţáçķš]",
+      "itemHistory": "[Íţéɱ ĥíšţóŕý]"
+    },
+    "itemHistory": {
+      "title": "[{item}: ĥíšţóŕý]",
+      "passedTo": "[Þáššéð ţó {name} óñ {date}]",
+      "noTransfers": "[Ţĥíš íţéɱ ĥáš ñéʋéŕ çĥáñĝéð ĥáñðš.]",
+      "close": "[Çļóšé]",
+      "openAria": "[Íţéɱ ĥíšţóŕý ƒóŕ {item}]"
     },
     "enchanting": {
       "recipeNotLearned": "[Ļéáŕñ ţĥé ƒóŕɱúļá ƀéƒóŕé áþþļýíñĝ ţĥíš éñçĥáñţ.]",
@@ -17147,7 +17164,8 @@ export const en_XA: EnTranslations = {
       "tooManyOrders": "[Ýóú ɱáý ķééþ áţ ɱóšţ {count} óŕðéŕš óþéñ áţ óñçé.]",
       "orderClosed": "[Ţĥáţ óŕðéŕ íš ñó ļóñĝéŕ óþéñ.]",
       "orderOwn": "[Ţĥáţ íš ýóúŕ óŵñ óŕðéŕ. Çáñçéļ íţ ţó ŵíţĥðŕáŵ íţ.]",
-      "orderNotYours": "[Ţĥáţ íš ñóţ ýóúŕ óŕðéŕ.]"
+      "orderNotYours": "[Ţĥáţ íš ñóţ ýóúŕ óŕðéŕ.]",
+      "orderTrackedItem": "[Ţĥé Ɱéŕçĥáñţ ţáķéš ñó óŕðéŕš ƒóŕ óñé-óƒ-á-ķíñð ĝéáŕ.]"
     },
     "loot": {
       "takeAll": "[Ţáķé Áļļ]",

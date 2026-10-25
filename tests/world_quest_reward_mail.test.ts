@@ -152,13 +152,20 @@ describe('grantWorldQuestRewardItems', () => {
           sim.rebucket(sim.player);
           meta.inventory.pop();
           sim.mailTake(rewardLetters(sim)[0].id, sim.playerId);
-          expect(meta.inventory.find((slot) => slot.itemId === gear)?.instance).toEqual(
-            copy?.instance,
-          );
+          const taken = meta.inventory.find((slot) => slot.itemId === gear)?.instance;
+          expect(taken?.lootQuality).toEqual(copy?.instance?.lootQuality);
+          // The authored parcel first reaches the inventory hub on withdrawal:
+          // quality is already rolled, while tracking identity is minted here.
+          expect(taken?.guid).toEqual(expect.any(String));
+          expect(taken?.provenance?.source).toBe('legacy');
+          expect(copy?.instance?.guid).toBeUndefined();
           expect(rewardLetters(sim)[0].items).toEqual([]);
           expect(int.mock.calls.filter(([min, max]) => min === 0 && max === 9999)).toHaveLength(1);
+        } else {
+          expect(copy?.instance?.guid).toEqual(expect.any(String));
+          expect(copy?.instance?.provenance?.source).toBe('world');
         }
-        return { instance: copy?.instance, next: sim.rng.next() };
+        return { lootQuality: copy?.instance?.lootQuality, next: sim.rng.next() };
       } finally {
         int.mockRestore();
       }

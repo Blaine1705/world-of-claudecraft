@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { addVaultRewardToCharacterState } from '../../server/vault_reward_state';
+import { prepareVaultRewardTracking } from '../../server/vault_reward_tracking';
 import type { CharacterState } from '../../src/sim/character_state';
 import { HEROIC_MARK_CURRENCY_ID } from '../../src/sim/content/dungeon_difficulty';
 import { HOARD_BASE_ITEM_IDS, hoardLootVariantId } from '../../src/sim/content/hoard_loot';
@@ -199,11 +200,27 @@ describe('direct vault reward character snapshot', () => {
       copper: 42,
       mailDueAt: '2026-09-23T00:00:00.000Z',
     };
-    const projected = addVaultRewardToCharacterState(structuredClone(before), claim, '7:1', true);
+    const prepared = prepareVaultRewardTracking(sim.ctx, pid, claim)!;
+    const projected = addVaultRewardToCharacterState(
+      structuredClone(before),
+      claim,
+      '7:1',
+      true,
+      prepared.items,
+    );
     const next = vi.spyOn(sim.rng, 'next');
     try {
       expect(
-        grantHoardReward(sim.ctx, pid, 'rare', { ...claim, capped: false }, true, undefined, true),
+        grantHoardReward(
+          sim.ctx,
+          pid,
+          'rare',
+          { ...claim, capped: false },
+          true,
+          undefined,
+          true,
+          prepared.items,
+        ),
       ).toBe(true);
       expect(next).not.toHaveBeenCalled();
     } finally {
@@ -218,7 +235,7 @@ describe('direct vault reward character snapshot', () => {
     expect(projected.inventory.some((slot) => slot.itemId === HEROIC_MARK_CURRENCY_ID)).toBe(false);
     expect(
       projected.inventory.find((slot) => slot.itemId === 'slagbreaker_helmet')?.instance,
-    ).toEqual({ lootQuality });
+    ).toMatchObject({ lootQuality, guid: expect.any(String), provenance: { byId: 7 } });
   });
 
   it.each([

@@ -48,8 +48,11 @@ export function grantFreshLoot(
     }
     const base = instance ? cloneItemInstancePayload(instance) : {};
     const copy: ItemInstancePayload = { ...base, lootQuality };
-    ctx.addItemInstance(itemId, copy, pid, 1, opts);
-    first ??= copy;
+    // The hub hands back the payload the copy landed with (a tracked copy's
+    // minted guid and provenance included), so the caller links that copy.
+    // The grant runs on its own line: a `??=` would skip it after the first.
+    const landed = ctx.addItemInstance(itemId, copy, pid, 1, opts);
+    first ??= landed || copy;
   }
   if (ordinary > 0) {
     if (instance) ctx.addItemInstance(itemId, instance, pid, ordinary, opts);
