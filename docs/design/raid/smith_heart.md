@@ -837,7 +837,7 @@ The council's effects are `src/render/smith_heart_fx/council_fx.ts` (pure plan
 | Hammer's Weight | A slab of stone dropping onto the tank and shattering (a lethal-coloured ring), then the tank's mark: a ring at its feet showing the time left and a stone hanging over its head |
 | Wake the Stone | The circle round its player at the knockback's reach (the control colour, ochre accent), filling with the mark, and the ghost of the pillar growing in it |
 | The heir's rising stone | The same circle locked on the floor (the danger colour) for its 2 s |
-| Falling Rock | The soak round its player (gold: gather in it) filling with the mark, motes drawn in, the boulder dropping out of the sky over its last 1.4 s; the impact's dust, shards and rings |
+| Falling Rock | The soak round its player (gold: gather in it) filling with the mark, motes drawn in, the boulder dropping out of the sky over its last 1.2 s; the impact's dust, shards and rings |
 | Seam Bolt | An ochre crystal shard thrown on an arc with sparks, bursting on its mark |
 | Resonance | A notched ring round the player at the 3.5 yd reach and a shimmer round the body; while it cracks a pillar, a thread of light to that pillar and the pillar humming (shaking, its seams glowing) |
 | The stone remembers | A river of beads of stone light arcing from the fallen to each survivor, a flare on arrival |
