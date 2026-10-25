@@ -5,14 +5,15 @@ separate room reached by a portal, bigger themed guardian rooms, the structural 
 phase 2B (the Hammer vein dressed: its Blender kit, its floor, air and light, the Hammer
 guardian's and the Slab's effects, section 5.9) and phase 2C (the Hammer vein's polish
 round and the North Stair, section 5.10), through the Breath (phase 2G, section 5.14), the
-Quench (phase 2H, section 5.15) and the Heat, now the Hearth (phase 2I, section 5.16) implemented on `feature/smith-heart-raid`, dev builds only. The per-room phases (Blender
+Quench (phase 2H, section 5.15), the Heat, now the Hearth (phase 2I, section 5.16), the Heart (phase 2J) and the Hammer Council's playable prototype (the first boss as three, sections 5.18 and 7.1) implemented on `feature/smith-heart-raid`, dev builds only. The per-room phases (Blender
 kits, own creatures, set pieces, boss kits), the quest and the loot are specified here
 and not built. The name is provisional and has not been IP-checked yet.
 
 At a glance: a ten-player level 20 raid (2 tanks, 2 healers, 6 damage), one
 instance slot inside Stormcrag holding two areas no floor joins: the main map (the
 Cleft, the four guardian rooms round the Ring, the heart seal on its dais) and the
-Heart (the final room). Five bosses: the Hammer guardian always first, then the
+Heart (the final room). Five boss fights: the Hammer Council (the Guardian of the Hammer, the
+Slabwright and the Seam Singer, section 7.1) always first, then the
 Breath, Quench and Heat guardians in any order; with all four lit and the Ring clear
 the seal opens into a portal to the Heart and the final boss. Twenty mandatory trash
 packs. Target clear: 90 to 120 minutes on normal.
@@ -47,6 +48,7 @@ Sources of truth, in order:
 | The Heat vein's Blender kit (sources, build, plan, painter) | `docs/design/raid/kit/build_smith_heart_heat_kit.py` (the pieces: `heat_pieces.py`), `scripts/assets/smith_heart_heat_kit/build.mjs`, `src/render/smith_heart/heat_kit_plan_core.ts`, `src/render/smith_heart/heat_kit.ts` |
 | The Heat vein's floors, basalt, air, light and the pour | the `hearth` ground, `src/render/smith_heart/heat_hearth_floor.ts`, `heat_soot_core.ts`, `heat_air_core.ts` / `heat_air.ts`, `heat_pour_core.ts` / `heat_pour.ts`, `heart_environment.ts` (`smithHeartHeat`) |
 | The Heat guardian's effects | `src/render/smith_heart_fx/heat_fx.ts` (`HeatFx`) |
+| The Hammer Council (the first boss: three members, the pillars) | `src/sim/encounters/smith_heart/council*.ts` (`tickHammerCouncil`, `COUNCIL_TUNING`, `COUNCIL_DIFFICULTY`); its look `src/render/smith_heart_fx/council_fx.ts` and `council_bodies.ts`; its alert `src/ui/hud/dungeon/council_alert_view.ts` |
 | Dev commands | `src/sim/dev/smith_heart_dev.ts` (`/dev heart`) |
 
 ## 1. Summary and lore
@@ -158,7 +160,7 @@ rather than repeating numbers that would rot.
 
 Each room reads its theme by shape first (kit placeholders in
 `src/render/smith_heart/heart_plan_core.ts`): the Quarry's kneeling colossi, cut blocks,
-derrick, ochre geodes and the five columns (Mountain's Wrath's line-of-sight cover);
+derrick, ochre geodes and the five columns (the Hammer Council's starting pillars, section 7.1);
 the Cornice's lightning rods and stone wind-horns (phase 2G, section 5.14); the Basin's great
 blades of ice sunk in the lake, heaped old ice, steaming vents and carved fire bowls (phase 2H,
 section 5.15); the Hearth's mouth framed by radiating basalt columns, its altar-stone (on
@@ -195,8 +197,8 @@ than the veins' rock, and no line of sight crosses from any main-map eye into th
 ### 3.3 The route, in order
 
 1. **The Cleft**, the **Hammer Gallery** (h1, h2, h3), the **Pit Mouth**, the
-   **Smith's Quarry**: the Hammer guardian, always first.
-2. **The Slab** breaks when the Hammer guardian dies; the Slab Stair climbs to **the
+   **Smith's Quarry**: the Hammer Council, always first.
+2. **The Slab** breaks when the whole Hammer Council has fallen; the Slab Stair climbs to **the
    Balcony**, the first view: the Grand Stair falling to the seal on its dais, the Ring
    round it, the three vein mouths.
 3. **The Ring** (eight packs) by the two Balcony Stairs; then in ANY order the
@@ -306,8 +308,8 @@ and while it stays engaged; open otherwise. Every gate is at least 12 yd wide.
 
 | Gate id | Kind | Where | Waits on | Seals for |
 |---|---|---|---|---|
-| `hammer_pit_mouth` | `stone_slab` | the Pit descent, near its top | packs h1, h2, h3 | Hammer guardian |
-| `the_slab` | `stone_slab` | the Slab Stair | boss: Hammer guardian | nothing |
+| `hammer_pit_mouth` | `stone_slab` | the Pit descent, near its top | packs h1, h2, h3 | the Hammer Council (any of the three fighting: `sealWithBodies`) |
+| `the_slab` | `stone_slab` | the Slab Stair | bosses: the Hammer Council's three | nothing |
 | `cornice_mouth` | `forge_seal` | the Cornice climb, near its top | packs b1, b2, b3 | Breath guardian |
 | `lake_mouth` | `forge_seal` | the lake descent | packs q1, q2, q3 | Quench guardian |
 | `anvil_mouth` | `forge_seal` | the anvil bridge | packs f1, f2, f3 | Heat guardian |
@@ -817,6 +819,38 @@ Readability: the Pour's cone and the Wrath's sight field draw on every tier; the
 trails and smoke thin on the low tier; the shakes go under reduced motion. No mechanic and no
 number changed; no player-visible text added.
 
+### 5.18 The Hammer Council's look (prototype)
+
+The council's effects are `src/render/smith_heart_fx/council_fx.ts` (pure plan
+`council_fx_core.ts`) and its two new bodies `council_bodies.ts` (pure plan
+`council_bodies_core.ts`), both hosted by `rift_death_zone.ts` and read from IWorld only.
+
+| Moment | Look |
+|---|---|
+| The Slabwright, the Seam Singer | Provisional bodies of the kits' own stone, floating pieces stitched by ochre threads of the vein's light like the Heart's colossus: the Slabwright broad and blocky with slab shoulders, the Seam Singer tall and slender with glowing amber seam crystals; both about 2 to 2.5 times a player. Idle breath, a swing, cast poses (the Slabwright raises its arms and slams for Wake the Stone and the rock; the Singer lifts its arms and its crystals flare with the bar), a hunch and white-gold threads when one holds the Wrath, a fall into rubble. Their joints are kept apart from the pieces, so the official pipeline's models replace the pieces only |
+| The pillars | The quarry's carved columns (the Hammer kit's) and the risen stone (the rock kit's needles), each drawing its integrity on the model: a network of seams cracking open and burning hotter, a growing lean, and three pips round its foot going dark one by one (the last one throbs) |
+| A pillar rising | Bursting out of the floor in under a second with a shudder, a ring of dust, shards thrown out and a shock ring at the knockback's reach |
+| A pillar losing a piece | Its seams flash, chips and dust off its face, a short shake |
+| A pillar falling | It tips, breaks and sinks into the floor in a cloud, shards flung; its rubble then lies as a hazard footprint (the danger colour) with the kits' rubble pieces until it is gone |
+| Mountain's Wrath | 2B's (cracks, lifted stones, dust wall) for whichever member holds it; the sight field (the trash engine's, every tier) shows the hatched safe shadow behind each pillar |
+| The energy | A gauge on the floor round the holder filling with the energy (white-hot past 80) and a glow over its head with rising embers |
+| Hammer's Weight | A slab of stone dropping onto the tank and shattering (a lethal-coloured ring), then the tank's mark: a ring at its feet showing the time left and a stone hanging over its head |
+| Wake the Stone | The circle round its player at the knockback's reach (the control colour, ochre accent), filling with the mark, and the ghost of the pillar growing in it |
+| The heir's rising stone | The same circle locked on the floor (the danger colour) for its 2 s |
+| Falling Rock | The soak round its player (gold: gather in it) filling with the mark, motes drawn in, the boulder dropping out of the sky over its last 1.4 s; the impact's dust, shards and rings |
+| Seam Bolt | An ochre crystal shard thrown on an arc with sparks, bursting on its mark |
+| Resonance | A notched ring round the player at the 3.5 yd reach and a shimmer round the body; while it cracks a pillar, a thread of light to that pillar and the pillar humming (shaking, its seams glowing) |
+| The stone remembers | A river of beads of stone light arcing from the fallen to each survivor, a flare on arrival |
+| Heroic pulse | A ring out to each pillar's reach every 2 s |
+
+Readability: every footprint (the floor telegraph), ring, gauge, pip, crack and lean draws
+on every tier; the static preset sheds only dust, grit and debris; reduced motion drops the
+shakes. Every material is built with the effects' root under one gated attach (the kits'
+pieces draw with their shared slot materials, warmed with the interior), no light, fixed
+pools. The council's own cues are claimed (`councilClaims`), so no generic burst doubles
+them; the marks and cues are mirrored entity state, so online looks the same. The Hammer
+kit's plan keeps only the columns' sockets: the column itself is the council's.
+
 ## 6. Set pieces (phase 2 specs)
 
 None of these is built in phase 1; their floors, props and anchors are. Every
@@ -887,19 +921,63 @@ health from a target fight length times measured raid DPS, damage anchored to th
 tanks' mitigated intake and the healers' throughput, every number calibrated with
 the meters harness, never shipped unmeasured.
 
-### 7.1 Guardian of the Hammer (always first)
+### 7.1 The Hammer Council (always first)
 
-- Look: a stone titan with a huge hammer, half-fused with the Quarry floor; the living
-  lock on the way to the heart.
-- Phase 1 (`heart_hammer_guardian`): Hammerfall (frontal arc cleave); Mountain's
-  Wrath (cast-bar line-of-sight nova covering the Quarry: hide behind a column).
-- Target: the five columns rise and fall on a cycle, so the safe spots for Mountain's
-  Wrath move; ground slams raise new columns; a tank-swap mechanic on the hammer.
-- Presentation (phase 2B, section 5.9): Mountain's Wrath and Hammerfall have their
-  effects; the columns are carved pillars standing in sockets they will sink into.
-  Mechanics and numbers unchanged.
-  Role jobs: tanks swap and position against the columns, healers recover after
-  each Wrath, damage dealers manage column timing.
+The Quarry's first boss is three stone beings that share the Hammer's strength: the
+**Guardian of the Hammer** (`heart_hammer_guardian`, id frozen: the tank boss), the
+**Slabwright** (`heart_slabwright`: the pillar maker) and the **Seam Singer**
+(`heart_seam_singer`: the caster), standing round the Quarry's middle among its five
+columns. Designed with the owner (2026-10-25) and built as a playable prototype: every
+number below is a SKETCH, unmeasured, to be calibrated with the meters harness.
+
+| Piece | Rule | Where |
+|---|---|---|
+| One pull | The three are one authored pack (`SMITH_HEART_COUNCIL_PACK`): pulling one pulls all three; a member whose foe fell is put back on the fight with its siblings' hate while any of them fights | `council.ts` (`keepTogether`) |
+| One wipe | The fight ends when no living member fights: every fallen member stands up whole at its place (`Entity.regrown`: no reward twice), the five columns stand whole again, the risen pillars, marks, rubble, Weight and stacks go | `council.ts` (`resetCouncil`), `council_pillars.ts` (`restorePillars`) |
+| One kill | Complete only when all three are dead: the Slab (`the_slab` waits on `SMITH_HEART_COUNCIL`), the heart seal's Hammer vein (`smithHeartVeinWon`) and every credit wait on all three; the risen pillars sink back into the floor | `content/smith_heart.ts`, `seal.ts`, `council_pillars.ts` (`settlePillars`) |
+| Pillars | The five carved columns (claim objects at `QUARRY_PILLAR_SPOTS`) plus the risen ones, at most 7 standing. Each has 3 integrity (whole, cracked, about to fall) in its template id and stands as a round combat wall (`COMBAT_WALL_SHAPES`): it blocks bodies and the Wrath's sight line, offline and online (`net/combat_wall_wire.ts`). At 0 it falls: its wall goes that tick, rubble lies 8 s and bites 90 to 110 a second, then it is gone. The columns are the field's `encounterOwned` props: the field builds no collider for them | `council_pillars.ts` |
+| Energy | 0 to 100, full in 55 s; the holder's energy bar is its resource (the target frame draws it, the snapshot carries it); after the 4th Wrath it fills 2.5 times faster (the soft enrage) | `council_wrath.ts` |
+| Mountain's Wrath | At 100 (cast id kept, `heart_mountains_wrath`): a 4 s bar, then 440 to 520 to everyone in the Quarry (45 yd) the caster can see; every pillar that stood between it and at least one player loses a piece (once, however many it shielded) | `council_wrath.ts` (`landWrath`), `council_pillars.ts` (`pillarBetween`) |
+| Hammer's Weight | Every 18 s (first at 10): a 1.5 s bar at the tank, then 2.2 times a swing through armor and +100 percent physical damage taken for 25 s: swap tanks | `council_wrath.ts` |
+| Hammerfall | Kept: the frontal arc reads well and keeps the raid off the Guardian's side (110 degrees, 9 yd, 0.7 of a swing, every third swing) | template `arcCleave` |
+| Wake the Stone | Every 30 s (first at 14): a 1.2 s bar, then 2 players (3 on heroic, never more than the cap allows) wear a circle for 5 s; a fresh pillar bursts out where each STANDS (nudged to the nearest clear spot: on the floor, 6.5 yd from another pillar, 4.5 from a council body), 120 to 150 and a throw to everyone within 3 yd | `council_stone.ts`, `council_pillars.ts` (`raisePillar`) |
+| Falling Rock | Every 25 s (first at 9): a 1.2 s bar, then one player wears the soak for 5 s; 1,350 split between everyone within 6 yd (fewer than 3 under it: each takes half as much again and the whole raid takes 140 to 170, the Rockfall Tremor); every pillar within 6 yd of its face loses a piece | `council_stone.ts` |
+| Seam Bolt | Every 8 s: a 2 s kickable bar at a random player in sight, 300 to 340 nature; it lands only on a player still in sight | `council_song.ts` |
+| Song of the Seam | A 3 s kickable bar: sung out, Resonance on 3 players; kicked, on 1. Normal: it starts 1 s after a Wrath lands, so its Resonance (15 s) is over long before the next Wrath (at least 22 s away even in the soft enrage). Heroic: its own clock (first at 20, every 24), so the two overlap | `council_song.ts` |
+| Resonance | 15 s, a ring round the player; standing within 3.5 yd of a pillar's face for 3 s in a row knocks a piece off it, then the 3 s start again; nothing cleanses it (the play: hide behind the most damaged pillar at Wrath, keep off the whole ones). Not a walk-to-cleanse mark (Ignivar's Brand of the Pyre is one) | `council_song.ts` |
+| The stone remembers | When one falls, every survivor gains a stack of Memory of Stone (+15 percent damage dealt each) and takes up its job in a worse form: the Slabwright's pillars rise under RANDOM players on a locked spot with a 2 s warning (the Falling Rock stops with it); the Singer's song is sung by a survivor on 3 players and no kick stops it (the bolt stops with it); the Guardian's energy passes to a survivor (from empty) with a shorter Wrath (fills in 35 s, a 3 s bar, 380 to 450; Hammer's Weight stops with it). The heir is the first survivor in `JOB_HEIRS`; the last one carries every job | `council_scope.ts` (`jobHolder`), `council.ts` |
+| Heroic | All the above, plus Resonance overlapping the Wrath, Wake the Stone marking 3, every standing pillar pulsing 60 to 75 nature on whoever stands within 3 yd of its face every 2 s (Restless Stone), and every council number 25 percent higher. The raid has no heroic tier yet (`HEROIC_DUNGEON_IDS`), so a dev run switches it on (`/dev heart council heroic`) | `council_ids.ts` (`COUNCIL_DIFFICULTY`) |
+| Mythic seam | `CouncilDifficulty` is the encounter state's switch; a mythic is one more `COUNCIL_DIFFICULTY` row (stronger inheritances, one mythic-only mechanic); no dead code waits for it | `council_ids.ts` |
+
+**Health (sketch, unmeasured).** Planning raid DPS about 600 (ten players at level 20;
+Varkhul's measured adds DPS was a median of 696 on heroic), a 4.5 minute fight at about 85
+percent uptime (the Wraths, the soaks, the moves): about 137,000 after the elite factor,
+split by role: the Guardian 22,000 base (50,600), the Slabwright 19,500 (44,850), the Seam
+Singer 18,000 (41,400). The old guardian's single 32,000 (73,600) was a one-mechanic
+blockout's.
+
+**Damage (sketch, unmeasured).** Anchored to the level-20 cloth reference (about 1,135 to
+1,345 health, `docs/design/class-health-table-2026-09-11.md`) and the dungeon rework's
+bands (a must-avoid hit 35 to 45 percent, a raid pulse 8 to 15): the Wrath about 40 percent
+of a cloth pool, a full soak's share about 35 percent with 3 under it, a thin soak or a
+second Weight a fumble that does not one-shot from full on normal.
+
+Kill order is the strategy: the Guardian first leaves the energy with a survivor on a
+shorter cycle; the Slabwright first trades chosen cover for random pillars on a 2 s warning;
+the Singer first makes Resonance unstoppable on three. Every order runs to the finish
+(pinned for all six in `tests/smith_heart_council.test.ts`); survivability on normal is to be
+measured in the playtest.
+
+Role jobs: tanks swap on Hammer's Weight and keep the three off the pillars the raid needs;
+healers recover after each Wrath and each soak; damage dealers kick the Song (and the bolt),
+put the Wake marks where cover is needed and gather three for the rock away from cover;
+Resonance carriers wait out the Wrath by the most damaged pillar.
+
+IP check (2026-10-25, exact phrase plus coined token on the major game wikis): Slabwright,
+Seam Singer, Hammer Council, Hammer's Weight, Wake the Stone, Seam Bolt, Song of the Seam,
+Memory of Stone, Rockfall Tremor, Crumbled Stone and Restless Stone returned no game use
+(CLEAR); Falling Rock (already shipped by the Buried Hoards) and Resonance are generic
+English.
 
 ### 7.2 Guardian of the Breath
 
@@ -1081,6 +1159,20 @@ on both difficulties (dungeon rework README, goal 4).
   order and timeline, the heart's rise, the arm's reach, the fist and the pour inside their
   areas, the fall, the seal memory's arrival (live and late), the room's darkness, FinalFx
   over a fake world.
+- `tests/smith_heart_council.test.ts` (on `tests/helpers/council_fight.ts`): the Hammer
+  Council over a real claim: one pull for all three (and nothing else), the energy bar, the
+  five columns as round walls, Wake the Stone's pillar at the marked spot and its throw, the
+  rise's spacing, the Wrath sparing the hidden, striking the exposed and cracking the
+  shielding pillar, Resonance's 3 s cracks and restart, the fall into rubble and the wipe
+  restoring the five, the soak's split and pillars, all six kill orders to the finish, the
+  wipe standing a fallen member up, normal's song after the Wrath, heroic's three marks,
+  pulse and own clock, a kicked song, the Slab and the seal waiting on all three, and
+  determinism.
+- `tests/smith_heart_council_ui.test.ts`: every raid warning's key resolving to the English
+  the sim sent, the personal alert's priorities, the marks' tooltips from the live tuning,
+  every cast and damage name re-localized.
+- `tests/smith_heart_council_fx.test.ts` and `tests/smith_heart_council_bodies.test.ts`: the
+  look's pure plans and both painters over a fake world.
 - `tests/smith_heart_dev.test.ts`: the `/dev heart` family (the portal forcing and the
   hop included) and the dev-only door.
 - Every new Smith's Heart test follows the path pattern `tests/smith_heart_*.test.ts`
@@ -1099,12 +1191,19 @@ on both difficulties (dungeon rework README, goal 4).
 | `/dev heart` | help line |
 | `/dev heart enter [normal]` | claim a fresh run and step in at the Cleft |
 | `/dev heart tp <area or boss>` | jump inside the run (enters first): cleft, gallery, pit, balcony, ring, ringse, ringsw, breath, bridge, cornice, quench, ice, lake, heat, forge, anvil, heart or portal (the Seal Dais beside the portal), heartroom or final (the Heart's Arrival Terrace); a guardian's name (hammer, breathboss, quenchboss, heatboss) lands beside it |
-| `/dev heart kill <what>` | kill a guardian (hammer, breath, quench, heat), the final boss (final), all four guardians (guardians), one pack (`pack h1` and so on), every pack (trash), or all; kills credit through the normal death path, so gates and seal follow on the next tick |
+| `/dev heart kill <what>` | kill a vein's fight (hammer: the whole Hammer Council; breath, quench, heat), the final boss (final), all four guardians (guardians), one pack (`pack h1` and so on), every pack (trash), or all; kills credit through the normal death path, so gates and seal follow on the next tick |
 | `/dev heart gates` | open every gate of the run |
 | `/dev heart portal` | force the seal's portal open for the run (the hop then works) |
 | `/dev heart seal` | print the `smithHeartProgress` readout (and whether the heart is awake) |
 | `/dev heart arrival` | replay the arrival scene: the heart sleeps a moment and wakes again with a living player in the Heart |
 | `/dev heart reset` | free the run and claim a fresh one |
+| `/dev heart council` | the Hammer Council's readout (difficulty, each member's health, energy, Wraths, the fallen in order) |
+| `/dev heart council pull` | pull all three onto you |
+| `/dev heart council reset` | the council whole again and out of its fight, the five columns with it |
+| `/dev heart council heroic [on, off]` | the council's heroic rules for this run (the raid has no heroic tier yet) |
+| `/dev heart council energy <n>` | set the Wrath holder's energy (95: a Wrath in about 3 s) |
+| `/dev heart council <mechanic>` | force one mechanic now: wrath, weight, wake, rock, bolt, song (skips its timing guard), resonance [n] |
+| `/dev heart kill guardian`, `slabwright`, `singer` | kill one council member (try each order of the inheritance); `kill council` or `kill hammer` kills all three |
 
 Pinned by `tests/smith_heart_dev.test.ts`, including the refusal without
 `devCommands` and the door refusing a non-dev world.
