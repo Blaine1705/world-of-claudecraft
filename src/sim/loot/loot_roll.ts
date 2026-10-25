@@ -64,7 +64,7 @@ import type {
   MasterLootThreshold,
 } from '../types';
 import { cloneItemInstancePayload, dist2d, PARTY_XP_RANGE } from '../types';
-import { grantAwardedLootItem, grantOrHoldAwardedLoot } from './awarded_loot_hold';
+import { grantAwardedLootItem, grantOrHoldAwardedLoot, mobLootSource } from './awarded_loot_hold';
 import { announceBossDrops } from './boss_drop_announce';
 import { lootItemUsableByClasses, usableRollGroup } from './class_locked_drop';
 import { rollEnemyLootQuality } from './enemy_quality';
@@ -651,7 +651,14 @@ export function awardSharedLootItem(
       : !ctx.canAddItem(itemId, 1, looter.entityId)
   )
     return false;
-  grantAwardedLootItem(ctx, itemId, looter.entityId, killSnapshotEligibility(ctx, mob), instance);
+  grantAwardedLootItem(
+    ctx,
+    itemId,
+    looter.entityId,
+    killSnapshotEligibility(ctx, mob),
+    instance,
+    mobLootSource(mob),
+  );
   return true;
 }
 

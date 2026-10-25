@@ -58,7 +58,7 @@ export function buyHeroicVendorItem(ctx: SimContext, itemId: string, pid?: numbe
   }
   // The debit gates the grant, so no reordering above can ever hand out the item free.
   if (!spendHeroicMarks(meta, entry.marks)) return;
-  ctx.addItem(itemId, 1, meta.entityId);
+  ctx.addItem(itemId, 1, meta.entityId, { source: 'vendor' });
   // Feedback rides the 'vendor' event (the shop window re-renders), matching
   // buyItem and delveBuyShopItem: no raw English log emitted from the sim.
   ctx.emit({ type: 'vendor', action: 'buy', itemId, pid: meta.entityId });

@@ -20,6 +20,7 @@ import type {
   EquipSlot,
   ItemDef,
   ItemInstancePayload,
+  ItemProvenance,
   PlayerClass,
   SkinCatalog,
 } from '../sim/types';
@@ -64,6 +65,13 @@ import {
   type InspectHeaderModel,
   type InspectHolderModel,
 } from './inspect_view';
+import { type ItemHistoryHolder, itemHistoryProvenanceFor } from './item_history_access_view';
+import {
+  appendItemHistoryActionAfter,
+  attachItemHistoryContextMenu,
+  closeItemHistoryDialogForOwner,
+  openItemHistoryDialog,
+} from './item_history_dialog';
 import type { PainterHostPresentation } from './painter_host';
 import { hydratePortraits, type ModularLook, portraitChipHtml } from './portrait_chip';
 import { qualityGlowShadow } from './quality_glow';
@@ -190,6 +198,7 @@ export class InspectWindow {
   close(): void {
     const el = this.deps.root();
     if (el.style.display !== 'block') return;
+    closeItemHistoryDialogForOwner(el);
     el.style.display = 'none';
     this.deps.hideTooltip();
     this.deps.restoreFocus(this.openerFocus);
@@ -298,7 +307,12 @@ export class InspectWindow {
         img.src = discordStatusBadgeDataUrl(e.discordTier ?? 0);
       });
     }
-    this.paintGear(el, model.gear, e);
+    // A worn tracked copy's Item history reads the RAW worn payload (the cell's
+    // instance is the stripped tooltip trim): the public projection for another
+    // player's gear, the viewer's own record on a self-inspect.
+    const worn = selfEquippedInstances ?? e.equippedInstances;
+    const holder: ItemHistoryHolder = selfEquippedInstances ? 'self' : 'other';
+    this.paintGear(el, model.gear, e, (cell) => itemHistoryProvenanceFor(worn[cell.slot], holder));
     const stage = el.querySelector<HTMLElement>('#inspect-model-preview');
     if (stage) {
       this.deps.mountPreview(stage, {
@@ -366,6 +380,34 @@ export class InspectWindow {
     el.style.display = 'block';
   }
 
+  // The Item history doors on a worn tracked copy's row (the bank cell rule,
+  // item_history_access_view.ts 'gridCell'): the row becomes focusable so the
+  // Context Menu key reaches it, right-click opens it on desktop, and touch
+  // layouts get the visible button beneath it. A paperdoll column has no room
+  // for a desktop button per slot.
+  private attachSlotHistory(
+    row: HTMLElement,
+    cell: PaperdollSlot,
+    history: ItemProvenance | null,
+  ): void {
+    if (!cell.item || history === null) return;
+    const name = wornItemCellParts(cell.item, cell.instance).name;
+    row.tabIndex = 0;
+    // A focus stop must do something on every keyboard: Enter and Space open
+    // the history too (no Context Menu key on a Mac keyboard), and the row
+    // announces what it opens.
+    row.setAttribute('role', 'button');
+    row.setAttribute('aria-haspopup', 'dialog');
+    row.setAttribute('aria-label', t('hudChrome.itemHistory.openAria', { item: name }));
+    row.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      openItemHistoryDialog({ itemName: name, provenance: history, opener: row });
+    });
+    attachItemHistoryContextMenu(row, name, history);
+    appendItemHistoryActionAfter(row, name, history, 'gridCell');
+  }
+
   /** Player Info from the public character sheet (a chat-name lookup): no gear.
    *  The sheet names the spec in English, so it maps back to the spec id. */
   openProfile(profile: CharacterProfile): void {
@@ -381,13 +423,26 @@ export class InspectWindow {
     });
   }
 
-  private paintGear(el: HTMLElement, gear: PaperdollView, wearer: InspectEntity): void {
-    const leftCol = el.querySelector('#inspect-equip-left');
-    const rightCol = el.querySelector('#inspect-equip-right');
-    for (const cell of gear.left) leftCol?.appendChild(this.buildSlotRow(cell, wearer));
-    for (const cell of gear.right) rightCol?.appendChild(this.buildSlotRow(cell, wearer));
-    const weaponsRow = el.querySelector('#inspect-equip-weapons');
-    for (const cell of gear.weapons) weaponsRow?.appendChild(this.buildSlotRow(cell, wearer));
+  // `historyFor` names a worn tracked copy's Item history record, if any
+  // (attachSlotHistory); the remote profile card passes none (no payloads).
+  private paintGear(
+    el: HTMLElement,
+    gear: PaperdollView,
+    wearer: InspectEntity,
+    historyFor?: (cell: PaperdollSlot) => ItemProvenance | null,
+  ): void {
+    const columns: [Element | null, readonly PaperdollSlot[]][] = [
+      [el.querySelector('#inspect-equip-left'), gear.left],
+      [el.querySelector('#inspect-equip-right'), gear.right],
+      [el.querySelector('#inspect-equip-weapons'), gear.weapons],
+    ];
+    for (const [col, cells] of columns) {
+      for (const cell of cells) {
+        const row = this.buildSlotRow(cell, wearer);
+        col?.appendChild(row);
+        if (historyFor) this.attachSlotHistory(row, cell, historyFor(cell));
+      }
+    }
   }
 
   // The Gearscore readout, painted inside the model stage just under its

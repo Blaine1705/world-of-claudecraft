@@ -31,7 +31,11 @@ describe('trinket soulbinding', () => {
       sim.addItem(item.id, 1);
       sim.drainEvents();
 
-      sim.marketList(item.id, 1, 100);
+      const held = sim.meta(sim.playerId)!.inventory.find((slot) => slot.itemId === item.id);
+      // Tracked epics are exact copies, so use the same instance-selected
+      // listing path as the market UI rather than the fungible bulk path.
+      if (held?.instance) sim.marketListInstance(item.id, 100, held.instance);
+      else sim.marketList(item.id, 1, 100);
 
       const bound = BOUND_TRINKETS.includes(item.id);
       expect(

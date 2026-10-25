@@ -3841,6 +3841,12 @@ export const fr_CA: EnTranslations = {
       "linkHint": "Maj-clic pour lier cet objet dans le canal de discussion."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "{count} guilde affichée",
         "few": "{count} guildes affichées",
@@ -5271,6 +5277,9 @@ export const fr_CA: EnTranslations = {
       "partyTradeWindow": "Vous pouvez échanger cet objet aux joueurs qui ont partagé son butin pendant encore {time}. L'équiper met fin à la fenêtre d'échange.",
       "perfectedBadge": "Perfectionné",
       "perfectingRank": "Perfectionnement : rang {rank} sur {ranks}",
+      "lootedBy": "Looted by {name} on {date}",
+      "questRewardTo": "Quest reward to {name} on {date}",
+      "obtainedBy": "Obtained by {name} on {date}",
       "materialSourceGatherer": "{count} × Récolté par {name}",
       "trophySkullSource": "{count} × Pris à {name}",
       "materialSourceGathererSigned": "{count} × Récolté par {name}, signé par {signer}",
@@ -6542,7 +6551,15 @@ export const fr_CA: EnTranslations = {
       "viewSources": "Voir les sources",
       "separateByGatherer": "Séparer par récolteur",
       "takeChosenQuantity": "Retirer la quantité choisie",
-      "combine": "Combiner les piles de matériaux"
+      "combine": "Combiner les piles de matériaux",
+      "itemHistory": "Item history"
+    },
+    "itemHistory": {
+      "title": "{item}: history",
+      "passedTo": "Passed to {name} on {date}",
+      "noTransfers": "This item has never changed hands.",
+      "close": "Close",
+      "openAria": "Item history for {item}"
     },
     "enchanting": {
       "recipeNotLearned": "Apprenez la formule avant d’appliquer cet enchantement.",
@@ -17151,7 +17168,8 @@ export const fr_CA: EnTranslations = {
       "tooManyOrders": "Vous pouvez garder au plus {count} commandes ouvertes à la fois.",
       "orderClosed": "Cette commande n'est plus ouverte.",
       "orderOwn": "C'est votre propre commande. Annulez-la pour la retirer.",
-      "orderNotYours": "Ce n'est pas votre commande."
+      "orderNotYours": "Ce n'est pas votre commande.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Tout prendre",

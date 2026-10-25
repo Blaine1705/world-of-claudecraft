@@ -21,6 +21,7 @@
 //
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
+import { isPlainCopy } from '../sim/item_plain_copy';
 import type { MaterialComposition } from '../sim/material_sources';
 import { isEnchantedInstance } from '../sim/professions/enchanting';
 import type { ItemInstancePayload } from '../sim/types';

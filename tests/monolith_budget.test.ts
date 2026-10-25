@@ -1311,7 +1311,7 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED to 11487 at the merge of PR 4390 (riding ranks) over release/v0.45.0:
     // riding progression lives in riding_training.ts. wc -l on the merged tree.
     // 11485 after the courier full-bank sync (PR 4598). wc -l.
-    ceiling: 11485,
+    ceiling: 11481, // 11481 after the Epic item UUIDs sync (PR 4305). wc -l.
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1850,7 +1850,7 @@ const MONOLITHS: MonolithRow[] = [
     // identity encoder and account mount items live in sibling modules. wc -l.
     // RE-PINNED to 9690 at the sync with the courier full-bank change (PR 4598): its
     // wiring composes with the extractions above, still under the release 9751. wc -l.
-    ceiling: 9690,
+    ceiling: 9684, // 9684 after the Epic item UUIDs sync (PR 4305). wc -l.
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
