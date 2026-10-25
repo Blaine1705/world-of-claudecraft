@@ -27,6 +27,10 @@ const H = Number(process.env.SHOT_H ?? 900);
 const PRESET = Number(process.env.SHOT_PRESET ?? 4);
 const ONLY = process.env.SHOT_ONLY ? new Set(process.env.SHOT_ONLY.split(',')) : null;
 const MOSAIC = process.env.SHOT_MOSAIC === '1';
+// SHOT_GUARDIAN / SHOT_CAST: the guardian a 'wrath' or 'blast' shot pulls
+// and the cast it waits for (phase 2G: the Breath guardian's casts).
+const GUARDIAN = process.env.SHOT_GUARDIAN ?? 'heart_hammer_guardian';
+const CAST = new RegExp(process.env.SHOT_CAST ?? 'wrath', 'i');
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // The instance-local entry (content/smith_heart_layout.ts SMITH_HEART_ANCHORS).
@@ -138,14 +142,14 @@ try {
     );
   // The Hammer guardian's cast state (null when it is not casting).
   const guardianCast = () =>
-    page.evaluate(() => {
+    page.evaluate((guardian) => {
       const w = window.__game.world;
       for (const e of w.entities.values()) {
-        if (e.templateId !== 'heart_hammer_guardian' || e.dead) continue;
+        if (e.templateId !== guardian || e.dead) continue;
         return e.castingAbility ? { id: e.castingAbility, left: e.castRemaining } : 'idle';
       }
       return null;
-    });
+    }, GUARDIAN);
   let pulled = false;
   for (const [name, at, look, yaw, pitch, dist, action] of list) {
     if (ONLY && !ONLY.has(name)) continue;
@@ -157,13 +161,13 @@ try {
         pulled = true;
         await chat('/dev noaggro', 300);
         const g = await page.evaluate(
-          ([ox, oz]) => {
+          ([ox, oz, guardian]) => {
             for (const e of window.__game.world.entities.values())
-              if (e.templateId === 'heart_hammer_guardian' && !e.dead)
+              if (e.templateId === guardian && !e.dead)
                 return { x: e.pos.x - ox, z: e.pos.z - oz };
             return null;
           },
-          [O.x, O.z],
+          [O.x, O.z, GUARDIAN],
         );
         if (g) await place([g.x - 8, g.z], [g.x, g.z], yaw, pitch, dist);
         await sleep(2500);
@@ -175,7 +179,7 @@ try {
       let seen = null;
       while (Date.now() < until) {
         seen = await guardianCast();
-        if (seen && seen !== 'idle' && /wrath/i.test(String(seen.id))) break;
+        if (seen && seen !== 'idle' && CAST.test(String(seen.id))) break;
         await sleep(100);
       }
       console.log('cast', JSON.stringify(seen));
