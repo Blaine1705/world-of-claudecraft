@@ -31,6 +31,7 @@ const SERVER_ONLY_EVENT_TYPES: ReadonlySet<SimEvent['type']> = new Set([
   'worldPvpKill',
   'hillAnnounced',
   'craftRoll',
+  'itemTracked',
   'treasureVaultOutcomePending',
   'treasureVaultClaimRequested',
 ]);

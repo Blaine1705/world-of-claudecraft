@@ -116,12 +116,13 @@ export type RuntimeSimConfig = Required<
     | 'courierBankExchange'
     | 'courierAccountExchange'
     | 'gathererIdentity'
+    | 'mintItemGuid'
     // Deliberately NOT defaulted: undefined is the "no day/night clock" world
     // (dayNightPhase() answers null), which tests and the RL env rely on.
     | 'dayNightNowMs'
   >
 > &
-  Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds' | 'dayNightNowMs'> & {
+  Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds' | 'mintItemGuid' | 'dayNightNowMs'> & {
     vaultOpenNeedsSave?: boolean;
     vaultRewardNeedsSave?: boolean;
   };
@@ -952,13 +953,16 @@ export interface SimContextCallbacks {
   equipItem(itemId: string, pid?: number): void;
   unequipItem(slot: EquipSlot, pid?: number): boolean;
   // Payload grants preserve material source buckets and gear instance identity.
+  // Returns the payload the first copy actually landed with (a tracked copy
+  // carries its minted guid and provenance, item_tracking.ts), or nothing when
+  // the grant did not resolve.
   addItemInstance(
     itemId: string,
     instance: ItemInstancePayload,
     pid?: number,
     count?: number,
     opts?: InventoryGrantOptions,
-  ): void;
+  ): ItemInstancePayload | void;
   // L2 World Market escrow (marketList) also consumes removeItem; it is declared once
   // above (P1b inventory-hub helper, points-at Sim) - deduped, not re-added here.
   // Owned by mob/boss_mechanics.ts (M5); the delve boss scripts consume it.

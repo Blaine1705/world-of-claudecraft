@@ -3841,6 +3841,12 @@ export const it_IT: EnTranslations = {
       "linkHint": "Shift-clic per collegare questo oggetto in chat."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "{count} gilda mostrata",
         "few": "{count} gilde mostrate",
@@ -5273,6 +5279,9 @@ export const it_IT: EnTranslations = {
       "partyTradeWindow": "Puoi scambiare questo oggetto con i giocatori che hanno condiviso il suo bottino per i prossimi {time}. Indossarlo pone fine alla finestra di scambio.",
       "perfectedBadge": "Perfezionato",
       "perfectingRank": "Perfezionamento: grado {rank} di {ranks}",
+      "lootedBy": "Looted by {name} on {date}",
+      "questRewardTo": "Quest reward to {name} on {date}",
+      "obtainedBy": "Obtained by {name} on {date}",
       "materialSourceGatherer": "{count} × Raccolto da {name}",
       "trophySkullSource": "{count} × Preso da {name}",
       "materialSourceGathererSigned": "{count} × Raccolto da {name}, firmato da {signer}",
@@ -5816,14 +5825,8 @@ export const it_IT: EnTranslations = {
       "logAdminPurge": "Un amministratore ha rimosso {count} {item}"
     },
     "collections": {
-      "title": "Caccia",
-      "close": "Chiudi la caccia",
-      "keybindLabel": "Caccia",
-      "launcherTitle": "Caccia: compagni, cavalcature e completi di oggetti",
       "tabs": {
-        "buddies": "Compagni",
-        "mounts": "Cavalcature",
-        "sets": "Completi di oggetti"
+        "buddies": "Compagni"
       },
       "state": {
         "owned": "Raccolto",
@@ -5833,7 +5836,6 @@ export const it_IT: EnTranslations = {
       },
       "presenceDefault": "Senti una presenza che ti osserva.",
       "revealed": "{name} ha deciso di seguirti.",
-      "cosmeticUnlocked": "Nuovo aspetto per {name}: {look}.",
       "presence": {
         "ember_fox": "Qualcosa di piccolo e caldo ti trotterella dietro.",
         "moss_hare": "Un fruscio nella torba accompagna i tuoi passi.",
@@ -5871,134 +5873,9 @@ export const it_IT: EnTranslations = {
         "phantom": "L'aria dietro di te è appena troppo immobile.",
         "emberfall_phoenix": "Un calore simile a un fuoco sotto la cenere si posa alle tue spalle."
       },
-      "cosmetic": {
-        "crystal_lich_frostbound": "Vincolato al gelo",
-        "crystal_lich_voltaic": "Voltaico",
-        "forgemaw_ashen": "Cinereo",
-        "forgemaw_whitehot": "Incandescente",
-        "stag_acorn": "Corona di ghiande",
-        "stag_gilded": "Dorato",
-        "moss_hare_verdant": "Verdeggiante",
-        "proud_grunt_warlord": "Signore della guerra",
-        "frog_sapphire": "Rana zaffiro"
-      },
       "actions": {
         "summon": "Evoca",
-        "dismiss": "Congeda",
-        "wear": "Indossa",
-        "remove": "Rimuovi"
-      },
-      "looks": {
-        "title": "Aspetti",
-        "unlocked": "Sbloccato",
-        "locked": "Bloccato",
-        "worn": "Indossato",
-        "none": "Non sono ancora stati creati aspetti per questo compagno"
-      },
-      "source": {
-        "bossLabel": "Famiglio del boss",
-        "bossDrop": "{mob} ({location}), {chance}% per giocatore per uccisione",
-        "bossDropWithHeroic": "{mob} ({location}), {chance}% per giocatore, {heroicChance}% in modalità Eroica",
-        "bossDropHeroicOnly": "{mob} ({location}), solo in modalità Eroica, {chance}% per giocatore",
-        "rollNote": "Ogni giocatore tira separatamente; nessuno perde un tiro contro un membro del gruppo.",
-        "deedLabel": "Ottenuto con",
-        "deed": "L'impresa {deed}",
-        "challengeLabel": "Sfida",
-        "challengeSpeed": "Sconfiggi {mob} entro {seconds} secondi dall'inizio dello scontro",
-        "challengeDps": "Infliggi {dps} danni al secondo a {mob} durante lo scontro",
-        "craftLabel": "Creato",
-        "craft": "{item} (ricetta di {profession})",
-        "grantLabel": "Assegnato",
-        "grantOnly": "Premio stagionale: classifica mensile e ricompense per le migliori prestazioni",
-        "tokenLabel": "Gettone",
-        "token": "{item}, usato una volta per legare il compagno"
-      },
-      "buddyLore": {
-        "ember_fox": "Una volpe delle siepi della Valle di Eastbrook, chiamata così per il manto rosso brace che spicca tra i cespugli invernali. I cacciatori locali hanno rinunciato ai cuccioli generazioni fa e hanno iniziato a lasciare loro del cibo.",
-        "moss_hare": "Una lepre di Willowfen, dal pelo verde per una vita trascorsa a dormire nella torba bagnata. Gli erboristi della palude la considerano fortunata e non permettono che venga scacciata dalle soglie.",
-        "frog": "La Palude di Mirefen li cresce grassi e tranquilli, a cantare tutta la notte tra i giunchi. Le guide della palude giurano che una barca che ne porta uno non si incaglia mai.",
-        "crimson_claw_crab": "Un granchio delle maree di Farshore la cui chela resta rossa a lungo dopo aver lasciato l'acqua. Gli scaricatori li facevano gareggiare sulle assi scommettendo monete.",
-        "golden_sentinel": "Uno scarabeo sentinella di Amberfall, dorato dalla resina in cui è cresciuto. Il nome è più antico della resina: sentinelle simili custodivano quei boschetti molto prima che qualcuno pensasse a imbottigliare la linfa.",
-        "nightfang": "Un giovane cacciatore di Nightbloom, silenzioso persino per la sua specie. Ti segue per compagnia e non caccia nulla di più grande di una falena.",
-        "tuskhorn_boar": "Una stirpe di Thornpeak, allevata con zampe corte da pastori che volevano un cinghiale incapace di abbattere una recinzione. Il caratteraccio è rimasto comunque.",
-        "emerald_wolf": "Un cucciolo di Wraithwood, dal pelo verde nella luce della chioma che non raggiunge mai davvero il suolo. I guardiani allevano gli orfani che il bosco si lascia alle spalle.",
-        "tiger": "Strisce di Palmreach su un animale che non ha mai visto Palmreach: la stirpe viene allevata in cattività dalla chiusura degli antichi serragli. Risponde a un fischio e a nient'altro.",
-        "cate_coin": "Un gatto che non si separa dalla moneta su cui siede e che nessuno ha mai visto mangiare. I mercanti di Eastbrook discutono ancora su quale dei due sia l'animale da compagnia.",
-        "alon": "La mascotte di un viaggiatore proveniente da una strada che nessuna mappa ammette di conoscere, compare ovunque un piano stia andando male. Osserva, approva e non offre il minimo aiuto.",
-        "trollface": "Una creatura ghignante che Wraithwood ha lasciato uscire e non ha voluto riprendersi. Ogni tentativo di descriverla finisce con il narratore che ride e rinuncia.",
-        "ansem": "Parla di porte e di oscurità e non vuole aggiungere altro su nessuna delle due. I cultisti di Nightbloom lo rivendicano come loro; lui si allontana ogni volta che celebrano un rito.",
-        "triple_t": "Tre di qualcosa, oppure una cosa ripetuta tre volte. I racconti non concordano e la creatura non resta ferma abbastanza da poterla contare.",
-        "kekius": "Un compagno ridente di origine incerta, adottato come portafortuna dalle piste di Galecrest. È sopravvissuto a quattro scuderie che giuravano su di lui.",
-        "solbot": "Un piccolo automa a energia solare, estratto mezzo sepolto dalla cenere delle Terre dei Draghi e ancora funzionante. L'officina che l'ha costruito non ha lasciato alcun marchio sull'involucro.",
-        "frostfire": "È nato nella Distesa di Frostveil, dove una sorgente calda affiora tra i ghiacci, e non ha mai deciso a quale metà appartenere. Fuma nell'aria fredda e trema in quella calda.",
-        "rocky": "Un animaletto dal guscio di pietra dei ghiaioni di Thornpeak, lento e del tutto tranquillo. I minatori li tengono perché si immobilizzano un istante prima di un crollo.",
-        "proud_grunt": "Un veterano dei magazzini di Guerra che ha conservato il saluto e perso il grado. Il Maresciallo Draven Kole ne affida uno a ogni soldato abbastanza onorevole da comprenderne il prezzo.",
-        "loot_goblin": "Segue chi porta Marchi Eroici e non è mai stato sorpreso a rubare. Il Quartiermastro Vex sostiene che questo non dimostri proprio nulla.",
-        "penny_goldspark": "Un'apprendista armeggiatrice gnomica che si fa pagare a ore e vale ogni rame. L'armaiolo Hode l'ha assunta per saldare un debito e ora offre l'accordo a chiunque abbia mille monete d'oro.",
-        "stag": "Una stirpe di Evergarden, rimpicciolita dai grandi cervi che un tempo cavalcavano i guardiani. Abbassa ancora la testa davanti a una mano alzata, per un'abitudine più antica dell'animale.",
-        "alpaca": "Le mandrie di Galecrest li allevano per la lana e per il carattere: nulla resta più calmo durante una tempesta. Questo sputa addosso a esattamente una persona per viaggio.",
-        "horse": "Un pony della Valle, allevato piccolo per i sentieri dei frutteti, a cui nessuno ha mai detto che non è un cavallo da guerra. Ti resta al fianco e segue chiunque gli abbia dato una mela.",
-        "sapling": "Un giovane albero con un sorriso nella corteccia e uno sguardo viola curioso. Le radici lo portano con un'allegra andatura ondeggiante ovunque tu vada.",
-        "bull": "Un toro della Valle grande come un cane, unico motivo per cui qualcuno ha accettato di tenerne uno in casa. Il temperamento non si è ridotto insieme al resto.",
-        "spider": "Un ragno tessitore di Wraithwood, grande quanto un palmo, che riarreda ogni zaino in cui viene trasportato. La tela è più resistente del filo che sostituisce.",
-        "raptor": "Un piccolo delle Terre dei Draghi, venduto prima che impari quanto sa correre veloce. A ogni nuovo proprietario viene detto di tenerlo sazio, e nessuno ha bisogno di sentirselo dire due volte.",
-        "skeleton": "È emerso dai tumuli di Wraithwood, si è scrollato la polvere di dosso e da allora segue la gente. Nessuno ha stabilito di chi fossero queste ossa.",
-        "crystal_lich": "Una scheggia di Nythraxis stesso, che vibra ancora del freddo che l'ha plasmata. Obbedisce a chi l'ha estratta dai resti dell'incursione e non gliel'ha perdonato.",
-        "forgemaw": "Forgiato nel Crogiolo dell'Ultima Sorgente e mai del tutto completato, è uscito dalla fonderia di Ignivar mentre i martelli battevano ancora. Lo trova solo chi affronta la discesa eroica: la creatura fusa torna sempre alla forgia che l'ha creata e segue a casa chi sopravvive al fuoco due volte.",
-        "crystal_tide": "Uno spiritello delle maree che cavalca la propria goccia di vetro marino, pescato nelle acque calme dai pescatori della Valle fino a Farshore che cercavano la cena. Conserva l'acqua da cui è emerso e non vuole saperne di tornare indietro.",
-        "sprites": "Due piccoli spiriti del fuoco, uno dorato e uno verde acqua, che non concordano mai su chi comandi. Se ti avvicini abbastanza si fondono in una fiamma verde, poi si separano ridendo.",
-        "phantom": "Un fantasma grande quanto un palmo proveniente dai tumuli di Wraithwood, tutto lenzuolo e niente ossa, che compare in uno zaino chiuso e resta per compagnia. Nessuno ha capito cosa voglia e non ha mai provato a spaventare nessuno.",
-        "emberfall_phoenix": "Ogni autunno si riduce a una brace e in primavera risorge dalle proprie ceneri: è tutto ciò che chiunque sa dirti. Nessuno ha mai trovato un nido e nessuno ne ha mai catturata una due volte."
-      },
-      "petKind": {
-        "beast": "Bestie",
-        "elemental": "Elementali",
-        "humanoid": "Umanoidi",
-        "undead": "Non Morti",
-        "celebrity": "Celebrità"
-      },
-      "armor": {
-        "cloth": "Stoffa",
-        "mail": "Maglia",
-        "leather": "Cuoio"
-      },
-      "stat": {
-        "intellect": "Intelletto",
-        "agility": "Agilità",
-        "strength": "Forza",
-        "mixed": "Ibrido"
-      },
-      "set": {
-        "owned": "{owned} pezzi su {total}",
-        "itemLevel": "liv. ogg. {level}",
-        "bonusLabel": "{pieces} pezzi"
-      },
-      "detail": {
-        "dropLabel": "Si ottiene da",
-        "vendorLabel": "Venduto da",
-        "bindLabel": "Vincolo",
-        "sellLabel": "Il venditore paga",
-        "marketLabel": "Mercato Mondiale",
-        "exchangeLabel": "Borsa $WOC",
-        "setLabel": "Raccolto",
-        "drop": "{mob} ({location}), {chance}% per uccisione",
-        "heroicDrop": "{mob} ({location}), solo in modalità Eroica, {chance}% per uccisione",
-        "dropWithHeroic": "{mob} ({location}), {chance}% per uccisione, {heroicChance}% in modalità Eroica",
-        "globalDrop": "Qualsiasi nemico, {chance}% per uccisione, uno di {count} di questa rarità",
-        "fishingDrop": "Pesca ovunque, {chance}% per cattura",
-        "vendor": "{npc} ({location}) per {price}",
-        "honorPrice": "{amount} Onore",
-        "marksPrice": "{amount} Marchi Eroici",
-        "noSource": "Nessuna fonte ancora presente nel gioco",
-        "noItem": "Nessun oggetto lo conferisce ancora",
-        "tradeable": "Scambiabile",
-        "soulbound": "Vincolato all'anima",
-        "noSell": "Non può essere venduto",
-        "marketAtMerchant": "Visibile dal Mercante",
-        "marketChecking": "Verifica...",
-        "marketNone": "Nessuna inserzione",
-        "exchangeNone": "Nessuna inserzione",
-        "exchangeUnavailable": "Non disponibile su questo client"
+        "dismiss": "Congeda"
       }
     },
     "calendar": {
@@ -6676,7 +6553,15 @@ export const it_IT: EnTranslations = {
       "viewSources": "Vedi fonti",
       "separateByGatherer": "Separa per raccoglitore",
       "takeChosenQuantity": "Preleva la quantità scelta",
-      "combine": "Combina pile di materiali"
+      "combine": "Combina pile di materiali",
+      "itemHistory": "Item history"
+    },
+    "itemHistory": {
+      "title": "{item}: history",
+      "passedTo": "Passed to {name} on {date}",
+      "noTransfers": "This item has never changed hands.",
+      "close": "Close",
+      "openAria": "Item history for {item}"
     },
     "enchanting": {
       "recipeNotLearned": "Impara la formula prima di applicare questo incantamento.",
@@ -17281,7 +17166,8 @@ export const it_IT: EnTranslations = {
       "tooManyOrders": "Puoi tenere aperti al massimo {count} ordini alla volta.",
       "orderClosed": "Quell'ordine non è più aperto.",
       "orderOwn": "È il tuo stesso ordine. Annullalo per ritirarlo.",
-      "orderNotYours": "Non è il tuo ordine."
+      "orderNotYours": "Non è il tuo ordine.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Prendi tutto",
@@ -21207,117 +21093,6 @@ export const it_IT: EnTranslations = {
       },
       "ps_passing_stone": {
         "name": "Pietra del trapasso"
-      },
-      "whistle_ember_fox": {
-        "name": "Fischietto della volpe di brace"
-      },
-      "whistle_moss_hare": {
-        "name": "Fischietto della lepre muschiosa"
-      },
-      "whistle_frog": {
-        "name": "Fischietto della rana"
-      },
-      "whistle_crimson_claw_crab": {
-        "name": "Fischietto del granchio Chela Cremisi"
-      },
-      "whistle_golden_sentinel": {
-        "name": "Fischietto della sentinella dorata"
-      },
-      "whistle_nightfang": {
-        "name": "Fischietto di Zanna Notturna"
-      },
-      "whistle_tuskhorn_boar": {
-        "name": "Fischietto del cinghiale Zannacorno"
-      },
-      "whistle_emerald_wolf": {
-        "name": "Fischietto del lupo di smeraldo"
-      },
-      "whistle_tiger": {
-        "name": "Fischietto della tigre"
-      },
-      "whistle_cate_coin": {
-        "name": "Fischietto di Cate Coin"
-      },
-      "whistle_alon": {
-        "name": "Fischietto di Alon"
-      },
-      "whistle_trollface": {
-        "name": "Fischietto di Trollface"
-      },
-      "whistle_ansem": {
-        "name": "Fischietto di Ansem"
-      },
-      "whistle_triple_t": {
-        "name": "Fischietto di Triple T"
-      },
-      "whistle_kekius": {
-        "name": "Fischietto di Kekius"
-      },
-      "whistle_solbot": {
-        "name": "Fischietto di Solbot"
-      },
-      "whistle_frostfire": {
-        "name": "Fischietto di Fuocogelo"
-      },
-      "whistle_rocky": {
-        "name": "Fischietto di Rocky"
-      },
-      "whistle_proud_grunt": {
-        "name": "Fischietto del grugno fiero"
-      },
-      "whistle_loot_goblin": {
-        "name": "Fischietto del goblin del bottino"
-      },
-      "whistle_penny_goldspark": {
-        "name": "Fischietto di Penny Scintilladoro"
-      },
-      "whistle_stag": {
-        "name": "Fischietto del cervo"
-      },
-      "whistle_alpaca": {
-        "name": "Fischietto dell'alpaca"
-      },
-      "whistle_horse": {
-        "name": "Fischietto del cavallo"
-      },
-      "whistle_sapling": {
-        "name": "Fischietto dell'arboscello"
-      },
-      "whistle_bull": {
-        "name": "Fischietto del toro"
-      },
-      "whistle_spider": {
-        "name": "Fischietto del ragno"
-      },
-      "whistle_raptor": {
-        "name": "Fischietto del raptor"
-      },
-      "whistle_skeleton": {
-        "name": "Fischietto dello scheletro"
-      },
-      "whistle_crystal_lich": {
-        "name": "Fischietto del lich di cristallo"
-      },
-      "whistle_forgemaw": {
-        "name": "Fischietto di Fauci della Forgia il Fuso"
-      },
-      "whistle_sprites": {
-        "name": "Fischietto di Flicker e Glimmer"
-      },
-      "whistle_crystal_tide": {
-        "name": "Fischietto di Marea Cristallina"
-      },
-      "whistle_phantom": {
-        "name": "Fischietto del fantasma"
-      },
-      "whistle_emberfall_phoenix": {
-        "name": "Fischietto della fenice Pioggia di Braci"
-      },
-      "charm_stag_acorn": {
-        "name": "Talismano della corona di ghiande"
-      },
-      "charm_stag_gilded": {
-        "name": "Talismano dorato"
       },
       "lastflame_core": {
         "name": "Nucleo dell’Ultima Fiamma"
@@ -26432,9 +26207,6 @@ export const it_IT: EnTranslations = {
       },
       "buddy_horse": {
         "name": "Tug, il cavallo da guerra"
-      },
-      "buddy_sapling": {
-        "name": "Arboscello"
       },
       "buddy_bull": {
         "name": "Toro"

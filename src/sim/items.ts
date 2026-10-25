@@ -31,7 +31,6 @@ import {
   equipBag as equipBagCmd,
   stackSizeOf,
 } from './bags';
-import { useBuddyToken } from './buddies';
 import { openTreasureCasket } from './clue_casket';
 import { useClueScroll } from './clue_scrolls';
 import { isWornTrinket, onTrinketEquipped, useWornTrinket } from './combat/trinkets';
@@ -89,6 +88,7 @@ import {
 import { canStackInstancePayloads, itemInstancePayloadsEqual } from './item_instance_merge';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { isItemLocked } from './item_lock';
+import { recordTrackedChange, recordTrackedConsumed } from './item_tracking';
 import { type ItemUseConsumption, planItemUseConsumption } from './item_use_consumption';
 import { withoutPartyTradeMarker } from './loot/bop_trade_window';
 import {
@@ -534,11 +534,13 @@ export function discardItem(
       return;
     }
     ctx.onInventoryChangedForQuests?.(meta);
+    // Destroying a tracked copy ends it: its final ledger row.
+    recordTrackedChange(ctx, meta, itemId, taken?.instance, 'consume', 'discard');
   } else {
     // The copy-choice rule on the discard arm (the phase 18 whole-branch
     // review): with a plain and a self-signed charm copy in the bags, the
     // discard consumes the plain one and the recharge discount survives.
-    removePreferFungible(
+    const destroyed = removePreferFungible(
       ctx,
       itemId,
       discardCount,
@@ -546,6 +548,7 @@ export function discardItem(
       undefined,
       sellerSignedCharmDeprioritize(meta.name, itemId),
     );
+    recordTrackedConsumed(ctx, meta, itemId, destroyed, 'discard');
   }
   ctx.emit({
     type: 'log',
@@ -1395,13 +1398,6 @@ export function useItem(
     // first. Reins are never consumed: mountOwned() derives ownership from holding
     // the item, so removing it here would delete the mount.
     summonMountItem(ctx, meta.entityId, def.mount);
-  } else if (def.kind === 'buddy') {
-    // A whistle is a grant TOKEN: using it attaches the companion to the
-    // character and consumes the token (a duplicate is refused unconsumed).
-    // Summoning an owned buddy is a Cosmetics-window command, not an item use.
-    useBuddyToken(ctx, meta.entityId, itemId);
-  } else if (def.kind === 'buddy_cosmetic') {
-    // Historical cosmetic tokens remain readable but are no longer usable.
   } else if (def.kind === 'recipe') {
     // A pattern teaches the recipe it names and is spent doing so.
     // useRecipePatternItem owns every gate and the consume; it sits here, below
@@ -1424,6 +1420,7 @@ export function buyItem(
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
+  if (buyBuddyOffer(ctx, meta.entityId, npcId, itemId, opts)) return;
   const npc = ctx.entities.get(npcId);
   const def = ITEMS[itemId];
   if (npc?.kind !== 'npc' || npc.vendorItems.length === 0) {
@@ -1616,7 +1613,6 @@ export function buyItem(
     ctx.error(meta.entityId, 'Not enough honor.');
     return;
   }
-  if (buyBuddyOffer(ctx, meta.entityId, def, copperCost, honorCost)) return;
   if (!ctx.canAddItem(itemId, qty, meta.entityId)) {
     bagsFullError(ctx, meta.entityId);
     return;
@@ -1629,7 +1625,7 @@ export function buyItem(
   }
   meta.copper -= copperCost;
   meta.honor -= honorCost;
-  ctx.addItem(itemId, qty, meta.entityId);
+  ctx.addItem(itemId, qty, meta.entityId, { source: 'vendor' });
   ctx.emit({ type: 'vendor', action: 'buy', itemId, pid: meta.entityId });
 }
 
@@ -1678,7 +1674,12 @@ export function skipsVendorBuyback(
 //
 // Plain gray junk never takes a row (see skipsVendorBuyback), so a Sell Junk
 // sweep cannot push the player's real sales off the end of the list.
+// A sold copy is still the seller's while it sits on the list (buying it back
+// is the same holder), so the sale writes no ledger row. A row that falls off
+// the end is destroyed, and THAT is where a tracked copy's final `consume`
+// row is written (source 'vendor', detail 'buybackExpired').
 function recordVendorBuyback(
+  ctx: SimContext,
   meta: PlayerMeta,
   itemId: string,
   count: number,
@@ -1711,7 +1712,20 @@ function recordVendorBuyback(
         : { materialSources: buybackCompositionAfter(undefined, materialSources) }),
     });
   }
-  while (meta.vendorBuyback.length > VENDOR_BUYBACK_LIMIT) meta.vendorBuyback.pop();
+  while (meta.vendorBuyback.length > VENDOR_BUYBACK_LIMIT) {
+    const expired = meta.vendorBuyback.pop();
+    if (expired) {
+      recordTrackedChange(
+        ctx,
+        meta,
+        expired.itemId,
+        expired.instance,
+        'consume',
+        'vendor',
+        'buybackExpired',
+      );
+    }
+  }
 }
 
 export function sellItem(
@@ -1841,7 +1855,15 @@ export function sellItem(
     );
   }
   for (const unit of consumedUnits) {
-    recordVendorBuyback(meta, itemId, 1, unit.instance, unit.craftedRecipeId, unit.materialSources);
+    recordVendorBuyback(
+      ctx,
+      meta,
+      itemId,
+      1,
+      unit.instance,
+      unit.craftedRecipeId,
+      unit.materialSources,
+    );
   }
   const payout = def.sellValue * sellableCount;
   meta.copper += payout;
@@ -1955,6 +1977,7 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
     );
     for (const unit of consumedUnits) {
       recordVendorBuyback(
+        ctx,
         meta,
         itemId,
         1,

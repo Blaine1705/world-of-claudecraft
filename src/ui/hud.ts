@@ -54,6 +54,7 @@ import {
 } from '../sim/account_flair';
 import { isOwnAura } from '../sim/aura_classify';
 import { bagPools } from '../sim/bags';
+import { buddyVendorOffer } from '../sim/content/buddy_offers';
 import { DEEDS } from '../sim/content/deeds';
 import { vendorFactionForNpc } from '../sim/content/faction_vendors';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
@@ -14710,6 +14711,7 @@ export class Hud {
       // driven against both world shapes by tests/warfare_vendor_view.test.ts.
       buildWarfareVendorView(npc.vendorItems, ITEMS, ITEM_SETS, {
         ...warfareShopViewer(this.sim),
+        warfareVendor: NPCS[npc.templateId ?? '']?.warfareVendor,
         setMemberCounts: itemSetMemberCounts(),
       }),
       {
@@ -14736,16 +14738,13 @@ export class Hud {
   // (gold vendors are the only buyback source), exactly like Heroic Marks, so
   // the buy command fires ONLY from the confirm callback.
   private requestWarfarePurchase(npcId: number, itemId: string): void {
-    const item = ITEMS[itemId];
+    const item = buddyVendorOffer(itemId) ?? ITEMS[itemId];
     if (!item) return;
     // Shared Heroic shop title/accept/cancel keys must remain currency-neutral.
     this.confirmDialog(
       t('heroicShop.buyConfirmTitle'),
       t('hudChrome.warfareShop.buyConfirmBody', {
-        item:
-          item.kind === 'buddy' && item.buddy
-            ? buddyDisplayName(item.buddy)
-            : itemDisplayName(item),
+        item: item.kind === 'companion' ? buddyDisplayName(item.buddy) : itemDisplayName(item),
         honor: t('hudChrome.warfare.honorAmount', {
           amount: formatNumber(Math.max(0, Math.floor(item.priceHonor ?? 0)), {
             maximumFractionDigits: 0,

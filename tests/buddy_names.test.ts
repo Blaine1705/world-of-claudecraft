@@ -95,14 +95,12 @@ describe('remembered buddy names', () => {
         horse: '  Sir   Oats ',
         crystal_lich: '<bad>',
         forgemaw: 'Cinder',
-        sapling: 'Sprout',
         stag: 'Retired',
       },
     });
     expect(serializeBuddyCollection(restored)?.names).toEqual({
       horse: 'Sir Oats',
       forgemaw: 'Cinder',
-      sapling: 'Sprout',
     });
     expect(serializeBuddyCollection(restoreBuddyCollection({ owned: ['horse'] }))).toEqual({
       owned: ['horse'],

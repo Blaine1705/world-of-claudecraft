@@ -70,8 +70,14 @@ function fakeCtx(rng: Rng) {
     ctx: {
       rng,
       addItem: (itemId: string, count: number) => plain.push({ itemId, count }),
-      addItemInstance: (itemId: string, instance: ItemInstancePayload, _pid?: number, count = 1) =>
-        instanced.push({ itemId, count, instance }),
+      addItemInstance: (
+        itemId: string,
+        instance: ItemInstancePayload,
+        _pid?: number,
+        count = 1,
+      ) => {
+        instanced.push({ itemId, count, instance });
+      },
     },
   };
 }

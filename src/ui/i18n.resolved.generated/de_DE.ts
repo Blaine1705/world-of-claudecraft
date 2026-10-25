@@ -3841,6 +3841,12 @@ export const de_DE: EnTranslations = {
       "linkHint": "Umschalt-Klick, um diesen Gegenstand im Chat zu verlinken."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "{count} Gilde angezeigt",
         "few": "{count} Gilden angezeigt",
@@ -5273,6 +5279,9 @@ export const de_DE: EnTranslations = {
       "partyTradeWindow": "Du kannst diesen Gegenstand noch {time} lang an Spieler weitergeben, die denselben Beutefund erhalten haben. Das Anlegen beendet dieses Handelsfenster.",
       "perfectedBadge": "Perfektioniert",
       "perfectingRank": "Perfektionierung: Rang {rank} von {ranks}",
+      "lootedBy": "Looted by {name} on {date}",
+      "questRewardTo": "Quest reward to {name} on {date}",
+      "obtainedBy": "Obtained by {name} on {date}",
       "materialSourceGatherer": "{count} × Gesammelt von {name}",
       "trophySkullSource": "{count} × Erbeutet von {name}",
       "materialSourceGathererSigned": "{count} × Gesammelt von {name}, signiert von {signer}",
@@ -5816,14 +5825,8 @@ export const de_DE: EnTranslations = {
       "logAdminPurge": "Ein Administrator hat {count} {item} entfernt"
     },
     "collections": {
-      "title": "Jagd",
-      "close": "Jagd schließen",
-      "keybindLabel": "Jagd",
-      "launcherTitle": "Jagd: Gefährten, Reittiere und Gegenstandssets",
       "tabs": {
-        "buddies": "Gefährten",
-        "mounts": "Reittiere",
-        "sets": "Gegenstandssets"
+        "buddies": "Gefährten"
       },
       "state": {
         "owned": "Gesammelt",
@@ -5833,7 +5836,6 @@ export const de_DE: EnTranslations = {
       },
       "presenceDefault": "Du spürst, wie dich eine Präsenz beobachtet.",
       "revealed": "{name} hat beschlossen, dir zu folgen.",
-      "cosmeticUnlocked": "Neues Aussehen für {name}: {look}.",
       "presence": {
         "ember_fox": "Etwas Kleines und Warmes tapst hinter dir her.",
         "moss_hare": "Ein Rascheln im Torf hält mit deinen Schritten mit.",
@@ -5871,134 +5873,9 @@ export const de_DE: EnTranslations = {
         "phantom": "Die Luft hinter dir ist eine Spur zu still.",
         "emberfall_phoenix": "Eine Wärme wie von einem bedeckten Feuer legt sich an deinen Rücken."
       },
-      "cosmetic": {
-        "crystal_lich_frostbound": "Frostbann",
-        "crystal_lich_voltaic": "Voltaisch",
-        "forgemaw_ashen": "Aschgrau",
-        "forgemaw_whitehot": "Weißglühend",
-        "stag_acorn": "Eichelkrone",
-        "stag_gilded": "Vergoldet",
-        "moss_hare_verdant": "Sattgrün",
-        "proud_grunt_warlord": "Kriegsfürst",
-        "frog_sapphire": "Saphirfrosch"
-      },
       "actions": {
         "summon": "Herbeirufen",
-        "dismiss": "Wegschicken",
-        "wear": "Anlegen",
-        "remove": "Entfernen"
-      },
-      "looks": {
-        "title": "Aussehen",
-        "unlocked": "Freigeschaltet",
-        "locked": "Gesperrt",
-        "worn": "Getragen",
-        "none": "Noch kein Aussehen für diesen Gefährten erstellt"
-      },
-      "source": {
-        "bossLabel": "Bossgefährte",
-        "bossDrop": "{mob} ({location}), {chance}% pro Spieler und Tötung",
-        "bossDropWithHeroic": "{mob} ({location}), {chance}% pro Spieler, {heroicChance}% auf Heroisch",
-        "bossDropHeroicOnly": "{mob} ({location}), nur Heroisch, {chance}% pro Spieler",
-        "rollNote": "Jeder Spieler würfelt separat; niemand verliert seinen Wurf an ein Gruppenmitglied.",
-        "deedLabel": "Verdient durch",
-        "deed": "Die Tat {deed}",
-        "challengeLabel": "Herausforderung",
-        "challengeSpeed": "Besiege {mob} innerhalb von {seconds} Sekunden nach Kampfbeginn",
-        "challengeDps": "Verursache im gesamten Kampf {dps} Schaden pro Sekunde an {mob}",
-        "craftLabel": "Hergestellt",
-        "craft": "{item} (Rezept für {profession})",
-        "grantLabel": "Verliehen",
-        "grantOnly": "Saisonbelohnung: die monatliche Rangliste und Belohnungen für die besten Kampfauswertungen",
-        "tokenLabel": "Marke",
-        "token": "{item}, einmal verwendet, um den Gefährten zu binden"
-      },
-      "buddyLore": {
-        "ember_fox": "Eine Füchsin aus den Hecken des Eastbrook-Tals, benannt nach dem kohleroten Fell, das durch winterliches Gestrüpp leuchtet. Die Fallensteller dort gaben die Jungtiere vor Generationen auf und begannen stattdessen, Futter auszulegen.",
-        "moss_hare": "Der Hase des Weidenmoors mit grünem Fell von einem Leben im feuchten Torf. Die Kräuterkundigen des Moors halten ihn für einen Glücksbringer und dulden nicht, dass man ihn von einer Türschwelle verjagt.",
-        "frog": "Das Mirefen-Moor lässt sie dick und unbekümmert aufwachsen, die ganze Nacht singend im Schilf. Die Moorführer schwören, dass ein Boot mit einem solchen Tier niemals auf Grund läuft.",
-        "crimson_claw_crab": "Eine Gezeitenkrabbe von der Fernküste, deren Schere lange nach dem Verlassen des Wassers rot bleibt. Hafenarbeiter ließen sie früher um Münzen über die Planken laufen.",
-        "golden_sentinel": "Ein Wachkäfer vom Bernsteinfall, vergoldet durch das Harz, in dem er aufwuchs. Sein Name ist älter als das Harz: Solche Wächter bewachten diese Haine lange bevor jemand daran dachte, den Saft abzufüllen.",
-        "nightfang": "Ein junger Jäger aus der Nachtblüte, selbst nach den Maßstäben seiner Art lautlos. Er folgt wegen der Gesellschaft und jagt nichts Größeres als eine Motte.",
-        "tuskhorn_boar": "Ein Tier aus Thornpeak, von Hirten kurzbeinig gezüchtet, die einen Eber wollten, der keinen Zaun umlegen konnte. Das Temperament hat er trotzdem behalten.",
-        "emerald_wolf": "Ein Welpe aus dem Gespensterwald, dessen Fell im Licht des Blätterdachs grün schimmert, das den Waldboden nie ganz erreicht. Die Hüter ziehen die Waisen auf, die der Wald zurücklässt.",
-        "tiger": "Streifen aus der Palmenbucht auf einem Tier, das die Palmenbucht nie sah: Die Linie wird seit der Schließung der alten Menagerien in Gefangenschaft gehalten. Es hört auf einen Pfiff und auf nichts sonst.",
-        "cate_coin": "Eine Katze, die sich nicht von der Münze trennen lässt, auf der sie sitzt, und die noch niemand beim Fressen gesehen hat. Die Händler von Eastbrook streiten noch immer darüber, welches der beiden das Haustier ist.",
-        "alon": "Das Maskottchen eines Reisenden von einer Straße, die keine Karte zugeben will. Es taucht überall dort auf, wo ein Plan schiefgeht. Es beobachtet, billigt und hilft dabei kein bisschen.",
-        "trollface": "Ein grinsendes Ding, das der Gespensterwald ausspuckte und nicht zurücknehmen wollte. Jeder Versuch einer Beschreibung endet damit, dass der Beschreibende lacht und aufgibt.",
-        "ansem": "Es spricht von Türen und Dunkelheit und lässt sich zu beidem nichts Weiteres entlocken. Die Kultisten der Nachtblüte beanspruchen es für sich; es läuft weg, sobald sie einen Ritus abhalten.",
-        "triple_t": "Drei von etwas oder ein Ding dreimal. Die Berichte widersprechen sich und die Kreatur hält nie lange genug still, um sie zu zählen.",
-        "kekius": "Ein lachender Gefährte unklarer Herkunft, den die Rennställe des Windkamms als Glücksbringer aufgenommen haben. Er hat vier Ställe überlebt, die auf ihn schworen.",
-        "solbot": "Ein kleiner sonnenbetriebener Automat, halb vergraben aus der Asche der Drakenlande geborgen und noch immer tickend. Welche Werkstatt ihn auch baute, sie hinterließ nirgends am Gehäuse ein Zeichen.",
-        "frostfire": "Geboren im Frostschleier, wo eine heiße Quelle durch das Eisfeld bricht, hat es sich nie entschieden, welcher Hälfte es angehört. In kalter Luft dampft es, in warmer zittert es.",
-        "rocky": "Ein Kriechtier mit Steinpanzer aus dem Geröll von Thornpeak, langsam und völlig unbeeindruckt. Bergleute halten sie, weil sie einen Augenblick vor einem Einsturz still werden.",
-        "proud_grunt": "Ein Veteran der Kriegsvorräte, der den Gruß behielt und den Rang verlor. Kriegsmarschall Draven Kole übergibt einen jedem Soldaten mit genug Ehre, um den Preis dafür zu kennen.",
-        "loot_goblin": "Es folgt jedem mit heroischen Marken und wurde noch nie beim Stehlen erwischt. Rüstmeister Vex besteht darauf, dass dies gar nichts beweist.",
-        "penny_goldspark": "Die Lehrlingin eines gnomischen Tüftlers, die stundenweise bezahlt wird und jede Kupfermünze wert ist. Rüstungsschmied Hode nahm sie zur Begleichung einer Schuld auf und verkauft die Vereinbarung nun an jeden mit tausend Gold.",
-        "stag": "Eine Blutlinie aus dem Immergarten, heruntergezüchtet von den großen Hirschen, die die Hüter einst ritten. Noch immer senkt er bei einer erhobenen Hand den Kopf, aus einer Gewohnheit, die älter ist als das Tier.",
-        "alpaca": "Die Herden am Windkamm halten sie wegen ihrer Wolle und ihres Gemüts: Nichts bleibt in einem Sturm ruhiger. Dieses spuckt auf jeder Reise genau eine Person an.",
-        "horse": "Ein Pony aus dem Tal, klein gezüchtet für Obstgartenwege und nie darüber aufgeklärt, dass es kein Schlachtross ist. Es hält an deiner Schulter Schritt und folgt jedem, der ihm einmal einen Apfel gab.",
-        "sapling": "Ein junger Baum mit einem Lächeln in der Rinde und neugierigem violettem Blick. Seine Wurzeln tragen ihn fröhlich watschelnd überallhin, wohin du wanderst.",
-        "bull": "Ein Bulle aus dem Tal von der Größe eines Hundes. Nur deshalb hat überhaupt jemand zugestimmt, ihn drinnen zu halten. Sein Temperament ist nicht mitgeschrumpft.",
-        "spider": "Eine handtellergroße Weberin aus dem Gespensterwald, die jeden Rucksack umgestaltet, in dem sie getragen wird. Ihre Spinnseide ist stärker als der Faden, den sie ersetzt.",
-        "raptor": "Ein Jungtier aus den Drakenlanden, verkauft, bevor es lernt, wie schnell es laufen kann. Jedem neuen Besitzer wird geraten, es gut zu füttern. Keiner muss es zweimal hören.",
-        "skeleton": "Es stieg aus den Grabhügeln des Gespensterwalds, klopfte sich den Staub ab und folgt seitdem den Leuten. Niemand hat herausgefunden, wem diese Knochen gehörten.",
-        "crystal_lich": "Ein Splitter von Nythraxis selbst, der noch immer vor der Kälte summt, die ihn formte. Er gehorcht demjenigen, der ihn aus den Trümmern des Schlachtzugs zog, und hat es ihm nicht verziehen.",
-        "forgemaw": "Im Schmelztiegel des Letzten Quells geschmiedet und nie ganz vollendet, verließ es Ignivars Gießerei, während die Hämmer noch fielen. Nur beim heroischen Abstieg findet man es: Das geschmolzene Wesen kehrt immer wieder zu seiner Schmiede zurück und folgt demjenigen nach Hause, der das Feuer zweimal überlebt.",
-        "crystal_tide": "Ein Gezeitengeist, der seinen eigenen Tropfen Meerglas reitet. Angler vom Tal bis zur Fernküste zogen ihn aus stillem Wasser, als sie ihr Abendessen fangen wollten. Er behält das Wasser, in dem er heraufkam, und lässt sich nicht zur Rückkehr überreden.",
-        "sprites": "Zwei kleine Feuergeister, einer golden und einer türkis, die sich nie recht einig sind, wer führt. Kommst du nahe genug, falten sie sich zu einer grünen Flamme zusammen, um dann lachend wieder auseinanderzufließen.",
-        "phantom": "Ein handtellergroßer Spuk aus den Grabhügeln des Gespensterwalds, ganz Tuch und ohne Knochen, der in einem geschlossenen Rucksack auftaucht und wegen der Gesellschaft bleibt. Niemand weiß, was er will, und er hat noch nie versucht, jemanden zu erschrecken.",
-        "emberfall_phoenix": "Jeden Herbst verbrennt er bis zur Glut und steigt im Frühling aus seiner eigenen Asche. Mehr kann dir niemand über ihn sagen. Niemand hat je ein Nest gefunden und niemand einen zweimal gefangen."
-      },
-      "petKind": {
-        "beast": "Wildtiere",
-        "elemental": "Elementare",
-        "humanoid": "Humanoide",
-        "undead": "Untote",
-        "celebrity": "Berühmtheiten"
-      },
-      "armor": {
-        "cloth": "Stoff",
-        "mail": "Kettenrüstung",
-        "leather": "Leder"
-      },
-      "stat": {
-        "intellect": "Intelligenz",
-        "agility": "Beweglichkeit",
-        "strength": "Stärke",
-        "mixed": "Hybrid"
-      },
-      "set": {
-        "owned": "{owned} von {total} Teilen",
-        "itemLevel": "Gegenstandsstufe {level}",
-        "bonusLabel": "{pieces} Teile"
-      },
-      "detail": {
-        "dropLabel": "Beute von",
-        "vendorLabel": "Verkauft von",
-        "bindLabel": "Bindung",
-        "sellLabel": "Händler zahlt",
-        "marketLabel": "Weltmarkt",
-        "exchangeLabel": "$WOC-Börse",
-        "setLabel": "Gesammelt",
-        "drop": "{mob} ({location}), {chance}% pro Tötung",
-        "heroicDrop": "{mob} ({location}), nur Heroisch, {chance}% pro Tötung",
-        "dropWithHeroic": "{mob} ({location}), {chance}% pro Tötung, {heroicChance}% auf Heroisch",
-        "globalDrop": "Jeder Gegner, {chance}% pro Tötung, einer von {count} dieser Seltenheit",
-        "fishingDrop": "Überall angeln, {chance}% pro Fang",
-        "vendor": "{npc} ({location}) für {price}",
-        "honorPrice": "{amount} Ehre",
-        "marksPrice": "{amount} heroische Marken",
-        "noSource": "Noch keine Quelle im Spiel",
-        "noItem": "Noch kein Gegenstand gewährt dies",
-        "tradeable": "Handelbar",
-        "soulbound": "Seelengebunden",
-        "noSell": "Kann nicht verkauft werden",
-        "marketAtMerchant": "Beim Händler angezeigt",
-        "marketChecking": "Wird geprüft...",
-        "marketNone": "Keine Angebote",
-        "exchangeNone": "Keine Angebote",
-        "exchangeUnavailable": "Auf diesem Client nicht verfügbar"
+        "dismiss": "Wegschicken"
       }
     },
     "calendar": {
@@ -6676,7 +6553,15 @@ export const de_DE: EnTranslations = {
       "viewSources": "Quellen anzeigen",
       "separateByGatherer": "Nach Sammler trennen",
       "takeChosenQuantity": "Gewählte Menge herausnehmen",
-      "combine": "Materialstapel zusammenlegen"
+      "combine": "Materialstapel zusammenlegen",
+      "itemHistory": "Item history"
+    },
+    "itemHistory": {
+      "title": "{item}: history",
+      "passedTo": "Passed to {name} on {date}",
+      "noTransfers": "This item has never changed hands.",
+      "close": "Close",
+      "openAria": "Item history for {item}"
     },
     "enchanting": {
       "recipeNotLearned": "Lerne die Formel, bevor du diese Verzauberung anwendest.",
@@ -17281,7 +17166,8 @@ export const de_DE: EnTranslations = {
       "tooManyOrders": "Ihr könnt höchstens {count} Aufträge gleichzeitig offen halten.",
       "orderClosed": "Dieser Auftrag ist nicht mehr offen.",
       "orderOwn": "Das ist Euer eigener Auftrag. Storniert ihn, um ihn zurückzuziehen.",
-      "orderNotYours": "Das ist nicht Euer Auftrag."
+      "orderNotYours": "Das ist nicht Euer Auftrag.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Alles nehmen",
@@ -21207,117 +21093,6 @@ export const de_DE: EnTranslations = {
       },
       "ps_passing_stone": {
         "name": "Übergangsstein"
-      },
-      "whistle_ember_fox": {
-        "name": "Glutfuchspfeife"
-      },
-      "whistle_moss_hare": {
-        "name": "Mooshasenpfeife"
-      },
-      "whistle_frog": {
-        "name": "Froschpfeife"
-      },
-      "whistle_crimson_claw_crab": {
-        "name": "Pfeife der Scharlachscherenkrabbe"
-      },
-      "whistle_golden_sentinel": {
-        "name": "Pfeife des goldenen Wächters"
-      },
-      "whistle_nightfang": {
-        "name": "Nachtfangpfeife"
-      },
-      "whistle_tuskhorn_boar": {
-        "name": "Hauerhornkeilerpfeife"
-      },
-      "whistle_emerald_wolf": {
-        "name": "Smaragdwolfpfeife"
-      },
-      "whistle_tiger": {
-        "name": "Tigerpfeife"
-      },
-      "whistle_cate_coin": {
-        "name": "Cate-Coin-Pfeife"
-      },
-      "whistle_alon": {
-        "name": "Alon-Pfeife"
-      },
-      "whistle_trollface": {
-        "name": "Trollface-Pfeife"
-      },
-      "whistle_ansem": {
-        "name": "Ansem-Pfeife"
-      },
-      "whistle_triple_t": {
-        "name": "Triple-T-Pfeife"
-      },
-      "whistle_kekius": {
-        "name": "Kekius-Pfeife"
-      },
-      "whistle_solbot": {
-        "name": "Solbot-Pfeife"
-      },
-      "whistle_frostfire": {
-        "name": "Frostfeuerpfeife"
-      },
-      "whistle_rocky": {
-        "name": "Rocky-Pfeife"
-      },
-      "whistle_proud_grunt": {
-        "name": "Pfeife des stolzen Grunzers"
-      },
-      "whistle_loot_goblin": {
-        "name": "Beutegoblinpfeife"
-      },
-      "whistle_penny_goldspark": {
-        "name": "Penny-Goldfunken-Pfeife"
-      },
-      "whistle_stag": {
-        "name": "Hirschpfeife"
-      },
-      "whistle_alpaca": {
-        "name": "Alpaka-Pfeife"
-      },
-      "whistle_horse": {
-        "name": "Pferdepfeife"
-      },
-      "whistle_sapling": {
-        "name": "Setzlingspfeife"
-      },
-      "whistle_bull": {
-        "name": "Bullenpfeife"
-      },
-      "whistle_spider": {
-        "name": "Spinnenpfeife"
-      },
-      "whistle_raptor": {
-        "name": "Raptorpfeife"
-      },
-      "whistle_skeleton": {
-        "name": "Skelettpfeife"
-      },
-      "whistle_crystal_lich": {
-        "name": "Kristalllich-Pfeife"
-      },
-      "whistle_forgemaw": {
-        "name": "Pfeife von Schmiedeschlund dem Geschmolzenen"
-      },
-      "whistle_sprites": {
-        "name": "Pfeife für Flacker und Schimmer"
-      },
-      "whistle_crystal_tide": {
-        "name": "Kristallflut-Pfeife"
-      },
-      "whistle_phantom": {
-        "name": "Phantompfeife"
-      },
-      "whistle_emberfall_phoenix": {
-        "name": "Pfeife des Bernsteinfall-Phönix"
-      },
-      "charm_stag_acorn": {
-        "name": "Eichelkronentalisman"
-      },
-      "charm_stag_gilded": {
-        "name": "Vergoldeter Talisman"
       },
       "lastflame_core": {
         "name": "Kern der Letzten Flamme"
@@ -26432,9 +26207,6 @@ export const de_DE: EnTranslations = {
       },
       "buddy_horse": {
         "name": "Tug, das Schlachtross"
-      },
-      "buddy_sapling": {
-        "name": "Setzling"
       },
       "buddy_bull": {
         "name": "Bulle"

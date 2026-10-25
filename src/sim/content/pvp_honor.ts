@@ -893,10 +893,7 @@ export const HONOR_QUARTERMASTER_STOCK: readonly string[] = [
   ...SEASON2_STOCK,
 ];
 /** Shared honor vendor stock; FURY_STOCK remains the gear-only list. */
-export const HONOR_VENDOR_STOCK: readonly string[] = [
-  ...HONOR_QUARTERMASTER_STOCK,
-  'whistle_horse',
-];
+export const HONOR_VENDOR_STOCK: readonly string[] = [...HONOR_QUARTERMASTER_STOCK];
 
 export const FURY_NPC: NpcDef = {
   id: FURY_NPC_ID,

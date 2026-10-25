@@ -21,7 +21,6 @@ import { STUDIO_CONTENT } from '../sim/studio_content';
 // Historical name keys remain for maintained locale overlays. They do not
 // register active mobs, rewards or Hunting entries.
 const RETIRED_BUDDY_NAMES = {
-  buddy_sapling: { name: 'Sapling' },
   buddy_ember_fox: { name: 'Ember Fox' },
   buddy_moss_hare: { name: 'Moss Hare' },
   buddy_frog: { name: 'Frog' },
@@ -433,7 +432,6 @@ const MOB_IDS = [
   'buddy_stag',
   'buddy_alpaca',
   'buddy_horse',
-  'buddy_sapling',
   'buddy_bull',
   'buddy_spider',
   'buddy_raptor',

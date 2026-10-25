@@ -37,8 +37,6 @@ import { worldEntityText } from '../src/ui/world_entity_i18n';
 
 const SEED = 42;
 const KOLE = ZONE3_NPCS[WARFARE_QUARTERMASTER_NPC_ID];
-/** Both honor vendors carry Horse alongside their mirrored WARFARE gear. */
-const HONOR_COMPANION_ITEM_ID = 'whistle_horse';
 
 /** A vendor list with the cosmetic rows dropped, so the two placements' GEAR
  *  can be compared for drift without the companion masking a real fork. */
@@ -78,12 +76,11 @@ describe('Warmarshal Draven Kole: the definition', () => {
         FURY_STOCK.length + WARFARE_TRINKET_STOCK.length,
       ),
     ).toEqual([...WARFARE_TRINKET_STOCK]);
-    expect(HONOR_VENDOR_STOCK).toEqual([...HONOR_QUARTERMASTER_STOCK, HONOR_COMPANION_ITEM_ID]);
+    expect(HONOR_VENDOR_STOCK).toEqual([...HONOR_QUARTERMASTER_STOCK]);
     expect(gearRows(KOLE.vendorItems)).toEqual([...HONOR_QUARTERMASTER_STOCK]);
     expect(FURY_STOCK.length).toBeGreaterThan(0);
-    // The companion is not gear.
-    expect(ITEMS[HONOR_COMPANION_ITEM_ID].kind).toBe('buddy');
-    expect(FURY_STOCK).not.toContain(HONOR_COMPANION_ITEM_ID);
+    // Companion unlocks are separate services, never inventory stock.
+    expect(KOLE.vendorItems?.some((id) => id.startsWith('whistle_'))).toBe(false);
   });
 
   it('carries the warfareVendor flag on BOTH placements, so the shop is not Highwatch-only', () => {
@@ -99,12 +96,11 @@ describe('Warmarshal Draven Kole: the definition', () => {
     expect(KOLE.vendorItems).toEqual([...HONOR_VENDOR_STOCK]);
   });
 
-  it('is an honor vendor purely by virtue of its priced stock, not by a flag', () => {
+  it('prices all inventory stock in honor', () => {
     // There is no honor-vendor flag: the buy path, range gate, balance debit and
     // gossip row are all generic over a non-empty vendorItems whose entries carry
-    // priceHonor. The warfareVendor flag above is a WINDOW routing hint only and
-    // is never read by the purchase path. Pin that, and pin that he did NOT pick
-    // up the id-keyed heroic vendor flag by accident.
+    // priceHonor. The warfareVendor flag also admits the separate companion
+    // service. It must not pick up the id-keyed heroic vendor flag.
     expect(KOLE.heroicVendor).toBeUndefined();
     expect(KOLE.market).toBeUndefined();
     expect(KOLE.banker).toBeUndefined();

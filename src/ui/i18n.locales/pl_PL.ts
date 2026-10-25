@@ -14,16 +14,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountBagsEmpty': 'Twoje torby są puste.',
   'hudChrome.bank.accountRetry': 'Spróbuj ponownie',
   'hudChrome.collections.actions.summon': 'Przywołaj',
-  'hudChrome.collections.actions.wear': 'Załóż',
-  'hudChrome.collections.armor.cloth': 'Tkanina',
-  'hudChrome.collections.armor.leather': 'Skóra',
-  'hudChrome.collections.detail.soulbound': 'Związany z duszą',
-  'hudChrome.collections.petKind.beast': 'Bestie',
-  'hudChrome.collections.petKind.elemental': 'Żywiołaki',
-  'hudChrome.collections.petKind.humanoid': 'Humanoidy',
-  'hudChrome.collections.petKind.undead': 'Nieumarli',
-  'hudChrome.collections.stat.agility': 'Zręczność',
-  'hudChrome.collections.tabs.mounts': 'Wierzchowce',
   'hudChrome.courier.empty': 'Brak przedmiotów',
   'hudChrome.courier.inventory': 'Ekwipunek',
   'hudChrome.expeditions.decline': 'Odrzuć',
@@ -21626,7 +21616,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'editor.tree.volumeSy': 'Rozciągnięcie',
   'editor.tunnel.cutShape.box': 'Prostopadłościan',
   'editor.tunnel.width': 'Szerokość',
-  'hudChrome.collections.stat.strength': 'Siła',
   'editor.decalTool.hint':
     'Wybierz naklejkę, a potem kliknij podłoże, aby ją odcisnąć. Naklejki układają się na terenie i wczytują tylko blisko kamery, więc mapa może zawierać ich wiele. Kliknij naklejkę, aby ją zaznaczyć; Delete ją usuwa.',
   'editor.decalTool.importDecal': 'Importuj obraz naklejki',
@@ -22354,7 +22343,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'editor.selection.hitboxAdd': 'Dodaj hitboks',
   'editor.selection.hitboxCap': 'Osiągnięto limit hitboksów ({max} na zasób).',
   'editor.tree.removeVolume': 'Usuń',
-  'hudChrome.collections.actions.remove': 'Usuń',
   'editor.selection.hitboxClearPreset': 'Wyczyść zapisane ustawienie wstępne',
   'editor.selection.hitboxDelete': 'Usuń zaznaczone',
   'editor.selection.hitboxDone': 'Zakończ edycję',
@@ -23218,8 +23206,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.cantors_hymnal.name': 'Śpiewnik Kantora',
   'entities.items.cantors_stole.name': 'Stuła Kantora',
   'entities.items.cellwatch_belt.name': 'Pas Straży Cel',
-  'entities.items.charm_stag_acorn.name': 'Talizman Korony Żołędzi',
-  'entities.items.charm_stag_gilded.name': 'Złocony talizman',
   'entities.items.choirward_leggings.name': 'Nogawice Osłony Chóru',
   'entities.items.choirward_pauldrons.name': 'Naramienniki Osłony Chóru',
   'entities.items.choristers_gloves.name': 'Rękawice Chórzysty',
@@ -23330,41 +23316,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.vestments_of_the_waking_rite.name': 'Szaty Budzącego Rytuału',
   'entities.items.warmonger_greaves.name': 'Nagolenniki Podżegacza Wojennego',
   'entities.items.warmonger_treads.name': 'Trzewiki Podżegacza Wojennego',
-  'entities.items.whistle_alon.name': 'Gwizdek Alona',
-  'entities.items.whistle_alpaca.name': 'Gwizdek Alpaki',
-  'entities.items.whistle_ansem.name': 'Gwizdek Ansema',
-  'entities.items.whistle_bull.name': 'Gwizdek Byka',
-  'entities.items.whistle_cate_coin.name': 'Gwizdek Cate Coin',
-  'entities.items.whistle_crimson_claw_crab.name': 'Gwizdek Kraba Karmazynowego Szczypca',
-  'entities.items.whistle_crystal_lich.name': 'Gwizdek Kryształowego Licza',
-  'entities.items.whistle_crystal_tide.name': 'Gwizdek Kryształowego Przypływu',
-  'entities.items.whistle_ember_fox.name': 'Gwizdek Żarzącego Lisa',
-  'entities.items.whistle_emberfall_phoenix.name': 'Gwizdek Feniksa Żarospadu',
-  'entities.items.whistle_emerald_wolf.name': 'Gwizdek Szmaragdowego Wilka',
-  'entities.items.whistle_forgemaw.name': 'Gwizdek Kuźniopaszczy Roztopionego',
-  'entities.items.whistle_frog.name': 'Gwizdek Żaby',
-  'entities.items.whistle_frostfire.name': 'Gwizdek Mroźnego Ognia',
-  'entities.items.whistle_golden_sentinel.name': 'Gwizdek Złotego Strażnika',
-  'entities.items.whistle_horse.name': 'Gwizdek Konia',
-  'entities.items.whistle_kekius.name': 'Gwizdek Kekiusa',
-  'entities.items.whistle_loot_goblin.name': 'Gwizdek Goblina Łupów',
-  'entities.items.whistle_moss_hare.name': 'Gwizdek Omszałego Zająca',
-  'entities.items.whistle_nightfang.name': 'Gwizdek Nocnego Kła',
-  'entities.items.whistle_penny_goldspark.name': 'Gwizdek Penny Goldspark',
-  'entities.items.whistle_phantom.name': 'Gwizdek Widma',
-  'entities.items.whistle_proud_grunt.name': 'Gwizdek Dumnego Piechura',
-  'entities.items.whistle_raptor.name': 'Gwizdek Drapieżnego Jaszczura',
-  'entities.items.whistle_rocky.name': 'Gwizdek Skalniaka',
-  'entities.items.whistle_sapling.name': 'Gwizdek Sadzonki',
-  'entities.items.whistle_skeleton.name': 'Gwizdek Szkieletu',
-  'entities.items.whistle_solbot.name': 'Gwizdek Solbota',
-  'entities.items.whistle_spider.name': 'Gwizdek Pająka',
-  'entities.items.whistle_sprites.name': 'Gwizdek Migotka i Błyska',
-  'entities.items.whistle_stag.name': 'Gwizdek Jelenia',
-  'entities.items.whistle_tiger.name': 'Gwizdek Tygrysa',
-  'entities.items.whistle_triple_t.name': 'Gwizdek Triple T',
-  'entities.items.whistle_trollface.name': "Gwizdek Trollface'a",
-  'entities.items.whistle_tuskhorn_boar.name': 'Gwizdek Odyńca Kłoroga',
   'bossJournal.wildheart.bloom.sproutName': 'Ciernisty Pęd',
   'entities.mobs.balgath_cyclops.name': 'Balgath, Jednooki Nadzorca',
   'entities.mobs.barnacle_crawler.name': 'Marynarz Spętany Wrakiem',
@@ -23398,7 +23349,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.buddy_proud_grunt.name': 'Dumny Piechur',
   'entities.mobs.buddy_raptor.name': 'Drapieżny jaszczur',
   'entities.mobs.buddy_rocky.name': 'Skalniak',
-  'entities.mobs.buddy_sapling.name': 'Sadzonka',
   'entities.mobs.buddy_skeleton.name': 'Szkielet',
   'entities.mobs.buddy_solbot.name': 'Solbot',
   'entities.mobs.buddy_spider.name': 'Pająk',
@@ -23553,7 +23503,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hud.social.boundFriendLink': 'Powiązanych znajomych łączy zaproszenie z poleceniem.',
   'hud.social.friendFirstPage': 'Pierwsza strona',
   'hud.system.moonbridgeBanner': 'Księżycowy Most Powstaje',
-  'hudChrome.collections.source.grantLabel': 'Przyznano',
   'hudChrome.expeditions.accept': 'Akceptuj',
   'referralCards.accept': 'Akceptuj',
   'referralCards.awarded': 'Przyznano',
@@ -23983,53 +23932,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.flagNameCrimson': 'Karmazynowa Flaga',
   'hudChrome.bg.flagReturnedByLog': '{name} zwraca flagę drużyny {team}.',
   'hudChrome.collections.actions.dismiss': 'Odeślij',
-  'hudChrome.collections.armor.mail': 'Kolczuga',
-  'hudChrome.collections.close': 'Zamknij polowanie',
-  'hudChrome.collections.cosmetic.crystal_lich_frostbound': 'Spętany Mrozem',
-  'hudChrome.collections.cosmetic.crystal_lich_voltaic': 'Błyskawiczny',
-  'hudChrome.collections.cosmetic.forgemaw_ashen': 'Popielny',
-  'hudChrome.collections.cosmetic.forgemaw_whitehot': 'Rozgrzany do Białości',
-  'hudChrome.collections.cosmetic.frog_sapphire': 'Szafirowa Żaba',
-  'hudChrome.collections.cosmetic.moss_hare_verdant': 'Bujny',
-  'hudChrome.collections.cosmetic.proud_grunt_warlord': 'Wódz wojenny',
-  'hudChrome.collections.cosmetic.stag_acorn': 'Korona Żołędzi',
-  'hudChrome.collections.cosmetic.stag_gilded': 'Złocony',
-  'hudChrome.collections.cosmeticUnlocked': 'Nowy wygląd dla {name}: {look}.',
-  'hudChrome.collections.detail.bindLabel': 'Związanie',
-  'hudChrome.collections.detail.drop': '{mob} ({location}), {chance}% za zabicie',
-  'hudChrome.collections.detail.dropLabel': 'Wypada z',
-  'hudChrome.collections.detail.dropWithHeroic':
-    '{mob} ({location}), {chance}% za zabicie, {heroicChance}% na heroicznym',
-  'hudChrome.collections.detail.exchangeLabel': 'Giełda $WOC',
-  'hudChrome.collections.detail.exchangeNone': 'Brak ofert',
-  'hudChrome.collections.detail.exchangeUnavailable': 'Niedostępne w tym kliencie',
-  'hudChrome.collections.detail.fishingDrop': 'Łowienie wszędzie, {chance}% za połów',
-  'hudChrome.collections.detail.globalDrop':
-    'Dowolny wróg, {chance}% za zabicie, jeden z {count} w tej rzadkości',
-  'hudChrome.collections.detail.heroicDrop':
-    '{mob} ({location}), tylko heroiczny, {chance}% za zabicie',
-  'hudChrome.collections.detail.honorPrice': '{amount} Honoru',
-  'hudChrome.collections.detail.marketAtMerchant': 'Widoczne u Handlarza',
-  'hudChrome.collections.detail.marketChecking': 'Sprawdzanie...',
-  'hudChrome.collections.detail.marketLabel': 'Rynek Światowy',
-  'hudChrome.collections.detail.marketNone': 'Brak ofert',
-  'hudChrome.collections.detail.marksPrice': '{amount} Znaków Heroicznych',
-  'hudChrome.collections.detail.noItem': 'Żaden przedmiot jeszcze tego nie daje',
-  'hudChrome.collections.detail.noSell': 'Nie można sprzedać',
-  'hudChrome.collections.detail.noSource': 'Brak źródła w grze',
-  'hudChrome.collections.detail.sellLabel': 'Handlarz płaci',
-  'hudChrome.collections.detail.setLabel': 'Zebrane',
-  'hudChrome.collections.detail.tradeable': 'Zbywalne',
-  'hudChrome.collections.detail.vendor': '{npc} ({location}) za {price}',
-  'hudChrome.collections.detail.vendorLabel': 'Sprzedawane przez',
-  'hudChrome.collections.keybindLabel': 'Polowanie',
-  'hudChrome.collections.launcherTitle': 'Polowanie: towarzysze, wierzchowce i zestawy przedmiotów',
-  'hudChrome.collections.looks.locked': 'Zablokowane',
-  'hudChrome.collections.looks.none': 'Nie opracowano jeszcze wyglądów tego towarzysza',
-  'hudChrome.collections.looks.title': 'Wyglądy',
-  'hudChrome.collections.looks.unlocked': 'Odblokowane',
-  'hudChrome.collections.looks.worn': 'Założone',
-  'hudChrome.collections.petKind.celebrity': 'Sławne postacie',
   'hudChrome.collections.presence.alon': 'Czujesz, że ktoś cię obserwuje i cicho aprobuje.',
   'hudChrome.collections.presence.alpaca':
     'Coś wełnistego i niespiesznego postanowiło ci towarzyszyć.',
@@ -24080,44 +23982,16 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Parsknięcie i tupnięcie: coś upartego podąża za tobą.',
   'hudChrome.collections.presenceDefault': 'Czujesz obecność, która cię obserwuje.',
   'hudChrome.collections.revealed': '{name} postanawia za tobą podążać.',
-  'hudChrome.collections.set.bonusLabel': 'Elementy: {pieces}',
-  'hudChrome.collections.set.itemLevel': 'poziom przedmiotu {level}',
-  'hudChrome.collections.set.owned': '{owned} z {total} elementów',
-  'hudChrome.collections.source.bossDrop': '{mob} ({location}), {chance}% na gracza za zabicie',
-  'hudChrome.collections.source.bossDropHeroicOnly':
-    '{mob} ({location}), tylko heroiczny, {chance}% na gracza',
-  'hudChrome.collections.source.bossDropWithHeroic':
-    '{mob} ({location}), {chance}% na gracza, {heroicChance}% na heroicznym',
-  'hudChrome.collections.source.bossLabel': 'Towarzysz z bossa',
-  'hudChrome.collections.source.challengeDps':
-    'Zadawaj {dps} obrażeń na sekundę celowi {mob} przez całą walkę',
-  'hudChrome.collections.source.challengeLabel': 'Wyzwanie',
-  'hudChrome.collections.source.challengeSpeed':
-    'Pokonaj cel {mob} w ciągu {seconds} sekund od rozpoczęcia walki',
   'hudChrome.collections.state.owned': 'Zebrane',
-  'hudChrome.collections.title': 'Polowanie',
   'hudChrome.cryptAlert.timeAria': 'Pozostało {seconds} sekund',
   'hudChrome.expeditions.dismiss': 'Odeślij',
   'hudChrome.kitUse.timeAria': 'Pozostało {seconds} sekund',
   'hudChrome.sanctumAlert.timeAria': 'Pozostało {seconds} sekund',
   'hudChrome.wildheartAlert.timeAria': 'Pozostało {seconds} sekund',
-  'hudChrome.collections.source.craft': '{item} (receptura: {profession})',
-  'hudChrome.collections.source.craftLabel': 'Wytworzone',
-  'hudChrome.collections.source.deed': 'Czyn {deed}',
-  'hudChrome.collections.source.deedLabel': 'Zdobywane przez',
-  'hudChrome.collections.source.grantOnly':
-    'Nagroda sezonowa: nagrody miesięcznego rankingu i najlepszych wyników',
-  'hudChrome.collections.source.rollNote':
-    'Każdy gracz losuje osobno; nikt nie przegrywa losowania z członkiem grupy.',
-  'hudChrome.collections.source.token': '{item}, jednorazowe użycie do przypisania towarzysza',
-  'hudChrome.collections.source.tokenLabel': 'Żeton',
-  'hudChrome.collections.stat.intellect': 'Intelekt',
-  'hudChrome.collections.stat.mixed': 'Hybryda',
   'hudChrome.collections.state.notOwned': 'Niezebrane',
   'hudChrome.collections.state.pending': 'Podąża za tobą jakaś obecność',
   'hudChrome.collections.state.unavailable': 'Jeszcze niedostępne do zdobycia',
   'hudChrome.collections.tabs.buddies': 'Towarzysze',
-  'hudChrome.collections.tabs.sets': 'Zestawy przedmiotów',
   'hudChrome.cosmetics.buddyActive': 'Przywołany',
   'hudChrome.cosmetics.buddyDrag': 'Przeciągnij na pasek akcji',
   'hudChrome.courier.bags': 'Wyślij do banku',
@@ -24573,76 +24447,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Wielki Jaguar poluje na ciebie i ignoruje prowokacje. Każde ugryzienie zadaje {min} do {max} obrażeń fizycznych ({heroicMin} do {heroicMax} na heroicznym) i wywołuje krwawienie. Prowadź go z dala od pana.',
   'hudChrome.bastionChain.anchoredLine':
     'Biegnij do oświetlonego słupka, aby przycumować łańcuch, lub niech grupa go zerwie, zanim wyciągarka wciągnie cię do jamy',
-  'hudChrome.collections.buddyLore.alon':
-    'Maskotka podróżnika z drogi, do której nie przyznaje się żadna mapa, pojawiająca się wszędzie tam, gdzie plan się sypie. Obserwuje, aprobuje i w żaden sposób nie pomaga.',
-  'hudChrome.collections.buddyLore.alpaca':
-    'Hodowcy Wichrowego Grzbietu trzymają je dla wełny i usposobienia: nic nie zachowuje większego spokoju podczas burzy. Ta opluje dokładnie jedną osobę na podróż.',
-  'hudChrome.collections.buddyLore.ansem':
-    'Mówi o drzwiach i ciemności, ale nie daje się nakłonić do szczegółów. Kultyści Nocnego Kwiatu uznają go za swojego; odchodzi, ilekroć odprawiają rytuał.',
-  'hudChrome.collections.buddyLore.bull':
-    'Byk z Doliny wielkości psa, co jest jedynym powodem, dla którego ktoś zgodził się trzymać go w domu. Usposobienie nie zmalało razem z resztą.',
-  'hudChrome.collections.buddyLore.cate_coin':
-    'Kot, który nie rozstaje się z monetą, na której siedzi, i którego nikt nigdy nie widział jedzącego. Kupcy z Eastbrook nadal spierają się, które z tej dwójki jest zwierzakiem.',
-  'hudChrome.collections.buddyLore.crimson_claw_crab':
-    'Krab pływowy z Dalekiego Wybrzeża, którego szczypce pozostają czerwone długo po wyjściu z wody. Załogi doków urządzały ich wyścigi po deskach, obstawiając monety.',
-  'hudChrome.collections.buddyLore.crystal_lich':
-    'Odłamek samego Nythraxis, wciąż brzęczący zimnem, które go ukształtowało. Słucha tego, kto wydobył go ze szczątków rajdu, i jeszcze mu tego nie wybaczył.',
-  'hudChrome.collections.buddyLore.crystal_tide':
-    'Ognik przypływu podróżujący na własnej kropli morskiego szkła, wyławiany ze spokojnej wody przez wędkarzy od Doliny po Dalekie Wybrzeże, którzy łowili na kolację. Zachowuje wodę, z którą wypłynął, i nie daje się przekonać do powrotu.',
-  'hudChrome.collections.buddyLore.ember_fox':
-    'Lisica z żywopłotów Doliny Wschodniego Strumienia, nazwana od żarząco czerwonej sierści widocznej w zimowych zaroślach. Tamtejsi traperzy pokolenia temu zrezygnowali z łapania młodych i zamiast tego zaczęli wykładać jedzenie.',
-  'hudChrome.collections.buddyLore.emberfall_phoenix':
-    'Każdej jesieni spala się do żaru, a wiosną odradza z własnego popiołu. To wszystko, co ktokolwiek potrafi o nim powiedzieć. Nikt nigdy nie znalazł gniazda ani nie złapał tego samego dwa razy.',
-  'hudChrome.collections.buddyLore.emerald_wolf':
-    'Szczenię z Widmowego Boru, o sierści zielonej w świetle koron, które nigdy nie dociera do leśnego dna. Strażnicy wychowują sieroty pozostawione przez las.',
-  'hudChrome.collections.buddyLore.forgemaw':
-    'Wykuty w Tyglu Ostatniego Źródła i nigdy w pełni ukończony, wyszedł z odlewni Ignivara, gdy młoty wciąż uderzały. Można go znaleźć tylko podczas heroicznego zejścia: stopiona istota wciąż wraca do kuźni, która ją stworzyła, i podąża do domu za tym, kto dwa razy przetrwa ogień.',
-  'hudChrome.collections.buddyLore.frog':
-    'Trzęsawisko Mokrzawia hoduje je tłuste i beztroskie, śpiewające całą noc w trzcinowiskach. Bagienni przewodnicy przysięgają, że łódź z taką żabą nigdy nie osiądzie na mieliźnie.',
-  'hudChrome.collections.buddyLore.frostfire':
-    'Zrodzony w Szronowej Krainie, gdzie gorące źródło przebija pole lodowe, nigdy nie zdecydował, do której połowy należy. Paruje na zimnym powietrzu i drży na ciepłym.',
-  'hudChrome.collections.buddyLore.golden_sentinel':
-    'Wartowniczy chrząszcz Bursztynowej Doliny, pozłocony żywicą, w której dorastał. Nazwa jest starsza od żywicy: podobni strażnicy pilnowali tych gajów na długo, zanim ktokolwiek pomyślał o butelkowaniu soku.',
-  'hudChrome.collections.buddyLore.horse':
-    'Kucyk z Doliny, hodowany na małego do sadowniczych alejek, któremu nikt nie powiedział, że nie jest koniem bojowym. Dotrzymuje kroku przy twoim ramieniu i pójdzie za każdym, kto choć raz dał mu jabłko.',
-  'hudChrome.collections.buddyLore.kekius':
-    'Śmiejący się towarzysz niejasnego pochodzenia, przygarnięty jako talizman przez tory wyścigowe Wichrowego Grzbietu. Przeżył cztery stajnie, które pokładały w nim wiarę.',
-  'hudChrome.collections.buddyLore.loot_goblin':
-    'Podąża za każdym, kto nosi Znaki Heroiczne, i nigdy nie został przyłapany na kradzieży. Kwatermistrz Vex twierdzi, że to absolutnie niczego nie dowodzi.',
-  'hudChrome.collections.buddyLore.moss_hare':
-    'Zając Wierzbowych Mokradeł, o zielonej sierści od życia w mokrym torfie. Bagienni zielarze uważają je za szczęśliwe i nie pozwalają przeganiać ich z progu.',
-  'hudChrome.collections.buddyLore.nightfang':
-    'Młody łowca Nocnego Kwiatu, cichy nawet jak na swój gatunek. Podąża dla towarzystwa i nie poluje na nic większego niż ćma.',
-  'hudChrome.collections.buddyLore.penny_goldspark':
-    'Uczennica gnomiego majsterkowicza, pobierająca opłatę za godzinę i warta każdego miedziaka. Płatnerz Hode zatrudnił ją w ramach spłaty długu, a teraz odstępuje umowę każdemu z tysiącem złota.',
-  'hudChrome.collections.buddyLore.phantom':
-    'Nawiedzenie wielkości dłoni z kurhanów Widmowego Boru, samo prześcieradło bez kości, pojawiające się w zamkniętym plecaku i zostające dla towarzystwa. Nikt nie ustalił, czego chce, i ani razu nie próbowało nikogo przestraszyć.',
-  'hudChrome.collections.buddyLore.proud_grunt':
-    'Weteran składów Wojny, który zachował salut, lecz stracił stopień. Marszałek Wojenny Draven Kole przekazuje takiego każdemu żołnierzowi o honorze wystarczającym, by rozumiał cenę.',
-  'hudChrome.collections.buddyLore.raptor':
-    'Pisklę ze Smoczych Ziem, sprzedawane, zanim odkryje, jak szybko biega. Każdy nowy właściciel dostaje radę, by dobrze je karmić, i żadnemu nie trzeba powtarzać.',
-  'hudChrome.collections.buddyLore.rocky':
-    'Pełzacz o kamiennej skorupie z piargów Ciernistego Szczytu, powolny i zupełnie beztroski. Górnicy trzymają je, bo nieruchomieją na chwilę przed zawałem.',
-  'hudChrome.collections.buddyLore.sapling':
-    'Młode drzewo z uśmiechem w korze i ciekawskim fioletowym spojrzeniem. Korzenie niosą je w wesołym kaczym chodzie wszędzie, gdzie wędrujesz.',
-  'hudChrome.collections.buddyLore.skeleton':
-    'Wyszedł z kurhanów Widmowego Boru, otrzepał się i od tej pory chodzi za ludźmi. Nikt nie ustalił, czyje to były kości.',
-  'hudChrome.collections.buddyLore.solbot':
-    'Mały automat zasilany słońcem, wykopany do połowy z popiołów Smoczych Ziem i wciąż tykający. Warsztat, który go stworzył, nie zostawił żadnego znaku na obudowie.',
-  'hudChrome.collections.buddyLore.spider':
-    'Tkacz z Widmowego Boru wielkości dłoni, który przemeblowuje każdy plecak, w którym podróżuje. Pajęczyna jest mocniejsza od zastępowanej nici.',
-  'hudChrome.collections.buddyLore.sprites':
-    'Dwa małe ogniki, złoty i morski, które nigdy nie ustalają, który prowadzi. Gdy podejdą blisko, zlewają się w jeden zielony płomień, a potem znów rozdzielają ze śmiechem.',
-  'hudChrome.collections.buddyLore.stag':
-    'Ród z Wiecznego Ogrodu, wyhodowany z wielkich jeleni, na których dawniej jeździli strażnicy. Nadal pochyla głowę na uniesioną dłoń, z nawyku starszego niż samo zwierzę.',
-  'hudChrome.collections.buddyLore.tiger':
-    'Pasy Palmowego Wybrzeża na zwierzęciu, które nigdy go nie widziało: ród żyje w niewoli od zamknięcia dawnych menażerii. Reaguje na gwizdek i na nic więcej.',
-  'hudChrome.collections.buddyLore.triple_t':
-    'Trzy czegoś lub jedna rzecz potrójnie. Relacje się różnią, a stworzenie nie stoi dość długo, by je policzyć.',
-  'hudChrome.collections.buddyLore.trollface':
-    'Szczerząca zęby istota, którą Widmowy Bór wypuścił i nie chciał przyjąć z powrotem. Każda próba opisu kończy się śmiechem i rezygnacją opisującego.',
-  'hudChrome.collections.buddyLore.tuskhorn_boar':
-    'Ród z Ciernistego Szczytu, hodowany przez pasterzy na krótkie nogi, bo chcieli dzika, który nie zburzy ogrodzenia. Mimo to zachował swój temperament.',
   'hudChrome.courier.instructions':
     'Wybierz całe stosy. Kurier najpierw je wpłaca, a potem odbiera zamówione przedmioty. Nie można wysyłać przedmiotów zadań.',
   'hudChrome.cryptAlert.riteNamedLine':

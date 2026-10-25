@@ -3841,6 +3841,12 @@ export const id_ID: EnTranslations = {
       "linkHint": "Shift-klik untuk menautkan item ini di obrolan."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "{count} guild ditampilkan",
         "few": "{count} guild ditampilkan",
@@ -5273,6 +5279,9 @@ export const id_ID: EnTranslations = {
       "partyTradeWindow": "Kamu dapat memperdagangkan barang ini kepada pemain yang berbagi jarahannya selama {time} berikutnya. Memakainya mengakhiri jendela perdagangan.",
       "perfectedBadge": "Disempurnakan",
       "perfectingRank": "Penyempurnaan: peringkat {rank} dari {ranks}",
+      "lootedBy": "Looted by {name} on {date}",
+      "questRewardTo": "Quest reward to {name} on {date}",
+      "obtainedBy": "Obtained by {name} on {date}",
       "materialSourceGatherer": "{count} × Dikumpulkan oleh {name}",
       "trophySkullSource": "{count} × Diambil dari {name}",
       "materialSourceGathererSigned": "{count} × Dikumpulkan oleh {name}, ditandatangani oleh {signer}",
@@ -5816,14 +5825,8 @@ export const id_ID: EnTranslations = {
       "logAdminPurge": "Seorang administrator menghapus {count} {item}"
     },
     "collections": {
-      "title": "Perburuan",
-      "close": "Tutup perburuan",
-      "keybindLabel": "Perburuan",
-      "launcherTitle": "Perburuan: teman, tunggangan, dan set barang",
       "tabs": {
-        "buddies": "Teman",
-        "mounts": "Tunggangan",
-        "sets": "Set Barang"
+        "buddies": "Teman"
       },
       "state": {
         "owned": "Dikumpulkan",
@@ -5833,7 +5836,6 @@ export const id_ID: EnTranslations = {
       },
       "presenceDefault": "Kamu merasakan sosok yang mengawasimu.",
       "revealed": "{name} memutuskan mengikutimu.",
-      "cosmeticUnlocked": "Tampilan baru untuk {name}: {look}.",
       "presence": {
         "ember_fox": "Sesuatu yang kecil dan hangat melangkah di belakangmu.",
         "moss_hare": "Gemerisik di gambut mengimbangi langkahmu.",
@@ -5871,134 +5873,9 @@ export const id_ID: EnTranslations = {
         "phantom": "Udara di belakangmu terasa sedikit terlalu hening.",
         "emberfall_phoenix": "Kehangatan seperti api terpendam menetap di punggungmu."
       },
-      "cosmetic": {
-        "crystal_lich_frostbound": "Terikat Es",
-        "crystal_lich_voltaic": "Berlistrik",
-        "forgemaw_ashen": "Berkelabu Abu",
-        "forgemaw_whitehot": "Pijar Putih",
-        "stag_acorn": "Mahkota Biji Ek",
-        "stag_gilded": "Bersepuh Emas",
-        "moss_hare_verdant": "Hijau Subur",
-        "proud_grunt_warlord": "Panglima Perang",
-        "frog_sapphire": "Katak Safir"
-      },
       "actions": {
         "summon": "Panggil",
-        "dismiss": "Panggil pulang",
-        "wear": "Kenakan",
-        "remove": "Hapus"
-      },
-      "looks": {
-        "title": "Tampilan",
-        "unlocked": "Terbuka",
-        "locked": "Terkunci",
-        "worn": "Dipakai",
-        "none": "Belum ada tampilan yang dibuat untuk teman ini"
-      },
-      "source": {
-        "bossLabel": "Peliharaan bos",
-        "bossDrop": "{mob} ({location}), {chance}% per pemain per pembunuhan",
-        "bossDropWithHeroic": "{mob} ({location}), {chance}% per pemain, {heroicChance}% pada Heroik",
-        "bossDropHeroicOnly": "{mob} ({location}), hanya Heroik, {chance}% per pemain",
-        "rollNote": "Setiap pemain mengundi sendiri; tak ada yang kehilangan hasil undian karena anggota kelompok.",
-        "deedLabel": "Diperoleh melalui",
-        "deed": "Jasa {deed}",
-        "challengeLabel": "Tantangan",
-        "challengeSpeed": "Kalahkan {mob} dalam {seconds} detik sejak pertempuran dimulai",
-        "challengeDps": "Berikan {dps} kerusakan per detik kepada {mob} sepanjang pertempuran",
-        "craftLabel": "Dibuat",
-        "craft": "{item} (resep {profession})",
-        "grantLabel": "Dianugerahkan",
-        "grantOnly": "Hadiah musiman: peringkat bulanan dan hadiah catatan tempur terbaik",
-        "tokenLabel": "Token",
-        "token": "{item}, digunakan sekali untuk mengikat teman"
-      },
-      "buddyLore": {
-        "ember_fox": "Rubah betina dari pagar semak Eastbrook Vale, dinamai dari bulu merah bara yang terlihat di sela semak musim dingin. Para penjerat menyerah menangkap anaknya beberapa generasi lalu dan mulai meninggalkan makanan.",
-        "moss_hare": "Terwelu Willowfen, berbulu hijau karena seumur hidup tidur di gambut basah. Ahli herbal rawa menganggapnya pembawa keberuntungan dan tak mengizinkan siapa pun mengusirnya dari ambang pintu.",
-        "frog": "Mirefen Marsh membesarkannya gemuk dan santai, bernyanyi semalaman dari rumpun gelagah. Pemandu rawa bersumpah perahu yang membawanya tidak pernah kandas.",
-        "crimson_claw_crab": "Kepiting pasang Farshore yang capitnya tetap merah lama setelah keluar dari air. Para pekerja dermaga dahulu mengadunya berlomba di papan untuk uang.",
-        "golden_sentinel": "Kumbang penjaga Amberfall, disepuh resin tempatnya tumbuh. Namanya lebih tua dari resin: penjaga sejenis telah menjaga hutan itu jauh sebelum orang terpikir membotolkan getahnya.",
-        "nightfang": "Pemburu muda Nightbloom, senyap bahkan menurut ukuran kaumnya. Ia mengikuti demi kebersamaan dan tidak memburu apa pun yang lebih besar dari ngengat.",
-        "tuskhorn_boar": "Keturunan Thornpeak, dibiakkan berkaki pendek oleh penggembala yang menginginkan babi hutan yang tak dapat merobohkan pagar. Perangainya tetap sama.",
-        "emerald_wolf": "Anak serigala Wraithwood, bulunya hijau dalam cahaya tajuk yang nyaris tak pernah mencapai lantai hutan. Para penjaga membesarkan anak yatim yang ditinggalkan hutan.",
-        "tiger": "Belang Palmreach pada hewan yang tak pernah melihat Palmreach: keturunannya dipelihara dalam penangkaran sejak kebun binatang lama ditutup. Ia hanya menanggapi siulan.",
-        "cate_coin": "Kucing yang tak mau berpisah dari koin yang didudukinya, dan tak pernah terlihat makan. Pedagang Eastbrook masih berdebat mana di antara keduanya yang merupakan peliharaan.",
-        "alon": "Maskot pengembara dari jalan yang tak diakui peta mana pun, muncul setiap kali rencana berjalan buruk. Ia mengamati, menyetujui, dan sama sekali tidak membantu.",
-        "trollface": "Makhluk menyeringai yang dikeluarkan Wraithwood dan tak mau diterima kembali. Setiap upaya menggambarkannya berakhir dengan si penggambar tertawa lalu menyerah.",
-        "ansem": "Ia berbicara tentang pintu dan kegelapan, lalu menolak menjelaskan keduanya. Pemuja Nightbloom mengakuinya sebagai milik mereka; ia pergi setiap kali mereka mengadakan ritus.",
-        "triple_t": "Tiga dari sesuatu, atau satu hal sebanyak tiga kali. Kesaksian berbeda-beda, dan makhluk itu tak mau diam cukup lama untuk dihitung.",
-        "kekius": "Teman tertawa yang tak jelas asalnya, diadopsi arena pacuan Galecrest sebagai jimat. Ia hidup lebih lama daripada empat kandang yang bersumpah atas tuahnya.",
-        "solbot": "Robot kecil bertenaga matahari, digali dari abu Drakelands saat setengah terkubur dan masih berdetak. Bengkel pembuatnya tak meninggalkan tanda apa pun pada cangkang.",
-        "frostfire": "Lahir di Frostveil Reach saat mata air panas menembus hamparan es, dan tak pernah memutuskan bagian mana yang menjadi asalnya. Ia beruap di udara dingin dan menggigil di udara hangat.",
-        "rocky": "Makhluk merayap bercangkang batu dari lereng puing Thornpeak, lambat dan sangat santai. Penambang memeliharanya karena ia mendadak diam sesaat sebelum runtuhan.",
-        "proud_grunt": "Veteran dari gudang Warfare yang mempertahankan hormatnya tetapi kehilangan pangkatnya. Warmarshal Draven Kole menyerahkan satu kepada prajurit dengan kehormatan cukup untuk memahami harganya.",
-        "loot_goblin": "Ia mengikuti siapa pun yang membawa Tanda Heroik dan tak pernah sekalipun tertangkap mencuri. Quartermaster Vex menegaskan bahwa itu sama sekali bukan bukti.",
-        "penny_goldspark": "Murid perajin gnome yang dibayar per jam dan pantas menerima setiap keping tembaganya. Armorer Hode menerimanya untuk melunasi utang dan kini menjual kesepakatan itu kepada siapa pun yang memiliki seribu emas.",
-        "stag": "Garis keturunan Evergarden, dibiakkan lebih kecil dari rusa besar tunggangan para penjaga dahulu. Ia masih menundukkan kepala pada tangan terangkat, kebiasaan yang lebih tua daripada hewan itu sendiri.",
-        "alpaca": "Kawanan Galecrest dipelihara untuk wol dan ketenangannya: tak ada yang lebih tenang di tengah badai. Yang ini akan meludahi tepat satu orang per perjalanan.",
-        "horse": "Keturunan poni Vale, dibiakkan kecil untuk lorong kebun dan tak pernah diberi tahu bahwa ia bukan kuda perang. Ia mengimbangi langkah di sisimu dan mengikuti siapa pun yang pernah memberinya apel.",
-        "sapling": "Pohon muda dengan senyum pada kulit kayunya dan tatapan ungu penuh rasa ingin tahu. Akarnya membawanya berjalan bergoyang ceria ke mana pun kamu mengembara.",
-        "bull": "Banteng Vale sebesar anjing, satu-satunya alasan orang setuju memeliharanya di dalam rumah. Perangainya tidak ikut mengecil.",
-        "spider": "Penenun Wraithwood seukuran telapak tangan yang menghias ulang tas tempatnya dibawa. Jaringnya lebih kuat daripada benang yang digantikannya.",
-        "raptor": "Anak raptor Drakelands, dijual sebelum belajar seberapa cepat ia dapat berlari. Setiap pemilik baru diminta memberinya makan, dan tak ada yang perlu diingatkan dua kali.",
-        "skeleton": "Ia bangkit dari makam Wraithwood, menepuk debu dari tubuhnya, dan sejak itu mengikuti orang ke mana-mana. Tak ada yang memastikan milik siapa tulang-tulang ini dahulu.",
-        "crystal_lich": "Serpihan Nythraxis sendiri, masih berdengung dengan dingin yang membentuknya. Ia menuruti siapa pun yang menariknya dari puing raid, dan belum memaafkan orang itu.",
-        "forgemaw": "Ditempa di Kawah Mata Air Terakhir dan tak pernah benar-benar selesai, ia berjalan keluar dari pengecoran Ignivar saat palu masih berdentang. Hanya penjelajahan Heroik yang menemukannya: makhluk cair itu terus kembali ke tungku pembuatnya, lalu mengikuti pulang siapa pun yang selamat dari api dua kali.",
-        "crystal_tide": "Roh pasang yang menunggangi tetesan kaca lautnya sendiri, terangkat dari air tenang oleh pemancing dari Vale hingga Farshore yang sedang mencari makan malam. Ia mempertahankan air tempatnya berasal dan tak mau dibujuk kembali.",
-        "sprites": "Dua roh api kecil, satu emas dan satu hijau kebiruan, yang tak pernah sepakat siapa pemimpinnya. Jika cukup dekat, mereka menyatu menjadi satu nyala hijau, lalu terpisah lagi sambil tertawa.",
-        "phantom": "Hantu seukuran telapak tangan dari makam Wraithwood, hanya kain tanpa tulang, muncul dalam tas tertutup dan bertahan demi kebersamaan. Tak ada yang tahu keinginannya, dan ia tak pernah mencoba menakuti siapa pun.",
-        "emberfall_phoenix": "Setiap musim gugur ia terbakar menjadi bara, lalu bangkit dari abunya sendiri pada musim semi; hanya itulah yang diketahui orang. Tak ada yang pernah menemukan sarangnya, dan tak ada yang pernah menangkapnya dua kali."
-      },
-      "petKind": {
-        "beast": "Binatang Buas",
-        "elemental": "Elemental",
-        "humanoid": "Humanoid",
-        "undead": "Mayat Hidup",
-        "celebrity": "Selebritas"
-      },
-      "armor": {
-        "cloth": "Kain",
-        "mail": "Zirah rantai",
-        "leather": "Kulit"
-      },
-      "stat": {
-        "intellect": "Kecerdasan",
-        "agility": "Kegesitan",
-        "strength": "Kekuatan",
-        "mixed": "Hibrida"
-      },
-      "set": {
-        "owned": "{owned} dari {total} bagian",
-        "itemLevel": "level barang {level}",
-        "bonusLabel": "{pieces} bagian"
-      },
-      "detail": {
-        "dropLabel": "Dijatuhkan oleh",
-        "vendorLabel": "Dijual oleh",
-        "bindLabel": "Ikatan",
-        "sellLabel": "Harga beli pedagang",
-        "marketLabel": "Pasar Dunia",
-        "exchangeLabel": "Bursa $WOC",
-        "setLabel": "Dikumpulkan",
-        "drop": "{mob} ({location}), {chance}% per pembunuhan",
-        "heroicDrop": "{mob} ({location}), hanya Heroik, {chance}% per pembunuhan",
-        "dropWithHeroic": "{mob} ({location}), {chance}% per pembunuhan, {heroicChance}% pada Heroik",
-        "globalDrop": "Musuh mana pun, {chance}% per pembunuhan, satu dari {count} pada kelangkaan ini",
-        "fishingDrop": "Memancing di mana saja, {chance}% per tangkapan",
-        "vendor": "{npc} ({location}) seharga {price}",
-        "honorPrice": "{amount} Kehormatan",
-        "marksPrice": "{amount} Tanda Heroik",
-        "noSource": "Belum ada sumber dalam gim",
-        "noItem": "Belum ada barang yang memberikannya",
-        "tradeable": "Dapat diperdagangkan",
-        "soulbound": "Terikat Jiwa",
-        "noSell": "Tidak dapat dijual",
-        "marketAtMerchant": "Ditampilkan di Pedagang",
-        "marketChecking": "Memeriksa...",
-        "marketNone": "Tidak ada penawaran",
-        "exchangeNone": "Tidak ada penawaran",
-        "exchangeUnavailable": "Tidak tersedia pada klien ini"
+        "dismiss": "Panggil pulang"
       }
     },
     "calendar": {
@@ -6676,7 +6553,15 @@ export const id_ID: EnTranslations = {
       "viewSources": "Lihat sumber",
       "separateByGatherer": "Pisahkan berdasarkan pengumpul",
       "takeChosenQuantity": "Keluarkan jumlah yang dipilih",
-      "combine": "Gabungkan tumpukan material"
+      "combine": "Gabungkan tumpukan material",
+      "itemHistory": "Item history"
+    },
+    "itemHistory": {
+      "title": "{item}: history",
+      "passedTo": "Passed to {name} on {date}",
+      "noTransfers": "This item has never changed hands.",
+      "close": "Close",
+      "openAria": "Item history for {item}"
     },
     "enchanting": {
       "recipeNotLearned": "Pelajari formulanya sebelum menerapkan enchant ini.",
@@ -17281,7 +17166,8 @@ export const id_ID: EnTranslations = {
       "tooManyOrders": "Kamu bisa menyimpan paling banyak {count} pesanan terbuka sekaligus.",
       "orderClosed": "Pesanan itu tidak lagi terbuka.",
       "orderOwn": "Itu pesanan mu sendiri. Batalkan untuk menariknya.",
-      "orderNotYours": "Itu bukan pesanan mu."
+      "orderNotYours": "Itu bukan pesanan mu.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Ambil Semua",
@@ -21207,117 +21093,6 @@ export const id_ID: EnTranslations = {
       },
       "ps_passing_stone": {
         "name": "Batu Pelepasan"
-      },
-      "whistle_ember_fox": {
-        "name": "Peluit Rubah Bara"
-      },
-      "whistle_moss_hare": {
-        "name": "Peluit Kelinci Lumut"
-      },
-      "whistle_frog": {
-        "name": "Peluit Katak"
-      },
-      "whistle_crimson_claw_crab": {
-        "name": "Peluit Kepiting Capit Merah"
-      },
-      "whistle_golden_sentinel": {
-        "name": "Peluit Penjaga Emas"
-      },
-      "whistle_nightfang": {
-        "name": "Peluit Taring Malam"
-      },
-      "whistle_tuskhorn_boar": {
-        "name": "Peluit Babi Hutan Tanduk Gading"
-      },
-      "whistle_emerald_wolf": {
-        "name": "Peluit Serigala Zamrud"
-      },
-      "whistle_tiger": {
-        "name": "Peluit Harimau"
-      },
-      "whistle_cate_coin": {
-        "name": "Peluit Kucing Koin"
-      },
-      "whistle_alon": {
-        "name": "Peluit Alon"
-      },
-      "whistle_trollface": {
-        "name": "Peluit Muka Troll"
-      },
-      "whistle_ansem": {
-        "name": "Peluit Ansem"
-      },
-      "whistle_triple_t": {
-        "name": "Peluit Triple T"
-      },
-      "whistle_kekius": {
-        "name": "Peluit Kekius"
-      },
-      "whistle_solbot": {
-        "name": "Peluit Robot Surya"
-      },
-      "whistle_frostfire": {
-        "name": "Peluit Api Es"
-      },
-      "whistle_rocky": {
-        "name": "Peluit Si Batu"
-      },
-      "whistle_proud_grunt": {
-        "name": "Peluit Prajurit Bangga"
-      },
-      "whistle_loot_goblin": {
-        "name": "Peluit Goblin Jarahan"
-      },
-      "whistle_penny_goldspark": {
-        "name": "Peluit Penny Percik Emas"
-      },
-      "whistle_stag": {
-        "name": "Peluit Rusa Jantan"
-      },
-      "whistle_alpaca": {
-        "name": "Peluit Alpaka"
-      },
-      "whistle_horse": {
-        "name": "Peluit Kuda"
-      },
-      "whistle_sapling": {
-        "name": "Peluit Anakan Pohon"
-      },
-      "whistle_bull": {
-        "name": "Peluit Banteng"
-      },
-      "whistle_spider": {
-        "name": "Peluit Laba-laba"
-      },
-      "whistle_raptor": {
-        "name": "Peluit Raptor"
-      },
-      "whistle_skeleton": {
-        "name": "Peluit Kerangka"
-      },
-      "whistle_crystal_lich": {
-        "name": "Peluit Lich Kristal"
-      },
-      "whistle_forgemaw": {
-        "name": "Peluit Rahang Tempa yang Meleleh"
-      },
-      "whistle_sprites": {
-        "name": "Peluit Kelip dan Kilau"
-      },
-      "whistle_crystal_tide": {
-        "name": "Peluit Pasang Kristal"
-      },
-      "whistle_phantom": {
-        "name": "Peluit Hantu"
-      },
-      "whistle_emberfall_phoenix": {
-        "name": "Peluit Foniks Hujan Bara"
-      },
-      "charm_stag_acorn": {
-        "name": "Jimat Mahkota Biji Ek"
-      },
-      "charm_stag_gilded": {
-        "name": "Jimat Berlapis Emas"
       },
       "lastflame_core": {
         "name": "Inti Api Terakhir"
@@ -26432,9 +26207,6 @@ export const id_ID: EnTranslations = {
       },
       "buddy_horse": {
         "name": "Tarik, Si Kuda Perang"
-      },
-      "buddy_sapling": {
-        "name": "Anakan Pohon"
       },
       "buddy_bull": {
         "name": "Banteng"

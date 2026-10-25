@@ -26,19 +26,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountBagsEmpty': 'Suas bolsas estão vazias.',
   'hudChrome.bank.accountRetry': 'Tentar de novo',
   'hudChrome.buddyMenu.cancel': 'Cancelar',
-  'hudChrome.collections.actions.remove': 'Remover',
   'hudChrome.collections.actions.summon': 'Invocar',
-  'hudChrome.collections.actions.wear': 'Equipar',
-  'hudChrome.collections.armor.leather': 'Couro',
-  'hudChrome.collections.detail.honorPrice': '{amount} de Honra',
-  'hudChrome.collections.detail.soulbound': 'Vinculado à alma',
-  'hudChrome.collections.petKind.beast': 'Feras',
-  'hudChrome.collections.petKind.elemental': 'Elementais',
-  'hudChrome.collections.petKind.humanoid': 'Humanoides',
-  'hudChrome.collections.petKind.undead': 'Mortos-vivos',
-  'hudChrome.collections.stat.agility': 'Agilidade',
-  'hudChrome.collections.stat.intellect': 'Intelecto',
-  'hudChrome.collections.tabs.mounts': 'Montarias',
   'hudChrome.courier.bankTitle': 'Banco',
   'hudChrome.courier.empty': 'Sem itens',
   'hudChrome.courier.inventory': 'Inventário',
@@ -21169,7 +21157,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'editor.tree.preset': 'Predefinição',
   'editor.tunnel.digAlphaLabel': 'Alfa do pincel',
   'editor.water.hue': 'Matiz',
-  'hudChrome.collections.stat.strength': 'Força',
   'hudChrome.guildHall.shop.kindTitle': 'Título',
   'editor.city.roadModeEdit': 'Editar estradas',
   'editor.city.roadPlaced': 'Estrada colocada.',
@@ -22130,8 +22117,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.cantors_hymnal.name': 'Hinário do cantor',
   'entities.items.cantors_stole.name': 'Estola do cantor',
   'entities.items.cellwatch_belt.name': 'Cinto da vigília das celas',
-  'entities.items.charm_stag_acorn.name': 'Amuleto da coroa de bolotas',
-  'entities.items.charm_stag_gilded.name': 'Amuleto dourado',
   'entities.items.choirward_leggings.name': 'Perneiras de tecido da proteção do coro',
   'entities.items.choirward_pauldrons.name': 'Ombreiras de placas da proteção do coro',
   'entities.items.choristers_gloves.name': 'Luvas do corista',
@@ -22531,9 +22516,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.vestments_of_the_waking_rite.name': 'Vestimentas do rito desperto',
   'entities.items.warmonger_greaves.name': 'Grevas do belicista',
   'entities.items.warmonger_treads.name': 'Pisantes do belicista',
-  'entities.items.whistle_alon.name': 'Apito de Alon',
-  'entities.items.whistle_alpaca.name': 'Apito de alpaca',
-  'entities.items.whistle_ansem.name': 'Apito de Ansem',
   'hud.social.boundFriend': 'Amigo vinculado',
   'hud.social.friendFirstPage': 'Primeira página',
   'hud.system.moonbridgeBanner': 'A Ponte Lunar se Ergue',
@@ -22593,86 +22575,13 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.buddyMenu.nameLabel': 'Nome do companheiro',
   'hudChrome.buddyMenu.rename': 'Renomear companheiro',
   'hudChrome.collections.actions.dismiss': 'Dispensar',
-  'hudChrome.collections.armor.cloth': 'Tecido',
-  'hudChrome.collections.armor.mail': 'Malha',
-  'hudChrome.collections.close': 'Fechar caçada',
-  'hudChrome.collections.cosmetic.crystal_lich_frostbound': 'Preso ao gelo',
-  'hudChrome.collections.cosmetic.crystal_lich_voltaic': 'Voltaico',
-  'hudChrome.collections.cosmetic.forgemaw_ashen': 'Acinzentado',
-  'hudChrome.collections.cosmetic.forgemaw_whitehot': 'Branco incandescente',
-  'hudChrome.collections.cosmetic.frog_sapphire': 'Sapo Safira',
-  'hudChrome.collections.cosmetic.moss_hare_verdant': 'Verdejante',
-  'hudChrome.collections.cosmetic.proud_grunt_warlord': 'Senhor da Guerra',
-  'hudChrome.collections.cosmetic.stag_acorn': 'Coroa de Bolotas',
-  'hudChrome.collections.cosmetic.stag_gilded': 'Dourado',
-  'hudChrome.collections.cosmeticUnlocked': 'Nova aparência para {name}: {look}.',
-  'hudChrome.collections.detail.bindLabel': 'Vinculação',
-  'hudChrome.collections.detail.dropLabel': 'Obtido de',
-  'hudChrome.collections.detail.exchangeLabel': 'Bolsa de $WOC',
-  'hudChrome.collections.detail.exchangeNone': 'Nenhum anúncio',
-  'hudChrome.collections.detail.exchangeUnavailable': 'Indisponível neste cliente',
-  'hudChrome.collections.detail.marketAtMerchant': 'Exibido no mercador',
-  'hudChrome.collections.detail.marketChecking': 'Verificando...',
-  'hudChrome.collections.detail.marketLabel': 'Mercado Mundial',
-  'hudChrome.collections.detail.marketNone': 'Nenhum anúncio',
-  'hudChrome.collections.detail.marksPrice': '{amount} marcas heroicas',
-  'hudChrome.collections.detail.noItem': 'Nenhum item concede isto ainda',
-  'hudChrome.collections.detail.noSell': 'Não pode ser vendido',
-  'hudChrome.collections.detail.noSource': 'Ainda sem fonte no jogo',
-  'hudChrome.collections.detail.sellLabel': 'O vendedor paga',
-  'hudChrome.collections.detail.setLabel': 'Coletado',
-  'hudChrome.collections.detail.tradeable': 'Negociável',
-  'hudChrome.collections.detail.vendor': '{npc} ({location}) por {price}',
-  'hudChrome.collections.detail.vendorLabel': 'Vendido por',
-  'hudChrome.collections.keybindLabel': 'Caçada',
-  'hudChrome.collections.looks.locked': 'Bloqueado',
-  'hudChrome.collections.looks.title': 'Aparências',
-  'hudChrome.collections.looks.unlocked': 'Desbloqueado',
-  'hudChrome.collections.looks.worn': 'Equipado',
-  'hudChrome.collections.petKind.celebrity': 'Celebridades',
-  'hudChrome.collections.set.bonusLabel': '{pieces} peças',
-  'hudChrome.collections.set.itemLevel': 'Nível de item {level}',
-  'hudChrome.collections.set.owned': '{owned} de {total} peças',
   'hudChrome.collections.state.owned': 'Coletado',
-  'hudChrome.collections.title': 'Caçada',
   'hudChrome.cryptAlert.timeAria': 'Restam {seconds} segundos',
   'hudChrome.expeditions.dismiss': 'Dispensar',
   'hudChrome.kitUse.timeAria': 'Restam {seconds} segundos',
   'hudChrome.nameplate.npcRole.innkeeper': 'Estalajadeiro',
   'hudChrome.sanctumAlert.timeAria': 'Restam {seconds} segundos',
   'hudChrome.wildheartAlert.timeAria': 'Restam {seconds} segundos',
-  'entities.items.whistle_bull.name': 'Apito de touro',
-  'entities.items.whistle_cate_coin.name': 'Apito de Cate Coin',
-  'entities.items.whistle_crimson_claw_crab.name': 'Apito de caranguejo de garra carmesim',
-  'entities.items.whistle_crystal_lich.name': 'Apito de lich de cristal',
-  'entities.items.whistle_crystal_tide.name': 'Apito de maré de cristal',
-  'entities.items.whistle_ember_fox.name': 'Apito de raposa de brasas',
-  'entities.items.whistle_emberfall_phoenix.name': 'Apito de fênix de chuva de brasas',
-  'entities.items.whistle_emerald_wolf.name': 'Apito de lobo esmeralda',
-  'entities.items.whistle_forgemaw.name': 'Apito de Bocaforja, o Fundido',
-  'entities.items.whistle_frog.name': 'Apito de sapo',
-  'entities.items.whistle_frostfire.name': 'Apito de fogo-gelo',
-  'entities.items.whistle_golden_sentinel.name': 'Apito de sentinela dourado',
-  'entities.items.whistle_horse.name': 'Apito de cavalo',
-  'entities.items.whistle_kekius.name': 'Apito de Kekius',
-  'entities.items.whistle_loot_goblin.name': 'Apito de goblin do saque',
-  'entities.items.whistle_moss_hare.name': 'Apito de lebre de musgo',
-  'entities.items.whistle_nightfang.name': 'Apito de Presa Noturna',
-  'entities.items.whistle_penny_goldspark.name': 'Apito de Penny Centelha Dourada',
-  'entities.items.whistle_phantom.name': 'Apito de fantasma',
-  'entities.items.whistle_proud_grunt.name': 'Apito de bruto orgulhoso',
-  'entities.items.whistle_raptor.name': 'Apito de raptor',
-  'entities.items.whistle_rocky.name': 'Apito de Rocky',
-  'entities.items.whistle_sapling.name': 'Apito de broto',
-  'entities.items.whistle_skeleton.name': 'Apito de esqueleto',
-  'entities.items.whistle_solbot.name': 'Apito de Solbot',
-  'entities.items.whistle_spider.name': 'Apito de aranha',
-  'entities.items.whistle_sprites.name': 'Apito de Cintila e Brilha',
-  'entities.items.whistle_stag.name': 'Apito de cervo',
-  'entities.items.whistle_tiger.name': 'Apito de tigre',
-  'entities.items.whistle_triple_t.name': 'Apito de Triple T',
-  'entities.items.whistle_trollface.name': 'Apito de Trollface',
-  'entities.items.whistle_tuskhorn_boar.name': 'Apito de javali Presa Cornuda',
   'entities.items.wyrmshadow_chainmail.name': 'Cota de malha de sombra de serpe',
   'entities.items.wyrmshadow_tunic.name': 'Túnica de sombra de serpe',
   'entities.items.wyrmshadow_vest.name': 'Colete de sombra de serpe',
@@ -22712,7 +22621,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.buddy_proud_grunt.name': 'Bruto Orgulhoso',
   'entities.mobs.buddy_raptor.name': 'Raptor',
   'entities.mobs.buddy_rocky.name': 'Rocky',
-  'entities.mobs.buddy_sapling.name': 'Broto',
   'entities.mobs.buddy_skeleton.name': 'Esqueleto',
   'entities.mobs.buddy_solbot.name': 'Solbot',
   'entities.mobs.buddy_spider.name': 'Aranha',
@@ -22836,20 +22744,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.zones.goldcrest_harbor.pois.7.label': 'A Luz Dourada',
   'entities.zones.goldcrest_harbor.pois.8.label': 'A Ponte Dourada',
   'referralCards.firstPage': 'Primeira página',
-  'hudChrome.collections.source.bossLabel': 'Mascote de chefe',
-  'hudChrome.collections.source.challengeLabel': 'Desafio',
-  'hudChrome.collections.source.craft': '{item} (receita de {profession})',
-  'hudChrome.collections.source.craftLabel': 'Fabricado',
-  'hudChrome.collections.source.deed': 'O feito {deed}',
-  'hudChrome.collections.source.deedLabel': 'Obtido por',
-  'hudChrome.collections.source.grantLabel': 'Concedido',
-  'hudChrome.collections.source.tokenLabel': 'Ficha',
-  'hudChrome.collections.stat.mixed': 'Híbrido',
   'hudChrome.collections.state.notOwned': 'Não coletado',
   'hudChrome.collections.state.pending': 'Uma presença segue você',
   'hudChrome.collections.state.unavailable': 'Ainda não pode ser obtido',
   'hudChrome.collections.tabs.buddies': 'Companheiros',
-  'hudChrome.collections.tabs.sets': 'Conjuntos de itens',
   'hudChrome.cosmetics.buddyActive': 'Invocado',
   'hudChrome.cosmetics.buddyDrag': 'Arrastar para a barra de ações',
   'hudChrome.courier.bags': 'Enviar ao banco',
@@ -24329,86 +24227,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Chegue a menos de {range} jardas do parceiro para parar o dano da corrente nos dois',
   'hudChrome.buddyMenu.autolootHint':
     'Seu companheiro busca saque dos cadáveres que pertencem a você a menos de 30 jardas.',
-  'hudChrome.collections.buddyLore.alon':
-    'Um mascote de viajante vindo de uma estrada que nenhum mapa admite existir, aparecendo onde um plano vai mal. Observa, aprova e não oferece ajuda alguma.',
-  'hudChrome.collections.buddyLore.alpaca':
-    'Os rebanhos de Galecrest os mantêm pela lã e pelo temperamento: nada fica mais calmo numa tempestade. Este cuspirá em exatamente uma pessoa por viagem.',
-  'hudChrome.collections.buddyLore.ansem':
-    'Fala de portas e de escuridão e não aceita aprofundar nenhum dos assuntos. Os cultistas de Nightbloom o reivindicam; ele vai embora sempre que fazem um rito.',
-  'hudChrome.collections.buddyLore.bull':
-    'Um touro do Vale do tamanho de um cachorro, a única razão pela qual alguém aceitou mantê-lo dentro de casa. O temperamento não diminuiu com o resto.',
-  'hudChrome.collections.buddyLore.cate_coin':
-    'Um gato que não se separa da moeda onde se senta e que ninguém jamais viu comer. Os mercadores de Eastbrook ainda discutem qual dos dois é o mascote.',
-  'hudChrome.collections.buddyLore.crimson_claw_crab':
-    'Um caranguejo de maré de Farshore cuja garra continua vermelha muito depois de sair da água. As equipes do cais costumavam apostar moedas em corridas deles sobre as tábuas.',
-  'hudChrome.collections.buddyLore.crystal_lich':
-    'Um estilhaço do próprio Nythraxis, ainda zumbindo com o frio que o moldou. Obedece a quem o tirou dos destroços da raide e não perdoou essa pessoa por isso.',
-  'hudChrome.collections.buddyLore.crystal_tide':
-    'Um espírito de maré que monta sua própria gota de vidro marinho, fisgado de água parada por pescadores do Vale a Farshore que buscavam o jantar. Conserva a água de onde saiu e não aceita voltar.',
-  'hudChrome.collections.buddyLore.ember_fox':
-    'Uma raposa das sebes do Vale de Eastbrook, nomeada pela pelagem vermelha como brasa que aparece no mato do inverno. Os caçadores desistiram dos filhotes há gerações e passaram a deixar comida.',
-  'hudChrome.collections.buddyLore.emberfall_phoenix':
-    'Queima até virar brasa a cada outono e renasce das próprias cinzas na primavera; isso é tudo que se pode dizer sobre ela. Ninguém jamais achou um ninho e ninguém capturou a mesma duas vezes.',
-  'hudChrome.collections.buddyLore.emerald_wolf':
-    'Um filhote de Wraithwood, com pelagem verde à luz das copas que nunca chega por completo ao chão da floresta. Os guardiões criam os órfãos que a mata deixa para trás.',
-  'hudChrome.collections.buddyLore.forgemaw':
-    'Forjado no Crisol da Última Fonte e nunca inteiramente terminado, saiu da fundição de Ignivar enquanto os martelos ainda caíam. Só a descida heroica o encontra: a criatura fundida sempre volta à forja que a fez e segue para casa quem sobrevive ao fogo duas vezes.',
-  'hudChrome.collections.buddyLore.frog':
-    'O Pântano de Mirefen os cria gordos e tranquilos, cantando a noite toda nos juncais. Os guias juram que um barco levando um nunca encalha.',
-  'hudChrome.collections.buddyLore.frostfire':
-    'Nasceu nos Confins de Frostveil onde uma fonte quente emerge pelo campo de gelo e nunca decidiu a qual metade pertence. Solta vapor no ar frio e treme no quente.',
-  'hudChrome.collections.buddyLore.golden_sentinel':
-    'Um besouro sentinela de Amberfall, dourado pela resina onde cresceu. O nome é mais antigo que a resina: sentinelas de algum tipo guardavam aqueles bosques muito antes de alguém pensar em engarrafar a seiva.',
-  'hudChrome.collections.buddyLore.horse':
-    'Linhagem de pônei do Vale, criada pequena para os caminhos dos pomares e nunca avisada de que não é cavalo de guerra. Acompanha seu passo ao lado e segue qualquer um que já tenha lhe dado uma maçã.',
-  'hudChrome.collections.buddyLore.kekius':
-    'Um companheiro risonho de origem incerta, adotado pelos campos de corrida de Galecrest como amuleto. Sobreviveu a quatro estábulos que juravam pela sorte dele.',
-  'hudChrome.collections.buddyLore.loot_goblin':
-    'Segue qualquer um que carregue marcas heroicas e nunca foi pego roubando. O Intendente Vex afirma que isso não prova absolutamente nada.',
-  'hudChrome.collections.buddyLore.moss_hare':
-    'A lebre de Willowfen, de pelo verde por uma vida deitada em turfa molhada. Os herboristas do brejo a consideram de sorte e não deixam ninguém enxotá-la de uma porta.',
-  'hudChrome.collections.buddyLore.nightfang':
-    'Um jovem caçador de Nightbloom, silencioso mesmo para os padrões da espécie. Segue pela companhia e não caça nada maior que uma mariposa.',
-  'hudChrome.collections.buddyLore.penny_goldspark':
-    'Uma aprendiz de inventora gnoma que cobra por hora e vale cada cobre. O armeiro Hode a contratou para quitar uma dívida e agora vende o acordo a quem tiver mil moedas de ouro.',
-  'hudChrome.collections.buddyLore.phantom':
-    'Um fantasma do tamanho da palma da mão vindo dos túmulos de Wraithwood, todo lençol e nada de ossos, que aparece numa mochila fechada e fica pela companhia. Ninguém sabe o que quer, e nunca tentou assustar ninguém.',
-  'hudChrome.collections.buddyLore.proud_grunt':
-    'Um veterano das lojas de Warfare que manteve a continência e perdeu a patente. O Marechal de Guerra Draven Kole entrega um a qualquer soldado com honra suficiente para saber o preço disso.',
-  'hudChrome.collections.buddyLore.raptor':
-    'Linhagem de filhote de Drakelands, vendida antes de aprender a velocidade que alcança. Todo novo dono é avisado para mantê-lo alimentado, e ninguém precisa ouvir duas vezes.',
-  'hudChrome.collections.buddyLore.rocky':
-    'Um rastejante de casco de pedra das encostas pedregosas de Thornpeak, lento e totalmente despreocupado. Os mineiros os mantêm porque param de se mover um instante antes de um desabamento.',
-  'hudChrome.collections.buddyLore.sapling':
-    'Uma árvore jovem com um sorriso na casca e um olhar roxo curioso. As raízes a levam num andar alegre e bamboleante por onde você for.',
-  'hudChrome.collections.buddyLore.skeleton':
-    'Saiu dos túmulos de Wraithwood, tirou o pó e desde então segue as pessoas. Ninguém estabeleceu de quem eram esses ossos.',
-  'hudChrome.collections.buddyLore.solbot':
-    'Um pequeno autômato alimentado pelo sol, desenterrado das cinzas de Drakelands, onde estava meio enterrado, e ainda funcionando. A oficina que o fez não deixou marca alguma na carcaça.',
-  'hudChrome.collections.buddyLore.spider':
-    'Uma tecelã de Wraithwood do tamanho da palma da mão, que redecora qualquer mochila onde é carregada. A teia é mais resistente que o fio que substitui.',
-  'hudChrome.collections.buddyLore.sprites':
-    'Dois pequenos espíritos de fogo, um dourado e outro verde-azulado, que nunca concordam sobre quem lidera. Quando chegam perto, viram uma chama verde e depois se separam de novo, rindo.',
-  'hudChrome.collections.buddyLore.stag':
-    'Linhagem de Evergarden, reduzida por criação a partir dos grandes cervos que os guardiões montavam. Ainda abaixa a cabeça diante de uma mão erguida, por um hábito mais velho que o animal.',
-  'hudChrome.collections.buddyLore.tiger':
-    'Listras de Palmreach num animal que nunca viu Palmreach: a linhagem é mantida em cativeiro desde que os antigos zoológicos fecharam. Responde a um apito e a nada mais.',
-  'hudChrome.collections.buddyLore.triple_t':
-    'Três de alguma coisa ou uma coisa três vezes. Os relatos discordam, e a criatura não fica quieta o bastante para ser contada.',
-  'hudChrome.collections.buddyLore.trollface':
-    'Uma coisa sorridente que Wraithwood expulsou e se recusou a receber de volta. Toda tentativa de descrevê-la acaba com a pessoa rindo e desistindo.',
-  'hudChrome.collections.buddyLore.tuskhorn_boar':
-    'Linhagem de Thornpeak, criada com pernas curtas por pastores que queriam um javali incapaz de derrubar uma cerca. Conservou o temperamento mesmo assim.',
-  'hudChrome.collections.detail.drop': '{mob} ({location}), {chance}% por morte',
-  'hudChrome.collections.detail.dropWithHeroic':
-    '{mob} ({location}), {chance}% por morte, {heroicChance}% no heroico',
-  'hudChrome.collections.detail.fishingDrop': 'Pesca em qualquer lugar, {chance}% por captura',
-  'hudChrome.collections.detail.globalDrop':
-    'Qualquer inimigo, {chance}% por morte, um de {count} nesta raridade',
-  'hudChrome.collections.detail.heroicDrop':
-    '{mob} ({location}), somente no heroico, {chance}% por morte',
-  'hudChrome.collections.launcherTitle': 'Caçada: companheiros, montarias e conjuntos de itens',
-  'hudChrome.collections.looks.none': 'Ainda não há aparências criadas para este companheiro',
   'hudChrome.collections.presence.alon': 'Você se sente observado e aprovado em silêncio.',
   'hudChrome.collections.presence.alpaca': 'Algo lanoso e sem pressa decidiu acompanhar você.',
   'hudChrome.collections.presence.ansem': 'Um sussurro de portas e escuridão segue você.',
@@ -24458,20 +24276,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Um bufar e uma pisada: algo teimoso está seguindo você.',
   'hudChrome.collections.presenceDefault': 'Você sente uma presença observando.',
   'hudChrome.collections.revealed': '{name} decidiu seguir você.',
-  'hudChrome.collections.source.bossDrop': '{mob} ({location}), {chance}% por jogador por morte',
-  'hudChrome.collections.source.bossDropHeroicOnly':
-    '{mob} ({location}), somente no heroico, {chance}% por jogador',
-  'hudChrome.collections.source.bossDropWithHeroic':
-    '{mob} ({location}), {chance}% por jogador, {heroicChance}% no heroico',
-  'hudChrome.collections.source.challengeDps':
-    'Cause {dps} de dano por segundo a {mob} ao longo da luta',
-  'hudChrome.collections.source.challengeSpeed':
-    'Derrote {mob} em até {seconds} segundos após iniciar a luta',
-  'hudChrome.collections.source.grantOnly':
-    'Prêmio sazonal: classificação mensal e recompensas dos melhores registros de combate',
-  'hudChrome.collections.source.rollNote':
-    'Cada jogador faz sua própria rolagem; ninguém perde para um membro do grupo.',
-  'hudChrome.collections.source.token': '{item}, usado uma vez para vincular o companheiro',
   'hudChrome.courier.cargoSafe':
     'Itens devolvidos transbordam as bolsas cheias. O mensageiro desaparece após entregar até ser invocado de novo.',
   'hudChrome.courier.instructions':

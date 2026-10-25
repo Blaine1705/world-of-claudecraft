@@ -64,7 +64,7 @@ import type {
   MasterLootThreshold,
 } from '../types';
 import { cloneItemInstancePayload, dist2d, PARTY_XP_RANGE } from '../types';
-import { grantAwardedLootItem, grantOrHoldAwardedLoot } from './awarded_loot_hold';
+import { grantAwardedLootItem, grantOrHoldAwardedLoot, mobLootSource } from './awarded_loot_hold';
 import { announceBossDrops } from './boss_drop_announce';
 import { lootItemUsableByClasses, usableRollGroup } from './class_locked_drop';
 import { rollEnemyLootQuality } from './enemy_quality';
@@ -340,13 +340,7 @@ export function rollLoot(
       questSlots.add(slot);
       continue;
     }
-    // A heroic claim can retune THIS row's odds (LootEntry.heroicChance), the
-    // same value swap on the same single draw that heroicCopper performs for
-    // the money arm below: no extra draw, so the trace and the parity goldens
-    // are untouched on both difficulties.
-    const rowChance =
-      heroicClaim && entry.heroicChance !== undefined ? entry.heroicChance : entry.chance;
-    if (!ctx.rng.chance(rowChance)) continue;
+    if (!ctx.rng.chance(entry.chance)) continue;
     if (entry.copper) {
       // A heroic claim substitutes the raised finale money base (see
       // LootEntry.heroicCopper): a VALUE swap on the same single int draw at
@@ -657,7 +651,14 @@ export function awardSharedLootItem(
       : !ctx.canAddItem(itemId, 1, looter.entityId)
   )
     return false;
-  grantAwardedLootItem(ctx, itemId, looter.entityId, killSnapshotEligibility(ctx, mob), instance);
+  grantAwardedLootItem(
+    ctx,
+    itemId,
+    looter.entityId,
+    killSnapshotEligibility(ctx, mob),
+    instance,
+    mobLootSource(mob),
+  );
   return true;
 }
 
