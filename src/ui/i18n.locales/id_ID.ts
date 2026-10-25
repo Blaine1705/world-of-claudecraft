@@ -6694,6 +6694,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Kamu tidak dapat mereset instans selama masih ada seseorang di dalamnya.',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     'Ubah kesulitan dungeon sebelum mereset instans ini. Instans kosong akan direset otomatis setelah 5 menit.',
+  'hudChrome.dungeonDifficulty.resetAlreadyFresh':
+    'Instance kamu sudah segar. Belum ada yang masuk sejak reset terakhir.',
   'hudChrome.dungeonDifficulty.resetUsage':
     'Gunakan /dungeon reset untuk meninggalkan instans kosong setelah mengubah kesulitan.',
   'hudChrome.dungeonDifficulty.resetLoot':

@@ -6683,6 +6683,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Bạn không thể đặt lại phụ bản khi vẫn còn người ở bên trong.',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     'Hãy đổi độ khó hầm ngục trước khi đặt lại các phụ bản này. Phụ bản trống sẽ tự đặt lại sau 5 phút.',
+  'hudChrome.dungeonDifficulty.resetAlreadyFresh':
+    'Các phó bản của bạn đã được làm mới. Chưa ai vào kể từ lần đặt lại gần nhất.',
   'hudChrome.dungeonDifficulty.resetUsage':
     'Dùng /dungeon reset để từ bỏ các phụ bản trống sau khi đổi độ khó.',
   'hudChrome.dungeonDifficulty.resetLoot':

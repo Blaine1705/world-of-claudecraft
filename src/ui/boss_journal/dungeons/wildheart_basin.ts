@@ -24,20 +24,17 @@ import {
   SAURIAN_TAIL_SWIPE,
   SAURIAN_TUNING,
   WILDHEART_DUNGEON,
+  ZULGAR_HUNTING_SPEAR,
   ZULGAR_ID,
+  ZULGAR_IDOL_WAKES,
+  ZULGAR_IDOLS_BREATH,
   ZULGAR_PULSE,
   ZULGAR_SPIRIT_HUNT,
   ZULGAR_TUNING,
 } from '../../../sim/encounters/wildheart_basin/ids';
 import { WILDHEART_ANCESTRAL_SAP } from '../../../sim/mob/trash_kit/wildheart_cast_ids';
 import type { TranslationKey } from '../../i18n';
-import {
-  heroicMechanicScale,
-  templateEnrage,
-  tierDamage,
-  tierFixed,
-  tierScaled,
-} from '../journal_tuning';
+import { heroicMechanicScale, tierDamage, tierFixed, tierScaled } from '../journal_tuning';
 import type { DungeonJournalDef, JournalBossDef } from '../journal_view';
 
 const k = (suffix: string): TranslationKey => `bossJournal.wildheart.${suffix}` as TranslationKey;
@@ -51,7 +48,6 @@ const G = BLOOM_TUNING;
 const Z = ZULGAR_TUNING;
 const SAP = WILDHEART_MOBS.howdah_hexcaller?.trashKit?.mend;
 const ROAR = WILDHEART_MOBS[ZULGAR_ID]?.knockback;
-const ZULGAR_ENRAGE = templateEnrage(ZULGAR_ID);
 
 const GREAT_SAURIAN: JournalBossDef = {
   mobId: GREAT_SAURIAN_ID,
@@ -460,13 +456,37 @@ const ZULGAR: JournalBossDef = {
           iconId: 'dgn_wildheart_pulse',
           nameKey: cast(ZULGAR_PULSE),
           castId: ZULGAR_PULSE,
-          summaryKey: k('zulgar.pulseSummary'),
+          summaryKey: k('zulgar.pulseSummaryRework'),
           responseKey: k('zulgar.pulseResponse'),
           roles: ['all'],
           flags: ['important'],
-          values: { every: Z.pulseEvery, cast: Z.pulseCast, radius: Z.pulseRadius },
+          values: {
+            every: Z.pulseEvery,
+            cast: Z.pulseCast,
+            radius: Z.pulseRadius,
+            pinMult: Z.pinPulseMult,
+          },
           difficultyValues: tierDamage(D, ZULGAR_ID, Z.pulseMin, Z.pulseMax),
           compare: true,
+        },
+        {
+          id: 'hunting-spear',
+          iconId: 'dgn_wildheart_ambush',
+          nameKey: cast(ZULGAR_HUNTING_SPEAR),
+          castId: ZULGAR_HUNTING_SPEAR,
+          summaryKey: k('zulgar.spearSummary'),
+          responseKey: k('zulgar.spearResponse'),
+          roles: ['all'],
+          flags: ['important'],
+          values: {
+            cast: Z.spearCast,
+            seconds: Z.pinSeconds,
+            tick: Z.pinBleedEvery,
+            range: Z.spearPullRange,
+            pull: Z.spearPullSeconds,
+            self: Z.spearWrenchSeconds,
+          },
+          difficultyValues: tierScaled(D, ZULGAR_ID, 'bleed', Z.pinBleed),
         },
         {
           id: 'jaguar-roar',
@@ -517,17 +537,21 @@ const ZULGAR: JournalBossDef = {
           id: 'sun-glyphs',
           iconId: 'dgn_wildheart_sun_glyph',
           nameKey: k('zulgar.glyphName'),
-          summaryKey: k('zulgar.glyphSummary'),
-          responseKey: k('zulgar.glyphResponse'),
+          summaryKey: k('zulgar.glyphSummaryRework'),
+          responseKey: k('zulgar.glyphResponseRework'),
           roles: ['all'],
           flags: ['important'],
           values: {
             count: SUN_GLYPHS.length,
             slow: Z.sunstruckSlow,
             seconds: Z.sunstruckSeconds,
-            dark: Z.glyphDarkSeconds,
+            dark: Z.glyphColdSeconds,
+            kindle: Z.glyphKindleSeconds,
+            alone: Z.glyphKindleAloneSeconds,
+            vulnerability: Z.sunstruckVuln,
+            wary: Z.sunWarySeconds,
           },
-          percentValues: ['slow'],
+          percentValues: ['slow', 'vulnerability'],
         },
         {
           id: 'ambush',
@@ -544,22 +568,43 @@ const ZULGAR: JournalBossDef = {
       ],
     },
     {
-      id: 'enrage',
-      nameKey: k('zulgar.phaseEnrageName'),
-      summaryKey: common('phaseEnrageSummary'),
-      values: { health: ZULGAR_ENRAGE.health },
+      id: 'idol',
+      nameKey: cast(ZULGAR_IDOL_WAKES),
+      summaryKey: k('zulgar.idolSummary'),
+      values: { health: Z.idolAtHpPct },
       percentValues: ['health'],
       mechanics: [
         {
-          id: 'enrage',
-          iconId: 'dgn_wildheart_zulgar_enrage',
-          nameKey: common('enrageName'),
-          summaryKey: common('enrageSummary'),
-          responseKey: common('enrageResponse'),
-          roles: ['tank', 'healer'],
+          id: 'idol-hunt',
+          iconId: 'dgn_wildheart_spirit_hunt',
+          nameKey: cast(ZULGAR_IDOL_WAKES),
+          castId: ZULGAR_IDOL_WAKES,
+          summaryKey: {
+            normal: k('zulgar.idolHuntSummary'),
+            heroic: k('zulgar.idolHuntHeroicSummary'),
+          },
+          responseKey: k('zulgar.huntResponse'),
+          roles: ['all'],
           flags: ['important'],
-          values: ZULGAR_ENRAGE,
-          percentValues: ['health', 'damage', 'haste'],
+          values: {
+            every: Z.finalPreySeconds,
+            turn: Z.finalSwitchPause,
+            switch: Z.twinSwitch,
+            pair: 2 * Z.twinSwitch,
+          },
+        },
+        {
+          id: 'idol-breath',
+          iconId: 'dgn_wildheart_pulse',
+          nameKey: cast(ZULGAR_IDOLS_BREATH),
+          castId: ZULGAR_IDOLS_BREATH,
+          summaryKey: k('zulgar.breathSummary'),
+          responseKey: k('zulgar.breathResponse'),
+          roles: ['all'],
+          flags: ['deadly'],
+          values: { every: Z.breathEvery, warning: Z.breathWarning },
+          difficultyValues: tierDamage(D, ZULGAR_ID, Z.breathMin, Z.breathMax),
+          compare: true,
         },
       ],
     },
@@ -569,16 +614,6 @@ const ZULGAR: JournalBossDef = {
     healer: k('zulgar.tipHealer'),
     damage: { normal: k('zulgar.tipDamage'), heroic: k('zulgar.tipDamageHeroic') },
   },
-  choices: [
-    {
-      id: 'glyphs',
-      iconId: 'dgn_wildheart_sun_glyph',
-      nameKey: k('zulgar.choiceName'),
-      gainKey: k('zulgar.choiceGain'),
-      riskKey: k('zulgar.choiceRisk'),
-      values: { dark: Z.glyphDarkSeconds, seconds: Z.huntSeconds },
-    },
-  ],
   heroicNotes: [common('heroicHarder'), k('zulgar.heroicTwinPrey'), k('zulgar.heroicAmbush')],
   heroicNoteValues: {
     scale: heroicMechanicScale(D, ZULGAR_ID),

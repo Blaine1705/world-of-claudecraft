@@ -4313,6 +4313,7 @@ export const zh_TW: EnTranslations = {
       "resetConfirmBody": "此操作會放棄先前所選難度下的空置副本。若有未拾取的戰利品，則無法重置。",
       "resetConfirm": "重置副本",
       "resetCooldown": "每5分鐘只能重置一次副本。",
+      "resetAlreadyFresh": "你的副本已經是全新的。自上次重置以來沒有人進入過。",
       "resetUsage": "切換難度後，使用 /dungeon reset 放棄你的空置地城副本。",
       "entryMismatchNormal": "此地城副本的難度為普通。使用「重置所有地城副本」以開始全新的英雄難度副本。",
       "entryMismatchHeroic": "此地城副本的難度為英雄。使用「重置所有地城副本」以開始全新的普通難度副本。"
@@ -4646,7 +4647,17 @@ export const zh_TW: EnTranslations = {
         "pollinated": "觸碰種莢會使其立刻長出荊棘幼芽。遠離種子，讓未授粉的玩家去踩碎它們；無人觸碰的種莢會在{seconds}秒後發芽（英雄難度下它會在{heroic}秒後鑽入地下，在最近的玩家身旁破土而出）。",
         "prey": "祖爾加在追獵你。引他踏過點亮的太陽符文，使他減速{slow}%。若被他追上，你會被撕咬，受到{damage}點傷害（英雄難度{heroic}點）並被擊倒{stun}秒。",
         "avatar": "移動速度提高{pct}%，追獵牠的獵物。減速和定身可以生效，擊暈的持續時間減半。",
-        "vanished": "隱匿且免疫傷害。他即將撲向最遠的玩家。"
+        "vanished": "隱匿且免疫傷害。他即將撲向最遠的玩家。",
+        "sunstruck": "被點亮的太陽符文灼傷：移動速度降低{pct}%。",
+        "sunstruckExposed": "被點亮的太陽符文灼傷：受到的傷害提高{pct}%。",
+        "sunWary": "在此效果結束前，任何太陽符文都無法灼傷他。他踏過的已點亮符文會保持點亮。",
+        "pinned": "一支狩獵之矛把你釘在原地。你每{every}秒流血，受到{bleed}點物理傷害（英雄難度{heroicBleed}點），而且無論你站在哪裡，荒野之心脈衝都會命中你，傷害提高{pulse}%。隊友可以用{pull}秒拔出長矛。如果沒有其他人能幫忙，你可以用{wrench}秒自己拔出。{seconds}秒後它會自行鬆脫。",
+        "idolAwake": "石美洲豹已經甦醒。每{every}秒，牠會在地面預警{warning}秒後，輪流向平台的一半吐息：對該半場的所有人造成{min}到{max}點自然傷害（英雄難度{heroicMin}到{heroicMax}點）。祖爾加會保持美洲豹化身直到死亡，並且每{seconds}秒更換獵物（英雄難度{heroicSeconds}秒）。"
+      },
+      "temple": {
+        "scoreWard": "正在吟唱樂譜：在結束前不會受到傷害。在樂句結束前，按石板響起的順序踏上月光石板，即可使她的嗓音破碎。輪流踩踏：奏響音符後，須等待另一名玩家奏響下一個正確音符。唯一的倖存者可以獨自完成。如果樂句先結束，不諧之音會對庭院中的所有人造成{min}到{max}點冰霜傷害（英雄難度下為{heroicMin}到{heroicMax}點）。",
+        "brokenVoice": "她的嗓音已破碎：在此效果結束前，她受到的傷害提高{pct}%。",
+        "spentVoice": "另一名玩家奏響下一個正確音符前，你無法奏響月亮地磚。在此期間踩上地磚不會重置應答，也不會對你造成傷害。無法驅散。當你成為同一副本內唯一存活的玩家或樂譜結束時移除。"
       },
       "bastion": {
         "brineColumn": "你被困在海水之柱中：每{tick}秒受到{min}到{max}點自然傷害，最多持續{seconds}秒。打斷或擊暈潮縛侍僧即可掙脫。",
@@ -6975,6 +6986,7 @@ export const zh_TW: EnTranslations = {
         "summons_adds": "召喚增援",
         "lunar_tide": "月潮（週期性範圍傷害）",
         "chorus_and_solo": "合唱與獨唱（一個標記集合分攤，另一個標記分散）",
+        "the_score": "樂譜（她會兩次在月光石板上吟唱旋律：按石板響起的順序踏上去，即可使她的嗓音破碎）",
         "tideglass_reflections": "潮鏡倒影（擊殺彼此的鏡像）",
         "hydra_three_elements": "三重元素（左側頭顱噴出18碼的冰霜錐形吐息，使你減速70%，持續4秒；中間頭顱向最多3名玩家腳下噴吐毒液，1.5秒後爆裂，並在落點灼燒6秒；右側頭顱沿一條26碼長的直線射出激流，將你擊退8碼：每一種都要走出去。一個頭顱倒下後，仍然存活的頭顱會接手它的攻擊）",
         "hydra_tsunami": "海嘯（頭顱沉入水中4.5秒，期間受到的傷害降低75%，一道巨浪席捲水池的一半，下一次換另一半：普通難度下造成160到190點冰霜傷害並把你推開10碼。跑到另一半，或站到池邊石柱後面；英雄難度下，巨浪會在3.5秒後回捲另一半。第一次海嘯在開戰24秒後到來，之後每一次都在上一次過去40秒後到來）",
@@ -7099,6 +7111,23 @@ export const zh_TW: EnTranslations = {
       "shadeLine": "光穿透了它：別管它，去找光束照亮的那個",
       "timeAria": "剩餘{seconds}秒"
     },
+    "templeAlert": {
+      "melodyTitle": "樂譜",
+      "melodyLine": "觀察月亮地磚依序奏響。與另一名玩家輪流踩出相同順序",
+      "melodyDarkLine": "在地磚熄滅前記住順序。與另一名玩家輪流踩出相同順序",
+      "answerTitle": "回應樂譜！",
+      "answerLine": "輪流踩踏：踩上標記為{place}的月亮地磚。已奏響：{done}/{total}",
+      "answerDarkLine": "輪流憑記憶重複順序。再次踩同一塊地磚前先離開。已奏響：{done}/{total}",
+      "spentTitle": "該由另一道聲音應答",
+      "spentLine": "另一名玩家奏響下一個正確音符前，你無法奏響地磚。已奏響：{done}/{total}",
+      "stepOffTitle": "先走下去，再踏上來",
+      "stepOffLine": "月光石板只有在有人踏上時才會奏響。離開這塊石板，然後重新踏上去",
+      "falseTitle": "錯音！",
+      "falseLine": "那塊石板的順序不對。回應將從第一塊石板重新開始",
+      "brokenTitle": "瑟爾瑟的嗓音破碎了！",
+      "brokenLine": "在效果結束前，她受到的傷害提高{pct}%：現在使用你最強的攻擊",
+      "timeAria": "剩餘{seconds}秒"
+    },
     "wildheartAlert": {
       "preyTitle": "你是獵物！",
       "preyLine": "祖爾加在追獵你：引他穿過點亮的太陽符文",
@@ -7109,7 +7138,21 @@ export const zh_TW: EnTranslations = {
       "pollinatedLine": "遠離種子：你的觸碰會讓它們發芽",
       "bondTitle": "獸群羈絆",
       "bondLine": "在一起時牠們傷害減半：把牠們拉開",
-      "timeAria": "剩餘{seconds}秒"
+      "timeAria": "剩餘{seconds}秒",
+      "preyAloneLine": "沒有其他人能點亮太陽符文。站在一個熄滅的符文上{seconds}秒將它點亮，再把祖爾加引過去",
+      "pinnedTitle": "被釘住了！",
+      "pinnedLine": "需要隊友拔出狩獵之矛。被釘住時，荒野之心脈衝對你的傷害更高",
+      "pinnedSelfLine": "沒有人能來幫忙：在荒野之心脈衝落下前自己拔出狩獵之矛",
+      "sunstruckTitle": "祖爾加被烈日灼傷了！",
+      "sunstruckLine": "在效果結束前他受到的傷害提高{pct}%：現在使用你最強的攻擊",
+      "spearTitle": "有隊友被釘住了！",
+      "spearLine": "跑到狩獵之矛旁，在荒野之心脈衝落下前把它拔出來",
+      "glyphTitle": "點亮太陽符文",
+      "glyphLine": "站在熄滅的太陽符文上{seconds}秒將它點亮。祖爾加踏過它時，會在{duration}秒內受到的傷害提高{pct}%",
+      "glyphLightingTitle": "正在點亮太陽符文",
+      "glyphLightingLine": "留在符文上直到它被點亮。離開就要重新開始",
+      "breathTitle": "神像吐息！",
+      "breathLine": "石美洲豹即將向平台的這一半吐息。跑到另一半去"
     },
     "sanctumAlert": {
       "quenchTitle": "身陷淬火之水！",
@@ -7198,6 +7241,13 @@ export const zh_TW: EnTranslations = {
       "relightFar": "靠近到{range}碼內才能重燃它",
       "relightAria": "重燃{name}",
       "relightUsingLine": "在它吸取你時保持不動：受到攻擊不會打斷，移動或昏迷會打斷",
+      "freeLine": "把長矛從地面拔出，解救被釘住的人。受到攻擊不會打斷你，移動或昏迷會打斷",
+      "freeKey": "拔出{name}",
+      "freeTap": "點擊這裡拔出{name}",
+      "freeClick": "點選這裡拔出{name}",
+      "freeFar": "靠近到{range}碼內才能拔出它",
+      "freeAria": "拔出{name}",
+      "freeUsingLine": "保持不動以拔出長矛：移動或昏迷會打斷",
       "timeAria": "剩餘{seconds}秒"
     },
     "cosmetics": {
@@ -8357,6 +8407,16 @@ export const zh_TW: EnTranslations = {
         "heroicCloud": "花粉雲：在已授粉玩家{cloudRadius}碼內站立{cloudSeconds}秒，你也會被授粉。"
       },
       "zulgar": {
+        "pulseSummaryRework": "每{every}秒施法{cast}秒，對{radius}碼內所有玩家造成{min}至{max}點傷害。被釘住的玩家無論距離多遠都會受到{pinMult}倍傷害。",
+        "spearSummary": "施法{cast}秒後釘住一名非坦克玩家；若沒有其他玩家，則選擇坦克。定身最多持續{seconds}秒，每{tick}秒造成{bleed}點傷害。",
+        "spearResponse": "選中長矛，在{range}碼內互動，花費{pull}秒拔出。受到傷害不會中斷。若平台上沒有其他自由行動的玩家，被釘住者可自行互動，花費{self}秒脫困。",
+        "glyphSummaryRework": "{count}枚符文最初熄滅。追獵期間，未被標記的玩家站在符文上{kindle}秒即可點亮。若沒有未標記者，獵物可在{alone}秒內點亮。離開會重置進度。他經過點亮的符文時，減速{slow}，受到的傷害提高{vulnerability}，持續{seconds}秒。符文在{dark}秒內無法重新點亮；他在{wary}秒內不會再次被符文擊中。追獵期間，昏迷持續時間減半。",
+        "glyphResponseRework": "未被標記者在獵物前方點亮符文。引他經過符文，在日灼期間攻擊。追獵結束時，符文全部熄滅。",
+        "idolSummary": "生命值降至{health}時，他保持獵豹靈體直到被擊敗。坦克也可能成為獵物。",
+        "idolHuntSummary": "每{every}秒選擇新獵物，先轉向目標{turn}秒，再開始追逐。",
+        "idolHuntHeroicSummary": "每{pair}秒標記一對新獵物，每{switch}秒切換目標。每次切換後，新獵物有{turn}秒反應時間。",
+        "breathSummary": "每{every}秒標記平台的一半，預警{warning}秒後，對該區域所有玩家造成{min}至{max}點自然傷害。兩側交替。",
+        "breathResponse": "預警結束前移動到未標記的一半。中線安全。英雄難度下，吐息還會熄滅所在半區的符文；這些符文可以立即重新點亮。",
         "overview": "盆地的大祭司。節奏穩定的戰鬥，帶有預警的圓環，直到他化為美洲豹之魂並追獵一名玩家。被追獵的玩家引他穿過點亮的太陽符文，符文會使他減速。",
         "phaseShrineName": "神殿",
         "phaseShrineSummary": "他在近戰中戰鬥，並在自身周圍釋放脈衝圓環。",
@@ -8669,6 +8729,14 @@ export const zh_TW: EnTranslations = {
     },
     "temple": {
       "selthe": {
+        "overviewRework": "塞爾瑟不會移動或近戰。合唱時集合，獨唱時遠離隊伍，打斷溺亡詠嘆調並躲避湖潮湧。到達兩次生命值門檻時，輪流踏上月光地磚，重現她的旋律。",
+        "phaseSummaryRework": "隊伍回應樂譜時，她暫停其他攻擊。月水箭沒有施法條，無法打斷。",
+        "boltSummaryRework": "其他施法之間，每{every}秒落下一枚月水箭，提前{windup}秒顯示預警，造成武器傷害{mult}倍的冰霜傷害。打斷溺亡詠嘆調會讓箭和詠嘆調暫停{quiet}秒。",
+        "boltResponseRework": "讓坦克保持在她的視線內。把打斷留給溺亡詠嘆調。",
+        "tipHealerRework": "照看詠嘆調目標和獨自承受合唱的玩家。樂譜期間幫忙唱出下一音，並治療失誤造成的傷害。",
+        "scoreSummary": "生命值降至{first}和{second}時，她免疫傷害，依次演奏{notes}音和{finalNotes}音旋律。分別在{answer}秒和{finalAnswer}秒內重現。踩錯地磚造成{falseNote}點冰霜傷害並重置進度，但不重置計時。逾時對所有人造成{min}至{max}點冰霜傷害。成功使她昏迷{stun}秒，並在{bonusSeconds}秒內受到額外{vulnerability}傷害。",
+        "scoreResponse": "觀察旋律，然後按順序踏入地磚。與另一名存活玩家輪流奏響正確音符；唯一倖存者可獨自完成。被阻止的踩踏無害。離開後重新踏入才能奏響，包括回應開始前已站著的地磚。",
+        "scoreHeroic": "回應時地磚會變暗。記住旋律，輪流奏響。",
         "overview": "唱詩之母在她的水池中歌唱，從不移動，也不近戰。她會標記玩家，施放需要集合分攤的合唱和需要獨自承受的獨唱，向一名玩家射出不斷增強的詠嘆調光束，並向庭院掃出一道波浪。她的箭和詠嘆調都可以被打斷。",
         "phaseName": "唱詩庭院",
         "phaseSummary": "只有一個階段，全靠計時。到期時若她正在施法，該機制會等施法結束後再觸發。",
@@ -16287,6 +16355,8 @@ export const zh_TW: EnTranslations = {
       "temple_moonwater_bolt": "月水箭",
       "temple_drowning_aria": "溺亡詠嘆調",
       "temple_mere_surge": "湖湧",
+      "temple_score": "樂譜",
+      "temple_score_answer": "回應樂譜",
       "temple_tideglass_fracture": "潮鏡碎裂",
       "temple_undertow": "暗流",
       "temple_lunar_tide": "月潮",
@@ -16324,6 +16394,12 @@ export const zh_TW: EnTranslations = {
       "wildheart_gorgebloom_gorge": "吞噬",
       "wildheart_zulgar_pulse": "荒野之心脈衝",
       "wildheart_zulgar_spirit_hunt": "狩獵之魂",
+      "wildheart_zulgar_hunting_spear": "狩獵之矛",
+      "wildheart_zulgar_idol_wakes": "神像甦醒",
+      "kituse_wildheart_pull_spear": "拔出長矛",
+      "wildheart_idols_breath": "神像吐息",
+      "wildheart_sun_glyph_kindle": "點亮中",
+      "wildheart_sun_glyph_cold": "冷卻中",
       "sanctum_cinder_breath": "餘燼吐息",
       "sanctum_warming_rite": "回暖儀式",
       "sanctum_goad": "驅策",
@@ -26132,6 +26208,9 @@ export const zh_TW: EnTranslations = {
       },
       "thorn_sprout": {
         "name": "荊棘幼芽"
+      },
+      "wildheart_hunting_spear": {
+        "name": "狩獵之矛"
       },
       "buddy_ember_fox": {
         "name": "餘燼狐"

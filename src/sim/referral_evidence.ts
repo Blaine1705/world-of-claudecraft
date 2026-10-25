@@ -13,6 +13,9 @@ export interface ReferralEvidence {
   mobId?: string;
   dungeonId?: string;
   activityId?: string;
+  /** Party evidence from an accepted invite, the only party change that can
+   * explain to unbound new players why no stamp card started. */
+  invited?: true;
 }
 
 /** Host-only evidence captured before another command can change the party or quests.
@@ -41,9 +44,19 @@ export function referralParticipants(
   }
   return participants;
 }
-export function emitReferralPartyEvidence(ctx: SimContext, pids: readonly number[]): void {
+export function emitReferralPartyEvidence(
+  ctx: SimContext,
+  pids: readonly number[],
+  invited = false,
+): void {
   const participants = referralParticipants(ctx, pids);
-  if (participants.length) ctx.emit({ type: 'referralEvidence', kind: 'party', participants });
+  if (participants.length)
+    ctx.emit({
+      type: 'referralEvidence',
+      kind: 'party',
+      participants,
+      ...(invited ? { invited: true as const } : {}),
+    });
 }
 export function emitReferralQuestEvidence(
   ctx: SimContext,

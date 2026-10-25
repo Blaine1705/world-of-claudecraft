@@ -4313,6 +4313,7 @@ export const tr_TR: EnTranslations = {
       "resetConfirmBody": "Bu işlem, daha önce seçtiğin zorluktaki boş örneklerden vazgeçer. Alınmamış ganimet sıfırlamayı engeller.",
       "resetConfirm": "Örnekleri Sıfırla",
       "resetCooldown": "Örnekler yalnızca 5 dakikada bir sıfırlanabilir.",
+      "resetAlreadyFresh": "Zindanların zaten sıfırlanmış durumda. Son sıfırlamadan beri kimse girmedi.",
       "resetUsage": "Zorluğu değiştirdikten sonra boş örneklerinden vazgeçmek için /dungeon reset kullan.",
       "entryMismatchNormal": "Bu örnek Normal zorluğa ayarlı. Yeni bir Kahramanca koşu başlatmak için Tüm Örnekleri Sıfırla seçeneğini kullan.",
       "entryMismatchHeroic": "Bu örnek Kahramanca zorluğa ayarlı. Yeni bir Normal koşu başlatmak için Tüm Örnekleri Sıfırla seçeneğini kullan."
@@ -4646,7 +4647,17 @@ export const tr_TR: EnTranslations = {
         "pollinated": "Tohum Kapsülüne dokunmak anında Diken Filizi büyütür. Tohumlardan uzak dur, temiz oyuncu ezsin; dokunulmayan kapsül {seconds} sn sonra filizlenir (Kahramanca'da {heroic} sn sonra kazılıp en yakın oyuncunun yanında çıkar).",
         "prey": "Zulgar seni avlar. %{slow} yavaşlatmak için yanan güneş glifinden geçir. Yakalarsa {damage} hasarla Parçalanırsın (Kahramanca'da {heroic}) ve {stun} sn yere serilirsin.",
         "avatar": "%{pct} daha hızlı hareket edip Avını kovalar. Yavaşlatma ve kökleme işler, sersemletmeler yarı sürer.",
-        "vanished": "Gizli ve hasara bağışık. En uzaktaki oyuncuya atlamak üzere."
+        "vanished": "Gizli ve hasara bağışık. En uzaktaki oyuncuya atlamak üzere.",
+        "sunstruck": "Struck by a lit sun glyph: moves {pct}% slower.",
+        "sunstruckExposed": "Struck by a lit sun glyph: takes {pct}% more damage.",
+        "sunWary": "No sun glyph can strike him until this ends. A lit glyph he crosses stays lit.",
+        "pinned": "A Hunting Spear pins you in place. You bleed for {bleed} Physical damage ({heroicBleed} on Heroic) every {every} sec, and Wildheart Pulse hits you wherever you stand for {pulse}% more damage. A teammate can pull the spear out in {pull} sec. If nobody else stands free, pull it out yourself in {wrench} sec. It lets go after {seconds} sec.",
+        "idolAwake": "The stone jaguar is awake. Every {every} sec it breathes over one half of the terrace, then the other, after a {warning} sec warning on the floor: {min} to {max} Nature damage ({heroicMin} to {heroicMax} on Heroic) to everyone in that half. Zulgar stays the Jaguar Avatar until he dies and picks new Prey every {seconds} sec ({heroicSeconds} sec on Heroic)."
+      },
+      "temple": {
+        "scoreWard": "Singing the Score: she takes no damage until it ends. Step onto the moon tiles in the order they rang before the verse ends to break her voice. Take turns: after sounding a note, wait for another player to sound the next correct note. A lone survivor can finish alone. If the verse ends first, Discord deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone in the court.",
+        "brokenVoice": "Her voice is broken: she takes {pct}% more damage until this ends.",
+        "spentVoice": "You cannot sound another moon tile until another player sounds the next correct note. Stepping onto a tile while this lasts does not reset the answer or hurt you. Cannot be dispelled. Removed when you are the only living player in your instance or the Score ends."
       },
       "bastion": {
         "brineColumn": "Deniz suyu sütununda köklüsün: en fazla {seconds} sn boyunca her {tick} sn'de {min} ile {max} arası Doğa hasarı alırsın. Kırmak için Gelgite Bağlı Müridi kes veya sersemlet.",
@@ -6975,6 +6986,7 @@ export const tr_TR: EnTranslations = {
         "summons_adds": "Takviye çağırır",
         "lunar_tide": "Ay Dalgası (darbeli alan hasarı)",
         "chorus_and_solo": "Koro ve Tekli Ezgi (bir işarette toplan, diğerinden uzaklaş)",
+        "the_score": "The Score (twice she sings a melody on the moon tiles: step onto them in the order they rang to break her voice)",
         "tideglass_reflections": "Gelgit Camı Yansımaları (birbirinizin ayna kopyalarını öldürün)",
         "hydra_three_elements": "Üç Element (sol baş 18 yarda buz konisi üfler, 4 saniye yüzde 70 yavaşlatır; orta baş en fazla 3 oyuncunun altına 1.5 saniye sonra patlayıp düştüğü yerde 6 saniye yakan zehir tükürür; sağ baş 26 yarda hatta 8 yarda geri fırlatan sel atar: her birinden çık. Baş düşünce yaşayanlar saldırısını devralır)",
         "hydra_tsunami": "Dev Dalga (başlar 4.5 saniye batarak yüzde 75 az hasar alır; dalga havuzun bir yarısından, sonraki sefer diğerinden geçer: Normal'de 160 ile 190 Buz hasarı ve 10 yarda itiş. Diğer yarıya geç veya kenar sütunu arkasına dur; Kahramanca'da dalga 3.5 saniye sonra diğer yarıdan geri döner. İlk Dev Dalga savaşın 24. saniyesinde, sonrakiler öncekinin geçişinden 40 saniye sonra gelir)",
@@ -7099,6 +7111,23 @@ export const tr_TR: EnTranslations = {
       "shadeLine": "Bu yemi bırak. Perdeyi kırmak için feneri ışında parlayan Vael'e saldır",
       "timeAria": "{seconds} saniye kaldı"
     },
+    "templeAlert": {
+      "melodyTitle": "The Score",
+      "melodyLine": "Watch the moon tiles ring one after another. Repeat the order, taking turns with another player",
+      "melodyDarkLine": "Remember the order before the tiles go dark. Repeat it, taking turns with another player",
+      "answerTitle": "Answer the Score!",
+      "answerLine": "Take turns: step onto the moon tile marked {place}. Sounded: {done} of {total}",
+      "answerDarkLine": "Take turns and repeat the order from memory. Step off before stepping onto a tile again. Sounded: {done} of {total}",
+      "spentTitle": "Another voice must answer",
+      "spentLine": "You cannot sound a tile until another player sounds the next correct note. Sounded: {done} of {total}",
+      "stepOffTitle": "Step off, then back on",
+      "stepOffLine": "A moon tile sounds only when someone steps onto it. Leave this tile and step onto it again",
+      "falseTitle": "False Note!",
+      "falseLine": "That tile was out of turn. The answer starts over from the first tile",
+      "brokenTitle": "Selthe's voice is broken!",
+      "brokenLine": "She takes {pct}% more damage until this ends: use your strongest attacks now",
+      "timeAria": "{seconds} seconds left"
+    },
     "wildheartAlert": {
       "preyTitle": "Av sensin!",
       "preyLine": "Seni yakalayıp parçalamadan yavaşlatmak için Zulgar'ı yanan güneş gliflerinden geçir",
@@ -7109,7 +7138,21 @@ export const tr_TR: EnTranslations = {
       "pollinatedLine": "Tohum kapsüllerinden kaçın: Polenlenmişken dokunmak düşman yaratır. İşaretsiz müttefikler ezebilir",
       "bondTitle": "Sürü Bağı",
       "bondLine": "Hasar azaltmalarını ve bonuslarını kaldırmak için Canavar Efendisi ile jaguarı ayır",
-      "timeAria": "{seconds} saniye kaldı"
+      "timeAria": "{seconds} saniye kaldı",
+      "preyAloneLine": "Nobody else can light the sun glyphs. Stand on a dark one for {seconds} sec to light it, then lure Zulgar across it",
+      "pinnedTitle": "Pinned!",
+      "pinnedLine": "A teammate must pull the Hunting Spear out. Wildheart Pulse hits you harder while you are Pinned",
+      "pinnedSelfLine": "Nobody is free to help: pull the Hunting Spear out yourself before Wildheart Pulse lands",
+      "sunstruckTitle": "Zulgar is Sunstruck!",
+      "sunstruckLine": "He takes {pct}% more damage until this ends: use your strongest attacks now",
+      "spearTitle": "An ally is Pinned!",
+      "spearLine": "Run to the Hunting Spear and pull it out before Wildheart Pulse lands",
+      "glyphTitle": "Light the sun glyphs",
+      "glyphLine": "Stand on a dark sun glyph for {seconds} sec to light it. When Zulgar crosses it he takes {pct}% more damage for {duration} sec",
+      "glyphLightingTitle": "Lighting the sun glyph",
+      "glyphLightingLine": "Stay on the glyph until it catches light. Stepping off starts it over",
+      "breathTitle": "Idol's Breath!",
+      "breathLine": "The stone jaguar is about to breathe over this half of the terrace. Cross to the other half"
     },
     "sanctumAlert": {
       "quenchTitle": "Soğutma suyundasın!",
@@ -7198,6 +7241,13 @@ export const tr_TR: EnTranslations = {
       "relightFar": "Yeniden yakmak için {range} yarda yakınına gel",
       "relightAria": "{name} yeniden yak",
       "relightUsingLine": "Mumu yakmak için kanal açmayı sürdür: sağlık tüketir. Vuruşlar kesmez; hareket veya sersemletme keser",
+      "freeLine": "Pull the spear out of the ground to free whoever it pins. Taking a hit does not stop you; moving or a stun does",
+      "freeKey": "Pull out the {name}",
+      "freeTap": "Tap here to pull out the {name}",
+      "freeClick": "Click here to pull out the {name}",
+      "freeFar": "Get within {range} yd to pull it out",
+      "freeAria": "Pull out the {name}",
+      "freeUsingLine": "Hold still to pull the spear out: moving or a stun stops you",
       "timeAria": "{seconds} saniye kaldı"
     },
     "cosmetics": {
@@ -8357,6 +8407,16 @@ export const tr_TR: EnTranslations = {
         "heroicCloud": "Polen Bulutu: Polenlenmiş oyuncunun {cloudRadius} yarda yakınında {cloudSeconds} saniye durmak sizi de polenler."
       },
       "zulgar": {
+        "pulseSummaryRework": "Every {every} sec, a {cast} sec cast hits everyone within {radius} yd for {min} to {max} damage. Pinned players take {pinMult} times this damage at any distance.",
+        "spearSummary": "A {cast} sec cast pins a non-tank player, or the tank if nobody else remains. The root lasts up to {seconds} sec and deals {bleed} damage every {tick} sec.",
+        "spearResponse": "Target the spear and interact within {range} yd to pull it out in {pull} sec. Damage does not interrupt the pull. If nobody else stands free on the terrace, the victim can interact to escape in {self} sec.",
+        "glyphSummaryRework": "The {count} glyphs start dark. While he hunts, an unmarked player lights one by standing on it for {kindle} sec. If no unmarked player remains, Prey can light it in {alone} sec. Moving off resets progress. Crossing a lit glyph slows him by {slow} and increases damage taken by {vulnerability} for {seconds} sec. The glyph cannot be relit for {dark} sec; he cannot be struck by another glyph for {wary} sec. During the hunt, stuns last half as long.",
+        "glyphResponseRework": "Unmarked players light glyphs ahead of the Prey. Lead him through them, then attack during Sunstruck. Glyphs go dark when the hunt ends.",
+        "idolSummary": "At {health} health, he stays a jaguar spirit until defeated. The tank can also become Prey.",
+        "idolHuntSummary": "He picks new Prey every {every} sec, then turns toward them for {turn} sec before chasing.",
+        "idolHuntHeroicSummary": "He marks a fresh pair every {pair} sec and switches between them every {switch} sec. Each switch gives the new Prey {turn} sec before he chases.",
+        "breathSummary": "Every {every} sec, one half of the terrace is marked for {warning} sec, then everyone in that half takes {min} to {max} Nature damage. Breaths alternate halves.",
+        "breathResponse": "Cross to the unmarked half before the warning ends. The centre line is safe. On Heroic, the breath also extinguishes lit glyphs in its half; they can be relit immediately.",
         "overview": "Havzanın başrahibi. Jaguar ruhuna dönüşüp bir oyuncuyu avlayana kadar önceden gösterilen halkayla düzenli bir savaş sürer. Avlanan oyuncu onu yavaşlatan yanan güneş gliflerinden geçirerek kaçırır.",
         "phaseShrineName": "Tapınak",
         "phaseShrineSummary": "Yakın dövüşür ve çevresine halka şeklinde darbe yayar.",
@@ -8669,6 +8729,14 @@ export const tr_TR: EnTranslations = {
     },
     "temple": {
       "selthe": {
+        "overviewRework": "Selthe never moves or melees. Stack for Chorus, leave the group for Solo, interrupt Drowning Aria and dodge Mere Surge. At two health thresholds, repeat her moon-tile melody with alternating singers.",
+        "phaseSummaryRework": "Her other attacks pause while the group answers the Score. Moonwater Bolts have no cast bar and cannot be interrupted.",
+        "boltSummaryRework": "Between other casts, a bolt lands every {every} sec after a {windup} sec visual warning, dealing {mult} times her weapon damage as Frost. Interrupting Drowning Aria stops bolts and Aria for {quiet} sec.",
+        "boltResponseRework": "Keep the tank in her line of sight. Save interrupts for Drowning Aria.",
+        "tipHealerRework": "Watch the Aria target and anyone caught alone by Chorus. During the Score, help sing the next note and heal mistakes.",
+        "scoreSummary": "At {first} and {second} health, she becomes immune and plays {notes}, then {finalNotes} notes. Repeat them within {answer}, then {finalAnswer} sec. A wrong tile deals {falseNote} Frost damage and resets progress, not the timer. Timeout deals {min} to {max} Frost damage to everyone. Success stuns her for {stun} sec and increases damage taken by {vulnerability} for {bonusSeconds} sec.",
+        "scoreResponse": "Watch the melody, then step onto tiles in order. Alternate correct notes with another living player; a sole survivor can finish alone. Blocked steps are harmless. Step off and enter again to sound a tile, including one occupied before the answer begins.",
+        "scoreHeroic": "During the answer, the tiles go dark. Remember the melody and take turns.",
         "overview": "Koroana havuzundan şarkı söyler; asla hareket etmez veya yakın dövüş saldırısı yapmaz. Oyuncuları paylaşılması gereken Koro ve yalnız kalınması gereken Solo ile işaretler, bir oyuncuya güçlenen arya ışını yöneltir ve avlu boyunca dalga gönderir. Okları ve aryası kesilebilir.",
         "phaseName": "Koro Avlusu",
         "phaseSummary": "Zamanlamaya bağlı tek aşama. Bir büyü sırasında zamanı gelen mekanik, büyünün bitmesini bekler.",
@@ -16287,6 +16355,8 @@ export const tr_TR: EnTranslations = {
       "temple_moonwater_bolt": "Ay Suyu Oku",
       "temple_drowning_aria": "Boğulma Aryası",
       "temple_mere_surge": "Göl Akını",
+      "temple_score": "The Score",
+      "temple_score_answer": "Answer the Score",
       "temple_tideglass_fracture": "Gelgit Camı Çatlağı",
       "temple_undertow": "Dip Akıntısı",
       "temple_lunar_tide": "Ay Gelgiti",
@@ -16324,6 +16394,12 @@ export const tr_TR: EnTranslations = {
       "wildheart_gorgebloom_gorge": "Tıkınma",
       "wildheart_zulgar_pulse": "Vahşi Yürek Atımı",
       "wildheart_zulgar_spirit_hunt": "Avın Ruhu",
+      "wildheart_zulgar_hunting_spear": "Hunting Spear",
+      "wildheart_zulgar_idol_wakes": "The Idol Wakes",
+      "kituse_wildheart_pull_spear": "Pull the Spear",
+      "wildheart_idols_breath": "Idol's Breath",
+      "wildheart_sun_glyph_kindle": "Lighting",
+      "wildheart_sun_glyph_cold": "Cooling",
       "sanctum_cinder_breath": "Köz Nefesi",
       "sanctum_warming_rite": "Isınma Ayini",
       "sanctum_goad": "Üvendire",
@@ -26132,6 +26208,9 @@ export const tr_TR: EnTranslations = {
       },
       "thorn_sprout": {
         "name": "Diken Filizi"
+      },
+      "wildheart_hunting_spear": {
+        "name": "Hunting Spear"
       },
       "buddy_ember_fox": {
         "name": "Köz Tilkisi"

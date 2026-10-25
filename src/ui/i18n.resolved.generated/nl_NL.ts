@@ -4313,6 +4313,7 @@ export const nl_NL: EnTranslations = {
       "resetConfirmBody": "Hiermee verlaat je lege instanties van je eerder geselecteerde moeilijkheid. Niet-opgeëiste buit voorkomt de reset.",
       "resetConfirm": "Instanties resetten",
       "resetCooldown": "Instanties kunnen slechts eenmaal per 5 minuten worden gereset.",
+      "resetAlreadyFresh": "Je instances zijn al fris. Niemand is ze binnengegaan sinds de laatste reset.",
       "resetUsage": "Gebruik /dungeon reset om je lege instanties te verlaten nadat je de moeilijkheid hebt gewijzigd.",
       "entryMismatchNormal": "Deze instantie is ingesteld op de moeilijkheid Normaal. Gebruik Alle instanties resetten om een nieuwe Heroïsche run te starten.",
       "entryMismatchHeroic": "Deze instantie is ingesteld op de moeilijkheid Heroïsch. Gebruik Alle instanties resetten om een nieuwe Normale run te starten."
@@ -4646,7 +4647,17 @@ export const nl_NL: EnTranslations = {
         "pollinated": "Een Zaaddoos aanraken laat meteen een doornspruit ontkiemen. Blijf van de zaden af en laat een schone speler ze platstampen. Een onaangeroerde zaaddoos ontkiemt na {seconds} sec (op Heroïsch graaft hij zich na {heroic} sec in en verrijst naast de dichtstbijzijnde speler).",
         "prey": "Zulgar jaagt op je. Leid hem over een brandende zonnerune om hem met {slow}% te vertragen. Vangt hij je, dan word je Toegetakeld voor {damage} schade ({heroic} op Heroïsch) en {stun} sec omvergeworpen.",
         "avatar": "Beweegt {pct}% sneller en jaagt op zijn Prooi. Vertragingen en vastzetten werken, verdovingen duren half zo lang.",
-        "vanished": "Verborgen en immuun voor schade. Hij staat op het punt op de verste speler te springen."
+        "vanished": "Verborgen en immuun voor schade. Hij staat op het punt op de verste speler te springen.",
+        "sunstruck": "Struck by a lit sun glyph: moves {pct}% slower.",
+        "sunstruckExposed": "Struck by a lit sun glyph: takes {pct}% more damage.",
+        "sunWary": "No sun glyph can strike him until this ends. A lit glyph he crosses stays lit.",
+        "pinned": "A Hunting Spear pins you in place. You bleed for {bleed} Physical damage ({heroicBleed} on Heroic) every {every} sec, and Wildheart Pulse hits you wherever you stand for {pulse}% more damage. A teammate can pull the spear out in {pull} sec. If nobody else stands free, pull it out yourself in {wrench} sec. It lets go after {seconds} sec.",
+        "idolAwake": "The stone jaguar is awake. Every {every} sec it breathes over one half of the terrace, then the other, after a {warning} sec warning on the floor: {min} to {max} Nature damage ({heroicMin} to {heroicMax} on Heroic) to everyone in that half. Zulgar stays the Jaguar Avatar until he dies and picks new Prey every {seconds} sec ({heroicSeconds} sec on Heroic)."
+      },
+      "temple": {
+        "scoreWard": "Singing the Score: she takes no damage until it ends. Step onto the moon tiles in the order they rang before the verse ends to break her voice. Take turns: after sounding a note, wait for another player to sound the next correct note. A lone survivor can finish alone. If the verse ends first, Discord deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone in the court.",
+        "brokenVoice": "Her voice is broken: she takes {pct}% more damage until this ends.",
+        "spentVoice": "You cannot sound another moon tile until another player sounds the next correct note. Stepping onto a tile while this lasts does not reset the answer or hurt you. Cannot be dispelled. Removed when you are the only living player in your instance or the Score ends."
       },
       "bastion": {
         "brineColumn": "Vastgezet in een zeewaterzuil: je krijgt elke {tick} sec {min} tot {max} natuurschade, maximaal {seconds} sec. Onderbreek of verdoof de getijdengebonden acoliet om dit te verbreken.",
@@ -6975,6 +6986,7 @@ export const nl_NL: EnTranslations = {
         "summons_adds": "Roept versterkingen op",
         "lunar_tide": "Maantij (pulserende gebiedsschade)",
         "chorus_and_solo": "Koorzang en Eenstemmige zang (verzamel op de ene markering, verspreid bij de andere)",
+        "the_score": "The Score (twice she sings a melody on the moon tiles: step onto them in the order they rang to break her voice)",
         "tideglass_reflections": "Getijdenglasweerspiegelingen (dood elkaars spiegelbeelden)",
         "hydra_three_elements": "Drie elementen (de linkerkop ademt een vorstkegel van 18 yard die je 4 seconden met 70 procent vertraagt. De middelste spuugt gif onder maximaal 3 spelers, dat na 1,5 seconden ontploft en 6 seconden op die plek brandt. De rechter vuurt een stortvloed door een baan van 26 yard die je 8 yard terugslaat. Stap uit elke aanval. Valt een kop, dan nemen de levende koppen zijn aanval over)",
         "hydra_tsunami": "Vloedgolf (de koppen zinken 4,5 seconden en krijgen 75 procent minder schade. Een golf rolt over de helft van de poel, de volgende keer over de andere: 160 tot 190 vorstschade op Normaal en een duw van 10 yard. Ga naar de andere helft of achter een randzuil. Op Heroïsch rolt de golf 3,5 seconden later terug over de andere helft. De eerste komt na 24 seconden, elke volgende 40 seconden nadat de vorige voorbij is)",
@@ -7099,6 +7111,23 @@ export const nl_NL: EnTranslations = {
       "shadeLine": "Laat deze lokvogel met rust. Val de Vael aan wiens lantaarn oplicht in de lichtbundel om de sluier te breken",
       "timeAria": "Nog {seconds} seconden"
     },
+    "templeAlert": {
+      "melodyTitle": "The Score",
+      "melodyLine": "Watch the moon tiles ring one after another. Repeat the order, taking turns with another player",
+      "melodyDarkLine": "Remember the order before the tiles go dark. Repeat it, taking turns with another player",
+      "answerTitle": "Answer the Score!",
+      "answerLine": "Take turns: step onto the moon tile marked {place}. Sounded: {done} of {total}",
+      "answerDarkLine": "Take turns and repeat the order from memory. Step off before stepping onto a tile again. Sounded: {done} of {total}",
+      "spentTitle": "Another voice must answer",
+      "spentLine": "You cannot sound a tile until another player sounds the next correct note. Sounded: {done} of {total}",
+      "stepOffTitle": "Step off, then back on",
+      "stepOffLine": "A moon tile sounds only when someone steps onto it. Leave this tile and step onto it again",
+      "falseTitle": "False Note!",
+      "falseLine": "That tile was out of turn. The answer starts over from the first tile",
+      "brokenTitle": "Selthe's voice is broken!",
+      "brokenLine": "She takes {pct}% more damage until this ends: use your strongest attacks now",
+      "timeAria": "{seconds} seconds left"
+    },
     "wildheartAlert": {
       "preyTitle": "Jij bent de Prooi!",
       "preyLine": "Lok Zulgar door brandende zonnerunen om hem te vertragen voordat hij je vangt en toetakelt",
@@ -7109,7 +7138,21 @@ export const nl_NL: EnTranslations = {
       "pollinatedLine": "Vermijd zaaddozen: ze aanraken terwijl je Bestoven bent maakt vijanden. Ongemarkeerde bondgenoten kunnen ze platstampen",
       "bondTitle": "Roedelband",
       "bondLine": "Scheid de Beestenmeester en jaguar om hun schadevermindering en schadebonus te verwijderen",
-      "timeAria": "Nog {seconds} seconden"
+      "timeAria": "Nog {seconds} seconden",
+      "preyAloneLine": "Nobody else can light the sun glyphs. Stand on a dark one for {seconds} sec to light it, then lure Zulgar across it",
+      "pinnedTitle": "Pinned!",
+      "pinnedLine": "A teammate must pull the Hunting Spear out. Wildheart Pulse hits you harder while you are Pinned",
+      "pinnedSelfLine": "Nobody is free to help: pull the Hunting Spear out yourself before Wildheart Pulse lands",
+      "sunstruckTitle": "Zulgar is Sunstruck!",
+      "sunstruckLine": "He takes {pct}% more damage until this ends: use your strongest attacks now",
+      "spearTitle": "An ally is Pinned!",
+      "spearLine": "Run to the Hunting Spear and pull it out before Wildheart Pulse lands",
+      "glyphTitle": "Light the sun glyphs",
+      "glyphLine": "Stand on a dark sun glyph for {seconds} sec to light it. When Zulgar crosses it he takes {pct}% more damage for {duration} sec",
+      "glyphLightingTitle": "Lighting the sun glyph",
+      "glyphLightingLine": "Stay on the glyph until it catches light. Stepping off starts it over",
+      "breathTitle": "Idol's Breath!",
+      "breathLine": "The stone jaguar is about to breathe over this half of the terrace. Cross to the other half"
     },
     "sanctumAlert": {
       "quenchTitle": "In het bluswater!",
@@ -7198,6 +7241,13 @@ export const nl_NL: EnTranslations = {
       "relightFar": "Kom binnen {range} yard om dit opnieuw aan te steken",
       "relightAria": "Steek {name} opnieuw aan",
       "relightUsingLine": "Blijf kanaliseren om de kaars aan te steken: dit kost gezondheid. Treffers onderbreken niet, bewegen of een verdoving wel",
+      "freeLine": "Pull the spear out of the ground to free whoever it pins. Taking a hit does not stop you; moving or a stun does",
+      "freeKey": "Pull out the {name}",
+      "freeTap": "Tap here to pull out the {name}",
+      "freeClick": "Click here to pull out the {name}",
+      "freeFar": "Get within {range} yd to pull it out",
+      "freeAria": "Pull out the {name}",
+      "freeUsingLine": "Hold still to pull the spear out: moving or a stun stops you",
       "timeAria": "Nog {seconds} seconden"
     },
     "cosmetics": {
@@ -8357,6 +8407,16 @@ export const nl_NL: EnTranslations = {
         "heroicCloud": "Stuifmeelwolk: {cloudSeconds} sec binnen {cloudRadius} yard van een bestoven speler staan bestuift jou ook."
       },
       "zulgar": {
+        "pulseSummaryRework": "Every {every} sec, a {cast} sec cast hits everyone within {radius} yd for {min} to {max} damage. Pinned players take {pinMult} times this damage at any distance.",
+        "spearSummary": "A {cast} sec cast pins a non-tank player, or the tank if nobody else remains. The root lasts up to {seconds} sec and deals {bleed} damage every {tick} sec.",
+        "spearResponse": "Target the spear and interact within {range} yd to pull it out in {pull} sec. Damage does not interrupt the pull. If nobody else stands free on the terrace, the victim can interact to escape in {self} sec.",
+        "glyphSummaryRework": "The {count} glyphs start dark. While he hunts, an unmarked player lights one by standing on it for {kindle} sec. If no unmarked player remains, Prey can light it in {alone} sec. Moving off resets progress. Crossing a lit glyph slows him by {slow} and increases damage taken by {vulnerability} for {seconds} sec. The glyph cannot be relit for {dark} sec; he cannot be struck by another glyph for {wary} sec. During the hunt, stuns last half as long.",
+        "glyphResponseRework": "Unmarked players light glyphs ahead of the Prey. Lead him through them, then attack during Sunstruck. Glyphs go dark when the hunt ends.",
+        "idolSummary": "At {health} health, he stays a jaguar spirit until defeated. The tank can also become Prey.",
+        "idolHuntSummary": "He picks new Prey every {every} sec, then turns toward them for {turn} sec before chasing.",
+        "idolHuntHeroicSummary": "He marks a fresh pair every {pair} sec and switches between them every {switch} sec. Each switch gives the new Prey {turn} sec before he chases.",
+        "breathSummary": "Every {every} sec, one half of the terrace is marked for {warning} sec, then everyone in that half takes {min} to {max} Nature damage. Breaths alternate halves.",
+        "breathResponse": "Cross to the unmarked half before the warning ends. The centre line is safe. On Heroic, the breath also extinguishes lit glyphs in its half; they can be relit immediately.",
         "overview": "De hogepriester van het bekken. Een vast gevecht met een vooraf aangegeven ring, totdat hij in een jaguargeest verandert en op één speler jaagt. De bejaagde speler leidt hem over brandende zonnerunen die hem vertragen.",
         "phaseShrineName": "Het Heiligdom",
         "phaseShrineSummary": "Hij vecht van dichtbij en laat een ring om zich heen pulseren.",
@@ -8669,6 +8729,14 @@ export const nl_NL: EnTranslations = {
     },
     "temple": {
       "selthe": {
+        "overviewRework": "Selthe never moves or melees. Stack for Chorus, leave the group for Solo, interrupt Drowning Aria and dodge Mere Surge. At two health thresholds, repeat her moon-tile melody with alternating singers.",
+        "phaseSummaryRework": "Her other attacks pause while the group answers the Score. Moonwater Bolts have no cast bar and cannot be interrupted.",
+        "boltSummaryRework": "Between other casts, a bolt lands every {every} sec after a {windup} sec visual warning, dealing {mult} times her weapon damage as Frost. Interrupting Drowning Aria stops bolts and Aria for {quiet} sec.",
+        "boltResponseRework": "Keep the tank in her line of sight. Save interrupts for Drowning Aria.",
+        "tipHealerRework": "Watch the Aria target and anyone caught alone by Chorus. During the Score, help sing the next note and heal mistakes.",
+        "scoreSummary": "At {first} and {second} health, she becomes immune and plays {notes}, then {finalNotes} notes. Repeat them within {answer}, then {finalAnswer} sec. A wrong tile deals {falseNote} Frost damage and resets progress, not the timer. Timeout deals {min} to {max} Frost damage to everyone. Success stuns her for {stun} sec and increases damage taken by {vulnerability} for {bonusSeconds} sec.",
+        "scoreResponse": "Watch the melody, then step onto tiles in order. Alternate correct notes with another living player; a sole survivor can finish alone. Blocked steps are harmless. Step off and enter again to sound a tile, including one occupied before the answer begins.",
+        "scoreHeroic": "During the answer, the tiles go dark. Remember the melody and take turns.",
         "overview": "De Koormoeder zingt vanuit haar poel en beweegt of slaat nooit. Ze markeert spelers voor gedeelde Koorzang en eenzame Eenstemmige zang, richt een oplopende aria op één speler en stuurt een golf over het hof. Haar schichten en aria kunnen worden onderbroken.",
         "phaseName": "Het Koorhof",
         "phaseSummary": "Eén fase met timers. Een mechaniek dat tijdens een spreuk aan de beurt komt, wacht totdat die klaar is.",
@@ -16287,6 +16355,8 @@ export const nl_NL: EnTranslations = {
       "temple_moonwater_bolt": "Maanwaterschicht",
       "temple_drowning_aria": "Verdrinkingsaria",
       "temple_mere_surge": "Meergolf",
+      "temple_score": "The Score",
+      "temple_score_answer": "Answer the Score",
       "temple_tideglass_fracture": "Getijdenglasbreuk",
       "temple_undertow": "Onderstroom",
       "temple_lunar_tide": "Maangetij",
@@ -16324,6 +16394,12 @@ export const nl_NL: EnTranslations = {
       "wildheart_gorgebloom_gorge": "Verzwelgen",
       "wildheart_zulgar_pulse": "Wildhartpuls",
       "wildheart_zulgar_spirit_hunt": "Geest van de jacht",
+      "wildheart_zulgar_hunting_spear": "Hunting Spear",
+      "wildheart_zulgar_idol_wakes": "The Idol Wakes",
+      "kituse_wildheart_pull_spear": "Pull the Spear",
+      "wildheart_idols_breath": "Idol's Breath",
+      "wildheart_sun_glyph_kindle": "Lighting",
+      "wildheart_sun_glyph_cold": "Cooling",
       "sanctum_cinder_breath": "Sinteladem",
       "sanctum_warming_rite": "Verwarmingsritueel",
       "sanctum_goad": "Provoceren",
@@ -26132,6 +26208,9 @@ export const nl_NL: EnTranslations = {
       },
       "thorn_sprout": {
         "name": "Doornspruit"
+      },
+      "wildheart_hunting_spear": {
+        "name": "Hunting Spear"
       },
       "buddy_ember_fox": {
         "name": "Sintelvos"

@@ -4310,10 +4310,11 @@ export const en_CA: EnTranslations = {
       "resetSameDifficulty": "Change dungeon difficulty before resetting these instances. Empty instances reset on their own after 5 minutes.",
       "resetLoot": "You cannot reset instances while loot remains inside.",
       "resetConfirmTitle": "Reset All Instances?",
-      "resetConfirmBody": "This abandons empty instances from your previously selected difficulty. Unclaimed loot will prevent the reset.",
+      "resetConfirmBody": "This abandons your empty instances so the next run starts fresh at your selected difficulty. Lockouts are not changed. Anyone still inside, or unclaimed loot, will prevent the reset.",
       "resetConfirm": "Reset Instances",
       "resetCooldown": "Instances can only be reset once every 5 minutes.",
-      "resetUsage": "Use /dungeon reset to abandon your empty instances after changing difficulty.",
+      "resetAlreadyFresh": "Your instances are already fresh. Nobody has entered them since they were last reset.",
+      "resetUsage": "Use /dungeon reset to abandon your empty instances and start them fresh.",
       "entryMismatchNormal": "This instance is set to Normal difficulty. Use Reset All Instances to start a fresh Heroic run.",
       "entryMismatchHeroic": "This instance is set to Heroic difficulty. Use Reset All Instances to start a fresh Normal run."
     },
@@ -4646,7 +4647,17 @@ export const en_CA: EnTranslations = {
         "pollinated": "Touching a Seedpod makes it sprout a Thorn Sprout at once. Stay off the seeds and let a clean player stomp them; an untouched pod sprouts after {seconds} sec (on Heroic it burrows after {heroic} sec and rises beside the nearest player).",
         "prey": "Zulgar hunts you. Lead him across a lit sun glyph to slow him by {slow}%. If he catches you, you are Mauled for {damage} damage ({heroic} on Heroic) and knocked down for {stun} sec.",
         "avatar": "Moves {pct}% faster and hunts its Prey. Slows and roots take hold, and stuns last half as long.",
-        "vanished": "Hidden and immune to damage. He is about to pounce on the farthest player."
+        "vanished": "Hidden and immune to damage. He is about to pounce on the farthest player.",
+        "sunstruck": "Struck by a lit sun glyph: moves {pct}% slower.",
+        "sunstruckExposed": "Struck by a lit sun glyph: takes {pct}% more damage.",
+        "sunWary": "No sun glyph can strike him until this ends. A lit glyph he crosses stays lit.",
+        "pinned": "A Hunting Spear pins you in place. You bleed for {bleed} Physical damage ({heroicBleed} on Heroic) every {every} sec, and Wildheart Pulse hits you wherever you stand for {pulse}% more damage. A teammate can pull the spear out in {pull} sec. If nobody else stands free, pull it out yourself in {wrench} sec. It lets go after {seconds} sec.",
+        "idolAwake": "The stone jaguar is awake. Every {every} sec it breathes over one half of the terrace, then the other, after a {warning} sec warning on the floor: {min} to {max} Nature damage ({heroicMin} to {heroicMax} on Heroic) to everyone in that half. Zulgar stays the Jaguar Avatar until he dies and picks new Prey every {seconds} sec ({heroicSeconds} sec on Heroic)."
+      },
+      "temple": {
+        "scoreWard": "Singing the Score: she takes no damage until it ends. Step onto the moon tiles in the order they rang before the verse ends to break her voice. Take turns: after sounding a note, wait for another player to sound the next correct note. A lone survivor can finish alone. If the verse ends first, Discord deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone in the court.",
+        "brokenVoice": "Her voice is broken: she takes {pct}% more damage until this ends.",
+        "spentVoice": "You cannot sound another moon tile until another player sounds the next correct note. Stepping onto a tile while this lasts does not reset the answer or hurt you. Cannot be dispelled. Removed when you are the only living player in your instance or the Score ends."
       },
       "bastion": {
         "brineColumn": "Rooted in a column of sea water: you take {min} to {max} Nature damage every {tick} sec for up to {seconds} sec. Interrupt or stun the Tidebound Acolyte to break it.",
@@ -6975,6 +6986,7 @@ export const en_CA: EnTranslations = {
         "summons_adds": "Summons reinforcements",
         "lunar_tide": "Lunar Tide (pulsing area damage)",
         "chorus_and_solo": "Chorus and Solo (stack on one mark, spread from the other)",
+        "the_score": "The Score (twice she sings a melody on the moon tiles: step onto them in the order they rang to break her voice)",
         "tideglass_reflections": "Tideglass Reflections (kill each other's mirror images)",
         "hydra_three_elements": "Three Elements (the left head breathes an 18 yard cone of frost that slows you by 70 percent for 4 seconds, the centre head spits venom under up to 3 players that bursts after 1.5 seconds and burns for 6 seconds where it lands, and the right head fires a torrent down a 26 yard lane that throws you back 8 yards: step out of each one. When a head falls, the heads still standing take over its attack)",
         "hydra_tsunami": "Tsunami (the heads sink for 4.5 seconds, taking 75 percent less damage, and a wave rolls over one half of the pool, the other half the next time: 160 to 190 frost damage on normal and a 10 yard shove. Cross to the other half or stand behind a rim column; on heroic the wave rolls back over the other half 3.5 seconds later. The first Tsunami comes 24 seconds into the fight, each later one 40 seconds after the last has passed)",
@@ -7099,6 +7111,23 @@ export const en_CA: EnTranslations = {
       "shadeLine": "Leave this decoy. Attack the Vael whose lantern flares in the beam to break the veil",
       "timeAria": "{seconds} seconds left"
     },
+    "templeAlert": {
+      "melodyTitle": "The Score",
+      "melodyLine": "Watch the moon tiles ring one after another. Repeat the order, taking turns with another player",
+      "melodyDarkLine": "Remember the order before the tiles go dark. Repeat it, taking turns with another player",
+      "answerTitle": "Answer the Score!",
+      "answerLine": "Take turns: step onto the moon tile marked {place}. Sounded: {done} of {total}",
+      "answerDarkLine": "Take turns and repeat the order from memory. Step off before stepping onto a tile again. Sounded: {done} of {total}",
+      "spentTitle": "Another voice must answer",
+      "spentLine": "You cannot sound a tile until another player sounds the next correct note. Sounded: {done} of {total}",
+      "stepOffTitle": "Step off, then back on",
+      "stepOffLine": "A moon tile sounds only when someone steps onto it. Leave this tile and step onto it again",
+      "falseTitle": "False Note!",
+      "falseLine": "That tile was out of turn. The answer starts over from the first tile",
+      "brokenTitle": "Selthe's voice is broken!",
+      "brokenLine": "She takes {pct}% more damage until this ends: use your strongest attacks now",
+      "timeAria": "{seconds} seconds left"
+    },
     "wildheartAlert": {
       "preyTitle": "You are the Prey!",
       "preyLine": "Lure Zulgar through lit sun glyphs to slow him before he catches and mauls you",
@@ -7109,7 +7138,21 @@ export const en_CA: EnTranslations = {
       "pollinatedLine": "Avoid seedpods: touching them while Pollinated creates enemies. Unmarked allies can stomp them",
       "bondTitle": "Pack Bond",
       "bondLine": "Separate the Beastmaster and jaguar to remove their damage reduction and damage bonus",
-      "timeAria": "{seconds} seconds left"
+      "timeAria": "{seconds} seconds left",
+      "preyAloneLine": "Nobody else can light the sun glyphs. Stand on a dark one for {seconds} sec to light it, then lure Zulgar across it",
+      "pinnedTitle": "Pinned!",
+      "pinnedLine": "A teammate must pull the Hunting Spear out. Wildheart Pulse hits you harder while you are Pinned",
+      "pinnedSelfLine": "Nobody is free to help: pull the Hunting Spear out yourself before Wildheart Pulse lands",
+      "sunstruckTitle": "Zulgar is Sunstruck!",
+      "sunstruckLine": "He takes {pct}% more damage until this ends: use your strongest attacks now",
+      "spearTitle": "An ally is Pinned!",
+      "spearLine": "Run to the Hunting Spear and pull it out before Wildheart Pulse lands",
+      "glyphTitle": "Light the sun glyphs",
+      "glyphLine": "Stand on a dark sun glyph for {seconds} sec to light it. When Zulgar crosses it he takes {pct}% more damage for {duration} sec",
+      "glyphLightingTitle": "Lighting the sun glyph",
+      "glyphLightingLine": "Stay on the glyph until it catches light. Stepping off starts it over",
+      "breathTitle": "Idol's Breath!",
+      "breathLine": "The stone jaguar is about to breathe over this half of the terrace. Cross to the other half"
     },
     "sanctumAlert": {
       "quenchTitle": "In the quench-water!",
@@ -7198,6 +7241,13 @@ export const en_CA: EnTranslations = {
       "relightFar": "Get within {range} yd to relight it",
       "relightAria": "Relight the {name}",
       "relightUsingLine": "Keep channeling to light the candle: it drains health. Hits do not interrupt; moving or a stun does",
+      "freeLine": "Pull the spear out of the ground to free whoever it pins. Taking a hit does not stop you; moving or a stun does",
+      "freeKey": "Pull out the {name}",
+      "freeTap": "Tap here to pull out the {name}",
+      "freeClick": "Click here to pull out the {name}",
+      "freeFar": "Get within {range} yd to pull it out",
+      "freeAria": "Pull out the {name}",
+      "freeUsingLine": "Hold still to pull the spear out: moving or a stun stops you",
       "timeAria": "{seconds} seconds left"
     },
     "cosmetics": {
@@ -8357,6 +8407,16 @@ export const en_CA: EnTranslations = {
         "heroicCloud": "Pollen Cloud: standing within {cloudRadius} yd of a Pollinated player for {cloudSeconds} sec pollinates you too."
       },
       "zulgar": {
+        "pulseSummaryRework": "Every {every} sec, a {cast} sec cast hits everyone within {radius} yd for {min} to {max} damage. Pinned players take {pinMult} times this damage at any distance.",
+        "spearSummary": "A {cast} sec cast pins a non-tank player, or the tank if nobody else remains. The root lasts up to {seconds} sec and deals {bleed} damage every {tick} sec.",
+        "spearResponse": "Target the spear and interact within {range} yd to pull it out in {pull} sec. Damage does not interrupt the pull. If nobody else stands free on the terrace, the victim can interact to escape in {self} sec.",
+        "glyphSummaryRework": "The {count} glyphs start dark. While he hunts, an unmarked player lights one by standing on it for {kindle} sec. If no unmarked player remains, Prey can light it in {alone} sec. Moving off resets progress. Crossing a lit glyph slows him by {slow} and increases damage taken by {vulnerability} for {seconds} sec. The glyph cannot be relit for {dark} sec; he cannot be struck by another glyph for {wary} sec. During the hunt, stuns last half as long.",
+        "glyphResponseRework": "Unmarked players light glyphs ahead of the Prey. Lead him through them, then attack during Sunstruck. Glyphs go dark when the hunt ends.",
+        "idolSummary": "At {health} health, he stays a jaguar spirit until defeated. The tank can also become Prey.",
+        "idolHuntSummary": "He picks new Prey every {every} sec, then turns toward them for {turn} sec before chasing.",
+        "idolHuntHeroicSummary": "He marks a fresh pair every {pair} sec and switches between them every {switch} sec. Each switch gives the new Prey {turn} sec before he chases.",
+        "breathSummary": "Every {every} sec, one half of the terrace is marked for {warning} sec, then everyone in that half takes {min} to {max} Nature damage. Breaths alternate halves.",
+        "breathResponse": "Cross to the unmarked half before the warning ends. The centre line is safe. On Heroic, the breath also extinguishes lit glyphs in its half; they can be relit immediately.",
         "overview": "The high priest of the basin. A steady fight with a telegraphed ring, until he turns into a jaguar spirit and hunts one player. The hunted player kites him across lit sun glyphs, which slow him.",
         "phaseShrineName": "The Shrine",
         "phaseShrineSummary": "He fights in melee and pulses a ring around himself.",
@@ -8669,6 +8729,14 @@ export const en_CA: EnTranslations = {
     },
     "temple": {
       "selthe": {
+        "overviewRework": "Selthe never moves or melees. Stack for Chorus, leave the group for Solo, interrupt Drowning Aria and dodge Mere Surge. At two health thresholds, repeat her moon-tile melody with alternating singers.",
+        "phaseSummaryRework": "Her other attacks pause while the group answers the Score. Moonwater Bolts have no cast bar and cannot be interrupted.",
+        "boltSummaryRework": "Between other casts, a bolt lands every {every} sec after a {windup} sec visual warning, dealing {mult} times her weapon damage as Frost. Interrupting Drowning Aria stops bolts and Aria for {quiet} sec.",
+        "boltResponseRework": "Keep the tank in her line of sight. Save interrupts for Drowning Aria.",
+        "tipHealerRework": "Watch the Aria target and anyone caught alone by Chorus. During the Score, help sing the next note and heal mistakes.",
+        "scoreSummary": "At {first} and {second} health, she becomes immune and plays {notes}, then {finalNotes} notes. Repeat them within {answer}, then {finalAnswer} sec. A wrong tile deals {falseNote} Frost damage and resets progress, not the timer. Timeout deals {min} to {max} Frost damage to everyone. Success stuns her for {stun} sec and increases damage taken by {vulnerability} for {bonusSeconds} sec.",
+        "scoreResponse": "Watch the melody, then step onto tiles in order. Alternate correct notes with another living player; a sole survivor can finish alone. Blocked steps are harmless. Step off and enter again to sound a tile, including one occupied before the answer begins.",
+        "scoreHeroic": "During the answer, the tiles go dark. Remember the melody and take turns.",
         "overview": "The Choirmother sings from her pool and never moves or melees. She marks players for a shared Chorus and a lonely Solo, beams a rising aria at one player, and sends a wave across the court. Her bolts and her aria can be interrupted.",
         "phaseName": "The Choir Court",
         "phaseSummary": "One phase on timers. A mechanic that comes due during a cast waits for it to end.",
@@ -9581,7 +9649,7 @@ export const en_CA: EnTranslations = {
       "graveyard": "Where your spirit would return to if you fell here.",
       "dungeons": "Every dungeon with the zone its door sits in and the party size it is built for, plus the difficulty you are currently set to.",
       "dungeonMode": "Switch your dungeons between the normal and heroic difficulty.",
-      "dungeonReset": "Abandon your own empty instances, which is what you do after changing difficulty.",
+      "dungeonReset": "Abandon your own empty instances so your next run starts fresh, at the same difficulty or a new one.",
       "groupRecovery": "Recovery and presence",
       "unstuck": "The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. It leaves you weakened by Unstuck Sickness for a while afterwards, so it is a last resort rather than a shortcut.",
       "unstuckWindow": "The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you weakened by Unstuck Sickness for a while afterwards, so it is a rescue rather than a shortcut.",
@@ -10203,7 +10271,7 @@ export const en_CA: EnTranslations = {
       "heroicRewardsBody": "Heroic bosses drop the loot you know, upgraded and tagged Heroic on the tooltip, and the final boss of each run adds epics found nowhere else. That last kill also leaves Heroic Marks for every participant: a currency spent with Quartermaster Vex in Highwatch, whose counter is a shelf of rings and pendants that nothing but proof of the heroic depths will buy.",
       "heroicLockoutBody": "Normal dungeons can be run all day. Heroic asks patience: the final boss kill locks everyone in the run to one heroic clear of that dungeon per day, and the raid keeps a daily lockout for each difficulty. On a live realm every daily lockout clears together at the realm's own nightly reset hour, so a clear taken just before that hour and one taken just after fall on two different days; play offline in your browser instead and a lockout simply runs out a day after your own kill. A cleared five-player run stays open to its own party for corpse runs and loot, so nobody is locked away from what they earned there. The raid is stricter: once its kill locks you the door stays shut until the reset, and the only way back through it is a corpse run by someone who fell in the very run that locked them, so a living raider who walks out has walked out for the day. Collect your spoils before you leave the arena. Every one of these lockouts belongs to the character that earned it, so a clear on your main leaves your other characters free.",
       "resetTitle": "Resetting your instances",
-      "resetBody": "Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, only once every corpse in there has been looted clean, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid resets the same way, its own lockout and corpse-return rules still standing on top, but it skips the cooldown between resets: a raid that picked the wrong tier, or bounced off Heroic, can switch back at once, since its own lockout is what limits repeat runs.",
+      "resetBody": "Empty claimed runs linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset, and the next run starts fresh at your current difficulty. Switching difficulty does the same for runs on the old difficulty. A reset works only while nobody, living or fallen, remains inside, and only once every corpse in there has been looted clean. It never shortens a lockout: a locked heroic or raid stays locked until its reset, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid resets the same way, its own lockout and corpse-return rules still standing on top, and a raid switching tier skips the cooldown: a raid that picked the wrong tier, or bounced off Heroic, can switch back at once, since its own lockout is what limits repeat runs.",
       "templeLoreTitle": "The Drowned Temple, a little deeper",
       "templeLoreBody": "The temple has its own legend, older than the cult you chase elsewhere. On the shore of the Glimmermere, a tarn that drinks the moonlight and gives back the drowned, a lone watcher keeps a gate of pale light. Beneath the surface, a stair of cold stone runs down to it. The folk who sank there did not drown by misadventure: they were the Pale Choir, who went under in worship and never stopped singing. The old wardens scratched a single warning into the rocks before the water took them, a prayer to something they called the Drowned Moon, with a steadier hand adding two words beneath it: it only sleeps.",
       "cryptLeadTitle": "A door the dead were meant to keep shut",
@@ -16287,6 +16355,8 @@ export const en_CA: EnTranslations = {
       "temple_moonwater_bolt": "Moonwater Bolt",
       "temple_drowning_aria": "Drowning Aria",
       "temple_mere_surge": "Mere Surge",
+      "temple_score": "The Score",
+      "temple_score_answer": "Answer the Score",
       "temple_tideglass_fracture": "Tideglass Fracture",
       "temple_undertow": "Undertow",
       "temple_lunar_tide": "Lunar Tide",
@@ -16324,6 +16394,12 @@ export const en_CA: EnTranslations = {
       "wildheart_gorgebloom_gorge": "Gorge",
       "wildheart_zulgar_pulse": "Wildheart Pulse",
       "wildheart_zulgar_spirit_hunt": "Spirit of the Hunt",
+      "wildheart_zulgar_hunting_spear": "Hunting Spear",
+      "wildheart_zulgar_idol_wakes": "The Idol Wakes",
+      "kituse_wildheart_pull_spear": "Pull the Spear",
+      "wildheart_idols_breath": "Idol's Breath",
+      "wildheart_sun_glyph_kindle": "Lighting",
+      "wildheart_sun_glyph_cold": "Cooling",
       "sanctum_cinder_breath": "Cinder Breath",
       "sanctum_warming_rite": "Warming Rite",
       "sanctum_goad": "Goad",
@@ -26132,6 +26208,9 @@ export const en_CA: EnTranslations = {
       },
       "thorn_sprout": {
         "name": "Thorn Sprout"
+      },
+      "wildheart_hunting_spear": {
+        "name": "Hunting Spear"
       },
       "buddy_ember_fox": {
         "name": "Ember Fox"
