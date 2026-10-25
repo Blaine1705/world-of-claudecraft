@@ -40,7 +40,12 @@ import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
 import { getFlameTex } from '../ignivar_fire_vfx';
 import { setRenderCategory } from '../renderer_diagnostics';
-import { ensureHeartKit, heartKitLoaded, heartKitMeshes } from '../smith_heart/heart_kit';
+import {
+  ensureHeartKit,
+  heartKitLoaded,
+  heartKitMeshes,
+  heartKitProgramWarmers,
+} from '../smith_heart/heart_kit';
 import { heartVeinGlowMaterial } from '../smith_heart/heart_room_kit';
 import { radialGlowTexture } from '../textures';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
@@ -74,9 +79,15 @@ import {
   councilWristTarget,
   type V3,
 } from './council_bodies_core';
+import { inSmithHeartClaim } from './council_fx_core';
 
 const SCAN_SEC = 0.1;
 const KINDS: readonly CouncilBodyKind[] = ['slabwright', 'singer'];
+const SIDES = [1, -1] as const;
+/** Per-frame scratch (the pose allocates no point of its own). */
+const _jp: V3 = { x: 0, y: 0, z: 0 };
+const _orbit: V3 = { x: 0, y: 0, z: 0 };
+const _breath = { bob: 0, drift: 0 };
 
 const _m = new THREE.Matrix4();
 const _q = new THREE.Quaternion();
@@ -93,6 +104,8 @@ const _centre = new THREE.Vector3();
 interface PieceView {
   def: CouncilBodyPiece;
   index: number;
+  /** A skirt or halo piece's slot round the body (read once from its id). */
+  orbit: number;
   /** Moves with the pose (body frame); holds the tilted, fitted kit piece. */
   holder: THREE.Group;
   pos: THREE.Vector3;
@@ -146,6 +159,7 @@ export class CouncilBodies {
   private clock = 0;
   private seed = 0x6b2d;
   private disposed = false;
+  private readonly glowTex: THREE.Texture | null;
 
   constructor(
     scene: THREE.Scene,
@@ -195,6 +209,7 @@ export class CouncilBodies {
     });
     this.materials.push(threadMat);
     const glowTex = hasDom ? radialGlowTexture() : null;
+    this.glowTex = glowTex;
     for (const kind of KINDS) {
       const plan = COUNCIL_BODY_PLANS[kind];
       for (let i = 0; i < COUNCIL_BODY_POOLS.rigsPerKind; i++) {
@@ -281,6 +296,9 @@ export class CouncilBodies {
         });
       }
     }
+    // The kit's slot programs, linked with this root (a body that shows
+    // before the interior's gate settles links nothing in a live frame).
+    this.root.add(heartKitProgramWarmers());
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
@@ -346,6 +364,7 @@ export class CouncilBodies {
       rig.pieces.push({
         def,
         index,
+        orbit: Number(def.id.replace(/\D+/g, '')) || 0,
         holder,
         pos: new THREE.Vector3(),
         quat: new THREE.Quaternion(),
@@ -394,7 +413,7 @@ export class CouncilBodies {
   handleEvent(ev: SimEvent): boolean {
     if (!this.world || this.disposed) return false;
     if (ev.type === 'damage' && ev.ability === null) {
-      const rig = this.rigs.find((r) => r.entityId === ev.sourceId);
+      const rig = this.rigOf(ev.sourceId);
       if (rig && rig.action === 'idle') {
         rig.swingAt = this.clock;
         rig.swingSide = rig.swingSide === 1 ? -1 : 1;
@@ -428,16 +447,31 @@ export class CouncilBodies {
 
   // ---- the scan: who wears which rig ---------------------------------------------------
 
+  /** The rig a council body wears, if any (an indexed loop). */
+  private rigOf(entityId: number): Rig | null {
+    if (entityId < 0) return null;
+    for (const r of this.rigs) if (r.entityId === entityId) return r;
+    return null;
+  }
+
+  private freeRig(kind: CouncilBodyKind): Rig | null {
+    for (const r of this.rigs) if (r.kind === kind && r.entityId < 0) return r;
+    return null;
+  }
+
   private scan(world: IWorld): void {
     for (const rig of this.rigs) {
       if (rig.entityId >= 0 && !world.entities.has(rig.entityId)) this.release(rig);
     }
+    // Outside the raid there is nobody to dress: no walk of the world.
+    const me = world.entities.get(world.playerId);
+    if (!me || !inSmithHeartClaim(me.pos.x, me.pos.z)) return;
     for (const e of world.entities.values()) {
       if (e.kind !== 'mob') continue;
       const kind = councilBodyKindOf(e.templateId);
       if (!kind) continue;
-      if (this.rigs.some((r) => r.entityId === e.id)) continue;
-      const rig = this.rigs.find((r) => r.kind === kind && r.entityId < 0);
+      if (this.rigOf(e.id)) continue;
+      const rig = this.freeRig(kind);
       if (!rig) continue;
       rig.entityId = e.id;
       rig.facing = e.facing;
@@ -493,24 +527,23 @@ export class CouncilBodies {
     rig.lastAction = action;
     rig.lastFill = k;
     const t = this.clock;
-    const breath = councilBreath(rig.kind, t);
+    const breath = councilBreath(rig.kind, t, _breath);
     let lean = 0;
     const J = rig.joints;
-    const put = (i: number, p: V3) => J[i].set(p.x, p.y, p.z);
-    put(0, councilJointPoint(plan, 'base', 0, breath.bob, breath.drift));
-    put(1, councilJointPoint(plan, 'hip', 0, breath.bob, breath.drift));
-    put(2, councilJointPoint(plan, 'torso', 0, breath.bob, breath.drift));
-    put(3, councilJointPoint(plan, 'head', 0, breath.bob, breath.drift));
-    put(4, councilJointPoint(plan, 'shoulder', 1, breath.bob, breath.drift));
-    put(5, councilJointPoint(plan, 'shoulder', -1, breath.bob, breath.drift));
+    putJoint(J[0], councilJointPoint(plan, 'base', 0, breath.bob, breath.drift, _jp));
+    putJoint(J[1], councilJointPoint(plan, 'hip', 0, breath.bob, breath.drift, _jp));
+    putJoint(J[2], councilJointPoint(plan, 'torso', 0, breath.bob, breath.drift, _jp));
+    putJoint(J[3], councilJointPoint(plan, 'head', 0, breath.bob, breath.drift, _jp));
+    putJoint(J[4], councilJointPoint(plan, 'shoulder', 1, breath.bob, breath.drift, _jp));
+    putJoint(J[5], councilJointPoint(plan, 'shoulder', -1, breath.bob, breath.drift, _jp));
     const lift = plan.hover + breath.bob;
-    for (const side of [1, -1] as const) {
+    for (let i = 0; i < SIDES.length; i++) {
+      const side = SIDES[i];
       const target = councilWristTarget(plan, action, side, k, rig.swingSide);
       lean += target.lean * 0.5;
       const arm = councilArm(plan, side, target.wrist);
-      const i = side === 1 ? 0 : 1;
-      put(6 + i, { x: arm.elbow.x, y: arm.elbow.y + lift, z: arm.elbow.z });
-      put(8 + i, { x: arm.wrist.x, y: arm.wrist.y + lift, z: arm.wrist.z });
+      J[6 + i].set(arm.elbow.x, arm.elbow.y + lift, arm.elbow.z);
+      J[8 + i].set(arm.wrist.x, arm.wrist.y + lift, arm.wrist.z);
     }
     // The upper body leans about the hip (the arms with it).
     const hipY = J[1].y;
@@ -525,10 +558,10 @@ export class CouncilBodies {
     _q2.setFromAxisAngle(_a.set(1, 0, 0), lean);
     for (const p of rig.pieces) this.posePiece(rig, p, breath.drift, t, _q2);
     this.poseThreads(rig, breath.drift, 1);
-    COUNCIL_EMBER_JOINTS.forEach((j, i) => {
+    for (let i = 0; i < COUNCIL_EMBER_JOINTS.length; i++) {
       rig.embers[i].visible = true;
-      rig.embers[i].position.copy(J[j]);
-    });
+      rig.embers[i].position.copy(J[COUNCIL_EMBER_JOINTS[i]]);
+    }
     this.glow(rig, action, k, t);
     this.cosmetics(rig, e, action, k, dt);
   }
@@ -575,8 +608,8 @@ export class CouncilBodies {
       }
       case 'skirt':
       case 'halo': {
-        const index = Number(def.id.replace(/\D+/g, '')) || 0;
-        const o = councilOrbitSlot(rig.plan, def.joint, index, t);
+        const index = p.orbit;
+        const o = councilOrbitSlot(rig.plan, def.joint, index, t, _orbit);
         p.pos.set(o.x, o.y + rig.plan.hover, o.z);
         if (def.joint === 'halo') {
           // The halo leans and turns with the upper body.
@@ -844,5 +877,10 @@ export class CouncilBodies {
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();
     for (const rig of this.rigs) rig.threads.dispose();
+    this.glowTex?.dispose();
   }
+}
+
+function putJoint(j: THREE.Vector3, p: V3): void {
+  j.set(p.x, p.y, p.z);
 }

@@ -10,9 +10,11 @@ import { TELEGRAPH_THREAT_COLORS } from '../src/render/floor_telegraph/telegraph
 import { CouncilFx } from '../src/render/smith_heart_fx/council_fx';
 import {
   COUNCIL_FX_COLORS,
+  COUNCIL_FX_POOLS,
   COUNCIL_MARK_SPECS,
   councilClaims,
   energyLook,
+  inheritArc,
   markFill,
   PILLAR_RISE_SECONDS,
   pillarFall,
@@ -79,6 +81,23 @@ describe('council_fx_core: integrity on the model', () => {
     expect(rockFall(0).height).toBeCloseTo(0);
     expect(energyLook(100).crackle).toBe(true);
     expect(energyLook(40).crackle).toBe(false);
+  });
+
+  it('sizes its pools from the tuning (no pillar or rubble left undrawn)', () => {
+    // Every standing pillar plus as many falling at once (a Wrath can break all).
+    expect(COUNCIL_FX_POOLS.pillars).toBeGreaterThanOrEqual(T.pillarCap * 2);
+    // Rubble lies rubbleSeconds: room for every pillar breaking inside it.
+    expect(COUNCIL_FX_POOLS.rubble).toBeGreaterThanOrEqual(T.pillarCap);
+  });
+
+  it('fills the per-frame scratch it is handed (the frame allocates nothing)', () => {
+    const out = { along: 0, lift: 0 };
+    expect(inheritArc(0.5, out)).toBe(out);
+    expect(out).toEqual(inheritArc(0.5));
+    const rise = { sunk: 0, shudder: 0 };
+    expect(pillarRise(0.3, rise)).toBe(rise);
+    expect(rise).toEqual(pillarRise(0.3));
+    expect(pillarLook(2)).toBe(pillarLook(2));
   });
 
   it("claims exactly the council's own cues", () => {

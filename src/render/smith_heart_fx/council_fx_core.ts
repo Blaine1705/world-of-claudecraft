@@ -10,6 +10,7 @@
 // Three-free, DOM-free, deterministic (a hash, never rng).
 
 import { SMITH_HEART_VEIN_COLORS } from '../../sim/content/smith_heart_layout';
+import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../sim/data';
 import {
   COUNCIL_AURAS,
   COUNCIL_CASTS,
@@ -61,10 +62,21 @@ export const COUNCIL_FX_COLORS = {
 } as const;
 
 /** The pools the painter keeps (fixed: no allocation in a fight). */
+/** Is this spot inside one of the Smith's Heart claims (the council's
+ *  painters walk the world only there)? */
+export function inSmithHeartClaim(x: number, z: number): boolean {
+  const def = DUNGEONS.smith_heart;
+  if (!def) return false;
+  const o = instanceOrigin(def.index, instanceSlotForZ(z));
+  return Math.abs(x - o.x) < 300 && Math.abs(z - o.z) < 260;
+}
+
 export const COUNCIL_FX_POOLS = {
-  pillars: 9,
+  /** Every standing pillar plus as many still falling (a Wrath can break all). */
+  pillars: T.pillarCap * 2,
   fallen: 4,
-  rubble: 4,
+  /** Rubble lies 8 s: room for every pillar breaking inside that window. */
+  rubble: T.pillarCap + 2,
   marks: 8,
   spots: 4,
   rocks: 2,
@@ -82,18 +94,40 @@ export const COUNCIL_FX_POOLS = {
  *  seams burn, how often grit trickles off it (a second), and whether its
  *  crown is split loose. */
 export interface PillarLook {
-  crack: number;
-  lean: number;
-  heat: number;
-  grit: number;
-  crownLoose: boolean;
+  readonly crack: number;
+  readonly lean: number;
+  readonly heat: number;
+  readonly grit: number;
+  readonly crownLoose: boolean;
 }
 
+const LOOK_WHOLE: PillarLook = Object.freeze({
+  crack: 0,
+  lean: 0,
+  heat: 0,
+  grit: 0,
+  crownLoose: false,
+});
+const LOOK_CRACKED: PillarLook = Object.freeze({
+  crack: 0.55,
+  lean: 0.035,
+  heat: 0.45,
+  grit: 1.5,
+  crownLoose: false,
+});
+const LOOK_FAILING: PillarLook = Object.freeze({
+  crack: 1,
+  lean: 0.085,
+  heat: 1,
+  grit: 5,
+  crownLoose: true,
+});
+
+/** One of three shared frozen looks (read every frame, never allocated). */
 export function pillarLook(integrity: number): PillarLook {
-  if (integrity >= 3) return { crack: 0, lean: 0, heat: 0, grit: 0, crownLoose: false };
-  if (integrity === 2)
-    return { crack: 0.55, lean: 0.035, heat: 0.45, grit: 1.5, crownLoose: false };
-  return { crack: 1, lean: 0.085, heat: 1, grit: 5, crownLoose: true };
+  if (integrity >= 3) return LOOK_WHOLE;
+  if (integrity === 2) return LOOK_CRACKED;
+  return LOOK_FAILING;
 }
 
 /** The side a pillar leans toward (sim yaw), fixed per entity. */
@@ -107,13 +141,22 @@ export const PILLAR_RISE_SECONDS = 0.75;
 /** A rising pillar `age` seconds in: how far it still stands below its rest
  *  (a share of its height, 1 sunk to 0 risen, overshooting a breath), and its
  *  shudder (yards of jitter). */
-export function pillarRise(age: number): { sunk: number; shudder: number } {
-  if (age <= 0) return { sunk: 1, shudder: 0.12 };
+export function pillarRise(
+  age: number,
+  out: { sunk: number; shudder: number } = { sunk: 0, shudder: 0 },
+): { sunk: number; shudder: number } {
+  if (age <= 0) {
+    out.sunk = 1;
+    out.shudder = 0.12;
+    return out;
+  }
   const t = Math.min(1, age / PILLAR_RISE_SECONDS);
   // Fast out of the floor, a breath of overshoot, settle.
   const ease = 1 - (1 - t) ** 3;
   const over = t < 1 ? Math.sin(t * Math.PI) * 0.04 : 0;
-  return { sunk: Math.max(-0.03, 1 - ease - over), shudder: (1 - t) * 0.12 };
+  out.sunk = Math.max(-0.03, 1 - ease - over);
+  out.shudder = (1 - t) * 0.12;
+  return out;
 }
 
 /** Seconds a fallen pillar takes to tip and break, and the crumble after. */
@@ -146,11 +189,21 @@ export function crackFlash(age: number): number {
 
 /** How hard a pillar shakes while a Resonance is cracking it (`share` of
  *  the 3 s stood, 0 to 1): yards of jitter and the seams' extra heat. */
-export function resonanceShake(share: number, clock: number): { jitter: number; heat: number } {
+export function resonanceShake(
+  share: number,
+  clock: number,
+  out: { jitter: number; heat: number } = { jitter: 0, heat: 0 },
+): { jitter: number; heat: number } {
   const s = Math.max(0, Math.min(1, share));
-  if (s <= 0) return { jitter: 0, heat: 0 };
+  if (s <= 0) {
+    out.jitter = 0;
+    out.heat = 0;
+    return out;
+  }
   const hum = 0.5 + 0.5 * Math.sin(clock * (18 + s * 22));
-  return { jitter: 0.02 + s * 0.06 * hum, heat: 0.35 + s * 0.65 * hum };
+  out.jitter = 0.02 + s * 0.06 * hum;
+  out.heat = 0.35 + s * 0.65 * hum;
+  return out;
 }
 
 // ---- the marks ---------------------------------------------------------------------------
@@ -232,9 +285,14 @@ export function pulseRadius(pillarR: number): number {
 /** The stream of stone light from a fallen member to a survivor: seconds it
  *  takes, and where a mote rides along it at `t` (0 to 1) with a lift. */
 export const INHERIT_SECONDS = 2.2;
-export function inheritArc(t: number): { along: number; lift: number } {
+export function inheritArc(
+  t: number,
+  out: { along: number; lift: number } = { along: 0, lift: 0 },
+): { along: number; lift: number } {
   const u = Math.max(0, Math.min(1, t));
-  return { along: u * u * (3 - 2 * u), lift: Math.sin(u * Math.PI) * 6 };
+  out.along = u * u * (3 - 2 * u);
+  out.lift = Math.sin(u * Math.PI) * 6;
+  return out;
 }
 
 /** The Wrath holder's gathering energy (0 to 100): its glow round the body

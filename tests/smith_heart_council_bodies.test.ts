@@ -30,6 +30,7 @@ import {
   councilWristTarget,
 } from '../src/render/smith_heart_fx/council_bodies_core';
 import { SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
+import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import type { Entity, SimEvent } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
 
@@ -167,14 +168,16 @@ describe('council_bodies_core: the poses', () => {
 });
 
 describe('CouncilBodies', () => {
+  // The Quarry's claim (the painter dresses bodies only inside the raid).
+  const o = instanceOrigin(DUNGEONS.smith_heart.index, 0);
   function body(id: number, templateId: string, x: number): Entity {
     return {
       id,
       kind: 'mob',
       templateId,
       name: templateId,
-      pos: { x, y: 0, z: 0 },
-      prevPos: { x, y: 0, z: 0 },
+      pos: { x: o.x + x, y: 0, z: o.z },
+      prevPos: { x: o.x + x, y: 0, z: o.z },
       facing: 0.4,
       scale: 1,
       hp: 100,
@@ -215,6 +218,14 @@ describe('CouncilBodies', () => {
       root?.children.filter((c) => c.name.startsWith('smithHeartCouncilBody:') && c.visible)
         .length ?? 0;
     expect(shown()).toBe(2);
+    // Outside the raid nobody new is dressed (no walk of the open world).
+    const away = body(9, 'heart_slabwright', 30);
+    entities.set(away.id, away);
+    me.pos = { x: 0, y: 0, z: 0 };
+    fx.update(0.2);
+    expect(shown()).toBe(2);
+    entities.delete(away.id);
+    me.pos = { x: o.x - 10, y: 0, z: o.z };
     // A swing, a raise ending in the slam, a song.
     const swing = {
       type: 'damage',

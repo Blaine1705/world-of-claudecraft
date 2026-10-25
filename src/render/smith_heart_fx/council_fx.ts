@@ -35,9 +35,8 @@
 
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
-import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../sim/data';
 import { COUNCIL_TUNING as T } from '../../sim/encounters/smith_heart/council_ids';
-import type { Entity, SimEvent } from '../../sim/types';
+import type { Aura, Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { type TelegraphFan, TelegraphKit } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
@@ -49,6 +48,7 @@ import {
   ensureHeartKit,
   heartKitLoaded,
   heartKitMeshes,
+  heartKitProgramWarmers,
   SMITH_HEART_HAMMER_KIT_URL,
   SMITH_HEART_HEART_KIT_URL,
   SMITH_HEART_ROCK_KIT_URL,
@@ -70,6 +70,7 @@ import {
   energyLook,
   INHERIT_SECONDS,
   inheritArc,
+  inSmithHeartClaim,
   markFill,
   COUNCIL_FX_POOLS as POOLS,
   RISE_SPOT_SPEC,
@@ -82,7 +83,6 @@ import { type CouncilFxHost, CouncilPillarsFx, RISEN_HEIGHT } from './council_pi
 import { chunkGeometry, Rubble } from './hammer_fx';
 
 const SCAN_SEC = 0.1;
-const SMITH_HEART = 'smith_heart';
 // ---- a soft additive band (the ghost pillar, Resonance, the threads) -----------------------
 
 const BAND_VERT = /* glsl */ `
@@ -145,6 +145,9 @@ interface MarkSlot {
   ghost: THREE.Mesh;
   ghostMat: THREE.ShaderMaterial;
   seen: boolean;
+  /** Where the fan was last draped (NaN: not yet). */
+  drapedX: number;
+  drapedZ: number;
 }
 
 interface SpotSlot {
@@ -215,6 +218,63 @@ const _v2 = new THREE.Vector3();
 const _m = new THREE.Matrix4();
 const _s = new THREE.Vector3();
 const _id = new THREE.Quaternion();
+/** Per-frame scratch (the frame allocates nothing). */
+const _paint = { fill: 0, clock: 0, range: 0 };
+const _arc = { along: 0, lift: 0 };
+const _moteColor: [number, number, number] = [1, 0.8, 0.36];
+const _moteDir: [number, number, number] = [0, 1, 0];
+const MOTE_GATHER = [1, 0.82, 0.4] as const;
+const _markMote = {
+  speed: 0,
+  up: 0,
+  life: 0.9,
+  size: [0.3, 0.1] as const,
+  color: _moteColor as readonly [number, number, number],
+  alpha: 0.85,
+  pool: 'glow' as const,
+  dir: _moteDir as readonly [number, number, number],
+  spread: 0.2,
+};
+const _beadMote = {
+  speed: 0.6,
+  life: 0.6,
+  size: [0.6, 0.15] as const,
+  color: _moteColor as readonly [number, number, number],
+  alpha: 0.95,
+  pool: 'glow' as const,
+};
+const _ember = {
+  speed: 0.6,
+  up: 0,
+  life: 1,
+  size: [0.3, 0.08] as const,
+  color: _moteColor as readonly [number, number, number],
+  alpha: 0.9,
+  pool: 'glow' as const,
+};
+const ROCK_GRIT = {
+  speed: 0.5,
+  life: 0.7,
+  size: [0.8, 2.2] as const,
+  color: C.dust,
+  alpha: 0.45,
+};
+
+/** An entity's aura by id (an indexed loop: no closure a frame). */
+function auraById(e: Entity | undefined, id: string): Aura | undefined {
+  if (!e) return undefined;
+  const auras = e.auras;
+  for (let i = 0; i < auras.length; i++) if (auras[i].id === id) return auras[i];
+  return undefined;
+}
+
+/** The one reused paint of a fan (fill, clock, range). */
+function paint(fill: number, clock: number, range: number): typeof _paint {
+  _paint.fill = fill;
+  _paint.clock = clock;
+  _paint.range = range;
+  return _paint;
+}
 /** Beads in one inheritance stream. */
 const BEADS = 26;
 
@@ -246,6 +306,7 @@ export class CouncilFx {
   /** The inheritance's beads of stone light (one instanced draw). */
   private readonly beads: THREE.InstancedMesh;
   private haloHolder = -1;
+  private readonly glowTex: THREE.Texture | null;
   private seed = 0x3c11;
   private scanTimer = 0;
   private clock = 0;
@@ -356,6 +417,8 @@ export class CouncilFx {
         ghost,
         ghostMat: gm,
         seen: false,
+        drapedX: Number.NaN,
+        drapedZ: Number.NaN,
       });
     }
     for (let i = 0; i < POOLS.spots; i++) {
@@ -505,6 +568,7 @@ export class CouncilFx {
     }
     // ---- the Wrath holder's gathering energy ----
     const glowTex = hasDom ? radialGlowTexture() : null;
+    this.glowTex = glowTex;
     this.haloMat = new THREE.SpriteMaterial({
       map: glowTex,
       color: 0xffb860,
@@ -549,6 +613,9 @@ export class CouncilFx {
     for (let i = 0; i < POOLS.streams * BEADS; i++)
       this.beads.setMatrixAt(i, _m.makeScale(0, 0, 0));
     this.root.add(this.beads);
+    // The kit's slot programs, so a council piece that shows before the
+    // interior's gate settles links nothing in a live frame.
+    this.root.add(heartKitProgramWarmers());
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
       .then(() => {})
       .catch(() => {});
@@ -635,11 +702,7 @@ export class CouncilFx {
   /** In the Smith's Heart at all (one cheap read of the local player). */
   private inRaid(world: IWorld): boolean {
     const me = world.entities.get(world.playerId);
-    if (!me) return false;
-    const def = DUNGEONS[SMITH_HEART];
-    if (!def) return false;
-    const o = instanceOrigin(def.index, instanceSlotForZ(me.pos.z));
-    return Math.abs(me.pos.x - o.x) < 300 && Math.abs(me.pos.z - o.z) < 260;
+    return !!me && inSmithHeartClaim(me.pos.x, me.pos.z);
   }
 
   private scan(world: IWorld): void {
@@ -651,8 +714,22 @@ export class CouncilFx {
     for (const r of this.rings) r.seen = false;
     for (const w of this.weights) w.seen = false;
     for (const sp of this.spots) sp.seen = false;
+    // The Wrath holder (the member whose energy is not empty), found here at
+    // the scan's pace, never by a walk a frame.
+    let holder = -1;
     if (here) {
       for (const e of world.entities.values()) {
+        if (e.kind === 'mob') {
+          if (
+            holder < 0 &&
+            !e.dead &&
+            e.resourceType === 'energy' &&
+            e.resource > 0 &&
+            councilRoleOf(e.templateId) !== null
+          )
+            holder = e.id;
+          continue;
+        }
         if (e.kind === 'object') {
           const pillar = councilPillarOf(e.templateId);
           if (pillar) this.pillarsFx.seePillar(e, pillar.integrity, pillar.risen);
@@ -670,6 +747,7 @@ export class CouncilFx {
         }
       }
     }
+    this.haloHolder = holder;
     // What the scan no longer saw.
     this.pillarsFx.endScan();
     for (const m of this.marks) {
@@ -709,13 +787,11 @@ export class CouncilFx {
     for (const r of this.rings) {
       if (r.playerId < 0) continue;
       const p = world.entities.get(r.playerId);
-      const a = p?.auras.find((x) => x.id === COUNCIL_AURAS.resonance);
+      const a = auraById(p, COUNCIL_AURAS.resonance);
       if (!a?.value2 || a.value <= 0) continue;
       humming.set(a.value2, Math.max(humming.get(a.value2) ?? 0, a.value));
     }
   }
-
-  // ---- the rubble ---------------------------------------------------------------------------
 
   // ---- the marks ----------------------------------------------------------------------------
 
@@ -739,6 +815,8 @@ export class CouncilFx {
 
   private freeMark(m: MarkSlot): void {
     m.key = '';
+    m.drapedX = Number.NaN;
+    m.drapedZ = Number.NaN;
     m.playerId = -1;
     m.fan.group.visible = false;
     m.ghost.visible = false;
@@ -748,13 +826,18 @@ export class CouncilFx {
     for (const m of this.marks) {
       if (m.playerId < 0) continue;
       const p = world.entities.get(m.playerId);
-      const a = p?.auras.find((x) => x.id === m.auraId);
+      const a = auraById(p, m.auraId);
       if (!p || !a) continue;
       const spec = COUNCIL_MARK_SPECS[m.auraId];
       const fill = markFill(a.remaining, a.duration);
       const y = this.groundY(p.pos.x, p.pos.z);
-      this.kit.drapeFan(m.fan, this.groundY, p.pos.x, y, p.pos.z, 0, spec.radius);
-      this.kit.paintFan(m.fan, { fill, clock: this.clock, range: spec.radius });
+      // Re-drape over the floor only once the player has moved.
+      if (!(Math.abs(p.pos.x - m.drapedX) <= 0.05 && Math.abs(p.pos.z - m.drapedZ) <= 0.05)) {
+        this.kit.drapeFan(m.fan, this.groundY, p.pos.x, y, p.pos.z, 0, spec.radius);
+        m.drapedX = p.pos.x;
+        m.drapedZ = p.pos.z;
+      }
+      this.kit.paintFan(m.fan, paint(fill, this.clock, spec.radius));
       if (m.ghost.visible) {
         const g = wakeGhost(fill);
         m.ghost.position.set(p.pos.x, y, p.pos.z);
@@ -765,17 +848,17 @@ export class CouncilFx {
       if (this.density > 0.5 && this.rand() < 0.4) {
         const ang = this.rand() * Math.PI * 2;
         const r = spec.radius * (0.9 + this.rand() * 0.1);
-        this.particles.puff(p.pos.x + Math.sin(ang) * r, y + 0.2, p.pos.z + Math.cos(ang) * r, 1, {
-          speed: spec.gather ? 2.4 : 0.6,
-          up: spec.gather ? 0.6 : 1.8,
-          life: 0.9,
-          size: [0.3, 0.1],
-          color: spec.gather ? [1, 0.82, 0.4] : C.flash,
-          alpha: 0.85,
-          pool: 'glow',
-          dir: spec.gather ? [-Math.sin(ang), 0, -Math.cos(ang)] : [0, 1, 0],
-          spread: 0.2,
-        });
+        _markMote.speed = spec.gather ? 2.4 : 0.6;
+        _markMote.up = spec.gather ? 0.6 : 1.8;
+        const tint = spec.gather ? MOTE_GATHER : C.flash;
+        _moteColor[0] = tint[0];
+        _moteColor[1] = tint[1];
+        _moteColor[2] = tint[2];
+        _moteDir[0] = spec.gather ? -Math.sin(ang) : 0;
+        _moteDir[1] = spec.gather ? 0 : 1;
+        _moteDir[2] = spec.gather ? -Math.cos(ang) : 0;
+        const mx = p.pos.x + Math.sin(ang) * r;
+        this.particles.puff(mx, y + 0.2, p.pos.z + Math.cos(ang) * r, 1, _markMote);
       }
     }
   }
@@ -801,7 +884,7 @@ export class CouncilFx {
     for (const sp of this.spots) {
       if (sp.id < 0) continue;
       const fill = Math.min(1, (this.clock - sp.born) / RISE_SPOT_SPEC.seconds);
-      this.kit.paintFan(sp.fan, { fill, clock: this.clock, range: RISE_SPOT_SPEC.radius });
+      this.kit.paintFan(sp.fan, paint(fill, this.clock, RISE_SPOT_SPEC.radius));
       const g = wakeGhost(fill);
       sp.ghost.position.set(sp.x, sp.y, sp.z);
       sp.ghost.scale.set(T.risenR, RISEN_HEIGHT * g.height, T.risenR);
@@ -815,14 +898,15 @@ export class CouncilFx {
       r = this.rocks.find((q) => q.playerId < 0);
       if (!r) return;
       r.playerId = e.id;
-      if (r.mesh.children.length === 0 && heartKitLoaded(SMITH_HEART_ROCK_KIT_URL)) {
-        const b = heartKitMeshes(SMITH_HEART_ROCK_KIT_URL, 'Kit_BoulderA');
-        if (b) {
-          const box = this.pillarsFx.boxOf(SMITH_HEART_ROCK_KIT_URL, 'Kit_BoulderA');
-          const size = box ? Math.max(box.max.x - box.min.x, box.max.z - box.min.z) : 4;
-          b.scale.setScalar(3.4 / Math.max(0.1, size));
-          r.mesh.add(b);
-        }
+    }
+    // Dressed on any scan the kit is in (it may land after the mark).
+    if (r.mesh.children.length === 0 && heartKitLoaded(SMITH_HEART_ROCK_KIT_URL)) {
+      const b = heartKitMeshes(SMITH_HEART_ROCK_KIT_URL, 'Kit_BoulderA');
+      if (b) {
+        const box = this.pillarsFx.boxOf(SMITH_HEART_ROCK_KIT_URL, 'Kit_BoulderA');
+        const size = box ? Math.max(box.max.x - box.min.x, box.max.z - box.min.z) : 4;
+        b.scale.setScalar(3.4 / Math.max(0.1, size));
+        r.mesh.add(b);
       }
     }
     r.seen = true;
@@ -832,7 +916,7 @@ export class CouncilFx {
     for (const r of this.rocks) {
       if (r.playerId < 0) continue;
       const p = world.entities.get(r.playerId);
-      const a = p?.auras.find((x) => x.id === COUNCIL_AURAS.rockMark);
+      const a = auraById(p, COUNCIL_AURAS.rockMark);
       if (!p || !a) {
         r.mesh.visible = false;
         continue;
@@ -845,13 +929,13 @@ export class CouncilFx {
       r.mesh.quaternion.setFromAxisAngle(r.spinAxis, fall.spin);
       // A trail of grit off the falling stone.
       if (this.density > 0.5 && this.rand() < 0.6)
-        this.particles.puff(r.mesh.position.x, r.mesh.position.y + 1, r.mesh.position.z, 1, {
-          speed: 0.5,
-          life: 0.7,
-          size: [0.8, 2.2],
-          color: C.dust,
-          alpha: 0.45,
-        });
+        this.particles.puff(
+          r.mesh.position.x,
+          r.mesh.position.y + 1,
+          r.mesh.position.z,
+          1,
+          ROCK_GRIT,
+        );
     }
   }
 
@@ -920,7 +1004,7 @@ export class CouncilFx {
     for (const r of this.rings) {
       if (r.playerId < 0) continue;
       const p = world.entities.get(r.playerId);
-      const a = p?.auras.find((x) => x.id === COUNCIL_AURAS.resonance);
+      const a = auraById(p, COUNCIL_AURAS.resonance);
       if (!p || !a) continue;
       const cracking = a.value > 0 && !!a.value2;
       const look = resonanceRing(this.clock, cracking);
@@ -955,16 +1039,17 @@ export class CouncilFx {
       if (!w) return;
       w.playerId = e.id;
       w.ring.visible = true;
-      if (!w.stone && heartKitLoaded(SMITH_HEART_HAMMER_KIT_URL)) {
-        const s = heartKitMeshes(SMITH_HEART_HAMMER_KIT_URL, 'Kit_SlabChunkB');
-        if (s) {
-          s.scale.setScalar(0.9);
-          for (const c of s.children) if (c instanceof THREE.Mesh) c.castShadow = false;
-          this.root.add(s);
-          w.stone = s;
-        }
-      }
       if (w.stone) w.stone.visible = true;
+    }
+    // Dressed on any scan the kit is in (it may land after the mark).
+    if (!w.stone && heartKitLoaded(SMITH_HEART_HAMMER_KIT_URL)) {
+      const s = heartKitMeshes(SMITH_HEART_HAMMER_KIT_URL, 'Kit_SlabChunkB');
+      if (s) {
+        s.scale.setScalar(0.9);
+        for (const c of s.children) if (c instanceof THREE.Mesh) c.castShadow = false;
+        this.root.add(s);
+        w.stone = s;
+      }
     }
     w.seen = true;
   }
@@ -973,7 +1058,7 @@ export class CouncilFx {
     for (const w of this.weights) {
       if (w.playerId < 0) continue;
       const p = world.entities.get(w.playerId);
-      const a = p?.auras.find((x) => x.id === COUNCIL_AURAS.weight);
+      const a = auraById(p, COUNCIL_AURAS.weight);
       if (!p || !a) continue;
       const y = this.groundY(p.pos.x, p.pos.z);
       w.ring.position.set(p.pos.x, y + 0.1, p.pos.z);
@@ -1149,7 +1234,8 @@ export class CouncilFx {
 
   private updateStreams(world: IWorld, dt: number): void {
     let any = false;
-    this.streams.forEach((s, k) => {
+    for (let k = 0; k < this.streams.length; k++) {
+      const s = this.streams[k];
       const base = k * BEADS;
       const age = this.clock - s.born;
       const target = s.alive ? world.entities.get(s.targetId) : undefined;
@@ -1171,7 +1257,7 @@ export class CouncilFx {
         }
         s.alive = false;
         for (let i = 0; i < BEADS; i++) this.beads.setMatrixAt(base + i, _m.makeScale(0, 0, 0));
-        return;
+        continue;
       }
       any = true;
       _v2.set(target.pos.x, this.groundY(target.pos.x, target.pos.z) + 3, target.pos.z);
@@ -1185,7 +1271,7 @@ export class CouncilFx {
           this.beads.setMatrixAt(base + i, _m.makeScale(0, 0, 0));
           continue;
         }
-        const arc = inheritArc(u);
+        const arc = inheritArc(u, _arc);
         _v.lerpVectors(s.from, _v2, arc.along);
         _v.y += arc.lift + Math.sin(this.clock * 9 + i) * 0.15;
         const size = (1.9 - (i / BEADS) * 1.3) * (0.85 + 0.15 * Math.sin(this.clock * 14 + i));
@@ -1195,19 +1281,15 @@ export class CouncilFx {
       s.acc += dt * 30 * this.density;
       while (s.acc >= 1) {
         s.acc -= 1;
-        const arc = inheritArc(Math.min(1, Math.max(0, head - this.rand() * 0.4)));
+        const arc = inheritArc(Math.min(1, Math.max(0, head - this.rand() * 0.4)), _arc);
         _v.lerpVectors(s.from, _v2, arc.along);
         _v.y += arc.lift;
-        this.particles.puff(_v.x, _v.y, _v.z, 1, {
-          speed: 0.6,
-          life: 0.6,
-          size: [0.6, 0.15],
-          color: [1, 0.72 + this.rand() * 0.2, 0.36],
-          alpha: 0.95,
-          pool: 'glow',
-        });
+        _moteColor[0] = 1;
+        _moteColor[1] = 0.72 + this.rand() * 0.2;
+        _moteColor[2] = 0.36;
+        this.particles.puff(_v.x, _v.y, _v.z, 1, _beadMote);
       }
-    });
+    }
     this.beads.visible = any;
     if (any) this.beads.instanceMatrix.needsUpdate = true;
   }
@@ -1215,17 +1297,7 @@ export class CouncilFx {
   // ---- the energy -----------------------------------------------------------------------------------
 
   private updateEnergy(world: IWorld, dt: number): void {
-    // The holder: the council member whose energy bar is not empty.
-    if (this.scanTimer === SCAN_SEC || this.haloHolder < 0) {
-      this.haloHolder = -1;
-      for (const e of world.entities.values()) {
-        if (e.kind !== 'mob' || e.dead || councilRoleOf(e.templateId) === null) continue;
-        if (e.resourceType === 'energy' && e.resource > 0) {
-          this.haloHolder = e.id;
-          break;
-        }
-      }
-    }
+    // The holder comes from the scan; the frame only re-reads that one body.
     const e = this.haloHolder >= 0 ? world.entities.get(this.haloHolder) : undefined;
     if (!e || e.dead || e.resource <= 0) {
       this.halo.visible = false;
@@ -1253,15 +1325,11 @@ export class CouncilFx {
     if (this.rand() < dt * look.embers * this.density) {
       const a = this.rand() * Math.PI * 2;
       const r = 1 + this.rand() * 2.5;
-      this.particles.puff(e.pos.x + Math.sin(a) * r, y + 0.4, e.pos.z + Math.cos(a) * r, 1, {
-        speed: 0.6,
-        up: 2.4 + look.glow * 3,
-        life: 1,
-        size: [0.3, 0.08],
-        color: look.crackle ? [1, 0.92, 0.7] : [1, 0.7, 0.32],
-        alpha: 0.9,
-        pool: 'glow',
-      });
+      _ember.up = 2.4 + look.glow * 3;
+      _moteColor[0] = 1;
+      _moteColor[1] = look.crackle ? 0.92 : 0.7;
+      _moteColor[2] = look.crackle ? 0.7 : 0.32;
+      this.particles.puff(e.pos.x + Math.sin(a) * r, y + 0.4, e.pos.z + Math.cos(a) * r, 1, _ember);
     }
   }
 
@@ -1274,5 +1342,7 @@ export class CouncilFx {
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();
     this.debris.mesh.dispose();
+    this.beads.dispose();
+    this.glowTex?.dispose();
   }
 }

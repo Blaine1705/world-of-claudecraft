@@ -51,6 +51,19 @@ const RISEN_RADIUS = 2.05;
 /** How far a crack shell stands off its pillar's surface (yards). */
 const SHELL_PUSH = 0.045;
 
+/** Per-frame scratch (the frame allocates nothing). */
+const _rise = { sunk: 0, shudder: 0 };
+const _hum = { jitter: 0, heat: 0 };
+const _rubblePaint = { fill: 1, clock: 0, range: 0, fade: 0.85 };
+const PILLAR_GRIT = {
+  speed: 0.3,
+  life: 1.8,
+  size: [0.4, 1.2] as const,
+  color: C.dust,
+  alpha: 0.4,
+  gravity: 6,
+};
+
 const rgb = (c: readonly [number, number, number]) => new THREE.Color(c[0], c[1], c[2]);
 
 /** What CouncilFx lends its parts: the root, the shared pools, the clock. */
@@ -196,6 +209,9 @@ interface RubbleSlot {
   id: number;
   group: THREE.Group;
   pieces: THREE.Group | null;
+  /** Which kit pieces the pile already carries (a kit can land late). */
+  hasScatter: boolean;
+  hasPile: boolean;
   fan: TelegraphFan;
   r: number;
   x: number;
@@ -327,7 +343,19 @@ export class CouncilPillarsFx {
       const fan = this.h.kit.fan(12);
       this.h.kit.layOutFan(fan, 360, { color: C.danger, accent: C.ochre });
       fan.group.visible = false;
-      this.rubble.push({ id: -1, group, pieces: null, fan, r: 3, x: 0, y: 0, z: 0, seenAt: -99 });
+      this.rubble.push({
+        id: -1,
+        group,
+        pieces: null,
+        hasScatter: false,
+        hasPile: false,
+        fan,
+        r: 3,
+        x: 0,
+        y: 0,
+        z: 0,
+        seenAt: -99,
+      });
     }
   }
 
@@ -680,10 +708,10 @@ export class CouncilPillarsFx {
       let jitter = 0;
       let tip = 0;
       if (s.state === 'standing') {
-        const rise = pillarRise(this.h.now() - s.riseAt);
+        const rise = pillarRise(this.h.now() - s.riseAt, _rise);
         sunk = rise.sunk;
         jitter = rise.shudder;
-        const hum = resonanceShake(this.humming.get(s.id) ?? 0, this.h.now());
+        const hum = resonanceShake(this.humming.get(s.id) ?? 0, this.h.now(), _hum);
         jitter += hum.jitter;
         const flash = crackFlash(this.h.now() - s.crackAt);
         const humShare = this.humming.get(s.id) ?? 0;
@@ -709,7 +737,7 @@ export class CouncilPillarsFx {
               s.y + s.height * (0.5 + this.h.rand() * 0.45),
               s.z + Math.cos(a) * s.radius,
               1,
-              { speed: 0.3, life: 1.8, size: [0.4, 1.2], color: C.dust, alpha: 0.4, gravity: 6 },
+              PILLAR_GRIT,
             );
           }
         }
@@ -735,6 +763,8 @@ export class CouncilPillarsFx {
         }
       }
       s.lean.rotation.x = look.lean + tip;
+      // Reduced motion keeps the lean and the sink, never the shudder.
+      if (this.h.reducedMotion()) jitter = 0;
       s.leanYaw.position.set(
         jitter ? (this.h.rand() - 0.5) * 2 * jitter : 0,
         -sunk * s.height,
@@ -765,23 +795,32 @@ export class CouncilPillarsFx {
       r.group.visible = true;
       r.fan.group.visible = true;
       this.h.kit.drapeFan(r.fan, this.h.groundY, r.x, r.y, r.z, 0, r.r);
-      if (!r.pieces && heartKitLoaded(SMITH_HEART_HEART_KIT_URL)) {
-        const scatter = heartKitMeshes(SMITH_HEART_HEART_KIT_URL, 'Kit_RubbleScatter');
-        const pile = heartKitLoaded(SMITH_HEART_HAMMER_KIT_URL)
-          ? heartKitMeshes(SMITH_HEART_HAMMER_KIT_URL, 'Kit_RubblePile')
-          : null;
-        const g = new THREE.Group();
-        if (scatter) g.add(scatter);
-        if (pile) {
-          pile.position.set(0.6, 0, -0.4);
-          g.add(pile);
-        }
-        r.pieces = g;
-        r.group.add(g);
-      }
-      if (r.pieces) r.pieces.scale.setScalar(Math.max(0.6, r.r / 3.4));
     }
+    // Dressed on every scan until both kits have given their piece (a kit
+    // that lands after the pile was first seen still fills it in).
+    if (!r.hasScatter || !r.hasPile) this.dressRubble(r);
+    if (r.pieces) r.pieces.scale.setScalar(Math.max(0.6, r.r / 3.4));
     r.seenAt = this.h.now();
+  }
+
+  private dressRubble(r: RubbleSlot): void {
+    if (!r.pieces) {
+      r.pieces = new THREE.Group();
+      r.group.add(r.pieces);
+    }
+    if (!r.hasScatter && heartKitLoaded(SMITH_HEART_HEART_KIT_URL)) {
+      const scatter = heartKitMeshes(SMITH_HEART_HEART_KIT_URL, 'Kit_RubbleScatter');
+      if (scatter) r.pieces.add(scatter);
+      r.hasScatter = true;
+    }
+    if (!r.hasPile && heartKitLoaded(SMITH_HEART_HAMMER_KIT_URL)) {
+      const pile = heartKitMeshes(SMITH_HEART_HAMMER_KIT_URL, 'Kit_RubblePile');
+      if (pile) {
+        pile.position.set(0.6, 0, -0.4);
+        r.pieces.add(pile);
+      }
+      r.hasPile = true;
+    }
   }
 
   private dropRubble(r: RubbleSlot): void {
@@ -802,7 +841,9 @@ export class CouncilPillarsFx {
     for (const r of this.rubble) {
       if (r.id < 0) continue;
       // A standing hazard: the footprint full, its warning breathing.
-      this.h.kit.paintFan(r.fan, { fill: 1, clock: this.h.now(), range: r.r, fade: 0.85 });
+      _rubblePaint.clock = this.h.now();
+      _rubblePaint.range = r.r;
+      this.h.kit.paintFan(r.fan, _rubblePaint);
     }
   }
 }

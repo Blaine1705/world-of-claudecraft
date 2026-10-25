@@ -474,10 +474,19 @@ export const COUNCIL_SWING_SECONDS = 0.8;
 /** The body's slow breath: its bob (yards), how far pieces drift off their
  *  joints, and the threads' stretch, by render time. The Singer sways more
  *  and slower; the Slabwright barely lifts. */
-export function councilBreath(kind: CouncilBodyKind, t: number): { bob: number; drift: number } {
-  if (kind === 'singer')
-    return { bob: 0.12 * Math.sin(t * 0.8), drift: 0.06 + 0.04 * Math.sin(t * 1.1 + 0.6) };
-  return { bob: 0.06 * Math.sin(t * 1.1), drift: 0.05 + 0.03 * Math.sin(t * 1.4 + 0.3) };
+export function councilBreath(
+  kind: CouncilBodyKind,
+  t: number,
+  out: { bob: number; drift: number } = { bob: 0, drift: 0 },
+): { bob: number; drift: number } {
+  if (kind === 'singer') {
+    out.bob = 0.12 * Math.sin(t * 0.8);
+    out.drift = 0.06 + 0.04 * Math.sin(t * 1.1 + 0.6);
+  } else {
+    out.bob = 0.06 * Math.sin(t * 1.1);
+    out.drift = 0.05 + 0.03 * Math.sin(t * 1.4 + 0.3);
+  }
+  return out;
 }
 
 const lerp3 = (a: V3, b: V3, t: number): V3 => ({
@@ -596,11 +605,15 @@ export function councilOrbitSlot(
   joint: 'skirt' | 'halo',
   index: number,
   t: number,
+  out: V3 = { x: 0, y: 0, z: 0 },
 ): V3 {
   const o = joint === 'skirt' ? plan.skirt : plan.halo;
   const n = Math.max(1, o.count);
   const a = (index / n) * Math.PI * 2 + t * o.spin;
-  return v(Math.sin(a) * o.r, o.y + 0.18 * Math.sin(t * 1.3 + index * 1.9), Math.cos(a) * o.r);
+  out.x = Math.sin(a) * o.r;
+  out.y = o.y + 0.18 * Math.sin(t * 1.3 + index * 1.9);
+  out.z = Math.cos(a) * o.r;
+  return out;
 }
 
 // ---- the fall --------------------------------------------------------------------------------
@@ -658,12 +671,16 @@ export function councilJointPoint(
   side: -1 | 0 | 1,
   bob: number,
   drift: number,
+  out: V3 = { x: 0, y: 0, z: 0 },
 ): V3 {
   const s = plan.slots[joint];
   const lift = joint === 'base' ? 0.4 : joint === 'hip' ? 0.7 : 1;
-  const out = joint === 'shoulder' ? drift : 0;
+  const spread = joint === 'shoulder' ? drift : 0;
   const up = joint === 'head' ? drift * 1.5 : joint === 'torso' ? drift * 0.5 : 0;
-  return v(side === 0 ? s.x : side * (s.x + out), s.y + plan.hover + bob * lift + up, s.z);
+  out.x = side === 0 ? s.x : side * (s.x + spread);
+  out.y = s.y + plan.hover + bob * lift + up;
+  out.z = s.z;
+  return out;
 }
 
 /** The top of the plan's highest fixed piece (its crown), body frame. */

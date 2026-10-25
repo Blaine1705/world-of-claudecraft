@@ -120,7 +120,8 @@ export class EngineWalls {
       this.shellGeo.set(templateId, shell);
       this.geometries.push(body, shell);
     }
-    const first = Object.keys(COMBAT_WALL_SHAPES)[0];
+    // The pool starts on the first slab shape it draws (never an own-look row).
+    const first = this.bodyGeo.keys().next().value ?? '';
     const bodyMat = surfaceMat({
       color: 0xffffff,
       vertexColors: true,
