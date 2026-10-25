@@ -352,6 +352,7 @@ export class FinalFx {
   private pourYaw = 0;
   private wrathAt = -99;
   private fistImpactDue = -1;
+  private bossHitAt = -99;
 
   constructor(
     scene: THREE.Scene,
@@ -648,6 +649,7 @@ export class FinalFx {
   handleEvent(ev: SimEvent): boolean {
     if (!this.world || this.disposed) return false;
     if (ev.type === 'damage') {
+      if (ev.sourceId === this.bossId || ev.targetId === this.bossId) this.bossHitAt = this.clock;
       if (ev.sourceId === this.bossId && ev.ability === null && this.action === 'idle') {
         this.action = 'swing';
         this.actionAt = this.clock;
@@ -726,7 +728,14 @@ export class FinalFx {
     // it on to its end at once.
     let t = this.view.awakeSince;
     if (t < 0 && this.deadAt >= 0) t = ARRIVAL_END + 1;
-    if (t >= 0 && t < ARRIVAL_END && (boss.inCombat || boss.castingAbility)) {
+    // Engaged: online a mob's in-combat bit is not mirrored, so a cast, a
+    // wound or a blow traded with it counts too.
+    const engaged =
+      boss.inCombat ||
+      !!boss.castingAbility ||
+      boss.hp < boss.maxHp ||
+      this.clock - this.bossHitAt < 1;
+    if (t >= 0 && t < ARRIVAL_END && engaged) {
       if (this.skipAt < 0) {
         this.skipAt = this.clock;
         this.skipFrom = t;
