@@ -32,7 +32,7 @@ export const QUENCH_SNOW = { drift: [0.35, -0.2] as const, fall: 0.9 } as const;
 export const QUENCH_CREAK = {
   cell: 5.5,
   grow: 1.6,
-  hold: 1.4,
+  hold: 2.0,
   fade: 1.6,
   stride: 3,
   cracks: 7,
@@ -115,14 +115,19 @@ export function planSingingCracks(count = QUENCH_CREAK.cracks): SingingCrack[] {
     // A start on the sheet itself (never where a stair's foot meets it).
     let x = 0;
     let z = 0;
+    // Spread over the sheet: each crack starts in its own cell of a three
+    // by three grid (so a creak runs somewhere new each time).
+    const cell = (k * 4) % 9;
+    const cw = (I.x1 - I.x0 - 6) / 3;
+    const cd = (I.z1 - I.z0 - 6) / 3;
     for (let t = 0; t < 12; t++) {
-      x = I.x0 + 3 + heartHash(k * 13 + t, 211) * (I.x1 - I.x0 - 6);
-      z = I.z0 + 3 + heartHash(k * 13 + t, 213) * (I.z1 - I.z0 - 6);
+      x = I.x0 + 3 + ((cell % 3) + heartHash(k * 13 + t, 211)) * cw;
+      z = I.z0 + 3 + (Math.floor(cell / 3) + heartHash(k * 13 + t, 213)) * cd;
       if (onSheet(x, z)) break;
     }
     let a = heartHash(k, 217) * Math.PI * 2;
     const pts = [{ x, z }];
-    const steps = 12 + Math.floor(heartHash(k, 219) * 8);
+    const steps = 16 + Math.floor(heartHash(k, 219) * 9);
     for (let i = 0; pts.length <= steps && i < steps * 4; i++) {
       a += (heartHash(k * 31 + i, 223) - 0.5) * 0.7;
       let nx = x + Math.sin(a) * 0.9;

@@ -202,7 +202,8 @@ vec3 quenchSky(vec3 d, float up) {
   float a = acos(clamp(dot(d, uQuenchSun), -1.0, 1.0));
   col += vec3(0.62, 0.66, 0.7) * exp(-a * a * 90.0) * 1.2;
   col += vec3(0.24, 0.27, 0.31) * exp(-a * 5.0) * 0.5;
-  float ring = exp(-pow((a - 0.384) * 34.0, 2.0));
+  float off = (a - 0.384) * 34.0;
+  float ring = exp(-off * off);
   col += vec3(0.13, 0.15, 0.18) * ring * (0.75 + 0.25 * sin(atan(d.x, d.z) * 3.0));
   return col;
 }

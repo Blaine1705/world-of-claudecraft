@@ -42,7 +42,7 @@ void main() {
   mv.xy += aCorner * aParams.y;
   vFade = smoothstep(0.0, 0.08, s) * (1.0 - smoothstep(0.9, 1.0, s));
   // Never a blot at the lens.
-  vFade *= smoothstep(2.0, 6.0, -mv.z);
+  vFade *= smoothstep(4.0, 11.0, -mv.z);
   vCorner = aCorner;
   gl_Position = projectionMatrix * mv;
 }
@@ -310,7 +310,7 @@ attribute vec4 aParams; // seed, radius
 varying vec2 vCorner;
 varying float vGlow;
 void main() {
-  vec3 p = position + vec3(aCorner.x, 0.0, aCorner.y) * aParams.y;
+  vec3 p = position + vec3(aCorner.x, 0.0, -aCorner.y) * aParams.y;
   vGlow = 0.9 + 0.1 * sin(uTime * 6.0 + aParams.x * 9.0);
   vCorner = aCorner;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
@@ -343,6 +343,8 @@ float creakBurst(float since) {
 `;
 const CREAK_VERT = /* glsl */ `
 uniform float uTime;
+uniform float uWidth;
+uniform float uFront;
 attribute vec3 aOther;
 attribute vec2 aCorner;
 attribute vec4 aParams; // crack, along (0 start .. 1 end), width
@@ -355,27 +357,72 @@ void main() {
   float grown = creakGrown(now.y);
   float reached = smoothstep(aParams.y - 0.02, aParams.y + 0.03, grown);
   // The front burns brightest where it is breaking.
-  float front = exp(-pow((aParams.y - grown) * 9.0, 2.0)) * step(grown, 0.999);
-  vShow = on * reached * creakGlow(now.y) * (0.55 + 0.45 * front);
+  // (A square written out: pow() of a negative base is undefined in GLSL.)
+  float lag = (aParams.y - grown) * 9.0;
+  float front = exp(-lag * lag) * step(grown, 0.999);
+  vShow = on * reached * creakGlow(now.y) * (0.45 + 0.55 * front * uFront);
   vec3 a = position;
   vec3 b = aOther;
   vec3 d = normalize(vec3(b.x - a.x, 0.0, b.z - a.z) + vec3(1e-5, 0.0, 0.0));
-  vec3 side = vec3(-d.z, 0.0, d.x);
-  vec3 p = mix(a, b, aCorner.x * 0.5 + 0.5) + side * aCorner.y * aParams.z * (1.0 + front * 0.8);
+  vec3 side = vec3(d.z, 0.0, -d.x);
+  vec3 p = mix(a, b, aCorner.x * 0.5 + 0.5)
+    + side * aCorner.y * aParams.z * uWidth * (1.0 + front * 0.8 * uFront);
   vCorner = aCorner;
   gl_Position = vShow > 0.0 ? projectionMatrix * modelViewMatrix * vec4(p, 1.0) : vec4(0.0, 0.0, 2.0, 1.0);
 }
 `;
+/** The crack itself: a dark seam opening in the ice, its broken edges
+ *  white (normal blended, so it reads on the pale sheet). */
+const SEAM_FRAG = /* glsl */ `
+uniform vec3 uColor;
+varying float vShow;
+varying vec2 vCorner;
+void main() {
+  float e = abs(vCorner.y);
+  float seam = 1.0 - smoothstep(0.12, 0.3, e);
+  float rim = (1.0 - smoothstep(0.3, 0.7, e)) * smoothstep(0.12, 0.3, e);
+  vec3 col = mix(vec3(1.0), uColor, seam);
+  float a = max(seam * 0.95, rim * 0.75) * min(1.0, vShow * 1.6);
+  if (a <= 0.003) discard;
+  gl_FragColor = vec4(col, a);
+  #include <colorspace_fragment>
+}
+`;
+/** The cold light breaking out along it, brightest at the running front. */
 const CREAK_FRAG = /* glsl */ `
 uniform vec3 uColor;
 varying float vShow;
 varying vec2 vCorner;
 void main() {
   float e = abs(vCorner.y);
-  float core = 1.0 - smoothstep(0.0, 0.35, e);
-  float glow = 1.0 - e;
-  vec3 col = mix(uColor, vec3(1.0), core * 0.6) * (core * 1.3 + glow * 0.5);
+  // A white-hot core of cold light, a broad halo of the vein's pale blue.
+  float core = 1.0 - smoothstep(0.0, 0.12, e);
+  float glow = (1.0 - e) * (1.0 - e);
+  vec3 col = mix(uColor, vec3(1.0), core * 0.8) * (core * 2.6 + glow * 1.5);
   gl_FragColor = vec4(col * vShow, glow * vShow);
+  #include <colorspace_fragment>
+}
+`;
+/** A puff of frost (normal blended: white over the pale sheet), its edge
+ *  torn by noise. */
+const FROST_PUFF_FRAG = /* glsl */ `
+uniform vec3 uColor;
+varying vec2 vCorner;
+varying float vGlow;
+float h(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float n(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(h(i), h(i + vec2(1, 0)), f.x), mix(h(i + vec2(0, 1)), h(i + vec2(1, 1)), f.x), f.y);
+}
+void main() {
+  float d = length(vCorner);
+  if (d > 1.0) discard;
+  float b = n(vCorner * 2.6 + 3.0) * 0.6 + n(vCorner * 6.0) * 0.4;
+  float a = (1.0 - smoothstep(0.1, 1.0, d + (b - 0.5) * 0.6)) * vGlow * 0.8;
+  if (a <= 0.003) discard;
+  gl_FragColor = vec4(uColor * (0.9 + 0.12 * b), a);
   #include <colorspace_fragment>
 }
 `;
@@ -420,6 +467,9 @@ function airMaterial(
     transparent: true,
     depthWrite: false,
     blending: additive ? THREE.AdditiveBlending : THREE.NormalBlending,
+    // Flat cards on the floor (the creaks, the pools) and billboards alike:
+    // drawn from either face, so no winding hides one.
+    side: THREE.DoubleSide,
   });
 }
 
@@ -617,34 +667,68 @@ export function buildQuenchAir(lowGfx: boolean): THREE.Group {
     }
     const end = c.pts[n];
     bursts.push([end.x, y + 0.3, end.z]);
-    burstP.push([ci, 0, 0, 1.2]);
+    burstP.push([ci, 0, 0, 2.2]);
     for (let k = 0; k < (lowGfx ? 5 : 12); k++) {
       bursts.push([end.x, y + 0.2, end.z]);
       burstP.push([
         ci,
         (k / 12) * Math.PI * 2 + heartHash(ci, k) * 0.4,
-        2 + heartHash(ci, k + 9) * 2.5,
-        0.12,
+        2.5 + heartHash(ci, k + 9) * 3.5,
+        0.2,
       ]);
     }
   });
   const cracks = { value: Math.max(1, plan.cracks.length) };
   const quench = SMITH_HEART_VEIN_COLORS.quench;
+  const creakGeo = heartQuadGeometry(a, cp, b);
   add(
-    'smithHeartQuenchCreaks',
-    heartQuadGeometry(a, cp, b),
+    'smithHeartQuenchCreakSeams',
+    creakGeo,
     airMaterial(
-      'smithHeartQuenchCreaks',
+      'smithHeartQuenchCreakSeams',
       CREAK_VERT,
-      CREAK_FRAG,
-      { uColor: col(quench), uCracks: cracks },
-      true,
+      SEAM_FRAG,
+      { uColor: col(0x10263a), uCracks: cracks, uWidth: { value: 1.4 }, uFront: { value: 0 } },
+      false,
     ),
     floorVfxRenderOrder('ground', 3),
   );
   add(
+    'smithHeartQuenchCreaks',
+    creakGeo,
+    airMaterial(
+      'smithHeartQuenchCreaks',
+      CREAK_VERT,
+      CREAK_FRAG,
+      { uColor: col(quench), uCracks: cracks, uWidth: { value: 9.0 }, uFront: { value: 1 } },
+      true,
+    ),
+    floorVfxRenderOrder('ground', 4),
+  );
+  // The frost burst: a puff of white frost (its speed 0), and glints flung.
+  const puffAt = burstP.map((q, i) => (q[2] === 0 ? i : -1)).filter((i) => i >= 0);
+  const glintAt = burstP.map((q, i) => (q[2] > 0 ? i : -1)).filter((i) => i >= 0);
+  add(
+    'smithHeartQuenchCreakFrost',
+    heartQuadGeometry(
+      puffAt.map((i) => bursts[i]),
+      puffAt.map((i) => burstP[i]),
+    ),
+    airMaterial(
+      'smithHeartQuenchCreakFrost',
+      BURST_VERT,
+      FROST_PUFF_FRAG,
+      { uColor: col(0xeef6fb), uCracks: cracks },
+      false,
+    ),
+    8,
+  );
+  add(
     'smithHeartQuenchCreakBursts',
-    heartQuadGeometry(bursts, burstP),
+    heartQuadGeometry(
+      glintAt.map((i) => bursts[i]),
+      glintAt.map((i) => burstP[i]),
+    ),
     airMaterial(
       'smithHeartQuenchCreakBursts',
       BURST_VERT,
