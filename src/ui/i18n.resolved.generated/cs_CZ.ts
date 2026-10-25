@@ -4645,7 +4645,17 @@ export const cs_CZ: EnTranslations = {
         "pollinated": "Dotyk Semenného lusku v něm okamžitě vypěstuje Trnitý výhonek. Vyhýbej se semenům a nech je rozdupat neopyleným hráčem. Nedotčený lusk vyklíčí po {seconds} s (na hrdinskou se po {heroic} s zahrabe a vynoří vedle nejbližšího hráče).",
         "prey": "Zulgar tě loví. Veď ho přes rozsvícený sluneční glyf a zpomalíš ho o {slow}%. Pokud tě dostihne, Rozsápání ti způsobí {damage} poškození ({heroic} na hrdinskou) a srazí tě na {stun} s.",
         "avatar": "Pohybuje se o {pct}% rychleji a loví svou Kořist. Zpomalení a znehybnění fungují, omráčení trvají polovinu obvyklé doby.",
-        "vanished": "Skrytý a imunní vůči poškození. Chystá se skočit na nejvzdálenějšího hráče."
+        "vanished": "Skrytý a imunní vůči poškození. Chystá se skočit na nejvzdálenějšího hráče.",
+        "sunstruck": "Struck by a lit sun glyph: moves {pct}% slower.",
+        "sunstruckExposed": "Struck by a lit sun glyph: takes {pct}% more damage.",
+        "sunWary": "No sun glyph can strike him until this ends. A lit glyph he crosses stays lit.",
+        "pinned": "A Hunting Spear pins you in place. You bleed for {bleed} Physical damage ({heroicBleed} on Heroic) every {every} sec, and Wildheart Pulse hits you wherever you stand for {pulse}% more damage. A teammate can pull the spear out in {pull} sec. If nobody else stands free, pull it out yourself in {wrench} sec. It lets go after {seconds} sec.",
+        "idolAwake": "The stone jaguar is awake. Every {every} sec it breathes over one half of the terrace, then the other, after a {warning} sec warning on the floor: {min} to {max} Nature damage ({heroicMin} to {heroicMax} on Heroic) to everyone in that half. Zulgar stays the Jaguar Avatar until he dies and picks new Prey every {seconds} sec ({heroicSeconds} sec on Heroic)."
+      },
+      "temple": {
+        "scoreWard": "Singing the Score: she takes no damage until it ends. Step onto the moon tiles in the order they rang before the verse ends to break her voice. Take turns: after sounding a note, wait for another player to sound the next correct note. A lone survivor can finish alone. If the verse ends first, Discord deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone in the court.",
+        "brokenVoice": "Her voice is broken: she takes {pct}% more damage until this ends.",
+        "spentVoice": "You cannot sound another moon tile until another player sounds the next correct note. Stepping onto a tile while this lasts does not reset the answer or hurt you. Cannot be dispelled. Removed when you are the only living player in your instance or the Score ends."
       },
       "bastion": {
         "brineColumn": "Znehybněn ve sloupci mořské vody: každých {tick} s utrpíš {min} až {max} přírodního poškození po dobu až {seconds} s. Přerušte nebo omračte Přílivem spoutaného akolytu a účinek ukončíte.",
@@ -6974,6 +6984,7 @@ export const cs_CZ: EnTranslations = {
         "summons_adds": "Přivolává posily",
         "lunar_tide": "Měsíční příboj (pulzující plošné poškození)",
         "chorus_and_solo": "Sbor a Sólo (na jedné značce se shlukněte, od druhé se rozestupte)",
+        "the_score": "The Score (twice she sings a melody on the moon tiles: step onto them in the order they rang to break her voice)",
         "tideglass_reflections": "Odrazy přílivového skla (zabíjejte navzájem své zrcadlové obrazy)",
         "hydra_three_elements": "Tři živly (levá hlava dýchá mráz do 18yardového kužele a na 4 sekundy zpomaluje o 70 procent. Prostřední plive pod až 3 hráče jed, který po 1.5 sekundy vybuchne a místo dopadu 6 sekund pálí. Pravá střílí příval do 26yardového pruhu a odhazuje o 8 yardů: každému útoku uhněte. Když hlava padne, přeživší převezmou její útok)",
         "hydra_tsunami": "Přílivová vlna (hlavy se na 4.5 sekundy ponoří a utrpí o 75 procent méně poškození. Jednu polovinu tůně převalí vlna, příště druhou: na normální obtížnost 160 až 190 mrazivého poškození a odhození o 10 yardů. Přejděte na druhou polovinu nebo stůjte za obvodovým sloupem. Na hrdinskou se za 3.5 sekundy vrátí vlna přes druhou polovinu. První Přílivová vlna přichází po 24 sekundách boje, další vždy 40 sekund po průchodu předchozí)",
@@ -7098,6 +7109,23 @@ export const cs_CZ: EnTranslations = {
       "shadeLine": "Nech tuto návnadu. Útoč na Vaela, jehož lucerna vzplane v paprsku, a protrhni závoj",
       "timeAria": "Zbývá {seconds} sekund"
     },
+    "templeAlert": {
+      "melodyTitle": "The Score",
+      "melodyLine": "Watch the moon tiles ring one after another. Repeat the order, taking turns with another player",
+      "melodyDarkLine": "Remember the order before the tiles go dark. Repeat it, taking turns with another player",
+      "answerTitle": "Answer the Score!",
+      "answerLine": "Take turns: step onto the moon tile marked {place}. Sounded: {done} of {total}",
+      "answerDarkLine": "Take turns and repeat the order from memory. Step off before stepping onto a tile again. Sounded: {done} of {total}",
+      "spentTitle": "Another voice must answer",
+      "spentLine": "You cannot sound a tile until another player sounds the next correct note. Sounded: {done} of {total}",
+      "stepOffTitle": "Step off, then back on",
+      "stepOffLine": "A moon tile sounds only when someone steps onto it. Leave this tile and step onto it again",
+      "falseTitle": "False Note!",
+      "falseLine": "That tile was out of turn. The answer starts over from the first tile",
+      "brokenTitle": "Selthe's voice is broken!",
+      "brokenLine": "She takes {pct}% more damage until this ends: use your strongest attacks now",
+      "timeAria": "{seconds} seconds left"
+    },
     "wildheartAlert": {
       "preyTitle": "Jsi Kořist!",
       "preyLine": "Veď Zulgara přes rozsvícené sluneční glyfy a zpomal ho, než tě dožene a rozsápe",
@@ -7108,7 +7136,21 @@ export const cs_CZ: EnTranslations = {
       "pollinatedLine": "Vyhýbej se semenným luskům: dotyk při Opylení vytvoří nepřátele. Neoznačení spojenci je mohou rozdupat",
       "bondTitle": "Pouto smečky",
       "bondLine": "Oddělte Pána šelem od jaguára a zrušte jejich snížení utrpěného poškození i bonus k poškození",
-      "timeAria": "Zbývá {seconds} sekund"
+      "timeAria": "Zbývá {seconds} sekund",
+      "preyAloneLine": "Nobody else can light the sun glyphs. Stand on a dark one for {seconds} sec to light it, then lure Zulgar across it",
+      "pinnedTitle": "Pinned!",
+      "pinnedLine": "A teammate must pull the Hunting Spear out. Wildheart Pulse hits you harder while you are Pinned",
+      "pinnedSelfLine": "Nobody is free to help: pull the Hunting Spear out yourself before Wildheart Pulse lands",
+      "sunstruckTitle": "Zulgar is Sunstruck!",
+      "sunstruckLine": "He takes {pct}% more damage until this ends: use your strongest attacks now",
+      "spearTitle": "An ally is Pinned!",
+      "spearLine": "Run to the Hunting Spear and pull it out before Wildheart Pulse lands",
+      "glyphTitle": "Light the sun glyphs",
+      "glyphLine": "Stand on a dark sun glyph for {seconds} sec to light it. When Zulgar crosses it he takes {pct}% more damage for {duration} sec",
+      "glyphLightingTitle": "Lighting the sun glyph",
+      "glyphLightingLine": "Stay on the glyph until it catches light. Stepping off starts it over",
+      "breathTitle": "Idol's Breath!",
+      "breathLine": "The stone jaguar is about to breathe over this half of the terrace. Cross to the other half"
     },
     "sanctumAlert": {
       "quenchTitle": "V kalicí vodě!",
@@ -7197,6 +7239,13 @@ export const cs_CZ: EnTranslations = {
       "relightFar": "Pro zapálení se přibliž na {range} yardů",
       "relightAria": "Znovu zapálit: {name}",
       "relightUsingLine": "Pokračuj v usměrňování a zapal svíci: odčerpává zdraví. Zásahy ho nepřeruší, pohyb nebo omráčení ano",
+      "freeLine": "Pull the spear out of the ground to free whoever it pins. Taking a hit does not stop you; moving or a stun does",
+      "freeKey": "Pull out the {name}",
+      "freeTap": "Tap here to pull out the {name}",
+      "freeClick": "Click here to pull out the {name}",
+      "freeFar": "Get within {range} yd to pull it out",
+      "freeAria": "Pull out the {name}",
+      "freeUsingLine": "Hold still to pull the spear out: moving or a stun stops you",
       "timeAria": "Zbývá {seconds} sekund"
     },
     "cosmetics": {
@@ -8356,6 +8405,16 @@ export const cs_CZ: EnTranslations = {
         "heroicCloud": "Pylový mrak: stání do {cloudRadius} yardů od Opyleného hráče po {cloudSeconds} s opylí i tebe."
       },
       "zulgar": {
+        "pulseSummaryRework": "Every {every} sec, a {cast} sec cast hits everyone within {radius} yd for {min} to {max} damage. Pinned players take {pinMult} times this damage at any distance.",
+        "spearSummary": "A {cast} sec cast pins a non-tank player, or the tank if nobody else remains. The root lasts up to {seconds} sec and deals {bleed} damage every {tick} sec.",
+        "spearResponse": "Target the spear and interact within {range} yd to pull it out in {pull} sec. Damage does not interrupt the pull. If nobody else stands free on the terrace, the victim can interact to escape in {self} sec.",
+        "glyphSummaryRework": "The {count} glyphs start dark. While he hunts, an unmarked player lights one by standing on it for {kindle} sec. If no unmarked player remains, Prey can light it in {alone} sec. Moving off resets progress. Crossing a lit glyph slows him by {slow} and increases damage taken by {vulnerability} for {seconds} sec. The glyph cannot be relit for {dark} sec; he cannot be struck by another glyph for {wary} sec. During the hunt, stuns last half as long.",
+        "glyphResponseRework": "Unmarked players light glyphs ahead of the Prey. Lead him through them, then attack during Sunstruck. Glyphs go dark when the hunt ends.",
+        "idolSummary": "At {health} health, he stays a jaguar spirit until defeated. The tank can also become Prey.",
+        "idolHuntSummary": "He picks new Prey every {every} sec, then turns toward them for {turn} sec before chasing.",
+        "idolHuntHeroicSummary": "He marks a fresh pair every {pair} sec and switches between them every {switch} sec. Each switch gives the new Prey {turn} sec before he chases.",
+        "breathSummary": "Every {every} sec, one half of the terrace is marked for {warning} sec, then everyone in that half takes {min} to {max} Nature damage. Breaths alternate halves.",
+        "breathResponse": "Cross to the unmarked half before the warning ends. The centre line is safe. On Heroic, the breath also extinguishes lit glyphs in its half; they can be relit immediately.",
         "overview": "Velekněz kotliny. Stálý boj s vyznačeným kruhem, dokud se nepromění v jaguářího ducha a nezačne lovit hráče. Lovený ho vodí přes rozsvícené sluneční glyfy, které ho zpomalují.",
         "phaseShrineName": "Svatyně",
         "phaseShrineSummary": "Bojuje zblízka a vysílá kolem sebe kruhový pulz.",
@@ -8668,6 +8727,14 @@ export const cs_CZ: EnTranslations = {
     },
     "temple": {
       "selthe": {
+        "overviewRework": "Selthe never moves or melees. Stack for Chorus, leave the group for Solo, interrupt Drowning Aria and dodge Mere Surge. At two health thresholds, repeat her moon-tile melody with alternating singers.",
+        "phaseSummaryRework": "Her other attacks pause while the group answers the Score. Moonwater Bolts have no cast bar and cannot be interrupted.",
+        "boltSummaryRework": "Between other casts, a bolt lands every {every} sec after a {windup} sec visual warning, dealing {mult} times her weapon damage as Frost. Interrupting Drowning Aria stops bolts and Aria for {quiet} sec.",
+        "boltResponseRework": "Keep the tank in her line of sight. Save interrupts for Drowning Aria.",
+        "tipHealerRework": "Watch the Aria target and anyone caught alone by Chorus. During the Score, help sing the next note and heal mistakes.",
+        "scoreSummary": "At {first} and {second} health, she becomes immune and plays {notes}, then {finalNotes} notes. Repeat them within {answer}, then {finalAnswer} sec. A wrong tile deals {falseNote} Frost damage and resets progress, not the timer. Timeout deals {min} to {max} Frost damage to everyone. Success stuns her for {stun} sec and increases damage taken by {vulnerability} for {bonusSeconds} sec.",
+        "scoreResponse": "Watch the melody, then step onto tiles in order. Alternate correct notes with another living player; a sole survivor can finish alone. Blocked steps are harmless. Step off and enter again to sound a tile, including one occupied before the answer begins.",
+        "scoreHeroic": "During the answer, the tiles go dark. Remember the melody and take turns.",
         "overview": "Matka sboru zpívá ze své tůně a nikdy se nehýbe ani neútočí zblízka. Označuje hráče sdíleným Sborem a osamělým Sólem, míří na jednoho sílící árií a posílá vlnu přes nádvoří. Střely i árii lze přerušit.",
         "phaseName": "Sborové nádvoří",
         "phaseSummary": "Jediná fáze řízená časovači. Mechanika, jejíž čas nastane během sesílání, čeká na jeho dokončení.",
@@ -16286,6 +16353,8 @@ export const cs_CZ: EnTranslations = {
       "temple_moonwater_bolt": "Střela měsíční vody",
       "temple_drowning_aria": "Árie tonutí",
       "temple_mere_surge": "Příval jezera",
+      "temple_score": "The Score",
+      "temple_score_answer": "Answer the Score",
       "temple_tideglass_fracture": "Prasknutí přílivového skla",
       "temple_undertow": "Spodní proud",
       "temple_lunar_tide": "Měsíční příliv",
@@ -16323,6 +16392,12 @@ export const cs_CZ: EnTranslations = {
       "wildheart_gorgebloom_gorge": "Hltání",
       "wildheart_zulgar_pulse": "Pulz Divokého srdce",
       "wildheart_zulgar_spirit_hunt": "Duch lovu",
+      "wildheart_zulgar_hunting_spear": "Hunting Spear",
+      "wildheart_zulgar_idol_wakes": "The Idol Wakes",
+      "kituse_wildheart_pull_spear": "Pull the Spear",
+      "wildheart_idols_breath": "Idol's Breath",
+      "wildheart_sun_glyph_kindle": "Lighting",
+      "wildheart_sun_glyph_cold": "Cooling",
       "sanctum_cinder_breath": "Dech žhavých uhlíků",
       "sanctum_warming_rite": "Zahřívací obřad",
       "sanctum_goad": "Bodnutí bodcem",
@@ -26131,6 +26206,9 @@ export const cs_CZ: EnTranslations = {
       },
       "thorn_sprout": {
         "name": "Trnitý výhonek"
+      },
+      "wildheart_hunting_spear": {
+        "name": "Hunting Spear"
       },
       "buddy_ember_fox": {
         "name": "Žhavá liška"

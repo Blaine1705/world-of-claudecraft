@@ -13,6 +13,42 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'bossJournal.wildheart.zulgar.pulseSummaryRework':
+    '{every}초마다 {cast}초 시전 후 {radius}야드 안의 모두에게 {min}~{max} 피해를 줍니다. 꿰뚫린 플레이어는 거리와 관계없이 {pinMult}배 피해를 받습니다.',
+  'bossJournal.wildheart.zulgar.spearSummary':
+    '{cast}초 시전 후 탱커가 아닌 한 명을 꿰뚫습니다. 다른 사람이 없으면 탱커를 겨냥합니다. 최대 {seconds}초 동안 이동 불가가 되며 {tick}초마다 {bleed} 피해를 받습니다.',
+  'bossJournal.wildheart.zulgar.spearResponse':
+    '창을 대상으로 지정하고 {range}야드 안에서 상호작용하면 {pull}초 후 뽑습니다. 피해를 받아도 중단되지 않습니다. 단상에 자유로운 동료가 없으면 피해자가 직접 상호작용해 {self}초 만에 탈출할 수 있습니다.',
+  'bossJournal.wildheart.zulgar.glyphSummaryRework':
+    '문양 {count}개는 처음에 꺼져 있습니다. 사냥 중 표식이 없는 플레이어가 {kindle}초 서 있으면 켜집니다. 표식 없는 사람이 없으면 먹잇감도 {alone}초 만에 켤 수 있습니다. 벗어나면 진행이 초기화됩니다. 그가 켜진 문양을 지나면 {seconds}초 동안 이동 속도가 {slow} 감소하고 받는 피해가 {vulnerability} 증가합니다. 문양은 {dark}초 동안 다시 켤 수 없으며, 그는 {wary}초 동안 다른 문양에 맞지 않습니다. 사냥 중 기절 시간은 절반입니다.',
+  'bossJournal.wildheart.zulgar.glyphResponseRework':
+    '표식 없는 플레이어는 먹잇감 앞의 문양을 켜세요. 그를 문양으로 유도하고 햇빛에 맞은 동안 공격하세요. 사냥이 끝나면 문양이 꺼집니다.',
+  'bossJournal.wildheart.zulgar.idolSummary':
+    '생명력이 {health}가 되면 쓰러질 때까지 재규어 영체로 남습니다. 탱커도 먹잇감이 될 수 있습니다.',
+  'bossJournal.wildheart.zulgar.idolHuntSummary':
+    '{every}초마다 새 먹잇감을 고르고 {turn}초 동안 바라본 뒤 추격합니다.',
+  'bossJournal.wildheart.zulgar.idolHuntHeroicSummary':
+    '{pair}초마다 새 두 명에게 표식을 남기고 {switch}초마다 추격 대상을 바꿉니다. 바뀔 때마다 새 먹잇감에게 {turn}초의 여유가 주어집니다.',
+  'bossJournal.wildheart.zulgar.breathSummary':
+    '{every}초마다 단상 절반을 {warning}초 동안 표시한 뒤 그곳의 모두에게 {min}~{max} 자연 피해를 줍니다. 양쪽을 번갈아 공격합니다.',
+  'bossJournal.wildheart.zulgar.breathResponse':
+    '경고가 끝나기 전에 표시되지 않은 절반으로 이동하세요. 중앙선은 안전합니다. 영웅 난이도에서는 숨결이 해당 절반의 켜진 문양도 끄지만 즉시 다시 켤 수 있습니다.',
+  'bossJournal.temple.selthe.overviewRework':
+    '셀세는 이동하거나 근접 공격하지 않습니다. 합창에는 모이고 독창에는 흩어지며, 익사의 아리아를 차단하고 호수의 파도를 피하세요. 두 생명력 구간에서 달빛 발판의 선율을 번갈아 재현하세요.',
+  'bossJournal.temple.selthe.phaseSummaryRework':
+    '일행이 악보에 응답하는 동안 다른 공격은 멈춥니다. 달물 화살은 시전 막대가 없고 차단할 수 없습니다.',
+  'bossJournal.temple.selthe.boltSummaryRework':
+    '다른 시전 사이에 {every}초마다 화살이 적중합니다. {windup}초 전에 시각적 경고가 나타나며 무기 공격력의 {mult}배 냉기 피해를 줍니다. 익사의 아리아를 차단하면 화살과 아리아가 {quiet}초 멈춥니다.',
+  'bossJournal.temple.selthe.boltResponseRework':
+    '탱커가 그녀의 시야에 있도록 하세요. 차단은 익사의 아리아에 사용하세요.',
+  'bossJournal.temple.selthe.tipHealerRework':
+    '아리아 대상과 혼자 합창을 맞는 사람을 살피세요. 악보 동안 다음 음을 내는 것을 돕고 실수로 받은 피해를 치유하세요.',
+  'bossJournal.temple.selthe.scoreSummary':
+    '생명력 {first}와 {second}에서 무적이 되어 각각 {notes}음과 {finalNotes}음 선율을 연주합니다. 각각 {answer}초와 {finalAnswer}초 안에 재현하세요. 잘못 밟으면 {falseNote} 냉기 피해를 받고 진행만 초기화되며 시간은 늘어나지 않습니다. 시간 초과 시 모두에게 {min}~{max} 냉기 피해를 줍니다. 성공하면 {stun}초 기절하고 동시에 {bonusSeconds}초 동안 받는 피해가 {vulnerability} 증가합니다.',
+  'bossJournal.temple.selthe.scoreResponse':
+    '선율을 본 뒤 순서대로 발판에 들어가세요. 살아 있는 다른 플레이어와 올바른 음을 번갈아 내세요. 혼자 살아남으면 혼자 완료할 수 있습니다. 막힌 발걸음은 해롭지 않습니다. 응답 시작 전부터 서 있던 발판도 한 번 나갔다 다시 들어와야 소리가 납니다.',
+  'bossJournal.temple.selthe.scoreHeroic':
+    '응답 중에는 발판이 어두워집니다. 선율을 기억하고 번갈아 연주하세요.',
   'auth.wocBuilder.cat.skinTone': '피부색',
   'auth.wocBuilder.slider.eyeSize': '눈 크기',
   'hudChrome.raidBossGuide.damageRange': '{min}에서 {max}',
@@ -25254,4 +25290,89 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'editor.tool.zone': '지역',
   'editor.toolGroup.world': '월드',
   'editor.weather.clear': '맑음',
+  // Zulgar's hunt rework (the sun glyphs, the Hunting Spear, The Idol Wakes):
+  // the M16 non-Latin fills of its new English.
+  'hudChrome.auraEffect.wildheart.sunstruck':
+    '빛나는 태양 문양에 그을림: 이동 속도가 {pct}% 감소합니다.',
+  'hudChrome.auraEffect.wildheart.sunstruckExposed':
+    '빛나는 태양 문양에 그을림: 받는 피해가 {pct}% 증가합니다.',
+  'hudChrome.auraEffect.wildheart.sunWary':
+    '이 효과가 끝날 때까지 어떤 태양 문양도 그를 그을릴 수 없습니다. 그동안 그가 밟은 빛나는 문양은 계속 빛납니다.',
+  'hudChrome.auraEffect.wildheart.pinned':
+    '사냥 창이 당신을 그 자리에 꿰어 고정했습니다. {every}초마다 {bleed}의 물리 피해(영웅 난이도 {heroicBleed})를 입는 출혈에 걸리며, 야생심장 파동은 어디에 서 있든 적중하고 피해가 {pulse}% 증가합니다. 아군이 {pull}초에 걸쳐 창을 뽑아 줄 수 있습니다. 도울 수 있는 사람이 아무도 없으면 직접 {wrench}초에 걸쳐 뽑으세요. {seconds}초 뒤에는 저절로 빠집니다.',
+  'hudChrome.auraEffect.wildheart.idolAwake':
+    '돌 재규어가 깨어났습니다. {every}초마다 바닥에 {warning}초 동안 경고를 띄운 뒤 테라스의 절반씩 번갈아 숨결을 내뿜습니다: 그 절반에 있는 모두에게 {min}~{max}의 자연 피해(영웅 난이도 {heroicMin}~{heroicMax})를 줍니다. 줄가르는 죽을 때까지 재규어 화신 상태를 유지하며 {seconds}초마다(영웅 난이도 {heroicSeconds}초마다) 사냥감을 바꿉니다.',
+  'hudChrome.wildheartAlert.preyAloneLine':
+    '태양 문양을 밝혀 줄 사람이 없습니다. 꺼진 문양 위에 {seconds}초 동안 서서 밝힌 뒤 줄가르를 그 위로 끌고 가세요',
+  'hudChrome.wildheartAlert.pinnedTitle': '꿰뚫려 고정됨!',
+  'hudChrome.wildheartAlert.pinnedLine':
+    '아군이 사냥 창을 뽑아 줘야 합니다. 고정된 동안 야생심장 파동의 피해가 더 커집니다',
+  'hudChrome.wildheartAlert.pinnedSelfLine':
+    '도와줄 사람이 없습니다: 야생심장 파동이 닿기 전에 직접 사냥 창을 뽑으세요',
+  'hudChrome.wildheartAlert.sunstruckTitle': '줄가르가 태양에 그을렸습니다!',
+  'hudChrome.wildheartAlert.sunstruckLine':
+    '효과가 끝날 때까지 그가 받는 피해가 {pct}% 증가합니다: 지금 가장 강한 공격을 쓰세요',
+  'hudChrome.wildheartAlert.spearTitle': '아군이 꿰뚫려 고정됐습니다!',
+  'hudChrome.wildheartAlert.spearLine': '사냥 창으로 달려가 야생심장 파동이 닿기 전에 뽑으세요',
+  'hudChrome.wildheartAlert.glyphTitle': '태양 문양을 밝히세요',
+  'hudChrome.wildheartAlert.glyphLine':
+    '꺼진 태양 문양 위에 {seconds}초 동안 서면 밝혀집니다. 줄가르가 그 위를 지나면 {duration}초 동안 받는 피해가 {pct}% 증가합니다',
+  'hudChrome.wildheartAlert.glyphLightingTitle': '태양 문양을 밝히는 중',
+  'hudChrome.wildheartAlert.glyphLightingLine':
+    '문양이 밝혀질 때까지 그 위에 머무르세요. 벗어나면 처음부터 다시 시작합니다',
+  'hudChrome.wildheartAlert.breathTitle': '우상의 숨결!',
+  'hudChrome.wildheartAlert.breathLine':
+    '돌 재규어가 테라스의 이쪽 절반에 숨결을 내뿜으려 합니다. 반대쪽 절반으로 건너가세요',
+  'hudChrome.kitUse.freeLine':
+    '창을 바닥에서 뽑아 고정된 대상을 풀어 주세요. 공격을 받아도 끊기지 않지만, 이동하거나 기절하면 끊깁니다',
+  'hudChrome.kitUse.freeKey': '{name} 뽑기',
+  'hudChrome.kitUse.freeTap': '여기를 탭해 {name}을(를) 뽑으세요',
+  'hudChrome.kitUse.freeClick': '여기를 클릭해 {name}을(를) 뽑으세요',
+  'hudChrome.kitUse.freeFar': '{range}야드 안으로 다가가 뽑으세요',
+  'hudChrome.kitUse.freeAria': '{name} 뽑기',
+  'hudChrome.kitUse.freeUsingLine':
+    '창을 뽑을 때까지 가만히 있으세요: 이동하거나 기절하면 끊깁니다',
+  'abilityUi.cast.wildheart_zulgar_hunting_spear': '사냥 창',
+  'abilityUi.cast.wildheart_zulgar_idol_wakes': '우상이 깨어나다',
+  'abilityUi.cast.kituse_wildheart_pull_spear': '창 뽑기',
+  'abilityUi.cast.wildheart_idols_breath': '우상의 숨결',
+  'abilityUi.cast.wildheart_sun_glyph_kindle': '밝히는 중',
+  'abilityUi.cast.wildheart_sun_glyph_cold': '식는 중',
+  'entities.mobs.wildheart_hunting_spear.name': '사냥 창',
+  // Choirmother Selthe's Score (the Drowned Temple alert, her ward and her
+  // broken voice, her two bars): the M16 non-Latin fills of its new English.
+  'hudChrome.templeAlert.melodyTitle': '악보',
+  'hudChrome.templeAlert.melodyLine':
+    '달 타일이 차례로 울리는 것을 지켜보세요. 다른 플레이어와 번갈아 같은 순서로 밟으세요',
+  'hudChrome.templeAlert.melodyDarkLine':
+    '타일이 어두워지기 전에 순서를 기억하세요. 다른 플레이어와 번갈아 같은 순서로 밟으세요',
+  'hudChrome.templeAlert.answerTitle': '악보에 답하세요!',
+  'hudChrome.templeAlert.answerLine':
+    '번갈아 밟으세요. {place} 표시가 있는 달 타일을 밟으세요. 진행: {total}개 중 {done}개',
+  'hudChrome.templeAlert.answerDarkLine':
+    '번갈아 기억한 순서대로 밟으세요. 같은 타일을 다시 밟으려면 먼저 내려오세요. 진행: {total}개 중 {done}개',
+  'hudChrome.templeAlert.stepOffTitle': '내려갔다가 다시 올라서세요',
+  'hudChrome.templeAlert.stepOffLine':
+    '달의 타일은 누군가 올라설 때만 울립니다. 이 타일에서 내려갔다가 다시 올라서세요',
+  'hudChrome.templeAlert.falseTitle': '틀린 음!',
+  'hudChrome.templeAlert.falseLine':
+    '그 타일은 차례가 아니었습니다. 답은 첫 번째 타일부터 다시 시작됩니다',
+  'hudChrome.templeAlert.brokenTitle': '셀세의 목소리가 갈라졌습니다!',
+  'hudChrome.templeAlert.brokenLine':
+    '효과가 끝날 때까지 받는 피해가 {pct}% 증가합니다: 지금 가장 강한 공격을 쏟아부으세요',
+  'hudChrome.templeAlert.timeAria': '{seconds}초 남음',
+  'hudChrome.auraEffect.temple.scoreWard':
+    '악보를 노래하는 중: 끝날 때까지 피해를 받지 않습니다. 노래가 끝나기 전에 울린 순서대로 달의 타일에 올라서면 그녀의 목소리가 갈라집니다. 번갈아 밟으세요. 음을 울린 뒤에는 다른 플레이어가 다음 올바른 음을 울릴 때까지 기다려야 합니다. 혼자 살아남았다면 끝까지 혼자 답할 수 있습니다. 노래가 먼저 끝나면 불협화음이 뜰에 있는 모두에게 {min}~{max}의 냉기 피해(영웅 난이도에서는 {heroicMin}~{heroicMax})를 입힙니다.',
+  'hudChrome.auraEffect.temple.brokenVoice':
+    '목소리가 갈라졌습니다: 이 효과가 끝날 때까지 받는 피해가 {pct}% 증가합니다.',
+  'abilityUi.cast.temple_score': '악보',
+  'abilityUi.cast.temple_score_answer': '악보에 답하기',
+  // The Dungeon Finder's line for Selthe's Score (M16).
+  'hudChrome.finder.mech.the_score':
+    '악보 (그녀가 두 번 달의 타일에 선율을 노래합니다: 울린 순서대로 올라서면 그녀의 목소리가 갈라집니다)',
+  'hudChrome.templeAlert.spentTitle': '다른 목소리가 답할 차례',
+  'hudChrome.templeAlert.spentLine':
+    '다른 플레이어가 다음 올바른 음을 울릴 때까지 타일을 울릴 수 없습니다. 진행: {total}개 중 {done}개',
+  'hudChrome.auraEffect.temple.spentVoice':
+    '다른 플레이어가 다음 올바른 음을 울릴 때까지 달 타일을 울릴 수 없습니다. 이 동안 타일을 밟아도 답이 초기화되거나 피해를 받지 않습니다. 해제할 수 없습니다. 같은 인스턴스에 살아 있는 플레이어가 자신뿐이거나 악보가 끝나면 사라집니다.',
 };

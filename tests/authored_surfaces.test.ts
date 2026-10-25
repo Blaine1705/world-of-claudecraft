@@ -315,6 +315,7 @@ const AUTHORED_ATLAS_DEFS = [
   'sanctum_sledge_hauler',
   'sanctum_glacier_splinter',
   'wildheart_great_saurian',
+  'wildheart_hunting_spear',
   'wildheart_gorgebloom',
   'wildheart_vine_lasher',
   'wildheart_thorn_sprout',

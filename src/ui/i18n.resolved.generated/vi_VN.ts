@@ -4645,7 +4645,17 @@ export const vi_VN: EnTranslations = {
         "pollinated": "Chạm Túi Hạt khiến nó lập tức mọc Chồi Gai. Tránh hạt và để người chơi sạch giẫm chúng; túi không ai chạm sẽ mọc sau {seconds} giây (ở Anh Hùng, nó chui xuống sau {heroic} giây và trồi cạnh người gần nhất).",
         "prey": "Zulgar săn bạn. Dẫn hắn qua ký hiệu mặt trời sáng để làm chậm hắn {slow}%. Nếu bắt được bạn, bạn bị Vồ Xé chịu {damage} sát thương ({heroic} ở Anh Hùng) và bị quật ngã {stun} giây.",
         "avatar": "Di chuyển nhanh hơn {pct}% và săn Con Mồi. Làm chậm và trói chân có hiệu lực, làm choáng kéo dài bằng nửa.",
-        "vanished": "Ẩn và miễn nhiễm sát thương. Hắn sắp vồ người chơi xa nhất."
+        "vanished": "Ẩn và miễn nhiễm sát thương. Hắn sắp vồ người chơi xa nhất.",
+        "sunstruck": "Struck by a lit sun glyph: moves {pct}% slower.",
+        "sunstruckExposed": "Struck by a lit sun glyph: takes {pct}% more damage.",
+        "sunWary": "No sun glyph can strike him until this ends. A lit glyph he crosses stays lit.",
+        "pinned": "A Hunting Spear pins you in place. You bleed for {bleed} Physical damage ({heroicBleed} on Heroic) every {every} sec, and Wildheart Pulse hits you wherever you stand for {pulse}% more damage. A teammate can pull the spear out in {pull} sec. If nobody else stands free, pull it out yourself in {wrench} sec. It lets go after {seconds} sec.",
+        "idolAwake": "The stone jaguar is awake. Every {every} sec it breathes over one half of the terrace, then the other, after a {warning} sec warning on the floor: {min} to {max} Nature damage ({heroicMin} to {heroicMax} on Heroic) to everyone in that half. Zulgar stays the Jaguar Avatar until he dies and picks new Prey every {seconds} sec ({heroicSeconds} sec on Heroic)."
+      },
+      "temple": {
+        "scoreWard": "Singing the Score: she takes no damage until it ends. Step onto the moon tiles in the order they rang before the verse ends to break her voice. Take turns: after sounding a note, wait for another player to sound the next correct note. A lone survivor can finish alone. If the verse ends first, Discord deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone in the court.",
+        "brokenVoice": "Her voice is broken: she takes {pct}% more damage until this ends.",
+        "spentVoice": "You cannot sound another moon tile until another player sounds the next correct note. Stepping onto a tile while this lasts does not reset the answer or hurt you. Cannot be dispelled. Removed when you are the only living player in your instance or the Score ends."
       },
       "bastion": {
         "brineColumn": "Bị trói chân trong cột nước biển: chịu {min} đến {max} sát thương Thiên Nhiên mỗi {tick} giây, tối đa {seconds} giây. Ngắt phép hoặc làm choáng Tín Đồ Triều Trói để phá.",
@@ -6974,6 +6984,7 @@ export const vi_VN: EnTranslations = {
         "summons_adds": "Triệu hồi quân tiếp viện",
         "lunar_tide": "Triều Nguyệt (sát thương vùng theo nhịp)",
         "chorus_and_solo": "Đồng Ca và Đơn Ca (tụ ở một dấu, tản khỏi dấu còn lại)",
+        "the_score": "The Score (twice she sings a melody on the moon tiles: step onto them in the order they rang to break her voice)",
         "tideglass_reflections": "Ảnh Phản Chiếu Kính Triều (giết ảnh gương của nhau)",
         "hydra_three_elements": "Ba Nguyên Tố (đầu trái phun hình nón băng 18 thước Anh làm chậm 70 phần trăm trong 4 giây; đầu giữa phun độc dưới tối đa 3 người, nổ sau 1.5 giây rồi đốt 6 giây tại nơi rơi; đầu phải bắn lũ theo làn 26 thước Anh đẩy lùi 8 thước Anh: tránh từng đòn. Khi một đầu gục, các đầu còn lại tiếp quản đòn của nó)",
         "hydra_tsunami": "Sóng Thần (các đầu chìm 4.5 giây, chịu ít hơn 75 phần trăm sát thương; sóng cuộn qua một nửa hồ, lần sau nửa kia: 160 đến 190 sát thương băng ở Thường và đẩy 10 thước Anh. Sang nửa kia hoặc nấp sau trụ viền; ở Anh Hùng, sóng cuộn ngược qua nửa còn lại sau 3.5 giây. Sóng Thần đầu đến 24 giây vào trận, các lần sau đến 40 giây từ khi lần trước đi qua)",
@@ -7098,6 +7109,23 @@ export const vi_VN: EnTranslations = {
       "shadeLine": "Bỏ mồi nhử này. Đánh Vael có đèn bùng sáng trong tia để phá màn",
       "timeAria": "Còn {seconds} giây"
     },
+    "templeAlert": {
+      "melodyTitle": "The Score",
+      "melodyLine": "Watch the moon tiles ring one after another. Repeat the order, taking turns with another player",
+      "melodyDarkLine": "Remember the order before the tiles go dark. Repeat it, taking turns with another player",
+      "answerTitle": "Answer the Score!",
+      "answerLine": "Take turns: step onto the moon tile marked {place}. Sounded: {done} of {total}",
+      "answerDarkLine": "Take turns and repeat the order from memory. Step off before stepping onto a tile again. Sounded: {done} of {total}",
+      "spentTitle": "Another voice must answer",
+      "spentLine": "You cannot sound a tile until another player sounds the next correct note. Sounded: {done} of {total}",
+      "stepOffTitle": "Step off, then back on",
+      "stepOffLine": "A moon tile sounds only when someone steps onto it. Leave this tile and step onto it again",
+      "falseTitle": "False Note!",
+      "falseLine": "That tile was out of turn. The answer starts over from the first tile",
+      "brokenTitle": "Selthe's voice is broken!",
+      "brokenLine": "She takes {pct}% more damage until this ends: use your strongest attacks now",
+      "timeAria": "{seconds} seconds left"
+    },
     "wildheartAlert": {
       "preyTitle": "Bạn Là Con Mồi!",
       "preyLine": "Dụ Zulgar qua ký hiệu mặt trời sáng để làm chậm trước khi hắn bắt và vồ xé bạn",
@@ -7108,7 +7136,21 @@ export const vi_VN: EnTranslations = {
       "pollinatedLine": "Tránh túi hạt: chạm khi bị Thụ Phấn sẽ tạo địch. Đồng minh không có dấu có thể giẫm",
       "bondTitle": "Liên Kết Bầy Đàn",
       "bondLine": "Tách Thầy Thú và báo đốm để bỏ giảm sát thương và tăng sát thương của chúng",
-      "timeAria": "Còn {seconds} giây"
+      "timeAria": "Còn {seconds} giây",
+      "preyAloneLine": "Nobody else can light the sun glyphs. Stand on a dark one for {seconds} sec to light it, then lure Zulgar across it",
+      "pinnedTitle": "Pinned!",
+      "pinnedLine": "A teammate must pull the Hunting Spear out. Wildheart Pulse hits you harder while you are Pinned",
+      "pinnedSelfLine": "Nobody is free to help: pull the Hunting Spear out yourself before Wildheart Pulse lands",
+      "sunstruckTitle": "Zulgar is Sunstruck!",
+      "sunstruckLine": "He takes {pct}% more damage until this ends: use your strongest attacks now",
+      "spearTitle": "An ally is Pinned!",
+      "spearLine": "Run to the Hunting Spear and pull it out before Wildheart Pulse lands",
+      "glyphTitle": "Light the sun glyphs",
+      "glyphLine": "Stand on a dark sun glyph for {seconds} sec to light it. When Zulgar crosses it he takes {pct}% more damage for {duration} sec",
+      "glyphLightingTitle": "Lighting the sun glyph",
+      "glyphLightingLine": "Stay on the glyph until it catches light. Stepping off starts it over",
+      "breathTitle": "Idol's Breath!",
+      "breathLine": "The stone jaguar is about to breathe over this half of the terrace. Cross to the other half"
     },
     "sanctumAlert": {
       "quenchTitle": "Đang Trong Nước Tôi!",
@@ -7197,6 +7239,13 @@ export const vi_VN: EnTranslations = {
       "relightFar": "Đến trong {range} thước Anh để thắp lại",
       "relightAria": "Thắp Lại {name}",
       "relightUsingLine": "Tiếp tục vận để thắp nến: nó rút máu. Đòn trúng không ngắt; di chuyển hoặc choáng sẽ ngắt",
+      "freeLine": "Pull the spear out of the ground to free whoever it pins. Taking a hit does not stop you; moving or a stun does",
+      "freeKey": "Pull out the {name}",
+      "freeTap": "Tap here to pull out the {name}",
+      "freeClick": "Click here to pull out the {name}",
+      "freeFar": "Get within {range} yd to pull it out",
+      "freeAria": "Pull out the {name}",
+      "freeUsingLine": "Hold still to pull the spear out: moving or a stun stops you",
       "timeAria": "Còn {seconds} giây"
     },
     "cosmetics": {
@@ -8356,6 +8405,16 @@ export const vi_VN: EnTranslations = {
         "heroicCloud": "Mây Phấn: đứng trong {cloudRadius} thước Anh quanh người Thụ Phấn {cloudSeconds} giây cũng làm bạn Thụ Phấn."
       },
       "zulgar": {
+        "pulseSummaryRework": "Every {every} sec, a {cast} sec cast hits everyone within {radius} yd for {min} to {max} damage. Pinned players take {pinMult} times this damage at any distance.",
+        "spearSummary": "A {cast} sec cast pins a non-tank player, or the tank if nobody else remains. The root lasts up to {seconds} sec and deals {bleed} damage every {tick} sec.",
+        "spearResponse": "Target the spear and interact within {range} yd to pull it out in {pull} sec. Damage does not interrupt the pull. If nobody else stands free on the terrace, the victim can interact to escape in {self} sec.",
+        "glyphSummaryRework": "The {count} glyphs start dark. While he hunts, an unmarked player lights one by standing on it for {kindle} sec. If no unmarked player remains, Prey can light it in {alone} sec. Moving off resets progress. Crossing a lit glyph slows him by {slow} and increases damage taken by {vulnerability} for {seconds} sec. The glyph cannot be relit for {dark} sec; he cannot be struck by another glyph for {wary} sec. During the hunt, stuns last half as long.",
+        "glyphResponseRework": "Unmarked players light glyphs ahead of the Prey. Lead him through them, then attack during Sunstruck. Glyphs go dark when the hunt ends.",
+        "idolSummary": "At {health} health, he stays a jaguar spirit until defeated. The tank can also become Prey.",
+        "idolHuntSummary": "He picks new Prey every {every} sec, then turns toward them for {turn} sec before chasing.",
+        "idolHuntHeroicSummary": "He marks a fresh pair every {pair} sec and switches between them every {switch} sec. Each switch gives the new Prey {turn} sec before he chases.",
+        "breathSummary": "Every {every} sec, one half of the terrace is marked for {warning} sec, then everyone in that half takes {min} to {max} Nature damage. Breaths alternate halves.",
+        "breathResponse": "Cross to the unmarked half before the warning ends. The centre line is safe. On Heroic, the breath also extinguishes lit glyphs in its half; they can be relit immediately.",
         "overview": "Đại tư tế vùng trũng. Trận đều với vòng báo trước tới khi hắn hóa tinh linh báo đốm săn một người. Người bị săn nhử hắn qua ký hiệu mặt trời sáng để làm chậm.",
         "phaseShrineName": "Đền Thiêng",
         "phaseShrineSummary": "Hắn cận chiến, phát nhịp vòng quanh mình.",
@@ -8668,6 +8727,14 @@ export const vi_VN: EnTranslations = {
     },
     "temple": {
       "selthe": {
+        "overviewRework": "Selthe never moves or melees. Stack for Chorus, leave the group for Solo, interrupt Drowning Aria and dodge Mere Surge. At two health thresholds, repeat her moon-tile melody with alternating singers.",
+        "phaseSummaryRework": "Her other attacks pause while the group answers the Score. Moonwater Bolts have no cast bar and cannot be interrupted.",
+        "boltSummaryRework": "Between other casts, a bolt lands every {every} sec after a {windup} sec visual warning, dealing {mult} times her weapon damage as Frost. Interrupting Drowning Aria stops bolts and Aria for {quiet} sec.",
+        "boltResponseRework": "Keep the tank in her line of sight. Save interrupts for Drowning Aria.",
+        "tipHealerRework": "Watch the Aria target and anyone caught alone by Chorus. During the Score, help sing the next note and heal mistakes.",
+        "scoreSummary": "At {first} and {second} health, she becomes immune and plays {notes}, then {finalNotes} notes. Repeat them within {answer}, then {finalAnswer} sec. A wrong tile deals {falseNote} Frost damage and resets progress, not the timer. Timeout deals {min} to {max} Frost damage to everyone. Success stuns her for {stun} sec and increases damage taken by {vulnerability} for {bonusSeconds} sec.",
+        "scoreResponse": "Watch the melody, then step onto tiles in order. Alternate correct notes with another living player; a sole survivor can finish alone. Blocked steps are harmless. Step off and enter again to sound a tile, including one occupied before the answer begins.",
+        "scoreHeroic": "During the answer, the tiles go dark. Remember the melody and take turns.",
         "overview": "Mẫu Ca hát từ hồ, không di chuyển hay cận chiến. Cô ta đánh dấu Đồng Ca chia sẻ và Đơn Ca riêng, chiếu khúc ca tăng dần vào một người, gửi sóng qua sân. Tia và khúc ca đều ngắt được.",
         "phaseName": "Sân Ca Đoàn",
         "phaseSummary": "Một giai đoạn theo bộ đếm. Cơ chế tới hạn khi đang thi triển sẽ đợi thi triển xong.",
@@ -16286,6 +16353,8 @@ export const vi_VN: EnTranslations = {
       "temple_moonwater_bolt": "Tia Nước Trăng",
       "temple_drowning_aria": "Khúc Ca Chết Đuối",
       "temple_mere_surge": "Hồ Dâng",
+      "temple_score": "The Score",
+      "temple_score_answer": "Answer the Score",
       "temple_tideglass_fracture": "Kính Triều Rạn Vỡ",
       "temple_undertow": "Dòng Nước Ngầm",
       "temple_lunar_tide": "Triều Trăng",
@@ -16323,6 +16392,12 @@ export const vi_VN: EnTranslations = {
       "wildheart_gorgebloom_gorge": "Ngấu Nghiến",
       "wildheart_zulgar_pulse": "Nhịp Tim Hoang Dã",
       "wildheart_zulgar_spirit_hunt": "Linh Hồn Cuộc Săn",
+      "wildheart_zulgar_hunting_spear": "Hunting Spear",
+      "wildheart_zulgar_idol_wakes": "The Idol Wakes",
+      "kituse_wildheart_pull_spear": "Pull the Spear",
+      "wildheart_idols_breath": "Idol's Breath",
+      "wildheart_sun_glyph_kindle": "Lighting",
+      "wildheart_sun_glyph_cold": "Cooling",
       "sanctum_cinder_breath": "Hơi Thở Tro Hồng",
       "sanctum_warming_rite": "Nghi Lễ Sưởi Ấm",
       "sanctum_goad": "Chọc Tức",
@@ -26131,6 +26206,9 @@ export const vi_VN: EnTranslations = {
       },
       "thorn_sprout": {
         "name": "Chồi Gai"
+      },
+      "wildheart_hunting_spear": {
+        "name": "Hunting Spear"
       },
       "buddy_ember_fox": {
         "name": "Cáo Than Hồng"
