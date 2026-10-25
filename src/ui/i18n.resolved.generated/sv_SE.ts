@@ -7479,6 +7479,7 @@ export const sv_SE: EnTranslations = {
       "sourceActivityRiftFirstClear": "Tilldelas varje medlem i gruppen som vinner första klarningen av en rankad Reva",
       "sourceActivityBuriedHoard": "Hittad i belöningskistan i en begravd skatt, valvet som en skattkartan leder till",
       "sourceActivityLanternHall": "Köps för lyktsigill hos Lykthallens kvartermästare",
+      "sourceActivityWeeklyVaultPvp": "Chosen from the PvP row of the Weekly Vault",
       "cellMissingSourceAria": "{name}, ännu inte funnen, {source}",
       "cellOwnedClearsAria": "{name}, katalogiserad, först funnen vid klarning {count}",
       "searchPlaceholder": "Sök reliker",

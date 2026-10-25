@@ -7479,6 +7479,7 @@ export const de_DE: EnTranslations = {
       "sourceActivityRiftFirstClear": "Wird jedem Mitglied der Gruppe verliehen, die den ersten Durchgang eines gewerteten Risses gewinnt",
       "sourceActivityBuriedHoard": "Gefunden in der Belohnungstruhe eines Vergrabenen Schatzes, dem Tresor, zu dem eine Schatzkarte führt",
       "sourceActivityLanternHall": "Für Laternensiegel beim Rüstmeister der Laternenhalle gekauft",
+      "sourceActivityWeeklyVaultPvp": "Chosen from the PvP row of the Weekly Vault",
       "cellMissingSourceAria": "{name}, noch nicht gefunden, {source}",
       "cellOwnedClearsAria": "{name}, katalogisiert, erstmals bei Durchgang {count} gefunden",
       "searchPlaceholder": "Reliquien durchsuchen",

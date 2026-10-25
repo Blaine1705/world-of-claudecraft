@@ -7479,6 +7479,7 @@ export const ja_JP: EnTranslations = {
       "sourceActivityRiftFirstClear": "ランク付きリフトの初回クリアを制したパーティーの全員に授与",
       "sourceActivityBuriedHoard": "宝の地図が導く「埋もれた財宝」の報酬の宝箱から手に入る",
       "sourceActivityLanternHall": "燈火の館の補給係から燈火の印章で購入",
+      "sourceActivityWeeklyVaultPvp": "週間宝物庫のPvP枠から選んで手に入る",
       "cellMissingSourceAria": "{name}、未発見、{source}",
       "cellOwnedClearsAria": "{name}、収蔵済み、初回入手はクリア {count} 回目",
       "searchPlaceholder": "聖遺物を検索",

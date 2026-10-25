@@ -7479,6 +7479,7 @@ export const nl_NL: EnTranslations = {
       "sourceActivityRiftFirstClear": "Toegekend aan elk lid van de groep die de eerste voltooiing van een gerangschikte Rift wint",
       "sourceActivityBuriedHoard": "Gevonden in de beloninsgkist van een Begraven Schat, de kluis waarnaar een kaart leidt",
       "sourceActivityLanternHall": "Gekocht voor Lantaarnzegels bij de kwartiermeester van Lantaarnhal",
+      "sourceActivityWeeklyVaultPvp": "Chosen from the PvP row of the Weekly Vault",
       "cellMissingSourceAria": "{name}, nog niet gevonden, {source}",
       "cellOwnedClearsAria": "{name}, gecatalogiseerd, voor het eerst gevonden bij voltooiing {count}",
       "searchPlaceholder": "Relieken zoeken",
