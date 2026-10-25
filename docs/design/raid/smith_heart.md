@@ -4,8 +4,8 @@ Status: phase 1 (playable blockout), phase 2A (the structure: the final boss in 
 separate room reached by a portal, bigger themed guardian rooms, the structural VFX) and
 phase 2B (the Hammer vein dressed: its Blender kit, its floor, air and light, the Hammer
 guardian's and the Slab's effects, section 5.9) and phase 2C (the Hammer vein's polish
-round and the North Stair, section 5.10), through the Breath (phase 2G, section 5.14) and the
-Quench (phase 2H, section 5.15) implemented on `feature/smith-heart-raid`, dev builds only. The per-room phases (Blender
+round and the North Stair, section 5.10), through the Breath (phase 2G, section 5.14), the
+Quench (phase 2H, section 5.15) and the Heat, now the Hearth (phase 2I, section 5.16) implemented on `feature/smith-heart-raid`, dev builds only. The per-room phases (Blender
 kits, own creatures, set pieces, boss kits), the quest and the loot are specified here
 and not built. The name is provisional and has not been IP-checked yet.
 
@@ -44,6 +44,9 @@ Sources of truth, in order:
 | The Quench vein's Blender kit (sources, build, plan, painter) | `docs/design/raid/kit/build_smith_heart_quench_kit.py` (the pieces: `quench_pieces.py`), `scripts/assets/smith_heart_quench_kit/build.mjs`, `src/render/smith_heart/quench_kit_plan_core.ts`, `src/render/smith_heart/quench_kit.ts` |
 | The Quench vein's floors, frost, air and light | `rime`, `lake_ice` grounds, `src/render/smith_heart/quench_lake_ice.ts`, `quench_frost_core.ts`, `quench_air_core.ts` / `quench_air.ts`, `heart_environment.ts` (`smithHeartQuench`) |
 | The Quench guardian's effects | `src/render/smith_heart_fx/quench_fx.ts` (`QuenchFx`) |
+| The Heat vein's Blender kit (sources, build, plan, painter) | `docs/design/raid/kit/build_smith_heart_heat_kit.py` (the pieces: `heat_pieces.py`), `scripts/assets/smith_heart_heat_kit/build.mjs`, `src/render/smith_heart/heat_kit_plan_core.ts`, `src/render/smith_heart/heat_kit.ts` |
+| The Heat vein's floors, basalt, air, light and the pour | the `hearth` ground, `src/render/smith_heart/heat_hearth_floor.ts`, `heat_soot_core.ts`, `heat_air_core.ts` / `heat_air.ts`, `heat_pour_core.ts` / `heat_pour.ts`, `heart_environment.ts` (`smithHeartHeat`) |
+| The Heat guardian's effects | `src/render/smith_heart_fx/heat_fx.ts` (`HeatFx`) |
 | Dev commands | `src/sim/dev/smith_heart_dev.ts` (`/dev heart`) |
 
 ## 1. Summary and lore
@@ -59,7 +62,7 @@ as the Sanctum's rune creed:
 
 | Strength | Element | Vein | Colour (`SMITH_HEART_VEIN_COLORS`) |
 |---|---|---|---|
-| The Heat of the forge | fire (smith fire: white-gold, never volcanic) | west, the Smith's forge, level | `0xffe6a0` white-gold |
+| The Heat of the forge | fire (the first flame: white-gold, never volcanic) | west, the Hearth, level | `0xffe6a0` white-gold |
 | The Breath of the bellows | storm | north, climbs to a cornice | `0x5ab8e8` storm blue |
 | The Hammer that shapes stone | earth | south, the entrance, descends | `0xc8903c` ochre |
 | The Quench of the cold water | frost | east, descends to a frozen lake | `0x9ad8ff` ice pale |
@@ -84,7 +87,11 @@ lay down, like a candle left lit on going to sleep. The final boss drops it, so 
 staff needs no dusk altar of its own.
 
 Fire is one strength of four and never the lead: Ignivar is already the fire raid.
-The Heat vein is a smithy (crucibles, chains, coal, white-gold fire), not lava.
+The Heat vein is the Hearth (phase 2I, the owner's decision; section 5.16): the Smith's
+first flame, white-gold fire sealed in living crystal and in the mountain's dark basalt.
+It is no smithy (no anvil, bellows, crucible, chain, coal or tool) and never lava; the
+Smith never appears as a character. Varkhul's Last Flame was a spark stolen from this
+vein: a scorched, empty socket in the Hearth's crystal shows where.
 
 ## 2. Instance facts
 
@@ -146,16 +153,17 @@ rather than repeating numbers that would rot.
 | The Storm Cornice (Breath arena) | a cracked plateau about 100 by 80 yd at the top of the mountain, its rim cut by five wind channels | `BREATH.cornice`, `CORNICE_CHANNELS` |
 | The Quench | q1, q2, the Singing Ice, the lake descent | `QUENCH` |
 | The Quench Basin (Quench arena) | a rock shelf about 96 by 92 yd with the frozen lake on it | `QUENCH.shelf`, `QUENCH.lake` |
-| The Heat | the forge hall, the casting floor, the Pour Channel, the anvil bridge | `HEAT`, `POUR_CHANNEL` |
-| The Smith's Forge (Heat arena) | an eight-sided hall about 82 by 92 yd, the great hearth in its west wall, the giant anvil before it | `HEAT.forge`, `GREAT_HEARTH`, `GIANT_ANVIL` |
+| The Heat | the hall, the casting floor, the Pour Channel, the bridge (the layout's ids keep their forge names: `forge_hall`, `anvil_bridge`) | `HEAT`, `POUR_CHANNEL` |
+| The Hearth (Heat arena, the layout's `smiths_forge`) | an eight-sided hall about 82 by 92 yd, the Hearth's mouth in its west wall, the great altar-stone before it | `HEAT.forge`, `GREAT_HEARTH`, `GIANT_ANVIL` |
 
 Each room reads its theme by shape first (kit placeholders in
 `src/render/smith_heart/heart_plan_core.ts`): the Quarry's kneeling colossi, cut blocks,
 derrick, ochre geodes and the five columns (Mountain's Wrath's line-of-sight cover);
 the Cornice's lightning rods and stone wind-horns (phase 2G, section 5.14); the Basin's great
 blades of ice sunk in the lake, heaped old ice, steaming vents and carved fire bowls (phase 2H,
-section 5.15); the Forge's great arched hearth, giant
-anvil (side-on to the door, horn north), bellows, crucibles and casting channels.
+section 5.15); the Hearth's mouth framed by radiating basalt columns, its altar-stone (on
+the old anvil's footprint, its crystal crown north), the ember boulders, the clusters of
+the first flame's crystal and the seams of fire in its floor (phase 2I, section 5.16).
 
 ### 3.2 The Heart (the separate final room)
 
@@ -192,7 +200,7 @@ than the veins' rock, and no line of sight crosses from any main-map eye into th
    round it, the three vein mouths.
 3. **The Ring** (eight packs) by the two Balcony Stairs; then in ANY order the
    **Breath** (to the Storm Cornice), the **Quench** (to the Quench Basin) and the
-   **Heat** (to the Smith's Forge), each behind its own three packs.
+   **Heat** (to the Hearth), each behind its own three packs.
 4. Each guardian's death lights its vein's **light river**; the river runs to the seal
    and its quarter fills. With all four lit and the Ring clear, the seal **opens into
    the portal**.
@@ -214,7 +222,7 @@ back to the dais at any time.
 | Ring and dais | Ring 0, dais -4 | the Ring looks down onto the seal |
 | Breath | 0, 16, 40, Cornice 60 | climbs into the wind, a summit |
 | Quench | -8, -16, -24, Basin -30 | sinks into the cold |
-| Heat | 0 throughout | the forge's level |
+| Heat | 0 throughout | the Hearth's level |
 | Heart | terrace +4, platform 0 | the arrival looks down onto the platform |
 
 Every path's slope stays under the authored field's limit
@@ -391,7 +399,7 @@ own fog and light state, `smithHeartCore` (`heart_environment.ts`), and so does 
 Hammer vein, `smithHeartHammer` (phase 2B: a warm quarry dusk, the key low from the
 south-west raking the terraces, the realm's blue sky light all but off), the Ring
 (`smithHeartRing`, phase 2F), the Breath (`smithHeartBreath`, phase 2G) and the Quench
-(`smithHeartQuench`, phase 2H); the Heat keeps the borrowed storm grade until its phase.
+(`smithHeartQuench`, phase 2H), and so does the Heat (`smithHeartHeat`, phase 2I).
 
 ### 5.9 The Hammer vein dressed (phase 2B)
 
@@ -669,6 +677,63 @@ frost on the encounter band under the telegraph's fill front. The new stones sta
 layout colliders at the landings' rims, clear of every walking line; the braziers' colliders
 grew to a body's width. No boss mechanic and no number changed.
 
+### 5.16 The Heat vein, now the Hearth (phase 2I)
+
+The owner's decision (2026-10-25, the "no repetir a Varkhul / Ignivar" note of the
+design decisions): the Heat is no longer a forge. It is the Hearth, the Smith's first
+flame: white-gold fire (never volcanic red) sealed in living crystal and in the
+mountain's dark basalt, cooled into the bundled hexagonal columns the whole vein is known
+by. No anvil, bellows, crucible, chain, coal or tool; the Smith never appears. Visual
+only: every layout id, constant, collider, gate, pack spot and mechanic the sim uses
+keeps its place (`HEAT`, `HEAT.forge`, `GREAT_HEARTH`, `GIANT_ANVIL`, `POUR_CHANNEL`,
+`sh_pour_crucible`, `anvil_mouth` and the rest keep their forge names); only what the
+player sees changed. The kit is `docs/design/raid/kit/heat_pieces.py`, built by
+`build_smith_heart_heat_kit.py` and shipped as `public/models/props/smith_heart_heat_kit.glb`
+(two slots: KitStone, KitGlow).
+
+| Piece | Look | Where |
+|---|---|---|
+| The floors | Every Heat walk is the heads of the basalt columns (a jittered hexagonal lattice, a yard and a half to two across, each its own warm dark grey, worn to a low dome), deep joints with ash packed into stretches of them, and in a few wandering bands the joints burn: the floor's material finds their painted hue and lights them with the first flame, breathing slow and uneven (never a pulse that reads as a warning), the heads either side baked umber. The cliffs under the floors are rock, not masonry | `hearth` ground (`paintHearth`, `HEARTH_SEAM_PAINT`, `hearthColor`), `heat_hearth_floor.ts` (the field terrain's `topMaterial` seam) |
+| The Hearth's mouth | The old great hearth: a vast natural mouth in the mountain behind the Forge's west wall, framed by a fan of basalt columns radiating round its pointed arch (as basalt cools round a vent), soot climbing the face over it; its throat full of the first flame's crystal, great white-gold prisms rising from its floor, hanging from its roof, crowding a faceted heart burning at the back. By the left jamb, a cluster of crystal with its heart torn out, its socket scorched black and cracked: the spark Varkhul's Last Flame was. Render only, past the floor's lip, no shadow | `Kit_HearthMouth` on `sh_great_hearth` |
+| The altar-stone | On the old giant anvil's footprint and height: a dolmen of the mountain's basalt, three pairs of columns in a bed of stumps carrying one great capstone, a crack of white-gold fire down its table and over its edges, crystal breaking out of its north end (where the anvil's horn was) and rising under it from the ground | `Kit_AltarStone` on `sh_giant_anvil` |
+| The wellspring | The pour crucible's spot: a cracked mound of column stumps brimming with the first flame (a low dome of white-gold fire, crust riding on it), crystal crowding its back, its lip split toward the Pour Channel where a tongue of fire spills down a chute to the channel's head | `Kit_Wellspring` on `sh_pour_crucible` (`HEAT_WELL_FIRE`) |
+| The Pour Channel and its spill | The groove the fire has worn across the casting floor (its bed one dark glassy skin of the cooled pour, a residue glowing faint down its middle, worn lips of the floor's columns a hand proud), and at the floor's south lip the notch it pours through, cheek stones either side and the glaze the pours ran down the cliff in | `Kit_PourChannel`, `Kit_PourSpill`, `planHeatChannel` |
+| The crystal, the boulders | The old crucibles are clusters of the first flame's crystal on beds of column stumps; the old bellows long boulders of basalt split open by a seam of fire, crystal grown in the split; the old casting channels seams of fire laid along the Forge's floor | `Kit_FireCrystalA`, `B`, `Kit_EmberBoulder`, `Kit_FireCrackA`, `B` |
+| The hall's sides | Bundles of basalt columns rising out of the chasm at ten of the Forge's corners (the two by the mouth are its jambs), their heads stepped, fire in a joint, crystal breaking out of a side: the eight-sided hall as carved mountain. Past the lips, never over a walk | `Kit_HearthPillar`, `planHeatPillars` |
+| The bridge and the walls | The anvil bridge stands on a natural arch of columnar basalt, its eye glazed warm by the chasm's fire (the field keeps only a shallow keel under the deck, `HEAT_KIT_SHALLOW`, and no mountain lip hangs there); every Heat lip over the void takes a rank of basalt columns, their heads a knee high, ash on them, never across the spill; drifts of ash banked at their feet | `Kit_HeatBridge`, `Kit_HeatWallA`, `B`, `planHeatWalls`, `Kit_AshDriftA`, `B` |
+| The mountain | Calm (2G's big masses): in the Heat its rock, its heightfield and the field's cliffs turn to sooted basalt in big value groups only, broad vertical bands of its columns, faint soot up the faces, ash on the ledges | `heat_soot_core.ts` (`heatSootWeight`, the rock material's `heatSootGlsl`, `heatCliffPaint`) |
+| The light | Its own state, `smithHeartHeat`: a warm white-gold key low from the west (the Hearth's side), over a cool slate smoke fill and a dim umber bounce (the fire below), so the basalt's shade is a cool dark grey, never black, and the warm lives in the key and the fire; a smoke haze a breath of grey-brown. The Hearth's own point light lays its gold across the Forge; another burns deep in the chasm under the bridge | `heart_environment.ts` (`SMITH_HEART_HEAT_LIGHT`, `SMITH_HEART_HEAT_FOG`, `inHeatLight`), `heart_plan_core.ts` (`hearth`, `chasm:heat`) |
+| The sky | The smoke of the first flame climbing out of the fissure and drifting east in slow billows, lit gold from below near the rim, a hazy white-gold sun low in the west behind it, a deep warm slate overhead | `heart_sky.ts` (`setHeat`) |
+| The weather | Embers rising over every Heat walk and out of the chasm, thick in the Hearth's throat; tall tongues of the first flame among its crystal; smoke climbing out of the chasm and off the Hearth's crown; the fire deep in the chasm glowing under the walks; a halo round every cluster of crystal; the heat's shimmer over the mouth, the wellspring and the bridge's chasm | `heat_air.ts` (`planHeatAir`), the shared fire shaders `heart_fire_glsl.ts` |
+| The pour | The set piece's look (section 6.4's mechanic is not built): every 26 seconds the wellspring brims and glows, the channel's bed lights from its head to the lip, then white-gold fire runs down it, fills it, falls off the lip into the chasm and drains, cooling dark | `heat_pour.ts` (`heatPourLook`, `HEAT_POUR`) |
+
+Effects of the Heat guardian (`src/render/smith_heart_fx/heat_fx.ts`, presentation only,
+the sim untouched):
+
+| Moment | Look |
+|---|---|
+| Molten Pour, on its bar | its footprint (a lane at the pour's exact length and width, aimed where the bar locked it) fills; the first flame gathers at the guardian, the floor's seams light down the lane toward its end, sparks run along it |
+| Molten Pour, landing | white-gold fire pours down the lane behind a wave of flame (never past its width), spatter and sparks thrown up, the lane left molten, cooling to a dark crust in plates and smoking a few seconds, a ring, a short shake |
+| Searing Knell, on its bar | its footprint (a ring at the stun's exact radius) fills; the fire is drawn into a sphere over the guardian, cracks of fire run out over the floor to the ring's edge |
+| Searing Knell, landing | a flash, a wall of white-gold fire ringing out to the stun's edge (never past it), the cracks flaring and fading, three rings of the toll, sparks and ash flung out, a short shake |
+
+Readability: the two footprints are the shared floor telegraph (threat colour `danger`,
+the vein's white-gold as the accent) on every graphics tier; before 2I these casts had
+only their bars. The pour's warning glow and its flow draw on every tier; the embers,
+sparks, smoke and haze are cosmetic (the low tier keeps a third of the particles and
+no haze; the flames, the halos and the chasm's glow stay), reduced motion drops the
+shake. Every effect is built with the interior or under one compile-gated root, so
+nothing links on first use; the channel's glow is a floor mark on the ground rung, the
+molten lane and the seams on the encounter band under the telegraph's fill front. No
+new collider: every solid stands on the layout's old ones or past the lips. No boss
+mechanic and no number changed.
+
+Player-visible text: the guardian's knell was "Anvil Clang"; it is now "Searing Knell"
+(the English source in `src/sim/content/smith_heart.ts`, `src/ui/sim_i18n.ts` and
+`src/ui/i18n.catalog/merge.ts`; its ids unchanged; the name was web-checked and collides
+with no other game's). The anvil bridge's gate reads "Hearth Mouth" (it read "Anvil
+Mouth"; its id `anvil_mouth` unchanged). The pour keeps "Molten Pour".
+
 ## 6. Set pieces (phase 2 specs)
 
 None of these is built in phase 1; their floors, props and anchors are. Every
@@ -718,13 +783,16 @@ room rule, `docs/design/boss-rooms/README.md`).
 
 ### 6.4 Heat: the pour
 
-- Where: `POUR_CHANNEL` across the casting floor, fed by `sh_pour_crucible` at
-  (-132, 30); the Heat light river crosses it at z 0.
-- Behaviour: the great crucible tilts and pours molten metal down the channel on a
+- Where: `POUR_CHANNEL` across the casting floor, fed by the wellspring (the layout's
+  `sh_pour_crucible`, at (-150, 31)); the Heat light river crosses it at z 0.
+- Behaviour: the wellspring brims and pours the first flame's fire down the channel on a
   fixed cycle. Cross between pours, and fight f2 and f3 without standing in the
   channel.
-- Telegraph: the crucible tilts and the channel glows before the flow arrives.
+- Telegraph: the wellspring brims and glows and the channel's bed lights from its head
+  down to the lip before the flow arrives.
 - Low tier: sparks and heat haze shed; the channel's warning glow and the flow stay.
+- Look (phase 2I, section 5.16; the mechanic is not built): the whole cycle plays on the
+  shared clock (`heat_pour_core.ts`), in the vein's white-gold, never a threat colour.
 
 ## 7. Boss kits
 
@@ -776,10 +844,14 @@ the meters harness, never shipped unmeasured.
 
 ### 7.4 Guardian of the Heat
 
-- Look: a faceless ember smith with a red-hot anvil chained to its arm; fights on
-  the anvil-shaped platform between molten channels.
-- Phase 1 (`heart_heat_guardian`): Molten Pour (cast-bar line, step out); Anvil
-  Clang (cast-bar stun on everyone close).
+- Look: to be designed with the Hearth (phase 2I): no smith and no anvil (the Smith
+  never appears as a character); fights before the altar-stone, the Hearth's mouth
+  behind it, the seams of fire in the floor round it.
+- Phase 1 (`heart_heat_guardian`): Molten Pour (cast-bar line, step out); Searing
+  Knell (cast-bar stun on everyone close; its id keeps the old name,
+  `heart_anvil_clang`: phase 2I renamed only what the player reads, from "Anvil Clang").
+- Presentation (phase 2I, section 5.16): Molten Pour telegraphs its lane and Searing Knell
+  its ring on every tier, with the first flame's fire. Mechanics and numbers unchanged.
 - Target: growing pools that spread unless someone soaks them, a shared strike that
   must be split among several players standing together, a heavy healing check.
 
@@ -958,7 +1030,10 @@ captures and review before the next:
    floors, its light, sky, frost and weather, the Singing Ice's look, the guardian's effects).
    Still to build: the singing ice's mechanic (its look is in), the brazier cold-cleansing
    mechanic (the bowls are in), the guardian's target kit and its own body.
-5. **The Heat**: the hearth, anvil, bellows and crucibles as models, the pour.
+5. **The Heat**: DRESSED as the Hearth in phase 2I (section 5.16: the kit, the columnar
+   basalt floors, its light, sky, basalt and weather, the pour's look, the guardian's
+   effects). Still to build: the pour's mechanic (its look is in), the guardian's target
+   kit and its own body.
 6. **The Heart**: the platform, altars, chains and core as models; the final boss's
    form choice, altar drags and adds.
 7. Original creature models for every trash and boss body (the official pipeline:

@@ -1,7 +1,7 @@
 <!-- src/render/smith_heart/: the Smith's Heart raid's open-air renderer (phase 2A:
      the structure; phase 2B: the Hammer vein's Blender kit, air and light; phase 2C:
      its polish round; phase 2D: its last weak points; phase 2E: the mountain's rock
-     kit and the Gallery's walk; phase 2F: the Ring's kit, the seal and the portal; phase 2G: the Breath vein's kit, light, sky and weather; phase 2H: the Quench vein's kit, floors, frost, light, sky and weather). Presentation only (parent dirs cover the IWorld seam,
+     kit and the Gallery's walk; phase 2F: the Ring's kit, the seal and the portal; phase 2G: the Breath vein's kit, light, sky and weather; phase 2H: the Quench vein's kit, floors, frost, light, sky and weather; phase 2I: the Heat vein as the Hearth, its kit, floors, basalt, light, sky, weather and the pour). Presentation only (parent dirs cover the IWorld seam,
      determinism and the GPU scheduler contract). Don't repeat root / src / render
      CLAUDE.md. -->
 
@@ -19,8 +19,9 @@ derives from them. The Hammer vein (the Cleft, the Gallery, the Smith's Quarry, 
 the Balcony's lookouts) is dressed with its Blender kit
 (`public/models/props/smith_heart_hammer_kit.glb`, built from
 `docs/design/raid/kit/build_smith_heart_hammer_kit.py`); the Ring, the Breath and the
-Quench have their own kits (phases 2F to 2H); the Heat's and the Heart's props are still
-placeholders composed from boxes, cylinders, cones and gems until their own phases. The
+Quench and the Heat (the Hearth, never a forge) have their own kits (phases 2F to 2I); the
+Heart's props are still placeholders composed from boxes, cylinders, cones and gems until its
+own phase. The
 Hammer guardian's and the Slab's effects are `../smith_heart_fx/`. The borrowed creature
 bodies live in ONE list, `../characters/smith_heart_placeholder_looks.ts`.
 
@@ -44,6 +45,12 @@ bodies live in ONE list, `../characters/smith_heart_placeholder_looks.ts`.
 | `quench_lake_ice.ts` | The Frozen Lake's and the Singing Ice's surface (the `lake_ice` tops through the field terrain's `topMaterial` seam): a lit standard material over the painted frost skin with depth (dark water, bubbles at three depths and old cracks under parallax, the sky at grazing angles, the shallows paler), snow at every edge, the Singing Ice crazed and rougher. Opaque; the low tier one bubble layer, the Lambert tier the skin alone. |
 | `quench_frost_core.ts` | PURE: the Quench's frost on the mountain (`quenchFrostWeight`, faded in past the Ring and out at the Breath and the Heart), its GLSL for the rock material (a cold film, rime on the ledges, faint glaze; read from the slot's origin, `setHeartRockSlot`), the heightfield's tint and the field cliffs' frost granite (`quenchCliffPaint`). |
 | `quench_air_core.ts` / `quench_air.ts` | PURE plan and painter of the Quench's air (phase 2H): snow and frost motes over every Quench walk, steam off the vents and out of the rock, pale mist in the void under the walks, the braziers' fire (flame, embers, halo, a warm pool on the snow), and the Singing Ice's creaks (`quenchCreakAt`, `quenchCreakLook`: a crack running out across the sheet, bursting into frost). Shader driven on the shared clock; cosmetic; the low tier a third of the particles (the fire and the creaks stay). |
+| `heat_kit_plan_core.ts` / `heat_kit.ts` | PURE plan and painter of the Heat's kit (phase 2I: `public/models/props/smith_heart_heat_kit.glb`, from `docs/design/raid/kit/build_smith_heart_heat_kit.py`): the Hearth's mouth, the altar-stone, the wellspring, the crystal clusters and the ember boulders on the layout's old forge props and colliders (ids frozen), the Pour Channel from the wellspring to its spill at the south lip (`heatChannelRun`), the column bundles past the Forge's corners (`planHeatPillars`), the bridge's arch (the field keeps a shallow keel under it, `HEAT_KIT_SHALLOW`, and no mountain lip hangs there), the walls along every Heat lip (never across the spill), the seams of fire and the ash flat on the floors. |
+| `heat_hearth_floor.ts` | The Heat's floors (the `hearth` tops through the field terrain's `topMaterial` seam): the joints the painter marked as burning (`HEARTH_SEAM_PAINT`, found in the map by `hearthSeamMask`) scorched dark and lit with the first flame, breathing slow; opaque, lit, under every telegraph; the low tier steady, the Lambert tier the painted joints alone. |
+| `heat_soot_core.ts` | PURE: the Heat's basalt on the mountain (`heatSootWeight`, faded in past the Ring and out at the Hammer and the Breath), its GLSL for the rock material (`heatSootGlsl`: darkened, the columns' vertical bands, soot, ash on the ledges; read from the slot's origin), the heightfield's tint and the field cliffs' columnar basalt (`heatCliffPaint`). |
+| `heat_air_core.ts` / `heat_air.ts` | PURE plan and painter of the Heat's air (phase 2I): embers over every Heat walk and out of the chasm, the first flame's tongues in the Hearth's throat (`hearthThroatPoint`), smoke out of the chasm and off the Hearth's crown, the chasm's fire glowing under the walks, halos round the crystal, the heat's shimmer. Cosmetic; the low tier a third of the particles and no haze (the flames, halos and glow stay). |
+| `heat_pour_core.ts` / `heat_pour.ts` | PURE timeline and painter of the pour, the Heat's set piece's look (`heatPourLook`, `HEAT_POUR`: the wellspring brims and the channel's bed lights to the lip BEFORE the flow, then the flow, the fall off the lip, the drain; the shaders run the same arithmetic). The warning glow and the flow on every tier (the channel on the ground rung), the sparks shed on the low tier; the vein's white-gold, never a threat colour. |
+| `heart_fire_glsl.ts` | The fire in the air shared by the Quench's fire bowls and the Heat's Hearth: a flame's billboards, embers off a fire, a soft glow (halo, ember, pool). |
 | `heart_ice_sheen.ts` | The kits' ice slot's touch (phase 2H): a cold sheen at grazing angles and a breath of inner light on a lit vertex-colour material. |
 | `heart_air_quads.ts` | The air systems' one geometry (the Hammer's, the Breath's and the Quench's): merged view-space quads. |
 | `hammer_walk_plan_core.ts` | PURE: the Gallery's worn kerb and chain rail along its lips over the chasm (the rail never over a walk); the paving is its `paving` ground, the fallen blocks layout props. |
@@ -74,8 +81,15 @@ Rules:
   is its own fog state, the Hammer vein's too (`smithHeartHammer`: warm key, cool
   slate-violet fill, a neutral dust; never a warm wash over everything), the Ring's and
   the Breath's and the Quench's too (`smithHeartRing`, `smithHeartBreath`,
-  `smithHeartQuench`); the rest of the main map's (the Heat) is the borrowed `sunkenBastion`
-  state.
+  `smithHeartQuench`) and the Heat's (`smithHeartHeat`, phase 2I: a warm key from the
+  Hearth's side over a cool slate fill, never a warm wash); whatever no vein's light holds
+  keeps the borrowed `sunkenBastion` state.
+- The Heat is the Hearth, never a forge (the owner's decision, phase 2I): no anvil, bellows,
+  crucible, chain, coal or tool in any piece, and white-gold fire, never volcanic red. The
+  layout's forge ids stay (frozen); only the look changes. Its weather (`heat_air.ts`) is
+  cosmetic; the pour's warning glow and flow (`heat_pour.ts`) draw on every tier, in the
+  vein's white-gold, under every telegraph. The Heat guardian's lane and ring are
+  `../smith_heart_fx/heat_fx.ts`'s, on every tier.
 - The Quench's weather (snow, motes, steam, mist, fire, creaks, `quench_air.ts`) is
   cosmetic: never a telegraph (the creaks wear the vein's pale light, never a threat
   colour, on the ground rung under every telegraph), its mist under the walks and past
@@ -120,5 +134,8 @@ effects), `tests/smith_heart_rock_kit.test.ts` (the rock kit and its plan) and
 `tests/smith_heart_breath_kit.test.ts` (the scoured floor, the Breath kit and its plan) and
 `tests/smith_heart_breath_air.test.ts` (its air, weather and light),
 `tests/smith_heart_quench_kit.test.ts` (the frost and lake-ice floors, the Quench kit and its
-plan) and `tests/smith_heart_quench_air.test.ts` (its air, creaks, frost and light). Evidence:
+plan), `tests/smith_heart_quench_air.test.ts` (its air, creaks, frost and light),
+`tests/smith_heart_heat_kit.test.ts` (the hearth floors, the Heat kit and its plan, the
+renamed knell) and `tests/smith_heart_heat_air.test.ts` (the pour's timeline, its air, basalt
+and light). Evidence:
 `scripts/smith_heart_hammer_shot.mjs` (its `mesh:` action waits on an effect mesh).
