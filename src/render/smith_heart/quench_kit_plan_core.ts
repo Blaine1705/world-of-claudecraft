@@ -274,7 +274,7 @@ export function planQuenchDressing(): HeartKitPlacement[] {
     const x = L.x + Math.sin(a) * (L.rx + out1);
     const z = L.z + Math.cos(a) * (L.rz + out1);
     const surf = authoredFieldSurfaceAt(F, x, z);
-    if (!surf || surf.id !== 'lake_shelf') continue;
+    if (surf?.id !== 'lake_shelf') continue;
     out.push({
       piece: k % 3 ? 'Kit_SnowDriftA' : 'Kit_SnowDriftB',
       x,
