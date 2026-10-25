@@ -571,7 +571,17 @@ jobs:
     # packing, never from the simulation (the review round showed a
     # simulated 9.79m flat pack against a real 11.21m when one modeling
     # assumption was wrong).
-    timeout-minutes: 37
+    # 2026-10-25 v0.45 re-derivation: run 40134416344 at 8a9bd02c
+    # was SELECTIVE; its completed healthy shard 6 took 35m52s. Shard 5
+    # (attempt 1) and shard 7 (attempt 2) reached the 37-minute limit with
+    # passing tests still running. Use the completed wall, not an estimate
+    # from either cancelled leg: (35 + 52/60) x 1.60 x 1.37 = 78.62,
+    # rounded up to 79. Selection, worker counts, and test coverage stay
+    # unchanged. This workflow edit widens its own PR run to FULL, so that
+    # run cannot be used to remeasure selective performance. The queue's
+    # 90-minute response ceiling leaves only 3 minutes beyond the maximum
+    # 8 + 79 required path; actual FULL walls must be monitored separately.
+    timeout-minutes: 79
     runs-on: ubuntu-latest
 
     # The real-SQL merge bar (ruling R16, recorded in the woc-marketplace
