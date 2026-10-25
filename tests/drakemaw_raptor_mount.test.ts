@@ -556,10 +556,12 @@ describe('the Drakemaw Raptor mount', () => {
   });
 
   it('plants its feet at exactly the ridden speeds: the refs are foot-lock speeds', () => {
-    // Both catalog mounts ride this visual, so its refs are each one's ridden speeds.
+    // Both catalog mounts ride this visual. Its refs were authored at the former
+    // epic ride speed (+80%); riding training now sets the speed and the gait
+    // time scale absorbs the difference.
     for (const key of ['drakemaw_raptor', 'referral_raptor'] as const) {
       expect(MOUNT_VISUAL_SPECS[key].visualKey).toBe('mount_drakemaw_raptor');
-      const ridden = RUN_SPEED * (1 + MOUNTS[key].moveSpeedPct);
+      const ridden = RUN_SPEED * (1 + 0.8);
       expect(def.runRef, `${key} runRef`).toBeCloseTo(ridden, 9);
       expect(def.walkBackRef, `${key} walkBackRef`).toBeCloseTo(ridden * BACKPEDAL_MULT, 9);
     }

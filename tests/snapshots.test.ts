@@ -25,6 +25,7 @@ import { tsFilesUnder } from './helpers/ts_files_under';
 // Mock the db layer so no Postgres is needed; snapshot logic is under test.
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
+  runWithStatementTimeout: vi.fn(async () => ({ rows: [] })),
   saveCharacterState: vi.fn(async () => {}),
   saveCharacterAndGuildBankState: vi.fn(async () => true),
   saveCharacterAndMarketState: vi.fn(async () => {}),
@@ -1491,6 +1492,7 @@ describe('delta snapshots', () => {
         weaponSkinIds: [],
         weaponSkinLoadout: {},
         mountSkinIds: [],
+        collectibleMountSkinIds: [],
       },
     });
     if ('error' in joined) throw new Error(joined.error);
@@ -1504,6 +1506,7 @@ describe('delta snapshots', () => {
       weaponSkinIds: [],
       weaponSkinLoadout: {},
       mountSkinIds: [],
+      collectibleMountSkinIds: [],
     });
 
     const client = bareClient(session.pid);
@@ -1514,6 +1517,7 @@ describe('delta snapshots', () => {
       weaponSkinIds: [],
       weaponSkinLoadout: {},
       mountSkinIds: [],
+      collectibleMountSkinIds: [],
     });
   });
 
@@ -3143,9 +3147,10 @@ describe('autosaves', () => {
   it('holds each character save under the shared major-producer permit', async () => {
     const gate = createBackgroundDbGate(3, 2); // one admitted producer
     const server = new GameServer(undefined, gate);
-    joinServer(server, fakeWs(), 1, 'Testa');
-    joinServer(server, fakeWs(), 2, 'Testb');
-    joinServer(server, fakeWs(), 3, 'Testc');
+    // A completed join projection isolates save admission from ownership refreshes.
+    joinServer(server, fakeWs(), 1, 'Testa', 'warrior', { accountMountItems: [] });
+    joinServer(server, fakeWs(), 2, 'Testb', 'warrior', { accountMountItems: [] });
+    joinServer(server, fakeWs(), 3, 'Testc', 'warrior', { accountMountItems: [] });
     let releaseDb!: () => void;
     const dbHold = new Promise<void>((resolve) => {
       releaseDb = resolve;
@@ -3174,7 +3179,7 @@ describe('autosaves', () => {
   it('joins the character FIFO before taking the shared DB permit', async () => {
     const gate = createBackgroundDbGate(1, 0); // the supported one-lane edge
     const server = new GameServer(undefined, gate);
-    const session = joinServer(server, fakeWs(), 1, 'Testa');
+    const session = joinServer(server, fakeWs(), 1, 'Testa', 'warrior', { accountMountItems: [] });
     const order: string[] = [];
     let markHeadStarted!: () => void;
     const headStarted = new Promise<void>((resolve) => {
@@ -3296,7 +3301,7 @@ describe('autosaves', () => {
   it('gates WOC dirty-book preflush and mail persistence at their innermost DB calls', async () => {
     const gate = createBackgroundDbGate(1, 0);
     const server = new GameServer(undefined, gate);
-    const session = joinServer(server, fakeWs(), 1, 'Testa');
+    const session = joinServer(server, fakeWs(), 1, 'Testa', 'warrior', { accountMountItems: [] });
     const guildId = 914;
     server.sim.loadGuildBank(guildId, {
       treasury: 0,
@@ -5699,10 +5704,9 @@ describe('online mount command and race-event transport', () => {
       { t: 'cmd', cmd: 'mount_race_cancel' },
     ]);
 
-    // The toggle no longer summons: reins are items, so an unmounted toggle is a
-    // no-op and neither player starts a summon channel from it.
+    // The toggle summons the trained ride only for the acting character.
     server.handleMessage(actor, outbox[0]);
-    expect(actorEntity.mountCastKey).toBe('');
+    expect(actorEntity.mountCastKey).toBe('valorsteed');
     expect(otherEntity.mountCastKey).toBe('');
 
     // Put the actor at the course already mounted, then start through the
@@ -6215,6 +6219,9 @@ function dirtyEveryDeltaField(): {
     { itemId: 'baked_bread', count: 3 },
     { itemId: 'reins_grag_bear', count: 1 },
   ];
+  // Direct fixture mutations must invalidate the account ownership cache.
+  meta.wireRev++;
+  meta.bankWireRev++;
   meta.vendorBuyback = [{ itemId: 'apprentice_staff', count: 1 }];
   meta.equipment = { ...meta.equipment, mainhand: 'zealotsbane_blade' };
   meta.equipmentInstance = {
@@ -6411,13 +6418,13 @@ function dirtyEveryDeltaField(): {
   meta.activeLoadout = 0;
 
   // Session-scoped account cosmetics.
-  leader.accountCosmetics = {
+  (server as any).cosmetics.updateLive(leader.accountId, {
     completedQuestIds: ['q_aldrics_fallen_star'],
     mechChromaIds: ['amber_crimson'],
     weaponSkinIds: [],
     weaponSkinLoadout: {},
     mountSkinIds: [],
-  };
+  });
   // Session-scoped stored action-bar layout (`hbl`, self-only): set the frozen
   // join-time wire view (the per-profile document plus the desktop `forms`
   // mirror), pre-serialized as the session holds it, so the heavy self block
@@ -6795,6 +6802,7 @@ describe('full self-state snapshot delta fixture', () => {
       weaponSkinIds: [],
       weaponSkinLoadout: {},
       mountSkinIds: [],
+      collectibleMountSkinIds: ['grag_bear'],
     });
     expect([...client.questLog.values()]).toEqual([
       { questId: 'q_widows', counts: [10, 0], state: 'active' },
@@ -6842,7 +6850,7 @@ describe('full self-state snapshot delta fixture', () => {
       bankerId: null,
       cargo: [{ itemId: 'wolf_fang', count: 3 }],
       withdrawals: [],
-      revision: 7,
+      revision: 8, // 7 plus the fixture's one bankWireRev bump
       bankSlots: [],
     });
     expect(client.courierInfo).not.toHaveProperty('retryRemaining');
@@ -7117,6 +7125,95 @@ describe('full self-state snapshot delta fixture', () => {
     ]);
   });
 
+  it('shares banked reins across account sessions and revokes the worn skin after final removal', () => {
+    const server = new GameServer();
+    const ownerWire = fakeWs();
+    const wearerWire = fakeWs();
+    const owner = server.join(ownerWire.ws, 890, 891, 'ReinsOwner', 'warrior', null, false, {
+      accountMountItems: [],
+    });
+    // GM session exemption permits two live characters in this account fixture.
+    const wearer = server.join(wearerWire.ws, 890, 892, 'ReinsWearer', 'warrior', null, true, {
+      accountMountItems: [],
+    });
+    if ('error' in owner || 'error' in wearer) throw new Error('join failed');
+    const sim = server.sim;
+    const client = bareClient(wearer.pid);
+    const ownerMeta = sim.meta(owner.pid)!;
+    sim.addItem('reins_grag_bear', 1, owner.pid);
+    // Selection before a broadcast also exercises the command-side ownership sync.
+    server.handleMessage(
+      wearer,
+      JSON.stringify({ t: 'cmd', cmd: 'change_mount_skin', skin: 'grag_bear' }),
+    );
+    expect(sim.entities.get(wearer.pid)!.mountSkinId).toBe('grag_bear');
+    broadcast(server);
+    (client as any).applySnapshot(lastSnap(wearerWire.sent));
+    expect(client.ownedMounts()).toContain('grag_bear');
+    expect(client.player.mountSkinId).toBe('grag_bear');
+
+    const banker = sim.entities.get(sim.bankerIds[0])!;
+    sim.entities.get(owner.pid)!.pos = { ...banker.pos };
+    const slot = ownerMeta.inventory.findIndex((item) => item.itemId === 'reins_grag_bear');
+    sim.bankDeposit(slot, 1, owner.pid);
+    expect(sim.countItem('reins_grag_bear', owner.pid)).toBe(0);
+    expect(ownerMeta.bank.inventory.some((item) => item.itemId === 'reins_grag_bear')).toBe(true);
+    broadcast(server);
+    (client as any).applySnapshot(lastSnap(wearerWire.sent));
+    expect(client.ownedMounts()).toContain('grag_bear');
+
+    const bankSlot = ownerMeta.bank.inventory.findIndex(
+      (item) => item.itemId === 'reins_grag_bear',
+    );
+    sim.bankWithdraw(bankSlot, 1, owner.pid);
+    sim.removeItem('reins_grag_bear', 1, owner.pid);
+    broadcast(server);
+    (client as any).applySnapshot(lastSnap(wearerWire.sent));
+    expect(client.ownedMounts()).not.toContain('grag_bear');
+    expect(client.accountCosmetics.collectibleMountSkinIds).not.toContain('grag_bear');
+    expect(client.player.mountSkinId).toBeNull();
+  });
+
+  it.each(['buy', 'learn_riding'] as const)(
+    'binds %s riding purchases to the quoted rank',
+    (cmd) => {
+      const server = new GameServer();
+      const fc = fakeWs();
+      const session = joinServer(server, fc, 901, 'QuotedRider');
+      const sim = server.sim;
+      sim.setPlayerLevel(20, session.pid);
+      const player = sim.entities.get(session.pid)!;
+      const meta = sim.meta(session.pid)!;
+      const marla = [...sim.entities.values()].find((e) => e.templateId === 'stablemaster_marla')!;
+      player.pos = { ...marla.pos };
+      meta.copper = 10_800_000;
+      const send = (ridingTier: number) =>
+        server.handleMessage(
+          session,
+          JSON.stringify({
+            t: 'cmd',
+            cmd,
+            npc: marla.id,
+            item: 'riding_training',
+            ridingTier,
+          }),
+        );
+      send(0);
+      send(0);
+      expect(meta.copper).toBe(10_000_000);
+      expect(player.ridingTier).toBe(1);
+      send(1);
+      send(1);
+      expect(meta.copper).toBe(0);
+      expect(player.ridingTier).toBe(2);
+      broadcast(server);
+      const client = bareClient(session.pid);
+      (client as any).applySnapshot(lastSnap(fc.sent));
+      expect(client.ridingTrainingTier()).toBe(2);
+      expect(client.player.ridingTier).toBe(2);
+    },
+  );
+
   it('keeps the live ride distinct from the persisted mount pick on self snapshots', () => {
     const { server, fc, leader } = dirtyEveryDeltaField();
     server.sim.entities.get(leader.pid)!.mountKey = 'valorsteed';
@@ -7290,11 +7387,11 @@ describe('full self-state snapshot delta fixture', () => {
       bankerId: null,
       travelDistance: 8,
       remainingDistance: 0,
-      inventoryRevision: 0,
+      inventoryRevision: 1, // the fixture bumps wireRev once for the mount cache
     });
     expect(initial.self.courierData).toMatchObject({
       cargo: [{ itemId: 'wolf_fang', count: 3 }],
-      revision: 7,
+      revision: 8,
     });
     expect(initial.self.courierTravelTicks).toBe(77);
     expect(initial.self.courierLegTicks).toBe(300);
@@ -7325,7 +7422,7 @@ describe('full self-state snapshot delta fixture', () => {
       bankerId: null,
       travelDistance: 8,
       remainingDistance: 0,
-      inventoryRevision: 0,
+      inventoryRevision: 1,
     });
     expect(moved.self.courierTravelTicks).toBe(78);
     expect(moved.self).not.toHaveProperty('courierData');

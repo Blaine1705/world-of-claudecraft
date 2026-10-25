@@ -43,7 +43,8 @@ export const guildHallStrings = {
   titleOffer: 'Title: {title}',
   titlePreview: 'Shown as {preview}',
   mountOffer: 'Mount: {mount}',
-  mountPreview: 'Ground mount: +{pct}% movement speed while riding. Requires riding training.',
+  mountPreview:
+    'Mount appearance for every character on your account. Your riding training sets your speed.',
   skinOffer: 'Sword appearance: {skin}',
   skinPreview:
     'Changes how your equipped sword looks, on every character of your account. Appearance only: no stats.',

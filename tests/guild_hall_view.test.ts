@@ -286,7 +286,8 @@ describe('the guild window view core', () => {
       name: 'Lantern Hall Destrier',
       kindLabel: 'Mount',
       stage: { kind: 'mount', heading: 'You, in the saddle', mountKey: 'lantern_hall_destrier' },
-      summary: 'Ground mount: +70% movement speed while riding. Requires riding training.',
+      summary:
+        'Mount appearance for every character on your account. Your riding training sets your speed.',
       cosmetic: null,
       priceText: 'Price: 40 Lantern Seals',
       state: 'short',
@@ -405,7 +406,7 @@ describe('the guild window view core', () => {
     const horse = guildShopTooltip('mount_lantern_hall_destrier', input({ seals: 40 }));
     expect(horse?.title).toBe('Mount: Lantern Hall Destrier');
     expect(horse?.lines.map((line) => line.tone)).toEqual(['sub', 'desc', 'sub']);
-    expect(horse?.lines[0].text).toMatch(/\+70% movement speed/);
+    expect(horse?.lines[0].text).toMatch(/riding training sets your speed/);
     const sword = guildShopTooltip('weapon_skin_lantern_hall_sword', input());
     expect(sword?.title).toMatch(/^Sword appearance: /);
     expect(sword?.lines.at(-1)?.tone).toBe('red');

@@ -1310,7 +1310,11 @@ const MONOLITHS: MonolithRow[] = [
     // (46f0679547): both parent pins for the record, the integration 11587 and the guild
     // 11582; the two sides' extractions compose to 11578 by wc -l on the merged tree.
     // Exact count.
-    ceiling: 11578,
+    // LOWERED to 11487 at the merge of PR 4390 (riding ranks) over release/v0.45.0:
+    // riding progression lives in riding_training.ts. wc -l on the merged tree.
+    // 11485 after the courier full-bank sync (PR 4598). wc -l.
+    // 11490 with the difficulty menu fix (PR 4625) merged ahead of its landing. wc -l.
+    ceiling: 11490,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1568,7 +1572,8 @@ const MONOLITHS: MonolithRow[] = [
     // (wc -l < src/main.ts). Exact merged count, zero slack.
     // Landing-first integration extracts the project counter and community tracking.
     // Re-pin the combined release entrypoint at its measured size, with zero slack.
-    ceiling: 10785,
+    // LOWERED to 10773 at the merge of PR 4390 (riding ranks) over release/v0.45.0. wc -l.
+    ceiling: 10773,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1844,7 +1849,12 @@ const MONOLITHS: MonolithRow[] = [
     // on the merged tree. Exact count.
     // Guild purchase wiring is paid for by moving quest/delve resync to quest_snapshot_wire.
     // Measured after formatting: 9751, below both merged parent ceilings.
-    ceiling: 9751,
+    // LOWERED to 9687 at the merge of PR 4390 (riding ranks) over release/v0.45.0: the
+    // identity encoder and account mount items live in sibling modules. wc -l.
+    // RE-PINNED to 9690 at the sync with the courier full-bank change (PR 4598): its
+    // wiring composes with the extractions above, still under the release 9751. wc -l.
+    // 9694 with the difficulty menu fix (PR 4625) merged ahead of its landing. wc -l.
+    ceiling: 9694,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

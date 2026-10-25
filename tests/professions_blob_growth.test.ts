@@ -270,6 +270,7 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'pendingSkinItemId',
   'mountTrainingFeePaid',
   'ridingTrained',
+  'ridingTier',
   'pbeBoostKit',
   'delveMarks',
   'delveClears',
@@ -830,6 +831,7 @@ function armNonProfessionsFields(sim: Sim): void {
   // Riding + the PBE kit stamp.
   meta.mountTrainingFeePaid = true;
   meta.ridingTrained = true;
+  meta.ridingTier = 2;
   meta.pbeBoostKit = 1;
   // Both worn cosmetics, through the real validators (they refuse anything
   // unearned or of the wrong reward kind, so the deeds are earned first).
@@ -1250,6 +1252,7 @@ describe('the professions blob growth bound (phase 16)', () => {
       'vcupWins',
       'vcupBetNet',
       'ridingTrained',
+      'ridingTier',
       'pbeBoostKit',
       'activeTitle',
       'activeBorder',
@@ -2040,10 +2043,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // Release merge adds 555 bytes, independently pinned by the content equation below:
     // skull 42 + Titan 26 + PvP titles 138 + Hard maze 34 + skull bag 62
     // + vault retune 119 + quiver 66 + quest shields 68. No storage limit changes.
-    expect(baselineBytes).toBe(258567);
+    // Advanced riding adds the sparse ridingTier scalar (+15, PR 4390).
+    expect(baselineBytes).toBe(258582);
     expect(bytes - baselineBytes).toBe(8284);
     // 266,699 -> 266,721 with Wobbles the Slime's reins (+22, kept).
-    expect(bytes).toBe(266851);
+    expect(bytes).toBe(266866);
     // Keep the warning threshold unchanged: saves above it remain whole.
     expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
     process.stdout.write(
@@ -2314,7 +2318,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // integration merges. 249,958 with the Staff of Changing's discovery id
     // (`"membership_staff",`, +19, PR 4281), isolated with membership below.
     // 249,984 -> 250,006 with Wobbles the Slime's reins (+22, kept).
-    expect(beforeReferralBytes).toBe(250136);
+    // Advanced riding adds the sparse ridingTier scalar (+15, PR 4390).
+    expect(beforeReferralBytes).toBe(250151);
     expect(bytes - stampCardBytes - beforeReferralBytes).toBe(122);
     expect(
       fieldBytes(beforeStampCards, 'deedStats') - fieldBytes(withoutReferral, 'deedStats'),
@@ -2340,7 +2345,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(membershipIds.size).toBe(9);
     const beforeMembershipBytes = Buffer.byteLength(JSON.stringify(withoutMembership), 'utf8');
     // 249,810 -> 249,832 with Wobbles the Slime's reins (+22, kept).
-    expect(beforeMembershipBytes).toBe(249962);
+    expect(beforeMembershipBytes).toBe(249977);
     expect(beforeReferralBytes - beforeMembershipBytes).toBe(174);
     expect(
       fieldBytes(withoutReferral, 'deedStats') - fieldBytes(withoutMembership, 'deedStats'),
@@ -2857,7 +2862,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // `"lychgate_buckler",` (+19), `"bastion_kite_shield",` (+22) and
         // `"barrowfield_tower_shield",` (+27) in deedStats.itemsDiscovered. Quest
         // rewards carry no Reliquary page, so no firstFind row. MEASURED.
-        68,
+        68 +
+        // Advanced riding adds the sparse scalar ,"ridingTier":2 (15 bytes).
+        15,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2968,7 +2975,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // Retained buddy data adds 706 discovery bytes and 179 collection bytes (247,117).
       // The Staff of Changing's discovery id adds 19 (247,136, PR 4281).
       // The sprite buddy's whistle id adds 18 (247,154).
-    ).toBe(247266);
+      // Advanced riding contributes 15 bytes for the armed ridingTier scalar.
+    ).toBe(247281);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -3009,7 +3017,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // Retained buddy data adds 706 discovery bytes and 179 collection bytes (249,927).
       // The Staff of Changing's discovery id adds 19 (249,946, PR 4281); reins_nightwing_chimera adds 26 (249,972).
       // reins_wobbles_slime adds 22 (249,994).
-    ).toBe(250124);
+      // Advanced riding contributes the same 15 bytes here.
+    ).toBe(250139);
     const priorContent = withoutCrucibleContent(withoutReferral);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -3156,8 +3165,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // itemsDiscovered. Floor at measurement minus 380, edge at measurement plus
     // one: 249766..250147.
     // Release composition: 250,982 bytes excluding referral cards; retain the 381-byte band.
-    expect(bytes - stampCardBytes, reMint).toBeGreaterThan(249878);
-    expect(bytes - stampCardBytes, reMint).toBeLessThan(250259);
+    // RE-BASED for advanced riding: up exactly 15 for the sparse ridingTier
+    // scalar (250,273). Same 381-byte band.
+    expect(bytes - stampCardBytes, reMint).toBeGreaterThan(249893);
+    expect(bytes - stampCardBytes, reMint).toBeLessThan(250274);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

@@ -55,6 +55,7 @@ import { loadAccountBuddies } from './account_buddies_db';
 import { loadAccountLedger } from './account_ledger_db';
 import { accountLedgerKeysFor } from './account_ledger_keys_cache';
 import { relicRecordsIdle } from './account_ledger_records';
+import { loadAccountMountItemsBounded as loadAccountMountItems } from './account_mount_items_loader';
 import {
   configureTopWealthHolders,
   startAccountWealthSweep,
@@ -3863,6 +3864,7 @@ export async function startServer(): Promise<http.Server> {
     loadAccountCosmetics,
     loadAccountBuddies,
     loadAccountLedger,
+    loadAccountMountItems,
     isConnectionRefused,
     bufferHandshakeMessages,
     requestMetadata,

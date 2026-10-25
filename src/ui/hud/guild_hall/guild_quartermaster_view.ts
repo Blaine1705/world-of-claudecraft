@@ -19,7 +19,6 @@ import {
   type GuildQuartermasterOffer,
   LANTERN_SEAL_ITEM_ID,
 } from '../../../sim/content/guild_contracts';
-import { mountDef } from '../../../sim/content/mounts';
 import { WEAPON_SKINS } from '../../../sim/content/weapon_skins';
 import { ITEMS } from '../../../sim/data';
 import type { InvSlot } from '../../../sim/types';
@@ -206,10 +205,8 @@ function offerSummary(offer: GuildQuartermasterOffer): string {
   switch (offer.kind) {
     case 'title':
       return '';
-    case 'mount': {
-      const pct = Math.round((mountDef(guildOfferMountKey(offer.itemId))?.moveSpeedPct ?? 0) * 100);
-      return t('hudChrome.guildHall.mountPreview', { pct: whole(pct) });
-    }
+    case 'mount':
+      return t('hudChrome.guildHall.mountPreview');
     case 'weaponSkin':
       return t('hudChrome.guildHall.skinPreview');
   }

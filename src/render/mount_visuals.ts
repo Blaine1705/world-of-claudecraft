@@ -5,8 +5,8 @@
 // renderer is a thin consumer. The catalog itself (names, gates, combat
 // numbers) is sim content: src/sim/content/mounts.ts.
 
-import type { MountSkinId } from '../sim/content/mount_skins';
-import { isMountSkinId } from '../sim/content/mount_skins';
+import type { StoreMountSkinId } from '../sim/content/mount_skins';
+import { isStoreMountSkinId } from '../sim/content/mount_skins';
 import type { MountKey } from '../sim/content/mounts';
 import { MOUNTS } from '../sim/content/mounts';
 
@@ -523,7 +523,7 @@ export function mountSeatLift(mountKey: string): number {
  *  owns. A skin is a look only: the ridden mount keeps its key and its stats,
  *  so nothing in the sim ever reads this table. Each `visualKey` here must equal
  *  MOUNT_SKINS[id].visualKey (tests/mount_skins.test.ts pins the lockstep). */
-export const MOUNT_SKIN_VISUAL_SPECS: Record<MountSkinId, MountVisualSpec> = {
+export const MOUNT_SKIN_VISUAL_SPECS: Record<StoreMountSkinId, MountVisualSpec> = {
   goblin_rocket_sled: spec(
     'mount_goblin_rocket_sled',
     1.29,
@@ -654,14 +654,15 @@ export function mountVisualSpecFor(
   // Only a catalog mount can be skinned: an unknown or empty key is not a ride,
   // whatever the save says is worn.
   if (!mountKey || !(mountKey in MOUNTS)) return null;
-  if (mountSkinId && isMountSkinId(mountSkinId)) return MOUNT_SKIN_VISUAL_SPECS[mountSkinId];
+  if (mountSkinId && isStoreMountSkinId(mountSkinId)) return MOUNT_SKIN_VISUAL_SPECS[mountSkinId];
+  if (mountSkinId && mountSkinId in MOUNTS) return MOUNT_VISUAL_SPECS[mountSkinId as MountKey];
   return MOUNT_VISUAL_SPECS[mountKey as MountKey];
 }
 
 /** The summon burst for what a mount PRESENTS as (mountPresentationKey: a worn skin's id or
  *  the mount key); '' (a dismount) and anything unknown throw the shared shimmer. */
 export function mountSummonFx(look: string): MountVisualSpec['summonFx'] {
-  if (isMountSkinId(look)) return MOUNT_SKIN_VISUAL_SPECS[look].summonFx;
+  if (isStoreMountSkinId(look)) return MOUNT_SKIN_VISUAL_SPECS[look].summonFx;
   return look in MOUNTS ? MOUNT_VISUAL_SPECS[look as MountKey].summonFx : 'shimmer';
 }
 

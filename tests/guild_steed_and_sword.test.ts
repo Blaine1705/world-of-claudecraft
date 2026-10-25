@@ -90,11 +90,7 @@ describe('the catalog records', () => {
       key: 'lantern_hall_destrier',
       name: 'Lantern Hall Destrier',
       rarity: 'uncommon',
-      moveSpeedPct: 0.7,
     });
-    expect(MOUNTS.lantern_hall_destrier.moveSpeedPct).toBe(
-      MOUNTS.stormfeather_griffin.moveSpeedPct,
-    );
     const reins = ITEMS[LANTERN_HALL_DESTRIER_REINS_ID];
     expect(reins).toMatchObject({
       kind: 'mount',

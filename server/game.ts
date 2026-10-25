@@ -13,6 +13,7 @@ import { damageTakenWithin } from '../src/sim/combat/damage_history';
 import { wireParkedMana } from '../src/sim/combat/form_auto_unshift';
 import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { DEEDS } from '../src/sim/content/deeds';
+import { mountDef } from '../src/sim/content/mounts';
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
 import { MECH_CHROMAS } from '../src/sim/content/skins';
 import {
@@ -104,6 +105,8 @@ import { ownedWeaponSkinLoadout } from './account_cosmetics_live';
 import { AccountCosmeticsService } from './account_cosmetics_service';
 import { reconcileAccountRelics, recordRelicFinds } from './account_ledger_records';
 import { AccountLedgerService } from './account_ledger_service';
+import type { AccountMountItemsRow } from './account_mount_items_core';
+import { createRealmMountItemsService } from './account_mount_items_runtime';
 import { addAccountPlayer } from './account_player_join';
 import { type ActivityDetectDeps, detectActivityEvent } from './activity_detect';
 import { recordOnlineSample } from './admin_db';
@@ -1428,6 +1431,12 @@ export class GameServer {
       this.escrowSessionLost(s.pid, s.characterId, 'ambiguous', 'guild weapon purchase'),
     cosmetics: this.cosmetics,
   });
+  private readonly mountItems = createRealmMountItemsService(
+    () => this.sim,
+    this.cosmetics,
+    () => this.backgroundDbGate,
+    (ms) => this.tickProfiler.add('mountItems', ms),
+  );
   private readonly ledger = new AccountLedgerService({
     sim: () => this.sim,
     sessions: () => this.clients.values(),
@@ -1608,6 +1617,7 @@ export class GameServer {
     'antibot',
     'broadcast',
     'bcastGrid',
+    'mountItems',
     'bcastSelf',
     'social',
     'saves',
@@ -3101,6 +3111,7 @@ export class GameServer {
     meta: RequestMetadata &
       Partial<AccountChatMuteStatus> & {
         accountCosmetics?: AccountCosmetics;
+        accountMountItems?: readonly AccountMountItemsRow[];
         accountBuddyOwned?: readonly string[];
         // Account ledger absent on bare test joins; the sim supplies a fresh one.
         accountLedger?: AccountLedger;
@@ -3200,7 +3211,10 @@ export class GameServer {
     // The worn mount skin rides the character save, ownership rides the
     // account: a saved skin the account does not own comes off here (never
     // healed into ownership; server/mount_skin_reconcile.ts).
-    if (!wornMountSkinAllowed(accountCosmetics, this.sim.meta(pid)?.mountSkinId)) {
+    if (
+      !wornMountSkinAllowed(accountCosmetics, this.sim.meta(pid)?.mountSkinId) &&
+      !mountDef(this.sim.meta(pid)?.mountSkinId ?? '')
+    ) {
       this.sim.setMountSkin(pid, null);
     }
     const sessionIp = meta.ip ?? '';
@@ -3355,6 +3369,7 @@ export class GameServer {
     if (session.jailed) this.teleportJailedSession(session);
     this.ipSessionCounts.set(sessionIp, (this.ipSessionCounts.get(sessionIp) ?? 0) + 1);
     this.clients.set(pid, session);
+    this.mountItems.join(session, meta.accountMountItems);
     this.sessionsByCharacterId.set(characterId, session);
     this.membership.onJoin(session);
     this.referral.attach(session);
@@ -3722,6 +3737,7 @@ export class GameServer {
     // Release only the session binding. The account-keyed token state remains
     // cached until it has naturally refilled, so reconnect cannot reset it.
     session.bankVaultLedgerGuard.release();
+    this.mountItems.leave(session);
     this.clients.delete(session.pid);
     this.membership.onLeave(session);
     this.referral.detach(session);
@@ -3767,6 +3783,7 @@ export class GameServer {
     // otherwise teardown could race the durable guild and fee verdict.
     await session.guildCreateSettlement;
     await this.saveCharacterOnLeave(session);
+    this.mountItems.settledLeave(session.accountId, session.characterId);
     // Whatever book work this session still holds can never commit now: it has
     // no save left. Undo the part whose character half never landed, and
     // record the part whose character half did (an escrow deficit that ran out
@@ -6270,6 +6287,7 @@ export class GameServer {
         }
         break;
       case 'use':
+        this.mountItems.syncAccount(session);
         if (typeof msg.item === 'string') {
           if (msg.item === 'membership_token') {
             void this.membership.redeem(
@@ -6315,10 +6333,18 @@ export class GameServer {
         }
         break;
       case 'buy':
-        if (typeof msg.npc === 'number' && typeof msg.item === 'string') {
+        // The options bag third, pid fourth (the one explicit shape; see
+        // Sim.buyItem). A non-number count is dropped like sell's, a hostile
+        // number reaches the sim's sanitize and denies there.
+        if (
+          typeof msg.npc === 'number' &&
+          typeof msg.item === 'string' &&
+          (msg.ridingTier === undefined || msg.ridingTier === 0 || msg.ridingTier === 1)
+        ) {
           const options = {
             count: typeof msg.count === 'number' ? msg.count : undefined,
             bulk: msg.bulk === true,
+            expectedRidingTier: (msg.ridingTier ?? 0) as 0 | 1,
           };
           if (!this.accountBuddies.buy(session, msg.npc, msg.item, options))
             sim.buyItem(msg.npc, msg.item, options, pid);
@@ -6604,6 +6630,7 @@ export class GameServer {
       // Rideable mounts: the Sim re-validates everything (catalog key, level
       // gate, combat gate); the entity mirror + self `mnt` field carry the result.
       case 'mount_toggle':
+        this.mountItems.syncAccount(session);
         sim.toggleMountFor(pid);
         break;
       case 'buddy_rename':
@@ -6637,8 +6664,12 @@ export class GameServer {
       // Riding skill purchase: player buys Riding from Marla for 80g. The Sim
       // re-validates NPC identity, range, level, and funds.
       case 'learn_riding':
-        if (typeof msg.npc === 'number' && Number.isInteger(msg.npc))
-          sim.learnRidingFor(msg.npc, pid);
+        if (
+          typeof msg.npc === 'number' &&
+          Number.isInteger(msg.npc) &&
+          (msg.ridingTier === undefined || msg.ridingTier === 0 || msg.ridingTier === 1)
+        )
+          sim.learnRidingFor(msg.npc, pid, msg.ridingTier ?? 0);
         break;
       // Show-jumping race: the Sim re-validates the glowing platform, lesson or
       // mount eligibility, and liveness before arming the countdown.
@@ -6667,6 +6698,7 @@ export class GameServer {
       // session's account cosmetics here; the Sim only validates the id.
       case 'change_mount_skin':
         if (!this.consumeCosmeticOp(session, receivedAtMs / 1000)) break;
+        this.mountItems.syncAccount(session);
         this.cosmetics.changeMountSkin(session, msg.skin);
         break;
       // Z-key sheathe toggle: cosmetic, no payload; the Sim owns the dead-gate
@@ -7750,6 +7782,10 @@ export class GameServer {
 
   private broadcastSnapshots(): void {
     if (this.clients.size === 0) return;
+    const mountItemsStarted = performance.now();
+    const mountItemsNow = Date.now();
+    for (const session of this.clients.values()) this.mountItems.probe(session, mountItemsNow);
+    this.tickProfiler.add('mountItems', performance.now() - mountItemsStarted);
     this.partyFrameGlobalsCache = null;
     this.partyFrameProjectionCache.beginBroadcast();
     const tick = this.sim.tickCount;

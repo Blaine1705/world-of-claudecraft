@@ -27,7 +27,6 @@ import { isRooted, isStunned } from './combat/cc';
 import { SPOREMENDER_FORM_KIND, SPOREMENDER_MOVE_SPEED_MULT } from './combat/druid_sporemender';
 import { huntingMomentumSpeedMult } from './combat/hunting_momentum_speed';
 import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
-import { mountMoveSpeedPct } from './content/mounts';
 import { authoredMapActive } from './data';
 import { deckCeilingAt } from './deck_ceiling';
 import { guardAndReportPose } from './finite_pose_guard';
@@ -48,6 +47,7 @@ import {
   shoreStepOut,
   stepWaterLevel,
 } from './ride_height';
+import { ridingMoveSpeedPct } from './riding_training';
 import { slideVelocity, slipperyGrip } from './slippery_ground';
 import { GHOST_RUN_MULT } from './spirit';
 import { traversalBand } from './traversal_band';
@@ -309,7 +309,7 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
   // every form, so in play the passive is 1 here). The whole expression is
   // slow * (max(buffs) * formPassive + mountPct + extraSpeedPct); slows still
   // bite multiplicatively.
-  if (e.mountKey) speed += mountMoveSpeedPct(e.mountKey);
+  if (e.mountKey) speed += ridingMoveSpeedPct(e.ridingTier);
   // Fiesta move-speed augments (only ever non-zero inside a Fiesta bout).
   if (extraSpeedPct) speed += extraSpeedPct;
   return slow * speed * cargo * formPace;

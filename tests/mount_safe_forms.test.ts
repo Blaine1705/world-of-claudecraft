@@ -10,7 +10,6 @@ import {
   isMountSafeFormToggle,
   MOUNT_SAFE_FORM_AURA_KINDS,
 } from '../src/sim/combat/forms';
-import { MOUNTS } from '../src/sim/content/mounts';
 import { ABILITIES } from '../src/sim/data';
 import {
   MOUNT_SUMMON_SECONDS,
@@ -19,6 +18,7 @@ import {
   updateMountTransition,
 } from '../src/sim/mounts';
 import { moveSpeedMult } from '../src/sim/player_motion';
+import { ridingMoveSpeedPct } from '../src/sim/riding_training';
 import { Sim } from '../src/sim/sim';
 import { type AuraKind, DT, type Entity, FORM_AURA_KINDS } from '../src/sim/types';
 import { VENDOR_TEST_WORLD } from './sim_shared';
@@ -125,7 +125,7 @@ describe('Moonwing Form in the saddle', () => {
     expect(hasLopingStride(e)).toBe(false);
     expect(e.procState?.icds.dru_loping_stride).toBeUndefined();
     // Mounted speed is the mount's alone: the shift added nothing on top.
-    expect(moveSpeedMult(e)).toBeCloseTo(1 + MOUNTS.valorsteed.moveSpeedPct);
+    expect(moveSpeedMult(e)).toBeCloseTo(1 + ridingMoveSpeedPct(1));
 
     expect(toggleMount(sim.ctx, pid)).toBe(true);
     expect(e.mountKey).toBe('');
@@ -168,7 +168,7 @@ describe('Moonwing Form in the saddle', () => {
     finishSummon(sim, e);
     expect(e.mountKey).toBe(MOUNT);
     expect(inForm(e, 'form_moonkin')).toBe(true);
-    expect(moveSpeedMult(e)).toBeCloseTo(1 + MOUNTS.valorsteed.moveSpeedPct);
+    expect(moveSpeedMult(e)).toBeCloseTo(1 + ridingMoveSpeedPct(1));
   });
 
   it('Cat Form still dismounts the rider', () => {

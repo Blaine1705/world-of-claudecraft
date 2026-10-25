@@ -179,7 +179,7 @@ describe('referral reward transactions', () => {
     expect(ITEMS[REFERRAL_SLIME_REINS]).toMatchObject({ kind: 'mount', mount: 'wobbles_slime' });
     expect(grantReferralReward(state, 1, 'raid')).toBe(state);
     expect(state.inventory.some((i) => i.itemId === 'reins_referral_tank')).toBe(false);
-    expect(MOUNTS.wobbles_slime.moveSpeedPct).toBe(MOUNTS.referral_raptor.moveSpeedPct);
+    expect(MOUNTS.wobbles_slime.rarity).toBe(MOUNTS.referral_raptor.rarity);
   });
 
   it('grants inviter tiers once, with a distinct raptor and Flicker and Glimmer ownership', () => {
