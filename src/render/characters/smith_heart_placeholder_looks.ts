@@ -43,7 +43,9 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // construct, tinted white-gold by its entity colour, never a lava golem.)
   heart_heat_guardian: 'skel_golem',
   // ---- the final boss -----------------------------------------------------------
-  // Final: the Masterless Strength, the Smith's four strengths fused into one
-  // shifting giant of stone, wind, ice and smith fire.
-  heart_masterless_strength: 'mob_elemental',
+  // Phase 2J: the Masterless Strength is a bodyless target; its body (the
+  // colossus of the Heart kit's rock pieces round the crystal heart) is drawn
+  // by smith_heart_fx/final_fx.ts. Final: its own model (the official
+  // pipeline), the same joints and timeline.
+  heart_masterless_strength: 'smith_heart_colossus',
 };

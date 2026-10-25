@@ -15,6 +15,7 @@ import {
   inSmithHeartRoom,
   SMITH_HEART_FIELD,
   SMITH_HEART_FLOATING_SURFACES,
+  SMITH_HEART_VEINS,
 } from '../../sim/content/smith_heart_layout';
 import { authoredFieldHeight } from '../../sim/instances/authored_field';
 import { buildAuthoredFieldTerrain } from '../authored_field/field_terrain';
@@ -27,6 +28,7 @@ import { buildHammerAir } from './hammer_air';
 import { dressHammerVein, ensureHammerKit, HAMMER_KIT_KINDS, hammerKitReady } from './hammer_kit';
 import { heartCliffPaint } from './heart_cliff_paint_core';
 import { inBreathLight, inHeatLight, inQuenchLight } from './heart_environment';
+import { heartFinalDarkness } from './heart_final_core';
 import { buildHeartGates } from './heart_gates';
 import { ensureHeartKit, heartKitProgramWarmers, SMITH_HEART_GATE_KIT_URL } from './heart_kit';
 import { buildHeartLights } from './heart_lights';
@@ -251,6 +253,15 @@ export async function buildSmithHeartInterior(
       heatBlend = heartAreaBlend(heatBlend, inHeatLight(local.x, local.z), dt);
       sky.setHeat(heatBlend);
       heartSealView(slot, now, view);
+      // The heart going dark when the Masterless Strength falls (phase 2J):
+      // the core in its bed, the rune rings, the altars, the roots and the
+      // channels with it.
+      const dark = heartFinalDarkness(slot, now);
+      room.setHeart(1 - dark);
+      for (const v of SMITH_HEART_VEINS) {
+        room.setVein(v, 1 - 0.85 * dark);
+        heartKit?.setVein(v, 1 - 0.7 * dark);
+      }
       heartPortalStage(view.portalSince, stage);
       heartHopStage(hopAt < 0 ? -1 : now - hopAt, hop);
       rivers.update(view);

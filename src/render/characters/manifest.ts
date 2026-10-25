@@ -4001,6 +4001,19 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.4,
   },
+  // The Masterless Strength (the Smith's Heart's final boss, phase 2J): a
+  // bodyless target, its click capsule, nameplate and bars over the colossus
+  // of rock pieces and crystal the raid's own effects draw
+  // (smith_heart_fx/final_fx.ts) until its own model ships. Bound off the
+  // goleling's rig (never seen); its height times the boss's scale (3.6) is
+  // the colossus's, so the nameplate rides over its head.
+  smith_heart_colossus: {
+    url: `${CREATURES}/golelingevolved.glb`,
+    height: 5.6,
+    clips: ELEMENTAL_FLOATING,
+    bodyless: true,
+    clickRadius: 4.4,
+  },
   mob_ignivar: {
     url: `${CREATURES}/ignivar_herald.glb`,
     authoredAtlas: true, // baked Tripo/contributor atlas: low-tier floor rides the map

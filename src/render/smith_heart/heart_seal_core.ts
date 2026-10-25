@@ -8,7 +8,9 @@
 // the portal read the slot's view each frame.
 //
 // A marker is rebuilt on every template swap, so the newest observation is
-// the claim's current value. A vein (or the portal) first seen already lit
+// the claim's current value. Since phase 2J the value also carries the
+// arrival (the heart awake): seen waking, it records when (the arrival scene
+// plays from there); first seen already awake, it snaps (the body is whole). A vein (or the portal) first seen already lit
 // snaps (a raid arriving at a lit seal sees it burning, no replay); one seen
 // lighting records when, so its river runs, its quarter fills and the portal
 // bursts open. A value that LOSES a vein or the portal is a fresh claim in
@@ -25,7 +27,8 @@
 import { SMITH_HEART_VEINS, type SmithHeartVein } from '../../sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../sim/data';
 import {
-  SMITH_HEART_PORTAL_BIT,
+  SMITH_HEART_SEAL_FULL,
+  smithHeartAwakeBitSet,
   smithHeartPortalBitSet,
   smithHeartSealMaskOf,
   smithHeartVeinLit,
@@ -44,6 +47,9 @@ interface SlotMemory {
   litAt: number[];
   /** When the portal opened, render seconds, or Infinity while shut. */
   portalAt: number;
+  /** When the heart woke (the raid's first arrival), render seconds, or
+   *  Infinity while it sleeps. */
+  awakeAt: number;
 }
 
 const memory = new Map<string, SlotMemory>();
@@ -58,6 +64,7 @@ function fresh(mask: number, now: number): SlotMemory {
     mask,
     litAt: SMITH_HEART_VEINS.map((v) => (smithHeartVeinLit(mask, v) ? now - SNAPPED : Infinity)),
     portalAt: smithHeartPortalBitSet(mask) ? now - SNAPPED : Infinity,
+    awakeAt: smithHeartAwakeBitSet(mask) ? now - SNAPPED : Infinity,
   };
 }
 
@@ -76,6 +83,7 @@ export function observeHeartSealMask(key: string, mask: number, now: number): vo
     if (smithHeartVeinLit(mask, v) && !smithHeartVeinLit(m.mask, v)) m.litAt[i] = now;
   });
   if (smithHeartPortalBitSet(mask) && !smithHeartPortalBitSet(m.mask)) m.portalAt = now;
+  if (smithHeartAwakeBitSet(mask) && !smithHeartAwakeBitSet(m.mask)) m.awakeAt = now;
   m.mask = mask;
 }
 
@@ -108,10 +116,13 @@ export interface HeartSealView {
   since: number[];
   /** Seconds since the seal opened into the portal, -1 while shut. */
   portalSince: number;
+  /** Seconds since the heart woke (the arrival), -1 while it sleeps (a
+   *  heart first seen awake reads as long awake). */
+  awakeSince: number;
 }
 
 export function newHeartSealView(): HeartSealView {
-  return { mask: 0, since: SMITH_HEART_VEINS.map(() => -1), portalSince: -1 };
+  return { mask: 0, since: SMITH_HEART_VEINS.map(() => -1), portalSince: -1, awakeSince: -1 };
 }
 
 /** The slot's seal at `now`, written into `out` (allocation-free: the frame
@@ -122,12 +133,13 @@ export function heartSealView(
   out: HeartSealView = newHeartSealView(),
 ): HeartSealView {
   const m = memory.get(key);
-  out.mask = m ? m.mask & ~SMITH_HEART_PORTAL_BIT : 0;
+  out.mask = m ? m.mask & SMITH_HEART_SEAL_FULL : 0;
   for (let i = 0; i < SMITH_HEART_VEINS.length; i++) {
     const at = m ? m.litAt[i] : Infinity;
     out.since[i] = Number.isFinite(at) ? now - at : -1;
   }
   out.portalSince = m && Number.isFinite(m.portalAt) ? now - m.portalAt : -1;
+  out.awakeSince = m && Number.isFinite(m.awakeAt) ? now - m.awakeAt : -1;
   return out;
 }
 
