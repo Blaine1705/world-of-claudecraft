@@ -12,7 +12,7 @@ vi.mock('../server/db', () => ({
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
 }));
 
-import { buddyOwned, grantBuddy } from '../src/sim/buddies';
+import { buddyOwned, grantBuddy, summonBuddy } from '../src/sim/buddies';
 import {
   playerInsideInstance,
   revealBuddiesOnJoin,
@@ -221,6 +221,24 @@ describe('the reveal: on the zone-out, or once the player walks away', () => {
     const again = makeWorld();
     const pid2 = again.addPlayer('warrior', 'Owner', { state });
     expect(buddyOwned(again.players.get(pid2)!, 'forgemaw')).toBe(true);
+  });
+
+  it('a buddy left out walks back out on the next join, a dismissed one stays dismissed', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    grantBuddy(sim.ctx, pid, 'crystal_lich');
+    expect(sim.entities.get(pid)?.buddyKey).toBe('crystal_lich');
+    // Control: logging out with the buddy out brings it back.
+    const out = makeWorld();
+    const outPid = out.addPlayer('warrior', 'Owner', { state: sim.serializeCharacter(pid)! });
+    expect(out.entities.get(outPid)?.buddyKey).toBe('crystal_lich');
+    // An explicit dismiss from Cosmetics is remembered across the logout.
+    expect(summonBuddy(sim.ctx, pid, 'crystal_lich')).toBe(true);
+    expect(sim.entities.get(pid)?.buddyKey).toBe('');
+    const back = makeWorld();
+    const backPid = back.addPlayer('warrior', 'Owner', { state: sim.serializeCharacter(pid)! });
+    expect(buddyOwned(back.players.get(backPid)!, 'crystal_lich')).toBe(true);
+    expect(back.entities.get(backPid)?.buddyKey).toBe('');
   });
 });
 

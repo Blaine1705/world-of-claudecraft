@@ -5814,14 +5814,8 @@ export const vi_VN: EnTranslations = {
       "logAdminPurge": "Một quản trị viên đã xóa {count} {item}"
     },
     "collections": {
-      "title": "Săn Tìm",
-      "close": "Đóng Săn Tìm",
-      "keybindLabel": "Săn Tìm",
-      "launcherTitle": "Săn Tìm: bạn đồng hành, thú cưỡi và bộ trang bị",
       "tabs": {
-        "buddies": "Bạn Đồng Hành",
-        "mounts": "Thú Cưỡi",
-        "sets": "Bộ Trang Bị"
+        "buddies": "Bạn Đồng Hành"
       },
       "state": {
         "owned": "Đã Sưu Tầm",
@@ -5831,7 +5825,6 @@ export const vi_VN: EnTranslations = {
       },
       "presenceDefault": "Bạn cảm thấy có thứ hiện diện đang nhìn mình.",
       "revealed": "{name} đã quyết định theo bạn.",
-      "cosmeticUnlocked": "Diện mạo mới cho {name}: {look}.",
       "presence": {
         "ember_fox": "Có thứ nhỏ và ấm đang rón rén theo sau bạn.",
         "moss_hare": "Tiếng xào xạc trong than bùn theo kịp bước chân bạn.",
@@ -5869,134 +5862,9 @@ export const vi_VN: EnTranslations = {
         "phantom": "Không khí sau bạn yên tĩnh hơn mức bình thường một chút.",
         "emberfall_phoenix": "Hơi ấm như lửa ủ lan sau lưng bạn."
       },
-      "cosmetic": {
-        "crystal_lich_frostbound": "Băng Trói",
-        "crystal_lich_voltaic": "Điện Áp",
-        "forgemaw_ashen": "Tro Xám",
-        "forgemaw_whitehot": "Nóng Trắng",
-        "stag_acorn": "Vương Miện Hạt Sồi",
-        "stag_gilded": "Mạ Vàng",
-        "moss_hare_verdant": "Xanh Tươi",
-        "proud_grunt_warlord": "Tướng Quân",
-        "frog_sapphire": "Ếch Lam Ngọc"
-      },
       "actions": {
         "summon": "Triệu Hồi",
-        "dismiss": "Cho Về",
-        "wear": "Mặc",
-        "remove": "Loại Bỏ"
-      },
-      "looks": {
-        "title": "Diện Mạo",
-        "unlocked": "Đã Mở Khóa",
-        "locked": "Đã Khóa",
-        "worn": "Đang mặc",
-        "none": "Chưa có diện mạo được tạo cho bạn đồng hành này"
-      },
-      "source": {
-        "bossLabel": "Thú Cưng Từ Trùm",
-        "bossDrop": "{mob} ({location}), {chance}% mỗi người mỗi lần hạ",
-        "bossDropWithHeroic": "{mob} ({location}), {chance}% mỗi người, {heroicChance}% ở Anh Hùng",
-        "bossDropHeroicOnly": "{mob} ({location}), chỉ Anh Hùng, {chance}% mỗi người",
-        "rollNote": "Mỗi người chơi rút riêng; không ai mất lượt rút vì thành viên nhóm.",
-        "deedLabel": "Đạt Bằng",
-        "deed": "Công trạng {deed}",
-        "challengeLabel": "Thử Thách",
-        "challengeSpeed": "Hạ {mob} trong {seconds} giây từ khi bắt đầu giao chiến",
-        "challengeDps": "Gây {dps} sát thương mỗi giây lên {mob} tính suốt trận",
-        "craftLabel": "Chế Tạo",
-        "craft": "{item} (công thức {profession})",
-        "grantLabel": "Được Trao",
-        "grantOnly": "Phần thưởng mùa: bảng xếp hạng hằng tháng và phần thưởng bản ghi chiến đấu hàng đầu",
-        "tokenLabel": "Vật Đổi",
-        "token": "{item}, dùng một lần để gắn bạn đồng hành"
-      },
-      "buddyLore": {
-        "ember_fox": "Một con cáo cái từ hàng giậu Thung Lũng Eastbrook, mang tên bộ lông đỏ than nổi qua bụi cây mùa đông. Những người bẫy thú đã bỏ bắt cáo con từ nhiều đời trước, thay bằng để thức ăn ngoài trời.",
-        "moss_hare": "Thỏ Willowfen, lông xanh vì cả đời nằm trong than bùn ướt. Người hái thuốc đầm lầy coi chúng là điềm lành, không cho ai đuổi khỏi bậc cửa.",
-        "frog": "Đầm Lầy Mirefen nuôi chúng béo tròn, vô lo, hát suốt đêm trong bãi sậy. Người dẫn đường đầm lầy thề rằng thuyền chở một con sẽ chẳng bao giờ mắc cạn.",
-        "crimson_claw_crab": "Một con cua thủy triều Farshore có càng vẫn đỏ rất lâu sau khi rời nước. Thợ bến tàu từng cho chúng đua trên ván để cá cược.",
-        "golden_sentinel": "Một bọ gác của Amberfall, dát vàng bởi nhựa cây nó lớn lên trong đó. Tên gọi còn cổ hơn lớp nhựa: lính gác cùng loại đã trông các lùm cây từ lâu trước khi người ta nghĩ tới việc đóng chai nhựa.",
-        "nightfang": "Một thợ săn Nightbloom trẻ, lặng lẽ ngay cả so với đồng loại. Nó theo chỉ để có bạn, chẳng săn thứ gì to hơn bướm đêm.",
-        "tuskhorn_boar": "Dòng Thornpeak, được mục đồng lai chân ngắn vì muốn con lợn rừng không phá nổi hàng rào. Dù vậy nó vẫn giữ nguyên tính khí.",
-        "emerald_wolf": "Một sói con Wraithwood, lông ánh xanh trong ánh sáng tán rừng hiếm khi chạm sàn rừng. Các hộ vệ nuôi những con mồ côi mà rừng để lại.",
-        "tiger": "Vằn Palmreach trên con vật chưa từng thấy Palmreach: dòng này được nuôi nhốt từ khi các vườn thú cũ đóng cửa. Nó chỉ nghe tiếng huýt sáo, không gì khác.",
-        "cate_coin": "Con mèo không chịu rời đồng xu nó ngồi trên, và chưa ai từng thấy nó ăn. Thương nhân Eastbrook vẫn cãi nhau xem trong hai thứ đó, thứ nào mới là thú cưng.",
-        "alon": "Linh vật của một lữ khách từ con đường không bản đồ nào chịu ghi nhận, cứ xuất hiện khi kế hoạch đang đổ bể. Nó quan sát, tán thành, và tuyệt nhiên không giúp gì.",
-        "trollface": "Một thứ cười toe do Wraithwood đẩy ra và không chịu nhận lại. Ai thử tả nó cuối cùng cũng bật cười rồi bỏ cuộc.",
-        "ansem": "Nó nói về cửa và bóng tối, rồi nhất quyết không nói thêm về cả hai. Giáo đồ Nightbloom nhận nó là của họ; mỗi khi họ làm lễ, nó lại đi lang thang mất.",
-        "triple_t": "Ba thứ gì đó, hoặc một thứ lặp ba lần. Lời kể mâu thuẫn, còn sinh vật chẳng chịu đứng yên đủ lâu để đếm.",
-        "kekius": "Bạn đồng hành hay cười, gốc gác không rõ, được các sân đua Galecrest nhận làm bùa may. Nó đã sống lâu hơn bốn chuồng ngựa từng tin vào nó.",
-        "solbot": "Một máy tự động nhỏ chạy bằng nắng, được đào lên khi nửa thân còn vùi trong tro Drakelands, vẫn tích tắc. Xưởng nào tạo nó cũng không để dấu trên vỏ.",
-        "frostfire": "Sinh ra ở Frostveil Reach, nơi suối nóng xuyên qua bãi băng, nó chưa bao giờ quyết định mình thuộc nửa nào. Nó bốc hơi trong khí lạnh và run rẩy trong khí ấm.",
-        "rocky": "Một sinh vật bò vỏ đá từ sườn đá vụn Thornpeak, chậm rãi và hoàn toàn thản nhiên. Thợ mỏ nuôi chúng vì chúng bất động ngay trước lúc sụp lở.",
-        "proud_grunt": "Cựu binh từ kho Chiến Tranh, còn giữ động tác chào nhưng mất quân hàm. Thống Chế Draven Kole trao một con cho người lính có đủ danh dự để hiểu cái giá đó.",
-        "loot_goblin": "Nó theo bất kỳ ai mang Dấu Ấn Anh Hùng, và chưa từng bị bắt quả tang ăn cắp. Quân nhu Vex khẳng định điều đó chẳng chứng minh được gì.",
-        "penny_goldspark": "Học việc của một thợ máy gnome, tính tiền theo giờ và đáng từng đồng xu. Thợ Giáp Hode nhận cô để trả nợ, giờ bán thỏa thuận đó cho bất cứ ai có một nghìn vàng.",
-        "stag": "Dòng máu Evergarden, lai nhỏ từ những con hươu lớn mà hộ vệ từng cưỡi. Nó vẫn cúi đầu khi thấy bàn tay giơ lên, một thói quen còn xưa hơn chính con vật.",
-        "alpaca": "Các đàn gia súc Galecrest nuôi chúng lấy len và vì tính khí: không gì bình thản hơn trong bão. Con này sẽ nhổ đúng vào một người mỗi chuyến đi.",
-        "horse": "Dòng ngựa con thung lũng, được lai nhỏ để đi lối vườn cây mà chưa từng được bảo mình không phải chiến mã. Nó theo sát vai bạn, và sẽ đi theo bất cứ ai từng cho nó một quả táo.",
-        "sapling": "Cây non có nụ cười trên vỏ và ánh nhìn tím tò mò. Rễ đưa nó lạch bạch vui vẻ tới bất cứ đâu bạn lang thang.",
-        "bull": "Một con bò đực vùng thung lũng chỉ to bằng chó, lý do duy nhất khiến người ta đồng ý nuôi trong nhà. Tính khí chẳng thu nhỏ theo cơ thể.",
-        "spider": "Một nhện dệt Wraithwood cỡ lòng bàn tay, trang trí lại mọi chiếc túi chở nó. Tơ còn bền hơn sợi chỉ nó thay thế.",
-        "raptor": "Dòng con non Drakelands, được bán trước khi biết mình chạy nhanh đến đâu. Chủ mới nào cũng được dặn cho ăn đầy đủ, chẳng ai cần nghe lần hai.",
-        "skeleton": "Nó chui lên từ mộ gò Wraithwood, phủi bụi, rồi theo người ta từ đó. Chưa ai xác định xương này từng thuộc về ai.",
-        "crystal_lich": "Một mảnh của chính Nythraxis, vẫn ngân lên cái lạnh đã tạo hình nó. Nó nghe lời người kéo nó khỏi tàn tích trận đột kích, và chưa hề tha thứ cho họ vì việc đó.",
-        "forgemaw": "Được rèn trong Lò Luyện Suối Cuối nhưng chưa hoàn thiện, nó bước khỏi xưởng đúc Ignivar khi búa vẫn đang nện. Chỉ cuộc xuống sâu Anh Hùng mới tìm thấy nó: sinh vật nóng chảy cứ quay về lò rèn đã tạo ra mình, rồi theo về nhà bất cứ ai sống sót qua lửa hai lần.",
-        "crystal_tide": "Một tinh linh triều cưỡi giọt thủy tinh biển riêng, bị các cần thủ từ thung lũng đến Farshore câu lên khi đang kiếm bữa tối trong nước lặng. Nó giữ lại nước đã theo mình lên, và không ai thuyết phục nổi nó quay về.",
-        "sprites": "Hai tinh linh lửa nhỏ, một vàng và một xanh ngọc, chẳng bao giờ thống nhất ai dẫn đầu. Đến đủ gần, chúng nhập thành ngọn lửa xanh lá rồi lại tách ra, cười vang.",
-        "phantom": "Một bóng ma cỡ lòng bàn tay từ các mộ gò Wraithwood, chỉ có tấm vải, không có xương, xuất hiện trong túi đã đóng rồi ở lại cho có bạn. Chưa ai biết nó muốn gì, và nó chưa từng cố dọa ai.",
-        "emberfall_phoenix": "Mỗi mùa thu nó cháy còn một tàn lửa, rồi mùa xuân lại trỗi từ tro của chính mình; đó là tất cả những gì người ta biết. Chưa ai tìm thấy tổ, và chưa ai bắt được một con hai lần."
-      },
-      "petKind": {
-        "beast": "Mãnh Thú",
-        "elemental": "Nguyên Tố",
-        "humanoid": "Nhân Hình",
-        "undead": "Tử Linh",
-        "celebrity": "Người Nổi Tiếng"
-      },
-      "armor": {
-        "cloth": "Vải",
-        "mail": "Giáp Xích",
-        "leather": "Da"
-      },
-      "stat": {
-        "intellect": "Trí Tuệ",
-        "agility": "Nhanh Nhẹn",
-        "strength": "Cường Độ",
-        "mixed": "Lai"
-      },
-      "set": {
-        "owned": "{owned}/{total} món",
-        "itemLevel": "Cấp vật phẩm {level}",
-        "bonusLabel": "{pieces} món"
-      },
-      "detail": {
-        "dropLabel": "Rơi Từ",
-        "vendorLabel": "Người Bán",
-        "bindLabel": "Ràng Buộc",
-        "sellLabel": "Người Bán Trả",
-        "marketLabel": "Chợ Thế Giới",
-        "exchangeLabel": "Sàn Giao Dịch $WOC",
-        "setLabel": "Đã Sưu Tầm",
-        "drop": "{mob} ({location}), {chance}% mỗi lần hạ",
-        "heroicDrop": "{mob} ({location}), chỉ Anh Hùng, {chance}% mỗi lần hạ",
-        "dropWithHeroic": "{mob} ({location}), {chance}% mỗi lần hạ, {heroicChance}% ở Anh Hùng",
-        "globalDrop": "Mọi kẻ địch, {chance}% mỗi lần hạ, một trong {count} vật phẩm ở độ hiếm này",
-        "fishingDrop": "Câu ở bất kỳ đâu, {chance}% mỗi lần bắt",
-        "vendor": "{npc} ({location}) bán với giá {price}",
-        "honorPrice": "Danh dự {amount}",
-        "marksPrice": "{amount} Dấu Ấn Anh Hùng",
-        "noSource": "Chưa Có Nguồn Trong Trò Chơi",
-        "noItem": "Chưa Có Vật Phẩm Nào Trao Thứ Này",
-        "tradeable": "Giao Dịch Được",
-        "soulbound": "Ràng Buộc Linh Hồn",
-        "noSell": "Không Thể Bán",
-        "marketAtMerchant": "Hiển Thị Tại Thương Nhân",
-        "marketChecking": "Đang kiểm tra...",
-        "marketNone": "Không Có Tin Rao",
-        "exchangeNone": "Không Có Tin Rao",
-        "exchangeUnavailable": "Không Khả Dụng Trên Ứng Dụng Này"
+        "dismiss": "Cho Về"
       }
     },
     "calendar": {
@@ -21206,117 +21074,6 @@ export const vi_VN: EnTranslations = {
       "ps_passing_stone": {
         "name": "Đá Từ Trần"
       },
-      "whistle_ember_fox": {
-        "name": "Còi Cáo Than Hồng"
-      },
-      "whistle_moss_hare": {
-        "name": "Còi Thỏ Rêu"
-      },
-      "whistle_frog": {
-        "name": "Còi Ếch"
-      },
-      "whistle_crimson_claw_crab": {
-        "name": "Còi Cua Càng Đỏ Thẫm"
-      },
-      "whistle_golden_sentinel": {
-        "name": "Còi Vệ Binh Vàng"
-      },
-      "whistle_nightfang": {
-        "name": "Còi Nanh Đêm"
-      },
-      "whistle_tuskhorn_boar": {
-        "name": "Còi Lợn Rừng Nanh Sừng"
-      },
-      "whistle_emerald_wolf": {
-        "name": "Còi Sói Lục Bảo"
-      },
-      "whistle_tiger": {
-        "name": "Còi Hổ"
-      },
-      "whistle_cate_coin": {
-        "name": "Còi Xu Cate"
-      },
-      "whistle_alon": {
-        "name": "Còi Alon"
-      },
-      "whistle_trollface": {
-        "name": "Còi Mặt Cười Troll"
-      },
-      "whistle_ansem": {
-        "name": "Còi Ansem"
-      },
-      "whistle_triple_t": {
-        "name": "Còi Bộ Ba T"
-      },
-      "whistle_kekius": {
-        "name": "Còi Kekius"
-      },
-      "whistle_solbot": {
-        "name": "Còi Rô-bốt Mặt Trời"
-      },
-      "whistle_frostfire": {
-        "name": "Còi Lửa Băng"
-      },
-      "whistle_rocky": {
-        "name": "Còi Đá Nhỏ"
-      },
-      "whistle_proud_grunt": {
-        "name": "Còi Binh Nhì Kiêu Hãnh"
-      },
-      "whistle_loot_goblin": {
-        "name": "Còi Yêu Tinh Nhặt Đồ"
-      },
-      "whistle_penny_goldspark": {
-        "name": "Còi Penny Tia Vàng"
-      },
-      "whistle_stag": {
-        "name": "Còi Hươu Đực"
-      },
-      "whistle_alpaca": {
-        "name": "Còi Lạc Đà Alpaca"
-      },
-      "whistle_horse": {
-        "name": "Còi Ngựa"
-      },
-      "whistle_sapling": {
-        "name": "Còi Cây Non"
-      },
-      "whistle_bull": {
-        "name": "Còi Bò Đực"
-      },
-      "whistle_spider": {
-        "name": "Còi Nhện"
-      },
-      "whistle_raptor": {
-        "name": "Còi Khủng Long Raptor"
-      },
-      "whistle_skeleton": {
-        "name": "Còi Bộ Xương"
-      },
-      "whistle_crystal_lich": {
-        "name": "Còi Lich Pha Lê"
-      },
-      "whistle_forgemaw": {
-        "name": "Còi Hàm Lò Nóng Chảy"
-      },
-      "whistle_sprites": {
-        "name": "Còi Chập Chờn Và Lung Linh"
-      },
-      "whistle_crystal_tide": {
-        "name": "Còi Triều Pha Lê"
-      },
-      "whistle_phantom": {
-        "name": "Còi Bóng Ma"
-      },
-      "whistle_emberfall_phoenix": {
-        "name": "Còi Phượng Hoàng Emberfall"
-      },
-      "charm_stag_acorn": {
-        "name": "Bùa Vương Miện Hạt Sồi"
-      },
-      "charm_stag_gilded": {
-        "name": "Bùa Dát Vàng"
-      },
       "lastflame_core": {
         "name": "Lõi Ngọn Lửa Cuối Cùng"
       },
@@ -26430,9 +26187,6 @@ export const vi_VN: EnTranslations = {
       },
       "buddy_horse": {
         "name": "Tug, Chiến Mã"
-      },
-      "buddy_sapling": {
-        "name": "Cây Non"
       },
       "buddy_bull": {
         "name": "Bò Đực"

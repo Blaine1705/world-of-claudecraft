@@ -5814,14 +5814,8 @@ export const sv_SE: EnTranslations = {
       "logAdminPurge": "En administratör tog bort {count} {item}"
     },
     "collections": {
-      "title": "Jakt",
-      "close": "Stäng jakten",
-      "keybindLabel": "Jakt",
-      "launcherTitle": "Jakt: följeslagare, riddjur och föremålsset",
       "tabs": {
-        "buddies": "Följeslagare",
-        "mounts": "Riddjur",
-        "sets": "Föremålsset"
+        "buddies": "Följeslagare"
       },
       "state": {
         "owned": "Insamlat",
@@ -5831,7 +5825,6 @@ export const sv_SE: EnTranslations = {
       },
       "presenceDefault": "Du känner en närvaro som iakttar dig.",
       "revealed": "{name} har bestämt sig för att följa dig.",
-      "cosmeticUnlocked": "Nytt utseende för {name}: {look}.",
       "presence": {
         "ember_fox": "Något litet och varmt tassar efter dig.",
         "moss_hare": "Ett prasslande i torven håller jämna steg med dig.",
@@ -5869,134 +5862,9 @@ export const sv_SE: EnTranslations = {
         "phantom": "Luften bakom dig är aningen för stilla.",
         "emberfall_phoenix": "En värme som från en pyrande eld slår sig ned bakom dig."
       },
-      "cosmetic": {
-        "crystal_lich_frostbound": "Frostbunden",
-        "crystal_lich_voltaic": "Elektrisk",
-        "forgemaw_ashen": "Askgrå",
-        "forgemaw_whitehot": "Vitglödande",
-        "stag_acorn": "Ekollonkrona",
-        "stag_gilded": "Förgylld",
-        "moss_hare_verdant": "Grönskande",
-        "proud_grunt_warlord": "Krigsherre",
-        "frog_sapphire": "Safirgroda"
-      },
       "actions": {
         "summon": "Frammana",
-        "dismiss": "Avvisa",
-        "wear": "Bär",
-        "remove": "Ta bort"
-      },
-      "looks": {
-        "title": "Utseenden",
-        "unlocked": "Upplåst",
-        "locked": "Låst",
-        "worn": "Använt",
-        "none": "Inga utseenden har skapats för denna följeslagare ännu"
-      },
-      "source": {
-        "bossLabel": "Bossföljeslagare",
-        "bossDrop": "{mob} ({location}), {chance}% per spelare och dödande",
-        "bossDropWithHeroic": "{mob} ({location}), {chance}% per spelare, {heroicChance}% i heroiskt läge",
-        "bossDropHeroicOnly": "{mob} ({location}), endast heroiskt läge, {chance}% per spelare",
-        "rollNote": "Varje spelare slår separat; ingen förlorar sitt slag till en gruppmedlem.",
-        "deedLabel": "Förtjänas genom",
-        "deed": "Bedriften {deed}",
-        "challengeLabel": "Utmaning",
-        "challengeSpeed": "Besegra {mob} inom {seconds} sekunder från stridens början",
-        "challengeDps": "Gör {dps} skada per sekund på {mob} under hela striden",
-        "craftLabel": "Tillverkat",
-        "craft": "{item} (recept för {profession})",
-        "grantLabel": "Tilldelat",
-        "grantOnly": "Säsongsbelöning: den månatliga rankningen och belöningarna för bästa stridsloggar",
-        "tokenLabel": "Pollett",
-        "token": "{item}, används en gång för att knyta följeslagaren till dig"
-      },
-      "buddyLore": {
-        "ember_fox": "En rävhona från häckarna i Östbäcksdalen, döpt efter den kolröda pälsen som syns genom vinterns snår. Fångstmännen där gav upp om ungarna för generationer sedan och började ställa ut mat i stället.",
-        "moss_hare": "En hare från Pilkärret, grönpälsad efter ett liv med sovplats i våt torv. Träskets örtkännare ser dem som lyckobringare och tillåter inte att någon jagar bort dem från en trappa.",
-        "frog": "Dykärrsträsket föder upp dem tjocka och obekymrade, kväkande hela natten i vassen. Träskguiderna svär på att en båt med en sådan ombord aldrig går på grund.",
-        "crimson_claw_crab": "En tidvattenskrabba från Fjärrkusten vars klo förblir röd långt efter att den lämnat vattnet. Hamnarbetarna brukade låta dem tävla längs plankorna om pengar.",
-        "golden_sentinel": "En vaktbagge från Bärnstensfallet, förgylld av kådan den växte upp i. Namnet är äldre än kådan: väktare av något slag vaktade lundarna långt innan någon kom på att tappa saven på flaska.",
-        "nightfang": "En ung jägare från Nattblomstret, tyst även med sitt släktes mått mätt. Den följer med för sällskapets skull och jagar inget större än en nattfjäril.",
-        "tuskhorn_boar": "Ett djur från Törntoppshöjderna, framavlat kortbent av herdar som ville ha ett vildsvin som inte kunde riva ett staket. Humöret behöll det ändå.",
-        "emerald_wolf": "En valp från Vålnadsskogen, vars päls är grön i trädkronornas ljus som aldrig riktigt når skogsmarken. Väktarna föder upp de föräldralösa ungar som skogen lämnar efter sig.",
-        "tiger": "Palmviddens ränder på ett djur som aldrig sett Palmvidden: blodslinjen har hållits i fångenskap sedan de gamla menagerierna stängde. Den lyder en vissling och ingenting annat.",
-        "cate_coin": "En katt som vägrar skiljas från myntet den sitter på, och som ingen någonsin sett äta. Köpmännen i Östbäck grälar fortfarande om vilken av de två som är husdjuret.",
-        "alon": "En resenärs maskot från en väg som ingen karta vill kännas vid, som dyker upp så fort en plan går snett. Den iakttar, den godkänner och den erbjuder ingen som helst hjälp.",
-        "trollface": "En grinande sak som Vålnadsskogen släppte ut och vägrade ta tillbaka. Varje försök att beskriva den slutar med att berättaren skrattar och ger upp.",
-        "ansem": "Den talar om dörrar och mörker och låter sig inte dras in på något av ämnena. Nattblomstrets kultister hävdar att den tillhör dem; den vandrar iväg så fort de håller en rit.",
-        "triple_t": "Tre av någonting, eller en sak tre gånger om. Uppgifterna går isär, och varelsen står inte still tillräckligt länge för att bli räknad.",
-        "kekius": "En skrattande följeslagare av oklart ursprung, anammad som lyckobringare av kapplöpningsstallarna i Stormkammen. Den har överlevt fyra stall som svor vid den.",
-        "solbot": "En liten soldriven automat, uppgrävd halvt begravd i Drakländernas aska och fortfarande tickande. Verkstaden som byggde den lämnade inget märke någonstans på höljet.",
-        "frostfire": "Född i Frostslöjans vidder där en het källa bryter fram genom isfältet, och den har aldrig bestämt sig för vilken hälft den tillhör. Den ångar i kall luft och huttrar i varm.",
-        "rocky": "En stenskalskrypare från Törntoppshöjdernas rasbranter, långsam och fullständigt obekymrad. Gruvarbetare håller dem för deras förmåga att stanna upp strax före ett ras.",
-        "proud_grunt": "En veteran från krigsförråden som behöll honnören och förlorade graden. Krigsmarskalk Draven Kole ger en till varje soldat med nog mycket ära för att veta vad det kostar.",
-        "loot_goblin": "Den följer alla som bär heroiska märken och har aldrig en enda gång ertappats med att stjäla. Kvartermästare Vex vidhåller att det inte bevisar någonting alls.",
-        "penny_goldspark": "En gnomisk uppfinnarlärling som tar betalt per timme och är värd varenda kopparslant. Rustmästare Hode tog sig an henne för att reglera en skuld och säljer nu arrangemanget till alla med tusen guld.",
-        "stag": "En blodslinje från Evighetsträdgården, framavlad ur de stora hjortar väktarna en gång red. Den sänker fortfarande huvudet när en hand höjs, av en vana äldre än djuret självt.",
-        "alpaca": "Hjordarna i Stormkammen håller dem för ullens och humörets skull: inget förblir lugnare i en storm. Den här spottar på exakt en person per resa.",
-        "horse": "En dalponny, framavlad liten för fruktträdgårdarnas stigar och aldrig upplyst om att den inte är en stridshäst. Den håller jämna steg vid din sida och följer vem som helst som en gång gett den ett äpple.",
-        "sapling": "Ett ungt träd med ett leende i barken och en nyfiken lila blick. Dess rötter bär det med glatt vaggande steg vart du än vandrar.",
-        "bull": "En tjur från Dalen, stor som en hund, vilket är det enda skälet till att någon gick med på att ha en inomhus. Humöret krympte inte med resten.",
-        "spider": "En handflatestor vävare från Vålnadsskogen som möblerar om varje packning den bärs i. Spindelväven är starkare än tråden den ersätter.",
-        "raptor": "En unge från Drakländerna, såld vidare innan den lär sig hur fort den kan springa. Varje ny ägare får höra att den måste hållas mätt, och ingen behöver höra det två gånger.",
-        "skeleton": "Det kom upp ur Vålnadsskogens gravhögar, borstade av sig och har följt efter folk sedan dess. Ingen har fastställt vems ben det var.",
-        "crystal_lich": "En skärva av självaste Nythraxis, fortfarande surrande av kylan som formade den. Den lyder den som drog fram den ur raidens spillror, och har inte förlåtit personen för det.",
-        "forgemaw": "Smidd i Den sista källans Smältdegel och aldrig riktigt färdig gick den ut ur Ignivars gjuteri medan hamrarna ännu slog. Bara den heroiska nedstigningen finner den: det smälta väsendet återvänder ständigt till smedjan som skapade det och följer med hem med den som överlever elden två gånger.",
-        "crystal_tide": "Ett tidvattensväsen som rider på sin egen droppe havsglas, uppfiskat ur stilla vatten av fiskare från Dalen till Fjärrkusten som ville fånga middag. Det behåller vattnet det kom upp i och vägrar låta sig övertalas att återvända.",
-        "sprites": "Två små eldväsen, ett gyllene och ett blågrönt, som aldrig riktigt enas om vem som leder. Kom nära nog så förenas de till en grön låga, för att sedan skratta och glida isär igen.",
-        "phantom": "En handflatestor vålnad från Vålnadsskogens gravhögar, bara lakan och inga ben, som dyker upp i en stängd packning och stannar för sällskapets skull. Ingen har kommit på vad den vill, och den har aldrig ens försökt skrämma någon.",
-        "emberfall_phoenix": "Den brinner ned till en glöd varje höst och reser sig ur sin egen aska till våren, vilket är allt någon kan berätta om den. Ingen har någonsin hittat ett bo, och ingen har någonsin fångat en två gånger."
-      },
-      "petKind": {
-        "beast": "Bestar",
-        "elemental": "Elementarer",
-        "humanoid": "Humanoider",
-        "undead": "Odöda",
-        "celebrity": "Kändisar"
-      },
-      "armor": {
-        "cloth": "Tyg",
-        "mail": "Ringbrynja",
-        "leather": "Läder"
-      },
-      "stat": {
-        "intellect": "Intellekt",
-        "agility": "Smidighet",
-        "strength": "Styrka",
-        "mixed": "Blandad"
-      },
-      "set": {
-        "owned": "{owned} av {total} delar",
-        "itemLevel": "föremålsnivå {level}",
-        "bonusLabel": "{pieces} delar"
-      },
-      "detail": {
-        "dropLabel": "Tappas av",
-        "vendorLabel": "Säljs av",
-        "bindLabel": "Bindning",
-        "sellLabel": "Handlaren betalar",
-        "marketLabel": "Världsmarknaden",
-        "exchangeLabel": "$WOC-börsen",
-        "setLabel": "Insamlat",
-        "drop": "{mob} ({location}), {chance}% per dödande",
-        "heroicDrop": "{mob} ({location}), endast heroiskt läge, {chance}% per dödande",
-        "dropWithHeroic": "{mob} ({location}), {chance}% per dödande, {heroicChance}% i heroiskt läge",
-        "globalDrop": "Valfri fiende, {chance}% per dödande, en av {count} med denna sällsynthet",
-        "fishingDrop": "Fiske var som helst, {chance}% per fångst",
-        "vendor": "{npc} ({location}) för {price}",
-        "honorPrice": "{amount} Heder",
-        "marksPrice": "{amount} heroiska märken",
-        "noSource": "Ingen källa i spelet ännu",
-        "noItem": "Inget föremål ger detta ännu",
-        "tradeable": "Kan handlas",
-        "soulbound": "Själsbundet",
-        "noSell": "Kan inte säljas",
-        "marketAtMerchant": "Visas hos köpmannen",
-        "marketChecking": "Kontrollerar...",
-        "marketNone": "Inga annonser",
-        "exchangeNone": "Inga annonser",
-        "exchangeUnavailable": "Inte tillgängligt i denna klient"
+        "dismiss": "Avvisa"
       }
     },
     "calendar": {
@@ -21206,117 +21074,6 @@ export const sv_SE: EnTranslations = {
       "ps_passing_stone": {
         "name": "Övergångssten"
       },
-      "whistle_ember_fox": {
-        "name": "Glödrävens visselpipa"
-      },
-      "whistle_moss_hare": {
-        "name": "Mossharens visselpipa"
-      },
-      "whistle_frog": {
-        "name": "Grodvisselpipa"
-      },
-      "whistle_crimson_claw_crab": {
-        "name": "Karmosinkrabbans visselpipa"
-      },
-      "whistle_golden_sentinel": {
-        "name": "Gyllene väktarens visselpipa"
-      },
-      "whistle_nightfang": {
-        "name": "Nattandens visselpipa"
-      },
-      "whistle_tuskhorn_boar": {
-        "name": "Beteshornsgaltens visselpipa"
-      },
-      "whistle_emerald_wolf": {
-        "name": "Smaragdvargens visselpipa"
-      },
-      "whistle_tiger": {
-        "name": "Tigervisselpipa"
-      },
-      "whistle_cate_coin": {
-        "name": "Myntkattens visselpipa"
-      },
-      "whistle_alon": {
-        "name": "Visselpipa för Alon"
-      },
-      "whistle_trollface": {
-        "name": "Trollansiktets visselpipa"
-      },
-      "whistle_ansem": {
-        "name": "Visselpipa för Ansem"
-      },
-      "whistle_triple_t": {
-        "name": "Trippel-T:s visselpipa"
-      },
-      "whistle_kekius": {
-        "name": "Visselpipa för Kekius"
-      },
-      "whistle_solbot": {
-        "name": "Solbotens visselpipa"
-      },
-      "whistle_frostfire": {
-        "name": "Frosteldens visselpipa"
-      },
-      "whistle_rocky": {
-        "name": "Stenis visselpipa"
-      },
-      "whistle_proud_grunt": {
-        "name": "Stolte soldatens visselpipa"
-      },
-      "whistle_loot_goblin": {
-        "name": "Bytesgoblinens visselpipa"
-      },
-      "whistle_penny_goldspark": {
-        "name": "Penny Guldgnistas visselpipa"
-      },
-      "whistle_stag": {
-        "name": "Hjortvisselpipa"
-      },
-      "whistle_alpaca": {
-        "name": "Alpackavisselpipa"
-      },
-      "whistle_horse": {
-        "name": "Hästvisselpipa"
-      },
-      "whistle_sapling": {
-        "name": "Plantans visselpipa"
-      },
-      "whistle_bull": {
-        "name": "Tjurvisselpipa"
-      },
-      "whistle_spider": {
-        "name": "Spindelvisselpipa"
-      },
-      "whistle_raptor": {
-        "name": "Raptorvisselpipa"
-      },
-      "whistle_skeleton": {
-        "name": "Skelettvisselpipa"
-      },
-      "whistle_crystal_lich": {
-        "name": "Kristalllichens visselpipa"
-      },
-      "whistle_forgemaw": {
-        "name": "Visselpipa för Smältkäften"
-      },
-      "whistle_sprites": {
-        "name": "Flimmer och Glimmers visselpipa"
-      },
-      "whistle_crystal_tide": {
-        "name": "Kristalltidvattnets visselpipa"
-      },
-      "whistle_phantom": {
-        "name": "Vålnadsvisselpipa"
-      },
-      "whistle_emberfall_phoenix": {
-        "name": "Glödfallsfenixens visselpipa"
-      },
-      "charm_stag_acorn": {
-        "name": "Ekollonkronans amulett"
-      },
-      "charm_stag_gilded": {
-        "name": "Förgylld amulett"
-      },
       "lastflame_core": {
         "name": "Den sista lågans kärna"
       },
@@ -26430,9 +26187,6 @@ export const sv_SE: EnTranslations = {
       },
       "buddy_horse": {
         "name": "Drag, stridshästen"
-      },
-      "buddy_sapling": {
-        "name": "Planta"
       },
       "buddy_bull": {
         "name": "Tjur"

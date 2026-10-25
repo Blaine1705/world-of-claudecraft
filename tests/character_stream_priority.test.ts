@@ -76,7 +76,7 @@ describe('the post-entry creature stream', () => {
     const { calls, assets, restoreGfx } = await iosWorld();
     restore = restoreGfx;
     const { VISUALS } = await import('../src/render/characters/manifest');
-    const buddy = VISUALS.buddy_sapling.url;
+    const buddy = VISUALS.buddy_horse.url;
     assets.startStreamedCharacterPreloads();
     expect(calls.some((call) => call.url === buddy)).toBe(false);
     const before = calls.length;

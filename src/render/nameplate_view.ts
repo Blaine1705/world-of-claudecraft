@@ -129,7 +129,7 @@ export function newNameplatePlan(): NameplatePlan {
  * cosmetic-buddy toggle (src/sim/pet/buddy_ai.ts's isBuddyMob):
  * a buddy's plate ignores `showNameplates` entirely (it is never a hostile,
  * attackable mob) and is hidden unless this is on, in which case it shows
- * name-only (noHealthBar is always true for a buddy — see that field). Pure:
+ * name-only (noHealthBar is always true for a buddy; see that field). Pure:
  * same inputs give the same plan, no DOM/Three/i18n, no
  * Math.random/Date.now/performance.now.
  */

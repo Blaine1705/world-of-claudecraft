@@ -20,9 +20,9 @@ export type HeightSampler = (x: number, z: number) => number;
 // humanoid/creature target reads correctly at entity.scale alone, with no
 // height term at all. A cosmetic buddy follower (src/sim/content/
 // buddy_mobs.ts) is authored far shorter than that (0.35-0.9) on top of its
-// own scale multiplier — tuned purely for relative buddy-to-buddy sizing,
+// own scale multiplier, tuned purely for relative buddy-to-buddy sizing,
 // never for ring proportion, and reaching as high as 2.7 for the rarity-tier
-// buddies — so feeding entity.scale alone into the ring ballooned it to
+// buddies, so feeding entity.scale alone into the ring ballooned it to
 // several times the buddy's actual silhouette (2026-08-28 owner report).
 const RING_REFERENCE_HEIGHT = 1.8;
 
@@ -35,8 +35,8 @@ const RING_REFERENCE_HEIGHT = 1.8;
  * Every ordinary target (viewHeight at or above the reference) is completely
  * unchanged from before this existed: the height factor clamps to 1, so the
  * result is exactly `entityScale`. Only a target authored shorter than the
- * reference — buddies, and incidentally a few small critters (a wild fox,
- * a dragonkin whelp) — additionally shrinks the ring so it hugs that
+ * reference (buddies, and incidentally a few small critters such as a wild
+ * fox or a dragonkin whelp) additionally shrinks the ring so it hugs that
  * target's real footprint instead of the reference creature's.
  */
 export function selectionRingScale(entityScale: number, viewHeight: number): number {

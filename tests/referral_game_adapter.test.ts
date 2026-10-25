@@ -76,7 +76,7 @@ it('selects the bound friend character in the acting party when both old and new
     const characterId = 100 + i;
     const pid = sim.addPlayer('warrior', `Player${i}`, { characterId });
     sim.meta(pid)!.accountId = accountId;
-    sim.syncBuddyOwnershipFor(pid, ['sapling']);
+    sim.syncBuddyOwnershipFor(pid, ['crystal_lich']);
     return { pid, accountId, characterId, left: false, escrowQuarantined: false } as ClientSession;
   });
   const [actor, old, replacement] = sessions;
@@ -108,7 +108,7 @@ it('bills a full 25-recipient outbox projection through the production adapter',
       accountId = 1000 + i;
     const pid = sim.addPlayer('warrior', `Friend${i}`, { characterId });
     sim.meta(pid)!.accountId = accountId;
-    sim.syncBuddyOwnershipFor(pid, ['sapling']);
+    sim.syncBuddyOwnershipFor(pid, ['crystal_lich']);
     return { pid, characterId, accountId, left: false, escrowQuarantined: false } as ClientSession;
   });
   const costs: number[] = [];
@@ -125,7 +125,10 @@ it('bills a full 25-recipient outbox projection through the production adapter',
   sim.addItem('reins_referral_raptor', 1, previousRecipient.pid);
   for (let replay = 0; replay < 2; replay++) {
     captured.delivery!.applyEntitlements(previousRecipient.accountId, 16);
-    expect([...sim.ownedBuddiesFor(previousRecipient.pid)].sort()).toEqual(['sapling', 'sprites']);
+    expect([...sim.ownedBuddiesFor(previousRecipient.pid)].sort()).toEqual([
+      'crystal_lich',
+      'sprites',
+    ]);
   }
   costs.length = 0;
   for (const session of sessions.slice(1))
@@ -135,7 +138,7 @@ it('bills a full 25-recipient outbox projection through the production adapter',
   for (const session of sessions) {
     const state = sim.serializeCharacter(session.pid)!;
     expect(state.inventory.some((item) => item.itemId === 'reins_referral_raptor')).toBe(true);
-    expect([...sim.ownedBuddiesFor(session.pid)].sort()).toEqual(['sapling', 'sprites']);
+    expect([...sim.ownedBuddiesFor(session.pid)].sort()).toEqual(['crystal_lich', 'sprites']);
     expect(sim.meta(session.pid)!.bankBonusSources).toContainEqual({
       id: 'referral_cards',
       slots: 20,

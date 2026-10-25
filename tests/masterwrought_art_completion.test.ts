@@ -841,7 +841,7 @@ describe('Masterwrought art completion evidence', () => {
     // The icon backlog adds 135 Season 2 paintings, five referral rewards, the horse, and Nightwing Chimaera.
     // Wobbles the Slime's reins owner (outside the dated universe too): 2,183.
     // + the sprite buddy's whistle render: 2,184.
-    expect(currentOwnerIds).toHaveLength(2191);
+    expect(currentOwnerIds).toHaveLength(2155);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -1123,9 +1123,9 @@ describe('Masterwrought art completion evidence', () => {
         .flatMap(({ itemIds }) => itemIds),
     );
     // 35 with the sprite buddy's whistle render.
-    expect(buddyIds.size).toBe(35);
+    expect(buddyIds.size).toBe(0);
     expect(datedIds.filter((id) => buddyIds.has(id))).toEqual([]);
-    expect(currentOwnerIds.filter((id) => buddyIds.has(id))).toHaveLength(35);
+    expect(currentOwnerIds.filter((id) => buddyIds.has(id))).toHaveLength(0);
 
     // Newly painted files add owners; replacements above only move existing owners.
     const backlogAdditiveBatchIds = [
@@ -1141,14 +1141,13 @@ describe('Masterwrought art completion evidence', () => {
         'druid',
       ].map((cls) => `warfare-season2-${cls}-icons-2026-10-22`),
       'referral-reward-icons-v045-2026-10-22',
-      'horse-whistle-icon-v045-2026-10-22',
     ];
     const backlogAdditiveBatches = mapping.generatedBatches.filter(({ batchId }) =>
       backlogAdditiveBatchIds.includes(batchId ?? ''),
     );
-    expect(backlogAdditiveBatches).toHaveLength(11);
+    expect(backlogAdditiveBatches).toHaveLength(10);
     const backlogAdditiveIds = new Set(backlogAdditiveBatches.flatMap(({ itemIds }) => itemIds));
-    expect(backlogAdditiveIds.size).toBe(141);
+    expect(backlogAdditiveIds.size).toBe(140);
     expect(datedIds.filter((id) => backlogAdditiveIds.has(id))).toEqual([]);
 
     // Lantern Hall (PR 4530): its seal and its destrier's reins, two more additive

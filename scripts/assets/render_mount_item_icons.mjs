@@ -1,5 +1,5 @@
 // Renders the bag-icon WebP for each of the 6 new mount reins items straight
-// from the mount's own shipped GLB (public/models/mounts/*.glb) — no
+// from the mount's own shipped GLB (public/models/mounts/*.glb), with no
 // text-to-image generation. Reuses the asset-pipeline's generic headless
 // preview renderer (hero turntable view: auto-framed bounding sphere).
 //

@@ -90,7 +90,8 @@ export function updateBuddyReveals(ctx: SimContext): void {
  *  left pending by a logout mid-instance reveals at once when the player
  *  stands outside, else the sweep picks it up on the way out. (3) The last
  *  summoned companion walks back out with the player, so a collected buddy
- *  is simply THERE every session rather than re-summoned by hand. */
+ *  is simply THERE every session rather than re-summoned by hand, unless the
+ *  player dismissed it (summonBuddy clears `last`), which is remembered. */
 export function revealBuddiesOnJoin(ctx: SimContext, pid: number): void {
   const meta = ctx.players.get(pid);
   const e = ctx.entities.get(pid);

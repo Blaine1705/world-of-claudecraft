@@ -110,7 +110,7 @@ export function despawnBuddyEntity(ctx: SimContext, ownerId: number): void {
  *  combat. The dispatcher (mob/locomotion.ts) already gates on isStunned
  *  before reaching here, matching every other owned-entity branch. Despawns
  *  itself if the owner is gone, dead, or no longer has this exact buddy
- *  active — a belt-and-suspenders net alongside the explicit spawn/despawn
+ *  active: a belt-and-suspenders net alongside the explicit spawn/despawn
  *  calls in src/sim/buddies.ts, so a buddy can never outlive the identity
  *  flip that was supposed to replace or dismiss it.
  *
@@ -118,7 +118,7 @@ export function despawnBuddyEntity(ctx: SimContext, ownerId: number): void {
  *  (pet_owner_revive.ts's whole snapshot/corpse/revive round trip), a buddy
  *  has no HP of its own to lose and no revive command to owe, so it just
  *  keeps standing by its fallen owner and resumes heeling once they're back
- *  up — closer to the old purely-cosmetic follower's behavior (which never
+ *  up, closer to the old purely-cosmetic follower's behavior (which never
  *  disappeared for any reason) than to the pet death handling.
  *
  *  The one thing that displaces the heel is the autoloot errand

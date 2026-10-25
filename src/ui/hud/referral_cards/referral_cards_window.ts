@@ -1,12 +1,10 @@
-import {
-  REFERRAL_BUDDY_WHISTLE,
-  REFERRAL_SLIME_REINS,
-} from '../../../sim/content/referral_rewards';
+import { REFERRAL_BUDDY, REFERRAL_SLIME_REINS } from '../../../sim/content/referral_rewards';
 import type { ReferralMilestone } from '../../../sim/referral_cards';
 import { esc } from '../../esc';
 import { focusKeyAttr } from '../../focus_restore';
 import { formatNumber, type TranslationKey, t } from '../../i18n';
 import { itemImageUrl } from '../../icons';
+import { BUDDY_PORTRAIT_URLS } from '../../target_portrait_view';
 import { svgIcon, type UiIconName } from '../../ui_icons';
 import { referralOwnParticipant, referralStampKey, referralStampRows } from './referral_cards_view';
 import type { ReferralCardsSnapshot, ReferralLinkSnapshot } from './types';
@@ -26,8 +24,8 @@ const STAMP_ART: Partial<Record<ReferralMilestone, string>> = {
   raid: REFERRAL_SLIME_REINS,
 };
 
-function rewardArt(itemId: string | undefined, fallback: UiIconName): string {
-  const image = itemId ? itemImageUrl(itemId) : null;
+function rewardArt(itemId: string | undefined, fallback: UiIconName, portrait?: string): string {
+  const image = portrait ?? (itemId ? itemImageUrl(itemId) : null);
   return image
     ? `<img src="${esc(image)}" alt="" width="128" height="128" decoding="async">`
     : svgIcon(fallback);
@@ -42,18 +40,12 @@ export function referralCardsHtml(
   const cards = snapshot.links.map((link) => cardHtml(link, snapshot, animated)).join('');
   const pages = `<nav class="referral-actions referral-pages" aria-label="${esc(referralText('pages'))}">${button('first-page', 'firstPage', referralText('firstPage'))}${snapshot.nextCursor != null ? button('next-page', 'nextPage', referralText('nextPage')) : ''}</nav>`;
   const invite = `<section class="referral-invite ui-card ui-card-tile"><div class="referral-section-heading">${svgIcon('mail')}<h3 class="ui-h">${esc(referralText('inviteTitle'))}</h3></div><p class="referral-invite-intro">${esc(referralText('inviteHelp'))}</p>${snapshot.inviteUrl ? `<label>${esc(referralText('inviteLabel'))}<input class="ui-input referral-link" readonly value="${esc(snapshot.inviteUrl)}"${focusKeyAttr('invite-url')}></label>` : `<p class="ui-muted">${esc(referralText('inviteUnavailable'))}</p>`}<p class="ui-muted">${esc(referralText('membership'))}</p></section>`;
-  const tierArt = [
-    'reins_referral_raptor',
-    undefined,
-    undefined,
-    undefined,
-    REFERRAL_BUDDY_WHISTLE,
-  ];
+  const tierArt = ['reins_referral_raptor', undefined, undefined, undefined, undefined];
   const tierIcons: UiIconName[] = ['mount', 'chest', 'market', 'market', 'sprout'];
   const tiers = [1, 2, 3, 4, 5]
     .map(
       (tier) =>
-        `<li class="ui-card ui-card-tile referral-tier ${snapshot.rewardedTiers.includes(tier) ? 'is-awarded' : ''}"><span class="referral-tier-art" aria-hidden="true">${rewardArt(tierArt[tier - 1], tierIcons[tier - 1])}</span><div class="referral-tier-copy"><span class="ui-h">${esc(referralText('friendTier', { count: formatNumber(tier) }))}</span><span>${esc(referralText(`referrerRewards.${tier}`))}</span><span class="ui-muted">${esc(referralText(snapshot.rewardedTiers.includes(tier) ? 'awarded' : 'pending'))}</span></div></li>`,
+        `<li class="ui-card ui-card-tile referral-tier ${snapshot.rewardedTiers.includes(tier) ? 'is-awarded' : ''}"><span class="referral-tier-art" aria-hidden="true">${rewardArt(tierArt[tier - 1], tierIcons[tier - 1], tier === 5 ? BUDDY_PORTRAIT_URLS[REFERRAL_BUDDY] : undefined)}</span><div class="referral-tier-copy"><span class="ui-h">${esc(referralText('friendTier', { count: formatNumber(tier) }))}</span><span>${esc(referralText(`referrerRewards.${tier}`))}</span><span class="ui-muted">${esc(referralText(snapshot.rewardedTiers.includes(tier) ? 'awarded' : 'pending'))}</span></div></li>`,
     )
     .join('');
   return `${head}<div class="ui-win-body referral-body"><div class="referral-main">${cards || `<div class="referral-empty ui-card ui-card-tile"><span class="referral-empty-art" aria-hidden="true">${svgIcon('social')}</span><p>${esc(referralText('empty'))}</p></div>`}${pages}${invite}</div><aside class="referral-sidebar"><section class="referral-referrer ui-card ui-card-tile"><h3 class="ui-h">${esc(referralText('referrerTitle'))}</h3><p>${esc(referralText('referrerCount', { count: formatNumber(snapshot.completedFriends) }))}</p><ol class="referral-tiers">${tiers}</ol></section></aside></div>`;

@@ -198,7 +198,7 @@ export const KTX2_MIP_RELEASABLE_MODEL_ROOTS: readonly string[] = [
  *  from these caches): their CPU mips must stay resident. Kept in an explicit
  *  list so tests can prove every on-disk root was consciously classified. */
 export const KTX2_MIP_EXEMPT_MODEL_ROOTS: readonly string[] = [
-  // buddy companions: drawn by the Hunting pane's preview rig beside the world
+  // buddy companions: streamed beside the creature rigs (characters/assets.ts)
   'buddies',
   'chars',
   'creatures',
