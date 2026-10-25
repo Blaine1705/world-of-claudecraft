@@ -7,8 +7,9 @@
 //     and the wind bridge's shelters, on the layout's props and colliders;
 //   - the Wind Bridge's natural arch under its ramp (the field then draws
 //     only a shallow keel under the deck, `BREATH_KIT_SHALLOW`);
-//   - the low walls along every Breath walk over the void (the edge planner's
-//     modules, past the lip over the drop, never over a walk);
+//   - the low walls along every Breath walk over the void (the shared lip
+//     planner's modules, lip_walls_core.ts: past the lip over the drop, never
+//     over a walk);
 //   - each wind channel (the notches in the Cornice's rim) flanked by two
 //     cheek stones past its mouth's corners, the groove the Smith cut leading
 //     the updraft in from it across the floor;
@@ -26,13 +27,10 @@ import {
   SMITH_HEART_FIELD,
   WIND_BRIDGE,
 } from '../../sim/content/smith_heart_layout';
-import {
-  authoredFieldCliffRuns,
-  authoredFieldHeight,
-  authoredFieldSurfaceAt,
-} from '../../sim/instances/authored_field';
+import { authoredFieldHeight, authoredFieldSurfaceAt } from '../../sim/instances/authored_field';
 import type { HeartKitPlacement } from './heart_kit_core';
 import { heartHash, heartPropBase } from './heart_plan_core';
+import { lipWallClear, planLipWalls } from './lip_walls_core';
 
 /** The layout prop kinds the kit draws in place of their placeholders. */
 export const BREATH_KIT_KINDS: ReadonlySet<string> = new Set([
@@ -174,116 +172,24 @@ export function planBreathProps(): HeartKitPlacement[] {
  *  hugs a landing's curve (the walls bend round it a module at a time). */
 export const BREATH_WALL_MODULE = 4;
 
-/** The Breath walks' lips over the void, chained end to end per surface:
- *  each chain a polyline along the lip with the outward normal at each run. */
-function breathLipChains(): { x: number; z: number; nx: number; nz: number }[][] {
-  const runs = authoredFieldCliffRuns(F).filter(
-    (r) =>
-      BREATH_WALK_SURFACES.has(r.surface) &&
-      r.low <= F.voidHeight + 1 &&
-      r.high - r.low >= 4 &&
-      Math.hypot(r.bx - r.ax, r.bz - r.az) > 1e-3,
-  );
-  const chains: { x: number; z: number; nx: number; nz: number }[][] = [];
-  let last: (typeof runs)[number] | null = null;
-  for (const r of runs) {
-    const joined =
-      last && last.surface === r.surface && Math.hypot(last.bx - r.ax, last.bz - r.az) < 0.05;
-    if (!joined) chains.push([{ x: r.ax, z: r.az, nx: r.nx, nz: r.nz }]);
-    chains[chains.length - 1].push({ x: r.bx, z: r.bz, nx: r.nx, nz: r.nz });
-    last = r;
-  }
-  return chains;
-}
-
-/** The low walls along every Breath walk's lip over the void: modules a
- *  few yards long walked along each lip's chain, each set on its chord and
- *  pushed out past the lip's own bow (never over the walk), following a
- *  stair's slope, none where the lip bends onto another floor. */
+/** The low walls along every Breath walk's lip over the void (the shared
+ *  lip planner: lip_walls_core.ts). */
 export function planBreathWalls(): HeartKitPlacement[] {
-  const out: HeartKitPlacement[] = [];
-  const ground = (x: number, z: number) => authoredFieldHeight(F, x, z);
-  for (const chain of breathLipChains()) {
-    const cum = [0];
-    for (let i = 1; i < chain.length; i++)
-      cum.push(cum[i - 1] + Math.hypot(chain[i].x - chain[i - 1].x, chain[i].z - chain[i - 1].z));
-    const total = cum[cum.length - 1];
-    if (total < BREATH_WALL_MODULE * 0.6) continue;
-    const pieces = Math.max(1, Math.round(total / BREATH_WALL_MODULE));
-    const len = total / pieces;
-    const at = (s: number) => {
-      let i = 1;
-      while (i < cum.length - 1 && cum[i] < s) i++;
-      const t = (s - cum[i - 1]) / Math.max(1e-6, cum[i] - cum[i - 1]);
-      const a = chain[i - 1];
-      const b = chain[i];
-      return { x: a.x + (b.x - a.x) * t, z: a.z + (b.z - a.z) * t, i };
-    };
-    for (let k = 0; k < pieces; k++) {
-      const p0 = at(k * len);
-      const p1 = at((k + 1) * len);
-      const cx = (p0.x + p1.x) / 2;
-      const cz = (p0.z + p1.z) / 2;
-      let ux = p1.x - p0.x;
-      let uz = p1.z - p0.z;
-      const ul = Math.hypot(ux, uz) || 1;
-      ux /= ul;
-      uz /= ul;
-      // The outward normal: the chord's perpendicular on the runs' side.
-      let nx = uz;
-      let nz = -ux;
-      const run = chain[Math.min(chain.length - 1, p0.i)];
-      if (nx * run.nx + nz * run.nz < 0) {
-        nx = -nx;
-        nz = -nz;
-      }
-      // Out past the lip's own bow between the chord's ends.
-      let bow = 0;
-      for (let i = p0.i; i < p1.i; i++)
-        bow = Math.max(bow, (chain[i].x - cx) * nx + (chain[i].z - cz) * nz);
-      const x = cx + nx * (bow + 0.02);
-      const z = cz + nz * (bow + 0.02);
-      const rot = Math.atan2(nx, nz);
-      const stretch = ul / (BREATH_WALL.half * 2);
-      if (stretch < 0.35 || !wallClear(x, z, rot, stretch)) continue;
-      // Local +X is (cos rot, -sin rot): the slope along it.
-      const lx = Math.cos(rot);
-      const lz = -Math.sin(rot);
-      const y0 = ground(x - lx * ul * 0.45 - nx * 0.4, z - lz * ul * 0.45 - nz * 0.4);
-      const y1 = ground(x + lx * ul * 0.45 - nx * 0.4, z + lz * ul * 0.45 - nz * 0.4);
-      const y = ground(x - nx * 0.4, z - nz * 0.4);
-      const shear = Math.abs(y1 - y0) < ul ? (y1 - y0) / (ul * 0.9) : 0;
-      const h = heartHash(Math.round(x * 3), Math.round(z * 3));
-      out.push({
-        piece: h < 0.22 ? 'Kit_BreathWallB' : 'Kit_BreathWallA',
-        x,
-        y,
-        z,
-        rot,
-        stretch,
-        shear,
-        noShadow: true,
-      });
-    }
-  }
-  return out;
+  return planLipWalls({
+    surfaces: BREATH_WALK_SURFACES,
+    pieceA: 'Kit_BreathWallA',
+    pieceB: 'Kit_BreathWallB',
+    bShare: 0.22,
+    module: BREATH_WALL_MODULE,
+    half: BREATH_WALL.half,
+    far: BREATH_WALL.far,
+  });
 }
 
 /** Does a wall module at (x, z) turned by `rot` stand wholly over the drop
  *  (none where the lip bends onto another floor)? */
 export function wallClear(x: number, z: number, rot: number, stretch: number): boolean {
-  const ux = Math.cos(rot);
-  const uz = -Math.sin(rot);
-  const nx = Math.sin(rot);
-  const nz = Math.cos(rot);
-  const half = BREATH_WALL.half * stretch;
-  for (let k = -6; k <= 6; k++) {
-    const a = (k / 6) * half;
-    for (const w of [0.2, 0.55, BREATH_WALL.far]) {
-      if (authoredFieldSurfaceAt(F, x + ux * a + nx * w, z + uz * a + nz * w)) return false;
-    }
-  }
-  return true;
+  return lipWallClear(x, z, rot, stretch, BREATH_WALL.half, BREATH_WALL.far);
 }
 
 /** Each wind channel's groove, cut in the Cornice's floor to lead the

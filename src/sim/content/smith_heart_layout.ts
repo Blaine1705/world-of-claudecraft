@@ -705,9 +705,9 @@ const AUTHORED_SURFACES: FieldSurface[] = [
       [98, 0, H.quenchUpper],
       [102, 0, H.quenchUpper],
     ],
-    { stairs: true },
+    { stairs: true, ground: 'rime' },
   ),
-  disc('quench_q1', QUENCH.q1, { edge: 'rock', ground: 'snow' }),
+  disc('quench_q1', QUENCH.q1, { edge: 'rock', ground: 'rime' }),
   path(
     'quench_stair',
     [
@@ -716,9 +716,9 @@ const AUTHORED_SURFACES: FieldSurface[] = [
       [120, -32, H.quenchMiddle],
       [121, -38, H.quenchMiddle],
     ],
-    { stairs: true, ground: 'snow' },
+    { stairs: true, ground: 'rime' },
   ),
-  disc('quench_q2', QUENCH.q2, { edge: 'rock', ground: 'snow' }),
+  disc('quench_q2', QUENCH.q2, { edge: 'rock', ground: 'rime' }),
   path(
     'quench_shelf_stair',
     [
@@ -727,9 +727,9 @@ const AUTHORED_SURFACES: FieldSurface[] = [
       [141, -75, H.quenchShelf],
       [144, -79, H.quenchShelf],
     ],
-    { stairs: true, ground: 'snow' },
+    { stairs: true, ground: 'rime' },
   ),
-  rect('singing_ice', QUENCH.ice, { edge: 'rock', ground: 'ice' }),
+  rect('singing_ice', QUENCH.ice, { edge: 'rock', ground: 'lake_ice' }),
   path(
     'lake_descent',
     [
@@ -738,10 +738,10 @@ const AUTHORED_SURFACES: FieldSurface[] = [
       [188, -50, H.lake],
       [190, -44, H.lake],
     ],
-    { ground: 'snow' },
+    { ground: 'rime' },
   ),
-  carvedEllipse('lake_shelf', QUENCH.shelf, 3, 71, { edge: 'rock', ground: 'snow' }),
-  carvedEllipse('frozen_lake', QUENCH.lake, 2, 73, { edge: 'rock', ground: 'ice' }, 10),
+  carvedEllipse('lake_shelf', QUENCH.shelf, 3, 71, { edge: 'rock', ground: 'rime' }),
+  carvedEllipse('frozen_lake', QUENCH.lake, 2, 73, { edge: 'rock', ground: 'lake_ice' }, 10),
   // --- The Heat (west): the Smith's forge, level with the Ring ------------------------
   rect('forge_hall', HEAT.hall, { edge: 'masonry', ground: 'soot' }),
   rect('casting_floor', HEAT.floor, { edge: 'masonry', ground: 'soot' }),
@@ -889,10 +889,11 @@ const GALLERY_FALLEN_BLOCKS: FieldProp[] = [
   { x: -84.3, z: -215.0, rot: 0.75 },
 ].map((b) => ({ kind: 'sh_fallen_block', ...b, hw: 1.3, hd: 1.0, h: 1.5 }));
 
-/** The Frozen Lake's braziers on its rock shelf (the Quench form's warmth). */
-const LAKE_BRAZIERS: FieldProp[] = [40, 140, 220, 320].map((deg) => {
+/** The Frozen Lake's braziers on its rock shelf (the Quench form's warmth):
+ *  the Smith's carved fire bowls (phase 2H), a body wide each. */
+export const LAKE_BRAZIERS: FieldProp[] = [40, 140, 220, 320].map((deg) => {
   const p = around(QUENCH.shelf, deg, -5);
-  return { kind: 'sh_brazier', ...p, rot: 0, r: 1, h: 2 };
+  return { kind: 'sh_brazier', ...p, rot: 0, r: 1.5, h: 2.6 };
 });
 
 /** The Smith's quenched blades, half-sunk in the lake ice (great swords
@@ -913,6 +914,20 @@ const STEAM_VENTS: FieldProp[] = [70, 190, 290].map((deg) => {
   const p = around(QUENCH.shelf, deg, -4);
   return { kind: 'sh_steam_vent', ...p, rot: 0 };
 });
+
+/** Frost-cracked standing stones at the Quench's landings' rims (phase 2H),
+ *  on colliders, between the walks that leave each landing. */
+const FROST_STONES: FieldProp[] = (
+  [
+    [QUENCH.q1, [30, 100, 215]],
+    [QUENCH.q2, [70, 245]],
+  ] as const
+).flatMap(([c, degs]) =>
+  degs.map((deg) => {
+    const p = around({ x: c.x, z: c.z, rx: c.r, rz: c.r }, deg, -2.4);
+    return { kind: 'sh_frost_stone', ...p, rot: 0, r: 1.6, h: 6 };
+  }),
+);
 
 /** The ice shelves: tilted slabs of old ice heaped past the basin's rim. */
 const ICE_SHELVES: FieldProp[] = [10, 60, 110, 300, 345].map((deg, i) => {
@@ -1045,6 +1060,7 @@ const PROPS: FieldProp[] = [
   ...STEAM_VENTS,
   ...SUNK_BLADES,
   ...ICE_SHELVES,
+  ...FROST_STONES,
   { kind: 'sh_ice_blade', x: 150, z: -78, rot: 0.3, r: 0.8, h: 4 },
   { kind: 'sh_ice_blade', x: 170, z: -96, rot: 1.2, r: 0.8, h: 4 },
   // The Heat: house-sized crucibles, the great pour crucible, the great

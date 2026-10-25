@@ -245,6 +245,12 @@ export const HEART_PROP_RECIPES: Readonly<Record<string, readonly HeartPart[]>> 
     part('box', 'stone', 'breath', [2.6, 7.5, 1.8], [0, 3.75, 0]),
     part('gem', 'glow', 'breath', [0.6, 1, 0.6], [0.3, 5.3, 0]),
   ],
+  // A Quench landing's frost-cracked standing stone (phase 2H stand-in until
+  // the Quench kit lands).
+  sh_frost_stone: [
+    part('box', 'stone', 'quench', [3, 5.6, 2.4], [0, 2.8, 0]),
+    part('gem', 'ice', 'quench', [0.8, 1.4, 0.8], [0.9, 3.4, 0.6]),
+  ],
   sh_lightning_rod: [
     part('cyl', 'stone', 'breath', [2.6, 2, 2.4], [0, 1, 0]),
     part('cyl', 'bronze', 'breath', [0.9, 20, 0.5], [0, 12, 0]),
@@ -623,7 +629,13 @@ export function planHeartLights(): HeartLightSpot[] {
         ),
       );
     } else if (p.kind === 'sh_brazier') {
-      spots.push(warm(`brazier:${p.x}:${p.z}`, p.x, p.z, 2.4, HEART_PALETTE.coal));
+      // The Quench's fire bowls (phase 2H): the one warm light in the cold,
+      // strong enough to lay a warm pool on the snow round each bowl.
+      spots.push({
+        ...warm(`brazier:${p.x}:${p.z}`, p.x, p.z, 3.2, HEART_PALETTE.coal),
+        intensity: 7,
+        range: 20,
+      });
     } else if (p.kind === 'sh_lightning_rod' && LIT_RODS.has(rod++)) {
       spots.push({
         id: `rod:${p.x}:${p.z}`,

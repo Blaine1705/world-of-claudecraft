@@ -1006,6 +1006,10 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart/breath_kit_plan_core.ts',
   'src/render/smith_heart/breath_air_core.ts',
   'src/render/smith_heart_fx/breath_fx_core.ts',
+  // The Quench vein (phase 2H): its kit's plan, the shared lip walls, its
+  // frost on the mountain, its air and weather, its guardian's effects.
+  'src/render/smith_heart/quench_kit_plan_core.ts',
+  'src/render/smith_heart/lip_walls_core.ts',
   'src/render/drowned_temple/temple_rising_stair_core.ts',
   // The Mere Hydra's Tsunami: the breaking wave's profile, timeline, spray and foam.
   'src/render/drowned_temple/temple_tsunami_core.ts',

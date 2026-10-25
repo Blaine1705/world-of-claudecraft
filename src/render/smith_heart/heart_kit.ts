@@ -20,6 +20,7 @@ import { registerDeferredPreload } from '../assets/preload';
 import { GFX } from '../gfx';
 import { markSharedGeometry, markSharedMaterial } from '../shared_resource';
 import { applySurfaceDetail } from '../worn_stone';
+import { applyHeartIceSheen } from './heart_ice_sheen';
 import type { HeartKitPlacement } from './heart_kit_core';
 import { applyRockCutaway } from './heart_rock_cutaway';
 
@@ -32,15 +33,22 @@ export const SMITH_HEART_RING_KIT_URL = '/models/props/smith_heart_ring_kit.glb'
 /** The Breath's kit (phase 2G, breath_kit.ts): the Cornice, the Wind Bridge,
  *  the walls over the void. */
 export const SMITH_HEART_BREATH_KIT_URL = '/models/props/smith_heart_breath_kit.glb';
+/** The Quench's kit (phase 2H, quench_kit.ts): the basin's fire bowls, the
+ *  lake's blades, the heaped ice, the walls over the void, the frozen falls. */
+export const SMITH_HEART_QUENCH_KIT_URL = '/models/props/smith_heart_quench_kit.glb';
 
-export type HeartKitSlot = 'stone' | 'glow';
+/** A kit's material slots: KitStone (lit rock), KitGlow (emissive light) and
+ *  KitIce (phase 2H: lit, glossy, a cold sheen at the grazing angles and a
+ *  breath of light inside, so a thick blade or a heap of old ice reads as
+ *  clear ice, never as blue stone). */
+export type HeartKitSlot = 'stone' | 'glow' | 'ice';
 export type HeartBakedPiece = Partial<Record<HeartKitSlot, THREE.BufferGeometry>>;
-export const HEART_KIT_SLOTS: readonly HeartKitSlot[] = ['stone', 'glow'];
+export const HEART_KIT_SLOTS: readonly HeartKitSlot[] = ['stone', 'glow', 'ice'];
 /** The materials a kit slot draws with: its own, or (the mountain's rock,
  *  phase 2E) the stone slot drawn as `rock`, the same lit vertex colour
  *  with a heavier, broader triplanar fracture (big faces seen from far). */
 export type HeartKitMaterial = HeartKitSlot | 'rock';
-export const HEART_KIT_MATERIALS: readonly HeartKitMaterial[] = ['stone', 'glow', 'rock'];
+export const HEART_KIT_MATERIALS: readonly HeartKitMaterial[] = ['stone', 'glow', 'ice', 'rock'];
 
 /** How long the interior waits for a kit before building with placeholders. */
 const KIT_WAIT_MS = 8000;
@@ -63,7 +71,8 @@ function stateOf(url: string): KitState {
 }
 
 function slotOf(materialName: string): HeartKitSlot {
-  return /glow/i.test(materialName) ? 'glow' : 'stone';
+  if (/glow/i.test(materialName)) return 'glow';
+  return /ice/i.test(materialName) ? 'ice' : 'stone';
 }
 
 /** Merge geometries into ONE indexed geometry (position, normal, colour). */
@@ -105,7 +114,7 @@ export function mergeHeartKitParts(list: readonly THREE.BufferGeometry[]): THREE
 
 function bakeNode(node: THREE.Object3D): HeartBakedPiece {
   node.updateWorldMatrix(true, true);
-  const parts: Record<HeartKitSlot, THREE.BufferGeometry[]> = { stone: [], glow: [] };
+  const parts: Record<HeartKitSlot, THREE.BufferGeometry[]> = { stone: [], glow: [], ice: [] };
   node.traverse((child) => {
     if (!(child instanceof THREE.Mesh)) return;
     const geometry = new THREE.BufferGeometry();
@@ -156,6 +165,7 @@ if (typeof window !== 'undefined') {
   registerDeferredPreload(() => startKitLoad(SMITH_HEART_ROCK_KIT_URL));
   registerDeferredPreload(() => startKitLoad(SMITH_HEART_RING_KIT_URL));
   registerDeferredPreload(() => startKitLoad(SMITH_HEART_BREATH_KIT_URL));
+  registerDeferredPreload(() => startKitLoad(SMITH_HEART_QUENCH_KIT_URL));
 }
 
 /** Fetch and bake a kit once. Never rejects; resolves within the wait cap
@@ -224,6 +234,17 @@ export function heartKitSlotMaterial(slot: HeartKitMaterial): THREE.Material {
     } else {
       m = new THREE.MeshLambertMaterial({ vertexColors: true, name: 'SmithHeartKitStone' });
     }
+  } else if (slot === 'ice') {
+    m = GFX.standardMaterials
+      ? applyHeartIceSheen(
+          new THREE.MeshStandardMaterial({
+            vertexColors: true,
+            metalness: 0.0,
+            roughness: 0.3,
+            name: 'SmithHeartKitIce',
+          }),
+        )
+      : new THREE.MeshLambertMaterial({ vertexColors: true, name: 'SmithHeartKitIce' });
   } else {
     m = new THREE.MeshBasicMaterial({
       vertexColors: true,
@@ -303,8 +324,8 @@ export function instanceHeartKit(
       for (const [i, p] of bucket.entries())
         mesh.setMatrixAt(i, heartKitPlacementMatrix(p, tmpOut));
       mesh.instanceMatrix.needsUpdate = true;
-      mesh.castShadow = casts && slot === 'stone';
-      mesh.receiveShadow = slot === 'stone';
+      mesh.castShadow = casts && slot !== 'glow';
+      mesh.receiveShadow = slot !== 'glow';
       mesh.computeBoundingSphere();
       mesh.matrixAutoUpdate = false;
       group.add(mesh);
@@ -361,8 +382,8 @@ export function heartKitMeshes(url: string, piece: string): THREE.Group | null {
     if (!g) continue;
     const mesh = new THREE.Mesh(g, heartKitSlotMaterial(slot));
     mesh.name = `${piece}:${slot}`;
-    mesh.castShadow = slot === 'stone';
-    mesh.receiveShadow = slot === 'stone';
+    mesh.castShadow = slot !== 'glow';
+    mesh.receiveShadow = slot !== 'glow';
     group.add(mesh);
   }
   return group;
