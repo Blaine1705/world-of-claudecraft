@@ -108,6 +108,15 @@ describe('resolveFogScene (the renderer fog resolution, moved verbatim)', () => 
       'smithHeartBreath',
     );
     expect(resolveFogScene(true, slotOrigin.x, 5, onBridge, SEED).desired).toBe('smithHeartBreath');
+    // North of the Ring past its mouth (the first landing, the chimney) the
+    // Breath's light wins over the Ring's.
+    for (const [x, z] of [
+      [0, 106],
+      [-30, 110],
+    ]) {
+      const at = { x: slotOrigin.x + x, z: slotOrigin.z + z };
+      expect(resolveFogScene(true, slotOrigin.x, 5, at, SEED).desired).toBe('smithHeartBreath');
+    }
     expect(resolveFogScene(true, slotOrigin.x, 5, inQuarry, SEED).desired).toBe('smithHeartHammer');
     expect(resolveFogScene(true, slotOrigin.x, 5, atCleft, SEED).desired).toBe('smithHeartHammer');
     expect(resolveFogScene(true, interiorPx('gravewyrm_sanctum'), 5, cam, SEED).desired).toBe(

@@ -84,19 +84,20 @@ export function resolveFogScene(
   // Its Hammer vein has its own warm quarry dusk (phase 2B).
   const inSmithHeartHammer =
     interior === 'smith_heart' && !inSmithHeartCore && smithHeartCameraInHammer(cam.x, cam.z);
+  // And the Breath its own storm summit light (phase 2G), which wins over
+  // the Ring's north of its mouth.
+  const inSmithHeartBreath =
+    interior === 'smith_heart' &&
+    !inSmithHeartCore &&
+    !inSmithHeartHammer &&
+    smithHeartCameraInBreath(cam.x, cam.z);
   // And the Ring round the seal its own (phase 2F).
   const inSmithHeartRing =
     interior === 'smith_heart' &&
     !inSmithHeartCore &&
     !inSmithHeartHammer &&
+    !inSmithHeartBreath &&
     smithHeartCameraInRing(cam.x, cam.z);
-  // And the Breath its own storm summit light (phase 2G).
-  const inSmithHeartBreath =
-    interior === 'smith_heart' &&
-    !inSmithHeartCore &&
-    !inSmithHeartHammer &&
-    !inSmithHeartRing &&
-    smithHeartCameraInBreath(cam.x, cam.z);
   // The Sunken Bastion: open-air at storm-tide dusk under its own sky.
   const inSunkenBastion =
     interior === 'sunken_bastion' ||

@@ -100,18 +100,21 @@ export const SMITH_HEART_RING_LIGHT = {
 /** The fog state of the Breath (phase 2G). */
 export const SMITH_HEART_BREATH_FOG_STATE = 'smithHeartBreath';
 
-/** Does the Breath's light hold at instance-local (x, z)? Its area, and the
- *  air south of its first landing a camera standing back from the mouth or
- *  the chimney stands in (the areas' map names that strip the Hammer's). */
+/** Does the Breath's light hold at instance-local (x, z)? North of the
+ *  Ring past its mouth (a camera standing back from a player on the first
+ *  landing or in the chimney stands there), the Breath's light wins over the
+ *  Ring's; elsewhere its area outside the Ring's light. */
 export function inBreathLight(x: number, z: number): boolean {
-  if (smithHeartAreaAt(x, z) === 'breath') return true;
-  return (
-    z > 64 && x > -140 && x < 90 && Math.hypot(x - RING.x, z - RING.z) > SMITH_HEART_RING_LIGHT_R
-  );
+  if (x <= -140 || x >= 90 || z <= 64)
+    return (
+      smithHeartAreaAt(x, z) === 'breath' &&
+      Math.hypot(x - RING.x, z - RING.z) > SMITH_HEART_RING_LIGHT_R
+    );
+  return z > RING.outerR + 22 || Math.hypot(x - RING.x, z - RING.z) > SMITH_HEART_RING_LIGHT_R;
 }
 
-/** Is the camera at world (x, z) in the Breath vein of its Smith's Heart slot?
- *  (The Ring's own state wins round the Breath's mouth.) */
+/** Is the camera at world (x, z) in the Breath vein of its Smith's Heart
+ *  slot? (The Ring's own state keeps the Breath's mouth.) */
 export function smithHeartCameraInBreath(x: number, z: number): boolean {
   const def = DUNGEONS.smith_heart;
   if (!def) return false;
