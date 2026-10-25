@@ -1020,6 +1020,10 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart/heat_air_core.ts',
   'src/render/smith_heart/heat_pour_core.ts',
   'src/render/smith_heart_fx/heat_fx_core.ts',
+  // The Smith's Heart's final room (phase 2J): its kit's plan, its crown of
+  // rock, the final boss's memory, its body and effects.
+  'src/render/smith_heart/heart_room_kit_plan_core.ts',
+  'src/render/smith_heart/heart_crown_core.ts',
   'src/render/drowned_temple/temple_rising_stair_core.ts',
   // The Mere Hydra's Tsunami: the breaking wave's profile, timeline, spray and foam.
   'src/render/drowned_temple/temple_tsunami_core.ts',
