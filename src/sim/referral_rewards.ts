@@ -5,13 +5,15 @@ import { restoreBuddyCollection, serializeBuddyCollection } from './buddies';
 import type { CharacterState } from './character_state';
 import {
   REFERRAL_BAG,
+  REFERRAL_BUDDY,
   REFERRAL_FOG_TRINKET,
   REFERRAL_HOLLOW_TRINKET,
   REFERRAL_RAPTOR_REINS,
-  REFERRAL_TANK_REINS,
+  REFERRAL_SLIME_REINS,
   REFERRAL_TITLE,
 } from './content/referral_rewards';
 import { isMaterialItemId } from './material_ids';
+import { savedMaterialSlot } from './material_slot_load';
 import { REFERRAL_MILESTONES, type ReferralMilestone } from './referral_cards';
 import type { SimContext } from './sim_context';
 import { cloneInvSlot, type EquipSlot, type InvSlot } from './types';
@@ -157,7 +159,7 @@ export function grantReferralReward(
       next.mountTrainingFeePaid = true;
       break;
     case 'raid':
-      give(next, { itemId: REFERRAL_TANK_REINS, count: 1 });
+      give(next, { itemId: REFERRAL_SLIME_REINS, count: 1 });
       break;
   }
   putReceipt(next, linkId, redeemed | bit);
@@ -219,7 +221,7 @@ export function grantReferralInviterReward(
   if (earned & 1 && !(prior & 1)) give(next, { itemId: REFERRAL_RAPTOR_REINS, count: 1 });
   if (earned & 2 && !(prior & 2)) {
     next.buddies ??= {};
-    next.buddies.owned = [...new Set([...(next.buddies.owned ?? []), 'sapling'])];
+    next.buddies.owned = [...new Set([...(next.buddies.owned ?? []), REFERRAL_BUDDY])];
   }
   next.referralInviterRewards = prior | earned;
   assertCapacity(next);
@@ -242,7 +244,8 @@ export function applyReferralRewardState(
   const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
   // Passive loot may arrive during the database await even when commands are fenced.
   // Never overwrite it. The host quarantines/reloads on false after a committed write.
-  if (changed('inventory') && !same(meta.inventory, before.inventory)) return false;
+  if (changed('inventory') && !same(meta.inventory.map(savedMaterialSlot), before.inventory))
+    return false;
   if (changed('equipment') && !same(meta.equipment, before.equipment)) return false;
   if (
     (changed('equipmentInstance') || changed('equipment')) &&

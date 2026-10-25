@@ -5,15 +5,8 @@
 // drift. Repeated modules render as one InstancedMesh per kind (~30 draws
 // per interior instance).
 //
-// Three looks from two layouts:
-//   Hollow Crypt   (interior 'crypt',  origin x 900 band)  - blue flame, coffins/graves/bones
-//   Sunken Bastion (interior 'crypt',  origin x 1500 band) - teal flame, cargo/banners fortress
-//   Gravewyrm Sanctum (interior 'sanctum')                 - green ritual fire, necromantic
-//   Drowned Temple (interior 'temple')                     - pale moon-violet, drowned reliquaries
-//   Abandoned Crypt raid (interior 'nythraxis')            - dark violet soul wards
-//   Crucible of the Last Spring (interior 'ignivar')       - hot amber forge light
+// Per-interior layouts and themes select their own kit dressing and lighting.
 import * as THREE from 'three';
-import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { arenaOriginAt, instanceOrigin } from '../sim/data';
 import type { DelveModuleId } from '../sim/delve_layout';
@@ -50,7 +43,7 @@ import {
   type WallSeg,
 } from '../sim/rift/authored';
 import { ARENA_WATER_NAVE_HALF_X, arenaWaterBands } from './arena_water_band_core';
-import { loadGltf, releaseGltf } from './assets/loader';
+import { type LoadedGltf, loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { fitAuthoredWallSegment } from './authored_walls_core';
 import { hash2, stackDaisBlocks } from './dais_blocks_core';
@@ -354,7 +347,7 @@ function attributeToFloat(geo: THREE.BufferGeometry, name: string): void {
   geo.setAttribute(name, new THREE.BufferAttribute(out, attr.itemSize));
 }
 
-function extractModule(name: string, pack: Pack, gltf: GLTF): void {
+function extractModule(name: string, pack: Pack, gltf: LoadedGltf): void {
   const geos: THREE.BufferGeometry[] = [];
   gltf.scene.updateMatrixWorld(true);
   gltf.scene.traverse((obj) => {
@@ -383,8 +376,10 @@ function extractModule(name: string, pack: Pack, gltf: GLTF): void {
 }
 
 function loadModuleAsset(name: string, pack: Pack): Promise<void> {
+  if (moduleAssets.has(name)) return Promise.resolve();
   const url = `models/dungeon/${name}.glb`;
   return loadGltf(url).then((g) => {
+    if (moduleAssets.has(name)) return;
     extractModule(name, pack, g);
     releaseGltf(url);
   });
@@ -394,7 +389,12 @@ export function ensureDungeonAssets(): Promise<void> {
   dungeonAssetsPromise ??= Promise.all([
     ...KIT_MODELS.map((name) => loadModuleAsset(name, 'kit')),
     ...BITS_MODELS.map((name) => loadModuleAsset(name, 'bits')),
-  ]).then(() => undefined);
+  ])
+    .then(() => undefined)
+    .catch((error) => {
+      dungeonAssetsPromise = null;
+      throw error;
+    });
   return dungeonAssetsPromise;
 }
 

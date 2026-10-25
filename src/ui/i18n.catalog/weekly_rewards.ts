@@ -16,6 +16,13 @@ export const weeklyRewardStrings = {
   heroicClears: '{count} Heroic',
   normalClears: '{count} Normal',
   viewPossibleLoot: 'View possible loot',
+  lootFocus: 'Loot focus',
+  allClassGear: 'All class gear',
+  specRole: '{name} ({role})',
+  mixedRole: '{first} / {second}',
+  lootFocusHelp: 'Applies to unopened vaults only.',
+  noFocusedLoot: 'No eligible loot. Choose another focus.',
+  rolledFocus: 'Rolled for: {focus}',
   chooseTable: 'Select which table to roll off',
   selectAllTables: 'Select all',
   selectedTables: '{count} tables selected',
@@ -37,6 +44,10 @@ export const weeklyRewardStrings = {
     worldMany: '{count} World Quests Completed',
     pvpOne: '{count} Rated Match Won',
     pvpMany: '{count} Rated Matches Won',
+    // Successors (2026-09-29): the PvP row also counts the King of the Hill
+    // longest hold (src/sim/pvp/hill.ts), which is no rated match.
+    pvpWinOne: '{count} PvP Win',
+    pvpWinMany: '{count} PvP Wins',
   },
   requiredTask: {
     raidOne: 'Clear {count} Raid Encounter',
@@ -47,12 +58,16 @@ export const weeklyRewardStrings = {
     worldMany: 'Complete {count} World Quests',
     pvpOne: 'Win {count} Rated Match',
     pvpMany: 'Win {count} Rated Matches',
+    pvpWinOne: 'Earn {count} PvP Win',
+    pvpWinMany: 'Earn {count} PvP Wins',
   },
   readyWeeks: 'Unclaimed weeks: {count}. Claim the oldest completed week first.',
   claimLastWeek: "Claim last week's reward",
   readyTitle: 'Your weekly rewards are ready',
   readyDescription:
     'A completed week of rewards is waiting. Open your earned vaults, then choose one item to claim.',
+  previewClaimNotice:
+    'Rewards are waiting. Visit the Vault Keeper in Eastbrook to open your vaults and claim a reward.',
   notNow: 'Not now',
   completedWeek: 'Week ended {date}',
   currentWeek: "Back to this week's progress",
@@ -81,6 +96,8 @@ export const weeklyRewardStrings = {
     'Every listed item has an equal chance. Items match your class restrictions. Defeated raids unlock their loot at that difficulty. Legendary items are excluded.',
   selectionPoolRule:
     'For raids and dungeons, select one or more tables before opening. Dungeon tables combine bosses you have cleared at this difficulty. Rolls exclude duplicates, legendary items and equipment requiring more than {maxLevelOffset} levels above your level.',
+  previewPoolRule:
+    'All tables these vaults can roll from. Defeating a boss permanently unlocks its loot for future vaults. A dungeon table holds only the bosses you defeated, and a Heroic kill also unlocks Normal. Rolls exclude items already rolled. Equipment requiring more than {maxLevelOffset} levels above your level is not shown.',
   rare: 'Rare',
   epic: 'Epic',
   unavailable: 'Not yet available',

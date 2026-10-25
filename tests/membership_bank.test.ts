@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { SavedBankState } from '../src/sim/bank';
 import { ITEMS } from '../src/sim/data';
+import { savedMaterialSlot } from '../src/sim/material_slot_load';
 import {
   applyMembershipBankInventoryPlan,
   membershipBankView,
@@ -51,11 +52,12 @@ describe('membership bank exact transfers', () => {
     expect(result).toMatchObject({
       ok: true,
       moved: 2,
-      inventory: [item],
+      inventory: [savedMaterialSlot(item)],
       bank: { inventory: [] },
     });
     if (result.ok) {
-      result.inventory[0].instance!.signer = 'Changed';
+      result.inventory[0].instance!.enchant = 'Changed';
+      expect(item.instance!.enchant).toBe('test-enchant');
       expect(item.instance!.signer).toBe('Mira');
     }
   });

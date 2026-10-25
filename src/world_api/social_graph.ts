@@ -166,7 +166,9 @@ export interface CharacterSearchResult {
 // This is the already-crawlable subset (the same one behind the public /c/:name
 // page), so it deliberately carries NO wallet balance, Discord/GitHub identity,
 // or equipped gear: those stay on the proximity-gated entity wire, visible only
-// when you are actually standing next to the player.
+// when you are actually standing next to the player. (One consented exception:
+// applying to a group listing shares worn gear with that listing's leader, via
+// DungeonFinderApplicantView.gear in the leader's own finder snapshot.)
 export interface CharacterProfile {
   name: string;
   cls: string;

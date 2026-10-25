@@ -14,7 +14,7 @@ import { buildMobPortraitJobs, PORTRAIT_RENDER_DEFINES } from './lib/mob_portrai
 const root = process.cwd();
 const temp = path.join(root, 'tmp/buddy-portraits');
 const out = path.join(root, 'public/ui/portraits');
-const ids = ['buddy_horse', 'buddy_crystal_lich', 'buddy_forgemaw'];
+const ids = ['buddy_horse', 'buddy_crystal_lich', 'buddy_forgemaw', 'buddy_sprites'];
 const jobs = (await buildMobPortraitJobs(root)).filter((job) => ids.includes(job.mobId));
 if (jobs.length !== ids.length) throw new Error('Missing active buddy model');
 mkdirSync(temp, { recursive: true });

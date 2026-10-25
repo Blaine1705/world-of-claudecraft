@@ -69,13 +69,16 @@ const FILE_ALLOWANCE_LEDGER: ReadonlyMap<string, number> = new Map([
   // the D136 nonce-expiry and D145 displacement-race arms this wave added, each
   // parking on a contended row against the real lock_timeout. The exact row
   // records that parallelizable shape without promoting it into the measured lane:
-  // 120_000 + 30_000 + 15 * 30_000 = 600_000.
-  ['tests/character_save_statement_pg_integration.test.ts', 600_000],
+  // The pending v1-market-backfill upgrade proof already declares a separate
+  // 120s case. This ledger records existing declarations, not new timeouts:
+  // 120_000 + 30_000 + 15 * 30_000 + 120_000 = 720_000.
+  ['tests/character_save_statement_pg_integration.test.ts', 720_000],
   ['tests/chronomancy_balance_targets.test.ts', 420_000],
   // The real-suite shard collection case walks the complete test corpus and
   // needs a 60s allowance on low-worker hosts; the other timeout pins in this
-  // file keep the exact aggregate just above the default.
-  ['tests/ci_shard_plan.test.ts', 310_000],
+  // file keep the exact aggregate just above the default. The fail-closed relay
+  // case adds 65_000 so runEntry's own 60s child deadline governs a full-tree scan.
+  ['tests/ci_shard_plan.test.ts', 375_000],
   ['tests/discord_db_integration.test.ts', 420_000],
   // The Mirefen tavern's whole-world build (the collider grid, the floor fold and the keeper
   // spawn over a full Sim) carries three raised cases: 180_000 + 120_000 + 120_000 plus

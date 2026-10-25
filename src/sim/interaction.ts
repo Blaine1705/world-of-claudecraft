@@ -33,6 +33,7 @@ import { type NoticeboardDef, noticeboardDefByEntityId } from './content/noticeb
 import { currentRealmBuilder, pastRealmBuilders } from './content/realm_builders';
 import { FORGE_INTERACT_RANGE } from './content/world_quest_forging';
 import { corpseInteractionAvailability } from './corpse_interaction';
+import { bodyPoolSharedWithParty, isLootableBody } from './corpse_loot_state';
 import { ITEMS, MOBS, QUESTS, SPIRIT_HEALER_NPC_ID } from './data';
 import * as deedsMod from './deeds';
 import {
@@ -41,11 +42,13 @@ import {
   tryStartNythraxisWardChannel,
 } from './encounters/nythraxis';
 import { tryCageStruggle } from './encounters/sunken_bastion/turnkey';
+import { trySpearWrench } from './encounters/wildheart_basin/zulgar_spear';
 import { tryStartEscort } from './escort';
 import { interactIgnivarRaidLore } from './ignivar_raid_lore';
 import { isInRaidInstance } from './instances/dungeons';
 import { FERRY_BELL_OBJECT_ID, tryRingFerryBell } from './interactions/ferry_bell';
 import { HUT_OBJECT_ID, tryBurnHut } from './interactions/firebottle_hut';
+import { mobLootSource } from './loot/awarded_loot_hold';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
   awardSharedLootItem,
@@ -57,6 +60,7 @@ import {
 } from './loot/loot_roll';
 import { isMusterRack, useMusterRack } from './mirefen_muster';
 import { startCorpseHarvest } from './professions/corpse_harvest_session';
+import { storeLootedSkulls } from './pvp/skull_bag';
 import { isQuestGatedGroundObjectHidden } from './quest_gated_entity';
 import { corpseHasDecayed } from './respawn_policy';
 import { isRiftForgeNpc } from './rift/forge_gate';
@@ -96,7 +100,9 @@ function corpseLootRights(
   entityId: number,
   ffaUnlocked: boolean,
 ): { shared: boolean; personal: boolean; open: boolean } {
-  const tapperParty = mob.tappedById !== null ? ctx.partyOf(mob.tappedById) : null;
+  // A World PvP body's gold is the killing blow's alone (bodyPoolSharedWithParty).
+  const tapperParty =
+    mob.tappedById !== null && bodyPoolSharedWithParty(mob) ? ctx.partyOf(mob.tappedById) : null;
   const shared = computeSharedLootRights(
     entityId,
     mob.tappedById,
@@ -139,6 +145,8 @@ export function lootCorpse(
   }
   const mob = ctx.entities.get(mobId);
   if (!mob?.lootable || !mob.loot || corpseHasDecayed(mob.dead, mob.corpseTimer)) return false;
+  // A player is looted only as a body (World PvP spoils), never standing up.
+  if (mob.kind === 'player' && !mob.dead) return false;
   // owner-lock lapses LOOT_FFA_DELAY after the corpse became lootable: then anyone may
   // loot. The flag is threaded into distribution too, so an outside looter keeps what
   // they take instead of it being split by the absent tapping party's strategies.
@@ -176,6 +184,7 @@ export function lootCorpse(
           meta.entityId,
           killSnapshotEligibility(ctx, mob),
           s.instance,
+          mobLootSource(mob),
         );
         s.count--;
         didLoot = true;
@@ -184,6 +193,16 @@ export function lootCorpse(
       continue;
     }
     if (s.personalFor) {
+      // A trophy skull goes straight into a carried Skull Bag, which has no
+      // room limit (pvp/skull_bag.ts); anything else takes the bag check.
+      const bagged =
+        !s.instance && storeLootedSkulls(ctx, meta, s.itemId, s.count, s.materialSources);
+      if (bagged) {
+        s.personalFor = s.personalFor.filter((id) => id !== meta.entityId);
+        tookPersonal = true;
+        didLoot = true;
+        continue;
+      }
       if (
         s.instance
           ? !canGrantItemInstance(
@@ -198,10 +217,24 @@ export function lootCorpse(
         bagsFull = true;
         continue;
       }
+      const lootOpts = { source: mobLootSource(mob) };
       if (s.instance) {
-        ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId, s.count);
+        ctx.addItemInstance(
+          s.itemId,
+          cloneItemInstancePayload(s.instance),
+          meta.entityId,
+          s.count,
+          lootOpts,
+        );
       } else {
-        ctx.addItem(s.itemId, s.count, meta.entityId);
+        // A provenance-tracked slot (a World PvP skull naming its victim) keeps
+        // its per-unit source buckets on the way into the bag.
+        ctx.addItem(
+          s.itemId,
+          s.count,
+          meta.entityId,
+          s.materialSources ? { ...lootOpts, materialSources: s.materialSources } : lootOpts,
+        );
       }
       s.personalFor = s.personalFor.filter((id) => id !== meta.entityId);
       tookPersonal = true;
@@ -482,6 +515,9 @@ export function interact(
   // Locked in the Gaol Turnkey's Iron Cage: the interact press is an escape
   // press (rate-limited and counted by the encounter), never anything else.
   if (tryCageStruggle(ctx, p)) return;
+  // Pinned by Zulgar's Hunting Spear: the press is the victim's own pull on
+  // it (only while nobody stands free to help), never anything else.
+  if (trySpearWrench(ctx, p)) return;
   if (p.targetId !== null) {
     const target = ctx.entities.get(p.targetId);
     if (
@@ -492,7 +528,7 @@ export function interact(
       // A usable encounter body (the trash engine's G3: the Soul Brazier):
       // the press starts its use, validated here on the authoritative sim.
       if (tryStartKitUse(ctx, target, p)) return;
-      if (target.kind === 'mob' && target.lootable) {
+      if (isLootableBody(target) || (target.kind === 'mob' && target.lootable)) {
         const availability = corpseInteractionAvailability(ctx, target, p.id, true);
         if (availability.hasLoot) {
           // Ordinary interaction never spends the independent harvest claim.
@@ -579,7 +615,7 @@ export function interact(
   let bestQuestD2 = INTERACT_RANGE * INTERACT_RANGE;
   ctx.grid.forEachInRadius(p.pos.x, p.pos.z, INTERACT_RANGE, (e, d2) => {
     if (
-      e.kind === 'mob' &&
+      (e.kind === 'mob' || isLootableBody(e)) &&
       e.lootable &&
       corpseInteractionAvailability(ctx, e, p.id, true).hasLoot &&
       d2 < bestCorpseD2

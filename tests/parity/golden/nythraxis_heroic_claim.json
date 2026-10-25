@@ -775,8 +775,8 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1021,
-      "state": "1278741b",
-      "events": "55560e1b",
+      "state": "6e62dc20",
+      "events": "a82dd91b",
       "rng": {
         "draws": 19,
         "digest": "b446fa79"
@@ -922,14 +922,11 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -1122,6 +1119,7 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
@@ -1130,10 +1128,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -1322,6 +1316,7 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
@@ -1330,10 +1325,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -1522,6 +1513,7 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
@@ -1530,10 +1522,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -1722,6 +1710,7 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
@@ -1730,10 +1719,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -2141,7 +2126,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1021,
-      "state": "1278741b",
+      "state": "6e62dc20",
       "events": "741638a5",
       "rng": {
         "draws": 19,
@@ -2288,14 +2273,11 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -2488,6 +2470,7 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
@@ -2496,10 +2479,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -2688,6 +2667,7 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
@@ -2696,10 +2676,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -2888,6 +2864,7 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
@@ -2896,10 +2873,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -3088,6 +3061,7 @@
               "nythraxis_boss_arena"
             ]
           },
+          "heroicMarks": 3,
           "inventory": [
             {
               "count": 5,
@@ -3096,10 +3070,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 3,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,

@@ -1,4 +1,5 @@
-import type { CourierBankExchange } from './courier';
+import type { CourierAccountExchange, CourierBankExchange } from './courier';
+import { cloneItemProvenance, type ItemTrackedKind } from './item_provenance';
 import { cloneLootQuality, type LootQualityDescriptor } from './loot_quality/types';
 import type { LocalGathererIdentity } from './material_gatherer';
 import { cloneMaterialData, cloneMaterialPayload } from './material_payload_identity';
@@ -7,11 +8,11 @@ import type { MaterialComposition } from './material_sources';
 
 import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { ClutterStamp } from './city_clutter';
-import type { BuddyTokenKey } from './content/buddies';
+import type { BuddyKey } from './content/buddies';
 import type { MountKey } from './content/mounts';
 import type { CraftDef, GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { RealmBuilderHonour } from './content/realm_builders';
-import type { TreasureMapRarity } from './content/treasure_maps';
+import type { InkMapTarget, TreasureMapRarity } from './content/treasure_maps';
 import type { DungeonGuideRun } from './dungeon_guide/types';
 import type { KorgathFightState } from './encounters/gravewyrm_sanctum/korgath_state';
 import type { KorzulFightState } from './encounters/gravewyrm_sanctum/korzul_state';
@@ -152,7 +153,10 @@ export type HonorReason =
   | 'world_assist'
   // King of the Hill (pvp/hill.ts): the once-a-minute trickle to a holder
   // standing inside the circle.
-  | 'hill_hold';
+  | 'hill_hold'
+  // The day's Honor world quests (src/sim/world_quest_honor_slots.ts): two
+  // rotating world quests per realm cycle pay a flat Honor bonus on completion.
+  | 'world_quest';
 
 // Persisted anti-win-trading window for ranked honor. `winsByOpponent` is keyed
 // by bracket plus the stable, sorted opposing-team identity; `totalWins` drives
@@ -513,6 +517,10 @@ export type AuraKind =
   | 'form_travel'
   | 'form_fireball'
   | 'form_moonkin'
+  // Groveheart's Sporemender Form: a caster form that keeps the full kit and
+  // mana bar (+20% healing done, +40% armor, 20% slower movement;
+  // combat/druid_sporemender.ts).
+  | 'form_sporemender'
   | 'form_shadow'
   // Necromancy secondary resource and signature transformation.
   | 'soul_fragments'
@@ -683,6 +691,8 @@ export type AuraKind =
   // the existing 'internal_cd' kind instead of a second new kind here.
   | 'hunter_coldsight_read'
   | 'hunter_momentum'
+  // Play Dead (hunter feign death): display-only death; the entity stays alive.
+  | 'feign_death'
   | 'hunter_reentry'
   | 'hunter_bloodtrail'
   // Ice Floes (mage choice row): `value` = cast-time spells left that may be
@@ -758,6 +768,7 @@ export const FORM_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'form_travel',
   'form_fireball',
   'form_moonkin',
+  'form_sporemender',
   'form_shadow',
   'form_lich',
 ]);
@@ -781,6 +792,9 @@ export interface Aura {
   tickTimer?: number;
   tickDamage?: number;
   tickDoom?: number;
+  // HoT only: a one-time heal paid when the aura runs its full duration
+  // (Second Bloom's closing heal, combat/druid_second_bloom.ts).
+  closingHeal?: number;
   // Sim-only periodic ramp: after each resolved DoT tick, increase `stacks`
   // and recompute `value` as per-stack damage times stacks, up to this cap.
   // The wire already mirrors the resulting value/stacks, so clients do not
@@ -822,8 +836,9 @@ export interface Aura {
   // effect kind, so only one flask ever rides at a time), the downward-refusal
   // guard (a same-family elixir or scroll is refused rather than allowed to
   // overwrite a flask), and death persistence (aurasSurvivingDeath in
-  // ./resurrection.ts keeps it). DEATH only: auras are session state and are
-  // not persisted, so a flask does not survive a logout or a restart. The
+  // ./resurrection.ts keeps it). A flask also persists through a logout or a
+  // restart like every other consumable buff (./aura_persist.ts, which keeps
+  // this marker and the undispellable stamp on the saved record). The
   // elixir/scroll sources of the same aura id never set it, so a plain elixir
   // stays mortal and stays outside the singleton. The mint also stamps
   // `undispellable` BESIDE this marker (the phase 10 QA STK-2 ruling; see
@@ -896,6 +911,7 @@ export interface DamageBreakBudget {
 export type CrowdControlDrCategory =
   | 'root'
   | 'incapacitate'
+  | 'sleep'
   | 'polymorph'
   | 'fear'
   | 'lockout'
@@ -1167,6 +1183,14 @@ export type TimedStatBuffAuraKind = Extract<AuraKind, 'buff_sta' | 'buff_ap' | '
 export interface ItemUseResult {
   type: 'mechChroma';
   chromaId: string;
+}
+
+/** What an item use is aimed at, beyond the item: the exact bag copy, a ground
+ *  point (an aimed throwable), or the treasure map a Cartographer's Ink redraws. */
+export interface ItemUseTarget {
+  slotIndex?: number;
+  aim?: { x: number; z: number };
+  inkMap?: InkMapTarget;
 }
 
 // One timed flat stat buff, the payload shape shared by the elixir/scroll/flask
@@ -1656,15 +1680,10 @@ export interface MountItemDef extends BaseItemDef {
   weapon?: never;
 }
 
-// A buddy GRANT TOKEN (a whistle). Using it attaches the named companion to
-// the character (src/sim/buddies.ts useBuddyToken) and consumes the token;
-// ownership is the per-character collection flag, never the item. Soulbound
-// and never listed by any loot table: a whistle is the channel a vendor, a
-// letter or an admin grant uses to hand a companion over, nothing more. A
-// token for a companion the player already has is refused unconsumed.
+// Historical item shape only. No buddy items exist in the live catalog.
 export interface BuddyItemDef extends BaseItemDef {
   kind: 'buddy';
-  buddy: BuddyTokenKey;
+  buddy: BuddyKey;
   armorType?: never;
   weapon?: never;
 }
@@ -1720,6 +1739,36 @@ export type ItemDef =
   | BuddyItemDef
   | BuddyCosmeticItemDef;
 
+/** One hand a tracked copy passed through: the character (display name plus
+ *  the stable character id where the host knows one) and the host epoch ms.
+ *  The origin record and every entry of the owner chain share this shape. */
+export interface ItemOwnerRecord {
+  at: number;
+  by: string;
+  byId?: number;
+}
+
+/** The provenance record on a tracked copy (item_provenance.ts owns the
+ *  bounds and the transfer rule). `source` is a sim-composed id
+ *  ("mob:<templateId>", "quest:<questId>", "craft:<recipeId>", "vendor",
+ *  "dev", "world", "legacy", "promotion", "restore", "boost"), never
+ *  player text; `zone` is the zone or dungeon id where the origin grant
+ *  landed. `owners` is the most
+ *  recent MAX_ITEM_OWNER_HISTORY holders after the origin, oldest first;
+ *  `transfers` is the true count of hands it changed, which keeps counting
+ *  after the chain rolls. */
+export interface ItemProvenance extends ItemOwnerRecord {
+  source: string;
+  zone?: string;
+  /** The guid of the copy this one was made from, when it was derived from
+   *  another tracked copy (an upgrade recipe that consumes one, an admin
+   *  restore of a lost copy, a duplicate-guid split): the parent's ledger
+   *  carries the matching consume row. */
+  derivedFrom?: string;
+  owners?: ItemOwnerRecord[];
+  transfers?: number;
+}
+
 // Per-instance item payload (#1165). Additive and OPTIONAL: most items stay plain
 // {itemId, count} with no instance payload (fungible, market-listable). A slot
 // carrying `instance` is non-fungible (signed, has rolled stats, or is
@@ -1728,9 +1777,28 @@ export type ItemDef =
 // time, see market.ts marketList); #1146 wires real market handling for
 // instanced items later.
 export interface ItemInstancePayload {
+  /** Per-copy identity for a TRACKED copy (an epic or legendary item,
+   *  item_provenance.ts TRACKED_ITEM_QUALITIES): one canonical UUID, minted
+   *  once at the inventory hub (item_tracking.ts) from the host's randomness
+   *  (SimConfig.mintItemGuid, the server's crypto.randomUUID) or the
+   *  deterministic fallback, and never rewritten afterwards. Two copies never
+   *  share one, so a tracked copy is one-per-slot by construction (the merge
+   *  predicate compares every key). Owner-only on the wire: the eqi peer
+   *  allowlist and publicInstanceView leave it out. */
+  guid?: string;
+  /** The tracked copy's provenance record (item_provenance.ts): who first
+   *  obtained it, when (host epoch ms), from what source and where, plus the
+   *  bounded chain of later holders the hub appends on every grant that
+   *  changes hands (`movement` grants to a different character). Stamped
+   *  beside `guid` and judged atomically on load. The full record is
+   *  owner-only; other players read its publicProvenanceView: beside the
+   *  payload on a market row (`history`) and the inspect `eqh` key, inside
+   *  the slot on the guild bank member wire (guildBankMemberWireView), never
+   *  inside publicInstanceView, so no payload equality moves. */
+  provenance?: ItemProvenance;
   /** Exact referral-card provenance for a movable trinket; bags remain fungible. */
   referralLinkId?: number;
-  /** Permanent enemy-drop quality, independent of rarity, enchants and upgrades. */
+  /** Permanent loot quality (enemy drops and other earned rewards), independent of rarity, enchants and upgrades. */
   lootQuality?: LootQualityDescriptor;
   /** Player name that signed/crafted this specific copy, if any. */
   signer?: string;
@@ -1864,6 +1932,9 @@ export function cloneItemInstancePayload(src: ItemInstancePayload): ItemInstance
   const lootQuality = cloneLootQuality(src.lootQuality);
   if (lootQuality) instance.lootQuality = lootQuality;
   if (src.charges) instance.charges = { ...src.charges };
+  // The owner chain is a mutable array on the provenance record (item_provenance.ts).
+  if (src.provenance && typeof src.provenance === 'object')
+    instance.provenance = cloneItemProvenance(src.provenance);
   if (
     src.perfectingBonus &&
     typeof src.perfectingBonus === 'object' &&
@@ -2072,14 +2143,6 @@ export interface LootEntry {
   // always rides a truthy `copper` (the roller's money arm gates on copper).
   heroicCopper?: number;
   chance: number; // 0..1
-  // Heroic-claim drop rate for THIS row, substituted for `chance` exactly the
-  // way heroicCopper substitutes for `copper`: a value swap on the same single
-  // draw, never an extra one, so the per-kill draw count (and every parity
-  // golden riding it) is identical on both difficulties. Authored where one
-  // item is meant to drop from the same boss at two rates rather than living
-  // on two tables (the Crystal Lich whistle: 0.5% normal, 1% heroic). Ignored
-  // on a rollGroup row, where the group's partition owns the odds.
-  heroicChance?: number;
   questId?: string; // only drops while this quest is active and not complete
   // Entries sharing a rollGroup are exclusive: one rng draw is partitioned by
   // their chances, so at most one matching entry drops.
@@ -2118,7 +2181,8 @@ export type MobFamily =
   | 'dragonkin'
   | 'demon'
   | 'reptile';
-export type PetMode = 'passive' | 'defensive' | 'aggressive';
+// 'assist' attacks only the owner's active target once they cast on it (pet/pet_assist.ts).
+export type PetMode = 'passive' | 'defensive' | 'aggressive' | 'assist';
 export type PetRole = 'melee_tank' | 'ranged_dps';
 
 // A mechanic-applied refreshing fire DoT (the dragonkin brood's burns): the
@@ -3618,6 +3682,10 @@ export type AbilityEffect =
       // high-per-hit weapon cannot inflate an energy-gated instant it is pressed
       // at will. Off by default (the un-normalized classic-era behavior).
       normalized?: boolean;
+      // Sweep variant (Scratch, combat/druid_scratch.ts): strike EVERY hostile
+      // within this many yards of the caster instead of one target, each hit
+      // rolling its own swing and awarding the ability's combo points.
+      sweepRadius?: number;
     } // instant special attack (sinister strike, overpower, backstab)
   | {
       type: 'directDamage';
@@ -3701,6 +3769,9 @@ export type AbilityEffect =
       bleedInterval: number;
       rangedPowerCoeff: number;
       damageMult?: number;
+      /** Arrival slow: the hooked target moves at this multiplier (0.7 = 30% slower). */
+      slowMult?: number;
+      slowDuration?: number;
     }
   | {
       type: 'hunterShrapnel';
@@ -3708,14 +3779,17 @@ export type AbilityEffect =
       primaryMax: number;
       splashMin: number;
       splashMax: number;
-      radius: number;
-      maxTargets: number;
+      /** Cone fired from the hunter's facing: reach in yards and full arc in degrees. */
+      coneRange: number;
+      coneAngleDeg: number;
       spreadTotal: number;
       spreadDuration: number;
       spreadInterval: number;
       damageMult?: number;
     }
   | { type: 'hunterTrailbreak'; distance: number }
+  /** movingGrace: seconds a hunter who cast it while moving has to stop. */
+  | { type: 'hunterPlayDead'; movingGrace: number }
   | { type: 'hunterPackRally'; duration: number; radius: number }
   | {
       type: 'frostjawTrap';
@@ -3726,6 +3800,21 @@ export type AbilityEffect =
       slowMult: number;
       slowDuration: number;
     }
+  | {
+      type: 'hunterBearTrap';
+      radius: number;
+      armTime: number;
+      lifetime: number;
+      /** The victim's bleed: base total plus rangedPowerCoeff x Ranged AP over its duration. */
+      bleedTotal: number;
+      bleedDuration: number;
+      bleedInterval: number;
+      rangedPowerCoeff: number;
+      slowMult: number;
+      slowDuration: number;
+    }
+  /** Shove every enemy in the cone straight back until it stands pushTo yards away. */
+  | { type: 'hunterScatterbolt'; coneRange: number; coneAngleDeg: number; pushTo: number }
   // Ice Block: strip every player-removable debuff (control, DoTs, stat saps, ...)
   // Broader than breakRoots and breakControl. See effect_dispatch.
   | { type: 'cleanseSelf' }
@@ -3808,6 +3897,20 @@ export type AbilityEffect =
       selfCooldownRate: number;
       allyCooldownRate: number;
     }
+  // Druid Spore Burst (combat/druid_spore_burst.ts): plants a spore burster at
+  // the aimed point. After `fuse` seconds it bursts once, healing every friendly
+  // unit within `radius` for healMin..healMax and dealing min..max Nature damage
+  // to every hostile one (no target cap on either side). Groveheart also plants
+  // Sporemending on each ally it heals.
+  | {
+      type: 'sporeBurst';
+      min: number;
+      max: number;
+      healMin: number;
+      healMax: number;
+      radius: number;
+      fuse: number;
+    }
   // Chronomancy raid cooldown (Rewind / Rebobinar): instant, no target, centered on
   // the caster. Restores `fraction` of the REAL damage each living group/raid member
   // within `radius` took in the last `windowSec` seconds, capped per target at
@@ -3846,7 +3949,17 @@ export type AbilityEffect =
   // pctOfMax: when set, the heal total is this fraction of the TARGET's max
   // health at cast time instead of the flat total, so the heal scales with
   // gear and any future pool retune (Savage Mending is the first user).
-  | { type: 'hot'; total: number; duration: number; interval: number; pctOfMax?: number } // renew, rejuvenation
+  | {
+      type: 'hot';
+      total: number;
+      duration: number;
+      interval: number;
+      pctOfMax?: number;
+      // Second Bloom: when the HoT runs its full duration, heal the target again
+      // for the amount this cast's direct heal produced (combat/
+      // druid_second_bloom.ts). Needs a 'heal' effect earlier in the list.
+      closingHealFromDirect?: boolean;
+    } // renew, rejuvenation
   | {
       type: 'absorb';
       amount: number;
@@ -3908,13 +4021,13 @@ export type AbilityEffect =
   | { type: 'extendDot'; dot: string; seconds: number; maxBonus: number }
   | { type: 'consumeDot'; dot: string }
   // Wildfang Marrowbreak (combat/druid_engines.ts): the bear cash-out's
-  // survival arm. Below the health fraction, the spent bank raises an absorb
-  // of absorbPctMaxHp and refunds rage instead of striking; above it the strike
+  // survival arm. Below the health fraction, the spent bank heals the druid for
+  // healPctMaxHp of maximum health and refunds rage instead of striking; above it the strike
   // alone carries the payoff. Deterministic, druid-only.
-  | { type: 'druidMarrowbreakGuard'; belowFrac: number; absorbPctMaxHp: number; rage: number }
+  | { type: 'druidMarrowbreakGuard'; belowFrac: number; healPctMaxHp: number; rage: number }
   // Groveheart Overbloom (combat/druid_engines.ts): harvest every HoT the
   // caster owns for harvestPct of its remaining healing, then replant a
-  // Wildbloom on the cast target (or on every harvested ally with the
+  // Sporemending on the cast target (or on every harvested ally with the
   // Seedspread row lean).
   | { type: 'druidOverbloom'; harvestPct: number }
   | { type: 'slow'; mult: number; duration: number }
@@ -4204,6 +4317,9 @@ export type AbilityEffect =
       // When set, only the NEAREST this many friendlies in radius are shielded (the
       // caster included, distance 0). Absent = every friendly in radius.
       maxTargets?: number;
+      // Optional healPower coefficient: absorbBonus is computed ONCE per cast from
+      // the caster and added to every recipient's shield. Absent = flat amount.
+      spellPowerCoeff?: number;
     }
   // Greater Invisibility (mage choice row): strips up to `removeDotCount`
   // damage-over-time auras, vanishes for `duration`, then applies `drValue`
@@ -4434,13 +4550,13 @@ export interface AbilityDef {
   actionReplacement?: ActionReplacementRule | ActionReplacementRule[];
   // Necromancy spenders use Soul Fragments in addition to the ordinary mana bar.
   soulFragmentCost?: number;
-  // Spend-ALL ability (Iron Resolve): `cost` is only the MINIMUM gate; the
+  // Spend-ALL ability: `cost` is only the MINIMUM gate; the
   // actual bill is the caster's resource bar (capped by spendResourceCap when
   // set), snapshotted into the resolved cost at apply time so both the spend and
   // the effects (e.g. absorbSpentResource) read the true spent amount.
   spendsAllResource?: boolean;
   // Optional ceiling on a spendsAllResource bill: the ability spends at most this
-  // much resource (Iron Resolve caps at 40 rage), keeping the effect it feeds bounded.
+  // much resource, keeping the effect it feeds bounded.
   spendResourceCap?: number;
   learnLevel: number;
   // Quest-gated ability: even at or above learnLevel the ability stays hidden from
@@ -5226,10 +5342,14 @@ export interface KitUseDef {
    *  from the user. 'relight': the body's dungeon module reads the completion
    *  off the body (`Entity.kitUseCompletedBy`) and decides what it lights
    *  (the Hollow Crypt's Remembrance Candles, encounters/hollow_crypt/
-   *  morthen_candles.ts). */
+   *  morthen_candles.ts). 'free': the same hand-off to the dungeon module,
+   *  for a body that holds a player (the Wildheart Basin's Hunting Spear,
+   *  encounters/wildheart_basin/zulgar_spear.ts); only the prompt's copy
+   *  differs. */
   effect:
     | { kind: 'topple'; ahead: number; hazard: KitHazardDef }
-    | { kind: 'relight'; school: Aura['school'] };
+    | { kind: 'relight'; school: Aura['school'] }
+    | { kind: 'free'; school: Aura['school'] };
   /** The use is NOT broken by a hit that lands on the user (a step, a stun,
    *  death or drifting out of reach still break it): the candle's channel
    *  drains its lighter's health and the healer heals them through it. */
@@ -5585,15 +5705,16 @@ export interface SeltheFightState {
   kind: 'selthe';
   chorusTimer: number;
   soloTimer: number;
-  songTimer: number;
   /** Seconds to the next Mere Surge and the next Drowning Aria. */
   surgeTimer: number;
   ariaTimer: number;
-  /** The breath she takes after a bar before her next Moonwater Bolt. */
-  boltGap: number;
-  /** After a kick: seconds she casts neither bolt nor aria. */
+  /** Seconds to her next Moonwater Bolt (it runs only while she sings no
+   *  bar), and whether its gather cue has gone out. */
+  boltTimer: number;
+  boltCued: boolean;
+  /** After a kick: seconds she throws no bolt and sings no aria. */
   quiet: number;
-  /** The kickable bar she began (a bolt or the aria), so a cut one is seen. */
+  /** The kickable bar she began (the aria), so a cut one is seen. */
   kickable: string | null;
   /** The Mere Surge's locked aim while its bar runs. */
   surgeYaw: number | null;
@@ -5618,6 +5739,41 @@ export interface SeltheFightState {
   casts: number;
   /** Someone took a Chorus alone or a Solo caught a second player (the deed). */
   flubbed: boolean;
+  /** The moon tiles round her pool (selthe_score.ts): their spots
+   *  (instance-local) and their encounter objects, in tile order. */
+  tiles: { x: number; z: number; objectId: number }[];
+  /** Scores begun this fight, and whether the next one is owed (her health
+   *  crossed its mark and she is waiting for her bar and her marks to end). */
+  scores: number;
+  scoreQueued: boolean;
+  /** The Score in flight. */
+  score: SeltheScoreState | null;
+}
+
+/** One Score (encounters/drowned_temple/selthe_score.ts): she sings the
+ *  melody on the tiles, then the group steps on them in that order. */
+export interface SeltheScoreState {
+  phase: 'melody' | 'answer';
+  /** Which Score of the fight this is (0 the first): its notes and its clock. */
+  index: number;
+  /** The melody: tile indices in the order they ring. */
+  order: number[];
+  /** Heroic: the tiles go dark for the answer. */
+  hidden: boolean;
+  /** Seconds left in this phase (it mirrors her bar). */
+  timer: number;
+  /** Melody: notes rung so far and the seconds to the next. */
+  rung: number;
+  noteIn: number;
+  /** Answer: tiles sounded in order so far. */
+  progress: number;
+  /** Last correct singer, independent of the display aura and wrong notes. */
+  lastSingerId: number | null;
+  /** Who stands on each tile (player ids, by tile), so a step counts once,
+   *  on the way in. */
+  inside: number[][];
+  /** Tiles a wrong step soured, and the seconds until each clears. */
+  sour: { tile: number; remaining: number }[];
 }
 
 /** The Mere Hydra's fight, SHARED by its three heads (one object referenced
@@ -5839,12 +5995,51 @@ export interface GorgebloomFightState {
 }
 
 /** Zulgar's pull (encounters/wildheart_basin/zulgar.ts). */
+/** One sun glyph of Zulgar's terrace (zulgar_glyphs.ts). */
+export interface ZulgarGlyphState {
+  /** Its encounter object (the look: lit or dark, and its clocks). */
+  objectId: number;
+  lit: boolean;
+  /** Seconds a player has stood lighting it (0 when nobody does). */
+  kindle: number;
+  /** Seconds left before a spent glyph can be lit again. */
+  cold: number;
+}
+
+/** A Hunting Spear standing in the terrace (zulgar_spear.ts). */
+export interface ZulgarSpearState {
+  /** The spear's usable body and the player it pins. */
+  bodyId: number;
+  victimId: number;
+  /** Seconds it has stood, and bleeds dealt. */
+  age: number;
+  bleeds: number;
+  /** Where it pinned its victim (world): a shove never drags them off it. */
+  x: number;
+  y: number;
+  z: number;
+}
+
+/** The Idol's Breath of the final phase (zulgar_idol.ts). */
+export interface ZulgarIdolState {
+  /** Seconds to the next warning. */
+  timer: number;
+  /** The half the next exhale marks (+1 east, -1 west). */
+  side: 1 | -1;
+  /** The exhale in flight: its object, its half, and the seconds left of
+   *  its warning (then of its pour). */
+  breath: { objectId: number; side: 1 | -1; left: number; landed: boolean } | null;
+}
+
 export interface ZulgarFightState {
   kind: 'zulgar';
-  phase: 'fight' | 'hunt' | 'ambush';
+  /** `final`: The Idol Wakes (30 percent): the avatar hunts until he dies. */
+  phase: 'fight' | 'hunt' | 'ambush' | 'final';
   pulseTimer: number;
   /** Spirit of the Hunt thresholds fired (70 and 40 percent). */
   huntsFired: number;
+  /** The Idol Wakes has begun (its 30 percent threshold fires once a pull). */
+  idolFired: boolean;
   /** Seconds left of the hunt (or of the ambush). */
   huntLeft: number;
   /** The prey marks (two on heroic Twin Prey) and which one he chases. */
@@ -5860,9 +6055,20 @@ export interface ZulgarFightState {
   respite: { id: number; left: number }[];
   /** He roared over the kill, waiting out a respite with nobody to hunt. */
   waiting: boolean;
-  /** Seconds each sun glyph stays dark (0 = lit), and its object. */
-  glyphDark: number[];
-  glyphIds: number[];
+  /** The six sun glyphs, in SUN_GLYPHS order. */
+  glyphs: ZulgarGlyphState[];
+  /** Seconds a Sunstruck avatar is still wary of the sun: no glyph strikes
+   *  him again until it runs out. */
+  sunWary: number;
+  /** Seconds to the next Hunting Spear, the pick its bar is aimed at, and
+   *  the spears standing. */
+  spearTimer: number;
+  spearTargetId: number | null;
+  spears: ZulgarSpearState[];
+  /** The final phase's Prey clock (seconds to the next switch) and the
+   *  idol's breath; null until the idol wakes. */
+  markClock: number;
+  idol: ZulgarIdolState | null;
   /** Heroic Ambush: the marked spot (instance-local) and its circle. */
   ambushAt: { x: number; z: number } | null;
   ambushMarkId: number | null;
@@ -6915,6 +7121,10 @@ export interface WorldQuestDef {
   faction?: 'rift_watch' | 'church_order' | 'automatons';
   minLevel: number;
   area: { x: number; z: number; radius: number };
+  /** Where the completion champion rises (world_quest_champion.ts), for a
+   *  ring whose centre plus the default offset lands somewhere unfit, such as
+   *  inside a hedge maze; omitted means that offset from the area centre. */
+  championAt?: { x: number; z: number };
   objective: WorldQuestObjective;
   count: number;
   /** Overrides of the shared reward schedule; omitted means XP, copper and
@@ -6950,6 +7160,9 @@ export interface WeeklyQuestProgress {
   /** The faction id that took the week's commendation (standing), once the
    *  finished charge's one choice is made; absent until then. */
   commended?: string;
+  /** Set once a later week has begun while the commendation is still
+   *  unclaimed: the pick is held only for that claim. Absent otherwise. */
+  carried?: true;
 }
 
 export interface WorldQuestProgress {
@@ -7361,6 +7574,12 @@ export interface Entity extends ClientMirroredEntityFields {
   // Lets a jump clear fences for the whole arc, independent of slope.
   jumping: boolean;
   fallStartY: number;
+  // Set while a hostile airborne knockback (Typhoon) has the body in flight
+  // (combat/knockback_launch.ts): who threw it, and the movement-kernel steps
+  // the throw has left. While set, air steering is off and a fall credits the
+  // thrower. The kernel counts it down and clears it once the body stands
+  // settled (not sliding); death and teleports clear it. Sim-side only.
+  launchedBy?: { sourceId: number; ticksLeft: number };
   // Seconds of held underwater travel. Ramps the dive speed from its slow
   // opening pace to the cruise across one stroke (see player_motion.ts
   // swimSpeedMult); zero whenever the body is not submerged.
@@ -7904,6 +8123,10 @@ export interface Entity extends ClientMirroredEntityFields {
    *  can walk among freshly spawned mobs to verify placement without scattering
    *  them. Toggled by /dev noaggro (gated by ALLOW_DEV_COMMANDS); never persisted. */
   devNoAggro?: boolean;
+  /** Staff invisibility (/visible off): no other player sees this entity, its
+   *  corpse included, and no mob or other player can aggro, track, or target it.
+   *  Server-set through gm_presence.ts setGmHidden; never persisted. */
+  gmHidden?: boolean;
   /** Per-spawn dormancy override (DungeonSpawn.idleStationary): this mob never
    *  idle-wanders even if its template would. Set at spawn; see mob/locomotion.ts. */
   idleStationary?: boolean;
@@ -7942,6 +8165,14 @@ export interface Entity extends ClientMirroredEntityFields {
    *  unflagged, so an unflagged character samples and serializes exactly as
    *  before the flag existed. */
   pvpFlag?: boolean;
+  /** Host-only disconnect grace marker; absent for offline/headless players. Never persisted. */
+  pvpRewardsPaused?: boolean;
+  /** World PvP bounty (src/sim/pvp/world_pvp_bounty.ts): this player's kill
+   *  streak earned a bounty, so every client paints their whole name tag blood
+   *  red. The DISPLAY mirror of PlayerMeta.worldPvp.bounty, written only by
+   *  that module, and it rides the entity wire (`bty`). Absent/false is no
+   *  bounty, so a character without one samples and serializes as before. */
+  bounty?: boolean;
   /** WARFARE Vitality switch (src/sim/pvp/vitality.ts): false while the player
    *  stands in a PvE instance (a dungeon, raid, delve or rift floor), so honor
    *  gear's health bonus never reaches raid content. Absent means the open
@@ -8009,6 +8240,11 @@ export interface Entity extends ClientMirroredEntityFields {
    *  Captured synchronously when loot rolls, so a later disconnect cannot
    *  erase a kill-eligible character from the copy's transfer group. */
   lootPartyTradeEligibility?: { names: string[]; characterIds: number[] };
+  /** Runtime-only: the durable character behind each entity id a full-bags
+   *  award is held on this corpse for (loot/awarded_loot_hold.ts). A relog
+   *  mints a new entity id, so the join re-points the held slots through it.
+   *  Never on the wire: the snapshot sends the loot slots, not this map. */
+  heldLootOwners?: Map<number, number>;
   xpValue: number;
   // npc
   questIds: string[];
@@ -8123,7 +8359,7 @@ export interface Entity extends ClientMirroredEntityFields {
    *  Sexton Marrow, the Lady of the Bonechill, Cantor Ilvane). Sim authority
    *  only; the client reads casts, auras and the encounter objects. */
   cryptBossFight?: CryptBossFightState;
-  /** A 'relight' G3 use completed on this body (mob/trash_kit/encounter_use.ts):
+  /** A 'relight' or 'free' G3 use completed on this body (mob/trash_kit/encounter_use.ts):
    *  the user's entity id, read and cleared by the dungeon module that owns
    *  the body on its next pass. Sim authority only. */
   kitUseCompletedBy?: number;
@@ -8347,6 +8583,16 @@ export interface Entity extends ClientMirroredEntityFields {
   // Null for world corpses and saved ghosts. Instance exits are recreated on
   // every claim, so stale corpse coordinates cannot match a recycled slot.
   corpseInstanceId: number | null;
+  // PvP Resurrect (src/sim/pvp/pvp_resurrect.ts): true while this corpse may stand
+  // up at the nearest graveyard at full health with no Keeper's Toll, because a
+  // hostile player had a hand in the death. Reset when a living player dies
+  // (combat/damage.ts handleDeath), stamped by that death, and cleared by the
+  // shared revive (spirit.ts reviveAt); absent on everyone else.
+  pvpResurrect?: boolean;
+  // Seconds left before that offer may be taken (PVP_RESURRECT_WAIT_SECONDS at the
+  // death, counted down by combat/auras.ts updateTimers, cleared with the offer).
+  // Online it mirrors the self wire's whole-second `pvrw`.
+  pvpResurrectWait?: number;
   scale: number;
   color: number;
   /** Authored character rig override and ambient VFX. Render-only. */
@@ -9253,6 +9499,39 @@ export type SimEvent = { pid?: number } & (
       itemName: string;
       quality: ItemDef['quality'];
     }
+  // A King of the Hill phase was announced to the realm: fired beside the
+  // realm's `log` line in hill.ts announcePhase, once per phase change.
+  // SERVER-ONLY like worldPvpKill: its one consumer is the Discord PvP feed
+  // (server/discord_hill_feed.ts), and server/event_frame.ts strips it from
+  // every client frame (clients already get the log line). Carries no pid and
+  // no absolute sim time: the seconds are RELATIVE to the moment of the
+  // announcement, so a host maps them onto its own clock.
+  | {
+      type: 'hillAnnounced';
+      phase: 'warning' | 'risen' | 'fallen';
+      zoneId: string;
+      secondsUntilRise: number;
+      secondsUntilFall: number;
+    }
+  // A World PvP (/pvp flag) death resolved: fired exactly once per death, from
+  // worldPvpOnPlayerDeath behind its paid-death guard, and only for a death at
+  // a world-hostile player's hands (duels, battlegrounds and arenas never
+  // fire it). SERVER-ONLY: its one consumer is the Discord PvP kill feed
+  // (server/discord_pvp_feed.ts), and server/event_frame.ts strips it from
+  // every client frame. Carries no pid. `zoneId` is the victim's zone (null
+  // off the zone table); `assists` counts the credited contributors other
+  // than the killing blow; `copper` is the stake actually taken from the
+  // victim, never the nominal stake.
+  | {
+      type: 'worldPvpKill';
+      killerName: string;
+      victimName: string;
+      killerLevel: number;
+      victimLevel: number;
+      zoneId: string | null;
+      assists: number;
+      copper: number;
+    }
   | {
       type: 'error';
       text: string;
@@ -9287,6 +9566,15 @@ export type SimEvent = { pid?: number } & (
   | { type: 'worldQuestWeeklyChosen'; questId: string }
   | { type: 'worldQuestWeeklyProgress'; questId: string; count: number; required: number }
   | { type: 'worldQuestWeeklyDone'; questId: string }
+  // Lantern Hall, the Highwatch adventurers' guild (src/sim/guild_contracts.ts,
+  // src/sim/guild_quartermaster.ts, src/sim/highwatch_guild.ts): a resident opens the guild
+  // window on a tab or the Dungeon Finder; a contract paid its seals; a cosmetic was bought
+  // or refused. All personal (pid); the client owns every visible string.
+  | { type: 'guildHallOpen'; tab: 'contracts' | 'quartermaster' }
+  | { type: 'guildRecruiterOpen' }
+  | { type: 'guildContractDone'; contractId: string; seals: number }
+  | { type: 'guildCosmeticBought'; offerId: string }
+  | { type: 'guildCosmeticRefused'; offerId: string; reason: GuildCosmeticRefusal }
   /** A big on-screen line for a shared world-quest moment (the client owns the
    *  wording under questUi.worldQuest.banner.<banner>). */
   | { type: 'worldQuestBanner'; banner: WorldQuestBannerId }
@@ -9337,7 +9625,12 @@ export type SimEvent = { pid?: number } & (
   // Treasure maps and vaults (src/sim/treasure_vault.ts). The sim emits ids
   // only; the client resolves the prose and opens the map window on a read.
   | { type: 'treasureMapEarned'; rarity: TreasureMapRarity }
+  /** Retired: the slate's map now waits in the mailbox when the bags are full
+   *  (worldQuestRewardMailed). Kept so the client case and its key still resolve. */
   | { type: 'treasureMapLost' }
+  /** World quest reward items that did not fit in the bags and were posted to
+   *  the Ravenpost instead (src/sim/world_quest_reward_mail.ts). Ids only. */
+  | { type: 'worldQuestRewardMailed'; itemIds: string[] }
   | { type: 'treasureMapRead'; rarity: TreasureMapRarity; siteId: string; fresh: boolean }
   | { type: 'treasureMapUpgraded'; rarity: TreasureMapRarity; inks: number }
   | { type: 'treasureVaultOpened'; rarity: TreasureMapRarity }
@@ -9349,7 +9642,7 @@ export type SimEvent = { pid?: number } & (
       claims: {
         characterId: number;
         recipientName: string;
-        items: { itemId: string; count: number }[];
+        items: { itemId: string; count: number; lootQuality?: LootQualityDescriptor }[];
         copper: number;
         guestCycle?: string;
       }[];
@@ -9630,7 +9923,14 @@ export type SimEvent = { pid?: number } & (
   | { type: 'duelRequest'; fromPid: number; fromName: string }
   | { type: 'duelCountdown'; seconds: number }
   | { type: 'duelStart' }
-  | { type: 'duelEnd'; winnerName: string; loserName: string }
+  | {
+      type: 'duelEnd';
+      winnerName: string;
+      loserName: string;
+      winnerPid: number;
+      loserPid: number;
+      zoneId: string | null;
+    }
   // Dungeon Finder: a 30s availability proposal opened for this player (the
   // client pops the finder window; state rides the `df` self snapshot).
   | { type: 'dfProposal' }
@@ -9811,10 +10111,12 @@ export type SimEvent = { pid?: number } & (
       // health" and "a blight ate the whole heal", and those need opposite
       // feedback. See src/ui/heal_landing_feedback_core.ts.
       absorbed?: number;
-      // Set only by a HoT's periodic tick (auras.ts), never a direct cast or the
-      // one-shot application emit below: the client uses this to silence the
+      // Set only by a periodic tick (auras.ts), never a direct cast or the
+      // one-shot application emit below: every HoT tick, plus a DoT leech tick
+      // that landed as pure overheal. The client uses this to silence the
       // repeated per-tick sound (see hud.ts), since a HoT fires this every couple
-      // seconds for its whole duration and the full heal_impact hit read as spam.
+      // seconds for its whole duration and the full heal_impact hit read as spam;
+      // the meters and the parse recorder treat a hot tick as passive activity.
       hot?: boolean;
       // The aura's ability id (Aura.id), set on both the per-tick emit and the
       // one-shot application emit (Sim.applyAura) so the client can except one
@@ -9830,8 +10132,9 @@ export type SimEvent = { pid?: number } & (
       // Healing lost to the missing-hp clamp (parse fidelity 7.1), omitted
       // when zero. Computed AFTER heal-absorb consumption, so absorbed and
       // overheal never double-count the same lost healing. Set at every
-      // clamped heal2 emit site; a tick whose heal fully overheals without
-      // draining a heal-absorb shield still emits nothing.
+      // clamped heal2 emit site. A HoT or DoT-leech tick that fully overheals
+      // still emits (amount 0, hot: true); a few other periodic heals (Temporal
+      // Hourglass, Demon Heal, Drain Life) still emit nothing in that case.
       overheal?: number;
     }
   // One absorb shield soaking part of one hit. Emitted per shield drained
@@ -9994,6 +10297,8 @@ export type SimEvent = { pid?: number } & (
         // travels to targetId as a cosmetic homing projectile.
         | 'soulTravel'
         | 'meteorImpact'
+        // A Spore Burst mushroom bursting (combat/druid_spore_burst.ts).
+        | 'sporeBurst'
         | 'ambientMeteorFall';
       // The casting ability's id, so the renderer can pick that ground cast's
       // authored visual instead of a generic per-school one.
@@ -10031,6 +10336,10 @@ export type SimEvent = { pid?: number } & (
       // of the generic per-school impact; unset for every other spellfxAt
       // caller, which keeps the existing generic sound unchanged.
       sfxKey?: string;
+      // A hidden hunter trap's placement and armed shimmer: the server delivers
+      // it only to sourceId and their group (server/event_delivery.ts), so enemy
+      // players never see where the trap lies.
+      concealedFromHostiles?: boolean;
     }
   // entityId (when set) anchors the log to that entity so the server only
   // delivers it to nearby players; anchorless logs broadcast server-wide
@@ -10134,6 +10443,8 @@ export type SimEvent = { pid?: number } & (
       // so the online client's lastCraftResult mirror stays field-complete.
       quality?: ItemDef['quality'];
       masterwork?: boolean;
+      // The crafted copy's whole payload, only when it rolled loot quality.
+      instance?: ItemInstancePayload;
       reason?:
         | 'unknown_recipe'
         | 'insufficient_materials'
@@ -10414,6 +10725,31 @@ export type SimEvent = { pid?: number } & (
       success: boolean;
       rankBefore?: number;
       rankAfter?: number;
+    }
+  // Tracked-item ledger event (item_tracking.ts): one per lifecycle step of
+  // an epic or legendary copy (ITEM_TRACKED_KINDS, item_provenance.ts): the
+  // guid mint, each recorded change of hands, each in-place modification,
+  // the end of its life, and the mint of a copy derived from another. Server-
+  // only (server/event_frame.ts SERVER_ONLY_EVENT_TYPES): the authoritative
+  // server mirrors it into item_ledger (server/item_ledger.ts), no client ever
+  // receives it. The pid is the character the step happened to; by/byId name
+  // that character (display name plus the stable character id online). The
+  // at field is host epoch ms. `detail` is a short sim-composed note (a rank,
+  // an enchant id, what the copy became) and `relatedGuid` the other copy a
+  // swap or derivation names. Draw-free by construction.
+  | {
+      type: 'itemTracked';
+      kind: ItemTrackedKind;
+      guid: string;
+      itemId: string;
+      quality: string;
+      by: string;
+      byId?: number;
+      source: string;
+      zone?: string;
+      detail?: string;
+      relatedGuid?: string;
+      at: number;
     }
   // Masterwork zone broadcast (Professions 2.0): the soft zone-wide
   // copy of a masterwork proc, one per overworld player currently in the
@@ -11976,6 +12312,8 @@ export type MapPresentationMode =
   | 'yumiMaze';
 
 export interface WorldContent {
+  /** Editor preview of the live overworld: retain release terrain, scenery and movement rules. */
+  liveWorldPreview?: true;
   zones: ZoneDef[];
   camps: CampDef[];
   npcs: Record<string, NpcDef>;
@@ -12134,6 +12472,9 @@ export interface WorldContent {
   // resolves through sim/moved_objects.ts with the built-in row as the
   // fallback. Frozen; absent for the built-in world.
   objectMoves?: ObjectMoves;
+  // Declarative Fenbridge town layout touch-ups (moved painted buildings,
+  // civic props, NPCs, and added cottage pads).
+  fenbridgeTouchup?: import('./fenbridge_touchup').FenbridgeTouchup;
 }
 
 /**
@@ -12229,11 +12570,15 @@ export interface StoragePricesOverride {
   readonly vaultUpgrades?: readonly number[];
 }
 
-/** One identity-free Materials Vault unit draw offered to the authoritative
- *  host before the sim mutates any character state. */
+/** One Materials Vault unit draw offered to the authoritative host before the
+ *  sim mutates any character state. Identity-free (pooled stock) unless
+ *  `signer` is set: then every unit of the take comes out of the crafter's OWN
+ *  signed buckets, which the custody ledger keys by that signer
+ *  (vault_material_sources.ts splitVaultTakesBySigner). */
 export interface VaultConsumptionTake {
   readonly itemId: string;
   readonly count: number;
+  readonly signer?: string;
 }
 
 /** Opaque host reservation for one planned Materials Vault consumption. */
@@ -12266,6 +12611,11 @@ export interface SimConfig {
   devCommands?: boolean; // local dev: /dev level|tp|give chat cheats
   worldPvpDisabled?: boolean; // realm kill switch for the /pvp flag (server env WORLD_PVP_DISABLED=1)
   lockoutNowMs?: () => number; // host wall-clock for persisted raid lockouts
+  // Host randomness for the per-copy guid of a tracked (epic or legendary)
+  // item (item_tracking.ts): the server binds crypto.randomUUID, the offline
+  // client its own crypto. Unset (tests, headless) falls back to the
+  // deterministic mint in item_provenance.ts, which never touches the rng.
+  mintItemGuid?: () => string;
   // Host wall clock the day/night cycle is anchored to (src/sim/day_night.ts): the
   // server's Date.now, the offline client's Date.now (or its /daynight override), so
   // a boss who sleeps at night sleeps under the sky the renderer actually draws.
@@ -12340,6 +12690,9 @@ export interface SimConfig {
   // headless hosts omit it and receive an inert successful reservation.
   vaultConsumptionAdmission?: VaultConsumptionAdmission;
   courierBankExchange?: CourierBankExchange;
+  // The courier's other-character leg (server membership services); offline
+  // hosts omit it and a courier there has no other characters to visit.
+  courierAccountExchange?: CourierAccountExchange;
   // The material-gatherer identity for the player this constructor MINTS (the
   // primary offline/headless character), allocated by the HOST outside the sim
   // and passed in whole (src/sim/material_gatherer.ts). A VALUE, never a
@@ -13489,3 +13842,8 @@ export interface VehicleSession {
   origin: Vec3;
   encounter: CannonEncounterState;
 }
+
+/** Why Lantern Hall's quartermaster refused a purchase (src/sim/guild_quartermaster.ts): out of
+ *  reach, already owned, short of seals, the horse's reins to a rider who cannot ride yet, or
+ *  no bag room for the reins. The client owns every visible string. */
+export type GuildCosmeticRefusal = 'owned' | 'seals' | 'range' | 'riding' | 'bags';

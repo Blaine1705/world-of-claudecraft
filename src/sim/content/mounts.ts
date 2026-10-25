@@ -24,7 +24,10 @@ export type MountKey =
   | 'drakemaw_raptor'
   | 'avian_strider'
   | 'lanternback_troll'
-  | 'terrorspark_groundshaker';
+  | 'wobbles_slime'
+  | 'terrorspark_groundshaker'
+  | 'nightwing_chimera'
+  | 'lantern_hall_destrier';
 
 export type MountRarity = 'common' | 'uncommon' | 'rare' | 'epic';
 
@@ -69,6 +72,15 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'uncommon',
     moveSpeedPct: 0.7,
   },
+  // Lantern Hall's war horse, bought from the guild quartermaster for Lantern Seals
+  // (content/guild_contracts.ts). An earned special from five-player dungeon contracts, so it
+  // sits in the five-man heroic drops' tier. PROVISIONAL tier, Jose to confirm.
+  lantern_hall_destrier: {
+    key: 'lantern_hall_destrier',
+    name: 'Lantern Hall Destrier',
+    rarity: 'uncommon',
+    moveSpeedPct: 0.7,
+  },
   // Rare tier (75%): the bear and the snail.
   grag_bear: {
     key: 'grag_bear',
@@ -83,10 +95,10 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     moveSpeedPct: 0.75,
   },
   // Paid cosmetic looks are MOUNT SKINS (content/mount_skins.ts), worn over
-  // whatever mount the character rides. The annual reward tank below is
+  // whatever mount the character rides. The annual reward Chimaera below is
   // the one paid mount item; it shares the existing epic travel speed.
   // Epic tier (80%): the hover-cycle and the gobbler come from Rift S clears,
-  // the Lanternback Troll from Treasure Caskets. The Dreadspark Groundshaker
+  // the Lanternback Troll from Treasure Caskets. The Nightwing Chimaera
   // is the annual membership bundle reward. It retains its catalog position.
   aether_hover_cycle: {
     key: 'aether_hover_cycle',
@@ -129,9 +141,24 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },
+  // A big blue jelly slime broken to the saddle: it hops rather than walks,
+  // jiggles under the rider, and carries bubbles drifting up through its body.
+  // Earned by completing a recruit-a-friend stamp card.
+  wobbles_slime: {
+    key: 'wobbles_slime',
+    name: 'Wobbles the Slime',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
   terrorspark_groundshaker: {
     key: 'terrorspark_groundshaker',
     name: 'Dreadspark Groundshaker',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
+  nightwing_chimera: {
+    key: 'nightwing_chimera',
+    name: 'Nightwing Chimaera',
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },
@@ -162,12 +189,12 @@ export const MOUNT_KEYS = Object.keys(MOUNTS) as readonly MountKey[];
  *  the single source of truth: the catalog, the item table, and the acquisition
  *  tests all read it, so a fourth place can never disagree about which mounts
  *  are still under development. */
-export const DEVELOPER_MOUNTS: readonly MountKey[] = [];
+export const DEVELOPER_MOUNTS: readonly MountKey[] = ['terrorspark_groundshaker', 'referral_tank'];
 
 /** Paid annual-bundle mounts retain soulbound reins and outlive membership expiry. */
-export const MEMBERSHIP_REWARD_MOUNTS: readonly MountKey[] = ['terrorspark_groundshaker'];
+export const MEMBERSHIP_REWARD_MOUNTS: readonly MountKey[] = ['nightwing_chimera'];
 /** Card and inviter milestones, delivered only by the committed referral reward transaction. */
-export const REFERRAL_REWARD_MOUNTS: readonly MountKey[] = ['referral_tank', 'referral_raptor'];
+export const REFERRAL_REWARD_MOUNTS: readonly MountKey[] = ['wobbles_slime', 'referral_raptor'];
 
 /** True while a mount has no player-facing acquisition path (see DEVELOPER_MOUNTS). */
 export function isDeveloperMount(key: string): boolean {

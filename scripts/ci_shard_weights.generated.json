@@ -2,8 +2,8 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 5777,
-    "harvestedFiles": 3946,
+    "files": 5768,
+    "harvestedFiles": 3942,
     "carried": {
       "tests/_debug_i18n.test.ts": {
         "ms": 101,
@@ -2076,61 +2076,6 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           4
-        ]
-      },
-      "tests/collections_exchange_price.test.ts": {
-        "ms": 5,
-        "method": "local-median",
-        "measured": "2026-10-20",
-        "reason": "v0.45.0 integration: three batched local runs (vitest --maxWorkers=4) pending the first full-mode harvest after the integration lands",
-        "runs": [
-          6,
-          4,
-          5
-        ]
-      },
-      "tests/collections_sources.test.ts": {
-        "ms": 18,
-        "method": "local-median",
-        "measured": "2026-10-20",
-        "reason": "v0.45.0 integration: three batched local runs (vitest --maxWorkers=4) pending the first full-mode harvest after the integration lands",
-        "runs": [
-          18,
-          18,
-          19
-        ]
-      },
-      "tests/collections_view.test.ts": {
-        "ms": 362,
-        "method": "local-median",
-        "measured": "2026-10-20",
-        "reason": "v0.45.0 integration: three batched local runs (vitest --maxWorkers=4) pending the first full-mode harvest after the integration lands",
-        "runs": [
-          346,
-          375,
-          362
-        ]
-      },
-      "tests/collections_window.test.ts": {
-        "ms": 8,
-        "method": "local-median",
-        "measured": "2026-10-20",
-        "reason": "v0.45.0 integration: three batched local runs (vitest --maxWorkers=4) pending the first full-mode harvest after the integration lands",
-        "runs": [
-          11,
-          8,
-          7
-        ]
-      },
-      "tests/collections_window_scroll.test.ts": {
-        "ms": 610,
-        "method": "local-median",
-        "measured": "2026-10-20",
-        "reason": "v0.45.0 integration: three batched local runs (vitest --maxWorkers=4) pending the first full-mode harvest after the integration lands",
-        "runs": [
-          674,
-          610,
-          537
         ]
       },
       "tests/collider_volumes.test.ts": {
@@ -19113,7 +19058,6 @@
   "tests/character_death_grounding.test.ts": 333,
   "tests/character_death_grounding_core.test.ts": 4,
   "tests/character_effect_compile_gate.test.ts": 1189,
-  "tests/character_effect_prewarm.test.ts": 18,
   "tests/character_effects.test.ts": 14,
   "tests/character_effects_impaled.test.ts": 8,
   "tests/character_far_compile_gate.test.ts": 18,
@@ -19285,11 +19229,6 @@
   "tests/codex_setup.test.ts": 155,
   "tests/collection_actions_core.test.ts": 4,
   "tests/collection_manuals.test.ts": 627,
-  "tests/collections_exchange_price.test.ts": 5,
-  "tests/collections_sources.test.ts": 18,
-  "tests/collections_view.test.ts": 362,
-  "tests/collections_window.test.ts": 8,
-  "tests/collections_window_scroll.test.ts": 610,
   "tests/collective_reversal.test.ts": 5086,
   "tests/collective_reversal_online.test.ts": 2885,
   "tests/collider_volumes.test.ts": 1846,
@@ -21591,7 +21530,6 @@
   "tests/nameplate_canvas.test.ts": 636,
   "tests/nameplate_combo.test.ts": 3005,
   "tests/nameplate_corpse_marker.test.ts": 22,
-  "tests/nameplate_declutter.test.ts": 251,
   "tests/nameplate_dev_glow.test.ts": 4,
   "tests/nameplate_dot_scale.test.ts": 8,
   "tests/nameplate_dots_core.test.ts": 18,
@@ -23155,8 +23093,6 @@
   "tests/software_render_notice.test.ts": 9,
   "tests/software_renderer.test.ts": 11,
   "tests/solid_impact_fragments_prewarm.test.ts": 11,
-  "tests/soul_rend_overlay.test.ts": 8,
-  "tests/soul_rend_prewarm_core.test.ts": 8,
   "tests/soulwell.test.ts": 4539,
   "tests/soulwell_visual.test.ts": 33,
   "tests/spatial.test.ts": 6090,

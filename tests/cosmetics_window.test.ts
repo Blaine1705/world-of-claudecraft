@@ -167,7 +167,8 @@ describe('CosmeticsWindow', () => {
     expect(card(el, 'crystal_lich').textContent).toContain('A presence follows you');
     expect(action(el, 'summon-buddy', 'crystal_lich')).toBeNull();
     expect(action(el, 'summon-buddy', 'forgemaw')).toBeNull();
-    expect(action(el, 'summon-buddy', 'sapling')).toBeNull();
+    expect(el.querySelector('[data-id="sapling"]')).toBeNull();
+    expect(action(el, 'summon-buddy', 'sprites')).toBeNull();
     const summon = action(el, 'summon-buddy', 'horse')!;
     summon.focus();
     summon.click();

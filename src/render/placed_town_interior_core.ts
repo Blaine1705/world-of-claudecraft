@@ -17,7 +17,10 @@
 //  - shop_a (a counting house) and shop_b (a potion shop): the shop room under its beams,
 //    in front of its back shelves, and the front door;
 //  - smithy: the forge room under its ceiling, the front door, and the side arch onto the
-//    forge shelter (an opening too: the shelter is open to the weather).
+//    forge shelter (an opening too: the shelter is open to the weather);
+//  - guild (the Highwatch adventurers' guild, built in this repo): the great hall clear of
+//    the guildmaster's hearth and the quartermaster's shelves, the front door, the arch
+//    and the trophy hall behind it, short of its hearth.
 // A model with no entry here (a sealed one: the cottages, the watch house, the vault) has no
 // air: the camera stays the open-world one. Every town that stands these models (Highwatch,
 // Eastbrook, Fenbridge) registers the air through placed_town_interiors.ts.
@@ -165,6 +168,24 @@ const MODEL_AIR: Readonly<Record<string, ModelAir>> = {
       { box: 1, axis: 2, side: -1 },
       { box: 2, axis: 0, side: 1 },
     ],
+  },
+  guild: {
+    // scripts/assets/highwatch_guild/guild_plan.py: one storey, the floor at 0.6 everywhere
+    boxes: [
+      // the great hall: inner walls x +-14, z +-10, clear of the hearth's breast and the
+      // shelves on the right wall (x -12.7), under the chandeliers; the open roof's trusses
+      // all stand above 11.6. Its front face sits a hair past the quarter yard (-9.74) so a
+      // walk in at a free turn never lands on it exactly, where float rounding alone would
+      // decide whether the eye is in
+      [-12.45, 13.75, 0.6, 9.6, -9.74, 9.75],
+      // the front door through the front wall (z -10.9 to -10), its head at 6.2
+      [-1.6, 1.6, 0.6, 6.2, -11.0, -9.7],
+      // the round arch into the trophy hall, inside its curve, and the trophy hall under its
+      // tie beams, short of its hearth's breast
+      [-2.8, 2.8, 0.6, 7.4, 9.6, 11.2],
+      [-8.25, 8.25, 0.6, 9.1, 10.95, 18.55],
+    ],
+    openings: [{ box: 1, axis: 2, side: -1 }],
   },
 };
 

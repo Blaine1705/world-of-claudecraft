@@ -77,6 +77,7 @@ describe('the walk-in town placement', () => {
       'highwatch_gate_chapel',
       'highwatch_counting_house',
       'highwatch_smithy',
+      'highwatch_guild',
     ]);
   });
 
@@ -227,7 +228,9 @@ describe('the walk-in town placement', () => {
       [0, 420],
       [0, 540],
       [0, 600],
-      [80, 660],
+      // (west of Highwatch past the guild at the old stable yard, which widens the town's box
+      // out to x 134)
+      [170, 660],
       [0, 100],
       [-10, 200],
     ]) {

@@ -298,6 +298,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the minimap raid-lockout badge class, value-diffed',
   },
   {
+    call: 'this.updateInstanceDifficultyBadge',
+    band: 'slow',
+    gate: '',
+    surface: 'chrome',
+    why: 'the minimap instance difficulty badge and tooltip, value-diffed',
+  },
+  {
     call: 'this.dailyRewardsLauncher.refresh',
     band: 'slow',
     gate: '',
@@ -553,6 +560,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: "target && target.kind !== 'object' && target.id !== this.lastAnnouncedTargetId",
     surface: 'chrome',
     why: 'marks the target-name announcement so a same-named re-target still re-reads; its result is written straight to the target live region, deliberately NOT through the elided writer, and the id gate makes that an event write rather than a per-frame one',
+  },
+  {
+    call: 'fillTargetHealthText',
+    band: 'frame',
+    gate: "target && target.kind !== 'object' && nonSelfRepaintDue(targetChanged, this.lastTargetFramePaintAt, now, targetFrameNonSelfIntervalMs(fxTier))",
+    surface: 'none',
+    why: 'fills the target descriptor health text under the Health Text option (dead or playing dead reads Dead); a pure descriptor write the painter call below paints, no DOM touch of its own',
   },
   {
     call: 'this.targetFramePainter.paint',
@@ -858,26 +872,26 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the spirit-mode body class that drains the world to greyscale',
   },
   {
+    call: 'noteReleaseOverlayShown',
+    band: 'frame',
+    gate: '',
+    surface: 'none',
+    why: 'records the Release overlay opening so its button ignores presses for a short hold; state only, no DOM write',
+  },
+  {
     call: 'this.setDisplay',
     band: 'frame',
     gate: '',
-    sites: 2,
+    sites: 3,
     surface: 'chrome',
-    why: 'the full-screen death overlay and the standing ghost hint line, through the elided writer',
+    why: 'the death screens through the elided writer: the full-screen death overlay, the standing ghost hint line and the ghost prompt (its one corpse button), each shown or hidden by the pure death view core (src/ui/hud/death; a battleground spirit gets neither ghost surface because the respawn wave is its only way back)',
   },
   {
-    call: 'this.setDisplay',
+    call: 'this.pvpRez.paint',
     band: 'frame',
-    gate: 'ghost && !ghostInBgMatch',
+    gate: '',
     surface: 'chrome',
-    why: 'the ghost prompt (its one corpse button) while the spirit is in reach of its body; a battleground spirit is exempt because the respawn wave is its only way back',
-  },
-  {
-    call: 'this.setDisplay',
-    band: 'frame',
-    gate: '!(ghost && !ghostInBgMatch)',
-    surface: 'chrome',
-    why: 'hides the ghost prompt while not a corpse-running ghost',
+    why: 'the PvP Resurrect button and its note line (src/ui/hud/death/pvp_resurrect_painter.ts): shown with the offer, disabled and counting down while the PVP_RESURRECT_WAIT_SECONDS wait runs, all through the elided writers',
   },
   {
     call: 'syncDeathControllerHints',
@@ -889,28 +903,28 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.showBanner',
     band: 'medium',
-    gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== ''",
+    gate: '!inDungeon && this.zoneAnnouncements.update(currentZone.id, this.lastZoneId, p)',
     surface: 'chrome',
     why: 'the zone banner on a real zone crossing, committed the moment zoneAt flips (the old z-only dead band never fired on an east-west realm crossing)',
   },
   {
     call: 'this.log',
     band: 'medium',
-    gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== ''",
+    gate: '!inDungeon && this.zoneAnnouncements.update(currentZone.id, this.lastZoneId, p)',
     surface: 'chrome',
     why: 'the zone-entry chat line',
   },
   {
     call: 'this.logZoneWelcome',
     band: 'medium',
-    gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== ''",
+    gate: '!inDungeon && this.zoneAnnouncements.update(currentZone.id, this.lastZoneId, p)',
     surface: 'chrome',
     why: 'the zone welcome blurb in chat',
   },
   {
     call: 'this.renderer.vistaPan',
     band: 'medium',
-    gate: "!inDungeon && currentZone.id !== this.lastZoneId && this.lastZoneId !== '' && !p.dead && !p.inCombat && !recentlyInCombat",
+    gate: '!inDungeon && this.zoneAnnouncements.update(currentZone.id, this.lastZoneId, p) && !p.dead && !p.inCombat && !recentlyInCombat',
     surface: 'none',
     why: 'the zone-entry camera sweep; a renderer call, not a HUD write',
   },
@@ -952,6 +966,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: '',
     surface: 'chrome',
     why: 'vehicle integrity, aiming and cooldowns use the shared eliding writer facet',
+  },
+  {
+    call: 'this.zoneAnnouncements.subzoneHit',
+    band: 'medium',
+    gate: '',
+    surface: 'none',
+    why: 'resolves landmark announcements with ferry and dungeon suppression',
   },
   {
     call: 'this.showSubzone',
@@ -1115,6 +1136,18 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
       proof: 'if (sig === this.lastSig) {',
     },
     why: 'the dungeon finder window; an unchanged sig still ticks its 1 Hz clock text',
+  },
+  {
+    call: 'this.finderSurfaces.expeditions.render',
+    band: 'medium',
+    gate: '',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'hud/expeditions/expedition_controller.ts',
+      proof: 'if (sig === this.lastSig) {',
+    },
+    why: 'signature-gated bell, entry choice and open expedition cards; no work on identical polls',
   },
   {
     call: 'this.dungeonFinderProposalPopup.render',
@@ -1362,6 +1395,14 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the weekly emissary window (charge progress and the reset clock, minute-granular)',
   },
   {
+    call: 'this.guildHallWindow.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.guildHallWindow.isOpen',
+    surface: 'window',
+    guard: { kind: 'module', module: 'hud/guild_hall/guild_hall_window.ts', proof: SIG_RETURN },
+    why: "Lantern Hall's guild window (the week's contracts, the seals, the titles owned and the reset clock, minute-granular)",
+  },
+  {
     call: 'this.wocMarketWindow.refreshIfChanged',
     band: 'slow',
     gate: 'this.wocMarketWindow.isOpen',
@@ -1518,9 +1559,9 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
       kind: 'module',
       module: 'hud/quest/quest_dialog_controller.ts',
       proof:
-        'if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible || gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig || clueStepRowSig(clueStepRowFor(this.deps.world().clueHunt, npc.templateId)) !== this.lastClueRowSig || (guideDialogView(npc)?.state ?? null) !== this.lastGuideState) { this.refresh(); }',
+        'if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible || gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig || clueStepRowSig(clueStepRowFor(this.deps.world().clueHunt, npc.templateId)) !== this.lastClueRowSig || (guideDialogView(npc)?.state ?? null) !== this.lastGuideState || this.hearthRowFactionFor(npc) !== this.lastHearthRowFaction) { this.refresh(); }',
     },
-    why: "the gossip dialog's intro hint row plus the offerable-row set (phase 23: a cadence lapse re-offers a work order) plus the Clue Scroll step row (world quests round 2: the hunt step advances on a sim log line) plus a dungeon guide's offer state (another member's answer flips it while the dialog is open), four edges no quest event fires for",
+    why: "the gossip dialog's intro hint row plus the offerable-row set (phase 23: a cadence lapse re-offers a work order) plus the Clue Scroll step row (world quests round 2: the hunt step advances on a sim log line) plus a dungeon guide's offer state (another member's answer flips it while the dialog is open), and the Allied Hearthstone attune row, five edges no quest event fires for",
   },
   {
     call: 'this.updateDeedTracker',
@@ -1925,7 +1966,8 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 52, 99.
       // chrome 99 -> 100: the dungeon objectives tracker's medium-band paint
       // (hud/dungeon/dungeon_tracker_painter.ts), facet-routed like the deed strip.
-    ).toEqual({ window: 53, chrome: 100, none: 18 });
+      // window 53 -> 54: Lantern Hall's guild window (hud/guild_hall/guild_hall_window.ts).
+    ).toEqual({ window: 55, chrome: 100, none: 21 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1949,7 +1991,8 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // this one: it gained a corpseSig latch when the popup started
       // refreshing instead of only closing.
       // The courier window owns both revision and content signature guards.
-      module: 30,
+      // Lantern Hall's guild window owns its signature guard (hud/guild_hall/).
+      module: 32,
       // Phase 20's refreshCharSheetIfChanged and its siblings. Their latches are
       // HUD fields (lastCharSheetSig et al) because the cold char_window painter
       // holds no signature of its own to diff. The release's trade row left this
@@ -2014,12 +2057,13 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'hud.ts: if (sig === this.lastTownFocusSig) return;',
         'hud/woc_trade/woc_trade_controller.ts: if (sig === this.lastTradeSig) return;',
         'hud/delve/lockpick_window.ts: if (lockpickRenderSig(view) !== this.lastSig) this.renderBoard();',
+        'hud/expeditions/expedition_controller.ts: if (sig === this.lastSig) {',
         // The corpse popup's own latch. `force` is the relocalize arm, which
         // rebuilds through the same guard past a signature a locale switch
         // cannot move, so the flag is part of the line the pin looks for.
         'hud/loot/loot_window_controller.ts: const unchanged = sig === this.corpseSig && harvestSig === this.harvestStatusSig; if (!force && unchanged) return availability;',
         'hud/professions/farming_plant_sheet_window.ts: if (view.status !== this.paintedStatus) this.paint();',
-        'hud/quest/quest_dialog_controller.ts: if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible || gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig || clueStepRowSig(clueStepRowFor(this.deps.world().clueHunt, npc.templateId)) !== this.lastClueRowSig || (guideDialogView(npc)?.state ?? null) !== this.lastGuideState) { this.refresh(); }',
+        'hud/quest/quest_dialog_controller.ts: if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible || gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig || clueStepRowSig(clueStepRowFor(this.deps.world().clueHunt, npc.templateId)) !== this.lastClueRowSig || (guideDialogView(npc)?.state ?? null) !== this.lastGuideState || this.hearthRowFactionFor(npc) !== this.lastHearthRowFaction) { this.refresh(); }',
         'mailbox_window.ts: if (sig === this.lastSig) return;',
         'market_window.ts: if (sig === this.lastSig) return;',
         'meters.ts: if (!this.isOpen || now - this.lastRender < 250) return;',
@@ -2037,6 +2081,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'spellbook_window.ts: if (this.knownChanged(this.deps.world().known)) {',
         'target_auras_window.ts: if (this.cleared) return;',
         'weekly_quests_window.ts: if (sig === this.lastSig) return;',
+        'hud/guild_hall/guild_hall_window.ts: if (sig === this.lastSig) return;',
         'woc_market_window.ts: if (sig === this.lastSig && !this.walletRepaintDue) return;',
       ].sort(),
     );

@@ -2559,8 +2559,10 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // buddy_forgemaw; the account-wide buddy merge 7bc9c74af57) add untagged
     // templates: 298. Plus buddy_sapling, the Sapling companion the referral
     // stamp cards (642100fe8aa) brought back to the roster: 299. Full chain:
-    // tests/gathering.test.ts.
-    expect(Object.keys(MOBS).length - tagged.length).toBe(299);
+    // tests/gathering.test.ts. Plus buddy_sprites, the flame-sprite pair: 300.
+    // Retiring buddy_sapling leaves 299. Zulgar's Hunting Spear is an encounter
+    // object without harvest components, bringing the merged roster to 300.
+    expect(Object.keys(MOBS).length - tagged.length).toBe(300);
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(

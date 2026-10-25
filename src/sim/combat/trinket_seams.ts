@@ -4,7 +4,7 @@
 // encounter's control rules on a mob), which saved cooldowns a relog
 // restores, and the dodge, parry or block a mob swing lands on a wearer.
 
-import { isTrinketCooldownKey } from '../content/trinkets';
+import { isTrinketCooldownKey, MEDALLION_USE_COOLDOWN_KEY } from '../content/trinkets';
 import { ABILITIES } from '../data';
 import { wildheartControlBlocks } from '../encounters/wildheart_basin/control_gate';
 import type { Aura, Entity } from '../types';
@@ -29,5 +29,22 @@ export function auraGuarded(target: Entity, aura: Aura): boolean {
 /** Whether a saved cooldown id is one a relog restores: an ability's, the unstuck
  *  system's, or a worn trinket's use. */
 export function restorableCooldown(id: string): boolean {
-  return isUnstuckSystemCooldown(id) || ABILITIES[id] !== undefined || isTrinketCooldownKey(id);
+  const ability = ABILITIES[id];
+  // Old saves can carry the cooldown retired from out-of-combat resurrection.
+  // Keep other timers, including clocks added by talents to base-zero abilities.
+  if (
+    ability?.requiresOutOfCombat &&
+    ability.cooldown === 0 &&
+    ability.effects.some(
+      (effect) => effect.type === 'resurrectAlly' || effect.type === 'massResurrectGroup',
+    )
+  ) {
+    return false;
+  }
+  return (
+    id === MEDALLION_USE_COOLDOWN_KEY ||
+    isUnstuckSystemCooldown(id) ||
+    ABILITIES[id] !== undefined ||
+    isTrinketCooldownKey(id)
+  );
 }

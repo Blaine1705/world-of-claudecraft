@@ -14,7 +14,7 @@ import { NOTICEBOARDS } from '../src/sim/content/noticeboards';
 import { PRACTICE_ROW_X } from '../src/sim/content/practice_dummies';
 import { STATIONS } from '../src/sim/content/professions';
 import { ZONE3_NPCS, ZONE3_PROPS, ZONE3_ROADS, ZONE3_ZONE } from '../src/sim/content/zone3';
-import { BUILTIN_WORLD } from '../src/sim/data';
+import { BUILTIN_WORLD, CAMPS } from '../src/sim/data';
 import { isExcludedStreetlamp } from '../src/sim/decoration_exclusions';
 import {
   HIGHWATCH_BUILDINGS_BY_ID,
@@ -26,14 +26,21 @@ import { PAINTED_TOWNS } from '../src/sim/painted_towns';
 import { findPath, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../src/sim/pathfind';
 import { distancePointToObb, localToWorld } from '../src/sim/placed_town_kit';
 import { Sim } from '../src/sim/sim';
-import { roadDistance, terrainHeight, terrainSteepnessAt, waterLevelAt } from '../src/sim/world';
+import {
+  groundHeight,
+  roadDistance,
+  terrainHeight,
+  terrainSteepnessAt,
+  waterLevelAt,
+} from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 // Highwatch, the hold of Thornpeak Heights, rebuilt with five painted
-// Tidehold buildings round the square it always had (sim/highwatch_layout.ts).
-// Everything else in the town stays where it stood; this suite pins that the
-// buildings stand clear of all of it, on level ground, off the roads, and that
-// every door, NPC and service is still reachable.
+// Tidehold buildings round the square it always had and the adventurers' guild
+// at the old stable yard (sim/highwatch_layout.ts). Everything else in the
+// town stays where it stood; this suite pins that the buildings stand clear of
+// all of it, on level ground, off the roads, and that every door, NPC and
+// service is still reachable.
 
 const SEED = WORLD_SEED;
 const BUILDINGS = HIGHWATCH_LAYOUT.buildings;
@@ -108,7 +115,7 @@ describe('the Highwatch layout', () => {
     });
   });
 
-  it('stands five painted buildings in the Highwatch look, one per role', () => {
+  it('stands five painted buildings in the Highwatch look, one per role, and the guild', () => {
     expect(
       BUILDINGS.map((building) => [building.id, building.assetId, building.kind, building.walkIn]),
     ).toEqual([
@@ -117,6 +124,7 @@ describe('the Highwatch layout', () => {
       ['highwatch_counting_house', '/models/tidehold/highwatch/shop_a.glb', 'house', true],
       ['highwatch_watch_house', '/models/tidehold/highwatch/house_c.glb', 'house', false],
       ['highwatch_smithy', '/models/tidehold/highwatch/smithy.glb', 'house', true],
+      ['highwatch_guild', '/models/tidehold/highwatch/guild.glb', 'house', true],
     ]);
     // stood GRAND: each at the scale that clears a door of about five yards
     // (highwatch_layout.ts), the footing buried and the ground line sunk 0.05
@@ -126,6 +134,8 @@ describe('the Highwatch layout', () => {
       ['highwatch_counting_house', 1.5],
       ['highwatch_watch_house', 1.4],
       ['highwatch_smithy', 1.3],
+      // built at its own grand size (scripts/assets/highwatch_guild/)
+      ['highwatch_guild', 1],
     ]);
     for (const building of BUILDINGS) {
       expect(building.placement.lift, building.id).toBeCloseTo(
@@ -287,13 +297,43 @@ describe('the Highwatch layout', () => {
 
   it('keeps every drawn road off every building', () => {
     for (const building of BUILDINGS) {
+      // the guild's reach takes in its paved yard, where the old stables spur ends by
+      // design (below): the house itself, its porch's front (the model's z -17.2) to the
+      // trophy hall's back, is the ground no road may cross
+      const ground =
+        building.id === 'highwatch_guild'
+          ? {
+              center: localToWorld(building.placement, building.rotation, 2.825, 2.65),
+              halfWidth: building.reach.halfWidth,
+              halfDepth: 19.85,
+              rotation: building.rotation,
+            }
+          : building.reach;
       let nearest = Infinity;
-      for (const point of samplesOf(building.reach)) {
+      for (const point of samplesOf(ground)) {
         nearest = Math.min(nearest, roadDistance(point.x, point.z));
       }
       // the drawn road band (grass-free) ends at 2.4 yd from its curve
       expect(nearest, building.id).toBeGreaterThan(2.4);
     }
+  });
+
+  it("ends the old stables spur in the guild's yard, at the foot of its steps", () => {
+    const guild = BUILDINGS.find((building) => building.id === 'highwatch_guild');
+    if (!guild) throw new Error('no guild');
+    const spur = ZONE3_ROADS.find((road) => road[0].x === 70 && road[0].z === 720);
+    if (!spur) throw new Error('no stables spur');
+    const end = spur[spur.length - 1];
+    expect(end).toEqual({ x: 91, z: 709 });
+    // inside the reach, in the yard in front of the porch's steps (the model's z -19)
+    expect(distancePointToObb(end, guild.reach)).toBe(0);
+    const local = {
+      x: -(end.z - guild.placement.z),
+      z: end.x - guild.placement.x,
+    };
+    expect(local.z).toBeLessThan(-19);
+    expect(local.z).toBeGreaterThan(-25.25);
+    expect(Math.abs(local.x)).toBeLessThan(8);
   });
 
   it('levels each building on its own pad across its whole reach', () => {
@@ -311,6 +351,7 @@ describe('the Highwatch layout', () => {
       highwatch_counting_house: 8.8,
       highwatch_watch_house: 7.6,
       highwatch_smithy: 10.6,
+      highwatch_guild: 9,
     };
     for (const building of BUILDINGS) {
       for (const point of samplesOf(building.reach, 1)) {
@@ -449,5 +490,105 @@ describe('Highwatch NPCs, services and traversal', () => {
       expectPath(`${destination.id}:out`, square, destination.point, 0.6);
       expectPath(`${destination.id}:back`, destination.point, square, 0.6);
     }
+  });
+});
+
+describe("the Highwatch adventurers' guild at the old stable yard", () => {
+  const guild = HIGHWATCH_BUILDINGS_BY_ID.highwatch_guild;
+  // the model's own axes (scripts/assets/highwatch_guild/guild_plan.py) carried into the world
+  const at = (x: number, z: number) => localToWorld(guild.placement, guild.rotation, x, z);
+
+  it('cuts back the rock knob in front of its door to an open, walkable meadow', () => {
+    // the knob rose about 20 yd over the yard at (70, 690); the view out of the door is open
+    for (let x = 62; x <= 80; x += 2) {
+      for (let z = 684; z <= 698; z += 2) {
+        expect(terrainHeight(x, z, WORLD_SEED), `${x},${z}`).toBeLessThan(11);
+      }
+    }
+    expect(terrainHeight(70, 690, WORLD_SEED)).toBeCloseTo(9, 1);
+    // graded, never a cut seam: a player walks every step from the yard over the old knob
+    for (let x = 58; x <= 88; x += 1.5) {
+      for (let z = 678; z <= 704; z += 1.5) {
+        expect(terrainSteepnessAt(x, z, WORLD_SEED), `${x},${z}`).toBeLessThan(
+          PLAYER_MAX_CLIMB_SLOPE,
+        );
+      }
+    }
+    // the cut is the town's last pad, after every building's own, so no apron lifts it again
+    const pads = HIGHWATCH_LAYOUT.pads;
+    const cut = pads.findIndex((p) => p.x === 71 && p.z === 691);
+    expect(cut).toBe(pads.length - 1);
+  });
+
+  it('looks east down the stables spur at the town, and stands clear of every other building', () => {
+    // the door (the model's -z) looks east (-x), toward the square
+    expect(guild.frontStandingPoint.x).toBeLessThan(guild.position.x);
+    expect(Math.abs(guild.frontStandingPoint.z - guild.position.z)).toBeLessThan(0.01);
+    for (const other of BUILDINGS) {
+      if (other.id === guild.id) continue;
+      for (const point of samplesOf(other.reach, 2)) {
+        expect(distancePointToObb(point, guild.reach), other.id).toBeGreaterThan(10);
+      }
+    }
+    // no streetlamp stands in its yard or its house
+    for (const lamp of streetlampPlacements(SEED)) {
+      expect(distancePointToObb(lamp, guild.reach), `lamp ${lamp.x}, ${lamp.z}`).toBeGreaterThan(1);
+    }
+  });
+
+  it('walks from the square to its yard, through its door, and on through the arch', () => {
+    const yard = at(0, -22);
+    expectPath('square to the guild yard', { x: 2, z: 664 }, yard, 0.6);
+    // then a player runs straight up the steps, across the porch, through the door, down the
+    // hall and through the arch into the trophy hall: nothing in the way
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior' });
+    const body = sim.player;
+    const meta = sim.players.get(body.id);
+    if (!meta) throw new Error('missing player meta');
+    body.pos.x = yard.x;
+    body.pos.z = yard.z;
+    body.pos.y = groundHeight(yard.x, yard.z, SEED);
+    body.prevPos = { ...body.pos };
+    body.facing = guild.rotation;
+    for (let i = 0; i < 20 * 7; i++) {
+      Object.assign(meta.moveInput, {
+        forward: true,
+        back: false,
+        turnLeft: false,
+        turnRight: false,
+      });
+      sim.tick();
+    }
+    Object.assign(meta.moveInput, { forward: false });
+    for (let i = 0; i < 20; i++) sim.tick();
+    // in the model's axes: past the arch (z 10.9) into the trophy hall, still on the axis
+    const local = { x: guild.placement.z - body.pos.z, z: body.pos.x - guild.placement.x };
+    expect(local.z).toBeGreaterThan(12);
+    expect(Math.abs(local.x)).toBeLessThan(0.5);
+    // and the floors stand where the model's decks are: the hall a hand over the yard
+    const ground = terrainHeight(guild.placement.x, guild.placement.z, SEED);
+    const hall = at(0, -4);
+    expect(groundHeight(hall.x, hall.z, SEED) - ground).toBeGreaterThan(0.4);
+    expect(groundHeight(hall.x, hall.z, SEED) - ground).toBeLessThan(0.7);
+  });
+
+  it("leaves every camp's ground as it was: no camp walks within reach of its pad", () => {
+    // A camp's mobs wander up to 9 yd past its radius, and each arrival draws the shared
+    // rng: a pad or an apron under them would change when they arrive, and with it every
+    // seeded roll in the world. The guild's apron eases the ground out 8 yd past its reach;
+    // the Stormcrag elementals to the north are the nearest camp.
+    const apron = 8;
+    const wander = 9;
+    let nearest = Infinity;
+    for (const camp of CAMPS) {
+      if (camp.count === 0) continue;
+      const clear = distancePointToObb(camp.center, guild.reach) - camp.radius - wander;
+      nearest = Math.min(nearest, clear);
+      expect(clear, `${camp.mobId} at ${camp.center.x}, ${camp.center.z}`).toBeGreaterThan(
+        apron + 2,
+      );
+    }
+    // not vacuous: a camp stands within a stone's throw of the margin
+    expect(nearest).toBeLessThan(apron + 6);
   });
 });

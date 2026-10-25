@@ -1,3 +1,4 @@
+import { BUDDY_PORTRAIT_URLS } from '../../target_portrait_view';
 // Thin DOM consumer for the WARFARE quartermaster's shop window.
 //
 // The consumer half of the pure-core + thin-consumer split (reference
@@ -66,9 +67,15 @@ function sectionTitleText(section: WarfareShopSection): string {
   if (section.kind === 'set') {
     return tEntity({ kind: 'itemSet', id: section.setId, field: 'name' });
   }
+  if (section.kind === 'goods') return t('hudChrome.warfareShop.goods');
   if (section.kind === 'jewelry') return t('hudChrome.warfareShop.jewelry');
-  if (section.kind === 'companions') return t('hudChrome.warfareShop.companions');
   return t('hudChrome.warfareShop.weapons');
+}
+
+function groupTitleText(group: WarfareShopSection['group']): string {
+  if (group === 'season2') return t('hudChrome.warfareShop.groupSeason2');
+  if (group === 'companions') return t('hudChrome.warfareShop.companions');
+  return t('hudChrome.warfareShop.groupEntry');
 }
 
 function appendOfferTile(
@@ -81,13 +88,13 @@ function appendOfferTile(
   const tile = document.createElement('button');
   tile.type = 'button';
   tile.className = owned ? 'vendor-item ui-card warfare-owned' : 'vendor-item ui-card';
-  const companion = item.kind === 'buddy';
+  const companion = item.kind === 'companion';
   tile.disabled = !affordable || (companion && owned);
   // Keyed on the SECTION plus the item id so the restore ladder can never land
   // on a same-named tile in another section (the sectioned window's version of
   // the heroic shop's one-tile-per-item identity).
   tile.dataset.focusKey = `buy:${section.key}:${itemId}`;
-  const itemName = item.kind === 'buddy' ? buddyDisplayName(item.buddy) : itemDisplayName(item);
+  const itemName = item.kind === 'companion' ? buddyDisplayName(item.buddy) : itemDisplayName(item);
   const price = honorText(honor);
   // An aria-label REPLACES the button's content as its accessible name, so the
   // owned marker folds into the name itself rather than being announced twice
@@ -103,10 +110,15 @@ function appendOfferTile(
   const ownedMark = owned
     ? `<span class="vi-sub">${esc(t('hudChrome.warfareShop.owned'))}</span>`
     : '';
-  tile.innerHTML = `<span class="ui-socket ui-socket--bag">${deps.itemIcon(item)}</span><span class="vi-name" style="color:${itemNameColor(item)}">${esc(itemName)}${ownedMark}</span><span class="vi-price ui-money"><span class="warfare-price${affordable ? '' : ' unaffordable'}">${currencyIconHtml('honor')}${esc(price)}</span></span>`;
+  const icon =
+    item.kind === 'companion'
+      ? `<img src="${esc(BUDDY_PORTRAIT_URLS[item.buddy])}" alt="" width="40" height="40">`
+      : deps.itemIcon(item);
+  const color = item.kind === 'companion' ? 'inherit' : itemNameColor(item);
+  tile.innerHTML = `<span class="ui-socket ui-socket--bag">${icon}</span><span class="vi-name" style="color:${color}">${esc(itemName)}${ownedMark}</span><span class="vi-price ui-money"><span class="warfare-price${affordable ? '' : ' unaffordable'}">${currencyIconHtml('honor')}${esc(price)}</span></span>`;
   tile.addEventListener('click', () => deps.onBuy(itemId));
   deps.attachTooltip(tile, () => {
-    if (companion) {
+    if (item.kind === 'companion') {
       return `<div class="tt-title">${esc(itemName)}</div><div class="tt-sub">${esc(t('hudChrome.warfareShop.companionPurchase'))}</div>`;
     }
     return `${deps.itemTooltip(item)}<div class="tt-sub">${esc(t('itemUi.tooltip.clickBuy'))}</div>`;
@@ -160,30 +172,31 @@ export function renderWarfareVendorWindow(
     // under it is the deader of the two. buildWarfareVendorView emits no empty
     // section today; this stays correct if it ever does.
     if (section.offers.length === 0) continue;
-    // A group heading (Warfare Season 2 above the entry tier) whenever the
-    // group changes, so the two tiers read as two blocks.
+    // A group heading (Warfare Season 2 above the entry tier, then the
+    // companions) whenever the group changes, so each reads as its own block.
     if (section.group !== group) {
       group = section.group;
       const groupHeading = document.createElement('div');
       groupHeading.className = 'vendor-section-title warfare-group-title';
-      groupHeading.textContent =
-        group === 'season2'
-          ? t('hudChrome.warfareShop.groupSeason2')
-          : t('hudChrome.warfareShop.groupEntry');
+      groupHeading.textContent = groupTitleText(group);
       el.appendChild(groupHeading);
     }
-    const heading = document.createElement('div');
-    heading.className = 'vendor-section-title';
-    heading.textContent = sectionTitleText(section);
-    // A Season 2 set names the spec it is built for beside the set name.
-    const specName = section.kind === 'set' ? setSpecName(section.spec) : null;
-    if (specName) {
-      const spec = document.createElement('span');
-      spec.className = 'warfare-set-spec';
-      spec.textContent = specName;
-      heading.appendChild(spec);
+    // The companions group holds one section, so its group heading already
+    // names it; a second "Companions" title under it would only repeat it.
+    if (section.group !== 'companions') {
+      const heading = document.createElement('div');
+      heading.className = 'vendor-section-title';
+      heading.textContent = sectionTitleText(section);
+      // A Season 2 set names the spec it is built for beside the set name.
+      const specName = section.kind === 'set' ? setSpecName(section.spec) : null;
+      if (specName) {
+        const spec = document.createElement('span');
+        spec.className = 'warfare-set-spec';
+        spec.textContent = specName;
+        heading.appendChild(spec);
+      }
+      el.appendChild(heading);
     }
-    el.appendChild(heading);
     const grid = document.createElement('div');
     grid.className = 'vendor-goods-grid';
     grid.dataset.grid = section.key;

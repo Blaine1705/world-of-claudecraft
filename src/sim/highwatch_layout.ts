@@ -201,7 +201,42 @@ const SMITHY = makePlacedTownBuilding(
   placedTownSeat(SMITHY_SCALE, FRONT_CLEARANCE * SMITHY_SCALE),
 );
 
-const BUILDINGS = [INN, CHAPEL, COUNTING_HOUSE, WATCH_HOUSE, SMITHY] as const;
+// The adventurers' guild, Lantern Hall, at the old stable yard where the Stormcrag road's spur
+// ends (the yard Marla's stables left when she moved to Galecrest): a walk-in hall of one
+// storey (scripts/assets/highwatch_guild/, built at its own grand size, so it stands at scale
+// 1), its door looking east down the spur at the town. Its great hall is the wall box; the
+// trophy hall behind it, the lantern tower at the front's south corner and the two chimneys
+// are its solid annexes; the porch, the steps and the paved yard lie inside its reach. Its pad
+// and apron touch no camp's ground (the Stormcrag elementals' wander stops north of it, the
+// burrows' kobolds south of the shelf), so no seeded roll moves.
+const GUILD_SCALE = 1;
+const GUILD = makePlacedTownBuilding(
+  {
+    id: 'highwatch_guild',
+    assetId: `${PAINTED_SET}/guild.glb`,
+    kind: 'house',
+    anchor: { x: 111.5, z: 703 },
+    rotation: EAST_FACING,
+    ...scalePlacedTownMeasurements(
+      {
+        reach: { x: 2.825, z: -1.375, width: 39.05, height: 35.45, depth: 47.75 },
+        walls: { x: 0, z: 0, width: 29.8, depth: 21.8 },
+        annexes: [
+          { name: 'trophy_hall', x: 0, z: 15.9, width: 18.8, depth: 10 },
+          { name: 'lantern_tower', x: 18.2, z: -7.6, width: 6.6, depth: 6.6 },
+          { name: 'hearth_chimney', x: -15.7, z: 6.6, width: 1.6, depth: 2.6 },
+          { name: 'trophy_chimney', x: 0, z: 21.6, width: 2.2, depth: 1.4 },
+        ],
+        doorX: 0,
+      },
+      GUILD_SCALE,
+    ),
+    walkIn: true,
+  },
+  placedTownSeat(GUILD_SCALE, FRONT_CLEARANCE * GUILD_SCALE),
+);
+
+const BUILDINGS = [INN, CHAPEL, COUNTING_HOUSE, WATCH_HOUSE, SMITHY, GUILD] as const;
 
 // The counting house's market counter (the stall annex on its front): the
 // auctioneer keeps it, a stride and a half in front of the boards (the counter
@@ -271,6 +306,10 @@ const STORMCRAG_ROAD = [
 // along it grade the lane from the one to the other, applied over the aprons
 // and before the pads, so the buildings' own pads keep their ground.
 const INN_HEIGHT = 9;
+// the guild's pad, the old stable yard's own height; a short apron (the yard is all but level
+// already, and the elementals' ground lies a little way north)
+const GUILD_HEIGHT = 9;
+const GUILD_APRON = 8;
 const SMITHY_HEIGHT = 10.6;
 const INN_NORTH_Z = INN.reach.center.z + INN.reach.halfWidth;
 const SMITHY_SOUTH_Z = SMITHY.reach.center.z - SMITHY.reach.halfDepth;
@@ -303,6 +342,7 @@ const GROUND = [
   { building: CHAPEL, height: 8.8, columns: 2, rows: 3, taper: 5, apron: 10 },
   { building: WATCH_HOUSE, height: 7.6, columns: 2, rows: 3, taper: 4, apron: 10 },
   { building: SMITHY, height: SMITHY_HEIGHT, columns: 3, rows: 2, taper: 4, apron: 13 },
+  { building: GUILD, height: GUILD_HEIGHT, columns: 4, rows: 5, taper: 4, apron: GUILD_APRON },
 ] as const;
 
 // The aprons reach into the square: this sets the shelf back at its own height
@@ -317,11 +357,18 @@ const SQUARE_RELEVEL = {
   hardness: SQUARE_FLAT / (SQUARE_FLAT + 2),
 };
 
+// The rock knob that rose straight out of the meadow in front of the guild's door (a 20 yd
+// crag at about (70, 690), south of the spur) blocked the view and the approach from the
+// porch. One soft level stamp at the yard's own height cuts it back to the meadow: a flat core
+// over the knob, then a long smooth fall into the ground around it, so no cut seam shows.
+const GUILD_FRONT_CUT = { x: 71, z: 691, radius: 16, delta: GUILD_HEIGHT, hardness: 0.55 };
+
 const PADS = [
   ...GROUND.flatMap((g) => padsAlong(g.building, g.height, g.columns, g.rows, g.apron)),
   SQUARE_RELEVEL,
   ...ROAD_GRADE,
   ...GROUND.flatMap((g) => padsAlong(g.building, g.height, g.columns, g.rows, g.taper)),
+  GUILD_FRONT_CUT,
 ].map((pad) => ({ ...pad, falloff: 'smooth' as const, mode: 'level' as const }));
 
 export const HIGHWATCH_LAYOUT = deepFreeze({

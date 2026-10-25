@@ -82,6 +82,7 @@ async function harness(lang = 'en') {
     hasOverheadEmote: false,
     threat: false,
     comboPips: 0,
+    nameOnly: false,
   };
   const resolve = (e: Entity) => {
     painter.resolveContent(state, e, me, plan, false, false);

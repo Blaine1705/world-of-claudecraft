@@ -2,6 +2,7 @@ import { MUSTER_RACK_TEMPLATE_ID } from '../sim/content/mirefen_muster';
 import { FORGE_INTERACT_RANGE, FORGE_STATIONS } from '../sim/content/world_quest_forging';
 import { isInvestigationNpc } from '../sim/content/world_quest_investigation';
 import { isShadowNpc, SHADOW_NPC_ID } from '../sim/content/world_quest_shadow';
+import { isLootableBody } from '../sim/corpse_loot_state';
 import { ESCORTS } from '../sim/data';
 import { kitUsableNow } from '../sim/mob/trash_kit/encounter_use';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
@@ -218,8 +219,7 @@ export function shouldApproachPickedEntity(
   const d = dist2d(player.pos, entity.pos);
   if (entity.dead) {
     return (
-      entity.kind === 'mob' &&
-      entity.lootable &&
+      isLootableBody(entity) &&
       d > INTERACT_RANGE + 1 &&
       corpseLootAvailability(entity, player.id, harvestStateReliable, partyMemberIds).canOpen
     );
@@ -289,7 +289,7 @@ export function handlePickedEntity(
         return true;
       }
       return world.pickUpObject(id);
-    } else if (e.kind === 'mob' && e.dead && e.lootable) {
+    } else if (isLootableBody(e)) {
       if (world.player.dead) {
         hud.showError(tSim('error.cantWhileDead'));
         return false;
@@ -395,7 +395,7 @@ export function handlePickedEntity(
         return true;
       }
       return world.pickUpObject(id);
-    } else if (e.kind === 'mob' && e.dead && e.lootable) {
+    } else if (isLootableBody(e)) {
       if (world.player.dead) {
         hud.showError(tSim('error.cantWhileDead'));
         return false;

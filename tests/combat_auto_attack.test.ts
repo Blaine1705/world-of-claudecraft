@@ -413,7 +413,7 @@ describe('auto_attack rangedSwing: Auto Shot vs Wand', () => {
 
 describe('auto_attack updatePlayerAutoAttack: ranged-vs-melee dispatch', () => {
   it.each([2, 20])(
-    'a Hunter at %s yards emits the real melee or ranged animation signal',
+    'a Hunter at %s yards emits the ranged animation signal without a dead zone',
     (distance) => {
       const { sim, p, meta } = makeSim('hunter', 12);
       spawnDummy(sim, p, 1, distance);
@@ -425,15 +425,8 @@ describe('auto_attack updatePlayerAutoAttack: ranged-vs-melee dispatch', () => {
       const shots = events.filter(
         (event) => event.type === 'spellfx' && event.attackAnimation === 'ranged-shot',
       );
-      if (distance === 2) {
-        expect(melee).toHaveLength(1);
-        expect(melee[0]).toMatchObject({ school: 'physical', ability: null });
-        expect(melee[0]).not.toHaveProperty('attackAnimationStarted', true);
-        expect(shots).toHaveLength(0);
-      } else {
-        expect(shots).toHaveLength(1);
-        expect(melee).toHaveLength(0);
-      }
+      expect(shots).toHaveLength(1);
+      expect(melee).toHaveLength(0);
     },
   );
 
@@ -634,6 +627,19 @@ describe('auto_attack startAutoAttack: ranged engage must not pre-aggro (issue #
     expect(p.autoAttack).toBe(true); // auto-attack still engages
     expect(mob.aiState).toBe('idle'); // but the mob is NOT pulled at engage time
     expect(mob.aggroTargetId).toBe(null);
+  });
+
+  it('a point-blank hunter Auto Shot does NOT pre-aggro before projectile impact', () => {
+    const { sim, p } = makeSim('hunter', 12);
+    const mob = spawnDummy(sim, p, 12, 2); // 2yd: melee range, but Auto Shot fires first
+    const events = capture(sim);
+    startAutoAttack(sim.ctx, p.id);
+    expect(p.autoAttack).toBe(true);
+    expect(mob.aiState).toBe('idle');
+    expect(mob.aggroTargetId).toBe(null);
+
+    landProjectiles(sim, events, (e) => e.type === 'damage' && e.ability === 'Auto Shot', 60);
+    expect(mob.aggroTargetId).toBe(p.id);
   });
 
   it('melee engage still seeds aggro immediately (unchanged behavior)', () => {

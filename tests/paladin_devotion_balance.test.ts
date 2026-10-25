@@ -57,6 +57,10 @@ const PRIORITY: Readonly<Record<PaladinSpec, readonly string[]>> = {
 // fix around those huts (an idle pick inside a hut wall is skipped for one more
 // pause, mob/locomotion.ts) forks it again: holy 41.25 to 43, protection 39.3 to
 // 41.7, retribution 53.9 to 52.45.
+// Dropping the Evergarden's undrawn scatter (the generator now skips the
+// pines and bed-side decorations the renderer never drew, so their trunk
+// colliders are gone) forks it once more: protection 40.15 to 38.65; holy
+// and retribution unmoved.
 // The wide 35-65s design band still holds.
 const EXPECTED_SECONDS: Readonly<Record<PaladinSpec, number>> = {
   holy: 43,

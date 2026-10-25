@@ -21,7 +21,6 @@ import { STUDIO_CONTENT } from '../sim/studio_content';
 // Historical name keys remain for maintained locale overlays. They do not
 // register active mobs, rewards or Hunting entries.
 const RETIRED_BUDDY_NAMES = {
-  buddy_sapling: { name: 'Sapling' },
   buddy_ember_fox: { name: 'Ember Fox' },
   buddy_moss_hare: { name: 'Moss Hare' },
   buddy_frog: { name: 'Frog' },
@@ -404,6 +403,9 @@ const MOB_IDS = [
   'sanctum_shackle_bellows',
   // The Gorgebloom's sprouts (encounters/wildheart_basin/gorgebloom.ts).
   'thorn_sprout',
+  // Zulgar's Hunting Spear: the usable body a teammate pulls out
+  // (encounters/wildheart_basin/zulgar_spear.ts).
+  'wildheart_hunting_spear',
   // Cosmetic buddy followers (src/sim/content/buddy_mobs.ts). Their nameplate
   // is off by default (the dedicated "Show Pet Names" option), but the
   // canonical-fallback name still has to resolve in every locale the moment
@@ -433,13 +435,13 @@ const MOB_IDS = [
   'buddy_stag',
   'buddy_alpaca',
   'buddy_horse',
-  'buddy_sapling',
   'buddy_bull',
   'buddy_spider',
   'buddy_raptor',
   'buddy_skeleton',
   'buddy_crystal_lich',
   'buddy_forgemaw',
+  'buddy_sprites',
   'buddy_crystal_tide',
   'buddy_phantom',
 ] as const;
@@ -589,6 +591,10 @@ const NPC_IDS = [
   'tinker_gizzel', // crafting-station master: toolworks (Eastbrook, zone 1)
   'tanner_hesk', // crafting-station master: tannery (Fenbridge, zone 2)
   'alchemist_verane', // crafting-station master: apothecary (Highwatch, zone 3)
+  'guildmaster_hesper_dunmore', // the Highwatch guild's guildmaster (zone 3)
+  'contract_clerk_tobias_wren', // the Highwatch guild's contract clerk (zone 3)
+  'guild_quartermaster_garrick_holt', // the Highwatch guild's quartermaster (zone 3)
+  'guild_recruiter_mira_fairweather', // the Highwatch guild's recruiter (zone 3)
   // The farmer NPCs (the farming go-live), one per farming hub, in the same
   // tier order as the corresponding FARM_PATCHES rows.
   'farmer_jessica', // Eastbrook allotments (zone 1, tier 1)
@@ -941,6 +947,9 @@ const LETTER_IDS = [
   'woc_market_return',
   'woc_market_sold',
   'hoard_vault_reward',
+  // The full-bags world quest reward delivery (WORLD_QUEST_REWARD_LETTER in
+  // src/sim/content/letters.ts).
+  'world_quest_reward',
 ] as const;
 
 type MobId = (typeof MOB_IDS)[number];

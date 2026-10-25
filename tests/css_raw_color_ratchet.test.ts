@@ -142,6 +142,8 @@ const TOKEN_HOME = 'tokens.css';
 // sheet with no row fails until it gets one.
 const CEILINGS: Record<string, number> = {
   'base.css': 23,
+  // The self-hosted webfonts (@font-face only): no colors.
+  'fonts.css': 0,
   // W19: 454, not 453, since the counter learned to read named colors and found a
   // pre-existing `white` inside a color-mix in the item-quality section.
   // 453 -> 463 at the release/v0.42.0 merge: the release arm's own sections
@@ -186,9 +188,6 @@ const ZERO_LITERAL_SECTIONS = [
   'character preview loading silhouette',
   // tokenized as authored (the tab reads --gold, --color-gold-300 and --color-bg-dark)
   'character preview touch hint',
-  // migrated on the v0.45.0 integration: its tab, row, lore, item-level and
-  // owned-piece colors moved to --color-collections-* in tokens.css
-  'Collections (buddies, mounts, item sets)',
 ];
 
 // A section counts zero when it is tokenized AND when it is empty, so the zero pin

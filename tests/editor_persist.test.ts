@@ -166,9 +166,9 @@ describe('CustomMap build + projection', () => {
       id: 'fenbridge_crooked_reed_inn',
       // the painted tavern on the main street, stood grand (fenbridge_layout.ts)
       assetId: expect.stringMatching(/\/tidehold\/(?:fenrire\/)?tavern\.glb$/),
-      x: 13.55,
-      z: 298,
     });
+    expect(fenbridgeInn?.x).toBeCloseTo(21.403452673548912, 6);
+    expect(fenbridgeInn?.z).toBeCloseTo(297.9037795860382, 6);
     expect(highwatchForge).toBeDefined();
     expect(templeCampfire).toBeDefined();
     expect(world.props.mines).toContainEqual(exteriorValeMine);

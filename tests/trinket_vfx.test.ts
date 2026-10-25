@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import type { AbilityVfxFx } from '../src/render/ability_vfx/fx';
 import { AbilityVfx, type TrinketRelicsHook } from '../src/render/ability_vfx/painter';
@@ -317,6 +318,7 @@ describe('trinket relic hook in the ability painter', () => {
       handleSpellfx: vi.fn<TrinketRelicsHook['handleSpellfx']>(() => claims),
       update: vi.fn(),
       setQuality: vi.fn(),
+      lanternLightDrawable: () => new THREE.Mesh(),
     } satisfies TrinketRelicsHook;
   }
 

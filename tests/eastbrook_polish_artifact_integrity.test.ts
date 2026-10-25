@@ -1379,6 +1379,7 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
+  // Re-minted for the release/v0.44.0 merge into the WebGL context restore. No capture was retaken.
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -1428,7 +1429,11 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // the renderer leaf. No capture was retaken.
   // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
   // No capture was retaken.
-  '05a6e4de9dbfd87d134bb056bae1cd96b249d661caa2654b3db178ba5581b5b9';
+  // Re-minted after merging v045-integration: guild hall, sprite model VFX and live-world
+  // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
+  // Re-minted for the one-colour market canopies on the current integration base.
+  // No capture was retaken.
+  '3df616db1e65ef5b7b5f19f569b8c71c0a672fea839b53cebd2dcdb2d393414a';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1478,7 +1483,11 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // the renderer leaf. No capture was retaken.
   // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
   // No capture was retaken.
-  'f7e90ef6fdde5b42ff2a99f85e067c1216b240a6a0d78f5da4b2d30eeaac5fb2';
+  // Re-minted after merging v045-integration: guild hall, sprite model VFX and live-world
+  // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
+  // Re-minted for the one-colour market canopies on the current integration base.
+  // No capture was retaken.
+  'e4b0c082ee94a3313569494c41e5dfeff074aa80d341cd64fe4c34c79e21dfbf';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2881,7 +2890,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // evidence. No capture was retaken.
       // Low-gfx scenery bands and day/night cycle in renderer.ts: recomputed
       // LAST again over the re-swept evidence. No capture was retaken.
-    ).toBe('5b6a3765c534210f9c26b884eabc190c32ca8d61b295bbeaff411e60544a1225');
+      // One-colour market canopies on the current integration base: recomputed
+      // from the swept evidence. No capture was retaken.
+    ).toBe('ef2a6a89e9561c73e4989e6adf852cf6dbd7f43b42adff33ac8631c2101625a6');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

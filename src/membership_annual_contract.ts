@@ -1,7 +1,8 @@
 /** Fixed annual bundle reward. The provider proves payment, never chooses an item. */
+// Keep the receipt SKU stable so earlier annual purchases cannot be replayed.
 export const MEMBERSHIP_ANNUAL_REWARD_SKU = 'membership_annual_tank';
-export const MEMBERSHIP_ANNUAL_MOUNT = 'terrorspark_groundshaker';
-export const MEMBERSHIP_ANNUAL_REINS = 'reins_terrorspark_groundshaker';
+export const MEMBERSHIP_ANNUAL_MOUNT = 'nightwing_chimera';
+export const MEMBERSHIP_ANNUAL_REINS = 'reins_nightwing_chimera';
 
 export function membershipAnnualReceipt(
   value: unknown,

@@ -26,6 +26,7 @@ export interface FirstPersonSelfView {
   height: number;
   mountLift: number;
   liveScale: number;
+  wasSwimming: boolean;
 }
 
 export class FirstPersonRig {
@@ -53,7 +54,13 @@ export class FirstPersonRig {
     camDist: number,
     blocked: boolean,
   ): boolean {
-    const active = firstPersonActive({ mode: this.mode, camDist, blocked });
+    // Upright eye height and base-rig head hiding do not describe swimming
+    // or alternate forms. Keep their existing chase framing until they return.
+    const active = firstPersonActive({
+      mode: this.mode,
+      camDist,
+      blocked: blocked || !!self?.wasSwimming || self?.visual?.root.visible === false,
+    });
     const hiding = firstPersonHiding(this.mode, active);
     this.syncHead(hiding.head && !hiding.body ? (self?.visual ?? null) : null);
     if (!active) return false;

@@ -43,7 +43,14 @@ interface FakeSource {
 // skins (src/sim/content/mount_skins.ts mountPresentationKey). Audio keys off
 // the presentation key, so a skin owns its own cue set exactly like a mount.
 const MOUNT_AUDIO_KEYS: readonly string[] = [...MOUNT_KEYS, ...MOUNT_SKIN_IDS];
-const FOOTFALL_MOUNTS = new Set(['lanternback_troll', 'chimeglass_tortoise']);
+// Wobbles the Slime (a developer mount) borrows the footfall too until a
+// bespoke squelch is generated for it.
+const FOOTFALL_MOUNTS = new Set([
+  'lanternback_troll',
+  'chimeglass_tortoise',
+  'nightwing_chimera',
+  'wobbles_slime',
+]);
 // A mount with a continuous loop (the rickshaw's mount_loop_ cue) gets no
 // per-stride one-shot either: mountRun no-ops for it by design (see its own
 // comment in sfx.ts), checking the real SFX_CLIPS catalog for a mount_loop_*
@@ -1528,7 +1535,12 @@ describe('amb_tavern: the tavern bed follows the listener through its lowpass', 
   });
 
   it('the renderer hands the ambience the avatar eye it samples the biome beds at', () => {
-    const src = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    expect(renderer).toContain('updateCameraAudioListener(this, this.cameraLookAt);');
+    const src = readFileSync(
+      new URL('../src/render/camera_audio_listener.ts', import.meta.url),
+      'utf8',
+    );
     expect(src).toMatch(
       /sink\.ambience\(\s*amb\.biome,\s*amb\.inDungeon,\s*amb\.precip,\s*amb\.nearWater,\s*0,\s*points,\s*eye,?\s*\)/,
     );

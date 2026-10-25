@@ -838,7 +838,10 @@ describe('Masterwrought art completion evidence', () => {
     // + the account-wide buddies (PR 4240): 32 whistle icons rendered from the buddy
     // GLBs and the 2 stag charm re-tints of them, on the same integration: 2039.
     // + the membership Staff of Changing (membership-weapon-2026-10-14, PR 4281): 2040.
-    expect(currentOwnerIds).toHaveLength(2040);
+    // The icon backlog adds 135 Season 2 paintings, five referral rewards, the horse, and Nightwing Chimaera.
+    // Wobbles the Slime's reins owner (outside the dated universe too): 2,183.
+    // + the sprite buddy's whistle render: 2,184.
+    expect(currentOwnerIds).toHaveLength(2155);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -936,10 +939,19 @@ describe('Masterwrought art completion evidence', () => {
     expect(currentOwnerIds.filter((id) => worldQuestObjectIds.has(id))).toHaveLength(4);
     // The wq-reputation merge's faction quartermaster stock, one SVG batch
     // (faction-vendor-icons-2026-09-16): 15 ids, additive the same way.
+    // Recover the historical faction groups from explicit supersession edges.
+    // The three current batches split those groups by faction instead.
+    const factionAssets = ['rift', 'church', 'automaton'].flatMap(
+      (faction) =>
+        readJson<{ assets: Array<{ id: string; superseded: { batchId: string } }> }>(
+          `docs/achievements/faction-${faction}-painted-icons-v045-2026-10-22/accepted-art.json`,
+        ).assets,
+    );
+    expect(factionAssets).toHaveLength(32);
     const factionVendorIds = new Set(
-      mapping.generatedBatches
-        .filter(({ batchId }) => batchId === 'faction-vendor-icons-2026-09-16')
-        .flatMap(({ itemIds }) => itemIds),
+      factionAssets
+        .filter(({ superseded }) => superseded.batchId === 'faction-vendor-icons-2026-09-16')
+        .map(({ id }) => id),
     );
     expect(factionVendorIds.size).toBe(15);
     expect(datedIds.filter((id) => factionVendorIds.has(id))).toEqual([]);
@@ -947,9 +959,9 @@ describe('Masterwrought art completion evidence', () => {
     // The faction ladder rework's periphery rows and formulas, one SVG batch
     // (faction-ladder-icons-2026-09-23): 17 ids, additive the same way.
     const factionLadderIds = new Set(
-      mapping.generatedBatches
-        .filter(({ batchId }) => batchId === 'faction-ladder-icons-2026-09-23')
-        .flatMap(({ itemIds }) => itemIds),
+      factionAssets
+        .filter(({ superseded }) => superseded.batchId === 'faction-ladder-icons-2026-09-23')
+        .map(({ id }) => id),
     );
     expect(factionLadderIds.size).toBe(17);
     expect(datedIds.filter((id) => factionLadderIds.has(id))).toEqual([]);
@@ -958,7 +970,7 @@ describe('Masterwrought art completion evidence', () => {
     // ids, additive the same way.
     const clueScrollIds = new Set(
       mapping.generatedBatches
-        .filter(({ batchId }) => batchId === 'clue-scroll-icons-2026-09-17')
+        .filter(({ batchId }) => batchId === 'clue-painted-icons-v045-2026-10-22')
         .flatMap(({ itemIds }) => itemIds),
     );
     expect(clueScrollIds.size).toBe(2);
@@ -996,9 +1008,16 @@ describe('Masterwrought art completion evidence', () => {
     // treasure-map family, hoard boss loot): 18 + 5 + 96 = 119 ids, additive
     // the same way.
     const hoardBranchBatchIds: readonly (string | undefined)[] = [
-      'faction-rewards-icons-2026-09-17',
+      'rewards-painted-icons-v045-2026-10-22',
       'buried-hoard-treasure-maps-2026-09-19',
-      'hoard-boss-loot-icons-2026-09-20',
+      'hoard-arcane-painted-icons-v045-2026-10-22',
+      'hoard-frost-painted-icons-v045-2026-10-22',
+      'hoard-ember-painted-icons-v045-2026-10-22',
+      'hoard-storm-painted-icons-v045-2026-10-22',
+      'hoard-brute-painted-icons-v045-2026-10-22',
+      'hoard-venom-painted-icons-v045-2026-10-22',
+      'hoard-necro-painted-icons-v045-2026-10-22',
+      'hoard-tide-painted-icons-v045-2026-10-22',
     ];
     const hoardBranchIds = new Set(
       mapping.generatedBatches
@@ -1073,13 +1092,14 @@ describe('Masterwrought art completion evidence', () => {
     // (the Hollow Crypt's, its Heroic Hymnal included) = 60 ids, additive the
     // same way.
     const dungeonReworkBatchIds: readonly (string | undefined)[] = [
-      'sunken-bastion-icons-2026-09-29',
-      'drowned-temple-icons-2026-09-30',
-      'wildheart-basin-icons-2026-10-02',
-      'gravewyrm-sanctum-icons-2026-10-03',
-      'hollow-crypt-icons-2026-10-03',
-      // The lower dungeons' normal blues: 55 more ids, 115 in all.
-      'lower-dungeon-blues-icons-2026-10-08',
+      'dungeon-bastion-painted-icons-v045-2026-10-22',
+      'dungeon-temple-painted-icons-v045-2026-10-22',
+      'dungeon-wildheart-painted-icons-v045-2026-10-22',
+      'dungeon-gravewyrm-painted-icons-v045-2026-10-22',
+      'dungeon-crypt-painted-icons-v045-2026-10-22',
+      'dungeon-bastion-blues-painted-icons-v045-2026-10-22',
+      'dungeon-temple-blues-painted-icons-v045-2026-10-22',
+      'dungeon-crypt-blues-painted-icons-v045-2026-10-22',
     ];
     const dungeonReworkIds = new Set(
       mapping.generatedBatches
@@ -1102,11 +1122,70 @@ describe('Masterwrought art completion evidence', () => {
         .filter(({ batchId }) => buddyBatchIds.includes(batchId))
         .flatMap(({ itemIds }) => itemIds),
     );
-    expect(buddyIds.size).toBe(34);
+    // 35 with the sprite buddy's whistle render.
+    expect(buddyIds.size).toBe(0);
     expect(datedIds.filter((id) => buddyIds.has(id))).toEqual([]);
-    expect(currentOwnerIds.filter((id) => buddyIds.has(id))).toHaveLength(34);
+    expect(currentOwnerIds.filter((id) => buddyIds.has(id))).toHaveLength(0);
 
-    // Strip all six later additive waves (Crucible professions, the Field Kit, the
+    // Newly painted files add owners; replacements above only move existing owners.
+    const backlogAdditiveBatchIds = [
+      ...[
+        'warrior',
+        'paladin',
+        'hunter',
+        'rogue',
+        'priest',
+        'shaman',
+        'mage',
+        'warlock',
+        'druid',
+      ].map((cls) => `warfare-season2-${cls}-icons-2026-10-22`),
+      'referral-reward-icons-v045-2026-10-22',
+    ];
+    const backlogAdditiveBatches = mapping.generatedBatches.filter(({ batchId }) =>
+      backlogAdditiveBatchIds.includes(batchId ?? ''),
+    );
+    expect(backlogAdditiveBatches).toHaveLength(10);
+    const backlogAdditiveIds = new Set(backlogAdditiveBatches.flatMap(({ itemIds }) => itemIds));
+    expect(backlogAdditiveIds.size).toBe(140);
+    expect(datedIds.filter((id) => backlogAdditiveIds.has(id))).toEqual([]);
+
+    // Lantern Hall (PR 4530): its seal and its destrier's reins, two more additive
+    // batches on the v0.45.0 integration, pinned by identity like the waves above.
+    const lanternHallBatchIds: readonly (string | undefined)[] = [
+      'lantern-hall-seal-2026-10-16',
+      'lantern-hall-destrier-reins-2026-10-16',
+    ];
+    const lanternHallIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => lanternHallBatchIds.includes(batchId))
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect([...lanternHallIds].sort()).toEqual(['lantern_seal', 'reins_lantern_hall_destrier']);
+    expect(datedIds.filter((id) => lanternHallIds.has(id))).toEqual([]);
+
+    // The leveling quest shields are a distinct later batch. Pin its exact ids
+    // and provenance before subtracting them from the historical completion set.
+    const questShieldBatches = mapping.generatedBatches.filter(
+      ({ batchId }) => batchId === 'quest-shield-icons-2026-10-23',
+    );
+    expect(questShieldBatches).toHaveLength(1);
+    const questShieldProvenance =
+      'docs/achievements/quest-shield-icons-2026-10-23/accepted-art.json';
+    expect(questShieldBatches[0]).toMatchObject({ provenanceRecord: questShieldProvenance });
+    const questShieldIds = new Set(questShieldBatches[0].itemIds);
+    expect(sorted(questShieldIds)).toEqual([
+      'barrowfield_tower_shield',
+      'bastion_kite_shield',
+      'lychgate_buckler',
+    ]);
+    expect(questShieldBatches[0].itemIds).toHaveLength(3);
+    const questShieldArt = readJson<{ assets: Array<{ id: string }> }>(questShieldProvenance);
+    expect(sorted(questShieldArt.assets.map(({ id }) => id))).toEqual(sorted(questShieldIds));
+    expect(datedIds.filter((id) => questShieldIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => questShieldIds.has(id))).toHaveLength(3);
+
+    // Strip the later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,
     // the OSSBrain mount reins, the Valestrider's reins, the world-quest,
     // faction quartermaster, and Clue Scroll batches, the Buried Hoards
@@ -1131,8 +1210,15 @@ describe('Masterwrought art completion evidence', () => {
         // beyond the dated completion union, like the Field Kit.
         id !== 'emissary_cache' &&
         id !== 'reins_avian_strider' &&
+        id !== 'reins_nightwing_chimera' &&
+        // Wobbles the Slime's reins, additive the same way.
+        id !== 'reins_wobbles_slime' &&
+        // The World PvP trophy skull, additive the same way.
+        id !== 'pvp_trophy_skull' &&
+        id !== 'pvp_skull_bag' &&
         !season2WeaponIds.has(id) &&
         !hoardBranchIds.has(id) &&
+        !questShieldIds.has(id) &&
         !questGearIds.has(id) &&
         !membershipIds.has(id) &&
         !referralIds.has(id) &&
@@ -1140,7 +1226,9 @@ describe('Masterwrought art completion evidence', () => {
         !balgathIds.has(id) &&
         !musterIds.has(id) &&
         !dungeonReworkIds.has(id) &&
-        !buddyIds.has(id),
+        !buddyIds.has(id) &&
+        !backlogAdditiveIds.has(id) &&
+        !lanternHallIds.has(id),
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

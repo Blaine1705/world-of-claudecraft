@@ -4,13 +4,15 @@
 // attenuate with distance and pan with direction relative to the camera.
 //
 // Decoupled, like audio/music/voice: its own AudioContext + AudioListener,
-// driven by the `sfxVolume` setting. Efficient by construction: one decoded
+// driven by the `sfxVolume` (effects) and `ambientVolume` (environment beds)
+// settings, one gain bus each (see sfx_mix_bus.ts). Efficient by construction: one decoded
 // AudioBuffer per clip shared across every source, startup-only preloading with
 // lazy context loads, a hard concurrency cap, a per-key cooldown, and a tiny
 // pool of persistent looping sources for ambience and sustained spell casts.
 
 import { apiUrl } from '../client_origin';
 import type { PointSoundSource } from '../render/audio_sink';
+import { GFX } from '../render/gfx';
 import { ABILITIES } from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { isAbilityMomentRecorded } from './ability_sfx_coverage';
@@ -32,6 +34,13 @@ import {
   SFX_RUNTIME_PACK_URL,
   type SfxEntry,
 } from './sfx_manifest.generated';
+import { sfxMixBus } from './sfx_mix_bus';
+import {
+  audioBufferBytes,
+  isSfxClipEvictable,
+  type SfxResidencyLedger,
+  sfxResidencyFor,
+} from './sfx_residency_core';
 import { loadRuntimeSfxPack } from './sfx_runtime_pack';
 import {
   newTavernAmbienceMix,
@@ -40,7 +49,7 @@ import {
 } from './tavern_ambience_core';
 import { type WaterElementalCue, waterElementalSamples } from './water_elemental_audio';
 
-const SAMPLE_GAIN = 0.85; // base level for sampled clips; sfxVolume multiplies this
+const SAMPLE_GAIN = 0.85; // base level for sampled clips; each bus volume multiplies this
 /** Per-call level for the movement one-shots (jump / land / splash / swim). */
 const MOVE_GAIN = 0.7;
 const SWIM_GAIN = 0.5;
@@ -198,6 +207,7 @@ export interface PlayOpts {
 
 interface LoopSlot {
   key: string;
+  cacheKey: string;
   src: AudioBufferSourceNode;
   gain: GainNode;
   panner: PannerNode | null;
@@ -260,9 +270,16 @@ interface AmbientPointSource {
 class Sfx {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
+  // The environment bus (ambientVolume): biome/weather beds and stationary world
+  // emitters, routed by sfxMixBus. Everything else plays through `master`.
+  private ambientBus: GainNode | null = null;
   private clips: Record<string, SfxEntry> = SFX_CLIPS;
   private clipsReady: Promise<void> | null = null;
   private buffers = new Map<string, AudioBuffer>();
+  // A byte budget over decoded cosmetic clips (pinned clips never count), LRU
+  // eviction of idle ones; null (unbounded) off the iOS memory profile. See
+  // sfx_residency_core.ts.
+  private residency: SfxResidencyLedger | null = null;
   private loading = new Map<string, Promise<AudioBuffer | null>>();
   private failedLoads = new Set<string>();
   private pendingOneShots = new Set<string>();
@@ -271,6 +288,7 @@ class Sfx {
   private pendingLoopLoads = new Map<string, string>();
   private pendingLoopVariants = new Map<string, number>();
   private vol = 0.8;
+  private ambientVol = 0.8;
   private active = 0;
   private lastPlay = new Map<string, number>();
   private lastPlayPruneAt = 0;
@@ -325,6 +343,13 @@ class Sfx {
     if (this.master) this.master.gain.value = SAMPLE_GAIN * this.vol;
   }
 
+  /** Set the ambience volume (0..1): the `ambientVolume` slider, independent of
+   *  the effects volume above. */
+  setAmbientVolume(v: number): void {
+    this.ambientVol = Math.min(1, Math.max(0, v));
+    if (this.ambientBus) this.ambientBus.gain.value = SAMPLE_GAIN * this.ambientVol;
+  }
+
   /** Enable/disable per-footfall step clips. Off by default (the `footstepSfx`
    *  setting): while off, `footstep()` is a silent no-op for self and other
    *  entities alike. Jump/land/splash/swim and combat SFX are unaffected. */
@@ -342,6 +367,10 @@ class Sfx {
       this.master = this.ctx.createGain();
       this.master.gain.value = SAMPLE_GAIN * this.vol;
       this.master.connect(this.ctx.destination);
+      this.residency = sfxResidencyFor(GFX);
+      this.ambientBus = this.ctx.createGain();
+      this.ambientBus.gain.value = SAMPLE_GAIN * this.ambientVol;
+      this.ambientBus.connect(this.ctx.destination);
       resumeWhenAllowed(this.ctx);
       const l = this.ctx.listener;
       if (l.upX) {
@@ -381,6 +410,12 @@ class Sfx {
 
   private entry(key: string): SfxEntry | undefined {
     return this.clips[key];
+  }
+
+  /** The output bus `key` connects to: the ambience bus for environment clips,
+   *  the effects master for everything else. Null before init. */
+  private busFor(key: string): GainNode | null {
+    return sfxMixBus(key, this.entry(key)?.category) === 'ambient' ? this.ambientBus : this.master;
   }
 
   private authoredPlaybackRate(key: string): number {
@@ -451,6 +486,7 @@ class Sfx {
         // without another lossy asset transcode.
         const buf = retainDecodedBuffer(ctx, decoded, entry.spatial);
         this.buffers.set(cacheKey, buf);
+        this.trackResidency(key, cacheKey, buf);
         return buf;
       } catch {
         this.failedLoads.add(cacheKey);
@@ -461,6 +497,25 @@ class Sfx {
     })();
     this.loading.set(cacheKey, request);
     return request;
+  }
+
+  private trackResidency(key: string, cacheKey: string, buf: AudioBuffer): void {
+    const residency = this.residency;
+    if (!residency) return;
+    residency.record(cacheKey, audioBufferBytes(buf), isSfxClipEvictable(key, this.entry(key)));
+    for (const dropped of residency.evict((held) => this.residencyHeld(held))) {
+      this.buffers.delete(dropped);
+    }
+  }
+
+  /** A clip a pending one-shot or loop is about to start, or still loading. */
+  private residencyHeld(cacheKey: string): boolean {
+    if (this.pendingOneShots.has(cacheKey) || this.loading.has(cacheKey)) return true;
+    for (const [id, pending] of this.pendingLoops) {
+      const variant = this.pendingLoopVariants.get(id) ?? 0;
+      if (assetCacheKey(pending.key, variant) === cacheKey) return true;
+    }
+    return false;
   }
 
   private async preloadStartup(): Promise<void> {
@@ -658,7 +713,7 @@ class Sfx {
    *  see src/ui/mob_idle_sfx.ts) needs this instead of firing blind. */
   playAt(key: string, x: number, y: number, z: number, opts?: PlayOpts): boolean {
     const ctx = this.ctx,
-      master = this.master;
+      master = this.busFor(key);
     if (!ctx || !master) return false;
     if (this.tooFar(x, z)) return false;
     const variantIndex = this.nextVariantIndex(key);
@@ -729,8 +784,10 @@ class Sfx {
     }
     src.connect(g).connect(panner).connect(master);
     this.active++;
+    this.residency?.acquire(cacheKey);
     src.onended = () => {
       this.active--;
+      this.residency?.release(cacheKey);
       if (opts?.voiceKey && this.keyedOneShots.get(opts.voiceKey)?.src === src) {
         this.keyedOneShots.delete(opts.voiceKey);
       }
@@ -880,8 +937,10 @@ class Sfx {
     g.gain.value = peak;
     src.connect(g).connect(master);
     this.active++;
+    this.residency?.acquire(cacheKey);
     src.onended = () => {
       this.active--;
+      this.residency?.release(cacheKey);
       src.disconnect();
       g.disconnect();
     };
@@ -926,7 +985,7 @@ class Sfx {
     refDistance?: number,
   ): void {
     const ctx = this.ctx,
-      master = this.master;
+      master = this.busFor(key);
     if (!ctx || !master) return;
     const positional = x !== undefined && y !== undefined && z !== undefined;
     let slot = this.loops.get(id);
@@ -990,10 +1049,12 @@ class Sfx {
       if (panner) src.connect(g).connect(panner).connect(master);
       else src.connect(g).connect(master);
       src.start();
+      this.residency?.acquire(cacheKey);
       this.commitVariant(key, variantIndex);
       this.pendingLoopVariants.delete(id);
       slot = {
         key,
+        cacheKey,
         src,
         gain: g,
         panner,
@@ -1047,6 +1108,7 @@ class Sfx {
       } catch {
         /* already stopped */
       }
+      this.residency?.release(slot.cacheKey);
       slot.src.disconnect();
       slot.filter?.disconnect();
       slot.gain.disconnect();
@@ -1062,6 +1124,7 @@ class Sfx {
         } catch {
           /* already stopped */
         }
+        this.residency?.release(slot.cacheKey);
         src.disconnect();
         slot.filter?.disconnect();
         slot.gain.disconnect();
@@ -1232,6 +1295,18 @@ class Sfx {
    *  listener is the camera, which trails the player, so a positional source at
    *  your own feet is already attenuating by the time you hear it. Other
    *  players' summons stay positional. A mount with no summon take is silent. */
+  /** The whinny a mount gives as it rears up on a standing jump (render/mount_rear_core.ts).
+   *  Keyed by the mount's own look, not its audio donor: the Lantern Hall Destrier gallops on
+   *  the Valorsteed's take but rears with its own voice. Same self/positional split as the
+   *  summon; silent for a mount with no take. */
+  mountNeigh(x: number, y: number, z: number, look: string, self: boolean): void {
+    const key = `mount_neigh_${look}`;
+    if (!(key in SFX_CLIPS)) return;
+    const opts = { cooldown: 0.5, jitter: false };
+    if (self) this.playUi(key, { ...opts, gain: 0.85 });
+    else this.playAt(key, x, y, z, { ...opts, gain: 0.85 });
+  }
+
   mountSummon(
     x: number,
     y: number,

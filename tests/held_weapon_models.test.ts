@@ -282,6 +282,9 @@ describe('held weapon models', () => {
       'heroic_direfang_quiver',
       'heroic_gravewyrm_bone_quiver',
       'heroic_wraithfire_orb',
+      // The Crucible hunter quiver joins its quiver siblings: worn on the
+      // back by ranger.glb, so no held GLB.
+      'infernal_quiver',
       'legendary_chalice_of_living_tides',
       'legendary_orb_collapsing_void',
       'moggers_hide_quiver',
@@ -562,11 +565,11 @@ describe('weapon skin held models', () => {
     expect(offhandModelUrl(null, 'frostbite_dagger')).toBeNull();
   });
 
-  it('ships 29 distinct skin model urls, all in the boot preload manifest', () => {
+  it("ships 34 distinct skin model urls (the store's 29, Lantern Hall's blade and its four elemental arms), all in the boot preload manifest", () => {
     const urls = weaponSkinModelUrls();
     expect(urls.length).toBe(WEAPON_SKIN_LIST.length);
-    expect(urls.length).toBe(29);
-    expect(new Set(urls).size).toBe(29);
+    expect(urls.length).toBe(34);
+    expect(new Set(urls).size).toBe(34);
     const manifest = new Set(manifestUrls());
     for (const url of urls) {
       expect(url.startsWith('models/weapons/'), url).toBe(true);

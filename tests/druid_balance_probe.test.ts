@@ -38,18 +38,21 @@ import { Sim } from '../src/sim/sim';
 // Strength ring it wore by accident of the old sum; the feral and Bruin
 // fixtures keep Ashveil and swap their two caster jewelry slots for Ignivar's
 // Ember Choker and the Seal of the Forgewall. Both are pinned on their own.
+// Since 2026-10-12 the picker skips Healing Power pieces for non-healer specs,
+// so the balance druid wears Moonscorch and spell-damage jewelry in place of
+// the Grovespring healer set, Heartspring Amulet and Loop of Quiet Springs.
 const BALANCE_LOADOUT = {
   mainhand: 'wand_of_quenched_sparks',
   helmet: 'heroic_thornpeak_moonhide_cowl',
-  neck: 'heartspring_amulet',
-  shoulder: 'grovespring_shoulder',
+  neck: 'locket_of_the_last_flame',
+  shoulder: 'moonscorch_shoulder',
   chest: 'crucible_caster_leather_chest',
   waist: 'crucible_caster_leather_waist',
-  legs: 'grovespring_legs',
-  gloves: 'grovespring_gloves',
+  legs: 'moonscorch_legs',
+  gloves: 'moonscorch_gloves',
   feet: 'heroic_bramblehide_treads',
   ring1: 'circle_of_cinders',
-  ring2: 'loop_of_quiet_springs',
+  ring2: 'champions_dawn_loop',
   // The trinket slot (PR 4173): the reference epic kit fills it with the
   // Varkhul caster trinket; the live-mob bands below held at the same seed.
   trinket: 'heart_of_the_crucible',
@@ -158,10 +161,21 @@ const FERAL_LOADOUT = {
 // 216, bear 126 to 139 (36 percent less, inside the 30 to 42 percent bounds);
 // its threat product (214.5) and Marrowbreak snap (1012.44) stayed in band, and
 // all three live-mob arms stayed inside their bands, so they are unchanged.
+// RE-MEASURED 2026-10-12 for the moongrove arm only: the reference picker
+// (src/sim/dev/bis_gear.ts) stopped handing non-healer specs Healing Power
+// pieces, so the balance druid swaps the Grovespring healer set and healer
+// jewelry for its own Moonscorch set and spell-damage jewelry. Damage 5956 to
+// 6115 and threat 5957 to 6116 stayed in band; incoming 212 to 242 left it
+// (the healer pieces' extra Spirit and Stamina are gone), still 7 payoffs.
+// RE-MEASURED 2026-10-14 after the v0.45 integration stack: moongrove kept
+// its damage/threat/payoff trace, while incoming settled back to 214.
 const LIVE_MOB_MEASURED = {
-  moongrove: { damage: 5492, incomingDamage: 241, threat: 5493, payoffs: 7 },
+  // Release merge: the caster picker excludes healer gear; Bruin gains its new
+  // double-swing/rage cadence. Authored-world wander also changes shared RNG.
+  // Re-measured at 42420 with the unchanged 8% bands and exact payoff counts.
+  moongrove: { damage: 6839, incomingDamage: 237, threat: 6840, payoffs: 7 },
   wildfang: { damage: 6389, incomingDamage: 213, threat: 7486.7135, payoffs: 10 },
-  bruin: { damage: 2765, incomingDamage: 162, threat: 9243.19625, payoffs: 4 },
+  bruin: { damage: 3254, incomingDamage: 159, threat: 12206.51375, payoffs: 6 },
 } as const;
 const BRUIN_TANK_MEASURED = {
   wolfIncomingDamage: 216,

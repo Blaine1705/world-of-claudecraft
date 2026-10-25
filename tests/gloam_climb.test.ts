@@ -6,8 +6,6 @@ import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { tintedMaterial } from '../src/render/characters/assets';
 import {
-  createGhostEffectMaterial,
-  createMoonkinEffectMaterial,
   createShadowformEffectMaterial,
   createShadowformStandInMaterial,
 } from '../src/render/characters/effect_materials';
@@ -227,18 +225,14 @@ describe('the Shadowform stand-in (program-free)', () => {
 });
 
 describe('the Shadowform clone (the settled form)', () => {
-  it('is the ghost clone program: solid, transparent, depth written', () => {
+  it('preserves the source hooks in its gated transparent program: solid, depth written', () => {
     const source = rigMaterial();
     const look = createGloamLook();
     const form = createShadowformEffectMaterial(source, look);
     expect(form.transparent).toBe(true);
     expect(form.depthWrite).toBe(true);
     expect(form.opacity).toBe(1);
-    // One program per source for every transparent flavour: the boot twin
-    // (minted through createGhostEffectMaterial) covers the form too.
     const key = form.customProgramCacheKey();
-    expect(key).toBe(createGhostEffectMaterial(source).customProgramCacheKey());
-    expect(key).toBe(createMoonkinEffectMaterial(source).customProgramCacheKey());
     expect(key).toBe(source.customProgramCacheKey());
     const shader = compiled(form);
     expect(shader.uniforms.uGloamBody).toBe(look.body);

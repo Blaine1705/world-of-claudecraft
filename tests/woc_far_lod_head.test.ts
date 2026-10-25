@@ -834,9 +834,11 @@ describe('the WOC far head is ONE draw', () => {
     expect(staged.some((m) => m.material === ghost && m.geometry === far(v.root).geometry)).toBe(
       true,
     );
-    // the clone is the same program variant (the hook, its key and the one sided define
-    // all come back with it) and SHARES the head's uniforms
-    expect(ghost.customProgramCacheKey()).toBe(plain.customProgramCacheKey());
+    // The unlit veil has its own program while preserving the merged layer
+    // and sharing the live head uniforms.
+    expect(ghost.type).toBe('MeshBasicMaterial');
+    expect(ghost.customProgramCacheKey()).toBe('woc_head_tint|merged|spirit-veil-color-v2');
+    expect(ghost.customProgramCacheKey()).not.toBe(plain.customProgramCacheKey());
     expect(ghost.defines).toHaveProperty('WOC_HM_ONE_SIDED');
     expect(h.wocHeadMergedTintOf(ghost)).toBe(u);
     // ...so a colour change still reaches the head while it is ghosted, as a uniform write

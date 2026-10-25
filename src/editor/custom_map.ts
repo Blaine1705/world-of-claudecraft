@@ -1,6 +1,7 @@
 import { cloneMaterialFinishes } from '../sim/material_finishes';
 import { cloneWallFinishes } from '../sim/wall_finishes';
 import { WORLD_SEED } from '../sim/world_seed';
+import { compileLiveWorldDocument } from './live_world_core';
 // The CustomMap document: the editor's canonical, serializable map. The type and
 // its sanitizer live in src/sim/map_doc.ts (shared with the server, which
 // validates uploaded documents with the SAME code); this module adapts the
@@ -10,7 +11,14 @@ import { WORLD_SEED } from '../sim/world_seed';
 import { autoCollideRadius } from '../sim/asset_collision';
 import { colliderVolumesFromPlacements } from '../sim/collider_volumes';
 import { clonePropsKeepingAuthoredTowns } from '../sim/custom_world_props';
-import { BUILTIN_WORLD, PLAYER_START, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
+import {
+  BASE_WORLD,
+  BUILTIN_WORLD,
+  PLAYER_START,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_Z,
+} from '../sim/data';
 import { fluidVolumesFromPlacements } from '../sim/fluid_volumes';
 import {
   type AssetCollisionBox,
@@ -146,19 +154,19 @@ export function newCustomMap(name: string, id: string, now: number): CustomMap {
       parentId: '',
     },
     content: {
-      zones: deepClone(BUILTIN_WORLD.zones as CustomMap['content']['zones']),
-      camps: deepClone(BUILTIN_WORLD.camps as CustomMap['content']['camps']),
-      npcs: deepClone(BUILTIN_WORLD.npcs as CustomMap['content']['npcs']),
-      objects: deepClone(BUILTIN_WORLD.groundObjects as CustomMap['content']['objects']),
-      roads: deepClone(BUILTIN_WORLD.roads as CustomMap['content']['roads']),
+      zones: deepClone(BASE_WORLD.zones as CustomMap['content']['zones']),
+      camps: deepClone(BASE_WORLD.camps as CustomMap['content']['camps']),
+      npcs: deepClone(BASE_WORLD.npcs as CustomMap['content']['npcs']),
+      objects: deepClone(BASE_WORLD.groundObjects as CustomMap['content']['objects']),
+      roads: deepClone(BASE_WORLD.roads as CustomMap['content']['roads']),
     },
     terrainEdits: [],
     placements: [
-      ...worldMajorPropPlacements(BUILTIN_WORLD.props, DEFAULT_SEED, true),
+      ...worldMajorPropPlacements(BASE_WORLD.props, DEFAULT_SEED, true),
       // The realms' authored dressing (flower beds, iron fences, torches, hex
       // homes): renderer-owned until now, which is why a maker could see them
       // and not move them.
-      ...decorPropPlacements(BUILTIN_WORLD.props),
+      ...decorPropPlacements(BASE_WORLD.props),
       // The road network's lamp posts (empty when the builtin plan has not
       // been cached yet and the builtin world is not active to plan it;
       // promoteStreetlamps then upgrades the map on a later boot).
@@ -493,6 +501,9 @@ export function zoneGraveyards(zones: readonly ZoneDef[]): GraveyardDef[] {
 // placements carry their collide footprint so the Sim's colliders and the
 // renderer read the SAME records.
 export function customMapToWorldContent(map: CustomMap): WorldContent {
+  if (map.meta.overworldBase) {
+    return { ...compileLiveWorldDocument(map).world, liveWorldPreview: true };
+  }
   // LINKED map: the maker anchored this map into the world, project its
   // layers into the FULL built-in world at that offset instead of booting the
   // standalone authored slate.

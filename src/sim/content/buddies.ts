@@ -7,8 +7,8 @@
 // MobTemplate per key, spawned/despawned by src/sim/buddies.ts and heeled by
 // src/sim/pet/buddy_ai.ts using the same A*-pathed locomotion as a hunter
 // pet), which is the "AI" this catalog has: purely locomotion, never combat.
-// Ownership is a per-character collection flag. Soulbound whistle tokens
-// grant the companion once and are consumed on use. Summoning pairs the
+// Ownership is an account collection online, with no inventory items.
+// The Cosmetics menu manages companions. Summoning pairs the
 // Entity.buddyKey identity with a real follower entity spawn or despawn.
 //
 // Used by the authoritative Sim (ownership + the active-buddy flip + the
@@ -18,43 +18,7 @@
 // imports and runs unchanged on the server, offline, and headless.
 // ---------------------------------------------------------------------------
 
-export type BuddyKey = 'horse' | 'crystal_lich' | 'forgemaw' | 'sapling';
-
-// Historical whistle identities remain readable in existing bags and bank saves.
-// This type is only for item definitions; active ownership uses BuddyKey.
-export type BuddyTokenKey =
-  | BuddyKey
-  | 'sapling'
-  | 'ember_fox'
-  | 'moss_hare'
-  | 'frog'
-  | 'crimson_claw_crab'
-  | 'golden_sentinel'
-  | 'nightfang'
-  | 'tuskhorn_boar'
-  | 'emerald_wolf'
-  | 'tiger'
-  | 'cate_coin'
-  | 'alon'
-  | 'trollface'
-  | 'ansem'
-  | 'triple_t'
-  | 'kekius'
-  | 'solbot'
-  | 'frostfire'
-  | 'rocky'
-  | 'proud_grunt'
-  | 'loot_goblin'
-  | 'penny_goldspark'
-  | 'stag'
-  | 'alpaca'
-  | 'bull'
-  | 'spider'
-  | 'raptor'
-  | 'skeleton'
-  | 'crystal_tide'
-  | 'phantom'
-  | 'emberfall_phoenix';
+export type BuddyKey = 'horse' | 'crystal_lich' | 'forgemaw' | 'sprites';
 
 export interface BuddyDef {
   key: BuddyKey;
@@ -75,20 +39,14 @@ export const BUDDIES: Record<BuddyKey, BuddyDef> = {
     key: 'forgemaw',
     name: 'Forgemaw The Molten',
   },
-  sapling: { key: 'sapling', name: 'Sapling' },
+  sprites: {
+    key: 'sprites',
+    name: 'Flicker and Glimmer',
+  },
 };
 
-// Enumerated art debt (the src/ui/icons.ts ITEM_ART_PENDING ledger): the
-// Emberfall Phoenix and Horse whistles have no committed icon yet. Their icons
-// render from the buddy GLB like every other whistle (scripts/assets/
-// render_buddy_item_icons.mjs), but that lane needs KTX-Software's `ktx` on
-// PATH to decompress the roster's models first, which the machines that
-// authored these two did not have. Empty this list in the same change that
-// commits the renders; tests/item_icons.test.ts pins the membership.
-export const BUDDY_ART_PENDING_ITEM_IDS: readonly string[] = [
-  'whistle_emberfall_phoenix',
-  'whistle_horse',
-];
+// Companions have no inventory items requiring item artwork.
+export const BUDDY_ART_PENDING_ITEM_IDS: readonly string[] = [];
 
 /** Catalog order: declaration order. */
 export const BUDDY_KEYS = Object.keys(BUDDIES) as readonly BuddyKey[];

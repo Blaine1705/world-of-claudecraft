@@ -5,7 +5,17 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+
+// These mutable temporary images must not stay open in libvips' operation cache.
+const cache = sharp.cache();
+beforeAll(() => {
+  sharp.cache(false);
+});
+afterAll(() => {
+  sharp.cache({ memory: cache.memory.max, files: cache.files.max, items: cache.items.max });
+});
+
 import {
   assertItemArtAuditPass,
   buildItemArtAudit,
@@ -880,29 +890,34 @@ describe('item-art audit builder', () => {
       // Buddy union measured with scripts/item_art_audit.mjs --verify-only.
       // 2040 / 2069 with the membership Staff of Changing (PR 4281), re-measured with
       // `--verify-only` on the merged tree.
-      catalogSha256: '15a9e4c4c955974c6b2b7470fcc796bc0fbd44eb5c5b99a5292a1efe75e26e1d',
-      catalogBytes: 1112742,
+      // Integration45: 141 new files plus repainted loot and Nightwing Chimaera, measured by --verify-only.
+      // 2,183 owners / 2,212 live with Wobbles the Slime's reins, re-measured with
+      // `node scripts/item_art_audit.mjs --verify-only` (catalog +523 bytes).
+      // + the sprite buddy's whistle render: 2186 / 2215, re-measured with --verify-only.
+      // Release adds five painted owners; measured with --verify-only on the combined tree.
+      catalogSha256: 'fbacd30b55a12eb85c81e76aa431312079634c9b4fa233135ca2707550776b75',
+      catalogBytes: 1178060,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 2040,
-      liveItemCount: 2069,
+      catalogCount: 2155,
+      liveItemCount: 2184,
       generatedHeroicDefinitions: 116,
       heroicDefinitionsWithOwnWebp: 86,
       heroicWeaponArtAliases: 30,
-      groupCount: 28,
-      sheetPageCount: 44,
-      sheetCount: 352,
+      groupCount: 26,
+      sheetPageCount: 45,
+      sheetCount: 360,
       sheetModeCounts: {
-        '128-color': 44,
-        '40-color': 44,
-        '28-color': 44,
-        '22-color': 44,
-        '28-grayscale': 44,
-        '64-circle': 44,
-        'small-multiview': 44,
-        identity: 44,
+        '128-color': 45,
+        '40-color': 45,
+        '28-color': 45,
+        '22-color': 45,
+        '28-grayscale': 45,
+        '64-circle': 45,
+        'small-multiview': 45,
+        identity: 45,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '654cc3b405a6ed997250542de3ff878895f6d539c3502a6acc3d0e02a2ee60c1',
+      shippingCatalogSha256: '0144a235ce50be3b4d507153485842c5213f24d959e6b06c094852e83c61c802',
       machineChecksPassed: true,
       verdict: null,
     });

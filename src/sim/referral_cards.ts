@@ -161,6 +161,11 @@ function characterError(character: ReferralCharacter): ReferralCardError | undef
   return undefined;
 }
 
+/** Whether this character alone meets the start rules (bound or not). */
+export function referralCharacterCanStart(character: ReferralCharacter): boolean {
+  return !characterError(character);
+}
+
 function contextError(
   state: ReferralCardState,
   context: ReferralCardContext,

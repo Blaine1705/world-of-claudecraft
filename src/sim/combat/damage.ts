@@ -33,12 +33,14 @@ import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
 import { emitIgnivarRaidNarrativeOnDeath } from '../ignivar_raid_lore';
+import { recordExpeditionEncounterDeath } from '../instances/dungeon_expeditions';
 import {
   claimedInstanceForMob,
   lockNormalDungeonResetOnBossKill,
   spawnBossExitPortal,
 } from '../instances/dungeons';
 import { isImmuneInPlace } from '../instances/instance_combat_hold';
+import { awardQueueEncounter, recordQueueDamage } from '../instances/queue_participation';
 import { isKillParticipant, killParticipationPos } from '../loot/kill_participation';
 import { membershipActive } from '../membership';
 import { wearsMembershipArmour } from '../membership_armour';
@@ -69,6 +71,7 @@ import {
   worldPvpOnPlayerDamaged,
   worldPvpOnPlayerDeath,
 } from '../pvp';
+import { worldPvpXpAmount } from '../pvp/world_pvp_rewards_rules';
 import { referralArmourXpActive } from '../referral_armour';
 import { emitReferralBossEvidence } from '../referral_evidence';
 import { resolveRespawnSeconds } from '../respawn_policy';
@@ -127,13 +130,14 @@ import {
   igniteOnCrit,
   PERSONAL_BARRIER_IDS,
 } from './fire_mage';
+import { formAutoRageMult } from './form_swing';
 import { clearFieldcraftState } from './hunter_fieldcraft';
+import { lonelySoulDamageMult, lonelySoulPetFloor } from './hunter_lonely_soul';
 import { clearPacklordState } from './hunter_packlord';
 import {
   breakEnduringCourserBurst,
   clearHunterTalentState,
   courserGuiseDazeOnDamage,
-  hasHunterTalent,
 } from './hunter_shared';
 import {
   clearOssuaryMarks,
@@ -172,6 +176,7 @@ import { applySetProcs } from './set_procs';
 import { clearSpiritmendCurrents, UNLEASH_WEAPON_GUARD_ID } from './shaman_spiritmend';
 import { clearShamanTalentState, onShamanDamageTaken } from './shaman_talents';
 import { elementalTranceManaFromDamage } from './shaman_warspirit';
+import { fallDamageKeepsStealth } from './stealth_fall';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 import { onTrinketDamage } from './trinkets';
 import { emitRainOfFireStop } from './warlock_meteor_events';
@@ -543,6 +548,13 @@ export function dealDamage(
     if (form) amount = Math.round(amount * (1 + form.value / 100));
   }
 
+  // Lonely Soul (hunter choice row): a petless hunter deals 10% more damage.
+  // Source-output, so the alreadyFinal guard keeps a redirect share clean.
+  if (!alreadyFinal && source && source.id !== target.id && amount > 0) {
+    const lonely = lonelySoulDamageMult(ctx, source);
+    if (lonely !== 1) amount = Math.round(amount * lonely);
+  }
+
   // Warded (mage choice row): the wearer takes barrierDrPct less damage while
   // their own personal barrier (an ice_barrier absorb aura) is up. Checked
   // target-side BEFORE absorb shields soak, so the cut stretches the barrier it
@@ -712,12 +724,8 @@ export function dealDamage(
     }
     const share = meta ? ctx.playerMods(meta).global.petDmgSharePct : 0;
     const pet = share > 0 ? ctx.petOf(target.id) : null;
-    const beastguard = !!meta && hasHunterTalent(meta, 'hun_r8_beastguard');
-    if (beastguard && (!pet || pet.dead) && target.hp < target.maxHp * 0.5) {
-      amount = Math.round(amount * 0.92);
-    }
     if (pet && !pet.dead) {
-      const petFloor = beastguard ? Math.ceil(pet.maxHp * 0.2) : 0;
+      const petFloor = lonelySoulPetFloor(ctx, target, pet);
       const redirected = Math.min(
         amount,
         Math.round(amount * share),
@@ -1047,6 +1055,7 @@ export function dealDamage(
   target.hp = guardianWardRestore || Math.max(0, target.hp - amount);
   // Snapshot before reactive heals can restore health or nested damage can add loss.
   const craftedHpLoss = Math.max(0, preHp - target.hp);
+  recordQueueDamage(ctx, source, target, craftedHpLoss);
   if (resolution) resolution.landedHpLoss = Math.max(0, preHp - target.hp);
   // Chronomancy Rewind (combat/damage_history.ts): log the REAL HP loss this player
   // just took, tagged by sim tick, so Rewind can restore a fraction of recent damage.
@@ -1148,9 +1157,10 @@ export function dealDamage(
     }
   }
 
-  // taking or dealing real damage breaks stealth
+  // taking or dealing real damage breaks stealth (a fall leaves Stalk and the
+  // rogue stealths up: combat/stealth_fall.ts)
   if (amount > 0) {
-    ctx.breakStealth(target);
+    if (!fallDamageKeepsStealth(source, target, ability)) ctx.breakStealth(target);
     if (source && source.id !== target.id) {
       ctx.breakStealth(source);
     }
@@ -1271,10 +1281,15 @@ export function dealDamage(
       // here, a hidden ~20% income buff that co-fed the fury overpower incident.
       const baseRage = rageFromDealing(amount, source.level);
       const talentMult = isWarrior ? 1 + ctx.playerMods(meta).global.autoRagePct : 1;
+      // Bruin Form white swings mint double rage (combat/form_swing.ts): the
+      // bear swings twice as fast for half the damage, so rage per second
+      // doubles while white damage does not.
       source.resource = Math.min(
         source.maxResource,
         source.resource +
-          baseRage * (isWarrior ? talentMult * rageGenAuraMult(source) * seasonedCrit : 1),
+          baseRage *
+            (isWarrior ? talentMult * rageGenAuraMult(source) * seasonedCrit : 1) *
+            formAutoRageMult(source),
       );
     }
   }
@@ -1471,6 +1486,15 @@ export function handleDeath(
   if (e.kind === 'player') {
     clearSpiritmendCurrents(ctx, e.id);
     clearShamanTalentState(ctx, e);
+    // A new death decides its own PvP Resurrect offer (pvp_resurrect.ts, stamped
+    // in worldPvpOnPlayerDeath below): drop one a revive outside spirit.ts
+    // reviveAt left behind (battleground seating, the delve respawn). Only a
+    // LIVING player's death resets it, so a second pass over the same corpse
+    // keeps the offer this death earned.
+    if (!e.dead) {
+      e.pvpResurrect = false;
+      e.pvpResurrectWait = 0;
+    }
   }
   // A dead mob keeps no route and no plan throttle (mob/chase_route.ts).
   if (e.chaseRoute !== undefined) e.chaseRoute = undefined;
@@ -1484,6 +1508,9 @@ export function handleDeath(
   stripPaladinDevotionsFromSource(ctx, e.id);
   e.dead = true;
   e.hp = 0;
+  // A corpse is not mid-throw: no Typhoon fall credit or steering lock
+  // survives into the next life (combat/knockback_launch.ts).
+  if (e.launchedBy) e.launchedBy = undefined;
   ctx.clearNonPlayerStatAuras(e);
   // Death cannot shed persistent death penalties or encounter-owned unbreakable
   // control. The encounter script remains responsible for releasing its markers.
@@ -1646,8 +1673,8 @@ export function handleDeath(
     ctx.bgOnPlayerDeath(e, killer);
     // World PvP: a flagged player's death in the open world moves the gold
     // stake and pays the honor pool to everyone who worked for the kill. Pure
-    // ledger arithmetic on the sim clock, zero rng; a no-op for every death
-    // that was not a flagged player's at a flagged player's hands.
+    // ledger arithmetic on the sim clock, zero rng. Every other death only
+    // ends the victim's kill streak and any bounty it earned.
     worldPvpOnPlayerDeath(ctx, e, killer);
     for (const m of ctx.entities.values()) {
       if (m.kind === 'mob' && !m.dead && m.aggroTargetId === e.id && m.aiState !== 'dead') {
@@ -1801,6 +1828,8 @@ export function handleDeath(
     // Resolve the owning claim once for corpse participation and both reward
     // awarders below; the slot remains stable throughout this death path.
     const claimedInst = claimedInstanceForMob(ctx, e.id);
+    awardQueueEncounter(ctx, claimedInst, e);
+    recordExpeditionEncounterDeath(claimedInst, e);
     let heroicRewardRecipients: PlayerMeta[] = [];
     // A regrown encounter part (the Mere Hydra's head) paid on its first death.
     if (meta && creditEntity && !meta.leaving && !e.regrown) {
@@ -2003,6 +2032,7 @@ export function grantXp(
 ): void {
   const p = ctx.entities.get(meta.entityId);
   if (!p || amount <= 0) return;
+  if (!ctx.worldPvpDisabled) amount = worldPvpXpAmount(amount, meta.worldPvp);
   // Rested XP bonus: the classic-era rule only doubles KILL xp (not quests), and
   // never past the cap (no level bar to advance). The bonus equals the rested
   // amount drawn down, so the effective award is up to 2x while the pool lasts.

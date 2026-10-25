@@ -1,6 +1,7 @@
 // FIRST import on purpose: loads .env before realm.ts (or any other module
 // with an import-time process.env read) evaluates. See server/env.ts.
 import './env';
+import { randomUUID } from 'node:crypto';
 import * as fs from 'node:fs';
 import * as http from 'node:http';
 import * as path from 'node:path';
@@ -17,6 +18,7 @@ import {
   paginateDevLeaderboard,
   paginateLeaderboard,
 } from '../src/sim/leaderboard_page';
+import { settleAllWorldPvpSpoils } from '../src/sim/pvp/world_pvp_spoils';
 import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { virtualLevel } from '../src/sim/types';
@@ -330,6 +332,7 @@ import {
 } from './internal';
 import { isConnectionRefused } from './ip_block';
 import { pruneExpiredBlockedIps } from './ip_block_db';
+import { pruneItemLedgerBatch } from './item_ledger_db';
 import {
   buildDeedsBoard,
   buildGuildBoardResponse,
@@ -642,6 +645,7 @@ function initialCharacterState(
     playerClass: cls,
     playerName: name,
     lockoutNowMs: () => Date.now(),
+    mintItemGuid: randomUUID,
   });
   sim.setPlayerSkin(sim.playerId, skin);
   const character = sim.serializeCharacter(sim.playerId);
@@ -3749,6 +3753,7 @@ export async function startServer(): Promise<http.Server> {
   await game.loadGuildBanks();
   await game.loadRifts();
   await game.loadChatFilter();
+  await game.realmMotd.load();
   await game.loadBlockedIps();
   void game.recordOnlineSnapshot();
   void currentSitePresenceUsers()
@@ -4137,6 +4142,13 @@ export async function startServer(): Promise<http.Server> {
         pruneBatch: (n) => pruneCraftRollEventsBatch(pool, config.craftRollEventsRetentionDays, n),
       },
       {
+        // The tracked epic/legendary copy provenance ledger (one row per
+        // mint or change of hands); append-only, observer-written
+        // (server/item_ledger.ts).
+        name: 'item_ledger',
+        pruneBatch: (n) => pruneItemLedgerBatch(pool, config.itemLedgerRetentionDays, n),
+      },
+      {
         // The buy-now abandon ledger (claim-cooldown evidence): dead once
         // outside every cooldown window; kept a month for tuning forensics.
         name: 'woc_market_buy_now_abandons',
@@ -4288,6 +4300,9 @@ export async function startServer(): Promise<http.Server> {
     // it races the pool close; the next boot's first pass rebuilds the totals).
     accountWealthSweep.stop();
     await game.stop();
+    // World PvP spoils live only in memory: pay every unlooted body out before
+    // the final save (src/sim/pvp/world_pvp_spoils.ts).
+    settleAllWorldPvpSpoils(game.sim.ctx);
     await game.saveAll('shutdown');
     await game.saveMarket();
     await game.saveMail();

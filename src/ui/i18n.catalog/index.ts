@@ -324,6 +324,8 @@ export const en = {
     terms: 'Terms of Service',
     privacy: 'Privacy Policy',
     discordLabel: 'Join the Discord',
+    // Studio name on the footer link to levystreet.com; a brand, kept verbatim in every locale.
+    levyStreet: 'Levy Street',
   },
   settings: {
     languageLoading: 'Loading language...',
@@ -378,6 +380,9 @@ export const en = {
     serverOffline: 'Offline',
     play: 'Play',
     playAria: 'Play World of ClaudeCraft',
+    // The Play button while a first visit's game client downloads, then boots.
+    playLoading: 'Loading',
+    playStarting: 'Starting',
     serverLabel: 'Choose your world',
     serverAria: 'Select world: Online or Offline',
     serverOfflineSub: 'Instant local world',
@@ -696,6 +701,9 @@ export const en = {
     resetShort: 'Reset',
     // The customizer's Share tab: every changeable feature serialized as a
     // named value in one line (the design code), exported and imported there.
+    // The face builder uses the same word for its footer toggle button and as
+    // the title of the Share page it opens (the face code), so keep it a verb
+    // that reads on a button.
     shareTab: 'Share',
     designCode: 'Design code',
     designCodeHint:
@@ -1999,10 +2007,19 @@ export const en = {
       kings_signet: { name: "King's Signet" },
       event_skin_token: { name: 'Mysterious Cosmetic Cache' },
       emissary_cache: { name: "Emissary's Cache" },
+      // World PvP trophy (src/sim/pvp/world_pvp_spoils.ts); each looted copy
+      // reads as "<name>'s Skull" (hudChrome.worldPvp.skullName).
+      pvp_trophy_skull: { name: 'Trophy Skull' },
+      // The World PvP Skull Bag (src/sim/pvp/skull_bag.ts), sold for honor.
+      pvp_skull_bag: { name: 'Skull Bag' },
       // Clue Scrolls (world quests, Stage 3): the scroll and the casket it buries.
       clue_scroll: { name: 'Clue Scroll' },
       treasure_casket: { name: 'Treasure Casket' },
       heroic_mark: { name: 'Heroic Mark' },
+      // Lantern Hall's contract currency (content/guild_contracts.ts).
+      lantern_seal: { name: 'Lantern Seal' },
+      // ...and the guild's war horse its quartermaster sells for them.
+      reins_lantern_hall_destrier: { name: 'Reins of the Lantern Hall Destrier' },
       wyrmfall_core: { name: 'Wyrmfall Core' },
       sundered_essence: { name: 'Sundered Essence' },
       makers_ember: { name: "Maker's Ember" },

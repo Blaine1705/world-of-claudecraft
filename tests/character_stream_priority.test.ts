@@ -1,6 +1,6 @@
 // The post-entry creature stream is BACKGROUND work (src/render/characters/assets.ts
 // startStreamedCharacterPreloads, over assets/load_queue_core.ts). On the iOS memory profile
-// it queues every creature body at first paint, two at a time, and before this a file a
+// it queues overworld creature bodies at first paint, two at a time, and before this a file a
 // player needed right then (an armor set, a hairstyle, a mount) waited behind all of it
 // (PR 4360 review, B1). Here: the stream asks the loader at background priority, and a
 // body a view needs NOW, still held by the stream, is asked for once more as a demand, which
@@ -51,7 +51,7 @@ afterEach(() => {
 });
 
 describe('the post-entry creature stream', () => {
-  it('stays out of the boot gate and queues every body as background work', async () => {
+  it('stays out of the boot gate and queues overworld bodies as background work', async () => {
     const { calls, assets, restoreGfx } = await iosWorld();
     restore = restoreGfx;
     // nothing of it at import: the stream starts at first paint
@@ -62,7 +62,7 @@ describe('the post-entry creature stream', () => {
     // a profile that streamed nothing would prove nothing
     expect(started).toBeGreaterThan(50);
     expect(stream).toHaveLength(started);
-    expect(stream.some((call) => call.url.includes('models/buddies/'))).toBe(true);
+    expect(stream.some((call) => call.url.includes('models/buddies/'))).toBe(false);
     for (const call of stream) {
       expect(isCreature(call.url), call.url).toBe(true);
       expect(call.priority, call.url).toBe('background');
@@ -70,6 +70,19 @@ describe('the post-entry creature stream', () => {
     // idempotent: a second kick queues nothing
     expect(assets.startStreamedCharacterPreloads()).toBe(0);
     expect(calls).toHaveLength(boot + started);
+  });
+
+  it('fetches a cosmetic buddy only on demand and reuses its pending download', async () => {
+    const { calls, assets, restoreGfx } = await iosWorld();
+    restore = restoreGfx;
+    const { VISUALS } = await import('../src/render/characters/manifest');
+    const buddy = VISUALS.buddy_horse.url;
+    assets.startStreamedCharacterPreloads();
+    expect(calls.some((call) => call.url === buddy)).toBe(false);
+    const before = calls.length;
+    assets.ensureCharacterUrl(buddy);
+    assets.ensureCharacterUrl(buddy);
+    expect(calls.slice(before)).toEqual([{ url: buddy, priority: 'demand' }]);
   });
 
   it('asks again as a demand, once, for a body a view needs while the stream holds it', async () => {

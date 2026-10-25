@@ -1155,13 +1155,12 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
       // ring, streak, star and wide-ray blooms here, all box-shadow or
       // drop-shadow scaled by the tier, never a blur. Base 97; the release's
       // two extra library composites (+4) and the world-quests branch's vault
-      // blooms (+11) compose to 112 at the release/v0.44.0 base merge.
-      // 112 -> 114: the dungeon objectives tracker's completion flash
-      // (c8702ec4f81, hud.css @keyframes dungeon-tracker-complete) scales its
-      // outer and inset box-shadow blur by the tier; the completed state itself
-      // (the unscaled gold keyline, bar and tally) reads the same at every preset.
-      'the style graph owns 114 reviewed tier-shadow uses',
-    ).toHaveLength(114);
+      // blooms (+11) compose to 112 at the release/v0.44.0 base merge. The vivid
+      // combat text crit and big-hit glows (tokens.css --glow-fct-crit x2,
+      // --glow-fct-big, --glow-fct-big-crit) and the dungeon tracker completion flash add 6 decorative blurs: 119. Their
+      // keyline (--fct-vivid-outline) is legibility and never rides the tier.
+      'the style graph owns 119 reviewed tier-shadow uses',
+    ).toHaveLength(119);
 
     for (const [name, body] of [
       [

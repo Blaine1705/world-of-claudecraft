@@ -20,7 +20,7 @@
 // the same plan), so nothing here needs to know about it.
 
 import * as THREE from 'three';
-import { BUILTIN_WORLD } from '../sim/data';
+import { isBuiltinWorldContent } from '../sim/data';
 import {
   MUSTER_CLUTTER_KEYS,
   type MusterKitKey,
@@ -74,7 +74,7 @@ export function musterCampDecor(
   seed: number,
   lowTier: boolean,
 ): RenderDecorProp[] {
-  if (content !== BUILTIN_WORLD) return [];
+  if (!isBuiltinWorldContent(content)) return [];
   return musterPlacementsForTier(musterCampPlan(seed), lowTier).map((p) => ({
     key: p.key,
     x: p.x,

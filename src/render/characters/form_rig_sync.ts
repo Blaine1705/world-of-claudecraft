@@ -19,7 +19,8 @@ export type FormRigSlot =
   | 'bearVisual'
   | 'catVisual'
   | 'travelVisual'
-  | 'metamorphVisual';
+  | 'metamorphVisual'
+  | 'sporemenderVisual';
 
 /** What the sync needs of a built rig. */
 export interface FormRig {
@@ -47,6 +48,7 @@ interface FormRigSpec {
 }
 
 const FORM_RIGS: Readonly<Partial<Record<CharacterFormVisual, FormRigSpec>>> = {
+  sporemender: { key: 'form_sporemender', slot: 'sporemenderVisual', gate: true },
   sheep: { key: 'form_sheep', slot: 'sheepVisual', gate: true },
   bear: { key: 'form_bear', slot: 'bearVisual', gate: true },
   cat: { key: 'form_cat', slot: 'catVisual', gate: true },

@@ -1,11 +1,10 @@
 import * as THREE from 'three';
-import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { buildingCameraHeight } from '../sim/building_layout';
 import { isBuiltinShapedWorld } from '../sim/builtin_shaped_world';
 import { mineMoundFootprint, STALL_HALF_D, STALL_HALF_W } from '../sim/colliders';
 import { MOUNT_RACE_JUMP_FIXTURES } from '../sim/content/mounts';
-import { BUILTIN_WORLD, getActiveWorldContent, WORLD_MIN_Z } from '../sim/data';
+import { getActiveWorldContent, isBuiltinWorldContent, WORLD_MIN_Z } from '../sim/data';
 import {
   DOCK_SECTION_LOCAL_Z,
   DOCK_SECTION_SURFACE_Y,
@@ -27,7 +26,7 @@ import {
 import { hash2 } from '../sim/rng';
 import type { BuildingDef } from '../sim/types';
 import { terrainHeight, WATER_LEVEL, waterLevel } from '../sim/world';
-import { loadGltf, releaseGltf } from './assets/loader';
+import { type LoadedGltf, loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { activeWorldHasAuthoredTown } from './authored_town_gate';
 import { attachBiomeHaze } from './biome_haze_field';
@@ -51,6 +50,7 @@ import {
 import { buildFerryPiers } from './ferry_piers';
 import { EMISSIVE_LIGHT, GFX, type GfxSettings, sharedUniforms, surfaceMat } from './gfx';
 import { buildHarborRouteMarkers, harborRouteMarkerPrewarmParts } from './harbor_route_markers';
+import { highwatchGuildFlames, highwatchGuildLights } from './highwatch_guild_lights';
 import { isHighwatchRebuildBuilding } from './highwatch_town';
 import { hutSmokePrewarmParts } from './hut_smoke';
 import {
@@ -486,7 +486,7 @@ export const MUDFIN_HUT_PROP_KEYS: Readonly<Record<MudfinHutModel, PropKey>> = {
   b: 'mudfinHutB',
 };
 
-const loadedProps = new Map<string, GLTF>();
+const loadedProps = new Map<string, LoadedGltf>();
 const propLoadTasks = new Map<string, Promise<void>>();
 const ALL_PROP_KEYS = Object.keys(PROP_ASSET_DEFS) as PropKey[];
 
@@ -1435,11 +1435,11 @@ export function buildProps(
   // their own LODs; ticked from update() below, never merged or ghosted
   const transportShips: TransportShipView[] = [];
   const activeContent = getActiveWorldContent();
-  const builtInWorld = activeContent === BUILTIN_WORLD;
+  const builtInWorld = isBuiltinWorldContent(activeContent);
   const builtInShaped = isBuiltinShapedWorld(activeContent);
   // The authored-town swap is gated on the town's DATA, not on world identity,
   // so an editor copy of the built-in world gets the same art the game draws
-  // (see authored_town_gate.ts). True for BUILTIN_WORLD, so the shipped path
+  // (see authored_town_gate.ts). True for isBuiltinWorldContent, so the shipped path
   // is unchanged.
   const eastbrookTown = activeWorldHasAuthoredTown(isEastbrookRebuildBuilding);
   const fenbridgeTown = activeWorldHasAuthoredTown(isFenbridgeRebuildBuilding);
@@ -1781,6 +1781,25 @@ export function buildProps(
     }
   } else {
     clearHarborHouseShell();
+  }
+  // ...and the Highwatch adventurers' guild's hearths, lamps and belfry lantern
+  // (render/highwatch_guild_lights.ts), lit like a campfire: root-level, world-positioned,
+  // in the fire-light budget
+  if (highwatchTown) {
+    for (const light of highwatchGuildLights(seed)) {
+      group.add(light);
+      fireLights.push(light);
+    }
+    for (const fire of highwatchGuildFlames(seed, usePbr ? EMISSIVE_LIGHT : 1.4)) {
+      group.add(fire.holder);
+      flames.push(fire.flame);
+      keepLiveMeshes.add(fire.flame);
+      noShadow.add(fire.flame);
+      if (fire.core) {
+        keepLiveMeshes.add(fire.core);
+        noShadow.add(fire.core);
+      }
+    }
   }
   // ...and the Wickharbor ferry wharf at the Wickharbor berth (render/wickharbor_wharf.ts),
   // with the rest of the town's wooden harbor in the same wood (render/wickharbor_harbor.ts)
@@ -3246,10 +3265,10 @@ export function collectBuildingImpostors(seed: number): {
   instances: BuildingImpostorInstance[];
 } {
   const activeContent = getActiveWorldContent();
-  const builtInWorld = activeContent === BUILTIN_WORLD;
+  const builtInWorld = isBuiltinWorldContent(activeContent);
   // The authored-town swap is gated on the town's DATA, not on world identity,
   // so an editor copy of the built-in world gets the same art the game draws
-  // (see authored_town_gate.ts). True for BUILTIN_WORLD, so the shipped path
+  // (see authored_town_gate.ts). True for isBuiltinWorldContent, so the shipped path
   // is unchanged.
   const eastbrookTown = activeWorldHasAuthoredTown(isEastbrookRebuildBuilding);
   const fenbridgeTown = activeWorldHasAuthoredTown(isFenbridgeRebuildBuilding);

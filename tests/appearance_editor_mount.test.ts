@@ -180,4 +180,38 @@ describe('the face builder mount tells the stage when its character is chosen', 
     control<HTMLButtonElement>('.whb-panel .whb-sw:not(.sel)').click();
     expect(calls).toEqual(['change:male', 'chosen']);
   });
+
+  const share = () => control<HTMLButtonElement>('.whb-foot-share');
+  /** Paste a face code into the Share page's box and press Import. */
+  function importCode(code: string): void {
+    control<HTMLTextAreaElement>('.whb-share-code').value = code;
+    control<HTMLButtonElement>('.whb-share-btn[data-focus-key="share:import"]').click();
+  }
+
+  it('marks it on opening Share (the face close-up); pressing it again says body', () => {
+    const calls = staged({ gender: 'male' });
+    share().click();
+    expect(calls).toEqual(['focus:face', 'chosen']);
+    calls.length = 0;
+    // back to the Body Type category it was opened from
+    share().click();
+    expect(calls).toEqual(['focus:body']);
+  });
+
+  it('marks an import onto the same body like any look change', () => {
+    const calls = staged({ gender: 'female' });
+    share().click();
+    calls.length = 0;
+    importCode('WOC1; body=female; headpiercing=septum');
+    expect(calls).toEqual(['change:female', 'chosen']);
+  });
+
+  it('marks an import onto the other body type too, after the host has staged it', () => {
+    // a body type PICK is browsing, but a face loaded from a code was chosen
+    const calls = staged({ gender: 'male' });
+    share().click();
+    calls.length = 0;
+    importCode('WOC1; body=female; headpiercing=septum');
+    expect(calls).toEqual(['change:female', 'focus:face', 'chosen']);
+  });
 });

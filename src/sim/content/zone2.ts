@@ -1843,7 +1843,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     ],
     xpReward: 1200,
     copperReward: 500,
-    itemRewards: {},
+    itemRewards: { warrior: 'bastion_kite_shield' },
     requiresQuest: 'q_deacon',
     minLevel: 12,
   },

@@ -44,9 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Vildhjertebassinet',
+    desc: 'Signaturvåben fra Hugtandsherren bæstmesteren, Frådseblomsten og Zulgar.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroisk: Vildhjertebassinet',
+    desc: 'Episke genstande og smykker kun fra heroisk, fra Hugtandsherren bæstmesteren, Frådseblomsten og Zulgar, bassinets stemme.',
   },
   conquerors_nythraxis: {
     name: 'Nythraxis-raid',
@@ -146,7 +148,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_armory: {
     name: 'Krigsførelsens våbenkammer',
-    desc: 'Smykker og våben til Krigsførelse, købt for hårdt vundet ære.',
+    desc: 'Smykker, våben og varer til Krigsførelse, købt for hårdt vundet ære.',
   },
   conquerors_vanguard_gallery: {
     name: 'Fortropsgalleri',

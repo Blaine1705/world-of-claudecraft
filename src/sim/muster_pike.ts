@@ -30,11 +30,11 @@ import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
 import { equipItem } from './items';
 import { isShardpikeItem, MUSTER_PIKE_MAX_LEVEL, MUSTER_SHARDPIKE_ID } from './lance_balance_core';
+import { savedMaterialSlot } from './material_slot_load';
 import { refreshModsForEquipmentChange } from './progression/talents';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import {
-  cloneInvSlot,
   cloneItemInstancePayload,
   dist2d,
   type EquipSlot,
@@ -230,7 +230,7 @@ export function savedGearFor(meta: PlayerMeta, record: LentPikeRecord | undefine
       cloneItemInstancePayload(inst),
     ]),
   );
-  const inventory = meta.inventory.map(cloneInvSlot);
+  const inventory = meta.inventory.map(savedMaterialSlot);
   const lentWorn = Object.values(equipment).some((id) => isLentGear(id));
   const lentCarried = inventory.some((s) => isLentGear(s.itemId));
   if (!lentWorn && !lentCarried) return { equipment, equipmentInstance, inventory };

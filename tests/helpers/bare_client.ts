@@ -164,6 +164,8 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.lanceTrial = null;
   c.lanceRestRemaining = 0;
   c.lanceGuidance = null;
+  // Lantern Hall's board mirror (src/net/guild_hall_wire_state.ts): the empty board.
+  c.guildContracts = { week: '', offered: [], done: [], lifetime: 0 };
   c.delveMarks = 0;
   c.companionUpgrades = {};
   c.craftSkills = emptyCraftSkills();
@@ -203,6 +205,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.townFocus = {};
   c.nodeCooldowns = new Map();
   c.recipeList = ALL_RECIPES;
+  c.activeInstanceDungeonDifficulty = null;
   // stationPlacements is a getter on ClientWorld (it resolves the active
   // content bundle, which wraps the builtin STATIONS on shipped hosts), so
   // the bare client already reads STATIONS without an assignment here.
@@ -238,6 +241,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.activeVarkhulAssemblies = [];
   c.activeTemporalHourglasses = [];
   c.activeConsecrations = [];
+  c.activeSporeBursts = [];
   c.profanityWords = [];
   c.mouselookFacing = null;
   c.lastInputSentAt = 0;

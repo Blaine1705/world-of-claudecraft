@@ -14,6 +14,8 @@ import {
   weaponTypeForItem,
 } from '../src/sim/content/weapon_skin_rules';
 import {
+  RESERVED_WEAPON_SKIN_IDS,
+  STORE_WEAPON_SKIN_LIST,
   WEAPON_SKIN_COLLECTIONS,
   WEAPON_SKIN_LIST,
   WEAPON_SKINS,
@@ -28,7 +30,27 @@ const ROOT = join(__dirname, '..');
 
 describe('season 1 weapon skin catalog', () => {
   it('ships exactly the 29 paid skins: 7 per collection plus the Fallen Star encore', () => {
-    expect(WEAPON_SKIN_LIST.length).toBe(29);
+    expect(STORE_WEAPON_SKIN_LIST.length).toBe(29);
+    // plus five skins the store never sells: Lantern Hall's earned blade, and four elemental arms
+    // reserved for a future raid (obtainable nowhere yet), outside the store's collections
+    expect(WEAPON_SKIN_LIST.length).toBe(34);
+    expect(WEAPON_SKIN_LIST.filter((s) => s.earnedFrom).map((s) => s.id)).toEqual([
+      'lantern_hall_sword',
+      'hearthbrand_sword',
+      'squallcrest_sword',
+      'rimelight_staff',
+      'duskwick_staff',
+    ]);
+    expect(
+      WEAPON_SKIN_LIST.filter((s) => s.earnedFrom === 'lantern_hall').map((s) => s.id),
+    ).toEqual(['lantern_hall_sword']);
+    expect(RESERVED_WEAPON_SKIN_IDS).toEqual([
+      'hearthbrand_sword',
+      'squallcrest_sword',
+      'rimelight_staff',
+      'duskwick_staff',
+    ]);
+    expect(WEAPON_SKIN_COLLECTIONS).not.toContain('lantern_hall');
     for (const collection of WEAPON_SKIN_COLLECTIONS) {
       const inCollection = WEAPON_SKIN_LIST.filter((s) => s.collection === collection);
       expect(inCollection.length, collection).toBe(collection === 'fallen_star' ? 8 : 7);
@@ -491,11 +513,13 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     const { isDrawnShotCast } = await import('../src/render/characters/skin_attack');
     const { ABILITIES } = await import('../src/sim/data');
     // A DRAWN shot is the intersection the allowlist exists to name: it takes
-    // cast time (so the held pose is visible at all) and carries the classic
-    // ranged dead zone. Instant shots need no held pose, and a cast without a
-    // dead zone is a spell or a pet utility, not something a bow draws.
+    // cast time (so the held pose is visible at all) and is a hunter ability that
+    // scales with ranged attack power. Instant shots need no held pose, and a
+    // cast that does not scale off the bow (tame_beast, revive_pet) is a pet
+    // utility, not something a bow draws. (The scan keyed on the classic ranged
+    // dead zone until the v0.45 hunter pass removed every hunter minRange.)
     const candidates = Object.values(ABILITIES)
-      .filter((a) => (a.castTime ?? 0) > 0 && ((a as { minRange?: number }).minRange ?? 0) > 0)
+      .filter((a) => (a.castTime ?? 0) > 0 && a.class === 'hunter' && a.scalesWith === 'ranged')
       .map((a) => a.id);
     expect(candidates.length, 'the scan must not be vacuous').toBeGreaterThan(0);
     const unclassified = candidates.filter((id) => !isDrawnShotCast(id));

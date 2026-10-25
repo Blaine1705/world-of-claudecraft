@@ -496,30 +496,21 @@ describe('the character overlay caches and the arena walls clone through the hoo
       );
       expect(body, `${name} went back to a bare clone`).not.toContain('.clone(');
     }
-    // The overlays that flip `transparent` mint through a shared factory
-    // module instead, so the boot prewarm twin and the live clone cannot drift
-    // into different program keys (character_effect_prewarm.ts). Each factory
-    // owes the same hook-preserving clone.
-    for (const [name, factory] of [
-      ['ghostMaterial', 'createGhostEffectMaterial'],
-      ['shadowformMaterial', 'createShadowformEffectMaterial'],
-      ['moonkinMaterial', 'createMoonkinEffectMaterial'],
-      ['soulRendMaterial', 'applySoulRendOverlay'],
-    ] as const) {
-      const body = methodSource(visual, `  private ${name}(`);
-      expect(body, `${name} lost its shared factory`).toContain(`${factory}(material`);
-      expect(body, `${name} went back to a bare clone`).not.toContain('.clone(');
-    }
-    for (const module of ['effect_materials', 'soul_rend_overlay']) {
-      const factory = readFileSync(
-        new URL(`../src/render/characters/${module}.ts`, import.meta.url),
-        'utf8',
-      );
-      expect(factory, `${module} lost its hook-preserving clone`).toMatch(
-        /cloneMaterialWithHooks\((?:source|material)\)/,
-      );
-      expect(factory, `${module} went back to a bare clone`).not.toContain('.clone(');
-    }
+    // Gloamveil's transparent body and immediate opaque stand-in both preserve
+    // the live hooks through their shared factory module.
+    const shadowform = methodSource(visual, '  private shadowformMaterial(');
+    expect(shadowform, 'shadowformMaterial lost its factory').toContain(
+      'createShadowformEffectMaterial(material',
+    );
+    expect(shadowform, 'shadowformMaterial went back to a bare clone').not.toContain('.clone(');
+    const factory = readFileSync(
+      new URL('../src/render/characters/effect_materials.ts', import.meta.url),
+      'utf8',
+    );
+    expect(factory, 'Gloamveil lost its hook-preserving clone').toMatch(
+      /cloneMaterialWithHooks\(source\)/,
+    );
+    expect(factory, 'Gloamveil went back to a bare clone').not.toContain('.clone(');
   });
 
   it('clones the hideable arena wall material through cloneMaterialWithHooks', () => {

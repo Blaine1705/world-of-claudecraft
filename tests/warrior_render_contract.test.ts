@@ -11,6 +11,7 @@ import {
 } from '../src/render/characters/weapon_attack_style_core';
 import { wocAnimsUrl, wocBaseUrl } from '../src/render/characters/woc_armor_core';
 import { wocKeyedAnimsUrl } from '../src/render/characters/woc_keyed_animations';
+import { Renderer } from '../src/render/renderer';
 import {
   isMobEngageCue,
   WARRIOR_SHOUT_COLORS,
@@ -128,13 +129,15 @@ describe('winning Warrior attack animation routing', () => {
 
   it.each(['cleave', 'whirlwind', 'bladestorm', 'dawnfall'])(
     'forwards %s identity to the live spin selector',
-    async (abilityId) => {
-      const { Renderer } = await import('../src/render/renderer');
+    (abilityId) => {
       const visual = { playWhirl: vi.fn(), playAttack: vi.fn() };
       const renderer = Object.assign(Object.create(Renderer.prototype), {
         views: new Map([[7, {}]]),
         activeVisual: () => visual,
         attackTriggerCount: 0,
+        // a swing first looks up its wearer's weapon skin for a trail
+        // (weapon_skin_trail_core.ts); one not in the world wears none
+        sim: { entities: new Map() },
       });
 
       renderer.triggerAttack(7, abilityId, false, 'melee');

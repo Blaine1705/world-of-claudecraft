@@ -4,6 +4,7 @@ import { dealDamage } from '../src/sim/combat/damage';
 import { SHADOW_GUARDS } from '../src/sim/content/world_quest_shadow';
 import {
   BUILTIN_WORLD,
+  CAMPS,
   ESCORTS,
   GATHER_NODES,
   ITEMS,
@@ -240,6 +241,28 @@ describe('world quest content', () => {
           return entity.templateId === targetMobId && dx * dx + dz * dz <= quest.area.radius ** 2;
         }).length;
         expect(population, quest.id).toBeGreaterThanOrEqual(quest.count);
+        // Every spawn of the target in the zone counts, not just `count` of
+        // them: a camp (centre, spawn radius and idle wander) or a live spawn
+        // left outside the ring is a pull that dies without credit.
+        for (const camp of CAMPS) {
+          if (camp.mobId !== targetMobId) continue;
+          if (zoneAt(camp.center.x, camp.center.z).id !== quest.zoneId) continue;
+          expect(
+            Math.hypot(camp.center.x - quest.area.x, camp.center.z - quest.area.z) +
+              camp.radius +
+              MAX_WANDER_RADIUS,
+            `${quest.id}: camp at ${camp.center.x},${camp.center.z}`,
+          ).toBeLessThanOrEqual(quest.area.radius);
+        }
+        for (const entity of sim.entities.values()) {
+          if (entity.templateId !== targetMobId) continue;
+          if (zoneAt(entity.pos.x, entity.pos.z).id !== quest.zoneId) continue;
+          expect(
+            Math.hypot(entity.pos.x - quest.area.x, entity.pos.z - quest.area.z) +
+              MAX_WANDER_RADIUS,
+            `${quest.id}: ${targetMobId} spawned at ${entity.pos.x},${entity.pos.z}`,
+          ).toBeLessThanOrEqual(quest.area.radius);
+        }
       } else if (quest.objective.type === 'gather') {
         const nodeType = quest.objective.nodeType;
         const nodes = GATHER_NODES.filter((node) => {

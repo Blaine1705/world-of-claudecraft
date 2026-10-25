@@ -524,6 +524,8 @@ describe('everything a player acts on draws below the set piece veil', () => {
     'src/render/aurora_sky.ts': /depthWrite: false/,
     // screen overlays and debug lines that never test depth
     'src/render/fenbridge_town.ts': /depthTest: false/,
+    // The actionable mushroom countdown is an overhead label, not floor VFX.
+    'src/render/spore_burst_visual.ts': /depthTest: false/,
     'src/render/underwater.ts': /depthTest: false/,
     'src/render/drowned_temple/temple_dazzle_veil.ts': /depthTest: false/,
   };

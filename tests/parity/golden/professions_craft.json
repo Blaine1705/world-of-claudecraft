@@ -14,8 +14,8 @@
     "daily gate (recipe_quickening_catalyst, oncePerDay): the success stamps craftDaily and draws once",
     "daily_limit denial: returns before any draw (zero draws), stamp unchanged"
   ],
-  "draws": 4,
-  "drawDigest": "c0076677",
+  "draws": 5,
+  "drawDigest": "e601bc88",
   "frames": [
     {
       "tick": 0,
@@ -343,7 +343,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "e14ae025",
+      "state": "5c9ae327",
       "events": "90a6bb67",
       "rng": {
         "draws": 1,
@@ -423,7 +423,13 @@
             },
             {
               "count": 1,
-              "itemId": "minor_healing_potion"
+              "itemId": "minor_healing_potion",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             }
           ],
           "lastCraftResult": {
@@ -526,11 +532,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "b8de70c8",
+      "state": "3e3231fe",
       "events": "f3538006",
       "rng": {
-        "draws": 2,
-        "digest": "58bf8a9e"
+        "draws": 3,
+        "digest": "7e0fce15"
       },
       "label": "craft-masterwork",
       "players": [
@@ -622,7 +628,13 @@
             },
             {
               "count": 1,
-              "itemId": "minor_healing_potion"
+              "itemId": "minor_healing_potion",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -786,11 +798,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "ce18dbf1",
+      "state": "8f7142e8",
       "events": "90a6bb67",
       "rng": {
-        "draws": 3,
-        "digest": "7e0fce15"
+        "draws": 4,
+        "digest": "c0076677"
       },
       "label": "craft-plain-2",
       "players": [
@@ -882,7 +894,13 @@
             },
             {
               "count": 2,
-              "itemId": "minor_healing_potion"
+              "itemId": "minor_healing_potion",
+              "materialSources": [
+                {
+                  "count": 2,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -1044,11 +1062,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "bc9b45f2",
+      "state": "67541f01",
       "events": "0980d452",
       "rng": {
-        "draws": 4,
-        "digest": "c0076677"
+        "draws": 5,
+        "digest": "e601bc88"
       },
       "label": "craft-daily-stamped",
       "players": [
@@ -1151,7 +1169,13 @@
             },
             {
               "count": 2,
-              "itemId": "minor_healing_potion"
+              "itemId": "minor_healing_potion",
+              "materialSources": [
+                {
+                  "count": 2,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -1346,11 +1370,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "8fb18557",
+      "state": "2a353de2",
       "events": "80023f3f",
       "rng": {
-        "draws": 4,
-        "digest": "c0076677"
+        "draws": 5,
+        "digest": "e601bc88"
       },
       "label": "craft-daily-denied",
       "players": [
@@ -1453,7 +1477,13 @@
             },
             {
               "count": 2,
-              "itemId": "minor_healing_potion"
+              "itemId": "minor_healing_potion",
+              "materialSources": [
+                {
+                  "count": 2,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -1645,11 +1675,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "b3c84769",
+      "state": "acd31020",
       "events": "74ca92c7",
       "rng": {
-        "draws": 4,
-        "digest": "c0076677"
+        "draws": 5,
+        "digest": "e601bc88"
       },
       "label": "craft-cast-armed",
       "players": [
@@ -1752,7 +1782,13 @@
             },
             {
               "count": 2,
-              "itemId": "minor_healing_potion"
+              "itemId": "minor_healing_potion",
+              "materialSources": [
+                {
+                  "count": 2,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
@@ -1979,11 +2015,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "b3c84769",
+      "state": "acd31020",
       "events": "741638a5",
       "rng": {
-        "draws": 4,
-        "digest": "c0076677"
+        "draws": 5,
+        "digest": "e601bc88"
       },
       "label": "final",
       "players": [
@@ -2086,7 +2122,13 @@
             },
             {
               "count": 2,
-              "itemId": "minor_healing_potion"
+              "itemId": "minor_healing_potion",
+              "materialSources": [
+                {
+                  "count": 2,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,

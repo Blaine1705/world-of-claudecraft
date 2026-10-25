@@ -495,6 +495,8 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
     'zone feature glowLights, lifted to the scene root and adopted into fireLights by attachZoneFeature',
   'render/haunt_features.ts':
     'zone feature glowLights, lifted to the scene root and adopted into fireLights by attachZoneFeature',
+  'render/highwatch_guild_lights.ts':
+    'the Highwatch adventurers guild hearths, lamps and belfry lantern, pushed into the props fireLights budget beside the campfires',
   'render/ignivar_fire_vfx.ts':
     'Ignivar flame light on the model bone inside the entity view, a view light marked on reconcile',
   'render/ignivar_model_vfx.ts':
@@ -665,6 +667,8 @@ describe('every point-light producer is a carrier source', () => {
       'render/placed_assets.ts: sparks',
       'render/point_light_carriers.ts: scene',
       'render/scene_sampling.ts: this.sentinel',
+      // The sprite buddy's flame meshes step and upload their own uniforms.
+      'render/sprites_buddy_flame.ts: mesh',
       // The Sunken Bastion's Fogbeacon beam: a mesh hook turning the beam to
       // the idle sweep or to Vael's lamp yaw, never a scene.
       'render/sunken_bastion/bastion_beacon.ts: mesh',
@@ -703,6 +707,8 @@ describe('every point-light producer is a carrier source', () => {
     }
     expect(layerCalls).toEqual([]);
     expect(maskWrites.sort()).toEqual([
+      // a spirit veil's depth sibling copies its body mesh's mask
+      'render/characters/ghost_veil.ts',
       'render/characters/makeup.ts',
       'render/characters/rig_merge.ts',
       'render/characters/stubble.ts',

@@ -234,6 +234,53 @@ describe('referral game host', () => {
     });
     expect(h.card().status).toBe('active');
   });
+  it('explains unbound accounts only when new characters accept an invite together', async () => {
+    const h = setup();
+    await flush();
+    h.store.pairs = vi.fn(async () => []);
+    const reasons = (id: number) =>
+      (h.frames.get(id)?.notices ?? []).filter(
+        (n) => n.type === 'reason' && n.reason === 'newAccountsOnly',
+      ).length;
+    const participants = () => h.context.characters.map((c, i) => ({ ...c, pid: i + 1 }));
+    // Leaving, disbanding and finder grouping report party changes without an invite.
+    h.service.observe({ type: 'referralEvidence', kind: 'party', participants: participants() });
+    await flush();
+    expect([reasons(100), reasons(200)]).toEqual([0, 0]);
+    // A character past the start rules could never start a card, so stays silent.
+    h.context.characters[1].level = 5;
+    h.service.observe({
+      type: 'referralEvidence',
+      kind: 'party',
+      participants: participants(),
+      invited: true,
+    });
+    await flush();
+    expect([reasons(100), reasons(200)]).toEqual([0, 0]);
+    h.context.characters[1].level = 1;
+    h.service.observe({
+      type: 'referralEvidence',
+      kind: 'party',
+      participants: participants(),
+      invited: true,
+    });
+    await flush();
+    expect([reasons(100), reasons(200)]).toEqual([1, 1]);
+  });
+  it('does not explain unbound accounts to bound friends who accept an invite', async () => {
+    const h = setup();
+    await flush();
+    h.card().status = 'active';
+    h.service.observe({
+      type: 'referralEvidence',
+      kind: 'party',
+      participants: h.context.characters.map((c, i) => ({ ...c, pid: i + 1 })),
+      invited: true,
+    });
+    await flush();
+    for (const id of [100, 200])
+      expect(h.frames.get(id)?.notices.some((n) => n.type === 'reason')).toBeFalsy();
+  });
   it('does not trust a client invented link or permit foreign revision acceptance', async () => {
     const h = setup();
     await flush();
