@@ -11,28 +11,34 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.dungeonDifficulty.unappliedHeroic",
-    "hudChrome.dungeonDifficulty.unappliedNormal"
+    "hudChrome.dungeonDifficulty.unappliedNormal",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "es_ES": [
     "hudChrome.dungeonDifficulty.unappliedHeroic",
-    "hudChrome.dungeonDifficulty.unappliedNormal"
+    "hudChrome.dungeonDifficulty.unappliedNormal",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "fr_FR": [
     "hudChrome.dungeonDifficulty.unappliedHeroic",
-    "hudChrome.dungeonDifficulty.unappliedNormal"
+    "hudChrome.dungeonDifficulty.unappliedNormal",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "fr_CA": [
     "hudChrome.dungeonDifficulty.unappliedHeroic",
-    "hudChrome.dungeonDifficulty.unappliedNormal"
+    "hudChrome.dungeonDifficulty.unappliedNormal",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "en_CA": [],
   "it_IT": [
     "hudChrome.dungeonDifficulty.unappliedHeroic",
-    "hudChrome.dungeonDifficulty.unappliedNormal"
+    "hudChrome.dungeonDifficulty.unappliedNormal",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "de_DE": [
     "hudChrome.dungeonDifficulty.unappliedHeroic",
-    "hudChrome.dungeonDifficulty.unappliedNormal"
+    "hudChrome.dungeonDifficulty.unappliedNormal",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -40,39 +46,48 @@ export const pending: Record<string, readonly string[]> = {
   "ja_JP": [],
   "pt_BR": [
     "hudChrome.dungeonDifficulty.unappliedHeroic",
-    "hudChrome.dungeonDifficulty.unappliedNormal"
+    "hudChrome.dungeonDifficulty.unappliedNormal",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "hudChrome.dungeonDifficulty.unappliedHeroic",
-    "hudChrome.dungeonDifficulty.unappliedNormal"
+    "hudChrome.dungeonDifficulty.unappliedNormal",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "nl_NL": [
     "hudChrome.dungeonDifficulty.unappliedHeroic",
-    "hudChrome.dungeonDifficulty.unappliedNormal"
+    "hudChrome.dungeonDifficulty.unappliedNormal",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "pl_PL": [
     "hudChrome.dungeonDifficulty.unappliedHeroic",
-    "hudChrome.dungeonDifficulty.unappliedNormal"
+    "hudChrome.dungeonDifficulty.unappliedNormal",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "id_ID": [
     "hudChrome.dungeonDifficulty.unappliedHeroic",
-    "hudChrome.dungeonDifficulty.unappliedNormal"
+    "hudChrome.dungeonDifficulty.unappliedNormal",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "tr_TR": [
     "hudChrome.dungeonDifficulty.unappliedHeroic",
-    "hudChrome.dungeonDifficulty.unappliedNormal"
+    "hudChrome.dungeonDifficulty.unappliedNormal",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "sv_SE": [
     "hudChrome.dungeonDifficulty.unappliedHeroic",
-    "hudChrome.dungeonDifficulty.unappliedNormal"
+    "hudChrome.dungeonDifficulty.unappliedNormal",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "vi_VN": [
     "hudChrome.dungeonDifficulty.unappliedHeroic",
-    "hudChrome.dungeonDifficulty.unappliedNormal"
+    "hudChrome.dungeonDifficulty.unappliedNormal",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ],
   "da_DK": [
     "hudChrome.dungeonDifficulty.unappliedHeroic",
-    "hudChrome.dungeonDifficulty.unappliedNormal"
+    "hudChrome.dungeonDifficulty.unappliedNormal",
+    "hudChrome.reliquary.sourceActivityWeeklyVaultPvp"
   ]
 };

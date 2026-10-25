@@ -7432,6 +7432,7 @@ export const ru_RU: EnTranslations = {
       "sourceActivityRiftFirstClear": "Вручается каждому участнику группы, первой прошедшей ранговый разлом",
       "sourceActivityBuriedHoard": "Находится в наградном сундуке зарытого клада, к которому ведёт карта сокровищ",
       "sourceActivityLanternHall": "Покупается за печати Фонаря у интенданта Зала Фонаря",
+      "sourceActivityWeeklyVaultPvp": "Выбирается из PvP-ряда Еженедельного хранилища",
       "cellMissingSourceAria": "{name}, ещё не найдено, {source}",
       "cellOwnedClearsAria": "{name}, каталогизировано, впервые найдено на прохождении {count}",
       "searchPlaceholder": "Поиск реликвий",

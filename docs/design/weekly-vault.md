@@ -47,6 +47,10 @@ content and equipment tiers:
   minutes in total, and is still in that group when it falls
   (`docs/design/warfare.md`, King of the Hill). The row reads "PvP Wins" for
   that reason.
+  The row pays Warfare Season 2 ("Vanguard") and nothing else: the
+  character's own three spec sets and the season weapons it can wield. The
+  Warfare entry tier is not in the row; it stays an honor purchase, and Season 2
+  is sold for honor too (`docs/design/warfare-season-2.md`).
 
 The window shows actual candidates with quality, item level and tooltips; current
 progress and exact eligible loot pools remain below. New rolls exclude every item

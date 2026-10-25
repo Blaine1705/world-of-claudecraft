@@ -7432,6 +7432,7 @@ export const it_IT: EnTranslations = {
       "sourceActivityRiftFirstClear": "Assegnata a ogni membro del gruppo che ottiene la prima conquista di uno Squarcio classificato",
       "sourceActivityBuriedHoard": "Trovato nel forziere del premio di un Tesoro Sepolto, il caveau a cui una mappa del tesoro conduce",
       "sourceActivityLanternHall": "Acquistato con Sigilli della Lanterna dal quartiermastro della Sala della Lanterna",
+      "sourceActivityWeeklyVaultPvp": "Chosen from the PvP row of the Weekly Vault",
       "cellMissingSourceAria": "{name}, non ancora trovata, {source}",
       "cellOwnedClearsAria": "{name}, catalogata, trovata per la prima volta alla conquista {count}",
       "searchPlaceholder": "Cerca reliquie",

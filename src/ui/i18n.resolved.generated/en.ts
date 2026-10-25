@@ -7432,6 +7432,7 @@ export const en: EnTranslations = {
       "sourceActivityRiftFirstClear": "Awarded to every member of the party that wins a ranked Rift's first clear",
       "sourceActivityBuriedHoard": "Found in the reward chest of a Buried Hoard, the vault a treasure map leads to",
       "sourceActivityLanternHall": "Bought for Lantern Seals from Lantern Hall's quartermaster",
+      "sourceActivityWeeklyVaultPvp": "Chosen from the PvP row of the Weekly Vault",
       "cellMissingSourceAria": "{name}, not yet found, {source}",
       "cellOwnedClearsAria": "{name}, catalogued, first found on clear {count}",
       "searchPlaceholder": "Search relics",
