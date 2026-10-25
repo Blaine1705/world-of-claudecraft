@@ -557,51 +557,55 @@ def wind_bridge(bpy):
 
     D = deck(X)
     # The wind-eye under the middle: from leg to leg, its crown some yards
-    # under the deck, a pointed arch a little off centre.
+    # under the deck, a pointed arch a little off centre, its soffit rugged.
     a0, a1 = 8.0, L - 7.0
     mid = (a0 + a1) / 2 + 1.5
     half = (a1 - a0) / 2
     u = np.clip((X - mid) / half, -1.0, 1.0)
     crown = float(deck(mid)) - 7.5
     intrados = -50.0 + (crown + 50.0) * np.sqrt(np.maximum(0.0, 1.0 - u ** 2)) ** 0.7
+    intrados = intrados - 1.6 * nf.fbm(X * 0.12, Y * 0.12, 3.0, 2)
     inside_span = (X > a0) & (X < a1)
     # The rib's width: the walk's own at the top and a little past it, the
-    # flanks battered outward as they fall, wider still at the legs.
+    # granite's beds stepping out one after another as they fall (each bed
+    # its own shoulder, a lit ledge on top, a shadowed drip under), wider
+    # still and flaring at the legs.
     depth_under = D - Z
-    width = (BRIDGE_HALF + 0.6 + np.minimum(depth_under, 18.0) * 0.1
-             + np.maximum(0.0, depth_under - 18.0) * 0.05)
-    width = width + np.where(inside_span, 0.0, 2.5) + 0.9 * nf.fbm(X * 0.04, Z * 0.05, 0.0, 2)
+    BED = 5.5
+    q = np.maximum(0.0, depth_under) / BED
+    step = np.floor(q) + np.clip((q - np.floor(q) - 0.82) / 0.18, 0.0, 1.0)
+    bed_out = 0.55 * nf.fbm(np.floor(q) * 3.1, X * 0.035, 7.0, 2)
+    width = BRIDGE_HALF + 0.6 + step * 0.62 + bed_out
+    into = np.minimum(X - a0, a1 - X)
+    legw = 1.0 - np.clip(into / 6.0, 0.0, 1.0) ** 2 * (3.0 - 2.0 * np.clip(into / 6.0, 0.0, 1.0))
+    leg = legw * (2.2 + np.maximum(0.0, depth_under - 10.0) * 0.07)
+    width = width + leg + 0.5 * nf.fbm(X * 0.05, Z * 0.05, 0.0, 2)
     side = np.abs(Y) - width
     top = Z - (D - 0.35)
     bottom = np.where(inside_span, intrados - Z, -50.0 - Z)
-    ends = np.maximum(-X - 10.0, X - (L + 10.0))
+    # The legs' far ends rough and battered back into the mountain.
+    rough = 2.5 * nf.fbm(Y * 0.12, Z * 0.08, 11.0, 2) + np.maximum(0.0, depth_under) * 0.05
+    ends = np.maximum(-X - 10.0 - rough, X - (L + 10.0) - rough)
     body = np.maximum(np.maximum(side * 0.8, top), np.maximum(bottom, ends))
     f.d = np.minimum(f.d, body.astype(np.float32))
-    f.parts.append(('g0', RoundBox(((lo[0] + hi[0]) / 2, 0.0, -12.0), (44.0, 9.0, 40.0), 1.0)))
-    # The beds: ledges stepping along both flanks, a deeper parting under
-    # each, at a fixed lift (the mountain's own beds).
-    for zb in np.arange(-44.0, BRIDGE_RISE - 2.0, 6.0):
-        for s in (-1, 1):
-            pts = [(x, s * (BRIDGE_HALF + 6.0), zb + 0.5 * math.sin(x * 0.09 + s)) for x in np.linspace(-8, L + 8, 20)]
-            on = []
-            for q in pts:
-                if q[2] < float(deck(q[0])) - 1.2:
-                    on.append(q)
-            if len(on) > 2:
-                _carve(f, on, 0.45, 0.22)
-    # Great spalls broken out of its flanks.
-    for j in range(7):
-        sx = float(rng.uniform(2.0, L - 2.0))
+    # The beds' tones (each band of the rib its own grey).
+    for k, zb in enumerate(np.arange(-50.0, BRIDGE_RISE + 2.0, 5.5)):
+        f.parts.append((('g0', 'g1', 'g4', 'g5', 'g3', 'g0')[k % 6],
+                        RoundBox(((lo[0] + hi[0]) / 2, 0.0, zb + 2.75), (60.0, 16.0, 2.75), 0.2)))
+    # A few spalls broken out of its flanks.
+    for j in range(5):
+        sx = float(rng.uniform(4.0, L - 4.0))
         s = -1.0 if j % 2 else 1.0
-        zc = float(deck(sx)) - float(rng.uniform(5.0, 22.0))
-        f.sub(Ellipsoid((sx, s * (BRIDGE_HALF + 4.0), zc), (float(rng.uniform(2.6, 4.2)), 2.4,
-                                                              float(rng.uniform(1.4, 2.6))), rot(rz=float(rng.uniform(-0.3, 0.3)))), 0.4)
+        zc = float(deck(sx)) - float(rng.uniform(6.0, 20.0))
+        f.sub(Ellipsoid((sx, s * (BRIDGE_HALF + 3.6), zc), (float(rng.uniform(2.0, 3.2)), 1.6,
+                                                              float(rng.uniform(1.1, 1.9))),
+                        rot(rz=float(rng.uniform(-0.3, 0.3)))), 0.4)
     _scour(f, 5401, amp=0.45, scale=0.07, band=1.4, along=(1.0, 0.0, 0.0), flutes=0.0)
     # Nothing over the deck within the walk.
     X, Y, Z = _axes(f)
     _clamp(f, np.where(np.abs(Y) < BRIDGE_HALF + 0.05, Z - (deck(X) - 0.3), -50.0))
     f.cut_below(-50.0)
-    _mesh(bpy, p, f, 'WindBridge', 9000)
+    _mesh(bpy, p, f, 'WindBridge', 12000)
     return p
 
 

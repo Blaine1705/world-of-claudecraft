@@ -216,7 +216,7 @@ describe('Smith Heart Breath kit: the piece list and the shipped GLB', () => {
       const cap = /Crack|Scar|Groove|Wall/.test(name)
         ? 1200
         : name === 'Kit_WindBridge'
-          ? 9500
+          ? 12500
           : 5000;
       expect(s.triangles, name).toBeLessThanOrEqual(cap);
       total += s.triangles;
