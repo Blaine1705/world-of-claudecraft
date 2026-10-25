@@ -202,6 +202,15 @@ function isFighting(mob: Entity): boolean {
   return isEngaged(mob) && mob.aiState !== 'evade';
 }
 
+/** Is the gate's sealing fight engaged: its boss, or any further body of it
+ *  (DungeonGateDef.sealWithBodies)? */
+function sealFightEngaged(ctx: SimContext, inst: InstanceSlot, gate: DungeonGateDef): boolean {
+  if (!gate.sealWhileEngaged) return false;
+  if (bossEngaged(ctx, inst, gate.sealWhileEngaged)) return true;
+  for (const id of gate.sealWithBodies ?? []) if (bossEngaged(ctx, inst, id)) return true;
+  return false;
+}
+
 function bossEngaged(ctx: SimContext, inst: InstanceSlot, templateId: string): boolean {
   const index = indexFor(DUNGEONS[inst.dungeonId]);
   for (const i of index.byTemplate.get(templateId) ?? []) {
@@ -271,7 +280,7 @@ function gateState(
   }
   if (
     gate.sealWhileEngaged &&
-    bossEngaged(ctx, inst, gate.sealWhileEngaged) &&
+    sealFightEngaged(ctx, inst, gate) &&
     sealLanded(ctx, entity === undefined ? dungeonGateEntity(ctx, inst, gate) : entity)
   ) {
     return 'sealed';
@@ -368,7 +377,13 @@ function tickBossSeal(
   }
   // Landed on an earlier tick: from here it only holds or lifts.
   const landed = at !== undefined && now > at;
-  const roster = indexFor(DUNGEONS[inst.dungeonId]).byTemplate.get(bossId) ?? [];
+  // The boss's bodies, and the further bodies of its fight its gates name.
+  const index = indexFor(DUNGEONS[inst.dungeonId]);
+  let roster = index.byTemplate.get(bossId) ?? [];
+  for (const gate of gates) {
+    if (gate.sealWhileEngaged !== bossId || !gate.sealWithBodies) continue;
+    for (const id of gate.sealWithBodies) roster = roster.concat(index.byTemplate.get(id) ?? []);
+  }
   // Is the boss engaged, and is it fighting? Asked first and alone: a boss
   // standing idle in its room (every boss of every claim, nearly every tick)
   // costs these two flags and nothing more.
@@ -476,6 +491,7 @@ export function dungeonGateBossIds(dungeon: DungeonDef): string[] {
   for (const g of dungeon.gates ?? []) {
     for (const b of g.bosses ?? []) out.add(b);
     if (g.sealWhileEngaged) out.add(g.sealWhileEngaged);
+    for (const b of g.sealWithBodies ?? []) out.add(b);
   }
   return [...out].filter((id) => MOBS[id] !== undefined);
 }

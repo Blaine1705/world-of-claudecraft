@@ -13,6 +13,7 @@ import {
   QUARRY_PILLAR_R,
   QUARRY_PILLAR_SPOTS,
 } from '../src/sim/content/smith_heart_layout';
+import { DUNGEONS } from '../src/sim/data';
 import {
   COUNCIL_AURAS,
   COUNCIL_CASTS,
@@ -461,6 +462,33 @@ describe('Hammer Council: the Slab and the seal wait on all three', () => {
     f.tick();
     expect(dungeonGateState(f.sim.ctx, f.inst, slab)).toBe('open');
     expect(smithHeartProgress(f.sim.ctx, f.inst).slabOpen).toBe(true);
+  });
+});
+
+describe('Hammer Council: the Pit Mouth', () => {
+  it('stays sealed while any of the three fights, whichever falls first', () => {
+    const f = councilFight(2);
+    const mouth = SMITH_HEART_GATES.find((g) => g.id === 'hammer_pit_mouth');
+    if (!mouth) throw new Error('mouth');
+    // The Gallery's packs down, so only the fight holds the mouth.
+    const spawns = DUNGEONS.smith_heart.spawns;
+    spawns.forEach((s, i) => {
+      if (!['h1', 'h2', 'h3'].includes(s.packId ?? '')) return;
+      const m = f.sim.ctx.entities.get(f.inst.mobIds[i]) as Entity;
+      m.hp = 0;
+      m.dead = true;
+      m.aiState = 'dead';
+    });
+    f.dev('/dev heart council pull');
+    f.tick(20 * 12);
+    expect(dungeonGateState(f.sim.ctx, f.inst, mouth)).toBe('sealed');
+    f.sim.ctx.handleDeath(f.bodies().guardian as Entity, f.players[0]);
+    f.tick(20);
+    expect(dungeonGateState(f.sim.ctx, f.inst, mouth)).toBe('sealed');
+    f.sim.ctx.handleDeath(f.bodies().slabwright as Entity, f.players[0]);
+    f.sim.ctx.handleDeath(f.bodies().singer as Entity, f.players[0]);
+    f.tick(2);
+    expect(dungeonGateState(f.sim.ctx, f.inst, mouth)).toBe('open');
   });
 });
 

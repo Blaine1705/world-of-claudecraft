@@ -6033,6 +6033,10 @@ export interface DungeonGateDef {
    *  engaged: BOSS_ROOM_SEAL_DELAY_SECONDS into the fight, or at once if the
    *  boss reaches the doorway first (instances/dungeon_gates.ts). */
   sealWhileEngaged?: string;
+  /** Further bodies of the same fight (templates) whose engagement holds the
+   *  seal too: a boss of several bodies (the Smith's Heart's Hammer Council)
+   *  keeps its room sealed while ANY of them fights, whichever falls first. */
+  sealWithBodies?: readonly string[];
   /** English log line when the gate first opens (sim_i18n EXACT map). */
   openText?: string;
 }

@@ -551,6 +551,8 @@ export const SMITH_HEART_GATES: DungeonGateDef[] = [
     rot: across(19, 18),
     packs: [...SMITH_HEART_PACKS.hammer],
     sealWhileEngaged: SMITH_HEART_GUARDIANS.hammer,
+    // The Hammer Council: sealed while any of the three fights.
+    sealWithBodies: ['heart_slabwright', 'heart_seam_singer'],
   },
   {
     id: 'the_slab',
