@@ -74,6 +74,11 @@ export const FIELD_GROUND_COLORS: Readonly<Record<FieldGround, Rgb>> = {
   // The Breath's summit (phase 2G): pale granite bedrock scoured by the
   // storm, a cool grey a value over the quarry's.
   scoured: [0.4, 0.405, 0.415],
+  // The Quench (phase 2H): Stormcrag granite gone pale and blue under the
+  // frost, snow drifted over it; and the Frozen Lake's clear ice, a cold
+  // blue the lake shader deepens to dark water.
+  rime: [0.36, 0.395, 0.45],
+  lake_ice: [0.36, 0.5, 0.62],
 };
 
 /** The texture families a walkable top draws with (one mesh each). */
@@ -90,6 +95,8 @@ export const FIELD_TOP_FAMILIES = [
   'quarry',
   'paving',
   'scoured',
+  'rime',
+  'lake_ice',
 ] as const;
 export type FieldTopFamily = (typeof FIELD_TOP_FAMILIES)[number];
 
@@ -104,6 +111,10 @@ export function fieldFamilyUvScale(family: FieldTopFamily): number {
   if (family === 'paving') return 1 / 10;
   // The scoured bedrock's slabs are several yards across: one tile every 14.
   if (family === 'scoured') return 1 / 14;
+  // The Quench's frost-cracked slabs, a few yards across: one tile every 12.
+  if (family === 'rime') return 1 / 12;
+  // The lake's cracks and bubble streams run long: one tile every 18.
+  if (family === 'lake_ice') return 1 / 18;
   return 0.25;
 }
 
@@ -118,6 +129,8 @@ export function fieldGroundFamily(ground: FieldGround): FieldTopFamily {
   if (ground === 'quarry') return 'quarry';
   if (ground === 'paving') return 'paving';
   if (ground === 'scoured') return 'scoured';
+  if (ground === 'rime') return 'rime';
+  if (ground === 'lake_ice') return 'lake_ice';
   if (ground === 'plate') return 'plate';
   if (ground === 'grating') return 'grating';
   return ground === 'earth' ||
@@ -429,6 +442,8 @@ export function topColor(ground: FieldGround, x: number, z: number, onPath: bool
   if (ground === 'quarry') return quarryColor(base, k, patch, dirt);
   if (ground === 'paving') return pavingColor(base, k, patch, dirt);
   if (ground === 'scoured') return scouredColor(base, k, x, z, patch);
+  if (ground === 'rime') return rimeColor(base, k, x, z, onPath);
+  if (ground === 'lake_ice') return lakeIceColor(base, x, z);
   const r = base[0] * k * (1 - moss * 0.35) * (1 - dirt * 0.25) + dirt * 0.05;
   const g = base[1] * k * (1 - moss * 0.05) * (1 - dirt * 0.3) + dirt * 0.035;
   const b = base[2] * k * (1 - moss * 0.3) * (1 - dirt * 0.45) + dirt * 0.02;
@@ -481,6 +496,38 @@ function scouredColor(base: Rgb, k: number, x: number, z: number, patch: number)
     base[1] * t + lichen * 0.015,
     base[2] * t * (1 + wet * 0.12) - lichen * 0.01,
   ];
+}
+
+/** The Quench's frost-bound granite (phase 2H): a pale cold blue-grey in
+ *  broad drifts, snow lying in long soft drifts over it (whiter, a cold blue
+ *  in their hollows), thinned where the walk is trodden; never one flat
+ *  colour, never the Gravewyrm's slate. */
+function rimeColor(base: Rgb, k: number, x: number, z: number, onPath: boolean): Rgb {
+  const drift = Math.max(0, fieldNoise(x * 0.045 + 17, z * 0.045 - 23, 3) - 0.56) * 2.6;
+  const powder = Math.max(0, fieldNoise(x * 0.15 - 4, z * 0.15 + 9, 2) - 0.64) * 1.8;
+  const snow = Math.min(1, (drift + powder * 0.5) * (onPath ? 0.5 : 1));
+  const t = k * 0.86;
+  const hollow = Math.max(0, 0.45 - fieldNoise(x * 0.09 + 3, z * 0.09 - 8, 2)) * 1.4;
+  const rock: Rgb = [
+    base[0] * t * (1 - hollow * 0.12),
+    base[1] * t,
+    base[2] * t * (1 + hollow * 0.06),
+  ];
+  const w = snow * 0.8;
+  return [
+    rock[0] + (0.74 - rock[0]) * w,
+    rock[1] + (0.8 - rock[1]) * w,
+    rock[2] + (0.88 - rock[2]) * w,
+  ];
+}
+
+/** The Frozen Lake's ice (phase 2H): a cold blue, darker where the ice is
+ *  clear over deep water, paler where it clouds; the lake shader
+ *  (smith_heart/quench_lake_ice.ts) draws its depth, bubbles and edge snow. */
+function lakeIceColor(base: Rgb, x: number, z: number): Rgb {
+  const cloud = fieldNoise(x * 0.04 + 41, z * 0.04 - 7, 3);
+  const k = 0.82 + cloud * 0.36;
+  return [base[0] * k, base[1] * k, base[2] * k];
 }
 
 /** Jungle moss: bright sunlit cushions, darker damp loam showing through,
@@ -605,6 +652,8 @@ export function planFieldTops(
     quarry: { positions: [], colors: [], uvs: [], indices: [] },
     paving: { positions: [], colors: [], uvs: [], indices: [] },
     scoured: { positions: [], colors: [], uvs: [], indices: [] },
+    rime: { positions: [], colors: [], uvs: [], indices: [] },
+    lake_ice: { positions: [], colors: [], uvs: [], indices: [] },
   };
   const clippers = laterClippers(def, opts.omit);
   def.surfaces.forEach((s, layer) => {

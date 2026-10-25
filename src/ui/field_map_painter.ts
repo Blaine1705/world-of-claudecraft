@@ -50,6 +50,8 @@ const FIELD_MAP_TOKENS = {
   quarry: '--color-field-map-quarry',
   paving: '--color-field-map-paving',
   scoured: '--color-field-map-scoured',
+  rime: '--color-field-map-rime',
+  lake_ice: '--color-field-map-lake-ice',
   crevasse: '--color-field-map-crevasse',
   crevasseDeep: '--color-field-map-crevasse-deep',
   wall: '--color-field-map-wall',

@@ -682,7 +682,7 @@ const paintGlacierWall: Painter = (h, size, rnd) => {
   }
 };
 
-interface DetailPair {
+export interface DetailPair {
   map: THREE.CanvasTexture;
   normalMap: THREE.CanvasTexture;
 }
@@ -1228,6 +1228,193 @@ const paintScoured: ColorPainter = (h, rgb, size, rnd) => {
     }
   }
 };
+
+/** The Quench's frost-bound granite (phase 2H), one tile = 12 yd: the
+ *  mountain's bedrock split by the freeze into slabs (a jittered lattice's
+ *  cells, about two to four yards), each its own cool tone and tipped a
+ *  hair, parted by joints packed with rime (a pale seam round a thin dark
+ *  core: the frost lights the cracks, never darkens them); a few long frost
+ *  cracks run on across the slabs, a pale hoar film lies in soft mottles,
+ *  cold blue in the low hollows. Broad relief only. */
+const paintRime: ColorPainter = (h, rgb, size, rnd) => {
+  const cells = 5;
+  const pts: [number, number][] = [];
+  for (let j = 0; j < cells; j++)
+    for (let i = 0; i < cells; i++)
+      pts.push([
+        ((i + 0.15 + rnd() * 0.7) / cells) * size,
+        ((j + 0.15 + rnd() * 0.7) / cells) * size,
+      ]);
+  const tones = pts.map(() => 0.82 + rnd() * 0.24);
+  const blue = pts.map(() => rnd() < 0.4);
+  const tilt = pts.map(() => [(rnd() - 0.5) * 0.3, (rnd() - 0.5) * 0.3] as const);
+  const mottle = noiseField(size, rnd, 6);
+  const hoar = noiseField(size, rnd, 9);
+  const grain = noiseField(size, rnd, 40);
+  const wobble = noiseField(size, rnd, 12);
+  const longCracks: { x: number; y: number; a: number; bend: number; len: number }[] = [];
+  for (let k = 0; k < 5; k++)
+    longCracks.push({
+      x: rnd() * size,
+      y: rnd() * size,
+      a: rnd() * Math.PI,
+      bend: (rnd() - 0.5) * 0.006,
+      len: size * (0.3 + rnd() * 0.4),
+    });
+  const crackMask = new Float32Array(size * size);
+  for (const c of longCracks) {
+    let x = c.x;
+    let y = c.y;
+    let a = c.a;
+    for (let s = 0; s < c.len; s += 0.7) {
+      a += c.bend + (wobble[wrapAt(x, y, size)] - 0.5) * 0.03;
+      x += Math.cos(a) * 0.7;
+      y += Math.sin(a) * 0.7;
+      for (let d = -2; d <= 2; d++) {
+        const i = wrapAt(x - Math.sin(a) * d, y + Math.cos(a) * d, size);
+        crackMask[i] = Math.max(crackMask[i], d === 0 ? 1 : Math.abs(d) === 1 ? 0.6 : 0.25);
+      }
+    }
+  }
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const i = y * size + x;
+      let d1 = 1e9;
+      let d2 = 1e9;
+      let best = 0;
+      const jx = x + (wobble[i] - 0.5) * 9;
+      const jy = y + (wobble[(i + 131) % (size * size)] - 0.5) * 9;
+      for (let k = 0; k < pts.length; k++) {
+        for (let oy = -1; oy <= 1; oy++) {
+          for (let ox = -1; ox <= 1; ox++) {
+            const dx = jx - (pts[k][0] + ox * size);
+            const dy = jy - (pts[k][1] + oy * size);
+            const d = dx * dx + dy * dy;
+            if (d < d1) {
+              d2 = d1;
+              d1 = d;
+              best = k;
+            } else if (d < d2) d2 = d;
+          }
+        }
+      }
+      const edge = Math.sqrt(d2) - Math.sqrt(d1);
+      const u = (jx - pts[best][0]) / size;
+      const v = (jy - pts[best][1]) / size;
+      let hv = 0.6 + u * tilt[best][0] * 4 + v * tilt[best][1] * 4 + (mottle[i] - 0.5) * 0.12;
+      const c = tones[best] * (0.92 + mottle[i] * 0.14 + (grain[i] - 0.5) * 0.05);
+      const hue: [number, number, number] = blue[best] ? [0.95, 0.99, 1.06] : [1.0, 1.0, 1.02];
+      let cr = c * hue[0];
+      let cg = c * hue[1];
+      let cb = c * hue[2];
+      // The joint: a worn shoulder sinking to it, rime packed in it (a pale
+      // seam) round a thin dark core.
+      if (edge < 6) hv -= ((6 - edge) / 6) ** 1.8 * 0.28;
+      if (edge < 3.2) {
+        const t = 1 - edge / 3.2;
+        cr += (1.35 - cr) * t * 0.75;
+        cg += (1.42 - cg) * t * 0.75;
+        cb += (1.5 - cb) * t * 0.75;
+      }
+      if (edge < 0.9) {
+        cr = 0.42;
+        cg = 0.47;
+        cb = 0.56;
+        hv = 0.1;
+      }
+      const cm = crackMask[i];
+      if (cm > 0 && edge > 2) {
+        const pale = cm < 0.9 ? cm * 0.55 : 0;
+        cr = cr * (1 - cm * 0.35) + pale * 1.3;
+        cg = cg * (1 - cm * 0.33) + pale * 1.36;
+        cb = cb * (1 - cm * 0.28) + pale * 1.45;
+        hv -= cm * 0.16;
+      }
+      // The hoar film: a pale bloom in soft mottles over the slabs.
+      const hr = Math.max(0, hoar[i] - 0.56) * 2.2;
+      cr += (1.32 - cr) * hr * 0.5;
+      cg += (1.38 - cg) * hr * 0.5;
+      cb += (1.46 - cb) * hr * 0.5;
+      // Cold blue in the low hollows.
+      const low = Math.max(0, 0.36 - mottle[i]) * 1.4;
+      cr *= 1 - low * 0.22;
+      cg *= 1 - low * 0.14;
+      cb *= 1 - low * 0.04;
+      h[i] = hv;
+      rgb[i * 3] = cr;
+      rgb[i * 3 + 1] = cg;
+      rgb[i * 3 + 2] = cb;
+    }
+  }
+};
+
+/** The Quench's frost-bound granite (one tile = 12 yd: the family's UV scale). */
+export function rimeDetail(): DetailPair {
+  return bakeColored('rime', paintRime, 0x7e1c, 512, 2.2, 1);
+}
+
+/** The Frozen Lake's surface (phase 2H), one tile = 18 yd: clear lake ice
+ *  under a skin of frost. Long pressure cracks wander across it (a white
+ *  frosted seam round a dark core), shorter hairlines branch off them, the
+ *  wind lays powder in soft streaks and the ice clouds paler in broad
+ *  patches; everywhere else it stays dark and clear, so the lake shader's
+ *  depth (the water, the bubbles, the deep cracks) shows through. Low
+ *  relief: a polished floor, still readable under every telegraph. */
+const paintLakeIce: ColorPainter = (h, rgb, size, rnd) => {
+  const cloud = noiseField(size, rnd, 5);
+  const streak = noiseField(size, rnd, 10);
+  const wobble = noiseField(size, rnd, 14);
+  for (let i = 0; i < size * size; i++) {
+    h[i] = 0.5 + (cloud[i] - 0.5) * 0.12;
+    const c = 0.62 + (cloud[i] - 0.5) * 0.36;
+    rgb[i * 3] = c * 0.96;
+    rgb[i * 3 + 1] = c;
+    rgb[i * 3 + 2] = c * 1.04;
+  }
+  const mark = (x: number, y: number, w: number, tone: number, dh: number) => {
+    const i = wrapAt(x, y, size);
+    rgb[i * 3] += (tone * 1.3 - rgb[i * 3]) * w;
+    rgb[i * 3 + 1] += (tone * 1.4 - rgb[i * 3 + 1]) * w;
+    rgb[i * 3 + 2] += (tone * 1.5 - rgb[i * 3 + 2]) * w;
+    h[i] += dh * w;
+  };
+  // The pressure cracks: long slow arcs, a frosted seam round a dark core,
+  // hairlines branching off them.
+  const crack = (x0: number, y0: number, a0: number, len: number, wide: number, depth: number) => {
+    let x = x0;
+    let y = y0;
+    let a = a0;
+    for (let s = 0; s < len; s += 0.8) {
+      a += (wobble[wrapAt(x, y, size)] - 0.5) * 0.12;
+      x += Math.cos(a) * 0.8;
+      y += Math.sin(a) * 0.8;
+      const fade = 1 - s / len;
+      for (let d = -wide; d <= wide; d++) {
+        const k = 1 - Math.abs(d) / (wide + 1);
+        mark(x - Math.sin(a) * d, y + Math.cos(a) * d, k * 0.55 * (0.5 + fade * 0.5), 1, 0.05);
+      }
+      mark(x, y, 0.9, 0.18, -0.2);
+      if (depth < 2 && rnd() < 0.025)
+        crack(x, y, a + (rnd() < 0.5 ? 1 : -1) * (0.5 + rnd()), len * 0.3, 1, depth + 1);
+    }
+  };
+  for (let k = 0; k < 3; k++)
+    crack(rnd() * size, rnd() * size, rnd() * Math.PI * 2, size * (0.5 + rnd() * 0.5), 1, 0);
+  for (let k = 0; k < 5; k++)
+    crack(rnd() * size, rnd() * size, rnd() * Math.PI * 2, size * (0.08 + rnd() * 0.14), 0, 1);
+  // The wind's powder in soft streaks.
+  for (let i = 0; i < size * size; i++) {
+    const p = Math.max(0, streak[i] - 0.66) * 2.2;
+    rgb[i * 3] += (1.2 - rgb[i * 3]) * p * 0.4;
+    rgb[i * 3 + 1] += (1.27 - rgb[i * 3 + 1]) * p * 0.4;
+    rgb[i * 3 + 2] += (1.35 - rgb[i * 3 + 2]) * p * 0.4;
+  }
+};
+
+/** The Frozen Lake's surface (one tile = 18 yd: the family's UV scale). */
+export function lakeIceDetail(): DetailPair {
+  return bakeColored('lakeIce', paintLakeIce, 0x1a6e, 512, 1.2, 1);
+}
 
 /** The Breath's scoured bedrock (one tile = 14 yd: the family's UV scale). */
 export function scouredDetail(): DetailPair {
