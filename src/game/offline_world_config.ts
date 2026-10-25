@@ -5,6 +5,7 @@ import { PLAYER_INTEREST_DROP_RADIUS, type PlayerClass, type SimConfig } from '.
 import { WORLD_SEED } from '../sim/world_seed';
 import { offlineDayNightNowMs } from './daynight_dev_command';
 import { allocateOfflineGathererIdentity } from './gatherer_identity';
+import { offlineItemGuidMint } from './item_guid_mint';
 
 export function offlineWorldConfig(options: {
   readonly playerClass: PlayerClass;
@@ -36,5 +37,8 @@ export function offlineWorldConfig(options: {
     dayNightNowMs: offlineDayNightNowMs,
     world: options.world,
     gathererIdentity: allocateOfflineGathererIdentity() ?? undefined,
+    // Tracked (epic/legendary) copies get a real UUID where the browser has
+    // crypto; absent, the sim's deterministic fallback stamps them.
+    mintItemGuid: offlineItemGuidMint(),
   };
 }

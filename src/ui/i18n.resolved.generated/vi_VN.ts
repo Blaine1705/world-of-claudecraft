@@ -3841,6 +3841,12 @@ export const vi_VN: EnTranslations = {
       "linkHint": "Shift-click để chia sẻ vật phẩm này trong khung chat."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "{count} earlier transfer is not shown.",
+        "few": "{count} earlier transfers are not shown.",
+        "many": "{count} earlier transfers are not shown.",
+        "other": "{count} earlier transfers are not shown."
+      },
       "guildBoardShown": {
         "one": "Đang hiển thị {count} bang hội",
         "few": "Đang hiển thị {count} bang hội",
@@ -5281,6 +5287,9 @@ export const vi_VN: EnTranslations = {
       "partyTradeWindow": "Bạn có thể giao dịch vật phẩm này cho những người chơi đã cùng nhận nó rơi ra, trong {time} tới. Trang bị nó sẽ kết thúc khoảng thời gian giao dịch này.",
       "perfectedBadge": "Đã hoàn thiện",
       "perfectingRank": "Hoàn thiện: bậc {rank} trên {ranks}",
+      "lootedBy": "Looted by {name} on {date}",
+      "questRewardTo": "Quest reward to {name} on {date}",
+      "obtainedBy": "Obtained by {name} on {date}",
       "materialSourceGatherer": "{count} × Được {name} thu thập",
       "trophySkullSource": "{count} × Lấy từ {name}",
       "materialSourceGathererSigned": "{count} × Được {name} thu thập, có chữ ký của {signer}",
@@ -6552,7 +6561,15 @@ export const vi_VN: EnTranslations = {
       "viewSources": "Xem nguồn",
       "separateByGatherer": "Tách theo người thu thập",
       "takeChosenQuantity": "Lấy số lượng đã chọn",
-      "combine": "Gộp các chồng nguyên liệu"
+      "combine": "Gộp các chồng nguyên liệu",
+      "itemHistory": "Item history"
+    },
+    "itemHistory": {
+      "title": "{item}: history",
+      "passedTo": "Passed to {name} on {date}",
+      "noTransfers": "This item has never changed hands.",
+      "close": "Close",
+      "openAria": "Item history for {item}"
     },
     "enchanting": {
       "recipeNotLearned": "Hãy học công thức trước khi áp dụng phép cường hóa này.",
@@ -17222,7 +17239,8 @@ export const vi_VN: EnTranslations = {
       "tooManyOrders": "Bạn có thể giữ tối đa {count} đơn hàng mở cùng lúc.",
       "orderClosed": "Đơn hàng đó không còn mở nữa.",
       "orderOwn": "Đó là đơn hàng của bạn. Hủy nó để rút lại.",
-      "orderNotYours": "Đó không phải là đơn hàng của bạn."
+      "orderNotYours": "Đó không phải là đơn hàng của bạn.",
+      "orderTrackedItem": "The Merchant takes no orders for one-of-a-kind gear."
     },
     "loot": {
       "takeAll": "Lấy Tất Cả",
