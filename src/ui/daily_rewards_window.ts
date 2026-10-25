@@ -147,7 +147,10 @@ export class DailyRewardsWindow {
   private mountInspect: MountInspect | null = null;
   private armoryGraphicsRestoreSkinId: string | null = null;
   private mountGraphicsRestoreSkinId: string | null = null;
-  private readonly subscription = new StoreSubscription(() => this.deps.subscriptionHooks?.());
+  private readonly subscription = new StoreSubscription(
+    () => this.deps.subscriptionHooks?.(),
+    () => void this.renderStore(null),
+  );
   private storeLoading = false;
   private storeReady = false;
   private previewFetched = false;

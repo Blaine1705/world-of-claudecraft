@@ -72,6 +72,12 @@ portal URLs `https://billing.stripe.com`; custom Stripe domains are not supporte
 Failures return `{ "ok": false, "url": null }`. The existing secret header gates
 all internal service endpoints. Redirect responses must not be used.
 
+A checkout (subscription or membership token) may instead return an embedded
+Checkout, `{ "ok": true, "url": null, "stripe": { "clientSecret": "cs_...",
+"publishableKey": "pk_..." } }`. The client mounts it in the same in-game overlay
+as a Claudium top-up (`src/net/stripe_checkout.ts`), so no tab is opened and popup
+blockers cannot stop it. The portal stays a hosted `billing.stripe.com` link.
+
 Required service behavior:
 
 - Create a recurring Stripe Price for exactly 500 USD cents, interval `month`,

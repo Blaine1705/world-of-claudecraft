@@ -123,4 +123,27 @@ describe('subscription wire contract', () => {
       expect(subscriptionLink({ ok: true, url }, 'checkout')).toEqual({ ok: false, url: null });
     }
   });
+  it('accepts an embedded Checkout only for checkout, with a strict client secret and key', () => {
+    const stripe = { clientSecret: 'cs_live_a1_secret_b2', publishableKey: 'pk_live_c3' };
+    expect(subscriptionLink({ ok: true, url: null, stripe }, 'checkout')).toEqual({
+      ok: true,
+      url: null,
+      stripe,
+    });
+    expect(subscriptionLink({ ok: true, url: null, stripe }, 'portal')).toEqual({
+      ok: false,
+      url: null,
+    });
+    for (const bad of [
+      null,
+      { ...stripe, clientSecret: 'sk_live_secret' },
+      { ...stripe, clientSecret: 'cs_live_<script>' },
+      { ...stripe, publishableKey: 'sk_live_c3' },
+      { ...stripe, extra: 'x' },
+    ])
+      expect(subscriptionLink({ ok: true, url: null, stripe: bad }, 'checkout')).toEqual({
+        ok: false,
+        url: null,
+      });
+  });
 });

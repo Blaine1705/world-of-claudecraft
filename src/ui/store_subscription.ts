@@ -1,8 +1,10 @@
 import { DESKTOP_APP } from '../client_origin';
 import { MEMBERSHIP_TOKEN_OFF } from '../membership_token_contract';
+import { openStripeCheckout } from '../net/stripe_checkout';
 import {
   isGameSubscriptionPlan,
   SUBSCRIPTION_OFF,
+  type SubscriptionLink,
   type SubscriptionStoreHooks,
   subscriptionLink,
 } from '../subscription_contract';
@@ -36,7 +38,43 @@ export class StoreSubscription {
     mint: mintIntentKey,
   });
   private annualDelivered = false;
-  constructor(private readonly hooks: () => SubscriptionStoreHooks | undefined) {}
+  constructor(
+    private readonly hooks: () => SubscriptionStoreHooks | undefined,
+    /** Repaints the store once an embedded checkout completes (webhooks settle shortly after). */
+    private readonly checkoutCompleted: () => void = () => {},
+  ) {}
+
+  /** Embedded Checkout mounts in the game like a Claudium top-up, so no tab or popup is
+   *  needed. A hosted link (a service without embedding) still opens a tab. */
+  private async openCheckout(result: SubscriptionLink): Promise<void> {
+    if (result.stripe) {
+      await openStripeCheckout(
+        result.stripe,
+        {
+          title: t('hudChrome.claudium.checkoutTitle'),
+          close: t('hudChrome.claudium.checkoutClose'),
+          loading: t('hudChrome.claudium.checkoutLoading'),
+          failed: t('hudChrome.claudium.checkoutFailed'),
+        },
+        {
+          onComplete: () => {
+            this.checkoutCompleted();
+            window.setTimeout(this.checkoutCompleted, 4000);
+          },
+        },
+      );
+      return;
+    }
+    if (!result.url) throw new Error('checkout unavailable');
+    // Electron denies BrowserWindows and sends HTTPS links to the system browser.
+    if (DESKTOP_APP) {
+      window.open(result.url, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    const tab = window.open(result.url, '_blank');
+    if (!tab) throw new Error('popup blocked');
+    tab.opener = null;
+  }
 
   refresh(): Promise<void> {
     if (this.flight) return this.flight;
@@ -100,11 +138,13 @@ export class StoreSubscription {
         if (!hooks || hooks !== this.owner) return;
         this.busy = true;
         button.disabled = true;
-        // Reserve a tab during the gesture so async checkout creation is not popup-blocked.
-        const tab = DESKTOP_APP ? null : window.open('about:blank', '_blank');
+        // Checkout is embedded in the game. The portal is Stripe-hosted only, so reserve its
+        // tab during the gesture to keep async link creation from being popup-blocked.
+        const tab =
+          DESKTOP_APP || action === 'checkout' ? null : window.open('about:blank', '_blank');
         if (tab) tab.opener = null;
         try {
-          if (!DESKTOP_APP && !tab) throw new Error('popup blocked');
+          if (action === 'portal' && !DESKTOP_APP && !tab) throw new Error('popup blocked');
           const requested = button.dataset.subscriptionCheckoutPlan;
           const plan =
             action === 'checkout' && isGameSubscriptionPlan(requested)
@@ -134,9 +174,11 @@ export class StoreSubscription {
               error.textContent = t('hudChrome.wocStore.subscription.checkoutClosed');
             return;
           }
-          if (!result.ok || !result.url) throw new Error('subscription unavailable');
+          if (!result.ok) throw new Error('subscription unavailable');
+          if (action === 'checkout') await this.openCheckout(result);
+          else if (!result.url) throw new Error('subscription unavailable');
           // Electron denies BrowserWindows and sends HTTPS links to the system browser.
-          if (DESKTOP_APP) window.open(result.url, '_blank', 'noopener,noreferrer');
+          else if (DESKTOP_APP) window.open(result.url, '_blank', 'noopener,noreferrer');
           else tab?.location.replace(result.url);
         } catch {
           tab?.close();
@@ -229,8 +271,6 @@ export class StoreSubscription {
               (control.dataset.membershipPurchaseAction === 'buy' && !this.tokenState.canCheckout);
         };
         disable(true);
-        const tab = buying && !DESKTOP_APP ? window.open('about:blank', '_blank') : null;
-        if (tab) tab.opener = null;
         let message:
           | 'hudChrome.wocStore.subscription.tokenPending'
           | 'hudChrome.wocStore.subscription.tokenDelivered'
@@ -238,17 +278,14 @@ export class StoreSubscription {
           'hudChrome.wocStore.subscription.tokenPending';
         try {
           if (buying) {
-            if (!DESKTOP_APP && !tab) throw new Error('popup blocked');
             try {
               localStorage.setItem('woc.membership-token.pending', this.tokenKey);
             } catch {
               /* Storage unavailable. */
             }
             const result = subscriptionLink(await hooks.tokenCheckout!(this.tokenKey), 'checkout');
-            if (hooks !== this.hooks() || !result.ok || !result.url)
-              throw new Error('token checkout unavailable');
-            if (DESKTOP_APP) window.open(result.url, '_blank', 'noopener,noreferrer');
-            else tab?.location.replace(result.url);
+            if (hooks !== this.hooks() || !result.ok) throw new Error('token checkout unavailable');
+            await this.openCheckout(result);
           } else if (
             (await hooks.tokenClaim?.(this.tokenKey))?.delivered &&
             hooks === this.hooks()
@@ -262,7 +299,6 @@ export class StoreSubscription {
             }
           }
         } catch {
-          tab?.close();
           message = 'hudChrome.wocStore.subscription.error';
         } finally {
           this.busy = false;
