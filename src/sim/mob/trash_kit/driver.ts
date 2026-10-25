@@ -772,6 +772,8 @@ function tryStartCast(
     if (!def || (st.timers[key] ?? 0) > 0) continue;
     // A heroic-only cast never starts on normal (TrashKitCast.heroicOnly).
     if (def.heroicOnly && inst.difficulty !== 'heroic') continue;
+    // An encounter-driven cast is its encounter's to start (TrashKitCast).
+    if (def.encounterDriven) continue;
     const physical = isPhysicalCast(key);
     if (!physical && (isSilenced(mob) || isLockedOut(mob, def.school as Aura['school']))) continue;
     const ext = extensionOf(key);

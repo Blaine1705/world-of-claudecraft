@@ -110,6 +110,8 @@ export class EngineWalls {
 
   constructor(private readonly host: TrashEngineHost) {
     for (const templateId of Object.keys(COMBAT_WALL_SHAPES)) {
+      // A wall its own encounter draws (the Hammer Council's pillars) is no slab.
+      if (COMBAT_WALL_SHAPES[templateId].ownLook) continue;
       const box = wallBox(templateId, 1);
       if (!box) continue;
       const body = buildIceSlabGeometry(box);

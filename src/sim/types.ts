@@ -4762,6 +4762,11 @@ export interface TrashKitCast {
   /** Heroic only: on normal the driver never starts this cast (the Gravecaller
    *  Adept's Grave Bolt, which its normal volley replaces). */
   heroicOnly?: boolean;
+  /** The driver never starts this cast: the body's own encounter module runs
+   *  it (the Hammer Council's Mountain's Wrath, encounters/smith_heart). The
+   *  record stays the cast's declaration, which the renderer reads for its
+   *  look (the nova's sight field) and its numbers. */
+  encounterDriven?: boolean;
 }
 
 /**

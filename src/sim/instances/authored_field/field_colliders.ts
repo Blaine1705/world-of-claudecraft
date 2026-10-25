@@ -42,6 +42,8 @@ export function authoredFieldColliders(def: AuthoredFieldDef, floorY: number): C
     });
   }
   for (const p of def.props) {
+    // An encounter publishes its own body as a combat wall (FieldProp).
+    if (p.encounterOwned) continue;
     const top = floorY + authoredFieldHeight(def, p.x, p.z) + (p.h ?? 6);
     if (p.r !== undefined && p.r > 0) {
       out.push({ type: 'circle', x: p.x, z: p.z, r: p.r, cameraTopY: top });

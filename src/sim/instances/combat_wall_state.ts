@@ -27,6 +27,11 @@ export interface CombatWallShape {
   hw: number;
   hd: number;
   height: number;
+  /** A round wall (a pillar): a circle of radius `hw` instead of the box. */
+  round?: boolean;
+  /** Drawn by its own encounter's renderer, never as the engine's ice slab
+   *  (the Hammer Council's pillars: render/smith_heart_fx). */
+  ownLook?: boolean;
 }
 
 /** Every wall shape, by the object template id that carries it. A new wall
@@ -36,6 +41,17 @@ export const COMBAT_WALL_SHAPES: Readonly<Record<string, CombatWallShape>> = {
   // yards on a side and a good head taller than a player, crashed down where
   // its Ice Block Toss landed (gravewyrm_sanctum.ts).
   sanctum_ice_slab: { hw: 2.1, hd: 1.6, height: 3.4 },
+  // The Smith's Heart's Hammer Council pillars (encounters/smith_heart/
+  // council_pillars.ts): the quarry's carved columns and the pillars the
+  // Slabwright raises, one template per integrity left (3 whole, 2 cracked,
+  // 1 about to fall). Sizes match content/smith_heart_layout.ts
+  // QUARRY_PILLAR_R and QUARRY_PILLAR_H (pinned by the council tests).
+  sh_council_pillar_3: { hw: 2.6, hd: 2.6, height: 13, round: true, ownLook: true },
+  sh_council_pillar_2: { hw: 2.6, hd: 2.6, height: 13, round: true, ownLook: true },
+  sh_council_pillar_1: { hw: 2.6, hd: 2.6, height: 13, round: true, ownLook: true },
+  sh_council_risen_3: { hw: 2.2, hd: 2.2, height: 10, round: true, ownLook: true },
+  sh_council_risen_2: { hw: 2.2, hd: 2.2, height: 10, round: true, ownLook: true },
+  sh_council_risen_1: { hw: 2.2, hd: 2.2, height: 10, round: true, ownLook: true },
 };
 
 /** Is `templateId` a combat wall's? */
@@ -63,6 +79,8 @@ export function combatWallCollider(w: CombatWallPlacement): Collider | null {
   const shape = COMBAT_WALL_SHAPES[w.templateId];
   if (!shape) return null;
   const s = w.scale > 0 ? w.scale : 1;
+  if (shape.round)
+    return { type: 'circle', x: w.x, z: w.z, r: shape.hw * s, cameraTopY: w.y + shape.height * s };
   return {
     type: 'obb',
     x: w.x,

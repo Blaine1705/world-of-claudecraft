@@ -119,6 +119,12 @@ export interface FieldProp {
   hd?: number;
   /** Visual height of the collider (sight top); defaults to 6. */
   h?: number;
+  /** An encounter owns this prop's solid body (it cracks and falls in a fight
+   *  and stands again on a reset: the Smith's Heart's quarry columns): the
+   *  field builds no collider for it, and a live claim publishes one as a
+   *  combat wall instead (instances/combat_wall_state.ts). Its footprint and
+   *  height still describe the body. */
+  encounterOwned?: boolean;
 }
 
 /** One lighting mood region (render-only: key tint, fog tint, torch colour). */
