@@ -92,6 +92,9 @@ export async function buildSmithHeartInterior(
   const quenchReady = quenchKitReady();
   const group = new THREE.Group();
   group.name = 'smithHeartField';
+  // The rock's regional paint (the Quench's frost) reads this slot from its
+  // first frame (the frame driver keeps it current after).
+  setHeartRockSlot(ox, oz);
   group.add(
     buildAuthoredFieldTerrain(SMITH_HEART_FIELD, {
       lowGfx: deps.lowGfx,

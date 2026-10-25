@@ -1284,18 +1284,27 @@ const paintRime: ColorPainter = (h, rgb, size, rnd) => {
       let best = 0;
       const jx = x + (wobble[i] - 0.5) * 9;
       const jy = y + (wobble[(i + 131) % (size * size)] - 0.5) * 9;
-      for (let k = 0; k < pts.length; k++) {
-        for (let oy = -1; oy <= 1; oy++) {
-          for (let ox = -1; ox <= 1; ox++) {
-            const dx = jx - (pts[k][0] + ox * size);
-            const dy = jy - (pts[k][1] + oy * size);
-            const d = dx * dx + dy * dy;
-            if (d < d1) {
-              d2 = d1;
-              d1 = d;
-              best = k;
-            } else if (d < d2) d2 = d;
-          }
+      // Each point is jittered inside its own lattice cell, so the nearest
+      // two lie in the 5 by 5 cells round this pixel's (wrapped): never
+      // the whole lattice.
+      const cs = size / cells;
+      const ci = Math.floor(jx / cs);
+      const cj = Math.floor(jy / cs);
+      for (let oj = -2; oj <= 2; oj++) {
+        for (let oi = -2; oi <= 2; oi++) {
+          const ii = ci + oi;
+          const jj = cj + oj;
+          const wi = ((ii % cells) + cells) % cells;
+          const wj = ((jj % cells) + cells) % cells;
+          const k = wj * cells + wi;
+          const dx = jx - (pts[k][0] + (ii - wi) * cs);
+          const dy = jy - (pts[k][1] + (jj - wj) * cs);
+          const d = dx * dx + dy * dy;
+          if (d < d1) {
+            d2 = d1;
+            d1 = d;
+            best = k;
+          } else if (d < d2) d2 = d;
         }
       }
       const edge = Math.sqrt(d2) - Math.sqrt(d1);

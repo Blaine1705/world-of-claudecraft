@@ -43,8 +43,10 @@ import { ARC_CLEAVE_ABILITY, fxHash } from './hammer_fx_core';
 import {
   BREATH_FROST_SECONDS,
   BREATH_SWEEP_SECONDS,
-  breathBlastLook,
-  breathChargeLook,
+  breathCreep,
+  breathDraw,
+  breathFrost,
+  breathGlints,
   QUENCH_FX_COLORS,
   QUENCH_FX_POOLS,
   QUENCH_GUARDIAN,
@@ -54,12 +56,35 @@ import {
   STRIKE_HOLD_SECONDS,
   STRIKE_RISE_SECONDS,
   type StrikeSpike,
-  strikeLook,
+  strikeFrost,
+  strikeRise,
   strikeSpikes,
 } from './quench_fx_core';
 
 const SCAN_SEC = 0.1;
 const C = QUENCH_FX_COLORS;
+
+/** The per-frame puffs' options, written in place (no allocation a frame):
+ *  the cold drawn in to the maw, and the glints winking in the cone. */
+const DRAW_DIR: [number, number, number] = [0, 0.25, 0];
+const DRAW_PUFF = {
+  speed: 8,
+  life: 0.9,
+  size: [0.8, 0.25] as const,
+  color: C.mist,
+  alpha: 0.28,
+  dir: DRAW_DIR,
+  spread: 0.12,
+  drag: 0.5,
+};
+const GLINT_PUFF = {
+  speed: 0.6,
+  life: 0.5,
+  size: [0.35, 0.05] as const,
+  color: C.glint,
+  alpha: 0.9,
+  pool: 'glow' as const,
+};
 
 // ---- the frost left on the floor ---------------------------------------------------
 
@@ -381,8 +406,15 @@ export class QuenchFx {
   // ---- Quenching Breath's bar and its telegraph ---------------------------------------
 
   private startCharge(e: Entity): void {
-    const used = new Set([...this.charges.values()].map((c) => c.fan));
-    const fan = this.fans.find((f) => !used.has(f)) ?? null;
+    let fan: TelegraphFan | null = null;
+    for (const f of this.fans) {
+      let used = false;
+      for (const c of this.charges.values()) if (c.fan === f) used = true;
+      if (!used) {
+        fan = f;
+        break;
+      }
+    }
     if (fan) {
       this.kit.layOutFan(fan, this.sim.breathArcDeg, {
         color: TELEGRAPH_THREAT_COLORS.danger,
@@ -432,47 +464,36 @@ export class QuenchFx {
         this.kit.drapeFan(c.fan, this.groundY, c.x, c.y, c.z, yaw, R);
         this.kit.paintFan(c.fan, { fill: c.progress, clock: this.clock, range: R });
       }
-      const look = breathChargeLook(c.progress);
+      const creep = breathCreep(c.progress);
+      const draw = breathDraw(c.progress);
+      const glints = breathGlints(c.progress);
       // The creeping frost follows the cone (its reach grows with the bar).
       if (c.creep) {
         c.creep.mesh.position.set(c.x, c.y + 0.06, c.z);
         c.creep.mesh.rotation.y = yaw;
-        c.creep.mat.uniforms.uReach.value = look.creep;
-        c.creep.mat.uniforms.uAlpha.value = 0.35 * look.creep;
+        c.creep.mat.uniforms.uReach.value = creep;
+        c.creep.mat.uniforms.uAlpha.value = 0.35 * creep;
       }
       const half = (this.sim.breathArcDeg * Math.PI) / 360;
       // The cold drawn in to the maw: mist streaming back from the cone.
       for (let k = 0; k < 2; k++) {
-        if (this.rand() > dt * 34 * look.draw * this.density) continue;
+        if (this.rand() > dt * 34 * draw * this.density) continue;
         const a = yaw + (this.rand() * 2 - 1) * half;
         const r = 4 + this.rand() * R * 0.6;
         const px = c.x + Math.sin(a) * r;
         const pz = c.z + Math.cos(a) * r;
-        this.particles.puff(px, c.y + 0.6 + this.rand() * 2.5, pz, 2, {
-          speed: 8 + look.draw * 8,
-          life: 0.9,
-          size: [0.8, 0.25],
-          color: C.mist,
-          alpha: 0.28,
-          dir: [-Math.sin(a), 0.25, -Math.cos(a)],
-          spread: 0.12,
-          drag: 0.5,
-        });
+        DRAW_DIR[0] = -Math.sin(a);
+        DRAW_DIR[2] = -Math.cos(a);
+        DRAW_PUFF.speed = 8 + draw * 8;
+        this.particles.puff(px, c.y + 0.6 + this.rand() * 2.5, pz, 2, DRAW_PUFF);
       }
       // Glints winking in the cone as it fills.
-      if (this.rand() < dt * 24 * look.glints * this.density) {
+      if (this.rand() < dt * 24 * glints * this.density) {
         const a = yaw + (this.rand() * 2 - 1) * half;
         const r = this.rand() * R;
         const px = c.x + Math.sin(a) * r;
         const pz = c.z + Math.cos(a) * r;
-        this.particles.puff(px, this.groundY(px, pz) + 0.3 + this.rand() * 1.2, pz, 1, {
-          speed: 0.6,
-          life: 0.5,
-          size: [0.35, 0.05],
-          color: C.glint,
-          alpha: 0.9,
-          pool: 'glow',
-        });
+        this.particles.puff(px, this.groundY(px, pz) + 0.3 + this.rand() * 1.2, pz, 1, GLINT_PUFF);
       }
     }
   }
@@ -541,8 +562,13 @@ export class QuenchFx {
     const z = e.pos.z;
     const y = this.groundY(x, z);
     const yaw = e.facing;
-    const set =
-      this.spikeSets.slice(0, QUENCH_FX_POOLS.spikes).find((s) => !s.live) ?? this.spikeSets[0];
+    let set = this.spikeSets[0];
+    for (let i = 0; i < QUENCH_FX_POOLS.spikes; i++) {
+      if (!this.spikeSets[i].live) {
+        set = this.spikeSets[i];
+        break;
+      }
+    }
     this.liftSpikes(set, x, y, z, yaw);
     this.layFrost(x, z, yaw, 'strike', 1, STRIKE_FROST_SECONDS);
     const half = (this.sim.strikeArcDeg * Math.PI) / 360;
@@ -593,14 +619,13 @@ export class QuenchFx {
         // The breath's ice rises as its front reaches each shard.
         const reach = Math.hypot(sp.x, sp.z) / Math.max(1, this.sim.breathRange);
         const local = set.sweep ? age - reach * BREATH_SWEEP_SECONDS : age;
-        const look = strikeLook(local);
         const hold = set.sweep ? 0.9 : 0;
         const rise =
           local < 0
             ? 0
             : set.sweep && local < STRIKE_RISE_SECONDS + STRIKE_HOLD_SECONDS + hold
               ? Math.min(1, local / STRIKE_RISE_SECONDS)
-              : look.rise;
+              : strikeRise(local);
         if (rise <= 0) {
           set.mesh.setMatrixAt(k, this.m.makeScale(0, 0, 0));
           if (local < STRIKE_RISE_SECONDS) any = true;
@@ -699,9 +724,7 @@ export class QuenchFx {
       if (!f.live || f.creeping) continue;
       const age = this.clock - f.born;
       const k =
-        f.kind === 'breath'
-          ? breathBlastLook(age).frost
-          : strikeLook(age).frost * (age < 0.15 ? age / 0.15 : 1);
+        f.kind === 'breath' ? breathFrost(age) : strikeFrost(age) * (age < 0.15 ? age / 0.15 : 1);
       f.mat.uniforms.uAlpha.value = 0.75 * k;
       if (age > f.span) {
         f.live = false;

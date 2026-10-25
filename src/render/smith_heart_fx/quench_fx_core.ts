@@ -72,12 +72,22 @@ export function breathChargeLook(progress: number): {
   creep: number;
   glints: number;
 } {
-  const p = clamp01(progress);
   return {
-    draw: 0.25 + 0.75 * smooth(p / 0.8),
-    creep: smooth((p - 0.15) / 0.85),
-    glints: smooth((p - 0.4) / 0.6),
+    draw: breathDraw(progress),
+    creep: breathCreep(progress),
+    glints: breathGlints(progress),
   };
+}
+
+/** The look's three terms as scalars (the per-frame painter allocates nothing). */
+export function breathDraw(progress: number): number {
+  return 0.25 + 0.75 * smooth(clamp01(progress) / 0.8);
+}
+export function breathCreep(progress: number): number {
+  return smooth((clamp01(progress) - 0.15) / 0.85);
+}
+export function breathGlints(progress: number): number {
+  return smooth((clamp01(progress) - 0.4) / 0.6);
 }
 
 /** Seconds the breath's freezing gust takes to sweep out to the cone's end,
@@ -95,9 +105,14 @@ export function breathBlastLook(elapsed: number): { front: number; mist: number;
   return {
     front,
     mist: elapsed < BREATH_SWEEP_SECONDS ? 0.9 : Math.max(0, 0.9 - after / 0.7),
-    frost:
-      Math.max(0, Math.min(1, elapsed / 0.4)) * Math.max(0, 1 - elapsed / BREATH_FROST_SECONDS),
+    frost: breathFrost(elapsed),
   };
+}
+
+/** The frost the breath leaves on the floor `elapsed` seconds in (0..1). */
+export function breathFrost(elapsed: number): number {
+  if (elapsed < 0) return 0;
+  return Math.max(0, Math.min(1, elapsed / 0.4)) * Math.max(0, 1 - elapsed / BREATH_FROST_SECONDS);
 }
 
 /** Seconds Tempering Strike's ice stands in its arc before it shatters, and
@@ -110,17 +125,26 @@ export const STRIKE_FROST_SECONDS = 2.2;
  *  ice have thrust up (0..1, then they shatter), the frost on the floor. */
 export function strikeLook(elapsed: number): { rise: number; shatter: boolean; frost: number } {
   if (elapsed < 0) return { rise: 0, shatter: false, frost: 0 };
-  const rise =
-    elapsed < STRIKE_RISE_SECONDS
-      ? smooth(elapsed / STRIKE_RISE_SECONDS)
-      : elapsed < STRIKE_RISE_SECONDS + STRIKE_HOLD_SECONDS
-        ? 1
-        : 0;
   return {
-    rise,
+    rise: strikeRise(elapsed),
     shatter: elapsed >= STRIKE_RISE_SECONDS + STRIKE_HOLD_SECONDS,
-    frost: Math.max(0, 1 - elapsed / STRIKE_FROST_SECONDS),
+    frost: strikeFrost(elapsed),
   };
+}
+
+/** How far the strike's ice has thrust up `elapsed` seconds in (0..1). */
+export function strikeRise(elapsed: number): number {
+  if (elapsed < 0) return 0;
+  return elapsed < STRIKE_RISE_SECONDS
+    ? smooth(elapsed / STRIKE_RISE_SECONDS)
+    : elapsed < STRIKE_RISE_SECONDS + STRIKE_HOLD_SECONDS
+      ? 1
+      : 0;
+}
+
+/** The frost the strike leaves on the floor `elapsed` seconds in (0..1). */
+export function strikeFrost(elapsed: number): number {
+  return elapsed < 0 ? 0 : Math.max(0, 1 - elapsed / STRIKE_FROST_SECONDS);
 }
 
 /** One spike of ice in Tempering Strike's arc (the guardian's frame: +z its
