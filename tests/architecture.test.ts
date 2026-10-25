@@ -1005,6 +1005,7 @@ const RENDER_PURE_CORES = [
   // guardian's effects.
   'src/render/smith_heart/breath_kit_plan_core.ts',
   'src/render/smith_heart/breath_air_core.ts',
+  'src/render/smith_heart_fx/breath_fx_core.ts',
   'src/render/drowned_temple/temple_rising_stair_core.ts',
   // The Mere Hydra's Tsunami: the breaking wave's profile, timeline, spray and foam.
   'src/render/drowned_temple/temple_tsunami_core.ts',
