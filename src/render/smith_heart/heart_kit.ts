@@ -40,6 +40,9 @@ export const SMITH_HEART_QUENCH_KIT_URL = '/models/props/smith_heart_quench_kit.
  *  altar-stone, the wellspring and the Pour Channel, the crystal, the
  *  bridge's arch, the walls over the void. */
 export const SMITH_HEART_HEAT_KIT_URL = '/models/props/smith_heart_heat_kit.glb';
+/** The gates' kit (heart_gates.ts): the carved threshold and the standing
+ *  stones every forge seal gate stands on, their crystal. */
+export const SMITH_HEART_GATE_KIT_URL = '/models/props/smith_heart_gate_kit.glb';
 
 /** A kit's material slots: KitStone (lit rock), KitGlow (emissive light) and
  *  KitIce (phase 2H: lit, glossy, a cold sheen at the grazing angles and a
@@ -171,6 +174,7 @@ if (typeof window !== 'undefined') {
   registerDeferredPreload(() => startKitLoad(SMITH_HEART_BREATH_KIT_URL));
   registerDeferredPreload(() => startKitLoad(SMITH_HEART_QUENCH_KIT_URL));
   registerDeferredPreload(() => startKitLoad(SMITH_HEART_HEAT_KIT_URL));
+  registerDeferredPreload(() => startKitLoad(SMITH_HEART_GATE_KIT_URL));
 }
 
 /** Fetch and bake a kit once. Never rejects; resolves within the wait cap

@@ -181,6 +181,8 @@ export function heartGateSolids(k: number): HeartSolid[] {
     const c = Math.cos(gate.rot);
     const s = Math.sin(gate.rot);
     for (const part of heartGateParts(rig, gate.hw * 2)) {
+      // The curtain and the channel's light are light, never a solid.
+      if (part.light) continue;
       const pose = heartGatePartPose(part, rig, k);
       if (!pose.shown) continue;
       out.push({

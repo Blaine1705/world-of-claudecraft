@@ -19,10 +19,13 @@ import {
   hammerRockLift,
 } from '../src/render/smith_heart/heart_cliff_paint_core';
 import {
+  HEART_GATE_HEART_TINT,
   HEART_SEAL_BARRIER,
   heartGatePartPose,
   heartGateParts,
   heartGateRig,
+  heartGateTint,
+  heartGateVein,
   heartSealGatePose,
   heartSlabPose,
 } from '../src/render/smith_heart/heart_gates_core';
@@ -642,31 +645,61 @@ describe('heart_gates_core: the gate poses', () => {
     expect(mid.sink).toBeGreaterThan(0);
     expect(heartSlabPose(1).shown).toBe(false);
   });
-  it('the forge seal shows its film shut, flares sealed, and is gone open', () => {
-    expect(heartSealGatePose(0, false, 0)).toEqual({ sink: 0, film: 1, shown: true });
+  it('the forge seal shows its light shut, flares sealed, drains first and is gone open', () => {
+    expect(heartSealGatePose(0, false, 0)).toEqual({ sink: 0, film: 1, rise: 1, shown: true });
     expect(heartSealGatePose(0, true, Math.PI / 10).film).toBeGreaterThan(1.3);
+    // Opening, the curtain drains into its channel before the threshold
+    // starts to sink.
+    const early = heartSealGatePose(0.2, false, 0);
+    expect(early.rise).toBeLessThan(0.5);
+    expect(early.sink).toBe(0);
     const open = heartSealGatePose(1, false, 0);
     expect(open.film).toBe(0);
+    expect(open.rise).toBe(0);
     expect(open.shown).toBe(false);
   });
-  it('the forge seal is a LOW barrier: nothing over 3 yd, nothing solid and wide above the sill', () => {
+  it('the forge seal is a LOW barrier of stone and light: nothing over 3 yd, only light and low crystal above the threshold', () => {
     for (const g of SMITH_HEART_GATES.filter((x) => x.kind === 'forge_seal')) {
       const parts = heartGateParts('seal', g.hw * 2);
       for (const p of parts) {
         expect(p.y + p.h / 2, `${g.id} ${p.role}`).toBeLessThanOrEqual(3);
-        if (p.y - p.h / 2 >= HEART_SEAL_BARRIER.sillHeight - 1e-9 && p.role !== 'post') {
-          expect(p.role).toBe('bar');
-          expect(p.w).toBeLessThanOrEqual(0.2);
+        if (p.y + p.h / 2 > HEART_SEAL_BARRIER.sillHeight + 1e-9 && p.role !== 'post') {
+          // Over the threshold: the curtain and the channel are light (never
+          // a solid in a sightline), the crystal small and low.
+          if (p.role === 'crystal') {
+            expect(p.y + p.h / 2).toBeLessThanOrEqual(1.2);
+            expect(p.w).toBeLessThanOrEqual(0.6);
+          } else {
+            expect(p.light, `${g.id} ${p.role}`).toBe(true);
+          }
         }
+        // The middle 2 yd (the line a raid looks along) holds no crystal.
+        if (p.role === 'crystal') expect(Math.abs(p.x) - p.w / 2).toBeGreaterThan(1);
         if (p.role === 'post') expect(Math.abs(p.x) - p.w / 2).toBeGreaterThanOrEqual(g.hw);
       }
       const sill = parts.find((p) => p.role === 'sill');
       expect(sill?.w).toBeCloseTo(g.hw * 2);
-      expect(parts.filter((p) => p.role === 'bar').length).toBeGreaterThanOrEqual(6);
+      // The curtain spans the passage between the standing stones.
+      const veil = parts.find((p) => p.role === 'veil');
+      expect(veil?.w).toBeGreaterThan(g.hw * 2 - 1);
+      expect((veil?.y ?? 0) + (veil?.h ?? 0) / 2).toBeCloseTo(HEART_SEAL_BARRIER.veilTop);
       for (const p of parts) {
         expect(heartGatePartPose(p, 'seal', 1).shown, p.role).toBe(p.role === 'post');
       }
     }
+  });
+  it("each vein gate burns its vein's colour, the Heart Bridge the Heart's white-gold", () => {
+    expect(heartGateVein('cornice_mouth')).toBe('breath');
+    expect(heartGateVein('lake_mouth')).toBe('quench');
+    expect(heartGateVein('anvil_mouth')).toBe('heat');
+    expect(heartGateVein('heart_bridge')).toBe('heart');
+    expect(heartGateTint('cornice_mouth')).toBe(SMITH_HEART_VEIN_COLORS.breath);
+    expect(heartGateTint('lake_mouth')).toBe(SMITH_HEART_VEIN_COLORS.quench);
+    expect(heartGateTint('anvil_mouth')).toBe(SMITH_HEART_VEIN_COLORS.heat);
+    expect(heartGateTint('heart_bridge')).toBe(HEART_GATE_HEART_TINT);
+    // Every forge seal gate has its light.
+    for (const g of SMITH_HEART_GATES.filter((x) => x.kind === 'forge_seal'))
+      expect(['breath', 'quench', 'heat', 'heart'], g.id).toContain(heartGateVein(g.id));
   });
   it('the slab stays a slab, and is gone open', () => {
     const parts = heartGateParts('slab', 15.2);

@@ -28,7 +28,7 @@ import { dressHammerVein, ensureHammerKit, HAMMER_KIT_KINDS, hammerKitReady } fr
 import { heartCliffPaint } from './heart_cliff_paint_core';
 import { inBreathLight, inHeatLight, inQuenchLight } from './heart_environment';
 import { buildHeartGates } from './heart_gates';
-import { heartKitProgramWarmers } from './heart_kit';
+import { ensureHeartKit, heartKitProgramWarmers, SMITH_HEART_GATE_KIT_URL } from './heart_kit';
 import { buildHeartLights } from './heart_lights';
 import { buildHeartMountain } from './heart_mountain';
 import { buildHeartPortals } from './heart_portal';
@@ -88,6 +88,7 @@ export async function buildSmithHeartInterior(
     ensureBreathKit(),
     ensureQuenchKit(),
     ensureHeatKit(),
+    ensureHeartKit(SMITH_HEART_GATE_KIT_URL),
   ]);
   // The Ring kit draws the two stairs tread by tread and the dais's keel
   // (phase 2F); without it the field's own ramps and keel stand.
