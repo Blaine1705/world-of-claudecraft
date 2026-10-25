@@ -1,0 +1,315 @@
+// The Hammer Council's leaf (docs/design/raid/smith_heart.md section 7.1):
+// every id the council's sim, its renderer, its HUD alert, its dev helpers and
+// its tests key on, the per-difficulty rules, the tuning, and the pure
+// template-id helpers of the pillars. No SimContext, no rng.
+//
+// EVERY number here is a SKETCH, unmeasured (the design doc's 7.1 table says
+// so too): anchored to the Hammer guardian's old kit (level 20 elite, ten
+// players) and the level-20 cloth reference, to be calibrated with the meters
+// harness before the raid ships.
+
+/** The three stone beings of the council (template ids; the Guardian's is
+ *  the shipped, frozen one, content/smith_heart.ts SMITH_HEART_GUARDIANS). A
+ *  leaf: the content imports these, never the other way. */
+export const COUNCIL_GUARDIAN = 'heart_hammer_guardian';
+export const COUNCIL_SLABWRIGHT = 'heart_slabwright';
+export const COUNCIL_SEAM_SINGER = 'heart_seam_singer';
+
+/** A council member's role (its original job). */
+export type CouncilRole = 'guardian' | 'slabwright' | 'singer';
+/** The three council jobs: the Guardian's energy and Wrath, the
+ *  Slabwright's pillars, the Seam Singer's Resonance. */
+export type CouncilJob = 'wrath' | 'pillars' | 'resonance';
+
+/** The roles in roster order (the council's own iteration order). */
+export const COUNCIL_ROLES: readonly CouncilRole[] = ['guardian', 'slabwright', 'singer'];
+
+export const COUNCIL_TEMPLATES: Readonly<Record<CouncilRole, string>> = {
+  guardian: COUNCIL_GUARDIAN,
+  slabwright: COUNCIL_SLABWRIGHT,
+  singer: COUNCIL_SEAM_SINGER,
+};
+
+/** Every council template id (the gate, the seal and the tests wait on all). */
+export const COUNCIL_TEMPLATE_IDS: readonly string[] = COUNCIL_ROLES.map(
+  (r) => COUNCIL_TEMPLATES[r],
+);
+
+/** The role whose own job each is. */
+export const JOB_OWNER: Readonly<Record<CouncilJob, CouncilRole>> = {
+  wrath: 'guardian',
+  pillars: 'slabwright',
+  resonance: 'singer',
+};
+
+/** Who takes up a fallen member's job: the first survivor in this order. */
+export const JOB_HEIRS: Readonly<Record<CouncilJob, readonly CouncilRole[]>> = {
+  wrath: ['slabwright', 'singer'],
+  pillars: ['guardian', 'singer'],
+  resonance: ['guardian', 'slabwright'],
+};
+
+/** The role a template plays in the council, or null. Pure. */
+export function councilRoleOf(templateId: string): CouncilRole | null {
+  for (const r of COUNCIL_ROLES) if (COUNCIL_TEMPLATES[r] === templateId) return r;
+  return null;
+}
+
+// ---- casts, auras, objects, cues --------------------------------------------------
+
+/** The cast bars (and the damage names they carry). */
+export const COUNCIL_CASTS = {
+  /** The Guardian's (and its heir's) line-of-sight blast at full energy. The
+   *  shipped id is kept. */
+  wrath: 'heart_mountains_wrath',
+  /** The tank buster. */
+  weight: 'heart_hammers_weight',
+  /** The Slabwright marks the players a pillar will rise under. */
+  wake: 'heart_wake_the_stone',
+  /** The Slabwright marks the player the rock falls on. */
+  rock: 'heart_falling_rock',
+  /** The Seam Singer's kickable bolt. */
+  bolt: 'heart_seam_bolt',
+  /** The Seam Singer's kickable song (Resonance on three, one if kicked). */
+  song: 'heart_song_of_the_seam',
+  /** The same song sung by an heir: no kick table lists it. */
+  songUnbroken: 'heart_song_of_the_seam_unbroken',
+} as const;
+
+/** The interruptible ones (spread into mob/healer_channel.ts
+ *  SCRIPTED_INTERRUPTIBLE_CHANNELS). Wrath, Weight, Wake, Rock and the heir's
+ *  song are never kicked. */
+export const COUNCIL_KICK_SCHOOLS: Readonly<Record<string, { school: 'nature' }>> = {
+  [COUNCIL_CASTS.bolt]: { school: 'nature' },
+  [COUNCIL_CASTS.song]: { school: 'nature' },
+};
+
+/** The auras the council puts on players and on itself. */
+export const COUNCIL_AURAS = {
+  /** +100 percent physical damage taken (the tank swap). */
+  weight: 'heart_hammers_weight',
+  /** A pillar rises under this player when it runs out (they choose where). */
+  wakeMark: 'heart_wake_mark',
+  /** The rock falls on this player when it runs out: share it. */
+  rockMark: 'heart_falling_rock_mark',
+  /** A pillar this player stands near for 3 s loses a piece. value = the
+   *  share of those 3 s already stood (tenths), value2 = the pillar's id. */
+  resonance: 'heart_resonance',
+  /** On a council member: one stack per fallen member, more damage dealt. */
+  memory: 'heart_memory_of_stone',
+} as const;
+
+/** The council's encounter object templates. Pillars carry their integrity
+ *  (3 whole, 2 cracked, 1 about to fall) and stand as combat walls
+ *  (instances/combat_wall_state.ts COMBAT_WALL_SHAPES). */
+export const COUNCIL_PILLAR_PREFIX = 'sh_council_pillar_';
+export const COUNCIL_RISEN_PREFIX = 'sh_council_risen_';
+/** The rubble a fallen pillar leaves (scale = its radius). */
+export const COUNCIL_RUBBLE = 'sh_council_rubble';
+/** An heir's rising pillar: the 2 s spot locked under a random player
+ *  (scale = the knockback radius). */
+export const COUNCIL_RISE_SPOT = 'sh_council_rise_spot';
+
+/** The spellfx ability ids of the council's moments (the renderer keys them). */
+export const COUNCIL_CUES = {
+  /** A pillar bursts out of the floor (spellfx 'nova' on the pillar). */
+  rise: 'heart_council_pillar_rise',
+  /** A pillar loses a piece (spellfx 'nova' on the pillar). */
+  crack: 'heart_council_pillar_crack',
+  /** A pillar falls (spellfxAt 'burst' where it stood, radius = its rubble). */
+  collapse: 'heart_council_pillar_collapse',
+  /** The rock lands (spellfxAt 'burst', radius = the soak). */
+  rockImpact: 'heart_falling_rock_impact',
+  /** The heroic pillars' pulse (spellfx 'nova' on each standing pillar). */
+  pulse: 'heart_council_pillar_pulse',
+  /** The stone remembers: light from the fallen to each survivor (spellfx
+   *  'beam', source the fallen, target the survivor). */
+  inherit: 'heart_council_inherit',
+  /** The council settles after its fall: the risen pillars sink. */
+  settle: 'heart_council_settle',
+} as const;
+
+/** The damage names (combat log and floating text; re-localized by
+ *  src/ui/sim_i18n.ts through the mechanic reverse map). */
+export const COUNCIL_NAMES = {
+  wrath: "Mountain's Wrath",
+  weight: "Hammer's Weight",
+  wake: 'Wake the Stone',
+  rock: 'Falling Rock',
+  rockTremor: 'Rockfall Tremor',
+  bolt: 'Seam Bolt',
+  song: 'Song of the Seam',
+  resonance: 'Resonance',
+  memory: 'Memory of Stone',
+  rubble: 'Crumbled Stone',
+  pulse: 'Restless Stone',
+} as const;
+
+// ---- difficulty -----------------------------------------------------------------------
+
+/** The council's difficulty. A later mythic adds its own row (stronger
+ *  inheritances, its own mechanic) here and in COUNCIL_DIFFICULTY; nothing
+ *  else switches on the tier by name. */
+export type CouncilDifficulty = 'normal' | 'heroic';
+
+export interface CouncilDifficultyRules {
+  /** How many players Wake the Stone marks. */
+  wakeMarks: number;
+  /** The song waits for a Wrath to land and its Resonance runs out before
+   *  the next one (normal); false: the song keeps its own clock and the two
+   *  overlap (heroic). */
+  songAfterWrath: boolean;
+  /** Every standing pillar pulses on whoever stands close. */
+  pillarPulse: boolean;
+  /** Every mechanic's damage, on top of the claim's own multiplier. */
+  damageMult: number;
+}
+
+export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDifficultyRules>> = {
+  normal: { wakeMarks: 2, songAfterWrath: true, pillarPulse: false, damageMult: 1 },
+  heroic: { wakeMarks: 3, songAfterWrath: false, pillarPulse: true, damageMult: 1.25 },
+};
+
+// ---- tuning (SKETCH, unmeasured) ------------------------------------------------------
+
+export const COUNCIL_TUNING = {
+  // The pillars.
+  pillarCap: 7,
+  integrity: 3,
+  /** A carved column's radius and a risen pillar's (the combat wall rows). */
+  columnR: 2.6,
+  risenR: 2.2,
+  /** Rubble: its radius past the pillar's, how long it lies, its bite. */
+  rubblePad: 1.6,
+  rubbleSeconds: 8,
+  rubbleTick: 1,
+  rubbleMin: 90,
+  rubbleMax: 110,
+  // The Guardian: energy and Mountain's Wrath.
+  energyMax: 100,
+  energyFillSeconds: 55,
+  /** After this many Wraths the energy fills much faster (the soft enrage). */
+  enrageAfterWraths: 4,
+  enrageFillMult: 2.5,
+  wrathCast: 4,
+  wrathRadius: 45,
+  wrathMin: 440,
+  wrathMax: 520,
+  /** The heir's shorter Wrath. */
+  heirFillSeconds: 35,
+  heirWrathCast: 3,
+  heirWrathMin: 380,
+  heirWrathMax: 450,
+  // Hammer's Weight.
+  weightFirst: 10,
+  weightEvery: 18,
+  weightCast: 1.5,
+  weightMult: 2.2,
+  weightSeconds: 25,
+  /** Physical damage taken while it holds (+100 percent). */
+  weightTaken: 1,
+  // Wake the Stone.
+  wakeFirst: 14,
+  wakeEvery: 30,
+  wakeCast: 1.2,
+  wakeMarkSeconds: 5,
+  /** The heir's rise: random players, the spot locked, this warning. */
+  heirRiseWarn: 2,
+  riseKnockRadius: 3,
+  riseKnockback: 7,
+  riseMin: 120,
+  riseMax: 150,
+  /** A rising pillar keeps this far (centre to centre) from another, from a
+   *  council member, and inside the pit's floor. */
+  riseGap: 6.5,
+  riseClearOfBodies: 4.5,
+  // Falling Rock.
+  rockFirst: 9,
+  rockEvery: 25,
+  rockCast: 1.2,
+  rockMarkSeconds: 5,
+  rockRadius: 6,
+  /** The whole blow, split between everyone under it. */
+  rockTotal: 1350,
+  /** Fewer soakers than this: each takes half as much again, and the whole
+   *  raid takes the tremor. */
+  rockMinSoakers: 3,
+  rockPenaltyMult: 1.5,
+  rockTremorMin: 140,
+  rockTremorMax: 170,
+  // Seam Bolt.
+  boltFirst: 4,
+  boltEvery: 8,
+  boltCast: 2,
+  boltRange: 40,
+  boltMin: 300,
+  boltMax: 340,
+  /** Seconds the Singer stays silent after a kick. */
+  kickQuiet: 2,
+  // Song of the Seam and Resonance.
+  songCast: 3,
+  /** Normal: the song starts this long after a Wrath lands. */
+  songAfterWrath: 1,
+  /** Heroic: the song's own clock. */
+  songFirst: 20,
+  songEvery: 24,
+  songMarks: 3,
+  songKickedMarks: 1,
+  resonanceSeconds: 15,
+  /** A marked player within this of a pillar's face is cracking it. */
+  resonanceReach: 3.5,
+  resonanceCrackSeconds: 3,
+  // The stone remembers.
+  memoryPerFallen: 0.15,
+  // Heroic: the pillars pulse.
+  pulseEvery: 2,
+  pulseReach: 3,
+  pulseMin: 60,
+  pulseMax: 75,
+  /** Seconds of plain melee after a bar lands before the same body starts
+   *  another (nothing chains bar into bar). */
+  barGap: 1.2,
+} as const;
+
+// ---- pillar templates (pure) --------------------------------------------------------
+
+/** A pillar's template: carved column or risen, with its integrity left. */
+export function councilPillarTemplate(integrity: number, risen: boolean): string {
+  const n = Math.max(1, Math.min(COUNCIL_TUNING.integrity, Math.round(integrity)));
+  return `${risen ? COUNCIL_RISEN_PREFIX : COUNCIL_PILLAR_PREFIX}${n}`;
+}
+
+/** A pillar template's integrity and kind, or null when `templateId` is no
+ *  pillar. Pure (the renderer reads the mirrored entity through it). */
+export function councilPillarOf(templateId: string): { integrity: number; risen: boolean } | null {
+  const risen = templateId.startsWith(COUNCIL_RISEN_PREFIX);
+  if (!risen && !templateId.startsWith(COUNCIL_PILLAR_PREFIX)) return null;
+  const n = Number(templateId.slice((risen ? COUNCIL_RISEN_PREFIX : COUNCIL_PILLAR_PREFIX).length));
+  if (!Number.isInteger(n) || n < 1 || n > COUNCIL_TUNING.integrity) return null;
+  return { integrity: n, risen };
+}
+
+/** A pillar's footprint radius by kind. */
+export function councilPillarRadius(risen: boolean): number {
+  return risen ? COUNCIL_TUNING.risenR : COUNCIL_TUNING.columnR;
+}
+
+/** Seconds the Wrath's energy takes to fill, by holder and Wraths landed. */
+export function councilFillSeconds(heir: boolean, wraths: number): number {
+  const base = heir ? COUNCIL_TUNING.heirFillSeconds : COUNCIL_TUNING.energyFillSeconds;
+  return wraths >= COUNCIL_TUNING.enrageAfterWraths ? base / COUNCIL_TUNING.enrageFillMult : base;
+}
+
+/** How each soaker of a Falling Rock fares (pure): the share each takes and
+ *  whether the tremor rolls over the raid. */
+export function fallingRockShare(
+  soakers: number,
+  total: number,
+): { each: number; tremor: boolean } {
+  const n = Math.max(1, soakers);
+  const short = n < COUNCIL_TUNING.rockMinSoakers;
+  return {
+    each: Math.round((total / n) * (short ? COUNCIL_TUNING.rockPenaltyMult : 1)),
+    tremor: short,
+  };
+}

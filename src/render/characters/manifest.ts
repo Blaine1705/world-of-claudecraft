@@ -4014,6 +4014,26 @@ export const VISUALS: Record<string, VisualDef> = {
     bodyless: true,
     clickRadius: 4.4,
   },
+  // The Hammer Council's Slabwright and Seam Singer (the Smith's Heart's first
+  // boss, design doc 7.1): bodyless targets, their click capsules, nameplates
+  // and bars over the provisional rock-and-crystal bodies the raid's own
+  // effects draw (smith_heart_fx/council_bodies.ts) until their own models
+  // ship. Bound off the goleling's rig (never seen); height times the
+  // template's scale is the body's (about 2 to 2.5 times a player).
+  smith_heart_slabwright: {
+    url: `${CREATURES}/golelingevolved.glb`,
+    height: 2.15,
+    clips: ELEMENTAL_FLOATING,
+    bodyless: true,
+    clickRadius: 1.4,
+  },
+  smith_heart_seam_singer: {
+    url: `${CREATURES}/golelingevolved.glb`,
+    height: 2.5,
+    clips: ELEMENTAL_FLOATING,
+    bodyless: true,
+    clickRadius: 1.0,
+  },
   mob_ignivar: {
     url: `${CREATURES}/ignivar_herald.glb`,
     authoredAtlas: true, // baked Tripo/contributor atlas: low-tier floor rides the map

@@ -3,8 +3,9 @@
 // portal, derived every tick from the claim's own roster, never a timer and
 // never stored.
 //
-//   the Hammer guardian ALWAYS FIRST: its death splits the Slab (the gate
-//     `the_slab`, bosses [hammer]); nothing past it is reachable before;
+//   the Hammer ALWAYS FIRST: the Hammer Council's fall (all three: the
+//     Guardian, the Slabwright and the Seam Singer) splits the Slab (the gate
+//     `the_slab`, bosses = the council); nothing past it is reachable before;
 //   the other three in ANY order: no gate orders the Breath, the Quench and
 //     the Heat against each other (each arena's mouth waits only on its own
 //     vein's three packs);
@@ -32,6 +33,7 @@
 // Draws NO rng; reads the roster through the gate engine's placed-boss read.
 
 import {
+  SMITH_HEART_COUNCIL,
   SMITH_HEART_DUNGEON,
   SMITH_HEART_GUARDIANS,
   SMITH_HEART_PACKS,
@@ -47,6 +49,7 @@ import { dungeonPacksDead, dungeonPlacedBossDead } from '../../instances/dungeon
 import { instanceHalfWidthOf } from '../../instances/instance_footprint';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
+import { tickHammerCouncil } from './council';
 import { tickSmithHeartPortal } from './portal';
 
 /** Each vein's bit in the seal mask (the template id's number). */
@@ -103,12 +106,24 @@ export function smithHeartLitCount(mask: number): number {
   return n;
 }
 
-/** The lit-vein mask the claim has earned right now: one bit per dead guardian. */
+/** Is a vein's guardian fight won in this claim? The Hammer's is the Hammer
+ *  Council's: its vein waits on all three (the Guardian, the Slabwright and
+ *  the Seam Singer), never on the Guardian alone. */
+export function smithHeartVeinWon(
+  ctx: SimContext,
+  inst: InstanceSlot,
+  vein: SmithHeartVein,
+): boolean {
+  if (vein === 'hammer')
+    return SMITH_HEART_COUNCIL.every((id) => dungeonPlacedBossDead(ctx, inst, id));
+  return dungeonPlacedBossDead(ctx, inst, SMITH_HEART_GUARDIANS[vein]);
+}
+
+/** The lit-vein mask the claim has earned right now: one bit per won vein. */
 export function smithHeartEarnedMask(ctx: SimContext, inst: InstanceSlot): number {
   let mask = 0;
   for (const v of SMITH_HEART_VEINS) {
-    if (dungeonPlacedBossDead(ctx, inst, SMITH_HEART_GUARDIANS[v]))
-      mask |= SMITH_HEART_VEIN_BITS[v];
+    if (smithHeartVeinWon(ctx, inst, v)) mask |= SMITH_HEART_VEIN_BITS[v];
   }
   return mask;
 }
@@ -267,12 +282,15 @@ export function tickSmithHeartSeal(ctx: SimContext, inst: InstanceSlot): number 
   return value;
 }
 
-/** One tick of every Smith's Heart claim (instances/dungeons.ts): the seal
- *  (and the arrival), then the portal hops (the Ring's portal only while the
- *  seal stands open). Allocation free: the claim list is walked in place. */
+/** One tick of every Smith's Heart claim (instances/dungeons.ts): the Hammer
+ *  Council's fight, the seal (and the arrival), then the portal hops (the
+ *  Ring's portal only while the seal stands open). The claim list is walked
+ *  in place. */
 export function tickSmithHeart(ctx: SimContext): void {
   for (const inst of ctx.instances) {
     if (inst.partyKey === null || inst.dungeonId !== SMITH_HEART_DUNGEON) continue;
+    // The council first, so its fall lights the Hammer vein this same tick.
+    tickHammerCouncil(ctx, inst);
     const value = tickSmithHeartSeal(ctx, inst);
     if (value !== null) tickSmithHeartPortal(ctx, inst, smithHeartPortalBitSet(value));
   }

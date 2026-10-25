@@ -20,6 +20,7 @@ import type {
   CryptBossFightState,
   KnellwyrmKnellState,
 } from './encounters/hollow_crypt/boss_state';
+import type { CouncilFightState } from './encounters/smith_heart/council_state';
 import type { GrassClearCircle } from './grass_clear';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { MapObjectives } from './map_objectives';
@@ -6076,7 +6077,11 @@ export interface DungeonObjectSpawn {
     | 'sanctum_story_0'
     // The Smith's Heart's seal markers (encounters/smith_heart/seal.ts): the
     // lit veins ride the template id.
-    | 'smith_heart_seal_0';
+    | 'smith_heart_seal_0'
+    // The Smith's Heart's quarry columns, the Hammer Council's starting
+    // pillars (encounters/smith_heart/council_pillars.ts): the integrity left
+    // rides the template id, and each stands as a combat wall.
+    | 'sh_council_pillar_3';
   dungeonId?: string;
   /**
    * This object is an encounter mechanic players INTERACT with, never a pickup, even
@@ -8098,6 +8103,11 @@ export interface Entity extends ClientMirroredEntityFields {
    *  gravewyrm_sanctum: the Sledge Tusker, and the bosses in phase B). Sim
    *  authority only; the client reads the fight from casts, auras and objects. */
   sanctumFight?: SanctumFightState;
+  /** The Smith's Heart's Hammer Council fight (encounters/smith_heart/
+   *  council.ts): ONE state object shared by the Guardian, the Slabwright and
+   *  the Seam Singer while they fight. Sim authority only; the client reads
+   *  the fight from casts, auras, the energy bar and the pillar objects. */
+  smithHeartFight?: CouncilFightState;
   /** A dead trash-kit mob's burst in the making (MobTemplate.trashKit.deathBurst,
    *  mob/trash_kit/death_burst.ts): seconds left, its floor ring, and whether it
    *  has gone off. A death cloud (trashKit.deathCloud, wildheart_kit.ts) rides

@@ -35,6 +35,12 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // ---- the four guardians -----------------------------------------------------
   // Final: a stone titan half-fused with the Pit's floor, a great hammer arm.
   heart_hammer_guardian: 'skel_golem',
+  // The Hammer Council's other two: bodyless targets; their provisional
+  // bodies of the Heart kit's rock and crystal are drawn by
+  // smith_heart_fx/council_bodies.ts (the Masterless Strength's pattern).
+  // Final: their own models (the official pipeline), the same joints.
+  heart_slabwright: 'smith_heart_slabwright',
+  heart_seam_singer: 'smith_heart_seam_singer',
   // Final: a towering storm colossus with a body of wind and slate shards.
   heart_breath_guardian: 'mob_hoard_storm_caller',
   // Final: a glacier giant of clear ice with the lake's cold light inside.

@@ -1,5 +1,18 @@
 // The Smith's Heart's sim surface (public barrel).
 
+export {
+  councilBodies,
+  councilDevTrigger,
+  councilDifficulty,
+  councilReadout,
+  councilScopeForDev,
+  councilState,
+  setCouncilDevHeroic,
+  tickHammerCouncil,
+} from './council';
+export * from './council_ids';
+export { councilPillars, nearestRiseSpot, onQuarryFloor, pillarBetween } from './council_pillars';
+export type { CouncilFightState } from './council_state';
 export { SMITH_HEART_CLOSED_TEXT, SMITH_HEART_PLAYABLE, smithHeartEntryOpen } from './entry';
 export {
   SMITH_HEART_PORTAL_HOP_TEXT,
@@ -26,6 +39,7 @@ export {
   smithHeartSealMaskOf,
   smithHeartSealTemplate,
   smithHeartVeinLit,
+  smithHeartVeinWon,
   tickSmithHeart,
   tickSmithHeartSeal,
 } from './seal';

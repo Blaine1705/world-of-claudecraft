@@ -12,12 +12,14 @@
 // listed in render/characters/smith_heart_placeholder_looks.ts (the one list
 // phase 2 replaces). Loot is deliberately not wired (design doc, "Loot hook").
 
+import { COUNCIL_TUNING } from '../encounters/smith_heart/council_ids';
 import type {
   DungeonDef,
   DungeonGateDef,
   DungeonObjectSpawn,
   DungeonSpawn,
   MobTemplate,
+  TrashKitDef,
 } from '../types';
 import {
   BREATH,
@@ -27,6 +29,7 @@ import {
   HEART_BRIDGE_GATE,
   HEART_ROOM,
   HEART_TERRACE,
+  QUARRY_PILLAR_SPOTS,
   QUENCH,
   RING_PACK_DEGREES,
   ringPoint,
@@ -170,6 +173,27 @@ function boss(id: string, name: string, hp: number, color: number, scale: number
 
 const C = SMITH_HEART_CASTS;
 
+/** The Hammer Council's Mountain's Wrath declaration (encounter-driven: the
+ *  council starts and lands it; the trash engine only reads its look). */
+function councilWrath(
+  castTime: number,
+  min: number,
+  max: number,
+): NonNullable<TrashKitDef['nova']> {
+  return {
+    castId: C.hammerWrath,
+    name: "Mountain's Wrath",
+    castTime,
+    every: 999,
+    first: 999,
+    school: 'physical',
+    radius: COUNCIL_TUNING.wrathRadius,
+    min,
+    max,
+    encounterDriven: true,
+  };
+}
+
 export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // ---- trash -------------------------------------------------------------------
   heart_hammer_warder: warder(
@@ -220,23 +244,61 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
     0xffe6a0,
   ),
   // ---- the four guardians ------------------------------------------------------------
-  // The Hammer: a stone titan half-fused with the floor. Mountain's Wrath is a
-  // line-of-sight blast round it: hide behind the pit's columns.
+  // The Hammer Council (design doc 7.1, encounters/smith_heart/council.ts):
+  // three stone beings sharing the Hammer's strength, one pull, one wipe, one
+  // kill. Every number is a SKETCH (unmeasured): the pools split about 137,000
+  // (after the elite factor) for a 4 to 5 minute fight at a planning raid DPS
+  // of about 600. Each carries the Wrath's declaration (`nova`,
+  // encounter-driven: the council casts it, never the trash engine), so the
+  // sight field draws for whichever of them holds the Wrath.
+  // The Guardian of the Hammer: a stone titan half-fused with the floor, the
+  // tank boss (energy, Mountain's Wrath, Hammer's Weight). Hammerfall, its
+  // frontal arc, stays: it reads well and keeps the raid off the tank's side.
   heart_hammer_guardian: {
-    ...boss('heart_hammer_guardian', 'Guardian of the Hammer', 32000, 0x8a6430, 3.2),
+    ...boss('heart_hammer_guardian', 'Guardian of the Hammer', 22000, 0x8a6430, 3.2),
+    ccImmune: true,
+    slowImmune: true,
     arcCleave: { every: 3, arcDeg: 110, range: 9, mult: 0.7, name: 'Hammerfall' },
     trashKit: {
-      nova: {
-        castId: C.hammerWrath,
-        name: "Mountain's Wrath",
-        castTime: 3,
-        every: 20,
-        first: 10,
-        school: 'physical',
-        radius: 45,
-        min: 260,
-        max: 300,
-      },
+      nova: councilWrath(
+        COUNCIL_TUNING.wrathCast,
+        COUNCIL_TUNING.wrathMin,
+        COUNCIL_TUNING.wrathMax,
+      ),
+    },
+  },
+  // The Slabwright: broad and blocky, slab shoulders; it makes the pillars
+  // (Wake the Stone) and drops the rock (Falling Rock).
+  heart_slabwright: {
+    ...boss('heart_slabwright', 'The Slabwright', 19500, 0x9a7a52, 2.2),
+    ccImmune: true,
+    slowImmune: true,
+    dmgBase: 34,
+    dmgPerLevel: 7,
+    attackSpeed: 2.8,
+    trashKit: {
+      nova: councilWrath(
+        COUNCIL_TUNING.heirWrathCast,
+        COUNCIL_TUNING.heirWrathMin,
+        COUNCIL_TUNING.heirWrathMax,
+      ),
+    },
+  },
+  // The Seam Singer: tall and slender, ochre seam crystals; the caster (Seam
+  // Bolt, Song of the Seam). A light melee: its pressure is its bars.
+  heart_seam_singer: {
+    ...boss('heart_seam_singer', 'The Seam Singer', 18000, 0xd8a24a, 2.0),
+    ccImmune: true,
+    slowImmune: true,
+    dmgBase: 24,
+    dmgPerLevel: 5,
+    attackSpeed: 2.2,
+    trashKit: {
+      nova: councilWrath(
+        COUNCIL_TUNING.heirWrathCast,
+        COUNCIL_TUNING.heirWrathMin,
+        COUNCIL_TUNING.heirWrathMax,
+      ),
     },
   },
   // The Breath: a winged bellows of wind. Its gust throws the raid back (the
@@ -402,6 +464,28 @@ function guardian(mobId: string, at: { x: number; z: number }, facing: number): 
   return { mobId, x: at.x, z: at.z, facing, idleStationary: true };
 }
 
+/** The Hammer Council's three, facing the Pit Mouth, held as one pack. */
+function councilSpawns(): DungeonSpawn[] {
+  const facing = toward(HAMMER_PIT.x, HAMMER_PIT.z, -35, -179);
+  return [
+    { ...guardian(SMITH_HEART_GUARDIANS.hammer, SMITH_HEART_BOSS_SPOTS.hammer, facing) },
+    { ...guardian('heart_slabwright', SMITH_HEART_BOSS_SPOTS.slabwright, facing) },
+    { ...guardian('heart_seam_singer', SMITH_HEART_BOSS_SPOTS.seamSinger, facing) },
+  ].map((sp) => ({ ...sp, packId: SMITH_HEART_COUNCIL_PACK }));
+}
+
+/** The council's authored pack id (no gate waits on it as a pack: the Slab
+ *  waits on its three bosses). */
+export const SMITH_HEART_COUNCIL_PACK = 'council';
+
+/** The council's three, in role order (the Slab, the seal and every credit
+ *  wait on all three). */
+export const SMITH_HEART_COUNCIL: readonly string[] = [
+  'heart_hammer_guardian',
+  'heart_slabwright',
+  'heart_seam_singer',
+];
+
 const G = GALLERY_LANDINGS;
 const S = SMITH_HEART_BOSS_SPOTS;
 
@@ -410,7 +494,8 @@ export const SMITH_HEART_SPAWNS: DungeonSpawn[] = [
   ...pack('h1', G.h1.x, G.h1.z, HAMMER_TRIO, toward(G.h1.x, G.h1.z, CLEFT.x, CLEFT.z)),
   ...pack('h2', G.h2.x, G.h2.z, HAMMER_TRIO, toward(G.h2.x, G.h2.z, G.h1.x, G.h1.z)),
   ...pack('h3', G.h3.x, G.h3.z, HAMMER_TRIO, toward(G.h3.x, G.h3.z, G.h2.x, G.h2.z)),
-  guardian(SMITH_HEART_GUARDIANS.hammer, S.hammer, toward(HAMMER_PIT.x, HAMMER_PIT.z, -35, -179)),
+  // The Hammer Council: one authored pack, so pulling one pulls all three.
+  ...councilSpawns(),
   // ---- The Ring: two packs between each pair of vein mouths -------------------------
   ...RING_PACK_DEGREES.flatMap((deg, i) => {
     const p = ringPoint(deg);
@@ -475,7 +560,7 @@ export const SMITH_HEART_GATES: DungeonGateDef[] = [
     z: SLAB.z,
     hw: 7.6,
     rot: across(0, 1),
-    bosses: [SMITH_HEART_GUARDIANS.hammer],
+    bosses: [...SMITH_HEART_COUNCIL],
     openText:
       'The living stone splits from end to end. Beyond the Slab, the heart of the mountain lies open.',
   },
@@ -576,6 +661,19 @@ export const SMITH_HEART_SEAL_OBJECTS: DungeonObjectSpawn[] = SMITH_HEART_SEAL_M
   lootable: false,
 }));
 
+/** The quarry's five carved columns, the Hammer Council's starting pillars:
+ *  spawned with the claim, their integrity in the template id, each a combat
+ *  wall (encounters/smith_heart/council_pillars.ts). */
+export const SMITH_HEART_PILLAR_OBJECTS: DungeonObjectSpawn[] = QUARRY_PILLAR_SPOTS.map((p) => ({
+  itemId: '',
+  name: 'Carved Column',
+  x: p.x,
+  z: p.z,
+  templateId: 'sh_council_pillar_3',
+  dungeonId: SMITH_HEART_DUNGEON,
+  lootable: false,
+}));
+
 // ---- the dungeon -------------------------------------------------------------------
 
 /** The world entrance: a cleft at the foot of the Stormcrag cliffs, past the
@@ -602,7 +700,11 @@ export const SMITH_HEART_DUNGEON_DEFS: Record<string, DungeonDef> = {
     // second exit opens on the Anvil of the World once the final boss falls.
     bossExitPortal: { x: HEART_ROOM.x + 20, z: HEART_ROOM.z + 20 },
     spawns: SMITH_HEART_SPAWNS,
-    objects: [...SMITH_HEART_GATE_OBJECTS, ...SMITH_HEART_SEAL_OBJECTS],
+    objects: [
+      ...SMITH_HEART_GATE_OBJECTS,
+      ...SMITH_HEART_SEAL_OBJECTS,
+      ...SMITH_HEART_PILLAR_OBJECTS,
+    ],
     gates: SMITH_HEART_GATES,
     // No bossChainPull: a raid holds five bosses, and a guardian pull that woke
     // every mob of the claim would drag the whole mountain onto the Quarry.

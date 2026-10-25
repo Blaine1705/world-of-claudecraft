@@ -328,6 +328,11 @@ export const SMITH_HEART_BOSS_SPOTS = {
   quench: { x: QUENCH.lake.x, z: QUENCH.lake.z },
   heat: { x: -210, z: 0 },
   final: { x: HEART_ROOM.x, z: HEART_ROOM.z },
+  /** The Hammer Council's other two (section 7.1): the Slabwright and the
+   *  Seam Singer flank the Guardian a little behind it, well inside the
+   *  ring of columns. */
+  slabwright: { x: HAMMER_PIT.x + 3, z: HAMMER_PIT.z - 9 },
+  seamSinger: { x: HAMMER_PIT.x + 3, z: HAMMER_PIT.z + 9 },
 } as const;
 
 /** Named anchors: the entry, dev teleports and the renderer's set pieces. */
@@ -827,19 +832,31 @@ const ALTAR_PROPS: FieldProp[] = HEART_ALTARS.map((a) => ({
   h: 6,
 }));
 
-/** The quarry's columns (they rise and fall in phase 2), on a 24 yd circle:
- *  the line-of-sight cover for Mountain's Wrath. */
-const PIT_COLUMNS: FieldProp[] = [20, 92, 164, 236, 308].map((deg) => {
+/** The quarry's five carved columns on a 24 yd circle: the Hammer Council's
+ *  starting pillars (encounters/smith_heart/council_pillars.ts), the cover
+ *  from Mountain's Wrath. The encounter owns their solid body (it cracks and
+ *  falls in the fight and stands whole again on a reset), so the field builds
+ *  no collider for them: a live claim publishes each standing one as a combat
+ *  wall. Their radius and height are the encounter's pillar shape. */
+export const QUARRY_PILLAR_SPOTS: readonly { x: number; z: number; rot: number }[] = [
+  20, 92, 164, 236, 308,
+].map((deg) => {
   const a = (deg * Math.PI) / 180;
-  return {
-    kind: 'sh_pit_column',
-    x: HAMMER_PIT.x + Math.sin(a) * 24,
-    z: HAMMER_PIT.z + Math.cos(a) * 24,
-    rot: a,
-    r: 2.6,
-    h: 13,
-  };
+  return { x: HAMMER_PIT.x + Math.sin(a) * 24, z: HAMMER_PIT.z + Math.cos(a) * 24, rot: a };
 });
+/** A carved column's footprint radius and sight height (yards). */
+export const QUARRY_PILLAR_R = 2.6;
+export const QUARRY_PILLAR_H = 13;
+
+const PIT_COLUMNS: FieldProp[] = QUARRY_PILLAR_SPOTS.map((p) => ({
+  kind: 'sh_pit_column',
+  x: p.x,
+  z: p.z,
+  rot: p.rot,
+  r: QUARRY_PILLAR_R,
+  h: QUARRY_PILLAR_H,
+  encounterOwned: true,
+}));
 
 /** How far past the pit's rim the colossi stand: carved out of the terraces
  *  themselves, their knees on the first step, their backs still one with the

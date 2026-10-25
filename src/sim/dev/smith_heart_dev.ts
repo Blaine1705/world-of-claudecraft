@@ -6,7 +6,8 @@
 //   /dev heart                       this help line
 //   /dev heart enter [normal]        claim a fresh run and step in at the Cleft
 //   /dev heart tp <area|boss>        jump inside the run (enters first)
-//   /dev heart kill <what>           kill a guardian (hammer, breath, quench,
+//   /dev heart kill <what>           kill a vein's fight (hammer: the whole
+//                                    Hammer Council; breath, quench,
 //                                    heat), the final boss (final), all four
 //                                    guardians (guardians), one pack (pack h1
 //                                    to h3, r1 to r8, b1 to b3, q1 to q3, f1
@@ -19,6 +20,15 @@
 //                                    back to sleep a moment and wakes again
 //                                    (with a living player in the Heart)
 //   /dev heart reset                 free the run and claim a fresh one
+//   /dev heart council               the Hammer Council's readout
+//   /dev heart council <what>        pull (all three onto you), reset (whole
+//                                    again, the five columns too), heroic
+//                                    [on|off] (this run's council), energy <n>,
+//                                    wrath, weight, wake, rock, bolt, song,
+//                                    resonance [n] (force one mechanic now)
+//   /dev heart kill guardian|slabwright|singer|council
+//                                    one council member (to test each order of
+//                                    the inheritance) or all three (= hammer)
 //
 // Areas: cleft, gallery, pit (or hammer), balcony, ring, ringse, ringsw,
 // breath, bridge, cornice (or breathboss), quench, ice, lake (or quenchboss),
@@ -29,6 +39,7 @@
 // follow on the next tick.
 
 import {
+  SMITH_HEART_COUNCIL_PACK,
   SMITH_HEART_DUNGEON,
   SMITH_HEART_FINAL_BOSS,
   SMITH_HEART_GUARDIANS,
@@ -36,6 +47,10 @@ import {
 import { SMITH_HEART_ANCHORS } from '../content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../data';
 import {
+  COUNCIL_TEMPLATE_IDS,
+  councilBodies,
+  councilDevTrigger,
+  councilReadout,
   replaySmithHeartArrivalForDev,
   SMITH_HEART_AWAKE_BIT,
   setSmithHeartPortalDevOpen,
@@ -83,13 +98,21 @@ export const SMITH_HEART_DEV_AREAS: Readonly<Record<string, { x: number; z: numb
 /** `/dev heart kill` boss names to template ids. */
 const BOSS_ALIASES: Readonly<Record<string, string>> = {
   ...SMITH_HEART_GUARDIANS,
+  guardian: SMITH_HEART_GUARDIANS.hammer,
+  slabwright: 'heart_slabwright',
+  singer: 'heart_seam_singer',
   final: SMITH_HEART_FINAL_BOSS,
 };
 
-const GUARDIAN_IDS: ReadonlySet<string> = new Set(Object.values(SMITH_HEART_GUARDIANS));
+/** The four vein fights' bodies: the Hammer's is the whole council. */
+const GUARDIAN_IDS: ReadonlySet<string> = new Set([
+  ...Object.values(SMITH_HEART_GUARDIANS),
+  ...COUNCIL_TEMPLATE_IDS,
+]);
+const COUNCIL_IDS: ReadonlySet<string> = new Set(COUNCIL_TEMPLATE_IDS);
 
 const HELP =
-  '[dev] /dev heart enter [normal] | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | arrival | reset';
+  '[dev] /dev heart enter [normal] | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|guardian|slabwright|singer|council|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | arrival | reset | council [pull|reset|heroic [on|off]|energy <n>|wrath|weight|wake|rock|bolt|song|resonance [n]]';
 
 function log(ctx: SimContext, pid: number, text: string): void {
   ctx.emit({ type: 'log', text, pid });
@@ -125,16 +148,20 @@ export function killSmithHeartMatching(
   ctx: SimContext,
   pid: number,
   inst: InstanceSlot,
-  what: string,
+  named: string,
 ): number {
+  let what = named;
   const packArg = /^pack\s+(\S+)$/.exec(what);
   const packId = packArg ? packArg[1] : null;
+  // The Hammer's vein is its whole fight: `hammer` kills the three.
+  if (what === 'hammer') what = 'council';
   const boss = BOSS_ALIASES[what];
   const spawns = DUNGEONS[SMITH_HEART_DUNGEON].spawns;
   if (
     what !== 'all' &&
     what !== 'trash' &&
     what !== 'guardians' &&
+    what !== 'council' &&
     boss === undefined &&
     (packId === null || !spawns.some((s) => s.packId === packId))
   ) {
@@ -145,8 +172,11 @@ export function killSmithHeartMatching(
   spawns.forEach((spawn, i) => {
     const hit =
       what === 'all' ||
-      (what === 'trash' && spawn.packId !== undefined) ||
+      (what === 'trash' &&
+        spawn.packId !== undefined &&
+        spawn.packId !== SMITH_HEART_COUNCIL_PACK) ||
       (what === 'guardians' && GUARDIAN_IDS.has(spawn.mobId)) ||
+      (what === 'council' && COUNCIL_IDS.has(spawn.mobId)) ||
       (boss !== undefined && spawn.mobId === boss) ||
       (packId !== null && spawn.packId === packId);
     if (!hit) return;
@@ -248,6 +278,32 @@ export function handleSmithHeartDevChat(ctx: SimContext, raw: string, pid: numbe
     }
     replaySmithHeartArrivalForDev(ctx, inst);
     log(ctx, pid, '[dev] The heart sleeps a moment; it wakes again with the raid in the Heart.');
+    return true;
+  }
+  if (verb === 'council') {
+    const inst = ensureInside(ctx, pid);
+    if (!inst) return true;
+    if (!arg) {
+      log(ctx, pid, councilReadout(ctx, inst));
+      return true;
+    }
+    if (arg === 'pull') {
+      const me = ctx.entities.get(pid);
+      const bodies = councilBodies(ctx, inst);
+      if (!me || !bodies) return true;
+      let n = 0;
+      for (const b of [bodies.guardian, bodies.slabwright, bodies.singer]) {
+        if (b && !b.dead && ctx.aggroMob(b, me, false)) n++;
+      }
+      log(ctx, pid, `[dev] The Hammer Council wakes (${n} pulled).`);
+      return true;
+    }
+    const reply = councilDevTrigger(ctx, inst, arg);
+    if (reply === null) {
+      ctx.error(pid, HELP);
+      return true;
+    }
+    log(ctx, pid, `[dev] ${reply}`);
     return true;
   }
   if (verb === 'reset') {

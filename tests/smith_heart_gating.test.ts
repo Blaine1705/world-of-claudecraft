@@ -2,8 +2,9 @@
 // shared gate engine over content/smith_heart.ts SMITH_HEART_GATES), driven
 // through a real Sim claim:
 // - a fresh claim: every gate shut, the seal dark;
-// - the Hammer ALWAYS FIRST: its death splits the Slab and lights the ochre
-//   quarter, and nothing else orders the other three;
+// - the Hammer ALWAYS FIRST: the Hammer Council's fall (all three of it, never
+//   the Guardian alone) splits the Slab and lights the ochre quarter, and
+//   nothing else orders the other three;
 // - the Breath, the Quench and the Heat light in any order, each with its own
 //   line to the raid, each once;
 // - the seal opens into the portal only with all four lit AND the Ring
@@ -15,6 +16,7 @@
 
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+  SMITH_HEART_COUNCIL,
   SMITH_HEART_FINAL_BOSS,
   SMITH_HEART_GATES,
   SMITH_HEART_GUARDIANS,
@@ -84,8 +86,18 @@ function state(sim: Sim, inst: InstanceSlot, id: string) {
   return dungeonGateState(sim.ctx, inst, gate(id));
 }
 
-/** Kill every claim mob of the listed packs or templates (instant, no loot). */
+/** Kill every claim mob of the listed packs or templates (instant, no loot).
+ *  The Hammer's guardian stands for its whole fight: the Hammer Council's
+ *  three (killOnly kills exactly what it names). */
 function kill(sim: Sim, inst: InstanceSlot, ids: readonly string[]): void {
+  killOnly(
+    sim,
+    inst,
+    ids.flatMap((id) => (id === SMITH_HEART_GUARDIANS.hammer ? SMITH_HEART_COUNCIL : [id])),
+  );
+}
+
+function killOnly(sim: Sim, inst: InstanceSlot, ids: readonly string[]): void {
   SPAWNS.forEach((s, i) => {
     if (!ids.includes(s.packId ?? '') && !ids.includes(s.mobId)) return;
     const mob = sim.ctx.entities.get(inst.mobIds[i]) as Entity;
@@ -183,6 +195,11 @@ describe("the Smith's Heart gating", () => {
     sim.tick();
     expect(state(sim, inst, 'hammer_pit_mouth')).toBe('open');
     expect(state(sim, inst, 'the_slab')).toBe('closed');
+    // The Hammer Council: two of the three down is not the fight won.
+    killOnly(sim, inst, [SMITH_HEART_GUARDIANS.hammer, 'heart_slabwright']);
+    sim.tick();
+    expect(state(sim, inst, 'the_slab')).toBe('closed');
+    expect(markers(sim, inst).every((m) => m === 0)).toBe(true);
     kill(sim, inst, [SMITH_HEART_GUARDIANS.hammer]);
     const events = sim.tick();
     expect(state(sim, inst, 'the_slab')).toBe('open');
