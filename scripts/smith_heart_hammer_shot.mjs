@@ -41,7 +41,8 @@ const ENTRY = { x: -196, z: -210 };
 // guardian and shoots while Mountain's Wrath is on its bar; 'hammerfall'
 // shoots just after a Hammerfall; 'slab' kills the guardian and shoots the
 // Slab breaking `SHOT_SLAB_MS` after; 'alive' revives the guardian first;
-// 'seq:<steps>' runs chat lines and waits ('c:/dev heart portal;w:1400').
+// 'seq:<steps>' runs chat lines and waits ('c:/dev heart portal;w:1400');
+// 'mesh:<name>' waits for a named effect mesh to show, then shoots.
 const SHOTS = [
   ['01_grieta', [-194, -208], [-213, -225], 0.0, 0.2, 15, ''],
   ['02_galeria', [-146, -224], [-96, -230], 0.2, 0.24, 18, ''],
@@ -193,6 +194,23 @@ try {
         await sleep(Number(process.env.SHOT_WRATH_MS ?? 1800));
       }
       await place(at, look, yaw, pitch, dist);
+    } else if (action.startsWith('mesh:')) {
+      // Phase 2H: wait (up to SHOT_MESH_WAIT_MS) for a named effect mesh to
+      // show (a guardian's swing ice, a creak), then shoot SHOT_MESH_MS in.
+      const want = action.slice(5);
+      const until = Date.now() + Number(process.env.SHOT_MESH_WAIT_MS ?? 40000);
+      while (Date.now() < until) {
+        const shown = await page.evaluate((name) => {
+          let on = false;
+          window.__game.renderer.scene.traverse((o) => {
+            if (o.name === name && o.visible) on = true;
+          });
+          return on;
+        }, want);
+        if (shown) break;
+        await sleep(40);
+      }
+      await sleep(Number(process.env.SHOT_MESH_MS ?? 120));
     } else if (action.startsWith('seq:')) {
       // A scripted moment (phase 2F, the Ring): 'seq:' then steps split by
       // ';', each 'c:<chat line>' or 'w:<ms>' (the still is taken after).

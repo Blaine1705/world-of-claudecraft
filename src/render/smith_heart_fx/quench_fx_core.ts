@@ -151,7 +151,7 @@ export function strikeSpikes(
     out.push({
       x: Math.sin(a) * r,
       z: Math.cos(a) * r,
-      height: 1.1 + 2.2 * Math.max(0.2, mid) * (0.7 + 0.3 * fxHash(seed, i * 3 + 2)),
+      height: 1.6 + 3.0 * Math.max(0.2, mid) * (0.7 + 0.3 * fxHash(seed, i * 3 + 2)),
       lean: 0.25 + 0.3 * fxHash(seed, i + 50),
       yaw: a,
     });
