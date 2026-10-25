@@ -1,6 +1,6 @@
 // The Smith's Heart's open-air interior (docs/design/raid/smith_heart.md):
 // the authored field's terraces (Stormcrag slate, quarried earth, snow and
-// lake ice, the forge's soot and plate, the dais's and the Heart's ritual
+// lake ice, the Hearth's columnar basalt, the dais's and the Heart's ritual
 // floors) with bedded-strata cliffs, the mountain's rock rising along every
 // outer lip (each vein an open fissure, the Cornice a summit, the Heart a
 // chamber inside the mountain), the rooms' hero props, each vein's colour
@@ -26,7 +26,7 @@ import { BREATH_KIT_KEEL, BREATH_KIT_SHALLOW } from './breath_kit_plan_core';
 import { buildHammerAir } from './hammer_air';
 import { dressHammerVein, ensureHammerKit, HAMMER_KIT_KINDS, hammerKitReady } from './hammer_kit';
 import { heartCliffPaint } from './heart_cliff_paint_core';
-import { inBreathLight, inQuenchLight } from './heart_environment';
+import { inBreathLight, inHeatLight, inQuenchLight } from './heart_environment';
 import { buildHeartGates } from './heart_gates';
 import { heartKitProgramWarmers } from './heart_kit';
 import { buildHeartLights } from './heart_lights';
@@ -46,6 +46,11 @@ import { buildHeartRoom } from './heart_room';
 import { buildHeartSeal } from './heart_seal';
 import { heartSealSlotKey, heartSealView, newHeartSealView } from './heart_seal_core';
 import { buildHeartSky } from './heart_sky';
+import { buildHeatAir } from './heat_air';
+import { hearthFloorMaterial } from './heat_hearth_floor';
+import { dressHeat, ensureHeatKit, HEAT_KIT_KINDS, heatKitReady } from './heat_kit';
+import { HEAT_KIT_SHALLOW } from './heat_kit_plan_core';
+import { buildHeatPour } from './heat_pour';
 import { buildQuenchAir } from './quench_air';
 import { dressQuench, ensureQuenchKit, QUENCH_KIT_KINDS, quenchKitReady } from './quench_kit';
 import { lakeIceMaterial } from './quench_lake_ice';
@@ -82,6 +87,7 @@ export async function buildSmithHeartInterior(
     ensureRingKit(),
     ensureBreathKit(),
     ensureQuenchKit(),
+    ensureHeatKit(),
   ]);
   // The Ring kit draws the two stairs tread by tread and the dais's keel
   // (phase 2F); without it the field's own ramps and keel stand.
@@ -90,6 +96,9 @@ export async function buildSmithHeartInterior(
   // keeps only a shallow keel under its deck.
   const breathReady = breathKitReady();
   const quenchReady = quenchKitReady();
+  // The Heat kit draws the anvil bridge's arch (phase 2I): the field then
+  // keeps only a shallow keel under its deck.
+  const heatReady = heatKitReady();
   const group = new THREE.Group();
   group.name = 'smithHeartField';
   // The rock's regional paint (the Quench's frost) reads this slot from its
@@ -106,13 +115,18 @@ export async function buildSmithHeartInterior(
         surfaces: new Set([
           ...SMITH_HEART_FLOATING_SURFACES,
           ...(breathReady ? BREATH_KIT_SHALLOW : []),
+          ...(heatReady ? HEAT_KIT_SHALLOW : []),
         ]),
         depth: BREATH_KIT_KEEL,
       },
       ...(ringReady ? { omitTops: RING_KIT_OMIT_TOPS } : {}),
       // The Frozen Lake and the Singing Ice drawn with the ice's depth
       // (phase 2H).
-      topMaterial: { lake_ice: (pair) => lakeIceMaterial(pair, deps.lowGfx) },
+      // The Heat's floors with the fire in their joints (phase 2I).
+      topMaterial: {
+        lake_ice: (pair) => lakeIceMaterial(pair, deps.lowGfx),
+        hearth: (pair) => hearthFloorMaterial(pair, deps.lowGfx),
+      },
     }),
   );
   group.add(buildHeartMountain(deps.lowGfx));
@@ -124,12 +138,14 @@ export async function buildSmithHeartInterior(
     ...RING_KIT_KINDS,
     ...BREATH_KIT_KINDS,
     ...QUENCH_KIT_KINDS,
+    ...HEAT_KIT_KINDS,
   ]);
   const drawn = new Set([
     ...(kitReady ? HAMMER_KIT_KINDS : []),
     ...(ringReady ? RING_KIT_KINDS : []),
     ...(breathReady ? BREATH_KIT_KINDS : []),
     ...(quenchReady ? QUENCH_KIT_KINDS : []),
+    ...(heatReady ? HEAT_KIT_KINDS : []),
   ]);
   const props = buildHeartProps(kitKinds, drawn);
   group.add(props.group);
@@ -137,12 +153,15 @@ export async function buildSmithHeartInterior(
   dressRing(group, props.kitOwned, deps.lowGfx);
   dressBreath(group, props.kitOwned, deps.lowGfx);
   dressQuench(group, props.kitOwned, deps.lowGfx);
+  dressHeat(group, props.kitOwned, deps.lowGfx);
   // The kit's slot programs link with the interior even when the kit lands
   // late (the swap then links nothing in a live frame).
   group.add(heartKitProgramWarmers());
   group.add(buildHammerAir(deps.lowGfx));
   group.add(buildBreathAir(deps.lowGfx));
   group.add(buildQuenchAir(deps.lowGfx));
+  group.add(buildHeatAir(deps.lowGfx));
+  group.add(buildHeatPour(deps.lowGfx));
   group.add(buildHeartRoom(deps.lowGfx, ringReady ? new Set(['seal_dais']) : new Set()));
   buildHeartLights(group, deps, ground);
   const rivers = buildHeartRivers();
@@ -163,6 +182,7 @@ export async function buildSmithHeartInterior(
   let blend = 0;
   let breathBlend = 0;
   let quenchBlend = 0;
+  let heatBlend = 0;
   let hopAt = -1;
   let hopSide: 'heart' | 'ring' | null = null;
   const sky = buildHeartSky({
@@ -195,6 +215,8 @@ export async function buildSmithHeartInterior(
       sky.setBreath(breathBlend);
       quenchBlend = heartAreaBlend(quenchBlend, inQuenchLight(local.x, local.z), dt);
       sky.setQuench(quenchBlend);
+      heatBlend = heartAreaBlend(heatBlend, inHeatLight(local.x, local.z), dt);
+      sky.setHeat(heatBlend);
       heartSealView(slot, now, view);
       heartPortalStage(view.portalSince, stage);
       heartHopStage(hopAt < 0 ? -1 : now - hopAt, hop);

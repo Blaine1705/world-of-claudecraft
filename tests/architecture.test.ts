@@ -1013,6 +1013,13 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart/quench_frost_core.ts',
   'src/render/smith_heart/quench_air_core.ts',
   'src/render/smith_heart_fx/quench_fx_core.ts',
+  // The Smith's Heart's Heat vein (phase 2I): its kit's plan, its basalt on
+  // the mountain, its air and the pour's timeline, its guardian's effects.
+  'src/render/smith_heart/heat_kit_plan_core.ts',
+  'src/render/smith_heart/heat_soot_core.ts',
+  'src/render/smith_heart/heat_air_core.ts',
+  'src/render/smith_heart/heat_pour_core.ts',
+  'src/render/smith_heart_fx/heat_fx_core.ts',
   'src/render/drowned_temple/temple_rising_stair_core.ts',
   // The Mere Hydra's Tsunami: the breaking wave's profile, timeline, spray and foam.
   'src/render/drowned_temple/temple_tsunami_core.ts',
