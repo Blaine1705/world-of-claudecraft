@@ -40,12 +40,14 @@ export type FieldGround =
   // The Smith's Heart's Hammer vein: the quarry's cut bedrock, and the
   // Gallery's worn paving (phase 2E); its Breath vein's storm-scoured pale
   // granite (phase 2G); its Quench vein's frost-bound granite and the Frozen
-  // Lake's clear ice (phase 2H).
+  // Lake's clear ice (phase 2H); its Heat vein's columnar basalt, fire in its
+  // joints (phase 2I).
   | 'quarry'
   | 'paving'
   | 'scoured'
   | 'rime'
-  | 'lake_ice';
+  | 'lake_ice'
+  | 'hearth';
 
 interface FieldSurfaceBase {
   id: string;

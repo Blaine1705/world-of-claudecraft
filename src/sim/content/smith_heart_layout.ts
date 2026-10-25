@@ -20,8 +20,9 @@
 //       the Wind Bridge, a cracked plateau cut by wind channels);
 //     east, the Quench (descends to the Quench Basin at -30: packs q1 to q3,
 //       the Singing Ice, the frozen lake where the Smith cooled his work);
-//     west, the Heat (level, the Smith's own forge: packs f1 to f3, the Pour
-//       Channel, the great hearth and the giant anvil);
+//     west, the Heat (level, the Hearth, the Smith's first flame: packs f1
+//       to f3, the Pour Channel, the Hearth's mouth and its altar-stone; the
+//       ids below keep the forge names they had before phase 2I);
 //   -> four colours lit on the heart seal, on the Seal Dais in the middle of
 //   the Ring, reached by the Grand Stair down from the Balcony's tip or by the
 //   North Stair down from the Ring's north (the Breath's mouth) -> the seal
@@ -223,17 +224,19 @@ export const QUENCH = {
 
 // ---- the main map: the Heat (west, level) -------------------------------------------
 
-/** The Heat: the forge hall, the casting floor, the Smith's Forge arena. */
+/** The Heat: the hall, the casting floor, the Hearth's arena (`forge`: the
+ *  ids keep their forge names; the look is the Hearth's, phase 2I). */
 export const HEAT = {
   hall: { x0: -124, z0: -14, x1: -76, z1: 14, h: H.heat },
   floor: { x0: -164, z0: -36, x1: -124, z1: 36, h: H.heat },
   forge: { x: -214, z: 0 },
 } as const;
-/** The Pour Channel: where the great crucible's colada crosses the casting
- *  floor's path (render strip now, a timed hazard in phase 2). */
+/** The Pour Channel: where the wellspring's fire crosses the casting floor's
+ *  path (its look and cycle are the renderer's now, a timed hazard later). */
 export const POUR_CHANNEL = { x: -150, z0: -36, z1: 36, halfWidth: 2.5 } as const;
-/** The Smith's Forge: an eight-sided hall of the Smith's own smithy, the
- *  great hearth in its west wall (render: beyond the floor's edge). */
+/** The Hearth's arena (`smiths_forge`): an eight-sided hall carved in the
+ *  mountain's basalt, the Hearth's mouth in its west wall (render: beyond the
+ *  floor's edge). */
 const FORGE_POINTS: readonly (readonly [number, number])[] = [
   [-174, -22],
   [-182, -38],
@@ -248,10 +251,11 @@ const FORGE_POINTS: readonly (readonly [number, number])[] = [
   [-182, 38],
   [-174, 22],
 ];
-/** The great hearth: the forge's mouth in the rock behind the west wall
- *  (render only; nothing of it stands over the floor). */
+/** The Hearth's mouth in the rock behind the west wall (render only; nothing
+ *  of it stands over the floor). */
 export const GREAT_HEARTH = { x: -263, z: 0, halfWidth: 18 } as const;
-/** The giant anvil, side-on to the arena's door (horn north). */
+/** The great altar-stone (once the giant anvil: its footprint and height),
+ *  side-on to the arena's door, its crystal crown north. */
 export const GIANT_ANVIL = { x: -236, z: 0, hw: 3.2, hd: 8.5, h: 9 } as const;
 
 // ---- the Heart: the separate final room ---------------------------------------------
@@ -742,9 +746,10 @@ const AUTHORED_SURFACES: FieldSurface[] = [
   ),
   carvedEllipse('lake_shelf', QUENCH.shelf, 3, 71, { edge: 'rock', ground: 'rime' }),
   carvedEllipse('frozen_lake', QUENCH.lake, 2, 73, { edge: 'rock', ground: 'lake_ice' }, 10),
-  // --- The Heat (west): the Smith's forge, level with the Ring ------------------------
-  rect('forge_hall', HEAT.hall, { edge: 'masonry', ground: 'soot' }),
-  rect('casting_floor', HEAT.floor, { edge: 'masonry', ground: 'soot' }),
+  // --- The Heat (west): the Hearth, level with the Ring (phase 2I: the
+  // mountain's columnar basalt, fire in its joints; ids unchanged) ------------------
+  rect('forge_hall', HEAT.hall, { edge: 'rock', ground: 'hearth' }),
+  rect('casting_floor', HEAT.floor, { edge: 'rock', ground: 'hearth' }),
   path(
     'anvil_bridge',
     [
@@ -753,15 +758,15 @@ const AUTHORED_SURFACES: FieldSurface[] = [
       [-174, 0, H.heat],
       [-178, 0, H.heat],
     ],
-    { edge: 'masonry', ground: 'plate' },
+    { edge: 'rock', ground: 'hearth' },
   ),
   {
     kind: 'poly',
     id: 'smiths_forge',
     points: FORGE_POINTS,
     h: H.heat,
-    edge: 'masonry',
-    ground: 'plate',
+    edge: 'rock',
+    ground: 'hearth',
   },
   // --- The Heart (the separate final room) --------------------------------------------
   disc('heart_terrace', HEART_TERRACE, { edge: 'balustrade', ground: 'slate' }),
@@ -1063,8 +1068,10 @@ const PROPS: FieldProp[] = [
   ...FROST_STONES,
   { kind: 'sh_ice_blade', x: 150, z: -78, rot: 0.3, r: 0.8, h: 4 },
   { kind: 'sh_ice_blade', x: 170, z: -96, rot: 1.2, r: 0.8, h: 4 },
-  // The Heat: house-sized crucibles, the great pour crucible, the great
-  // hearth, its bellows, the giant anvil, the casting channels.
+  // The Heat (the Hearth, phase 2I; the kinds keep their forge names): the
+  // crystal clusters (`sh_crucible`), the wellspring (`sh_pour_crucible`),
+  // the Hearth's mouth, its ember boulders (`sh_great_bellows`), the
+  // altar-stone (`sh_giant_anvil`), the seams of fire (`sh_casting_channel`).
   { kind: 'sh_crucible', x: -100, z: 11, rot: 0, r: 2.4, h: 6 },
   { kind: 'sh_crucible', x: -100, z: -11, rot: 0, r: 2.4, h: 6 },
   { kind: 'sh_pour_crucible', x: POUR_CHANNEL.x, z: 31, rot: Math.PI, r: 3, h: 10 },

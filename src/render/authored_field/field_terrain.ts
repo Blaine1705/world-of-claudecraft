@@ -22,6 +22,7 @@ import {
   flagstoneDetail,
   glacierWallDetail,
   gratingDetail,
+  hearthDetail,
   iceDetail,
   lakeIceDetail,
   mossDetail,
@@ -127,6 +128,9 @@ export function buildAuthoredFieldTerrain(
     // Frozen Lake's polished ice (its depth is the dungeon's own material).
     rime: { detail: rimeDetail, rough: 0.86 },
     lake_ice: { detail: lakeIceDetail, rough: 0.3, metal: 0.02 },
+    // The Heat (phase 2I): the basalt columns' worn heads, matte, the fire
+    // in their joints the dungeon's own material.
+    hearth: { detail: hearthDetail, rough: 0.84 },
   };
   for (const family of FIELD_TOP_FAMILIES) {
     const data = tops[family];

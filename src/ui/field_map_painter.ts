@@ -52,6 +52,7 @@ const FIELD_MAP_TOKENS = {
   scoured: '--color-field-map-scoured',
   rime: '--color-field-map-rime',
   lake_ice: '--color-field-map-lake-ice',
+  hearth: '--color-field-map-hearth',
   crevasse: '--color-field-map-crevasse',
   crevasseDeep: '--color-field-map-crevasse-deep',
   wall: '--color-field-map-wall',

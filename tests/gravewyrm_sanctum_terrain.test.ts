@@ -52,10 +52,10 @@ describe('the Sanctum ground families', () => {
     }
     // Every ground the colour table knows is covered by one of the lists: the
     // older grounds, the Sanctum's, and the Smith's Heart's (each in its own
-    // family: the quarry, the paving, the scoured granite, the rime and the
-    // lake ice).
+    // family: the quarry, the paving, the scoured granite, the rime, the
+    // lake ice and the Heat's columnar basalt).
     const all = Object.keys(FIELD_GROUND_COLORS);
-    const smithHeart = ['quarry', 'paving', 'scoured', 'rime', 'lake_ice'];
+    const smithHeart = ['quarry', 'paving', 'scoured', 'rime', 'lake_ice', 'hearth'];
     for (const ground of smithHeart)
       expect(fieldGroundFamily(ground as FieldGround), ground).toBe(ground);
     expect(all.sort()).toEqual(

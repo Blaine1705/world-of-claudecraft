@@ -1426,6 +1426,152 @@ export function lakeIceDetail(): DetailPair {
   return bakeColored('lakeIce', paintLakeIce, 0x1a6e, 512, 1.2, 1);
 }
 
+/** The colour the Heat's floor paints its burning joints in: a hue nothing
+ *  else in the tile carries (the basalt is grey, the ash pale, the baked
+ *  rims umber), so the floor's material (smith_heart/heat_hearth_floor.ts)
+ *  finds them in the map and lights them. Stored at 1/1.6, as every tile. */
+export const HEARTH_SEAM_PAINT: readonly [number, number, number] = [1.5, 0.95, 0.25];
+
+/** The Heat's floor (phase 2I), one tile = 10 yd: the heads of the basalt
+ *  columns the mountain cooled into (a jittered hexagonal lattice's cells,
+ *  a yard and a half to two across), each its own warm dark grey, worn to a
+ *  low dome and tipped a hair, parted by deep joints; pale ash settled in
+ *  soft drifts and packed into stretches of the joints; and in a few
+ *  wandering bands the joints burn (painted HEARTH_SEAM_PAINT), the heads
+ *  either side baked a warm umber. Broad relief only. */
+const paintHearth: ColorPainter = (h, rgb, size, rnd) => {
+  const cols = 6;
+  const rows = 8;
+  const cw = size / cols;
+  const ch = size / rows;
+  const pts: [number, number][] = [];
+  for (let j = 0; j < rows; j++)
+    for (let i = 0; i < cols; i++)
+      pts.push([
+        (i + 0.5 + (j % 2) * 0.5 + (rnd() - 0.5) * 0.46) * cw,
+        (j + 0.5 + (rnd() - 0.5) * 0.46) * ch,
+      ]);
+  const tones = pts.map(() => 0.8 + rnd() * 0.32);
+  const warmth = pts.map(() => rnd());
+  const tilt = pts.map(() => [(rnd() - 0.5) * 0.24, (rnd() - 0.5) * 0.24] as const);
+  const ash = noiseField(size, rnd, 5);
+  const ashFine = noiseField(size, rnd, 14);
+  const grain = noiseField(size, rnd, 40);
+  const wobble = noiseField(size, rnd, 10);
+  // The burning bands: slow wandering paths across the tile; every joint
+  // within a band burns (a trail of lit joints, the fire running under).
+  const band = new Float32Array(size * size);
+  for (let k = 0; k < 3; k++) {
+    let x = rnd() * size;
+    let y = rnd() * size;
+    let a = rnd() * Math.PI * 2;
+    const len = size * (0.45 + rnd() * 0.4);
+    const bend = (rnd() - 0.5) * 0.008;
+    for (let s = 0; s < len; s += 1.5) {
+      a += bend + (wobble[wrapAt(x, y, size)] - 0.5) * 0.06;
+      x += Math.cos(a) * 1.5;
+      y += Math.sin(a) * 1.5;
+      const w = 30 * (0.55 + 0.45 * Math.sin((s / len) * Math.PI));
+      for (let d = -w; d <= w; d += 1.5) {
+        const i = wrapAt(x - Math.sin(a) * d, y + Math.cos(a) * d, size);
+        band[i] = Math.max(band[i], 1 - Math.abs(d) / w);
+      }
+    }
+  }
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const i = y * size + x;
+      // The nearest two lattice points (only the cells round this pixel's).
+      const jy = y + (wobble[i] - 0.5) * 6;
+      const jx = x + (wobble[(i + 97) % (size * size)] - 0.5) * 6;
+      const cj = Math.floor(jy / ch);
+      let d1 = 1e9;
+      let d2 = 1e9;
+      let best = 0;
+      let second = 0;
+      for (let oj = -2; oj <= 2; oj++) {
+        const jj = cj + oj;
+        const wj = ((jj % rows) + rows) % rows;
+        const shift = (wj % 2) * 0.5;
+        const ci = Math.floor(jx / cw - shift);
+        for (let oi = -2; oi <= 2; oi++) {
+          const ii = ci + oi;
+          const wi = ((ii % cols) + cols) % cols;
+          const k = wj * cols + wi;
+          const dx = jx - (pts[k][0] + (ii - wi) * cw);
+          const dy = jy - (pts[k][1] + (jj - wj) * ch);
+          const d = dx * dx + dy * dy;
+          if (d < d1) {
+            d2 = d1;
+            second = best;
+            d1 = d;
+            best = k;
+          } else if (d < d2) {
+            d2 = d;
+            second = k;
+          }
+        }
+      }
+      // A few neighbouring heads are one column split by a hairline only
+      // (never the same lattice twice over).
+      const pair = Math.min(best, second) * 131 + Math.max(best, second);
+      const fused = ((pair * 2654435761) >>> 0) / 4294967296 < 0.2;
+      const edge = (Math.sqrt(d2) - Math.sqrt(d1)) * 0.5 + (fused ? 3.5 : 0);
+      const r = Math.sqrt(d1) / (cw * 0.55);
+      const u = (jx - pts[best][0]) / cw;
+      const v = (jy - pts[best][1]) / ch;
+      // The head: worn to a low dome, tipped a hair.
+      let hv = 0.6 + u * tilt[best][0] + v * tilt[best][1] + (1 - Math.min(1, r * r)) * 0.08;
+      const c = tones[best] * (0.92 + (grain[i] - 0.5) * 0.08);
+      const wk = warmth[best];
+      let cr = c * (1.02 + wk * 0.06);
+      let cg = c * (0.98 + wk * 0.02);
+      let cb = c * (0.94 - wk * 0.03);
+      // The joint: the head's worn shoulder sinking into it, deep and dark.
+      if (edge < 6) hv -= ((6 - edge) / 6) ** 1.7 * 0.24;
+      const burning = band[i] > 0.15 && !fused;
+      if (edge < 1.6) {
+        hv = 0.08;
+        if (burning) {
+          cr = HEARTH_SEAM_PAINT[0];
+          cg = HEARTH_SEAM_PAINT[1];
+          cb = HEARTH_SEAM_PAINT[2];
+        } else {
+          cr = 0.5;
+          cg = 0.47;
+          cb = 0.45;
+        }
+      } else if (burning && edge < 9) {
+        // The heads either side of a burning joint baked a warm umber.
+        const t = (1 - (edge - 1.6) / 7.4) * Math.min(1, band[i] * 2);
+        cr += (1.05 - cr) * t * 0.5;
+        cg += (0.72 - cg) * t * 0.5;
+        cb += (0.5 - cb) * t * 0.5;
+      }
+      // Ash: soft drifts over the heads, packed into the joints where it
+      // lies (never over a burning joint: the fire keeps it clear).
+      const drift = Math.max(0, ash[i] - 0.55) * 2.2 + Math.max(0, ashFine[i] - 0.7) * 0.8;
+      if (!(burning && edge < 1.6)) {
+        const inJoint = edge < 4 ? Math.max(0, ash[i] - 0.42) * 2.5 : 0;
+        const w = Math.min(0.55, drift * 0.45 + inJoint * 0.7);
+        cr += (1.32 - cr) * w;
+        cg += (1.26 - cg) * w;
+        cb += (1.18 - cb) * w;
+        hv += w * 0.06;
+      }
+      h[i] = hv;
+      rgb[i * 3] = cr;
+      rgb[i * 3 + 1] = cg;
+      rgb[i * 3 + 2] = cb;
+    }
+  }
+};
+
+/** The Heat's columnar basalt (one tile = 10 yd: the family's UV scale). */
+export function hearthDetail(): DetailPair {
+  return bakeColored('hearth', paintHearth, 0x4e47, 512, 2.6, 1);
+}
+
 /** The Breath's scoured bedrock (one tile = 14 yd: the family's UV scale). */
 export function scouredDetail(): DetailPair {
   return bakeColored('scoured', paintScoured, 0x9b21, 512, 2.4, 1);

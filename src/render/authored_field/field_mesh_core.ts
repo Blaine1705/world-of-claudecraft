@@ -79,6 +79,9 @@ export const FIELD_GROUND_COLORS: Readonly<Record<FieldGround, Rgb>> = {
   // blue the lake shader deepens to dark water.
   rime: [0.36, 0.395, 0.45],
   lake_ice: [0.36, 0.5, 0.62],
+  // The Heat (phase 2I): the mountain's basalt cooled in columns, their worn
+  // heads a dark warm grey, sooted, ash settled over them.
+  hearth: [0.25, 0.235, 0.225],
 };
 
 /** The texture families a walkable top draws with (one mesh each). */
@@ -97,6 +100,7 @@ export const FIELD_TOP_FAMILIES = [
   'scoured',
   'rime',
   'lake_ice',
+  'hearth',
 ] as const;
 export type FieldTopFamily = (typeof FIELD_TOP_FAMILIES)[number];
 
@@ -115,6 +119,9 @@ export function fieldFamilyUvScale(family: FieldTopFamily): number {
   if (family === 'rime') return 1 / 12;
   // The lake's cracks and bubble streams run long: one tile every 18.
   if (family === 'lake_ice') return 1 / 18;
+  // The basalt columns' heads, a yard and a half to two across: one tile
+  // every 10.
+  if (family === 'hearth') return 1 / 10;
   return 0.25;
 }
 
@@ -131,6 +138,7 @@ export function fieldGroundFamily(ground: FieldGround): FieldTopFamily {
   if (ground === 'scoured') return 'scoured';
   if (ground === 'rime') return 'rime';
   if (ground === 'lake_ice') return 'lake_ice';
+  if (ground === 'hearth') return 'hearth';
   if (ground === 'plate') return 'plate';
   if (ground === 'grating') return 'grating';
   return ground === 'earth' ||
@@ -444,6 +452,7 @@ export function topColor(ground: FieldGround, x: number, z: number, onPath: bool
   if (ground === 'scoured') return scouredColor(base, k, x, z, patch);
   if (ground === 'rime') return rimeColor(base, k, x, z, onPath);
   if (ground === 'lake_ice') return lakeIceColor(base, x, z);
+  if (ground === 'hearth') return hearthColor(base, k, x, z, onPath);
   const r = base[0] * k * (1 - moss * 0.35) * (1 - dirt * 0.25) + dirt * 0.05;
   const g = base[1] * k * (1 - moss * 0.05) * (1 - dirt * 0.3) + dirt * 0.035;
   const b = base[2] * k * (1 - moss * 0.3) * (1 - dirt * 0.45) + dirt * 0.02;
@@ -530,6 +539,32 @@ function lakeIceColor(base: Rgb, x: number, z: number): Rgb {
   const cloud = fieldNoise(x * 0.04 + 41, z * 0.04 - 7, 3);
   const k = 0.82 + cloud * 0.36;
   return [base[0] * k, base[1] * k, base[2] * k];
+}
+
+/** The Heat's columnar basalt (phase 2I): a dark warm grey in broad
+ *  drifts, soot pooled darker in patches, pale ash settled over it in soft
+ *  drifts (thinned where the walk is trodden), the stone baked a breath
+ *  warmer in long bands where the fire runs under it; never one flat
+ *  colour, never black, never orange (the fire is the joints' own light,
+ *  smith_heart/heat_hearth_floor.ts). */
+function hearthColor(base: Rgb, k: number, x: number, z: number, onPath: boolean): Rgb {
+  const soot = Math.max(0, fieldNoise(x * 0.06 - 9, z * 0.06 + 14, 3) - 0.55) * 1.6;
+  const ash =
+    Math.min(0.5, Math.max(0, fieldNoise(x * 0.05 + 21, z * 0.05 - 3, 3) - 0.55) * 1.4) *
+    (onPath ? 0.6 : 1);
+  const warm = Math.max(0, fieldNoise(x * 0.025 + 5, z * 0.08 - 11, 2) - 0.6) * 1.5;
+  const t = k * 0.9 * (1 - soot * 0.3);
+  const rock: Rgb = [
+    base[0] * t * (1 + warm * 0.18),
+    base[1] * t * (1 + warm * 0.08),
+    base[2] * t * (1 - warm * 0.05),
+  ];
+  const w = ash * 0.55;
+  return [
+    rock[0] + (0.52 - rock[0]) * w,
+    rock[1] + (0.49 - rock[1]) * w,
+    rock[2] + (0.45 - rock[2]) * w,
+  ];
 }
 
 /** Jungle moss: bright sunlit cushions, darker damp loam showing through,
@@ -656,6 +691,7 @@ export function planFieldTops(
     scoured: { positions: [], colors: [], uvs: [], indices: [] },
     rime: { positions: [], colors: [], uvs: [], indices: [] },
     lake_ice: { positions: [], colors: [], uvs: [], indices: [] },
+    hearth: { positions: [], colors: [], uvs: [], indices: [] },
   };
   const clippers = laterClippers(def, opts.omit);
   def.surfaces.forEach((s, layer) => {
