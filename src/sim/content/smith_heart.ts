@@ -604,7 +604,8 @@ export const SMITH_HEART_DUNGEON_DEFS: Record<string, DungeonDef> = {
     spawns: SMITH_HEART_SPAWNS,
     objects: [...SMITH_HEART_GATE_OBJECTS, ...SMITH_HEART_SEAL_OBJECTS],
     gates: SMITH_HEART_GATES,
-    bossChainPull: true,
+    // No bossChainPull: a raid holds five bosses, and a guardian pull that woke
+    // every mob of the claim would drag the whole mountain onto the Quarry.
     areaCastsPlant: true,
     interior: 'smith_heart',
     suggestedPlayers: 10,
