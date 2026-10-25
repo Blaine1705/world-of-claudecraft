@@ -124,11 +124,13 @@ export async function drainPendingBuddyGrants(
     return;
   }
   if (rows.length === 0) return;
-  // The player may have left during the read; the rows are already consumed,
-  // so re-queue by not applying is impossible. Apply to whoever holds the pid
-  // only when it is still this character (the sim re-validates the key).
+  // takePendingBuddyGrants already committed these keys to account_buddies in
+  // the same statement that consumed them, so a player who left during the read
+  // loses only the live apply and its announcement: the next join hydrates the
+  // ownership. Apply to whoever holds the pid only when it is still this
+  // character (the sim re-validates the key).
   if (!sim.players.get(pid) || sim.players.get(pid)?.characterId !== characterId) {
-    console.error(`buddy grants: ${name} left before ${rows.length} queued grant(s) landed`);
+    console.error(`buddy grants: ${name} left before ${rows.length} queued grant(s) applied live`);
     return;
   }
   let landed = 0;

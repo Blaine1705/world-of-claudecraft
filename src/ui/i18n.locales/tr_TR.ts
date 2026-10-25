@@ -12,20 +12,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountBagsEmpty': 'Çantaların boş.',
   'hudChrome.bank.accountRetry': 'Tekrar dene',
   'hudChrome.collections.actions.dismiss': 'Kapat',
-  'hudChrome.collections.actions.remove': 'Kaldır',
   'hudChrome.collections.actions.summon': 'Çağır',
-  'hudChrome.collections.actions.wear': 'Giy',
-  'hudChrome.collections.armor.cloth': 'Kumaş',
-  'hudChrome.collections.armor.leather': 'Deri',
-  'hudChrome.collections.detail.honorPrice': '{amount} Onur',
-  'hudChrome.collections.detail.soulbound': 'Ruha Bağlı',
-  'hudChrome.collections.petKind.beast': 'Canavarlar',
-  'hudChrome.collections.petKind.elemental': 'Elementaller',
-  'hudChrome.collections.petKind.humanoid': 'İnsansılar',
-  'hudChrome.collections.petKind.undead': 'Hortlaklar',
-  'hudChrome.collections.stat.agility': 'Çeviklik',
-  'hudChrome.collections.stat.intellect': 'Zeka',
-  'hudChrome.collections.tabs.mounts': 'Binekler',
   'hudChrome.courier.bankTitle': 'Banka',
   'hudChrome.courier.empty': 'Eşya yok',
   'hudChrome.courier.inventory': 'Envanter',
@@ -21453,7 +21440,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'editor.tree.volumeSy': 'Germe',
   'editor.tunnel.cutShape.box': 'Kutu',
   'editor.tunnel.width': 'Genişlik',
-  'hudChrome.collections.stat.strength': 'Güç',
   'editor.decalTool.hint':
     'Bir çıkartma seç, ardından damgalamak için zemine tıkla. Damgalar araziye yayılır ve yalnızca kamera yakındayken yüklenir, bu yüzden harita çok sayıda taşıyabilir. Seçmek için damgaya tıkla; Delete kaldırır.',
   'editor.decalTool.importDecal': 'Çıkartma görüntüsü içe aktar',
@@ -23023,8 +23009,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.cantors_hymnal.name': 'Kantorun İlahi Kitabı',
   'entities.items.cantors_stole.name': 'Kantorun Şalı',
   'entities.items.cellwatch_belt.name': 'Hücre Nöbeti Kemeri',
-  'entities.items.charm_stag_acorn.name': 'Palamut Tacı Tılsımı',
-  'entities.items.charm_stag_gilded.name': 'Yaldızlı Tılsım',
   'entities.items.choirward_leggings.name': 'Koro Koruması Bacaklığı',
   'entities.items.choirward_pauldrons.name': 'Koro Koruması Omuzlukları',
   'entities.items.choristers_gloves.name': 'Korocunun Eldivenleri',
@@ -23135,41 +23119,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.vestments_of_the_waking_rite.name': 'Uyanan Ayin Giysileri',
   'entities.items.warmonger_greaves.name': 'Savaş Kışkırtıcısı Baldır Zırhı',
   'entities.items.warmonger_treads.name': 'Savaş Kışkırtıcısı Ayakkabıları',
-  'entities.items.whistle_alon.name': 'Alon Düdüğü',
-  'entities.items.whistle_alpaca.name': 'Alpaka Düdüğü',
-  'entities.items.whistle_ansem.name': 'Ansem Düdüğü',
-  'entities.items.whistle_bull.name': 'Boğa Düdüğü',
-  'entities.items.whistle_cate_coin.name': 'Cate Coin Düdüğü',
-  'entities.items.whistle_crimson_claw_crab.name': 'Kızıl Kıskaçlı Yengeç Düdüğü',
-  'entities.items.whistle_crystal_lich.name': 'Kristal Liç Düdüğü',
-  'entities.items.whistle_crystal_tide.name': 'Kristal Gelgit Düdüğü',
-  'entities.items.whistle_ember_fox.name': 'Köz Tilkisi Düdüğü',
-  'entities.items.whistle_emberfall_phoenix.name': 'Köz Yağışı Anka Düdüğü',
-  'entities.items.whistle_emerald_wolf.name': 'Zümrüt Kurt Düdüğü',
-  'entities.items.whistle_forgemaw.name': 'Erimiş Ocakçene Düdüğü',
-  'entities.items.whistle_frog.name': 'Kurbağa Düdüğü',
-  'entities.items.whistle_frostfire.name': 'Buz Ateşi Düdüğü',
-  'entities.items.whistle_golden_sentinel.name': 'Altın Nöbetçi Düdüğü',
-  'entities.items.whistle_horse.name': 'At Düdüğü',
-  'entities.items.whistle_kekius.name': 'Kekius Düdüğü',
-  'entities.items.whistle_loot_goblin.name': 'Ganimet Goblini Düdüğü',
-  'entities.items.whistle_moss_hare.name': 'Yosun Tavşanı Düdüğü',
-  'entities.items.whistle_nightfang.name': 'Gece Dişi Düdüğü',
-  'entities.items.whistle_penny_goldspark.name': 'Penny Goldspark Düdüğü',
-  'entities.items.whistle_phantom.name': 'Hayalet Düdüğü',
-  'entities.items.whistle_proud_grunt.name': 'Gururlu Piyade Düdüğü',
-  'entities.items.whistle_raptor.name': 'Yırtıcı Kertenkele Düdüğü',
-  'entities.items.whistle_rocky.name': 'Kayacık Düdüğü',
-  'entities.items.whistle_sapling.name': 'Fidan Düdüğü',
-  'entities.items.whistle_skeleton.name': 'İskelet Düdüğü',
-  'entities.items.whistle_solbot.name': 'Solbot Düdüğü',
-  'entities.items.whistle_spider.name': 'Örümcek Düdüğü',
-  'entities.items.whistle_sprites.name': 'Titreşim ve Parıltı Düdüğü',
-  'entities.items.whistle_stag.name': 'Geyik Düdüğü',
-  'entities.items.whistle_tiger.name': 'Kaplan Düdüğü',
-  'entities.items.whistle_triple_t.name': 'Triple T Düdüğü',
-  'entities.items.whistle_trollface.name': 'Trollface Düdüğü',
-  'entities.items.whistle_tuskhorn_boar.name': 'Azıboynuz Yaban Domuzu Düdüğü',
   'bossJournal.wildheart.bloom.sproutName': 'Diken Filizi',
   'entities.mobs.balgath_cyclops.name': 'Balgath, Tek Gözlü Ustabaşı',
   'entities.mobs.barnacle_crawler.name': 'Enkaza Bağlı Denizci',
@@ -23203,7 +23152,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.buddy_proud_grunt.name': 'Gururlu Piyade',
   'entities.mobs.buddy_raptor.name': 'Yırtıcı Kertenkele',
   'entities.mobs.buddy_rocky.name': 'Kayacık',
-  'entities.mobs.buddy_sapling.name': 'Fidan',
   'entities.mobs.buddy_skeleton.name': 'İskelet',
   'entities.mobs.buddy_solbot.name': 'Solbot',
   'entities.mobs.buddy_spider.name': 'Örümcek',
@@ -23358,7 +23306,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.social.boundFriendLink': 'Bağlı arkadaşlar, davet bağlantılarıyla birbirine bağlanır.',
   'hud.social.friendFirstPage': 'İlk sayfa',
   'hud.system.moonbridgeBanner': 'Ay Köprüsü Yükseliyor',
-  'hudChrome.collections.source.grantLabel': 'Verildi',
   'referralCards.awarded': 'Verildi',
   'referralCards.bankBonus': 'Tamamlanan damga kartları',
   'referralCards.bankBonusHelp':
@@ -23770,52 +23717,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.flagNameAzure': 'Masmavi Bayrak',
   'hudChrome.bg.flagNameCrimson': 'Kızıl Bayrak',
   'hudChrome.bg.flagReturnedByLog': '{name}, {team} bayrağını geri getirdi.',
-  'hudChrome.collections.armor.mail': 'Zincir Zırh',
-  'hudChrome.collections.close': 'Avcılığı kapat',
-  'hudChrome.collections.cosmetic.crystal_lich_frostbound': 'Buza Bağlı',
-  'hudChrome.collections.cosmetic.crystal_lich_voltaic': 'Elektrikli',
-  'hudChrome.collections.cosmetic.forgemaw_ashen': 'Küllü',
-  'hudChrome.collections.cosmetic.forgemaw_whitehot': 'Akkor',
-  'hudChrome.collections.cosmetic.frog_sapphire': 'Safir Kurbağa',
-  'hudChrome.collections.cosmetic.moss_hare_verdant': 'Yemyeşil',
-  'hudChrome.collections.cosmetic.proud_grunt_warlord': 'Savaş Lordu',
-  'hudChrome.collections.cosmetic.stag_acorn': 'Palamut Tacı',
-  'hudChrome.collections.cosmetic.stag_gilded': 'Yaldızlı',
-  'hudChrome.collections.cosmeticUnlocked': '{name} için yeni görünüm: {look}.',
-  'hudChrome.collections.detail.bindLabel': 'Bağlanma',
-  'hudChrome.collections.detail.drop': '{mob} ({location}), öldürme başına %{chance}',
-  'hudChrome.collections.detail.dropLabel': 'Şundan düşer',
-  'hudChrome.collections.detail.dropWithHeroic':
-    "{mob} ({location}), öldürme başına %{chance}, Kahramanca'da %{heroicChance}",
-  'hudChrome.collections.detail.exchangeLabel': '$WOC Borsası',
-  'hudChrome.collections.detail.exchangeNone': 'İlan yok',
-  'hudChrome.collections.detail.exchangeUnavailable': 'Bu istemcide kullanılamıyor',
-  'hudChrome.collections.detail.fishingDrop': 'Her yerde balıkçılık, av başına %{chance}',
-  'hudChrome.collections.detail.globalDrop':
-    'Her düşman, öldürme başına %{chance}, bu nadirlikteki {count} seçenekten biri',
-  'hudChrome.collections.detail.heroicDrop':
-    '{mob} ({location}), yalnızca Kahramanca, öldürme başına %{chance}',
-  'hudChrome.collections.detail.marketAtMerchant': 'Tüccarda gösterilir',
-  'hudChrome.collections.detail.marketChecking': 'Kontrol ediliyor...',
-  'hudChrome.collections.detail.marketLabel': 'Dünya Pazarı',
-  'hudChrome.collections.detail.marketNone': 'İlan yok',
-  'hudChrome.collections.detail.marksPrice': '{amount} Kahramanlık Nişanı',
-  'hudChrome.collections.detail.noItem': 'Henüz bunu veren eşya yok',
-  'hudChrome.collections.detail.noSell': 'Satılamaz',
-  'hudChrome.collections.detail.noSource': 'Henüz oyunda kaynak yok',
-  'hudChrome.collections.detail.sellLabel': 'Satıcının ödediği',
-  'hudChrome.collections.detail.setLabel': 'Toplandı',
-  'hudChrome.collections.detail.tradeable': 'Takas edilebilir',
-  'hudChrome.collections.detail.vendor': '{npc} ({location}), {price} karşılığında',
-  'hudChrome.collections.detail.vendorLabel': 'Satan',
-  'hudChrome.collections.keybindLabel': 'Avcılık',
-  'hudChrome.collections.launcherTitle': 'Avcılık: yoldaşlar, binekler ve eşya setleri',
-  'hudChrome.collections.looks.locked': 'Kilitli',
-  'hudChrome.collections.looks.none': 'Bu yoldaş için henüz görünüm hazırlanmamış',
-  'hudChrome.collections.looks.title': 'Görünümler',
-  'hudChrome.collections.looks.unlocked': 'Açıldı',
-  'hudChrome.collections.looks.worn': 'Kuşanılmış',
-  'hudChrome.collections.petKind.celebrity': 'Ünlüler',
   'hudChrome.collections.presence.alon': 'İzlendiğini ve sessizce onaylandığını hissediyorsun.',
   'hudChrome.collections.presence.alpaca': 'Yünlü ve telaşsız bir şey sana katılmaya karar verdi.',
   'hudChrome.collections.presence.ansem': 'Kapılara ve karanlığa dair bir fısıltı seni izliyor.',
@@ -23865,43 +23766,15 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Homurtu ve tepinme: inatçı bir şey peşinden geliyor.',
   'hudChrome.collections.presenceDefault': 'Seni izleyen bir varlık hissediyorsun.',
   'hudChrome.collections.revealed': '{name} seni izlemeye karar verdi.',
-  'hudChrome.collections.set.bonusLabel': '{pieces} parça',
-  'hudChrome.collections.set.itemLevel': 'eşya seviyesi {level}',
-  'hudChrome.collections.set.owned': '{total} parçadan {owned}',
-  'hudChrome.collections.source.bossDrop':
-    '{mob} ({location}), öldürme başına oyuncu başına %{chance}',
-  'hudChrome.collections.source.bossDropHeroicOnly':
-    '{mob} ({location}), yalnızca Kahramanca, oyuncu başına %{chance}',
-  'hudChrome.collections.source.bossDropWithHeroic':
-    "{mob} ({location}), oyuncu başına %{chance}, Kahramanca'da %{heroicChance}",
-  'hudChrome.collections.source.bossLabel': 'Baş düşman yoldaşı',
-  'hudChrome.collections.source.challengeDps':
-    'Savaş boyunca {mob} hedefine saniyede {dps} hasar ver',
-  'hudChrome.collections.source.challengeLabel': 'Meydan okuma',
-  'hudChrome.collections.source.challengeSpeed':
-    '{mob} hedefini çekişten sonraki {seconds} saniyede yen',
   'hudChrome.collections.state.owned': 'Toplandı',
-  'hudChrome.collections.title': 'Avcılık',
   'hudChrome.cryptAlert.timeAria': '{seconds} saniye kaldı',
   'hudChrome.kitUse.timeAria': '{seconds} saniye kaldı',
   'hudChrome.sanctumAlert.timeAria': '{seconds} saniye kaldı',
   'hudChrome.wildheartAlert.timeAria': '{seconds} saniye kaldı',
-  'hudChrome.collections.source.craft': '{item} ({profession} tarifi)',
-  'hudChrome.collections.source.craftLabel': 'Üretildi',
-  'hudChrome.collections.source.deed': '{deed} yiğitliği',
-  'hudChrome.collections.source.deedLabel': 'Şununla kazanılır',
-  'hudChrome.collections.source.grantOnly':
-    'Sezonluk ödül: aylık sıralama ve en iyi analiz ödülleri',
-  'hudChrome.collections.source.rollNote':
-    'Her oyuncu ayrı zar atar; kimse grup üyesi yüzünden zar kaybetmez.',
-  'hudChrome.collections.source.token': '{item}, yoldaşı bağlamak için bir kez kullanılır',
-  'hudChrome.collections.source.tokenLabel': 'Jeton',
-  'hudChrome.collections.stat.mixed': 'Karma',
   'hudChrome.collections.state.notOwned': 'Toplanmadı',
   'hudChrome.collections.state.pending': 'Bir varlık seni izliyor',
   'hudChrome.collections.state.unavailable': 'Henüz elde edilemiyor',
   'hudChrome.collections.tabs.buddies': 'Yoldaşlar',
-  'hudChrome.collections.tabs.sets': 'Eşya Setleri',
   'hudChrome.cosmetics.buddyActive': 'Çağrıldı',
   'hudChrome.cosmetics.buddyDrag': 'Eylem çubuğuna sürükle',
   'hudChrome.courier.bags': 'Bankaya gönder',
@@ -24347,76 +24220,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Büyük Jaguar seni avlar ve kışkırtmaları yok sayar. Her ısırık {min} ile {max} arası fiziksel hasar verir (Kahramanca'da {heroicMin} ile {heroicMax}) ve kanama açar. Ustasından uzağa kaçır.",
   'hudChrome.bastionChain.anchoredLine':
     'Zinciri bağlamak için yanan bağlama direğine koş veya vinç seni çukura çekmeden grubun kırsın',
-  'hudChrome.collections.buddyLore.alon':
-    'Hiçbir haritanın kabul etmediği yoldan gelen yolcu maskotu; planların ters gittiği her yerde belirir. İzler, onaylar ve hiçbir yardım sunmaz.',
-  'hudChrome.collections.buddyLore.alpaca':
-    'Fırtına Sırtı sürücüleri onları yünleri ve huyları için besler: fırtınada hiçbir şey daha sakin kalmaz. Bu, yolculuk başına tam bir kişiye tükürür.',
-  'hudChrome.collections.buddyLore.ansem':
-    'Kapılardan ve karanlıktan söz eder, ikisini de açmaz. Gece Çiçeği tarikatçıları onun kendilerine ait olduğunu söyler; ne zaman ayin yapsalar uzaklaşır.',
-  'hudChrome.collections.buddyLore.bull':
-    'Köpek boyunda Vadi boğası; birinin evde beslemeyi kabul etmesinin tek nedeni de bu. Huyu geri kalanıyla birlikte küçülmedi.',
-  'hudChrome.collections.buddyLore.cate_coin':
-    'Üzerine oturduğu paradan ayrılmayan, kimsenin yemek yerken görmediği bir kedi. Eastbrook tüccarları ikisinden hangisinin evcil hayvan olduğunu hâlâ tartışır.',
-  'hudChrome.collections.buddyLore.crimson_claw_crab':
-    'Sudan çıktıktan çok sonra bile kıskacı kırmızı kalan Uzak Kıyı gelgit yengeci. İskele ekipleri eskiden tahtalar boyunca para karşılığı yarıştırırdı.',
-  'hudChrome.collections.buddyLore.crystal_lich':
-    "Nythraxis'in kendisinden bir kıymık; onu şekillendiren soğukla hâlâ uğuldar. Baskın enkazından çıkarana itaat eder ve bunun için onu affetmemiştir.",
-  'hudChrome.collections.buddyLore.crystal_tide':
-    "Kendi deniz camı damlasına binen gelgit perisi; Vadi'den Uzak Kıyı'ya kadar akşam yemeği tutan balıkçılar durgun sudan çıkarır. Çıktığı suyu korur ve geri dönmeye ikna olmaz.",
-  'hudChrome.collections.buddyLore.ember_fox':
-    'Doğudere Vadisi çitlerinden dişi tilki; kış çalılığında görünen köz kızılı kürkünden adını alır. Oradaki avcılar nesiller önce yavruları yakalamaktan vazgeçip yiyecek bırakmaya başladı.',
-  'hudChrome.collections.buddyLore.emberfall_phoenix':
-    'Her sonbaharda köze kadar yanar, ilkbaharda kendi külünden yeniden çıkar; hakkında söylenebilenin tamamı bu. Kimse yuvasını bulmadı, kimse birini iki kez yakalamadı.',
-  'hudChrome.collections.buddyLore.emerald_wolf':
-    'Orman zeminine tam ulaşmayan taç ışığında kürkü yeşil görünen Hayalet Ormanı yavrusu. Muhafızlar ormanın geride bıraktığı yetimleri büyütür.',
-  'hudChrome.collections.buddyLore.forgemaw':
-    "Son Pınar Potasında dövülmüş, asla tam bitirilmemiştir; çekiçler hâlâ inerken Ignivar'ın dökümhanesinden yürüyüp çıktı. Yalnızca Kahramanca inişte bulunur: erimiş şey onu yapan ocağa dönüp durur ve ateşten iki kez sağ çıkanın peşinden eve gider.",
-  'hudChrome.collections.buddyLore.frog':
-    'Mirefen Bataklığı onları şişman, tasasız, bütün gece sazlıklardan şarkı söyler hâlde yetiştirir. Bataklık rehberleri, birini taşıyan teknenin asla karaya oturmadığına yemin eder.',
-  'hudChrome.collections.buddyLore.frostfire':
-    'Kırağı Diyarında sıcak pınarın buz alanını yardığı yerde doğmuştur; hangi yarıya ait olduğuna hiç karar vermedi. Soğuk havada buhar çıkarır, sıcakta titrer.',
-  'hudChrome.collections.buddyLore.golden_sentinel':
-    'Büyüdüğü reçineyle yaldızlanmış Kehribar Vadisi bekçi böceği. Adı reçineden eskidir: bir tür nöbetçi, biri özsuyu şişelemeyi düşünmeden çok önce bu koruları beklerdi.',
-  'hudChrome.collections.buddyLore.horse':
-    'Meyve bahçesi yolları için küçük yetiştirilen Vadi midillisi; savaş atı olmadığı hiç söylenmemiş. Omzunda adım tutar ve bir kez elma veren herkesi izler.',
-  'hudChrome.collections.buddyLore.kekius':
-    'Kökeni belirsiz gülen yoldaş, Fırtına Sırtı yarış ahırları tarafından uğur diye benimsenmiş. Ona inanan dört ahırdan uzun yaşadı.',
-  'hudChrome.collections.buddyLore.loot_goblin':
-    'Kahramanlık Nişanı taşıyan herkesi izler ve bir kez bile çalarken yakalanmamıştır. Levazım Subayı Vex bunun hiçbir şeyi kanıtlamadığını söyler.',
-  'hudChrome.collections.buddyLore.moss_hare':
-    'Ömrünü ıslak turbada geçirip kürkü yeşillenen Söğüt Bataklığı tavşanı. Bataklık otacıları onları uğurlu sayar, kapı eşiğinden kovdurmaz.',
-  'hudChrome.collections.buddyLore.nightfang':
-    'Kendi türüne göre bile sessiz genç Gece Çiçeği avcısı. Arkadaşlık için izler, güveden büyük bir şey avlamaz.',
-  'hudChrome.collections.buddyLore.penny_goldspark':
-    'Saatlik ücret alan, her bakırına değen cüce tamirci çırağı. Zırhçı Hode borç kapatmak için onu işe aldı; şimdi anlaşmayı bin altını olana satar.',
-  'hudChrome.collections.buddyLore.phantom':
-    'Hayalet Ormanı mezarlarından avuç boyunda hayalet; tamamen çarşaf, hiç kemik yok. Kapalı çantada belirip arkadaşlık için kalır. Ne istediğini kimse çözemedi; hiç kimseyi korkutmayı da denemedi.',
-  'hudChrome.collections.buddyLore.proud_grunt':
-    'Selamını koruyup rütbesini kaybetmiş Savaş stokları gazisi. Savaş Mareşali Draven Kole, bunun bedelini anlayacak kadar onurlu her askere birini verir.',
-  'hudChrome.collections.buddyLore.raptor':
-    'Ne kadar hızlı koşabileceğini öğrenmeden satılan Ejder Toprakları yavrusu. Her yeni sahibine tok tutması söylenir; kimseye iki kez söylemek gerekmez.',
-  'hudChrome.collections.buddyLore.rocky':
-    'Dikenzirve molozlarından taş kabuklu sürüngen; yavaş ve tamamen tasasız. Madenciler, çökmeden hemen önce hareketsiz kalmaları için besler.',
-  'hudChrome.collections.buddyLore.sapling':
-    'Kabuğunda gülümsemesi, meraklı mor bakışı olan genç ağaç. Nereye gidersen kökleri onu neşeli paytak adımlarla taşır.',
-  'hudChrome.collections.buddyLore.skeleton':
-    'Hayalet Ormanı mezarlarından çıktı, tozunu silkti ve o zamandan beri insanları izliyor. Kemiklerin kime ait olduğunu kimse belirleyemedi.',
-  'hudChrome.collections.buddyLore.solbot':
-    'Ejder Toprakları külünden yarı gömülü çıkarılan, hâlâ tıkırdayan küçük güneşle beslenen otomat. Onu yapan atölye kasasının hiçbir yerine işaret bırakmamış.',
-  'hudChrome.collections.buddyLore.spider':
-    'Taşındığı her çantayı yeniden süsleyen avuç boyunda Hayalet Ormanı dokumacısı. Ağı, yerini aldığı iplikten güçlüdür.',
-  'hudChrome.collections.buddyLore.sprites':
-    'Biri altın, biri petrol mavisi iki küçük ateş perisi; kimin önde olduğunda anlaşamazlar. Yeterince yaklaşınca tek yeşil alevde birleşip gülerek yeniden ayrılırlar.',
-  'hudChrome.collections.buddyLore.stag':
-    'Muhafızların bir zamanlar bindiği büyük geyiklerden küçültülerek yetiştirilmiş Sonsuz Bahçe soyu. Hayvandan eski alışkanlıkla, kaldırılan ele hâlâ başını eğer.',
-  'hudChrome.collections.buddyLore.tiger':
-    'Palmiye Kıyısını hiç görmemiş hayvanda Palmiye Kıyısı çizgileri: eski hayvanat bahçeleri kapandığından beri soy esarette tutulur. Yalnızca düdüğe yanıt verir.',
-  'hudChrome.collections.buddyLore.triple_t':
-    'Bir şeyden üç tane veya üç kez bir şey. Anlatılar uyuşmaz; yaratık sayılacak kadar uzun süre yerinde durmaz.',
-  'hudChrome.collections.buddyLore.trollface':
-    'Hayalet Ormanının dışarı atıp geri almadığı sırıtan şey. Onu tarif etmeye çalışan herkes gülerek vazgeçer.',
-  'hudChrome.collections.buddyLore.tuskhorn_boar':
-    'Çit deviremeyen domuz isteyen çobanların kısa bacaklı yetiştirdiği Dikenzirve soyu. Yine de huyunu korudu.',
   'hudChrome.courier.instructions':
     'Tam yığınları seç. Kuryen önce onları yatırır, sonra istediğin eşyaları alır. Görev eşyaları gönderilemez.',
   'hudChrome.cryptAlert.riteNamedLine':

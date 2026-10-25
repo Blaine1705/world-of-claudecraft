@@ -5824,14 +5824,8 @@ export const zh_TW: EnTranslations = {
       "logAdminPurge": "管理員移除了 {count} 個 {item}"
     },
     "collections": {
-      "title": "狩獵",
-      "close": "關閉狩獵",
-      "keybindLabel": "狩獵",
-      "launcherTitle": "狩獵：夥伴、坐騎與套裝",
       "tabs": {
-        "buddies": "夥伴",
-        "mounts": "坐騎",
-        "sets": "物品套裝"
+        "buddies": "夥伴"
       },
       "state": {
         "owned": "已收集",
@@ -5841,7 +5835,6 @@ export const zh_TW: EnTranslations = {
       },
       "presenceDefault": "你感覺到有什麼在注視著你。",
       "revealed": "{name}決定跟隨你。",
-      "cosmeticUnlocked": "{name}的新外觀：{look}。",
       "presence": {
         "ember_fox": "有個溫暖的小東西正輕手輕腳地跟在你身後。",
         "moss_hare": "泥炭裡的一陣窸窣聲與你的腳步保持著同步。",
@@ -5879,134 +5872,9 @@ export const zh_TW: EnTranslations = {
         "phantom": "你身後的空氣靜得有些過分。",
         "emberfall_phoenix": "一股如同封火般的暖意落在你的背後。"
       },
-      "cosmetic": {
-        "crystal_lich_frostbound": "霜縛",
-        "crystal_lich_voltaic": "雷光",
-        "forgemaw_ashen": "灰燼",
-        "forgemaw_whitehot": "白熱",
-        "stag_acorn": "橡果之冠",
-        "stag_gilded": "鍍金",
-        "moss_hare_verdant": "青翠",
-        "proud_grunt_warlord": "戰爭領主",
-        "frog_sapphire": "藍寶石蛙"
-      },
       "actions": {
         "summon": "召喚",
-        "dismiss": "解散",
-        "wear": "穿戴",
-        "remove": "卸下"
-      },
-      "looks": {
-        "title": "外觀",
-        "unlocked": "已解鎖",
-        "locked": "未解鎖",
-        "worn": "穿戴中",
-        "none": "這個夥伴還沒有可用的外觀"
-      },
-      "source": {
-        "bossLabel": "首領寵物",
-        "bossDrop": "{mob}（{location}），每次擊殺每位玩家{chance}%",
-        "bossDropWithHeroic": "{mob}（{location}），每位玩家{chance}%，英雄難度{heroicChance}%",
-        "bossDropHeroicOnly": "{mob}（{location}），僅限英雄難度，每位玩家{chance}%",
-        "rollNote": "每位玩家單獨擲骰；不會有人因隊友而失去機會。",
-        "deedLabel": "獲取途徑",
-        "deed": "功績：{deed}",
-        "challengeLabel": "挑戰",
-        "challengeSpeed": "在開怪後{seconds}秒內擊敗{mob}",
-        "challengeDps": "在整場戰鬥中對{mob}保持每秒{dps}點傷害",
-        "craftLabel": "製作",
-        "craft": "{item}（{profession}配方）",
-        "grantLabel": "頒發",
-        "grantOnly": "賽季獎勵：每月天梯與最高戰鬥記錄獎勵",
-        "tokenLabel": "憑證",
-        "token": "{item}，使用一次即可讓夥伴跟隨"
-      },
-      "buddyLore": {
-        "ember_fox": "出自東溪谷樹籬間的母狐，得名於冬日枯叢中透出的炭紅皮毛。那裡的獵人幾代之前就不再打幼崽的主意，改成替牠們留下食物。",
-        "moss_hare": "柳澤沼地的野兔，一輩子臥在濕泥炭裡，長出了一身綠毛。沼澤的草藥師視牠們為吉兆，絕不肯把落在門前的趕走。",
-        "frog": "泥沼濕地把牠們養得肥壯而無憂無慮，整夜在葦叢裡高歌。沼澤嚮導都賭咒說，船上載著一隻就絕不會擱淺。",
-        "crimson_claw_crab": "遠岸的潮間蟹，離水許久之後鉗子依舊通紅。當年碼頭工人常讓牠們在跳板上賽跑賭錢。",
-        "golden_sentinel": "琥珀秋境的守望甲蟲，被自己長大的那片樹脂鍍成了金色。這名字比樹脂更古老：早在有人想到裝取樹液之前，就已有某種哨兵守著那些林子了。",
-        "nightfang": "夜綻花野的年輕獵手，即便以同類的標準衡量也安靜得出奇。牠跟著人只為作伴，獵物從不比飛蛾更大。",
-        "tuskhorn_boar": "荊峰高地的種，被牧人刻意育成短腿，圖的是一頭拱不倒籬笆的野豬。脾氣倒是原封不動地留下來了。",
-        "emerald_wolf": "一隻怨靈林的幼狼，皮毛在幾乎照不到林底的樹冠餘光裡泛著綠色。守林人會把森林留下的每一隻孤兒養大。",
-        "tiger": "一身棕櫚灣的斑紋，長在一頭從沒見過棕櫚灣的獸身上：自從舊日獸苑關閉，這一支血脈便一直圈養至今。牠只聽哨聲，此外什麼也不應。",
-        "cate_coin": "一隻貓，絕不肯離開自己屁股底下那枚錢幣，也從沒人見牠吃過東西。東溪谷的商人至今還在爭論：這兩者到底哪一個才是寵物。",
-        "alon": "一位旅人的吉祥物，來自任何地圖都不肯承認的道路，總在計畫出岔子的地方現身。牠看著，牠點頭，然後什麼忙也不幫。",
-        "trollface": "怨靈林放出來、又不肯收回去的一張咧嘴笑臉。每一次試圖描述牠的嘗試，都以描述者自己笑場放棄告終。",
-        "ansem": "牠談論門扉與黑暗，再問就不肯多說了。夜綻花野的信徒聲稱牠屬於他們；可每逢他們舉行儀式，牠就溜走了。",
-        "triple_t": "某樣東西的三份，或是同一樣東西重複三遍。各家說法互相矛盾，而這生物又從不肯老實待著讓人數清。",
-        "kekius": "一位來歷不明的歡笑同伴，被疾風崖的賽馬場收作吉祥物。發誓靠牠轉運的馬廄換了四家，牠還在。",
-        "solbot": "一具以陽光為食的小型自動機，從龍裔荒原的火山灰裡半埋著挖出來時仍在走動。造牠的作坊沒在外殼上留下任何印記。",
-        "frostfire": "生於霜幕之境一處溫泉湧出冰原的地方，牠始終沒弄明白自己屬於哪一半。冷天裡冒著熱氣，暖處又直打哆嗦。",
-        "rocky": "荊峰高地碎石坡上的石殼爬行者，行動遲緩，且徹底心無掛礙。礦工養著牠們，是因為牠們總在塌方前一瞬靜止不動。",
-        "proud_grunt": "戰備倉庫的一名老兵，敬禮保住了，軍銜丟了。戰帥德拉文·科爾會把這樣一位交給任何一個榮譽足以懂得那代價的士兵。",
-        "loot_goblin": "牠跟著每一個身上帶著英雄徽記的人，卻一次也沒被抓到偷東西。軍需官維克斯堅稱，這壓根說明不了任何問題。",
-        "penny_goldspark": "一位侏儒工匠的學徒，按小時收費，而且每一枚銅板都物有所值。護甲匠霍德當年為抵一筆債收下了她，如今誰揣著一千金，他就把這份差事賣給誰。",
-        "stag": "常青園的血脈，由守林人昔日騎乘的巨鹿一代代選育而來。有人抬手，牠仍會低下頭——那是比這頭鹿本身更古老的習慣。",
-        "alpaca": "疾風崖的牧群養牠們既為羊毛，也為脾氣：暴風雨裡沒有比牠更鎮定的。這一隻每趟旅程恰好會朝一個人吐口水。",
-        "horse": "東溪谷矮馬血統，為果園小徑特意培育得矮小，也從沒人告訴牠自己不是戰馬。牠在你肩旁保持步調，誰曾餵過牠一個蘋果，牠就會跟誰走。",
-        "sapling": "一株樹皮上帶著笑容、紫色眼睛裡滿是好奇的小樹。無論你走到哪裡，牠都會邁著樹根，歡快地搖搖擺擺跟上。",
-        "bull": "一頭狗一般大的東溪谷公牛，這也是唯一讓人肯把牠養在屋裡的理由。可脾氣並沒跟著一起縮小。",
-        "spider": "怨靈林的織網者，巴掌大小，會把任何裝著牠的背包重新佈置一遍。那些蛛絲比牠替換掉的線還結實。",
-        "raptor": "龍裔荒原的雛龍種，還沒學會自己能跑多快就被轉手賣掉。每一位新主人都被叮囑要餵飽牠，而沒有一個需要被叮囑第二遍。",
-        "skeleton": "牠從怨靈林的古塚裡爬出來，撢了撢自己身上的土，從此就跟著人走。這副骨頭當初是誰的，至今沒人查清。",
-        "crystal_lich": "尼思拉克西斯本體的一枚碎片，至今仍鳴響著塑成牠的那股寒意。誰把牠從團隊副本的殘骸裡拽出來，牠就聽誰的——而且始終沒有原諒那個人。",
-        "forgemaw": "在最後泉源熔爐中鍛造，卻始終沒有真正完工——錘聲未歇，牠便自己走出了伊格尼瓦的鑄場。只有英雄難度的下潛才能找到牠：這熔融之物總會回到造出牠的那座爐子，然後跟著兩度熬過烈火的人回家。",
-        "crystal_tide": "一隻乘著自己那滴海玻璃的潮汐精靈，被從東溪谷到遠岸只想釣頓晚飯的漁人從靜水裡勾了上來。牠把撈起牠的那捧水一直帶在身邊，怎麼勸也不肯回去。",
-        "sprites": "兩隻小小的火精，一金一青，總也說不好誰該打頭。靠得夠近時，它們會融成一團綠焰，隨後又笑著分開。",
-        "phantom": "來自怨靈林古塚的巴掌大幽魂，只有一層布、沒有骨頭，會出現在一個明明合好的背包裡，然後為了作伴留下來。沒人弄清牠想要什麼，而牠一次也沒試過嚇唬誰。",
-        "emberfall_phoenix": "每逢秋天牠便燃盡成一粒餘燼，到了春天又從自己的灰裡重新升起——關於牠，誰也說不出更多了。從沒有人找到過牠的巢，也從沒有人捉到過同一隻兩次。"
-      },
-      "petKind": {
-        "beast": "野獸",
-        "elemental": "元素生物",
-        "humanoid": "類人生物",
-        "undead": "不死生物",
-        "celebrity": "名流"
-      },
-      "armor": {
-        "cloth": "布甲",
-        "mail": "鎖甲",
-        "leather": "皮甲"
-      },
-      "stat": {
-        "intellect": "智力",
-        "agility": "敏捷",
-        "strength": "力量",
-        "mixed": "混合"
-      },
-      "set": {
-        "owned": "{total} 件中已收集 {owned} 件",
-        "itemLevel": "裝等 {level}",
-        "bonusLabel": "{pieces} 件套"
-      },
-      "detail": {
-        "dropLabel": "掉落自",
-        "vendorLabel": "出售者",
-        "bindLabel": "綁定",
-        "sellLabel": "商人收購價",
-        "marketLabel": "世界市場",
-        "exchangeLabel": "$WOC 交易所",
-        "setLabel": "已收集",
-        "drop": "{mob}（{location}），每次擊殺 {chance}%",
-        "heroicDrop": "{mob}（{location}），僅限英雄難度，每次擊殺 {chance}%",
-        "dropWithHeroic": "{mob}（{location}），每次擊殺 {chance}%，英雄難度 {heroicChance}%",
-        "globalDrop": "任意敵人，每次擊殺 {chance}%，同稀有度 {count} 件中的一件",
-        "fishingDrop": "任意水域釣魚，每次上鉤 {chance}%",
-        "vendor": "{npc}（{location}），價格：{price}",
-        "honorPrice": "{amount} 榮譽",
-        "marksPrice": "{amount} 英雄徽記",
-        "noSource": "遊戲中尚無獲取途徑",
-        "noItem": "尚無物品可以獲得",
-        "tradeable": "可交易",
-        "soulbound": "靈魂綁定",
-        "noSell": "無法出售",
-        "marketAtMerchant": "在商人處查看",
-        "marketChecking": "查詢中…",
-        "marketNone": "無上架",
-        "exchangeNone": "無上架",
-        "exchangeUnavailable": "此用戶端不支援"
+        "dismiss": "解散"
       }
     },
     "calendar": {
@@ -21281,117 +21149,6 @@ export const zh_TW: EnTranslations = {
       "ps_passing_stone": {
         "name": "往生石"
       },
-      "whistle_ember_fox": {
-        "name": "餘燼狐的哨子"
-      },
-      "whistle_moss_hare": {
-        "name": "苔蘚野兔的哨子"
-      },
-      "whistle_frog": {
-        "name": "青蛙的哨子"
-      },
-      "whistle_crimson_claw_crab": {
-        "name": "赤鉗蟹的哨子"
-      },
-      "whistle_golden_sentinel": {
-        "name": "黃金哨兵的哨子"
-      },
-      "whistle_nightfang": {
-        "name": "夜牙的哨子"
-      },
-      "whistle_tuskhorn_boar": {
-        "name": "獠角野豬的哨子"
-      },
-      "whistle_emerald_wolf": {
-        "name": "翡翠狼的哨子"
-      },
-      "whistle_tiger": {
-        "name": "猛虎的哨子"
-      },
-      "whistle_cate_coin": {
-        "name": "錢幣貓的哨子"
-      },
-      "whistle_alon": {
-        "name": "阿隆的哨子"
-      },
-      "whistle_trollface": {
-        "name": "巨魔臉的哨子"
-      },
-      "whistle_ansem": {
-        "name": "安塞姆的哨子"
-      },
-      "whistle_triple_t": {
-        "name": "三重T的哨子"
-      },
-      "whistle_kekius": {
-        "name": "凱基烏斯的哨子"
-      },
-      "whistle_solbot": {
-        "name": "索爾機偶的哨子"
-      },
-      "whistle_frostfire": {
-        "name": "霜火的哨子"
-      },
-      "whistle_rocky": {
-        "name": "岩仔的哨子"
-      },
-      "whistle_proud_grunt": {
-        "name": "驕傲步兵的哨子"
-      },
-      "whistle_loot_goblin": {
-        "name": "戰利品哥布林的哨子"
-      },
-      "whistle_penny_goldspark": {
-        "name": "潘妮·金火花的哨子"
-      },
-      "whistle_stag": {
-        "name": "雄鹿的哨子"
-      },
-      "whistle_alpaca": {
-        "name": "羊駝的哨子"
-      },
-      "whistle_horse": {
-        "name": "馬的哨子"
-      },
-      "whistle_sapling": {
-        "name": "小樹苗的哨子"
-      },
-      "whistle_bull": {
-        "name": "公牛的哨子"
-      },
-      "whistle_spider": {
-        "name": "蜘蛛的哨子"
-      },
-      "whistle_raptor": {
-        "name": "迅猛龍的哨子"
-      },
-      "whistle_skeleton": {
-        "name": "骷髏的哨子"
-      },
-      "whistle_crystal_lich": {
-        "name": "水晶巫妖的哨子"
-      },
-      "whistle_forgemaw": {
-        "name": "熔顎·熔融者的哨子"
-      },
-      "whistle_sprites": {
-        "name": "閃爍與微光的哨子"
-      },
-      "whistle_crystal_tide": {
-        "name": "水晶潮汐的哨子"
-      },
-      "whistle_phantom": {
-        "name": "幻魂的哨子"
-      },
-      "whistle_emberfall_phoenix": {
-        "name": "燼落鳳凰的哨子"
-      },
-      "charm_stag_acorn": {
-        "name": "橡果之冠護符"
-      },
-      "charm_stag_gilded": {
-        "name": "鍍金護符"
-      },
       "lastflame_core": {
         "name": "末焰之核"
       },
@@ -26508,9 +26265,6 @@ export const zh_TW: EnTranslations = {
       },
       "buddy_horse": {
         "name": "馬"
-      },
-      "buddy_sapling": {
-        "name": "小樹苗"
       },
       "buddy_bull": {
         "name": "公牛"

@@ -249,6 +249,8 @@ const UI_PURE_CORES = [
   'src/ui/hud/cooldown_manager/cooldown_manager_view.ts',
   'src/ui/collection_actions_core.ts',
   'src/ui/hud/cosmetics/buddy_cosmetics_view.ts',
+  // The buddy presence and reveal chat lines.
+  'src/ui/buddy_event_lines.ts',
   'src/ui/hud/cosmetics/cosmetics_cards_view.ts',
   'src/ui/hud/cosmetics/cosmetics_view.ts',
   'src/ui/hud/faction_reward_tooltip_view.ts',
@@ -673,7 +675,6 @@ const UI_PURE_CORES = [
   'src/ui/quest_tracking_core.ts',
   'src/ui/quest_map_location_core.ts',
   'src/ui/arena_window_view.ts',
-  'src/ui/collections/collections_view.ts',
   'src/ui/pvp_record_core.ts',
   'src/ui/pvp_tabs_view.ts',
   'src/ui/pvp_hostile_core.ts',
@@ -769,6 +770,8 @@ const UI_PURE_CORES = [
   'src/ui/hud/action_bar/action_bar_visibility_core.ts',
   'src/ui/hud/action_bar/action_bar_toggle_core.ts',
   'src/ui/hud/action_bar/action_bar_bind_core.ts',
+  // The action-bar drag payload, pure over the DataTransfer it is handed.
+  'src/ui/hud/action_bar/hotbar_drag.ts',
   'src/ui/hud/action_bar/mobile_action_page_view.ts',
   'src/ui/hud/action_bar/consumable_bar_view.ts',
   'src/ui/hud/action_bar/consumable_strip_core.ts',
@@ -1633,6 +1636,8 @@ const BARE_NAMED = [
   'src/ui/store_purchase_intent.ts',
   'src/ui/purchase_intent_record.ts',
   'src/ui/charter_fit_memory.ts',
+  'src/ui/buddy_event_lines.ts',
+  'src/ui/hud/action_bar/hotbar_drag.ts',
 ].map((rel) => join(repoRoot, rel));
 
 function importSpecs(src: string): string[] {
@@ -2658,6 +2663,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/bag_item_context_menu.ts',
   'src/ui/bank_filter.ts',
   'src/ui/banner_queue.ts',
+  'src/ui/buddy_event_lines.ts',
   'src/ui/charter_fit_memory.ts',
   'src/ui/chat_bubble_style.ts',
   'src/ui/claudium_purchase_bridge.ts',
@@ -2672,6 +2678,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/guild_hide_offline.ts',
   'src/ui/guild_motd_login.ts',
   'src/ui/guild_tag.ts',
+  'src/ui/hud/action_bar/hotbar_drag.ts',
   'src/ui/hud/aura_tracks/aura_track_catalog.ts',
   'src/ui/hud/aura_tracks/aura_track_descriptors.ts',
   'src/ui/hud/delve/delve_map.ts',

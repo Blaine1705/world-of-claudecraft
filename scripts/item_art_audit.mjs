@@ -168,16 +168,16 @@ const build = await buildItemArtAudit({
     // Completed Season 2 painted armor leaves the pending ledger, plus Nightwing Chimaera mount.
     // Wobbles the Slime's reins add one owner and one live definition.
     // + the sprite whistle and Lantern Hall seal/reins: 2186 owners / 2215 live items.
-    catalogCount: 2191,
-    liveItemCount: 2220,
-    // Only the intentionally retired Phoenix token retains its procedural icon.
-    pendingArtCount: 2,
+    catalogCount: 2155,
+    liveItemCount: 2184,
+    // Companion items are removed; only the Infernal Quiver awaits artwork.
+    pendingArtCount: 1,
     generatedHeroicDefinitions: 116,
     heroicDefinitionsWithOwnWebp: 86,
     heroicWeaponArtAliases: 30,
     // Completed Season 2 icons add pages to the grouped review sheets.
-    sheetPageCount: 47,
-    groupCount: 28,
+    sheetPageCount: 45,
+    groupCount: 26,
   },
 });
 assertItemArtAuditPass(build);

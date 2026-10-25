@@ -7,7 +7,7 @@ import type { MaterialComposition } from './material_sources';
 
 import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { ClutterStamp } from './city_clutter';
-import type { BuddyTokenKey } from './content/buddies';
+import type { BuddyKey } from './content/buddies';
 import type { MountKey } from './content/mounts';
 import type { CraftDef, GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { RealmBuilderHonour } from './content/realm_builders';
@@ -1679,15 +1679,10 @@ export interface MountItemDef extends BaseItemDef {
   weapon?: never;
 }
 
-// A buddy GRANT TOKEN (a whistle). Using it attaches the named companion to
-// the character (src/sim/buddies.ts useBuddyToken) and consumes the token;
-// ownership is the per-character collection flag, never the item. Soulbound
-// and never listed by any loot table: a whistle is the channel a vendor, a
-// letter or an admin grant uses to hand a companion over, nothing more. A
-// token for a companion the player already has is refused unconsumed.
+// Historical item shape only. No buddy items exist in the live catalog.
 export interface BuddyItemDef extends BaseItemDef {
   kind: 'buddy';
-  buddy: BuddyTokenKey;
+  buddy: BuddyKey;
   armorType?: never;
   weapon?: never;
 }
@@ -2095,14 +2090,6 @@ export interface LootEntry {
   // always rides a truthy `copper` (the roller's money arm gates on copper).
   heroicCopper?: number;
   chance: number; // 0..1
-  // Heroic-claim drop rate for THIS row, substituted for `chance` exactly the
-  // way heroicCopper substitutes for `copper`: a value swap on the same single
-  // draw, never an extra one, so the per-kill draw count (and every parity
-  // golden riding it) is identical on both difficulties. Authored where one
-  // item is meant to drop from the same boss at two rates rather than living
-  // on two tables (the Crystal Lich whistle: 0.5% normal, 1% heroic). Ignored
-  // on a rollGroup row, where the group's partition owns the odds.
-  heroicChance?: number;
   questId?: string; // only drops while this quest is active and not complete
   // Entries sharing a rollGroup are exclusive: one rng draw is partitioned by
   // their chances, so at most one matching entry drops.

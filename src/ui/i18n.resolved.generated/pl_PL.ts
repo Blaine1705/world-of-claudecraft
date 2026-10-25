@@ -5824,14 +5824,8 @@ export const pl_PL: EnTranslations = {
       "logAdminPurge": "Administrator usunął {count} {item}"
     },
     "collections": {
-      "title": "Polowanie",
-      "close": "Zamknij polowanie",
-      "keybindLabel": "Polowanie",
-      "launcherTitle": "Polowanie: towarzysze, wierzchowce i zestawy przedmiotów",
       "tabs": {
-        "buddies": "Towarzysze",
-        "mounts": "Wierzchowce",
-        "sets": "Zestawy przedmiotów"
+        "buddies": "Towarzysze"
       },
       "state": {
         "owned": "Zebrane",
@@ -5841,7 +5835,6 @@ export const pl_PL: EnTranslations = {
       },
       "presenceDefault": "Czujesz obecność, która cię obserwuje.",
       "revealed": "{name} postanawia za tobą podążać.",
-      "cosmeticUnlocked": "Nowy wygląd dla {name}: {look}.",
       "presence": {
         "ember_fox": "Coś małego i ciepłego drepcze za tobą.",
         "moss_hare": "Szelest w torfie dotrzymuje kroku twoim stopom.",
@@ -5879,134 +5872,9 @@ export const pl_PL: EnTranslations = {
         "phantom": "Powietrze za tobą jest odrobinę zbyt nieruchome.",
         "emberfall_phoenix": "Za plecami czujesz ciepło jak przy przygaszonym ognisku."
       },
-      "cosmetic": {
-        "crystal_lich_frostbound": "Spętany Mrozem",
-        "crystal_lich_voltaic": "Błyskawiczny",
-        "forgemaw_ashen": "Popielny",
-        "forgemaw_whitehot": "Rozgrzany do Białości",
-        "stag_acorn": "Korona Żołędzi",
-        "stag_gilded": "Złocony",
-        "moss_hare_verdant": "Bujny",
-        "proud_grunt_warlord": "Wódz wojenny",
-        "frog_sapphire": "Szafirowa Żaba"
-      },
       "actions": {
         "summon": "Przywołaj",
-        "dismiss": "Odeślij",
-        "wear": "Załóż",
-        "remove": "Usuń"
-      },
-      "looks": {
-        "title": "Wyglądy",
-        "unlocked": "Odblokowane",
-        "locked": "Zablokowane",
-        "worn": "Założone",
-        "none": "Nie opracowano jeszcze wyglądów tego towarzysza"
-      },
-      "source": {
-        "bossLabel": "Towarzysz z bossa",
-        "bossDrop": "{mob} ({location}), {chance}% na gracza za zabicie",
-        "bossDropWithHeroic": "{mob} ({location}), {chance}% na gracza, {heroicChance}% na heroicznym",
-        "bossDropHeroicOnly": "{mob} ({location}), tylko heroiczny, {chance}% na gracza",
-        "rollNote": "Każdy gracz losuje osobno; nikt nie przegrywa losowania z członkiem grupy.",
-        "deedLabel": "Zdobywane przez",
-        "deed": "Czyn {deed}",
-        "challengeLabel": "Wyzwanie",
-        "challengeSpeed": "Pokonaj cel {mob} w ciągu {seconds} sekund od rozpoczęcia walki",
-        "challengeDps": "Zadawaj {dps} obrażeń na sekundę celowi {mob} przez całą walkę",
-        "craftLabel": "Wytworzone",
-        "craft": "{item} (receptura: {profession})",
-        "grantLabel": "Przyznano",
-        "grantOnly": "Nagroda sezonowa: nagrody miesięcznego rankingu i najlepszych wyników",
-        "tokenLabel": "Żeton",
-        "token": "{item}, jednorazowe użycie do przypisania towarzysza"
-      },
-      "buddyLore": {
-        "ember_fox": "Lisica z żywopłotów Doliny Wschodniego Strumienia, nazwana od żarząco czerwonej sierści widocznej w zimowych zaroślach. Tamtejsi traperzy pokolenia temu zrezygnowali z łapania młodych i zamiast tego zaczęli wykładać jedzenie.",
-        "moss_hare": "Zając Wierzbowych Mokradeł, o zielonej sierści od życia w mokrym torfie. Bagienni zielarze uważają je za szczęśliwe i nie pozwalają przeganiać ich z progu.",
-        "frog": "Trzęsawisko Mokrzawia hoduje je tłuste i beztroskie, śpiewające całą noc w trzcinowiskach. Bagienni przewodnicy przysięgają, że łódź z taką żabą nigdy nie osiądzie na mieliźnie.",
-        "crimson_claw_crab": "Krab pływowy z Dalekiego Wybrzeża, którego szczypce pozostają czerwone długo po wyjściu z wody. Załogi doków urządzały ich wyścigi po deskach, obstawiając monety.",
-        "golden_sentinel": "Wartowniczy chrząszcz Bursztynowej Doliny, pozłocony żywicą, w której dorastał. Nazwa jest starsza od żywicy: podobni strażnicy pilnowali tych gajów na długo, zanim ktokolwiek pomyślał o butelkowaniu soku.",
-        "nightfang": "Młody łowca Nocnego Kwiatu, cichy nawet jak na swój gatunek. Podąża dla towarzystwa i nie poluje na nic większego niż ćma.",
-        "tuskhorn_boar": "Ród z Ciernistego Szczytu, hodowany przez pasterzy na krótkie nogi, bo chcieli dzika, który nie zburzy ogrodzenia. Mimo to zachował swój temperament.",
-        "emerald_wolf": "Szczenię z Widmowego Boru, o sierści zielonej w świetle koron, które nigdy nie dociera do leśnego dna. Strażnicy wychowują sieroty pozostawione przez las.",
-        "tiger": "Pasy Palmowego Wybrzeża na zwierzęciu, które nigdy go nie widziało: ród żyje w niewoli od zamknięcia dawnych menażerii. Reaguje na gwizdek i na nic więcej.",
-        "cate_coin": "Kot, który nie rozstaje się z monetą, na której siedzi, i którego nikt nigdy nie widział jedzącego. Kupcy z Eastbrook nadal spierają się, które z tej dwójki jest zwierzakiem.",
-        "alon": "Maskotka podróżnika z drogi, do której nie przyznaje się żadna mapa, pojawiająca się wszędzie tam, gdzie plan się sypie. Obserwuje, aprobuje i w żaden sposób nie pomaga.",
-        "trollface": "Szczerząca zęby istota, którą Widmowy Bór wypuścił i nie chciał przyjąć z powrotem. Każda próba opisu kończy się śmiechem i rezygnacją opisującego.",
-        "ansem": "Mówi o drzwiach i ciemności, ale nie daje się nakłonić do szczegółów. Kultyści Nocnego Kwiatu uznają go za swojego; odchodzi, ilekroć odprawiają rytuał.",
-        "triple_t": "Trzy czegoś lub jedna rzecz potrójnie. Relacje się różnią, a stworzenie nie stoi dość długo, by je policzyć.",
-        "kekius": "Śmiejący się towarzysz niejasnego pochodzenia, przygarnięty jako talizman przez tory wyścigowe Wichrowego Grzbietu. Przeżył cztery stajnie, które pokładały w nim wiarę.",
-        "solbot": "Mały automat zasilany słońcem, wykopany do połowy z popiołów Smoczych Ziem i wciąż tykający. Warsztat, który go stworzył, nie zostawił żadnego znaku na obudowie.",
-        "frostfire": "Zrodzony w Szronowej Krainie, gdzie gorące źródło przebija pole lodowe, nigdy nie zdecydował, do której połowy należy. Paruje na zimnym powietrzu i drży na ciepłym.",
-        "rocky": "Pełzacz o kamiennej skorupie z piargów Ciernistego Szczytu, powolny i zupełnie beztroski. Górnicy trzymają je, bo nieruchomieją na chwilę przed zawałem.",
-        "proud_grunt": "Weteran składów Wojny, który zachował salut, lecz stracił stopień. Marszałek Wojenny Draven Kole przekazuje takiego każdemu żołnierzowi o honorze wystarczającym, by rozumiał cenę.",
-        "loot_goblin": "Podąża za każdym, kto nosi Znaki Heroiczne, i nigdy nie został przyłapany na kradzieży. Kwatermistrz Vex twierdzi, że to absolutnie niczego nie dowodzi.",
-        "penny_goldspark": "Uczennica gnomiego majsterkowicza, pobierająca opłatę za godzinę i warta każdego miedziaka. Płatnerz Hode zatrudnił ją w ramach spłaty długu, a teraz odstępuje umowę każdemu z tysiącem złota.",
-        "stag": "Ród z Wiecznego Ogrodu, wyhodowany z wielkich jeleni, na których dawniej jeździli strażnicy. Nadal pochyla głowę na uniesioną dłoń, z nawyku starszego niż samo zwierzę.",
-        "alpaca": "Hodowcy Wichrowego Grzbietu trzymają je dla wełny i usposobienia: nic nie zachowuje większego spokoju podczas burzy. Ta opluje dokładnie jedną osobę na podróż.",
-        "horse": "Kucyk z Doliny, hodowany na małego do sadowniczych alejek, któremu nikt nie powiedział, że nie jest koniem bojowym. Dotrzymuje kroku przy twoim ramieniu i pójdzie za każdym, kto choć raz dał mu jabłko.",
-        "sapling": "Młode drzewo z uśmiechem w korze i ciekawskim fioletowym spojrzeniem. Korzenie niosą je w wesołym kaczym chodzie wszędzie, gdzie wędrujesz.",
-        "bull": "Byk z Doliny wielkości psa, co jest jedynym powodem, dla którego ktoś zgodził się trzymać go w domu. Usposobienie nie zmalało razem z resztą.",
-        "spider": "Tkacz z Widmowego Boru wielkości dłoni, który przemeblowuje każdy plecak, w którym podróżuje. Pajęczyna jest mocniejsza od zastępowanej nici.",
-        "raptor": "Pisklę ze Smoczych Ziem, sprzedawane, zanim odkryje, jak szybko biega. Każdy nowy właściciel dostaje radę, by dobrze je karmić, i żadnemu nie trzeba powtarzać.",
-        "skeleton": "Wyszedł z kurhanów Widmowego Boru, otrzepał się i od tej pory chodzi za ludźmi. Nikt nie ustalił, czyje to były kości.",
-        "crystal_lich": "Odłamek samego Nythraxis, wciąż brzęczący zimnem, które go ukształtowało. Słucha tego, kto wydobył go ze szczątków rajdu, i jeszcze mu tego nie wybaczył.",
-        "forgemaw": "Wykuty w Tyglu Ostatniego Źródła i nigdy w pełni ukończony, wyszedł z odlewni Ignivara, gdy młoty wciąż uderzały. Można go znaleźć tylko podczas heroicznego zejścia: stopiona istota wciąż wraca do kuźni, która ją stworzyła, i podąża do domu za tym, kto dwa razy przetrwa ogień.",
-        "crystal_tide": "Ognik przypływu podróżujący na własnej kropli morskiego szkła, wyławiany ze spokojnej wody przez wędkarzy od Doliny po Dalekie Wybrzeże, którzy łowili na kolację. Zachowuje wodę, z którą wypłynął, i nie daje się przekonać do powrotu.",
-        "sprites": "Dwa małe ogniki, złoty i morski, które nigdy nie ustalają, który prowadzi. Gdy podejdą blisko, zlewają się w jeden zielony płomień, a potem znów rozdzielają ze śmiechem.",
-        "phantom": "Nawiedzenie wielkości dłoni z kurhanów Widmowego Boru, samo prześcieradło bez kości, pojawiające się w zamkniętym plecaku i zostające dla towarzystwa. Nikt nie ustalił, czego chce, i ani razu nie próbowało nikogo przestraszyć.",
-        "emberfall_phoenix": "Każdej jesieni spala się do żaru, a wiosną odradza z własnego popiołu. To wszystko, co ktokolwiek potrafi o nim powiedzieć. Nikt nigdy nie znalazł gniazda ani nie złapał tego samego dwa razy."
-      },
-      "petKind": {
-        "beast": "Bestie",
-        "elemental": "Żywiołaki",
-        "humanoid": "Humanoidy",
-        "undead": "Nieumarli",
-        "celebrity": "Sławne postacie"
-      },
-      "armor": {
-        "cloth": "Tkanina",
-        "mail": "Kolczuga",
-        "leather": "Skóra"
-      },
-      "stat": {
-        "intellect": "Intelekt",
-        "agility": "Zręczność",
-        "strength": "Siła",
-        "mixed": "Hybryda"
-      },
-      "set": {
-        "owned": "{owned} z {total} elementów",
-        "itemLevel": "poziom przedmiotu {level}",
-        "bonusLabel": "Elementy: {pieces}"
-      },
-      "detail": {
-        "dropLabel": "Wypada z",
-        "vendorLabel": "Sprzedawane przez",
-        "bindLabel": "Związanie",
-        "sellLabel": "Handlarz płaci",
-        "marketLabel": "Rynek Światowy",
-        "exchangeLabel": "Giełda $WOC",
-        "setLabel": "Zebrane",
-        "drop": "{mob} ({location}), {chance}% za zabicie",
-        "heroicDrop": "{mob} ({location}), tylko heroiczny, {chance}% za zabicie",
-        "dropWithHeroic": "{mob} ({location}), {chance}% za zabicie, {heroicChance}% na heroicznym",
-        "globalDrop": "Dowolny wróg, {chance}% za zabicie, jeden z {count} w tej rzadkości",
-        "fishingDrop": "Łowienie wszędzie, {chance}% za połów",
-        "vendor": "{npc} ({location}) za {price}",
-        "honorPrice": "{amount} Honoru",
-        "marksPrice": "{amount} Znaków Heroicznych",
-        "noSource": "Brak źródła w grze",
-        "noItem": "Żaden przedmiot jeszcze tego nie daje",
-        "tradeable": "Zbywalne",
-        "soulbound": "Związany z duszą",
-        "noSell": "Nie można sprzedać",
-        "marketAtMerchant": "Widoczne u Handlarza",
-        "marketChecking": "Sprawdzanie...",
-        "marketNone": "Brak ofert",
-        "exchangeNone": "Brak ofert",
-        "exchangeUnavailable": "Niedostępne w tym kliencie"
+        "dismiss": "Odeślij"
       }
     },
     "calendar": {
@@ -21281,117 +21149,6 @@ export const pl_PL: EnTranslations = {
       "ps_passing_stone": {
         "name": "Kamień Przejścia"
       },
-      "whistle_ember_fox": {
-        "name": "Gwizdek Żarzącego Lisa"
-      },
-      "whistle_moss_hare": {
-        "name": "Gwizdek Omszałego Zająca"
-      },
-      "whistle_frog": {
-        "name": "Gwizdek Żaby"
-      },
-      "whistle_crimson_claw_crab": {
-        "name": "Gwizdek Kraba Karmazynowego Szczypca"
-      },
-      "whistle_golden_sentinel": {
-        "name": "Gwizdek Złotego Strażnika"
-      },
-      "whistle_nightfang": {
-        "name": "Gwizdek Nocnego Kła"
-      },
-      "whistle_tuskhorn_boar": {
-        "name": "Gwizdek Odyńca Kłoroga"
-      },
-      "whistle_emerald_wolf": {
-        "name": "Gwizdek Szmaragdowego Wilka"
-      },
-      "whistle_tiger": {
-        "name": "Gwizdek Tygrysa"
-      },
-      "whistle_cate_coin": {
-        "name": "Gwizdek Cate Coin"
-      },
-      "whistle_alon": {
-        "name": "Gwizdek Alona"
-      },
-      "whistle_trollface": {
-        "name": "Gwizdek Trollface'a"
-      },
-      "whistle_ansem": {
-        "name": "Gwizdek Ansema"
-      },
-      "whistle_triple_t": {
-        "name": "Gwizdek Triple T"
-      },
-      "whistle_kekius": {
-        "name": "Gwizdek Kekiusa"
-      },
-      "whistle_solbot": {
-        "name": "Gwizdek Solbota"
-      },
-      "whistle_frostfire": {
-        "name": "Gwizdek Mroźnego Ognia"
-      },
-      "whistle_rocky": {
-        "name": "Gwizdek Skalniaka"
-      },
-      "whistle_proud_grunt": {
-        "name": "Gwizdek Dumnego Piechura"
-      },
-      "whistle_loot_goblin": {
-        "name": "Gwizdek Goblina Łupów"
-      },
-      "whistle_penny_goldspark": {
-        "name": "Gwizdek Penny Goldspark"
-      },
-      "whistle_stag": {
-        "name": "Gwizdek Jelenia"
-      },
-      "whistle_alpaca": {
-        "name": "Gwizdek Alpaki"
-      },
-      "whistle_horse": {
-        "name": "Gwizdek Konia"
-      },
-      "whistle_sapling": {
-        "name": "Gwizdek Sadzonki"
-      },
-      "whistle_bull": {
-        "name": "Gwizdek Byka"
-      },
-      "whistle_spider": {
-        "name": "Gwizdek Pająka"
-      },
-      "whistle_raptor": {
-        "name": "Gwizdek Drapieżnego Jaszczura"
-      },
-      "whistle_skeleton": {
-        "name": "Gwizdek Szkieletu"
-      },
-      "whistle_crystal_lich": {
-        "name": "Gwizdek Kryształowego Licza"
-      },
-      "whistle_forgemaw": {
-        "name": "Gwizdek Kuźniopaszczy Roztopionego"
-      },
-      "whistle_sprites": {
-        "name": "Gwizdek Migotka i Błyska"
-      },
-      "whistle_crystal_tide": {
-        "name": "Gwizdek Kryształowego Przypływu"
-      },
-      "whistle_phantom": {
-        "name": "Gwizdek Widma"
-      },
-      "whistle_emberfall_phoenix": {
-        "name": "Gwizdek Feniksa Żarospadu"
-      },
-      "charm_stag_acorn": {
-        "name": "Talizman Korony Żołędzi"
-      },
-      "charm_stag_gilded": {
-        "name": "Złocony talizman"
-      },
       "lastflame_core": {
         "name": "Rdzeń Ostatniego Płomienia"
       },
@@ -26508,9 +26265,6 @@ export const pl_PL: EnTranslations = {
       },
       "buddy_horse": {
         "name": "Tug, Koń Bojowy"
-      },
-      "buddy_sapling": {
-        "name": "Sadzonka"
       },
       "buddy_bull": {
         "name": "Byk"

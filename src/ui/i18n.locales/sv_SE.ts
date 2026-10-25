@@ -14,19 +14,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountBagsEmpty': 'Dina väskor är tomma.',
   'hudChrome.bank.accountRetry': 'Försök igen',
   'hudChrome.buddyMenu.cancel': 'Avbryt',
-  'hudChrome.collections.actions.remove': 'Ta bort',
   'hudChrome.collections.actions.summon': 'Frammana',
-  'hudChrome.collections.actions.wear': 'Bär',
-  'hudChrome.collections.armor.cloth': 'Tyg',
-  'hudChrome.collections.armor.leather': 'Läder',
-  'hudChrome.collections.detail.honorPrice': '{amount} Heder',
-  'hudChrome.collections.petKind.beast': 'Bestar',
-  'hudChrome.collections.petKind.elemental': 'Elementarer',
-  'hudChrome.collections.petKind.humanoid': 'Humanoider',
-  'hudChrome.collections.petKind.undead': 'Odöda',
-  'hudChrome.collections.stat.agility': 'Smidighet',
-  'hudChrome.collections.stat.intellect': 'Intellekt',
-  'hudChrome.collections.tabs.mounts': 'Riddjur',
   'hudChrome.courier.empty': 'Inga föremål',
   'hudChrome.courier.inventory': 'Inventarium',
   'hudChrome.expeditions.cancel': 'Avbryt',
@@ -20729,123 +20717,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.buddyMenu.nameLabel': 'Följeslagarens namn',
   'hudChrome.buddyMenu.rename': 'Byt namn på följeslagaren',
   'hudChrome.collections.actions.dismiss': 'Avvisa',
-  'hudChrome.collections.armor.mail': 'Ringbrynja',
-  'hudChrome.collections.buddyLore.alon':
-    'En resenärs maskot från en väg som ingen karta vill kännas vid, som dyker upp så fort en plan går snett. Den iakttar, den godkänner och den erbjuder ingen som helst hjälp.',
-  'hudChrome.collections.buddyLore.alpaca':
-    'Hjordarna i Stormkammen håller dem för ullens och humörets skull: inget förblir lugnare i en storm. Den här spottar på exakt en person per resa.',
-  'hudChrome.collections.buddyLore.ansem':
-    'Den talar om dörrar och mörker och låter sig inte dras in på något av ämnena. Nattblomstrets kultister hävdar att den tillhör dem; den vandrar iväg så fort de håller en rit.',
-  'hudChrome.collections.buddyLore.bull':
-    'En tjur från Dalen, stor som en hund, vilket är det enda skälet till att någon gick med på att ha en inomhus. Humöret krympte inte med resten.',
-  'hudChrome.collections.buddyLore.cate_coin':
-    'En katt som vägrar skiljas från myntet den sitter på, och som ingen någonsin sett äta. Köpmännen i Östbäck grälar fortfarande om vilken av de två som är husdjuret.',
-  'hudChrome.collections.buddyLore.crimson_claw_crab':
-    'En tidvattenskrabba från Fjärrkusten vars klo förblir röd långt efter att den lämnat vattnet. Hamnarbetarna brukade låta dem tävla längs plankorna om pengar.',
-  'hudChrome.collections.buddyLore.crystal_lich':
-    'En skärva av självaste Nythraxis, fortfarande surrande av kylan som formade den. Den lyder den som drog fram den ur raidens spillror, och har inte förlåtit personen för det.',
-  'hudChrome.collections.buddyLore.crystal_tide':
-    'Ett tidvattensväsen som rider på sin egen droppe havsglas, uppfiskat ur stilla vatten av fiskare från Dalen till Fjärrkusten som ville fånga middag. Det behåller vattnet det kom upp i och vägrar låta sig övertalas att återvända.',
-  'hudChrome.collections.buddyLore.ember_fox':
-    'En rävhona från häckarna i Östbäcksdalen, döpt efter den kolröda pälsen som syns genom vinterns snår. Fångstmännen där gav upp om ungarna för generationer sedan och började ställa ut mat i stället.',
-  'hudChrome.collections.buddyLore.emberfall_phoenix':
-    'Den brinner ned till en glöd varje höst och reser sig ur sin egen aska till våren, vilket är allt någon kan berätta om den. Ingen har någonsin hittat ett bo, och ingen har någonsin fångat en två gånger.',
-  'hudChrome.collections.buddyLore.emerald_wolf':
-    'En valp från Vålnadsskogen, vars päls är grön i trädkronornas ljus som aldrig riktigt når skogsmarken. Väktarna föder upp de föräldralösa ungar som skogen lämnar efter sig.',
-  'hudChrome.collections.buddyLore.forgemaw':
-    'Smidd i Den sista källans Smältdegel och aldrig riktigt färdig gick den ut ur Ignivars gjuteri medan hamrarna ännu slog. Bara den heroiska nedstigningen finner den: det smälta väsendet återvänder ständigt till smedjan som skapade det och följer med hem med den som överlever elden två gånger.',
-  'hudChrome.collections.buddyLore.frog':
-    'Dykärrsträsket föder upp dem tjocka och obekymrade, kväkande hela natten i vassen. Träskguiderna svär på att en båt med en sådan ombord aldrig går på grund.',
-  'hudChrome.collections.buddyLore.frostfire':
-    'Född i Frostslöjans vidder där en het källa bryter fram genom isfältet, och den har aldrig bestämt sig för vilken hälft den tillhör. Den ångar i kall luft och huttrar i varm.',
-  'hudChrome.collections.buddyLore.golden_sentinel':
-    'En vaktbagge från Bärnstensfallet, förgylld av kådan den växte upp i. Namnet är äldre än kådan: väktare av något slag vaktade lundarna långt innan någon kom på att tappa saven på flaska.',
-  'hudChrome.collections.buddyLore.horse':
-    'En dalponny, framavlad liten för fruktträdgårdarnas stigar och aldrig upplyst om att den inte är en stridshäst. Den håller jämna steg vid din sida och följer vem som helst som en gång gett den ett äpple.',
-  'hudChrome.collections.buddyLore.kekius':
-    'En skrattande följeslagare av oklart ursprung, anammad som lyckobringare av kapplöpningsstallarna i Stormkammen. Den har överlevt fyra stall som svor vid den.',
-  'hudChrome.collections.buddyLore.loot_goblin':
-    'Den följer alla som bär heroiska märken och har aldrig en enda gång ertappats med att stjäla. Kvartermästare Vex vidhåller att det inte bevisar någonting alls.',
-  'hudChrome.collections.buddyLore.moss_hare':
-    'En hare från Pilkärret, grönpälsad efter ett liv med sovplats i våt torv. Träskets örtkännare ser dem som lyckobringare och tillåter inte att någon jagar bort dem från en trappa.',
-  'hudChrome.collections.buddyLore.nightfang':
-    'En ung jägare från Nattblomstret, tyst även med sitt släktes mått mätt. Den följer med för sällskapets skull och jagar inget större än en nattfjäril.',
-  'hudChrome.collections.buddyLore.penny_goldspark':
-    'En gnomisk uppfinnarlärling som tar betalt per timme och är värd varenda kopparslant. Rustmästare Hode tog sig an henne för att reglera en skuld och säljer nu arrangemanget till alla med tusen guld.',
-  'hudChrome.collections.buddyLore.phantom':
-    'En handflatestor vålnad från Vålnadsskogens gravhögar, bara lakan och inga ben, som dyker upp i en stängd packning och stannar för sällskapets skull. Ingen har kommit på vad den vill, och den har aldrig ens försökt skrämma någon.',
-  'hudChrome.collections.buddyLore.proud_grunt':
-    'En veteran från krigsförråden som behöll honnören och förlorade graden. Krigsmarskalk Draven Kole ger en till varje soldat med nog mycket ära för att veta vad det kostar.',
-  'hudChrome.collections.buddyLore.raptor':
-    'En unge från Drakländerna, såld vidare innan den lär sig hur fort den kan springa. Varje ny ägare får höra att den måste hållas mätt, och ingen behöver höra det två gånger.',
-  'hudChrome.collections.buddyLore.rocky':
-    'En stenskalskrypare från Törntoppshöjdernas rasbranter, långsam och fullständigt obekymrad. Gruvarbetare håller dem för deras förmåga att stanna upp strax före ett ras.',
-  'hudChrome.collections.buddyLore.sapling':
-    'Ett ungt träd med ett leende i barken och en nyfiken lila blick. Dess rötter bär det med glatt vaggande steg vart du än vandrar.',
-  'hudChrome.collections.buddyLore.skeleton':
-    'Det kom upp ur Vålnadsskogens gravhögar, borstade av sig och har följt efter folk sedan dess. Ingen har fastställt vems ben det var.',
-  'hudChrome.collections.buddyLore.solbot':
-    'En liten soldriven automat, uppgrävd halvt begravd i Drakländernas aska och fortfarande tickande. Verkstaden som byggde den lämnade inget märke någonstans på höljet.',
-  'hudChrome.collections.buddyLore.spider':
-    'En handflatestor vävare från Vålnadsskogen som möblerar om varje packning den bärs i. Spindelväven är starkare än tråden den ersätter.',
-  'hudChrome.collections.buddyLore.sprites':
-    'Två små eldväsen, ett gyllene och ett blågrönt, som aldrig riktigt enas om vem som leder. Kom nära nog så förenas de till en grön låga, för att sedan skratta och glida isär igen.',
-  'hudChrome.collections.buddyLore.stag':
-    'En blodslinje från Evighetsträdgården, framavlad ur de stora hjortar väktarna en gång red. Den sänker fortfarande huvudet när en hand höjs, av en vana äldre än djuret självt.',
-  'hudChrome.collections.buddyLore.tiger':
-    'Palmviddens ränder på ett djur som aldrig sett Palmvidden: blodslinjen har hållits i fångenskap sedan de gamla menagerierna stängde. Den lyder en vissling och ingenting annat.',
-  'hudChrome.collections.buddyLore.triple_t':
-    'Tre av någonting, eller en sak tre gånger om. Uppgifterna går isär, och varelsen står inte still tillräckligt länge för att bli räknad.',
-  'hudChrome.collections.buddyLore.trollface':
-    'En grinande sak som Vålnadsskogen släppte ut och vägrade ta tillbaka. Varje försök att beskriva den slutar med att berättaren skrattar och ger upp.',
-  'hudChrome.collections.buddyLore.tuskhorn_boar':
-    'Ett djur från Törntoppshöjderna, framavlat kortbent av herdar som ville ha ett vildsvin som inte kunde riva ett staket. Humöret behöll det ändå.',
-  'hudChrome.collections.close': 'Stäng jakten',
-  'hudChrome.collections.cosmetic.crystal_lich_frostbound': 'Frostbunden',
-  'hudChrome.collections.cosmetic.crystal_lich_voltaic': 'Elektrisk',
-  'hudChrome.collections.cosmetic.forgemaw_ashen': 'Askgrå',
-  'hudChrome.collections.cosmetic.forgemaw_whitehot': 'Vitglödande',
-  'hudChrome.collections.cosmetic.frog_sapphire': 'Safirgroda',
-  'hudChrome.collections.cosmetic.moss_hare_verdant': 'Grönskande',
-  'hudChrome.collections.cosmetic.proud_grunt_warlord': 'Krigsherre',
-  'hudChrome.collections.cosmetic.stag_acorn': 'Ekollonkrona',
-  'hudChrome.collections.cosmetic.stag_gilded': 'Förgylld',
-  'hudChrome.collections.cosmeticUnlocked': 'Nytt utseende för {name}: {look}.',
-  'hudChrome.collections.detail.bindLabel': 'Bindning',
-  'hudChrome.collections.detail.drop': '{mob} ({location}), {chance}% per dödande',
-  'hudChrome.collections.detail.dropLabel': 'Tappas av',
-  'hudChrome.collections.detail.dropWithHeroic':
-    '{mob} ({location}), {chance}% per dödande, {heroicChance}% i heroiskt läge',
-  'hudChrome.collections.detail.exchangeLabel': '$WOC-börsen',
-  'hudChrome.collections.detail.exchangeNone': 'Inga annonser',
-  'hudChrome.collections.detail.exchangeUnavailable': 'Inte tillgängligt i denna klient',
-  'hudChrome.collections.detail.fishingDrop': 'Fiske var som helst, {chance}% per fångst',
-  'hudChrome.collections.detail.globalDrop':
-    'Valfri fiende, {chance}% per dödande, en av {count} med denna sällsynthet',
-  'hudChrome.collections.detail.heroicDrop':
-    '{mob} ({location}), endast heroiskt läge, {chance}% per dödande',
-  'hudChrome.collections.detail.marketAtMerchant': 'Visas hos köpmannen',
-  'hudChrome.collections.detail.marketChecking': 'Kontrollerar...',
-  'hudChrome.collections.detail.marketLabel': 'Världsmarknaden',
-  'hudChrome.collections.detail.marketNone': 'Inga annonser',
-  'hudChrome.collections.detail.marksPrice': '{amount} heroiska märken',
-  'hudChrome.collections.detail.noItem': 'Inget föremål ger detta ännu',
-  'hudChrome.collections.detail.noSell': 'Kan inte säljas',
-  'hudChrome.collections.detail.noSource': 'Ingen källa i spelet ännu',
-  'hudChrome.collections.detail.sellLabel': 'Handlaren betalar',
-  'hudChrome.collections.detail.setLabel': 'Insamlat',
-  'hudChrome.collections.detail.soulbound': 'Själsbundet',
-  'hudChrome.collections.detail.tradeable': 'Kan handlas',
-  'hudChrome.collections.detail.vendor': '{npc} ({location}) för {price}',
-  'hudChrome.collections.detail.vendorLabel': 'Säljs av',
-  'hudChrome.collections.keybindLabel': 'Jakt',
-  'hudChrome.collections.launcherTitle': 'Jakt: följeslagare, riddjur och föremålsset',
-  'hudChrome.collections.looks.locked': 'Låst',
-  'hudChrome.collections.looks.none': 'Inga utseenden har skapats för denna följeslagare ännu',
-  'hudChrome.collections.looks.title': 'Utseenden',
-  'hudChrome.collections.looks.unlocked': 'Upplåst',
-  'hudChrome.collections.looks.worn': 'Använt',
-  'hudChrome.collections.petKind.celebrity': 'Kändisar',
   'hudChrome.collections.presence.alon': 'Du känner dig iakttagen och stillsamt godkänd.',
   'hudChrome.collections.presence.alpaca':
     'Något ulligt och makligt har bestämt sig för att följa med.',
@@ -20896,41 +20767,11 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'En grymtning och en stampning: något envist följer dig.',
   'hudChrome.collections.presenceDefault': 'Du känner en närvaro som iakttar dig.',
   'hudChrome.collections.revealed': '{name} har bestämt sig för att följa dig.',
-  'hudChrome.collections.set.bonusLabel': '{pieces} delar',
-  'hudChrome.collections.set.itemLevel': 'föremålsnivå {level}',
-  'hudChrome.collections.set.owned': '{owned} av {total} delar',
-  'hudChrome.collections.source.bossDrop': '{mob} ({location}), {chance}% per spelare och dödande',
-  'hudChrome.collections.source.bossDropHeroicOnly':
-    '{mob} ({location}), endast heroiskt läge, {chance}% per spelare',
-  'hudChrome.collections.source.bossDropWithHeroic':
-    '{mob} ({location}), {chance}% per spelare, {heroicChance}% i heroiskt läge',
-  'hudChrome.collections.source.bossLabel': 'Bossföljeslagare',
-  'hudChrome.collections.source.challengeDps':
-    'Gör {dps} skada per sekund på {mob} under hela striden',
-  'hudChrome.collections.source.challengeLabel': 'Utmaning',
-  'hudChrome.collections.source.challengeSpeed':
-    'Besegra {mob} inom {seconds} sekunder från stridens början',
-  'hudChrome.collections.source.craft': '{item} (recept för {profession})',
-  'hudChrome.collections.source.craftLabel': 'Tillverkat',
-  'hudChrome.collections.source.deed': 'Bedriften {deed}',
-  'hudChrome.collections.source.deedLabel': 'Förtjänas genom',
-  'hudChrome.collections.source.grantLabel': 'Tilldelat',
-  'hudChrome.collections.source.grantOnly':
-    'Säsongsbelöning: den månatliga rankningen och belöningarna för bästa stridsloggar',
-  'hudChrome.collections.source.rollNote':
-    'Varje spelare slår separat; ingen förlorar sitt slag till en gruppmedlem.',
-  'hudChrome.collections.source.token':
-    '{item}, används en gång för att knyta följeslagaren till dig',
-  'hudChrome.collections.source.tokenLabel': 'Pollett',
-  'hudChrome.collections.stat.mixed': 'Blandad',
-  'hudChrome.collections.stat.strength': 'Styrka',
   'hudChrome.collections.state.notOwned': 'Inte insamlat',
   'hudChrome.collections.state.owned': 'Insamlat',
   'hudChrome.collections.state.pending': 'En närvaro följer dig',
   'hudChrome.collections.state.unavailable': 'Kan inte fås ännu',
   'hudChrome.collections.tabs.buddies': 'Följeslagare',
-  'hudChrome.collections.tabs.sets': 'Föremålsset',
-  'hudChrome.collections.title': 'Jakt',
   'hudChrome.cosmetics.buddyActive': 'Frammanad',
   'hudChrome.cosmetics.buddyDrag': 'Dra till handlingsfältet',
   'hudChrome.courier.bags': 'Skicka till banken',
@@ -24483,8 +24324,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.cantors_hymnal.name': 'Kantorns psalmbok',
   'entities.items.cantors_stole.name': 'Kantorns stola',
   'entities.items.cellwatch_belt.name': 'Cellvaktens bälte',
-  'entities.items.charm_stag_acorn.name': 'Ekollonkronans amulett',
-  'entities.items.charm_stag_gilded.name': 'Förgylld amulett',
   'entities.items.choristers_gloves.name': 'Koristens handskar',
   'entities.items.choristers_spaulders.name': 'Koristens axelskenor',
   'entities.items.chorus_conch.name': 'Körsnäcka',
@@ -24568,41 +24407,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.turnkeys_shank.name': 'Fängelsevaktens stickkniv',
   'entities.items.unquiet_stalkers_hood.name': 'Den orolige smygarens huva',
   'entities.items.vestments_of_the_waking_rite.name': 'Uppvaknandets rits skrud',
-  'entities.items.whistle_alon.name': 'Visselpipa för Alon',
-  'entities.items.whistle_alpaca.name': 'Alpackavisselpipa',
-  'entities.items.whistle_ansem.name': 'Visselpipa för Ansem',
-  'entities.items.whistle_bull.name': 'Tjurvisselpipa',
-  'entities.items.whistle_cate_coin.name': 'Myntkattens visselpipa',
-  'entities.items.whistle_crimson_claw_crab.name': 'Karmosinkrabbans visselpipa',
-  'entities.items.whistle_crystal_lich.name': 'Kristalllichens visselpipa',
-  'entities.items.whistle_crystal_tide.name': 'Kristalltidvattnets visselpipa',
-  'entities.items.whistle_ember_fox.name': 'Glödrävens visselpipa',
-  'entities.items.whistle_emberfall_phoenix.name': 'Glödfallsfenixens visselpipa',
-  'entities.items.whistle_emerald_wolf.name': 'Smaragdvargens visselpipa',
-  'entities.items.whistle_forgemaw.name': 'Visselpipa för Smältkäften',
-  'entities.items.whistle_frog.name': 'Grodvisselpipa',
-  'entities.items.whistle_frostfire.name': 'Frosteldens visselpipa',
-  'entities.items.whistle_golden_sentinel.name': 'Gyllene väktarens visselpipa',
-  'entities.items.whistle_horse.name': 'Hästvisselpipa',
-  'entities.items.whistle_kekius.name': 'Visselpipa för Kekius',
-  'entities.items.whistle_loot_goblin.name': 'Bytesgoblinens visselpipa',
-  'entities.items.whistle_moss_hare.name': 'Mossharens visselpipa',
-  'entities.items.whistle_nightfang.name': 'Nattandens visselpipa',
-  'entities.items.whistle_penny_goldspark.name': 'Penny Guldgnistas visselpipa',
-  'entities.items.whistle_phantom.name': 'Vålnadsvisselpipa',
-  'entities.items.whistle_proud_grunt.name': 'Stolte soldatens visselpipa',
-  'entities.items.whistle_raptor.name': 'Raptorvisselpipa',
-  'entities.items.whistle_rocky.name': 'Stenis visselpipa',
-  'entities.items.whistle_sapling.name': 'Plantans visselpipa',
-  'entities.items.whistle_skeleton.name': 'Skelettvisselpipa',
-  'entities.items.whistle_solbot.name': 'Solbotens visselpipa',
-  'entities.items.whistle_spider.name': 'Spindelvisselpipa',
-  'entities.items.whistle_sprites.name': 'Flimmer och Glimmers visselpipa',
-  'entities.items.whistle_stag.name': 'Hjortvisselpipa',
-  'entities.items.whistle_tiger.name': 'Tigervisselpipa',
-  'entities.items.whistle_triple_t.name': 'Trippel-T:s visselpipa',
-  'entities.items.whistle_trollface.name': 'Trollansiktets visselpipa',
-  'entities.items.whistle_tuskhorn_boar.name': 'Beteshornsgaltens visselpipa',
   'entities.mobs.balgath_cyclops.name': 'Balgath, den enögde förmannen',
   'entities.mobs.barnacle_crawler.name': 'Vrakbunden sjöman',
   'entities.mobs.basin_raptor.name': 'Bassängraptor',
@@ -24634,7 +24438,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.buddy_phantom.name': 'Vålnad',
   'entities.mobs.buddy_proud_grunt.name': 'Stolt soldat',
   'entities.mobs.buddy_rocky.name': 'Stenis',
-  'entities.mobs.buddy_sapling.name': 'Planta',
   'entities.mobs.buddy_skeleton.name': 'Skelett',
   'entities.mobs.buddy_solbot.name': 'Solboten',
   'entities.mobs.buddy_spider.name': 'Spindel',

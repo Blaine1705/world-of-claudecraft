@@ -6,20 +6,14 @@ import { FINDER_ACTIVITIES } from '../src/sim/content/dungeon_finder';
 import { MOBS } from '../src/sim/data';
 import { targetPortraitUrl } from '../src/ui/target_portrait_view';
 
-it('renders every live mob portrait except the five shared buddy headshots', async () => {
+it('renders every live mob portrait except the four shared buddy headshots', async () => {
   const root = fileURLToPath(new URL('..', import.meta.url));
   const jobs = await buildMobPortraitJobs(root);
   const ids = new Set(jobs.map((job) => job.mobId));
   const aliases = Object.keys(MOBS)
     .filter((id) => !ids.has(id))
     .sort();
-  expect(aliases).toEqual([
-    'buddy_crystal_lich',
-    'buddy_forgemaw',
-    'buddy_horse',
-    'buddy_sapling',
-    'buddy_sprites',
-  ]);
+  expect(aliases).toEqual(['buddy_crystal_lich', 'buddy_forgemaw', 'buddy_horse', 'buddy_sprites']);
   for (const id of aliases) {
     expect(targetPortraitUrl(id, true)).toBe(`/ui/portraits/${id}.webp`);
     expect(existsSync(new URL(`../public/ui/portraits/${id}.webp`, import.meta.url))).toBe(true);

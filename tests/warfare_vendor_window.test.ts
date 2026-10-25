@@ -18,8 +18,8 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { TUG_HONOR_OFFER } from '../src/sim/content/buddy_offers';
 import { talentsFor } from '../src/sim/content/talents';
-import { ITEMS } from '../src/sim/data';
 import type { ItemDef } from '../src/sim/types';
 import { FocusManager } from '../src/ui/focus_manager';
 import type {
@@ -203,13 +203,13 @@ describe('renderWarfareVendorWindow: direct buddy purchases', () => {
     return view([
       {
         kind: 'companions',
-        group: 'entry',
+        group: 'companions',
         key: 'companions',
         offers: [
           {
-            itemId: 'whistle_horse',
-            item: ITEMS.whistle_horse,
-            honor: 100_000,
+            itemId: 'companion_horse',
+            item: TUG_HONOR_OFFER,
+            honor: 10_000,
             affordable: true,
             owned,
           },
@@ -235,14 +235,14 @@ describe('renderWarfareVendorWindow: direct buddy purchases', () => {
         },
       }),
     );
-    const horse = tile(el, 'buy:companions:whistle_horse');
+    const horse = tile(el, 'buy:companions:companion_horse');
     expect(horse.querySelector('.vi-name')?.textContent).toBe('Tug, the Warhorse');
-    expect(horse.getAttribute('aria-label')).toBe('Buy Tug, the Warhorse for 100,000 Honor');
+    expect(horse.getAttribute('aria-label')).toBe('Buy Tug, the Warhorse for 10,000 Honor');
     expect(tooltip).toContain('Permanently unlocks this buddy and summons it immediately.');
     expect(tooltip).toContain('No item is added to your bags.');
     expect(itemTooltip).not.toHaveBeenCalled();
     horse.click();
-    expect(onBuy).toHaveBeenCalledExactlyOnceWith('whistle_horse');
+    expect(onBuy).toHaveBeenCalledExactlyOnceWith('companion_horse');
   });
 
   it('disables an acquired buddy while owned gear remains purchasable', () => {
@@ -251,7 +251,7 @@ describe('renderWarfareVendorWindow: direct buddy purchases', () => {
     const model = companionView(true);
     model.sections.unshift(section(SET_A, [offer('a_one', 'helmet', { owned: true })]));
     renderWarfareVendorWindow(el, 'FURY', model, deps({ onBuy }));
-    const horse = tile(el, 'buy:companions:whistle_horse');
+    const horse = tile(el, 'buy:companions:companion_horse');
     expect(horse.disabled).toBe(true);
     expect(horse.getAttribute('aria-label')).toBe(
       'Tug, the Warhorse, already collected or awaiting reveal',
@@ -262,6 +262,25 @@ describe('renderWarfareVendorWindow: direct buddy purchases', () => {
     expect(gear.disabled).toBe(false);
     gear.click();
     expect(onBuy).toHaveBeenCalledExactlyOnceWith('a_one');
+  });
+
+  it('heads the companions with their own group, never under Warfare Season 1', () => {
+    const el = mount();
+    const model = companionView(false);
+    model.sections.unshift(section(SET_A, [offer('a_one', 'helmet')]));
+    renderWarfareVendorWindow(el, 'FURY', model, deps());
+    const groups = [...el.querySelectorAll<HTMLElement>('.warfare-group-title')].map(
+      (h) => h.textContent,
+    );
+    expect(groups).toEqual(['Warfare Season 1', 'Companions']);
+    // The group heading names the one companions section, so no second
+    // "Companions" section title repeats it, and the grid follows directly.
+    const titles = [...el.querySelectorAll<HTMLElement>('.vendor-section-title')].map(
+      (h) => h.textContent,
+    );
+    expect(titles.filter((text) => text === 'Companions')).toHaveLength(1);
+    const companionsHead = [...el.querySelectorAll<HTMLElement>('.warfare-group-title')][1];
+    expect(companionsHead.nextElementSibling?.getAttribute('data-grid')).toBe('companions');
   });
 });
 

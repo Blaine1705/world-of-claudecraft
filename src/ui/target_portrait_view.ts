@@ -12,7 +12,6 @@ export const BUDDY_PORTRAIT_URLS: Readonly<Record<BuddyKey, string>> = Object.fr
   horse: '/ui/portraits/buddy_horse.webp',
   crystal_lich: '/ui/portraits/buddy_crystal_lich.webp',
   forgemaw: '/ui/portraits/buddy_forgemaw.webp',
-  sapling: '/ui/portraits/buddy_sapling.webp',
   sprites: '/ui/portraits/buddy_sprites.webp',
 });
 
