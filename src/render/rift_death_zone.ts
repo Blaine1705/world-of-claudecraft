@@ -54,7 +54,7 @@ import {
   RING_MAX_OPACITY,
   SWEEP_BASE_OPACITY,
 } from './rift_death_zone_core';
-import { BreathFx, HammerFx, SealShake } from './smith_heart_fx';
+import { BreathFx, HammerFx, QuenchFx, SealShake } from './smith_heart_fx';
 import { SummonRiseFx } from './summon_rise_fx';
 import { BastionFx } from './sunken_bastion/bastion_fx';
 import { TrashEngineFx } from './trash_engine_fx';
@@ -143,6 +143,9 @@ export class RiftDeathZoneVisuals {
   // Its Breath guardian (Bellows Gust, Storm Lance: their telegraphs and
   // their wind and lightning).
   private readonly breathFx: BreathFx;
+  // Its Quench guardian (Quenching Breath's cone telegraph and its frost,
+  // Tempering Strike's ice).
+  private readonly quenchFx: QuenchFx;
   // The Smith's Heart's seal moments felt in the camera.
   private readonly sealShake: SealShake;
 
@@ -283,6 +286,7 @@ export class RiftDeathZoneVisuals {
     this.summonRise = new SummonRiseFx(playGesture);
     this.hammerFx = new HammerFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.breathFx = new BreathFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.quenchFx = new QuenchFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.sealShake = new SealShake(world, shake);
   }
 
@@ -363,6 +367,7 @@ export class RiftDeathZoneVisuals {
     this.summonRise.update(dt);
     this.hammerFx.update(dt);
     this.breathFx.update(dt);
+    this.quenchFx.update(dt);
     this.sealShake.update();
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
@@ -409,6 +414,7 @@ export class RiftDeathZoneVisuals {
     this.trashEngine.dispose();
     this.hammerFx.dispose();
     this.breathFx.dispose();
+    this.quenchFx.dispose();
     this.hoardPresentation.dispose();
   }
 
@@ -436,6 +442,7 @@ export class RiftDeathZoneVisuals {
     this.summonRise.handleEvent(event);
     this.hammerFx.handleEvent(event);
     this.breathFx.handleEvent(event);
+    this.quenchFx.handleEvent(event);
     return (
       this.bastionFx.handleEvent(event) ||
       temple ||
