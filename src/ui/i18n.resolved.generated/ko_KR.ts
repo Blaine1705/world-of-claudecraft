@@ -4230,10 +4230,10 @@ export const ko_KR: EnTranslations = {
         "icedOver": "스며드는 서리에 얼어붙었습니다: 이동하거나 행동할 수 없습니다."
       },
       "council": {
-        "wakeMark": "When this ends, a pillar bursts out of the floor where you stand, dealing {min} to {max} damage to everyone within {radius} yd and throwing them back. Stand where the raid needs cover. Heroic: {heroic}% more damage.",
-        "rockMark": "When this ends, a rock falls on you: {total} damage shared between everyone within {radius} yd. With fewer than {soakers} under it, each takes {penalty}% more and the whole raid takes {tremorMin} to {tremorMax}. Every pillar within {radius} yd loses a piece, so share it away from cover. Heroic: {heroic}% more damage.",
-        "resonance": "Standing within {reach} yd of a pillar for {seconds} sec in a row knocks a piece off it, and again every {seconds} sec you stay. Nothing removes it: wait out the Wrath by the most damaged pillar and keep off the whole ones.",
-        "memory": "Deals {pct}% more damage: {per}% for each fallen member of the Hammer Council."
+        "wakeMark": "효과가 끝나면 서 있는 자리의 바닥에서 기둥이 솟구쳐 {radius}야드 안의 모두에게 {min}에서 {max}의 피해를 주고 밀쳐냅니다. 공격대에 엄폐물이 필요한 곳에 서세요. 영웅: 피해 {heroic}% 증가.",
+        "rockMark": "효과가 끝나면 바위가 떨어집니다: {total}의 피해를 {radius}야드 안의 모두가 나눠 받습니다. {soakers}명 미만이면 각자 {penalty}% 더 받고 공격대 전체가 {tremorMin}에서 {tremorMax}의 피해를 받습니다. {radius}야드 안의 모든 기둥이 한 조각씩 깨지니 엄폐물에서 떨어져 나눠 맞으세요. 영웅: 피해 {heroic}% 증가.",
+        "resonance": "기둥에서 {reach}야드 안에 {seconds}초 동안 계속 서 있으면 기둥이 한 조각 깨지고, 머무는 동안 {seconds}초마다 다시 깨집니다. 제거할 수 없습니다: 가장 손상된 기둥 옆에서 산의 분노를 버티고 멀쩡한 기둥에서는 떨어지세요.",
+        "memory": "주는 피해가 {pct}% 증가합니다: 쓰러진 망치 의회 구성원 1명당 {per}%."
       },
       "sharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).",
       "varkhulSharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%). 부족한 플레이어 1명당 원 안의 플레이어를 포함한 공격대 전체가 최대 생명력의 {missingPenalty}%에 해당하는 피해를 추가로 받습니다.",
@@ -6664,29 +6664,29 @@ export const ko_KR: EnTranslations = {
     },
     "council": {
       "warn": {
-        "wrath": "Mountain's Wrath! Hide behind a pillar!",
-        "enrage": "The mountain's anger quickens! Mountain's Wrath comes much sooner now.",
-        "weight": "Hammer's Weight on {player}: swap tanks!",
-        "wake": "Wake the Stone: pillars rise under {players}! Stand where the cover should go.",
-        "wakeHeir": "The stone wakes under {players}: move!",
-        "rock": "Falling Rock on {player}! Share the blow, away from your cover!",
-        "song": "Song of the Seam! Interrupt it!",
-        "resonance": "Resonance on {players}: crack the weakest pillar, keep off the whole ones!",
-        "fell_guardian": "The Guardian of the Hammer falls. Its wrath passes into the stone that remains!",
-        "fell_slabwright": "The Slabwright falls. Now the stone rises where it will!",
-        "fell_singer": "The Seam Singer falls. Its song passes on, and no one can stop it now!"
+        "wrath": "산의 분노! 기둥 뒤에 숨으세요!",
+        "enrage": "산의 분노가 빨라집니다! 이제 산의 분노가 훨씬 빨리 옵니다.",
+        "weight": "{player}에게 망치의 무게: 탱커 교대!",
+        "wake": "돌 깨우기: {players} 아래에서 기둥이 솟아오릅니다! 엄폐물이 필요한 곳에 서세요.",
+        "wakeHeir": "{players} 아래에서 돌이 깨어납니다: 움직이세요!",
+        "rock": "{player}에게 낙석! 엄폐물에서 떨어져 함께 나눠 맞으세요!",
+        "song": "광맥의 노래! 차단하세요!",
+        "resonance": "{players}에게 공명: 가장 손상된 기둥을 깨고, 멀쩡한 기둥에서는 떨어지세요!",
+        "fell_guardian": "망치의 수호자가 쓰러졌습니다. 그 분노가 남은 돌에게 넘어갑니다!",
+        "fell_slabwright": "석판장이가 쓰러졌습니다. 이제 돌이 제멋대로 솟아오릅니다!",
+        "fell_singer": "광맥의 노래꾼이 쓰러졌습니다. 그 노래가 이어지며, 이제 아무도 막을 수 없습니다!"
       },
       "alert": {
-        "wakeTitle": "Wake the Stone!",
-        "wakeLine": "A pillar rises where you stand: put the cover where the raid needs it",
-        "rockTitle": "Falling Rock!",
-        "rockLine": "Gather at least three allies on you, away from the pillars",
-        "resonanceTitle": "Resonance",
-        "resonanceLine": "Near a pillar you crack it: wait by the most damaged one",
-        "resonanceCracking": "Cracking a pillar: move away to spare it",
-        "weightTitle": "Hammer's Weight",
-        "weightLine": "You take double physical damage: the other tank must take the Guardian",
-        "timeAria": "{seconds} seconds left"
+        "wakeTitle": "돌 깨우기!",
+        "wakeLine": "서 있는 곳에서 기둥이 솟아오릅니다: 공격대에 필요한 곳에 엄폐물을 만드세요",
+        "rockTitle": "낙석!",
+        "rockLine": "기둥에서 떨어져 최소 세 명의 아군을 모으세요",
+        "resonanceTitle": "공명",
+        "resonanceLine": "기둥 근처에 있으면 기둥을 깹니다: 가장 손상된 기둥 옆에서 기다리세요",
+        "resonanceCracking": "기둥을 깨는 중: 지키려면 멀어지세요",
+        "weightTitle": "망치의 무게",
+        "weightLine": "받는 물리 피해가 두 배가 됩니다: 다른 탱커가 수호자를 맡아야 합니다",
+        "timeAria": "{seconds}초 남음"
       }
     },
     "sanctumAlert": {
@@ -15164,12 +15164,12 @@ export const ko_KR: EnTranslations = {
       "heart_gale_bolt": "Gale Bolt",
       "heart_rime_bolt": "Rime Bolt",
       "heart_ember_bolt": "Ember Bolt",
-      "heart_hammers_weight": "Hammer's Weight",
-      "heart_wake_the_stone": "Wake the Stone",
-      "heart_falling_rock": "Falling Rock",
-      "heart_seam_bolt": "Seam Bolt",
-      "heart_song_of_the_seam": "Song of the Seam",
-      "heart_song_of_the_seam_unbroken": "Song of the Seam",
+      "heart_hammers_weight": "망치의 무게",
+      "heart_wake_the_stone": "돌 깨우기",
+      "heart_falling_rock": "낙석",
+      "heart_seam_bolt": "광맥 화살",
+      "heart_song_of_the_seam": "광맥의 노래",
+      "heart_song_of_the_seam_unbroken": "광맥의 노래",
       "kituse_sanctum_topple_brazier": "화로 넘어뜨리기",
       "trash_demo_nova": "Test Nova",
       "trash_demo_nova_unstoppable": "Test Nova",
@@ -25016,10 +25016,10 @@ export const ko_KR: EnTranslations = {
         "name": "Guardian of the Hammer"
       },
       "heart_slabwright": {
-        "name": "The Slabwright"
+        "name": "석판장이"
       },
       "heart_seam_singer": {
-        "name": "The Seam Singer"
+        "name": "광맥의 노래꾼"
       },
       "heart_breath_guardian": {
         "name": "Guardian of the Breath"

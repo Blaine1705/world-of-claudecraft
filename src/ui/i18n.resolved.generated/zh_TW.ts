@@ -4230,10 +4230,10 @@ export const zh_TW: EnTranslations = {
         "icedOver": "被蔓延霜凇凍結：無法移動或行動。"
       },
       "council": {
-        "wakeMark": "When this ends, a pillar bursts out of the floor where you stand, dealing {min} to {max} damage to everyone within {radius} yd and throwing them back. Stand where the raid needs cover. Heroic: {heroic}% more damage.",
-        "rockMark": "When this ends, a rock falls on you: {total} damage shared between everyone within {radius} yd. With fewer than {soakers} under it, each takes {penalty}% more and the whole raid takes {tremorMin} to {tremorMax}. Every pillar within {radius} yd loses a piece, so share it away from cover. Heroic: {heroic}% more damage.",
-        "resonance": "Standing within {reach} yd of a pillar for {seconds} sec in a row knocks a piece off it, and again every {seconds} sec you stay. Nothing removes it: wait out the Wrath by the most damaged pillar and keep off the whole ones.",
-        "memory": "Deals {pct}% more damage: {per}% for each fallen member of the Hammer Council."
+        "wakeMark": "結束時，一根石柱會從你腳下的地面衝出，對{radius}碼內的所有人造成{min}到{max}點傷害並將其擊退。站到團隊需要掩體的位置。英雄難度：傷害提高{heroic}%。",
+        "rockMark": "結束時，一塊巨石砸向你：{total}點傷害由{radius}碼內的所有人分擔。若不足{soakers}人分擔，每人多受{penalty}%傷害，且全團受到{tremorMin}到{tremorMax}點傷害。{radius}碼內的每根石柱都會損失一塊，所以要遠離掩體分擔。英雄難度：傷害提高{heroic}%。",
+        "resonance": "在石柱{reach}碼內連續站立{seconds}秒會震落它的一塊，之後每多待{seconds}秒再震落一塊。無法移除：在最破損的石柱旁躲過山岳之怒，遠離完好的石柱。",
+        "memory": "造成的傷害提高{pct}%：重錘議會每倒下一名成員提高{per}%。"
       },
       "sharedPyre": "造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。",
       "varkhulSharedPyre": "造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。每缺少一名玩家，還會對整個團隊（包括圈內玩家）造成最大生命值 {missingPenalty}% 的傷害。",
@@ -6664,29 +6664,29 @@ export const zh_TW: EnTranslations = {
     },
     "council": {
       "warn": {
-        "wrath": "Mountain's Wrath! Hide behind a pillar!",
-        "enrage": "The mountain's anger quickens! Mountain's Wrath comes much sooner now.",
-        "weight": "Hammer's Weight on {player}: swap tanks!",
-        "wake": "Wake the Stone: pillars rise under {players}! Stand where the cover should go.",
-        "wakeHeir": "The stone wakes under {players}: move!",
-        "rock": "Falling Rock on {player}! Share the blow, away from your cover!",
-        "song": "Song of the Seam! Interrupt it!",
-        "resonance": "Resonance on {players}: crack the weakest pillar, keep off the whole ones!",
-        "fell_guardian": "The Guardian of the Hammer falls. Its wrath passes into the stone that remains!",
-        "fell_slabwright": "The Slabwright falls. Now the stone rises where it will!",
-        "fell_singer": "The Seam Singer falls. Its song passes on, and no one can stop it now!"
+        "wrath": "山岳之怒！躲到石柱後面！",
+        "enrage": "山岳的怒火加速了！山岳之怒會來得更快。",
+        "weight": "{player}受到重錘之壓：換坦克！",
+        "wake": "喚醒岩石：石柱將在{players}腳下升起！站到需要掩體的地方。",
+        "wakeHeir": "岩石在{players}腳下甦醒：快移動！",
+        "rock": "落石砸向{player}！遠離掩體，一起分擔！",
+        "song": "礦脈之歌！打斷它！",
+        "resonance": "{players}獲得共鳴：去震裂最破損的石柱，遠離完好的石柱！",
+        "fell_guardian": "重錘守護者倒下了。它的怒火傳入了剩下的岩石！",
+        "fell_slabwright": "石板匠倒下了。現在岩石會隨意升起！",
+        "fell_singer": "礦脈歌者倒下了。它的歌聲被傳承下去，再也無法打斷！"
       },
       "alert": {
-        "wakeTitle": "Wake the Stone!",
-        "wakeLine": "A pillar rises where you stand: put the cover where the raid needs it",
-        "rockTitle": "Falling Rock!",
-        "rockLine": "Gather at least three allies on you, away from the pillars",
-        "resonanceTitle": "Resonance",
-        "resonanceLine": "Near a pillar you crack it: wait by the most damaged one",
-        "resonanceCracking": "Cracking a pillar: move away to spare it",
-        "weightTitle": "Hammer's Weight",
-        "weightLine": "You take double physical damage: the other tank must take the Guardian",
-        "timeAria": "{seconds} seconds left"
+        "wakeTitle": "喚醒岩石！",
+        "wakeLine": "石柱會在你站的地方升起：把掩體放在團隊需要的位置",
+        "rockTitle": "落石！",
+        "rockLine": "遠離石柱，讓至少三名隊友站到你身邊",
+        "resonanceTitle": "共鳴",
+        "resonanceLine": "靠近石柱就會震裂它：在最破損的石柱旁等待",
+        "resonanceCracking": "正在震裂石柱：離開它以保住它",
+        "weightTitle": "重錘之壓",
+        "weightLine": "你受到雙倍物理傷害：另一名坦克必須接手守護者",
+        "timeAria": "剩餘{seconds}秒"
       }
     },
     "sanctumAlert": {
@@ -15164,12 +15164,12 @@ export const zh_TW: EnTranslations = {
       "heart_gale_bolt": "Gale Bolt",
       "heart_rime_bolt": "Rime Bolt",
       "heart_ember_bolt": "Ember Bolt",
-      "heart_hammers_weight": "Hammer's Weight",
-      "heart_wake_the_stone": "Wake the Stone",
-      "heart_falling_rock": "Falling Rock",
-      "heart_seam_bolt": "Seam Bolt",
-      "heart_song_of_the_seam": "Song of the Seam",
-      "heart_song_of_the_seam_unbroken": "Song of the Seam",
+      "heart_hammers_weight": "重錘之壓",
+      "heart_wake_the_stone": "喚醒岩石",
+      "heart_falling_rock": "落石",
+      "heart_seam_bolt": "礦脈箭",
+      "heart_song_of_the_seam": "礦脈之歌",
+      "heart_song_of_the_seam_unbroken": "礦脈之歌",
       "kituse_sanctum_topple_brazier": "推倒火盆",
       "trash_demo_nova": "Test Nova",
       "trash_demo_nova_unstoppable": "Test Nova",
@@ -25016,10 +25016,10 @@ export const zh_TW: EnTranslations = {
         "name": "Guardian of the Hammer"
       },
       "heart_slabwright": {
-        "name": "The Slabwright"
+        "name": "石板匠"
       },
       "heart_seam_singer": {
-        "name": "The Seam Singer"
+        "name": "礦脈歌者"
       },
       "heart_breath_guardian": {
         "name": "Guardian of the Breath"

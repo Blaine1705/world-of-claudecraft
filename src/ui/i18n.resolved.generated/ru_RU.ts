@@ -4230,10 +4230,10 @@ export const ru_RU: EnTranslations = {
         "icedOver": "Скован Ползучей изморозью: невозможно двигаться и действовать."
       },
       "council": {
-        "wakeMark": "When this ends, a pillar bursts out of the floor where you stand, dealing {min} to {max} damage to everyone within {radius} yd and throwing them back. Stand where the raid needs cover. Heroic: {heroic}% more damage.",
-        "rockMark": "When this ends, a rock falls on you: {total} damage shared between everyone within {radius} yd. With fewer than {soakers} under it, each takes {penalty}% more and the whole raid takes {tremorMin} to {tremorMax}. Every pillar within {radius} yd loses a piece, so share it away from cover. Heroic: {heroic}% more damage.",
-        "resonance": "Standing within {reach} yd of a pillar for {seconds} sec in a row knocks a piece off it, and again every {seconds} sec you stay. Nothing removes it: wait out the Wrath by the most damaged pillar and keep off the whole ones.",
-        "memory": "Deals {pct}% more damage: {per}% for each fallen member of the Hammer Council."
+        "wakeMark": "Когда эффект закончится, из пола под вами вырвется колонна: от {min} до {max} урона всем в пределах {radius} м и отбрасывание. Встаньте там, где рейду нужно укрытие. Героический режим: урон выше на {heroic}%.",
+        "rockMark": "Когда эффект закончится, на вас упадёт камень: {total} урона делится между всеми в пределах {radius} м. Если под ним меньше {soakers}, каждый получает на {penalty}% больше, а весь рейд получает от {tremorMin} до {tremorMax}. Каждая колонна в пределах {radius} м теряет кусок, так что делите удар подальше от укрытий. Героический режим: урон выше на {heroic}%.",
+        "resonance": "Если простоять в пределах {reach} м от колонны {seconds} с подряд, от неё откалывается кусок, и снова каждые {seconds} с, пока вы рядом. Снять нельзя: переждите Гнев горы у самой повреждённой колонны и держитесь подальше от целых.",
+        "memory": "Наносит на {pct}% больше урона: по {per}% за каждого павшего члена Совета Молота."
       },
       "sharedPyre": "Наносит урон в размере {total}% от максимального здоровья каждого игрока, разделённый между игроками в круге ({perPlayer}% каждому при {players} игроках).",
       "varkhulSharedPyre": "Наносит урон в размере {total}% от максимального здоровья каждого игрока, разделённый между игроками в круге ({perPlayer}% каждому при {players} игроках). За каждого недостающего игрока весь рейд, включая игроков в круге, дополнительно получает урон в размере {missingPenalty}% от максимального здоровья.",
@@ -6664,29 +6664,29 @@ export const ru_RU: EnTranslations = {
     },
     "council": {
       "warn": {
-        "wrath": "Mountain's Wrath! Hide behind a pillar!",
-        "enrage": "The mountain's anger quickens! Mountain's Wrath comes much sooner now.",
-        "weight": "Hammer's Weight on {player}: swap tanks!",
-        "wake": "Wake the Stone: pillars rise under {players}! Stand where the cover should go.",
-        "wakeHeir": "The stone wakes under {players}: move!",
-        "rock": "Falling Rock on {player}! Share the blow, away from your cover!",
-        "song": "Song of the Seam! Interrupt it!",
-        "resonance": "Resonance on {players}: crack the weakest pillar, keep off the whole ones!",
-        "fell_guardian": "The Guardian of the Hammer falls. Its wrath passes into the stone that remains!",
-        "fell_slabwright": "The Slabwright falls. Now the stone rises where it will!",
-        "fell_singer": "The Seam Singer falls. Its song passes on, and no one can stop it now!"
+        "wrath": "Гнев горы! Спрячьтесь за колонной!",
+        "enrage": "Гнев горы нарастает! Теперь Гнев горы приходит гораздо чаще.",
+        "weight": "Тяжесть Молота на {player}: смена танков!",
+        "wake": "Пробуждение камня: колонны поднимутся под {players}! Встаньте там, где нужно укрытие.",
+        "wakeHeir": "Камень просыпается под {players}: двигайтесь!",
+        "rock": "Камнепад на {player}! Разделите удар, подальше от укрытий!",
+        "song": "Песнь жилы! Прервите её!",
+        "resonance": "Резонанс на {players}: раскалывайте самую повреждённую колонну, держитесь подальше от целых!",
+        "fell_guardian": "Страж Молота пал. Его гнев переходит в оставшийся камень!",
+        "fell_slabwright": "Плитотёс пал. Теперь камень поднимается где захочет!",
+        "fell_singer": "Певец Жилы пал. Его песнь продолжается, и теперь её не остановить!"
       },
       "alert": {
-        "wakeTitle": "Wake the Stone!",
-        "wakeLine": "A pillar rises where you stand: put the cover where the raid needs it",
-        "rockTitle": "Falling Rock!",
-        "rockLine": "Gather at least three allies on you, away from the pillars",
-        "resonanceTitle": "Resonance",
-        "resonanceLine": "Near a pillar you crack it: wait by the most damaged one",
-        "resonanceCracking": "Cracking a pillar: move away to spare it",
-        "weightTitle": "Hammer's Weight",
-        "weightLine": "You take double physical damage: the other tank must take the Guardian",
-        "timeAria": "{seconds} seconds left"
+        "wakeTitle": "Пробуждение камня!",
+        "wakeLine": "Колонна поднимется там, где вы стоите: поставьте укрытие туда, где оно нужно рейду",
+        "rockTitle": "Камнепад!",
+        "rockLine": "Соберите рядом с собой хотя бы трёх союзников, подальше от колонн",
+        "resonanceTitle": "Резонанс",
+        "resonanceLine": "Рядом с колонной вы её раскалываете: ждите у самой повреждённой",
+        "resonanceCracking": "Вы раскалываете колонну: отойдите, чтобы её сберечь",
+        "weightTitle": "Тяжесть Молота",
+        "weightLine": "Вы получаете двойной физический урон: другой танк должен забрать Стража",
+        "timeAria": "Осталось {seconds} с"
       }
     },
     "sanctumAlert": {
@@ -15164,12 +15164,12 @@ export const ru_RU: EnTranslations = {
       "heart_gale_bolt": "Gale Bolt",
       "heart_rime_bolt": "Rime Bolt",
       "heart_ember_bolt": "Ember Bolt",
-      "heart_hammers_weight": "Hammer's Weight",
-      "heart_wake_the_stone": "Wake the Stone",
-      "heart_falling_rock": "Falling Rock",
-      "heart_seam_bolt": "Seam Bolt",
-      "heart_song_of_the_seam": "Song of the Seam",
-      "heart_song_of_the_seam_unbroken": "Song of the Seam",
+      "heart_hammers_weight": "Тяжесть Молота",
+      "heart_wake_the_stone": "Пробуждение камня",
+      "heart_falling_rock": "Камнепад",
+      "heart_seam_bolt": "Стрела жилы",
+      "heart_song_of_the_seam": "Песнь жилы",
+      "heart_song_of_the_seam_unbroken": "Песнь жилы",
       "kituse_sanctum_topple_brazier": "Опрокинуть жаровню",
       "trash_demo_nova": "Test Nova",
       "trash_demo_nova_unstoppable": "Test Nova",
@@ -25016,10 +25016,10 @@ export const ru_RU: EnTranslations = {
         "name": "Guardian of the Hammer"
       },
       "heart_slabwright": {
-        "name": "The Slabwright"
+        "name": "Плитотёс"
       },
       "heart_seam_singer": {
-        "name": "The Seam Singer"
+        "name": "Певец Жилы"
       },
       "heart_breath_guardian": {
         "name": "Guardian of the Breath"

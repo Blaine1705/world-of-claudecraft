@@ -4230,10 +4230,10 @@ export const ja_JP: EnTranslations = {
         "icedOver": "忍び寄る霧氷で凍りついた：移動も行動もできない。"
       },
       "council": {
-        "wakeMark": "When this ends, a pillar bursts out of the floor where you stand, dealing {min} to {max} damage to everyone within {radius} yd and throwing them back. Stand where the raid needs cover. Heroic: {heroic}% more damage.",
-        "rockMark": "When this ends, a rock falls on you: {total} damage shared between everyone within {radius} yd. With fewer than {soakers} under it, each takes {penalty}% more and the whole raid takes {tremorMin} to {tremorMax}. Every pillar within {radius} yd loses a piece, so share it away from cover. Heroic: {heroic}% more damage.",
-        "resonance": "Standing within {reach} yd of a pillar for {seconds} sec in a row knocks a piece off it, and again every {seconds} sec you stay. Nothing removes it: wait out the Wrath by the most damaged pillar and keep off the whole ones.",
-        "memory": "Deals {pct}% more damage: {per}% for each fallen member of the Hammer Council."
+        "wakeMark": "効果が切れると、立っている場所の床から柱が突き出し、{radius}ヤード以内の全員に{min}から{max}のダメージを与えて吹き飛ばす。レイドが遮蔽物を必要とする場所に立とう。ヒロイック：ダメージ{heroic}%増加。",
+        "rockMark": "効果が切れると岩が落ちてくる：{total}のダメージを{radius}ヤード以内の全員で分け合う。{soakers}人未満だと各自が{penalty}%多く受け、レイド全体が{tremorMin}から{tremorMax}を受ける。{radius}ヤード以内の柱はすべて欠けるので、遮蔽物から離れて受けよう。ヒロイック：ダメージ{heroic}%増加。",
+        "resonance": "柱から{reach}ヤード以内に{seconds}秒続けて立つと柱が一つ欠け、そこにいる限り{seconds}秒ごとにまた欠ける。解除はできない：一番傷んだ柱のそばで山の怒りをやり過ごし、無傷の柱には近づかないこと。",
+        "memory": "与えるダメージが{pct}%増加：槌の評議会の倒れた仲間1人につき{per}%。"
       },
       "sharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。",
       "varkhulSharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。不足しているプレイヤー1人につき、サークル内を含むレイド全体が最大体力の{missingPenalty}%のダメージを受ける。",
@@ -6664,29 +6664,29 @@ export const ja_JP: EnTranslations = {
     },
     "council": {
       "warn": {
-        "wrath": "Mountain's Wrath! Hide behind a pillar!",
-        "enrage": "The mountain's anger quickens! Mountain's Wrath comes much sooner now.",
-        "weight": "Hammer's Weight on {player}: swap tanks!",
-        "wake": "Wake the Stone: pillars rise under {players}! Stand where the cover should go.",
-        "wakeHeir": "The stone wakes under {players}: move!",
-        "rock": "Falling Rock on {player}! Share the blow, away from your cover!",
-        "song": "Song of the Seam! Interrupt it!",
-        "resonance": "Resonance on {players}: crack the weakest pillar, keep off the whole ones!",
-        "fell_guardian": "The Guardian of the Hammer falls. Its wrath passes into the stone that remains!",
-        "fell_slabwright": "The Slabwright falls. Now the stone rises where it will!",
-        "fell_singer": "The Seam Singer falls. Its song passes on, and no one can stop it now!"
+        "wrath": "山の怒り！柱の陰に隠れろ！",
+        "enrage": "山の怒りが速まった！山の怒りがずっと早く来る。",
+        "weight": "{player}に槌の重み：タンク交代！",
+        "wake": "石の目覚め：{players}の足元に柱がせり上がる！遮蔽物が必要な場所に立て。",
+        "wakeHeir": "{players}の足元で石が目覚める：動け！",
+        "rock": "{player}に落石！遮蔽物から離れて一緒に受けろ！",
+        "song": "鉱脈の歌！詠唱を止めろ！",
+        "resonance": "{players}に共鳴：一番傷んだ柱を割れ、無傷の柱には近づくな！",
+        "fell_guardian": "槌の守護者が倒れた。その怒りは残された石へと移る！",
+        "fell_slabwright": "石板の匠が倒れた。これからは石が好きな場所にせり上がる！",
+        "fell_singer": "鉱脈の歌い手が倒れた。その歌は受け継がれ、もう誰にも止められない！"
       },
       "alert": {
-        "wakeTitle": "Wake the Stone!",
-        "wakeLine": "A pillar rises where you stand: put the cover where the raid needs it",
-        "rockTitle": "Falling Rock!",
-        "rockLine": "Gather at least three allies on you, away from the pillars",
-        "resonanceTitle": "Resonance",
-        "resonanceLine": "Near a pillar you crack it: wait by the most damaged one",
-        "resonanceCracking": "Cracking a pillar: move away to spare it",
-        "weightTitle": "Hammer's Weight",
-        "weightLine": "You take double physical damage: the other tank must take the Guardian",
-        "timeAria": "{seconds} seconds left"
+        "wakeTitle": "石の目覚め！",
+        "wakeLine": "立っている場所に柱がせり上がる：レイドが必要な場所に遮蔽物を置こう",
+        "rockTitle": "落石！",
+        "rockLine": "柱から離れ、少なくとも3人の味方を集めよう",
+        "resonanceTitle": "共鳴",
+        "resonanceLine": "柱の近くにいると割ってしまう：一番傷んだ柱のそばで待とう",
+        "resonanceCracking": "柱を割っている：守るなら離れよう",
+        "weightTitle": "槌の重み",
+        "weightLine": "物理ダメージが倍になる：もう一人のタンクが守護者を引き受けよう",
+        "timeAria": "残り{seconds}秒"
       }
     },
     "sanctumAlert": {
@@ -15164,12 +15164,12 @@ export const ja_JP: EnTranslations = {
       "heart_gale_bolt": "Gale Bolt",
       "heart_rime_bolt": "Rime Bolt",
       "heart_ember_bolt": "Ember Bolt",
-      "heart_hammers_weight": "Hammer's Weight",
-      "heart_wake_the_stone": "Wake the Stone",
-      "heart_falling_rock": "Falling Rock",
-      "heart_seam_bolt": "Seam Bolt",
-      "heart_song_of_the_seam": "Song of the Seam",
-      "heart_song_of_the_seam_unbroken": "Song of the Seam",
+      "heart_hammers_weight": "槌の重み",
+      "heart_wake_the_stone": "石の目覚め",
+      "heart_falling_rock": "落石",
+      "heart_seam_bolt": "鉱脈の矢",
+      "heart_song_of_the_seam": "鉱脈の歌",
+      "heart_song_of_the_seam_unbroken": "鉱脈の歌",
       "kituse_sanctum_topple_brazier": "火鉢倒し",
       "trash_demo_nova": "Test Nova",
       "trash_demo_nova_unstoppable": "Test Nova",
@@ -25016,10 +25016,10 @@ export const ja_JP: EnTranslations = {
         "name": "Guardian of the Hammer"
       },
       "heart_slabwright": {
-        "name": "The Slabwright"
+        "name": "石板の匠"
       },
       "heart_seam_singer": {
-        "name": "The Seam Singer"
+        "name": "鉱脈の歌い手"
       },
       "heart_breath_guardian": {
         "name": "Guardian of the Breath"
