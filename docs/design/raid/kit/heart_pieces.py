@@ -151,7 +151,7 @@ HEART_COLOURS = {
     'g0': GRANITE, 'g1': GRANITE_COOL, 'g2': GRANITE_WARM, 'g3': GRANITE_DARK, 'g4': GRANITE_PALE,
     'bed': GRANITE_BED, 'dressed': (0.5, 0.48, 0.46), 'ochre': OCHRE, 'ochre2': OCHRE_DARK, 'storm': STORM,
     'storm2': STORM_DARK, 'glass': GLASS, 'frost': FROST, 'frost2': FROST_DARK, 'basalt': BASALT_H,
-    'basalt2': BASALT_HD, 'soot': SOOT,
+    'basalt2': BASALT_HD, 'soot': SOOT, 'deep': (0.13, 0.12, 0.13), 'deep2': (0.17, 0.15, 0.15),
 }
 HEART_KINDS = {k: RAW for k in HEART_COLOURS}
 HEART_KINDS['dressed'] = DRESSED
@@ -1160,13 +1160,13 @@ def core_bed(bpy):
         R = 23.5 * (1.0 - t) ** 0.9 + 1.0
         return np.maximum(r - R, Z - (1.2 - 0.06 * np.maximum(0.0, 20 - r)))
 
-    f.put('g3', Fn(body, (-27, -27, -32), (27, 27, 5)), 0.0)
+    f.put('deep', Fn(body, (-27, -27, -32), (27, 27, 5)), 0.0)
     f.sub(Ellipsoid((0, 0, 3.5), (17.0, 17.0, 6.5)), 1.0)
     f.sub(Ellipsoid((0, 0, -1.0), (5.2, 5.2, 4.0)), 0.6)
     for k in range(14):
         a = rng.uniform(0, TAU)
         c = (math.sin(a) * 19.0, -math.cos(a) * 19.0, rng.uniform(-3.0, 1.0))
-        f.put(('g0', 'g3', 'bed')[k % 3], block(rng, c, (rng.uniform(4, 8), rng.uniform(4, 8), rng.uniform(3, 6)),
+        f.put(('deep2', 'deep', 'deep2')[k % 3], block(rng, c, (rng.uniform(4, 8), rng.uniform(4, 8), rng.uniform(3, 6)),
                                                cuts=8, chamfer=(0.7, 0.92), R=rot(rz=float(a))), 0.8)
     f.displace(lambda X, Y, Z: 0.7 * n1.fbm(X * 0.1, Y * 0.1, Z * 0.1, 3)
                + 0.35 * (n1.ridged(X * 0.25, Y * 0.25, Z * 0.25, 2) - 0.45), band=2.0)
