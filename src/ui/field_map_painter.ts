@@ -49,6 +49,7 @@ const FIELD_MAP_TOKENS = {
   slate: '--color-field-map-slate',
   quarry: '--color-field-map-quarry',
   paving: '--color-field-map-paving',
+  scoured: '--color-field-map-scoured',
   crevasse: '--color-field-map-crevasse',
   crevasseDeep: '--color-field-map-crevasse-deep',
   wall: '--color-field-map-wall',

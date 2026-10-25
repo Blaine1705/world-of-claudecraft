@@ -27,6 +27,7 @@ import {
   plateDetail,
   quarryDetail,
   rockDetail,
+  scouredDetail,
   slateDetail,
   snowDetail,
   soilDetail,
@@ -112,6 +113,9 @@ export function buildAuthoredFieldTerrain(
     quarry: { detail: quarryDetail, rough: 0.9 },
     // The Hammer Gallery's worn paving: dry dressed granite, matte.
     paving: { detail: pavingDetail, rough: 0.88 },
+    // The Breath's storm-scoured granite: polished by the wind, a hair less
+    // matte than the quarry.
+    scoured: { detail: scouredDetail, rough: 0.8 },
   };
   for (const family of FIELD_TOP_FAMILIES) {
     const data = tops[family];

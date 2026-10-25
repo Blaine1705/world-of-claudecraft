@@ -490,7 +490,7 @@ function cornice(): FieldSurface {
     }
     points.push(bearingPoint(C.x, C.z, d, C.rx - bite, C.rz - bite));
   }
-  return { kind: 'poly', id: 'storm_cornice', points, h: C.h, edge: 'rock', ground: 'slate' };
+  return { kind: 'poly', id: 'storm_cornice', points, h: C.h, edge: 'rock', ground: 'scoured' };
 }
 
 /** The Ring as one flat annulus sector (clockwise from `fromDeg` to `toDeg`). */
@@ -660,9 +660,9 @@ const AUTHORED_SURFACES: FieldSurface[] = [
       [0, 92, H.breathLow],
       [0, 96, H.breathLow],
     ],
-    {},
+    { ground: 'scoured' },
   ),
-  disc('breath_b1', BREATH.b1, { edge: 'rock', ground: 'slate' }),
+  disc('breath_b1', BREATH.b1, { edge: 'rock', ground: 'scoured' }),
   path(
     'breath_chimney',
     [
@@ -671,9 +671,9 @@ const AUTHORED_SURFACES: FieldSurface[] = [
       [-50, 112, H.breathMid],
       [-57, 112, H.breathMid],
     ],
-    { stairs: true },
+    { stairs: true, ground: 'scoured' },
   ),
-  disc('breath_b2', BREATH.b2, { edge: 'rock', ground: 'slate' }),
+  disc('breath_b2', BREATH.b2, { edge: 'rock', ground: 'scoured' }),
   path(
     'wind_bridge',
     [
@@ -682,9 +682,9 @@ const AUTHORED_SURFACES: FieldSurface[] = [
       [WIND_BRIDGE.toX, WIND_BRIDGE.toZ, H.breathHigh],
       [-106, 165, H.breathHigh],
     ],
-    { edge: 'balustrade', halfWidth: WIND_BRIDGE.halfWidth },
+    { edge: 'balustrade', halfWidth: WIND_BRIDGE.halfWidth, ground: 'scoured' },
   ),
-  disc('breath_b3', BREATH.b3, { edge: 'rock', ground: 'slate' }),
+  disc('breath_b3', BREATH.b3, { edge: 'rock', ground: 'scoured' }),
   path(
     'cornice_climb',
     [
@@ -693,7 +693,7 @@ const AUTHORED_SURFACES: FieldSurface[] = [
       [-64, 193, H.cornice],
       [-42, 195, H.cornice],
     ],
-    { stairs: true },
+    { stairs: true, ground: 'scoured' },
   ),
   cornice(),
   // --- The Quench (east): descends to the Quench Basin --------------------------------

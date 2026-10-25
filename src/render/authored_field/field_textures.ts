@@ -1102,6 +1102,138 @@ const paintPaving: ColorPainter = (h, rgb, size, rnd) => {
   }
 };
 
+/** The Breath's summit (phase 2G), one tile = 14 yd: pale granite bedrock
+ *  the storm has scoured. Broad slabs of every shape (a jittered lattice's
+ *  cells, about three to five yards), each its own tone of the cool and pale
+ *  greys and tipped a hair, parted by narrow wandering cracks; a few long
+ *  cracks running on across the slabs (the cracked plateau); shallow wind
+ *  flutes polished down one diagonal (the prevailing wind) catching the
+ *  light in pale streaks; a cold wet darkening in the low hollows and a few
+ *  pale lichen rosettes on the high spots. Broad relief only. */
+const paintScoured: ColorPainter = (h, rgb, size, rnd) => {
+  const cells = 4;
+  const pts: [number, number][] = [];
+  for (let j = 0; j < cells; j++)
+    for (let i = 0; i < cells; i++)
+      pts.push([
+        ((i + 0.15 + rnd() * 0.7) / cells) * size,
+        ((j + 0.15 + rnd() * 0.7) / cells) * size,
+      ]);
+  const tones = pts.map(() => 0.8 + rnd() * 0.28);
+  const warm = pts.map(() => rnd() < 0.25);
+  const tilt = pts.map(() => [(rnd() - 0.5) * 0.3, (rnd() - 0.5) * 0.3] as const);
+  const mottle = noiseField(size, rnd, 7);
+  const wet = noiseField(size, rnd, 5);
+  const grain = noiseField(size, rnd, 36);
+  const wobble = noiseField(size, rnd, 12);
+  // Long cracks across the slabs: a few slow arcs each.
+  const longCracks: { x: number; y: number; a: number; bend: number; len: number }[] = [];
+  for (let k = 0; k < 4; k++)
+    longCracks.push({
+      x: rnd() * size,
+      y: rnd() * size,
+      a: rnd() * Math.PI,
+      bend: (rnd() - 0.5) * 0.004,
+      len: size * (0.35 + rnd() * 0.4),
+    });
+  const crackMask = new Float32Array(size * size);
+  for (const c of longCracks) {
+    let x = c.x;
+    let y = c.y;
+    let a = c.a;
+    for (let s = 0; s < c.len; s += 0.7) {
+      a += c.bend + (wobble[wrapAt(x, y, size)] - 0.5) * 0.02;
+      x += Math.cos(a) * 0.7;
+      y += Math.sin(a) * 0.7;
+      const w = s < c.len * 0.8 ? 1 : 0;
+      for (let d = -w; d <= w; d++) {
+        const i = wrapAt(x - Math.sin(a) * d, y + Math.cos(a) * d, size);
+        crackMask[i] = Math.max(crackMask[i], d === 0 ? 1 : 0.55);
+      }
+    }
+  }
+  const wind = { x: Math.cos(0.65), y: Math.sin(0.65) };
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const i = y * size + x;
+      // The two nearest slab centres (wrapped): the slab and its parting.
+      let d1 = 1e9;
+      let d2 = 1e9;
+      let best = 0;
+      const jx = x + (wobble[i] - 0.5) * 10;
+      const jy = y + (wobble[(i + 97) % (size * size)] - 0.5) * 10;
+      for (let k = 0; k < pts.length; k++) {
+        for (let oy = -1; oy <= 1; oy++) {
+          for (let ox = -1; ox <= 1; ox++) {
+            const dx = jx - (pts[k][0] + ox * size);
+            const dy = jy - (pts[k][1] + oy * size);
+            const d = dx * dx + dy * dy;
+            if (d < d1) {
+              d2 = d1;
+              d1 = d;
+              best = k;
+            } else if (d < d2) d2 = d;
+          }
+        }
+      }
+      const edge = Math.sqrt(d2) - Math.sqrt(d1);
+      const u = (jx - pts[best][0]) / size;
+      const v = (jy - pts[best][1]) / size;
+      // Wind flutes: shallow grooves across the wind, polished pale.
+      const along = x * wind.x + y * wind.y;
+      const across = -x * wind.y + y * wind.x;
+      const flute = Math.sin(across * 0.19 + Math.sin(along * 0.012) * 3 + mottle[i] * 4);
+      let hv =
+        0.6 +
+        u * tilt[best][0] * 4 +
+        v * tilt[best][1] * 4 +
+        (mottle[i] - 0.5) * 0.12 +
+        flute * 0.035;
+      let c = tones[best] * (0.92 + mottle[i] * 0.14 + (grain[i] - 0.5) * 0.06);
+      c *= 1 + Math.max(0, flute) * 0.05;
+      const hue: [number, number, number] = warm[best] ? [1.03, 1.0, 0.95] : [0.97, 0.99, 1.03];
+      let cr = c * hue[0];
+      let cg = c * hue[1];
+      let cb = c * hue[2];
+      // The parting between slabs: a worn shoulder, a narrow dark crack.
+      if (edge < 7) hv -= ((7 - edge) / 7) ** 1.8 * 0.3;
+      if (edge < 1.6) {
+        const j = 0.36;
+        cr = j * 0.96;
+        cg = j * 0.98;
+        cb = j * 1.06;
+        hv = 0.08;
+      }
+      const cm = crackMask[i];
+      if (cm > 0 && edge > 2) {
+        cr *= 1 - cm * 0.5;
+        cg *= 1 - cm * 0.5;
+        cb *= 1 - cm * 0.46;
+        hv -= cm * 0.22;
+      }
+      // Wet hollows: cooler and darker where the rain stands.
+      const w = Math.max(0, 0.38 - wet[i]) * 1.4;
+      cr *= 1 - w * 0.3;
+      cg *= 1 - w * 0.26;
+      cb *= 1 - w * 0.18;
+      // Lichen rosettes on the high spots: a pale grey-green, sparse.
+      const lich = Math.max(0, grain[i] - 0.86) * 5 * Math.max(0, hv - 0.55) * 4;
+      cr += lich * 0.05;
+      cg += lich * 0.08;
+      cb += lich * 0.04;
+      h[i] = hv;
+      rgb[i * 3] = cr;
+      rgb[i * 3 + 1] = cg;
+      rgb[i * 3 + 2] = cb;
+    }
+  }
+};
+
+/** The Breath's scoured bedrock (one tile = 14 yd: the family's UV scale). */
+export function scouredDetail(): DetailPair {
+  return bakeColored('scoured', paintScoured, 0x9b21, 512, 2.4, 1);
+}
+
 /** The Hammer Gallery's worn paving (one tile = 10 yd: the family's UV scale). */
 export function pavingDetail(): DetailPair {
   return bakeColored('paving', paintPaving, 0x9a7e, 512, 2.6, 1);

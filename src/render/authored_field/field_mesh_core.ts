@@ -71,6 +71,9 @@ export const FIELD_GROUND_COLORS: Readonly<Record<FieldGround, Rgb>> = {
   // The Hammer Gallery's paving: dressed granite flags, a warm grey (the
   // kerbs a shade paler), dust in the joints.
   paving: [0.33, 0.315, 0.3],
+  // The Breath's summit (phase 2G): pale granite bedrock scoured by the
+  // storm, a cool grey a value over the quarry's.
+  scoured: [0.4, 0.405, 0.415],
 };
 
 /** The texture families a walkable top draws with (one mesh each). */
@@ -86,6 +89,7 @@ export const FIELD_TOP_FAMILIES = [
   'slate',
   'quarry',
   'paving',
+  'scoured',
 ] as const;
 export type FieldTopFamily = (typeof FIELD_TOP_FAMILIES)[number];
 
@@ -98,6 +102,8 @@ export function fieldFamilyUvScale(family: FieldTopFamily): number {
   if (family === 'quarry') return 1 / 16;
   // The Gallery's flags are a yard or two each: one tile every 10 yd.
   if (family === 'paving') return 1 / 10;
+  // The scoured bedrock's slabs are several yards across: one tile every 14.
+  if (family === 'scoured') return 1 / 14;
   return 0.25;
 }
 
@@ -111,6 +117,7 @@ export function fieldGroundFamily(ground: FieldGround): FieldTopFamily {
   if (ground === 'slate') return 'slate';
   if (ground === 'quarry') return 'quarry';
   if (ground === 'paving') return 'paving';
+  if (ground === 'scoured') return 'scoured';
   if (ground === 'plate') return 'plate';
   if (ground === 'grating') return 'grating';
   return ground === 'earth' ||
@@ -421,6 +428,7 @@ export function topColor(ground: FieldGround, x: number, z: number, onPath: bool
   if (ground === 'slate') return slateColor(base, k, x, z, onPath);
   if (ground === 'quarry') return quarryColor(base, k, patch, dirt);
   if (ground === 'paving') return pavingColor(base, k, patch, dirt);
+  if (ground === 'scoured') return scouredColor(base, k, x, z, patch);
   const r = base[0] * k * (1 - moss * 0.35) * (1 - dirt * 0.25) + dirt * 0.05;
   const g = base[1] * k * (1 - moss * 0.05) * (1 - dirt * 0.3) + dirt * 0.035;
   const b = base[2] * k * (1 - moss * 0.3) * (1 - dirt * 0.45) + dirt * 0.02;
@@ -452,6 +460,26 @@ function pavingColor(base: Rgb, k: number, patch: number, dirt: number): Rgb {
     base[0] * t + dust * 0.1,
     base[1] * t + dust * 0.085,
     base[2] * t * (1 + shade * 0.08) + dust * 0.06,
+  ];
+}
+
+/** The Breath's scoured bedrock (phase 2G): a pale cool grey in long drifts
+ *  laid down the wind (the storm polishes the rock in streaks, never in
+ *  blots), a cold blue-grey in the hollows where the rain stands, a little
+ *  grey-green lichen on the high spots. */
+function scouredColor(base: Rgb, k: number, x: number, z: number, patch: number): Rgb {
+  // Streaks along the prevailing wind (from the north-west): the noise
+  // stretched across it.
+  const along = x * 0.6 + z * 0.8;
+  const across = x * 0.8 - z * 0.6;
+  const streak = fieldNoise(along * 0.025 + 31, across * 0.16 - 9, 2);
+  const wet = Math.max(0, 0.42 - patch) * 1.6;
+  const lichen = Math.max(0, patch - 0.66) * 1.4;
+  const t = k * (0.9 + streak * 0.22) * (1 - wet * 0.22);
+  return [
+    base[0] * t - lichen * 0.02,
+    base[1] * t + lichen * 0.015,
+    base[2] * t * (1 + wet * 0.12) - lichen * 0.01,
   ];
 }
 
@@ -576,6 +604,7 @@ export function planFieldTops(
     slate: { positions: [], colors: [], uvs: [], indices: [] },
     quarry: { positions: [], colors: [], uvs: [], indices: [] },
     paving: { positions: [], colors: [], uvs: [], indices: [] },
+    scoured: { positions: [], colors: [], uvs: [], indices: [] },
   };
   const clippers = laterClippers(def, opts.omit);
   def.surfaces.forEach((s, layer) => {
