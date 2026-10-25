@@ -1313,12 +1313,16 @@ def col_head(bpy):
     def crags(f, rng):
         # Three broken crags of unequal height leaning their own ways, a
         # spike or two between (the mountain's crown on its brow).
-        for k, (x, y, w, h, lean, turn) in enumerate(((-1.25, 0.9, 1.7, 2.6, -0.5, 0.4),
-                                                      (0.35, 1.25, 1.9, 3.8, -0.12, -0.3),
-                                                      (1.45, 0.45, 1.4, 2.1, 0.55, 0.9))):
-            f.put(('g0', 'g4', 'g2')[k], block(rng, (x + lean * 0.5, y + 0.2, 1.1 + h / 2), (w, w * 0.9, h),
-                                               cuts=14, chamfer=(0.55, 0.88), R=rot(ry=lean, rx=-0.3, rz=turn),
-                                               top_tilt=0.5), 0.3)
+        # A crown of peaks like the mountain's own range: tapering spires of
+        # unequal height spread over the brow, each with a lower shoulder
+        # peak leaning off it (a skyline, never a row of fingers).
+        for k, (x, y, r, h, lean) in enumerate(((-1.45, 0.6, 1.05, 2.3, -0.5), (0.15, 1.0, 1.25, 3.7, -0.08),
+                                                (1.55, 0.5, 0.95, 2.0, 0.55))):
+            tip = (x + math.sin(lean) * h, y + 0.6, 1.0 + math.cos(lean) * h)
+            f.put(('g0', 'g4', 'g2')[k], RoundCone((x, y, 0.9), tip, r, 0.06), 0.35)
+            sx = x + (0.55 if k != 2 else -0.55)
+            stip = (sx + math.sin(lean * 1.6 + 0.3) * h * 0.55, y + 0.2, 1.0 + h * 0.5)
+            f.put('g1', RoundCone((sx, y - 0.1, 0.9), stip, r * 0.7, 0.05), 0.3)
         for (x, y, h) in ((-0.45, 0.2, 1.3), (0.95, 1.6, 1.1)):
             f.put('g1', RoundCone((x, y, 1.2), (x * 1.1, y * 1.1 + 0.2, 1.2 + h), 0.45, 0.08), 0.2)
         # The cleft under the brow, right across the front.
