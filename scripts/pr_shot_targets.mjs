@@ -1918,8 +1918,8 @@ export const TARGETS = [
     label: 'The Book of Deeds: a deed an ALT on the account earned, with its earner named',
     when: ['sim/account_ledger', 'sim/deeds_restore', 'net/book_wire', 'server/account_ledger'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       const seeded = await page.evaluate(() => {
@@ -1959,8 +1959,8 @@ export const TARGETS = [
     label: 'The Reliquary: a page half-filled by an ALT on the account, finders in the tooltip',
     when: ['sim/account_ledger', 'net/book_wire', 'server/account_ledger'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       const pageIds = await openReliquaryConquerorsShelf(page);
@@ -6540,8 +6540,8 @@ export const TARGETS = [
     // FULL FRAME, so the world behind the pane is in the shot and the tier is
     // not the no-op it is for a clipped, pure-DOM surface.
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
       {
         key: 'mobile-short',
         mobile: true,
@@ -10670,8 +10670,8 @@ export const TARGETS = [
       'reliquary_phase22_closeout',
     ],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       await page.evaluate(() => {
@@ -10710,8 +10710,8 @@ export const TARGETS = [
     label: 'Loot Explorer: Encounters tab searched to the Crucible Robe sigils (Heroic odds)',
     when: ['sim/content/heroic_loot'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       await page.evaluate(() => {
@@ -10740,8 +10740,8 @@ export const TARGETS = [
     label: 'The Reliquary: Hollow Crypt page meter after four Heroic clears',
     when: ['sim/content/reliquary', 'sim/reliquary'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       // The player report: a Heroic-farmed five-man page whose relics all
@@ -10785,8 +10785,8 @@ export const TARGETS = [
     label: 'The Reliquary: fresh-character Overview (strip hints + shelf cards)',
     when: ['ui/reliquary_view', 'ui/reliquary_window'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       // Deliberately NO seeding: the acceptance shot is the fresh character's
@@ -10807,8 +10807,8 @@ export const TARGETS = [
     label: 'The Reliquary: Conquerors shelf under the Missing chip (illuminated page hidden)',
     when: ['ui/reliquary_view', 'ui/reliquary_window'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       await page.evaluate(() => document.getElementById('tutorial-greeting')?.remove());
@@ -10855,8 +10855,8 @@ export const TARGETS = [
       'reliquary_phase22_closeout',
     ],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       await page.evaluate(() => {
@@ -10931,8 +10931,8 @@ export const TARGETS = [
     label: "The Reliquary: The Drowned Litany names a Marks relic's Heroic-clear gate",
     when: ['ui/reliquary_view', 'ui/reliquary_labels', 'sim/content/delves/shop'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       await page.evaluate(() => {
@@ -10977,8 +10977,8 @@ export const TARGETS = [
       'The Rift page: dual clear meters (lifetime clears + S-rank clears) over the 16-slot chase',
     when: ['sim/content/reliquary', 'reliquary_phase21_qa'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       await page.evaluate(() => {
@@ -11008,8 +11008,8 @@ export const TARGETS = [
     label: 'Rares of the Realm: slain kill proofs with the trophy glyph on filled marks',
     when: ['sim/content/reliquary', 'reliquary_phase21_qa'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       await page.evaluate(() => {
@@ -11042,8 +11042,8 @@ export const TARGETS = [
     label: 'The Horizons shelf: the Vault of Ages row wearing the muted Retired chip',
     when: ['sim/content/reliquary', 'reliquary_phase21_qa'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       await page.evaluate(() => {
@@ -11071,8 +11071,8 @@ export const TARGETS = [
     label: 'Vault of Ages page: the Retired chip on the header over the four retired relics',
     when: ['sim/content/reliquary', 'reliquary_phase21_qa'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       await page.evaluate(() => {
@@ -11096,8 +11096,8 @@ export const TARGETS = [
     label: 'Riftbound page: the Personal chip, holding your own band among the three',
     when: ['sim/content/reliquary', 'reliquary_phase21_qa'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       await page.evaluate(() => {
@@ -11270,8 +11270,8 @@ export const TARGETS = [
     label: 'Character sheet framed on the Reliquary progression row',
     when: ['ui/reliquary_sheet_view', 'ui/char_view', 'reliquary_phase22_closeout'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       await page.evaluate(() => {
@@ -11588,8 +11588,8 @@ export const TARGETS = [
     // the feat ribbon chip plus the updated retirement sentence in the desc.
     when: ['sim/content/deeds.ts'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       const opened = await page.evaluate(() => {
@@ -11644,8 +11644,8 @@ export const TARGETS = [
     // plus the updated retirement sentence in the desc.
     when: ['sim/content/deeds.ts'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       const opened = await page.evaluate(() => {
@@ -11742,8 +11742,8 @@ export const TARGETS = [
     // it and no unrelated diff pays for the run.
     when: ['sim/moderation', 'ui/cheater_tag'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       // Brand BOTH the viewer and a staged peer, then target the peer: one full
@@ -17439,8 +17439,8 @@ export const TARGETS = [
     label: 'Farming hub garden beds with per-viewer growth stages (Eastbrook patch)',
     when: ['render/farm_patches', 'assets/farm_props', 'content/farm_patches'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       await page.waitForFunction(
@@ -17561,8 +17561,8 @@ export const TARGETS = [
     label: 'Placed harvest feast beside the Eastbrook garden beds (the shared feast)',
     when: ['sim/professions/feast', 'game/feast_interact', 'ui/hud/professions/feast_tooltip_view'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       // The beds give the shot its farming context; the staging helper owns
@@ -17652,8 +17652,8 @@ export const TARGETS = [
     label: 'Harvest Journal window with staged growth ladder (Eastbrook beds)',
     when: ['ui/hud/professions/harvest_journal'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page, shot) {
       await stageEastbrookBeds(page);
@@ -17681,8 +17681,8 @@ export const TARGETS = [
     label: 'The shared harvest preference picker (radio rows, Apply and Cancel)',
     when: ['ui/hud/professions/harvest_preference_picker'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page, shot) {
       await dismissTutorialGreeting(page);
@@ -17714,8 +17714,8 @@ export const TARGETS = [
       'ui/minimap_painter',
     ],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       await stageEastbrookBeds(page);
@@ -17731,8 +17731,8 @@ export const TARGETS = [
     label: 'Farmer Jessica beside the Eastbrook garden beds (the farming go-live face)',
     when: ['professions/farmer_npcs', 'content/zone1'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       await stageFarmerJessica(page);
@@ -17755,8 +17755,8 @@ export const TARGETS = [
       'Farmer Jessica gossip menu and the First Furrow quest detail (magic sentence, journal pointer)',
     when: ['professions/farmer_npcs', 'hud/quest/gossip_menu', 'hud/quest/quest_dialog_controller'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       await stageFarmerJessica(page);
@@ -17802,8 +17802,8 @@ export const TARGETS = [
     label: 'Farmer Jessica gossip menu: quest, Browse Goods, Trade husks for compost',
     when: ['professions/farmer_npcs', 'hud/quest/gossip_menu', 'hud/quest/quest_dialog_controller'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       await stageFarmerJessica(page);
@@ -17838,8 +17838,8 @@ export const TARGETS = [
     label: 'Church Order quartermaster gossip menu with the Allied Hearthstone attune row',
     when: ['hud/quest/hearthstone_attune_row_core', 'content/faction_rewards'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       // Reuses the Eastbrook staging (town loaded, hostiles cleared), then
@@ -17883,8 +17883,8 @@ export const TARGETS = [
     label: 'Farmer Jessica vendor grid: tier-1 seeds, brook carrot, compost, garden hoe',
     when: ['professions/farmer_npcs', 'content/zone1'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       await stageFarmerJessica(page);
@@ -17928,8 +17928,8 @@ export const TARGETS = [
     label: 'The plant sheet opened from a free garden bed by the interact press (Phase 9b)',
     when: ['ui/hud/professions/farming_plant_sheet', 'game/farm_bed_interact'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page, shot) {
       await stagePlantSheetBed(page);
@@ -18952,8 +18952,8 @@ export const TARGETS = [
     label: 'The Perfecting window: candidates, rank track, bill, bind warning (phase 14)',
     when: ['ui/hud/professions/perfecting_view', 'ui/hud/professions/perfecting_window'],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page, shot) {
       await dismissTutorialGreeting(page);
@@ -19986,8 +19986,8 @@ export const TARGETS = [
       'ui/hud/practice',
     ],
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page, variant) {
       const staged = await page.evaluate(() => {
@@ -20407,8 +20407,8 @@ export const TARGETS = [
     // The colorblind variants shoot the same frame with Colorblind Mode
     // (Options > Interface) seeded on, so the two palettes compare 1:1.
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
       { key: 'desktop-colorblind', beforeLoad: seedLowGraphicsPresetColorblind },
       { key: 'mobile-colorblind', mobile: true, beforeLoad: seedLowGraphicsPresetColorblind },
     ],
@@ -20617,8 +20617,8 @@ export const TARGETS = [
     // read on the Lambert tier too, since the tint is the actionable part
     // and the self-illumination lift is standard-tier polish only.
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
@@ -20755,8 +20755,8 @@ export const TARGETS = [
     // is frozen and the tester targets a spike so the target frame shows the
     // hit-count pool. Lowest preset per the standing capture rule.
     variants: [
-      { key: 'desktop', charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
-      { key: 'mobile', mobile: true, charClass: 'warrior', beforeLoad: seedLowGraphicsPreset },
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
     ],
     async capture(page) {
       await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
