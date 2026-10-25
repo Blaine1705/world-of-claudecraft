@@ -42,7 +42,8 @@ const ENTRY = { x: -196, z: -210 };
 // shoots just after a Hammerfall; 'slab' kills the guardian and shoots the
 // Slab breaking `SHOT_SLAB_MS` after; 'alive' revives the guardian first;
 // 'seq:<steps>' runs chat lines and waits ('c:/dev heart portal;w:1400');
-// 'mesh:<name>' waits for a named effect mesh to show, then shoots.
+// 'mesh:<name>' waits for a named effect mesh to show, then shoots;
+// 'clock:<mesh>:<period>:<at>' waits for a cycled set piece's moment.
 const SHOTS = [
   ['01_grieta', [-194, -208], [-213, -225], 0.0, 0.2, 15, ''],
   ['02_galeria', [-146, -224], [-96, -230], 0.2, 0.24, 18, ''],
@@ -211,6 +212,27 @@ try {
         await sleep(40);
       }
       await sleep(Number(process.env.SHOT_MESH_MS ?? 120));
+    } else if (action.startsWith('clock:')) {
+      // Phase 2I: 'clock:<mesh>:<period>:<at>' waits (up to a period and a
+      // half) until the shared clock a named mesh's material reads sits `at`
+      // seconds into its `period` (a cycled set piece: the Heat's pour).
+      const [, mesh, period, at] = action.split(':');
+      const until = Date.now() + Number(period) * 1500 + 5000;
+      while (Date.now() < until) {
+        const since = await page.evaluate(
+          ([name, per]) => {
+            let t = null;
+            window.__game.renderer.scene.traverse((o) => {
+              if (o.name === name && o.material?.uniforms?.uTime)
+                t = o.material.uniforms.uTime.value;
+            });
+            return t === null ? null : ((t % per) + per) % per;
+          },
+          [mesh, Number(period)],
+        );
+        if (since !== null && Math.abs(since - Number(at)) < 0.12) break;
+        await sleep(30);
+      }
     } else if (action.startsWith('seq:')) {
       // A scripted moment (phase 2F, the Ring): 'seq:' then steps split by
       // ';', each 'c:<chat line>' or 'w:<ms>' (the still is taken after).
