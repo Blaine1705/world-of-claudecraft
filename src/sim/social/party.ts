@@ -221,7 +221,7 @@ export class PartyMachine {
     this.ctx.hillPartyJoin(r.meta.entityId);
     rememberSoulwellPartyEligibility(this.ctx, party);
     this.ctx.inheritDungeonResetLocks(r.meta.entityId);
-    emitReferralPartyEvidence(this.ctx, party.members);
+    emitReferralPartyEvidence(this.ctx, party.members, true);
     this.syncPersistentPaladinPartyAuras(party);
     for (const memberPid of party.members) this.ctx.onDungeonFinderPartyJoined(memberPid);
     // Forming the party is the inviter's join too; the accepter counts on
