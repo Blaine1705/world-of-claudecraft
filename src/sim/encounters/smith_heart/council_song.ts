@@ -20,6 +20,7 @@
 // council's own cleanup first), so a kickable bar that is gone was cut.
 // Zero rng in every pick; the draws are the damage rolls.
 
+import { isLockedOut } from '../../combat/cc';
 import { DT, type Entity } from '../../types';
 import { clearCastIf, dropAuraById } from '../sunken_bastion/claim';
 import { COUNCIL_AURAS, COUNCIL_CASTS, COUNCIL_NAMES, COUNCIL_TUNING as T } from './council_ids';
@@ -35,18 +36,21 @@ import {
   raidWarn,
   roll,
 } from './council_scope';
+import { secondsToNextWrath } from './council_wrath';
 
 /** Seam Bolt: the Singer's own. */
 export function startBolt(s: CouncilScope): boolean {
   const c = s.bodies.singer;
   if (!living(c) || s.st.quiet > 0 || !memberFree(s, 'singer')) return false;
+  // A kick's lockout holds its bolt too.
+  if (isLockedOut(c, 'nature')) return false;
   const seen = s.players.filter(
     (p) =>
       !p.dead &&
       Math.hypot(p.pos.x - c.pos.x, p.pos.z - c.pos.z) <= T.boltRange &&
       s.ctx.hasLineOfSight(c, p),
   );
-  // Any player in sight, the tank included (it is a caster's bolt).
+  // Any player in sight (the tank only when nobody else is).
   const [victim] = pickMarks({ ...s, players: seen }, c, 1);
   s.st.boltTimer = T.boltEvery;
   if (!victim) return false;
@@ -93,7 +97,7 @@ export function startSong(s: CouncilScope, force = false): boolean {
   const holder = jobHolder(s, 'resonance');
   if (!holder) return false;
   if (!force && !songDue(s)) return false;
-  if (!holder.heir && s.st.quiet > 0) return false;
+  if (!holder.heir && (s.st.quiet > 0 || isLockedOut(holder.body, 'nature'))) return false;
   if (!memberFree(s, holder.role)) return false;
   s.st.songDue = null;
   s.st.songTimer = T.songEvery;
@@ -110,14 +114,19 @@ export function startSong(s: CouncilScope, force = false): boolean {
 export function applyResonance(s: CouncilScope, singer: Entity, count: number): Entity[] {
   const busy = new Set(s.st.resonance.map((r) => r.playerId));
   const marked = pickMarks(s, singer, count, busy);
+  // Normal: it runs out a breath before the next Wrath, whatever the fill
+  // (an heir's soft-enraged Wrath comes sooner than its 15 s).
+  const seconds = s.rules.songAfterWrath
+    ? Math.max(5, Math.min(T.resonanceSeconds, secondsToNextWrath(s) - 1.5))
+    : T.resonanceSeconds;
   for (const p of marked) {
-    s.st.resonance.push({ playerId: p.id, remaining: T.resonanceSeconds, near: 0, pillarId: null });
+    s.st.resonance.push({ playerId: p.id, remaining: seconds, near: 0, pillarId: null });
     s.ctx.applyAura(p, {
       id: COUNCIL_AURAS.resonance,
       name: COUNCIL_NAMES.resonance,
       kind: 'vulnerability',
-      remaining: T.resonanceSeconds,
-      duration: T.resonanceSeconds,
+      remaining: seconds,
+      duration: seconds,
       value: 0,
       value2: 0,
       sourceId: singer.id,

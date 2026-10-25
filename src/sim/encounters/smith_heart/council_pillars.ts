@@ -307,7 +307,6 @@ export function raisePillar(
   const bodySpots = bodies.filter((b) => !b.dead).map((b) => local(ctx, inst, b));
   const spot = nearestRiseSpot(pillarSpots, bodySpots, x, z);
   if (!spot) return null;
-  // Facing: its carved face turned to the quarry's middle, so the cracks read.
   const pillar = spawnPillar(ctx, inst, spot.x, spot.z, 0, true);
   syncPillarWalls(ctx, inst);
   ctx.emit({
@@ -323,12 +322,7 @@ export function raisePillar(
     if (p.dead) continue;
     if (Math.hypot(p.pos.x - pillar.pos.x, p.pos.z - pillar.pos.z) > T.riseKnockRadius + 1e-6)
       continue;
-    const amount = Math.max(
-      1,
-      Math.round(
-        ctx.rng.range(T.riseMin, T.riseMax) * damageMult * (source.mechanicDamageMult ?? 1),
-      ),
-    );
+    const amount = Math.max(1, Math.round(ctx.rng.range(T.riseMin, T.riseMax) * damageMult));
     ctx.dealDamage(source, p, amount, false, 'physical', COUNCIL_NAMES.wake, 'hit', true);
     if (!p.dead) ctx.applyKnockback(shove, p, T.riseKnockback);
   }
@@ -405,12 +399,7 @@ export function stepRubble(
     r.tick += T.rubbleTick;
     for (const p of players) {
       if (p.dead || Math.hypot(p.pos.x - o.x - r.x, p.pos.z - o.z - r.z) > r.r) continue;
-      const amount = Math.max(
-        1,
-        Math.round(
-          ctx.rng.range(T.rubbleMin, T.rubbleMax) * damageMult * (source.mechanicDamageMult ?? 1),
-        ),
-      );
+      const amount = Math.max(1, Math.round(ctx.rng.range(T.rubbleMin, T.rubbleMax) * damageMult));
       ctx.dealDamage(source, p, amount, false, 'physical', COUNCIL_NAMES.rubble, 'hit', true);
     }
   }
@@ -442,12 +431,7 @@ export function pulsePillars(
       if (pl.dead) continue;
       const d = Math.hypot(pl.pos.x - p.e.pos.x, pl.pos.z - p.e.pos.z) - p.r;
       if (d > T.pulseReach) continue;
-      const amount = Math.max(
-        1,
-        Math.round(
-          ctx.rng.range(T.pulseMin, T.pulseMax) * damageMult * (source.mechanicDamageMult ?? 1),
-        ),
-      );
+      const amount = Math.max(1, Math.round(ctx.rng.range(T.pulseMin, T.pulseMax) * damageMult));
       ctx.dealDamage(source, pl, amount, false, 'nature', COUNCIL_NAMES.pulse, 'hit', true);
       hits++;
     }

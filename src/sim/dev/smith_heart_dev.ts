@@ -51,6 +51,7 @@ import {
   councilBodies,
   councilDevTrigger,
   councilReadout,
+  councilState,
   replaySmithHeartArrivalForDev,
   SMITH_HEART_AWAKE_BIT,
   setSmithHeartPortalDevOpen,
@@ -287,17 +288,25 @@ export function handleSmithHeartDevChat(ctx: SimContext, raw: string, pid: numbe
       log(ctx, pid, councilReadout(ctx, inst));
       return true;
     }
-    if (arg === 'pull') {
+    const pullAll = (): number => {
       const me = ctx.entities.get(pid);
       const bodies = councilBodies(ctx, inst);
-      if (!me || !bodies) return true;
+      if (!me || !bodies) return 0;
       let n = 0;
       for (const b of [bodies.guardian, bodies.slabwright, bodies.singer]) {
         if (b && !b.dead && ctx.aggroMob(b, me, false)) n++;
       }
-      log(ctx, pid, `[dev] The Hammer Council wakes (${n} pulled).`);
+      return n;
+    };
+    if (arg === 'pull') {
+      log(ctx, pid, `[dev] The Hammer Council wakes (${pullAll()} pulled).`);
       return true;
     }
+    // A mechanic forced on a council nobody has pulled pulls it first (an
+    // unpulled council resets its fight on the next tick).
+    const verbName = arg.split(' ')[0];
+    const bodies = councilBodies(ctx, inst);
+    if (verbName !== 'reset' && verbName !== 'heroic' && bodies && !councilState(bodies)) pullAll();
     const reply = councilDevTrigger(ctx, inst, arg);
     if (reply === null) {
       ctx.error(pid, HELP);

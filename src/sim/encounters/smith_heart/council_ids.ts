@@ -250,6 +250,8 @@ export const COUNCIL_TUNING = {
   songCast: 3,
   /** Normal: the song starts this long after a Wrath lands. */
   songAfterWrath: 1,
+  /** Normal: an owed song this late after its moment is dropped. */
+  songLateDrop: 4,
   /** Heroic: the song's own clock. */
   songFirst: 20,
   songEvery: 24,

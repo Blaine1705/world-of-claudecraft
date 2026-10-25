@@ -62,6 +62,16 @@ export function fillEnergy(s: CouncilScope): void {
   s.st.energy = Math.min(T.energyMax, s.st.energy + per * DT);
 }
 
+/** Seconds until the next Wrath lands at the current fill (the holder's
+ *  bar included); Infinity with nobody to cast it. */
+export function secondsToNextWrath(s: CouncilScope): number {
+  const holder = jobHolder(s, 'wrath');
+  if (!holder) return Number.POSITIVE_INFINITY;
+  const per = T.energyMax / councilFillSeconds(holder.heir, s.st.wraths);
+  const cast = holder.heir ? T.heirWrathCast : T.wrathCast;
+  return Math.max(0, T.energyMax - s.st.energy) / per + cast;
+}
+
 /** Start the Wrath when the energy is full and its holder is free. Exported
  *  for the dev trigger (which fills the energy first). */
 export function startWrath(s: CouncilScope): boolean {

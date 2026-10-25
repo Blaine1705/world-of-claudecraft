@@ -306,9 +306,10 @@ function stepBars(s: CouncilScope): void {
       // Cut: between two passes only a player interrupt clears a council bar.
       delete s.st.bars[role];
       s.st.gaps[role] = T.barGap;
+      // A kick, unless the bar went with an evade (the leash clears it).
       if (s.st.kickable === bar.castId) {
         s.st.kickable = null;
-        songKicked(s, b, bar.castId);
+        if (b.aiState !== 'evade') songKicked(s, b, bar.castId);
       }
       continue;
     }
@@ -337,6 +338,9 @@ function startBars(s: CouncilScope): void {
   st.boltTimer -= DT;
   st.songTimer -= DT;
   if (st.songDue !== null) st.songDue -= DT;
+  // An owed song that could not start soon after its Wrath is dropped (sung
+  // late it would run into the next one).
+  if (st.songDue !== null && st.songDue < -T.songLateDrop) st.songDue = null;
   st.quiet = Math.max(0, st.quiet - DT);
   // The Wrath first (its holder waits for nothing but its own bar to end).
   startWrath(s);
@@ -361,7 +365,8 @@ function keepTogether(s: CouncilScope): void {
   if (!foe || foe.dead) return;
   for (const r of COUNCIL_ROLES) {
     const b = s.bodies[r];
-    if (!living(b) || b === lead || fighting(b)) continue;
+    // A member walking home keeps its leash; once home and idle it rejoins.
+    if (!living(b) || b === lead || fighting(b) || b.aiState === 'evade') continue;
     b.aiState = 'chase';
     b.aggroTargetId = foe.id;
     b.inCombat = true;
@@ -390,6 +395,16 @@ function clearBars(bodies: CouncilBodies): void {
   }
 }
 
+/** Lift Hammer's Weight off this claim's players (never another claim's). */
+function dropClaimWeight(ctx: SimContext, inst: InstanceSlot): void {
+  const o = ctx.instanceOriginOf(inst);
+  for (const meta of ctx.players.values()) {
+    const p = ctx.entities.get(meta.entityId);
+    if (!p || Math.abs(p.pos.x - o.x) >= 300 || Math.abs(p.pos.z - o.z) >= 250) continue;
+    dropAuraById(p, COUNCIL_AURAS.weight);
+  }
+}
+
 /** The fight ended without the kill: everything stands as it was. */
 function resetCouncil(ctx: SimContext, inst: InstanceSlot, bodies: CouncilBodies): void {
   const st = councilState(bodies);
@@ -399,10 +414,7 @@ function resetCouncil(ctx: SimContext, inst: InstanceSlot, bodies: CouncilBodies
     clearSong(s);
     clearRubble(ctx, inst, st);
     // The tank keeps no Weight past the fight.
-    for (const meta of ctx.players.values()) {
-      const p = ctx.entities.get(meta.entityId);
-      if (p) dropAuraById(p, COUNCIL_AURAS.weight);
-    }
+    dropClaimWeight(ctx, inst);
   }
   clearBars(bodies);
   const anyAlive = COUNCIL_ROLES.some((r) => living(bodies[r]));
@@ -430,10 +442,7 @@ function finishCouncil(
   clearSong(s);
   clearRubble(ctx, inst, st);
   clearBars(bodies);
-  for (const meta of ctx.players.values()) {
-    const p = ctx.entities.get(meta.entityId);
-    if (p) dropAuraById(p, COUNCIL_AURAS.weight);
-  }
+  dropClaimWeight(ctx, inst);
   settlePillars(ctx, inst);
   for (const r of COUNCIL_ROLES) {
     const b = bodies[r];

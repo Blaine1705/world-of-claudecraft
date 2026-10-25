@@ -409,6 +409,23 @@ describe('Hammer Council: difficulty', () => {
     expect(T.songCast + T.resonanceSeconds).toBeLessThan(toNext);
   });
 
+  it("normal: even an heir's soft-enraged Wrath never overlaps the Resonance", () => {
+    const f = pulled(5);
+    f.sim.ctx.handleDeath(f.bodies().guardian as Entity, f.players[0]);
+    f.tick();
+    quiet(f.st);
+    f.st.wraths = T.enrageAfterWraths;
+    f.dev('/dev heart council wrath');
+    f.tick(Math.ceil(T.heirWrathCast * 20) + 2);
+    // The song is owed now and starts after its breath.
+    f.tick(Math.ceil((T.songAfterWrath + T.songCast + 0.3) * 20));
+    expect(f.st.resonance.length).toBeGreaterThan(0);
+    const left = Math.max(...f.st.resonance.map((r) => r.remaining));
+    const per = T.energyMax / (T.heirFillSeconds / T.enrageFillMult);
+    const toNext = (T.energyMax - f.st.energy) / per + T.heirWrathCast;
+    expect(left).toBeLessThan(toNext);
+  });
+
   it('heroic: three marks, the pillars pulse, the song keeps its own clock', () => {
     const f = pulled(5);
     expect(f.dev('/dev heart council heroic on')).toBe(true);

@@ -353,6 +353,29 @@ function announce(ctx: SimContext, inst: InstanceSlot, text: string): void {
   }
 }
 
+// Derived once per dungeon and boss from immutable content (spawn indices).
+const sealRosters = new Map<string, readonly number[]>();
+
+/** The spawn indices of a sealing boss's bodies, its gates' further bodies
+ *  (DungeonGateDef.sealWithBodies) included. */
+function sealRosterFor(
+  dungeon: DungeonDef,
+  gates: readonly DungeonGateDef[],
+  bossId: string,
+): readonly number[] {
+  const key = `${dungeon.id}|${bossId}`;
+  const have = sealRosters.get(key);
+  if (have) return have;
+  const index = indexFor(dungeon);
+  let roster = index.byTemplate.get(bossId) ?? [];
+  for (const gate of gates) {
+    if (gate.sealWhileEngaged !== bossId || !gate.sealWithBodies) continue;
+    for (const id of gate.sealWithBodies) roster = roster.concat(index.byTemplate.get(id) ?? []);
+  }
+  sealRosters.set(key, roster);
+  return roster;
+}
+
 /**
  * Advance one boss's seal clock in one claim and stamp it on every gate that
  * seals for that boss (Korgath has two), so they land together. Runs once per
@@ -377,13 +400,9 @@ function tickBossSeal(
   }
   // Landed on an earlier tick: from here it only holds or lifts.
   const landed = at !== undefined && now > at;
-  // The boss's bodies, and the further bodies of its fight its gates name.
-  const index = indexFor(DUNGEONS[inst.dungeonId]);
-  let roster = index.byTemplate.get(bossId) ?? [];
-  for (const gate of gates) {
-    if (gate.sealWhileEngaged !== bossId || !gate.sealWithBodies) continue;
-    for (const id of gate.sealWithBodies) roster = roster.concat(index.byTemplate.get(id) ?? []);
-  }
+  // The boss's bodies, and the further bodies of its fight its gates name
+  // (derived once per dungeon and boss from immutable content).
+  const roster = sealRosterFor(DUNGEONS[inst.dungeonId], gates, bossId);
   // Is the boss engaged, and is it fighting? Asked first and alone: a boss
   // standing idle in its room (every boss of every claim, nearly every tick)
   // costs these two flags and nothing more.

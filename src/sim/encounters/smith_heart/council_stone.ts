@@ -127,8 +127,8 @@ export function landWake(s: CouncilScope, caster: Entity): void {
 }
 
 /** The marks and the heir's spots count down; each rises when its time is up.
- *  A mark whose player died or left the Quarry rises where they last stood
- *  (never on a corpse's own body: the shove is for the living). */
+ *  A mark whose player left the Quarry rises nowhere (no clear floor there);
+ *  a mark on a player who fell raises nothing (never on a corpse). */
 export function stepRises(s: CouncilScope): void {
   const holder = jobHolder(s, 'pillars');
   const source = holder?.body ?? null;
@@ -145,7 +145,8 @@ export function stepRises(s: CouncilScope): void {
         const p = s.ctx.entities.get(m.playerId);
         if (!p) continue;
         dropAuraById(p, COUNCIL_AURAS.wakeMark);
-        if (!source) continue;
+        // A mark on a player who fell raises nothing (no pillar on a corpse).
+        if (!source || p.dead) continue;
         raisePillar(
           s.ctx,
           s.inst,
