@@ -12,10 +12,11 @@
 
 import * as THREE from 'three';
 import { HEART_ROCK_CUT_FAR, HEART_ROCK_CUT_NEAR, HEART_ROCK_STRATA } from './heart_rock_plan_core';
+import { heatSootGlsl } from './heat_soot_core';
 import { QUENCH_FROST_NOISE_GLSL, quenchFrostGlsl } from './quench_frost_core';
 
 /** The drawn slot's origin (world x, z), for the rock's regional paint (the
- *  Quench's frost, phase 2H): one rock material serves every slot, and only
+ *  Quench's frost, phase 2H; the Heat's basalt, phase 2I): one rock material serves every slot, and only
  *  one Smith's Heart field draws at a time, so its frame driver sets it. */
 const HEART_ROCK_SLOT = { value: new THREE.Vector2() };
 
@@ -57,7 +58,7 @@ export function heartRockBedGlsl(): string {
         }`;
 }
 
-const KEY = `smith-heart-rock-cutaway|beds2g|frost2h|${HEART_ROCK_CUT_NEAR}|${HEART_ROCK_CUT_FAR}|${HEART_ROCK_SHADE_FLOOR.join(',')}`;
+const KEY = `smith-heart-rock-cutaway|beds2g|frost2h|soot2i|${HEART_ROCK_CUT_NEAR}|${HEART_ROCK_CUT_FAR}|${HEART_ROCK_SHADE_FLOOR.join(',')}`;
 
 /** Wire the cutaway into a rock material (before any other layer: those
  *  compose with it). */
@@ -104,7 +105,8 @@ export function applyRockCutaway(mat: THREE.Material): void {
         '#include <color_fragment>',
         `#include <color_fragment>
 ${heartRockBedGlsl()}
-${quenchFrostGlsl()}`,
+${quenchFrostGlsl()}
+${heatSootGlsl()}`,
       )
       .replace(
         '#include <emissivemap_fragment>',

@@ -13,8 +13,13 @@
 //     pale overcast thinning to a wash of cold blue overhead, high thin
 //     veils drifting slow, the low pale sun in the south-east behind them
 //     with the ice crystals' ring round it (a 22 degree halo), no storm.
+//   - over the Heat (phase 2I), the sky seen up out of the Hearth's fissure:
+//     the smoke of the first flame rising and drifting east in slow billows,
+//     lit gold from below where the fire catches it, a hazy white-gold sun
+//     low in the west behind it, a deep warm slate overhead; never a storm,
+//     never a volcano's red.
 // `uBreath` blends the storm toward the Breath's as the camera climbs into
-// it, `uQuench` toward the Quench's as it sinks (both eased like the hop's). `uCore` blends the two (heart_portal_core.ts heartAreaBlend eases it after
+// it, `uQuench` toward the Quench's as it sinks, `uHeat` toward the Heat's smoke (both eased like the hop's). `uCore` blends the two (heart_portal_core.ts heartAreaBlend eases it after
 // a hop, so the sky turns as the raid arrives). One shader on the dome, no
 // light; the horizon is the area's fog colour.
 //
@@ -28,6 +33,8 @@ import { SUNKEN_BASTION_FOG_COLOR } from '../fog_scene_state';
 import { sharedUniforms } from '../gfx';
 import {
   SMITH_HEART_BREATH_FOG,
+  SMITH_HEART_HEAT_FOG,
+  SMITH_HEART_HEAT_LIGHT,
   SMITH_HEART_QUENCH_FOG,
   SMITH_HEART_QUENCH_LIGHT,
 } from './heart_environment';
@@ -65,6 +72,9 @@ uniform vec3 uBreathHorizon;
 uniform float uQuench;
 uniform vec3 uQuenchHorizon;
 uniform vec3 uQuenchSun;
+uniform float uHeat;
+uniform vec3 uHeatHorizon;
+uniform vec3 uHeatSun;
 float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float noise(vec2 p) {
   vec2 i = floor(p); vec2 f = fract(p);
@@ -207,6 +217,34 @@ vec3 quenchSky(vec3 d, float up) {
   col += vec3(0.13, 0.15, 0.18) * ring * (0.75 + 0.25 * sin(atan(d.x, d.z) * 3.0));
   return col;
 }
+vec3 heatSky(vec3 d, float up) {
+  // The smoke over the Hearth: a warm smoke-grey band low, a deep warm
+  // slate overhead, the fog at the rim (linear values).
+  vec3 zenith = vec3(0.045, 0.04, 0.043);
+  vec3 band = vec3(0.22, 0.185, 0.16);
+  vec3 col = mix(band, zenith, smoothstep(0.04, 0.78, up));
+  col = mix(uHeatHorizon, col, smoothstep(-0.03, 0.22, up));
+  if (up > -0.06) {
+    vec2 uv = d.xz / (up + 0.2);
+    // Billows of smoke climbing out of the fissure and drifting east (their
+    // pattern runs up the sky and leans with the wind), slow.
+    vec2 drift = vec2(uTime * 0.011, uTime * 0.003);
+    float s1 = fbm(uv * 0.28 + drift - vec2(0.0, uTime * 0.008));
+    float s2 = fbm(uv * 0.85 - drift * 1.6 + 3.0);
+    float smoke = smoothstep(0.42, 0.78, s1 * 0.72 + s2 * 0.36 * uDetail) * smoothstep(-0.05, 0.16, up);
+    // Lit gold from below near the rim, where the fire catches it.
+    vec3 smokeLit = mix(vec3(0.15, 0.125, 0.11), vec3(0.4, 0.29, 0.17), 1.0 - smoothstep(0.0, 0.42, up));
+    col = mix(col, smokeLit, smoke * 0.78);
+    // Thinner veils high up, catching a little warm light.
+    float veil = smoothstep(0.55, 0.85, fbm(uv * 0.12 + drift * 0.5 + 7.0));
+    col += vec3(0.04, 0.03, 0.02) * veil * smoothstep(0.2, 0.7, up) * uDetail;
+  }
+  // The low sun in the west behind the smoke: a soft hazy disc, a broad glow.
+  float a = acos(clamp(dot(d, uHeatSun), -1.0, 1.0));
+  col += vec3(0.86, 0.62, 0.32) * exp(-a * a * 40.0) * 0.7;
+  col += vec3(0.3, 0.19, 0.09) * exp(-a * 3.4) * 0.6;
+  return col;
+}
 vec3 coreSky(vec3 d, float up) {
   // Ember-violet night: warm low (the heart's light on the high air), deep
   // violet-black overhead.
@@ -239,9 +277,10 @@ void main() {
   float up = d.y;
   vec3 col = vec3(0.0);
   if (uCore < 0.999) {
-    col = uBreath < 0.999 && uQuench < 0.999 ? stormSky(d, up) : vec3(0.0);
+    col = uBreath < 0.999 && uQuench < 0.999 && uHeat < 0.999 ? stormSky(d, up) : vec3(0.0);
     if (uBreath > 0.001) col = mix(col, breathSky(d, up), uBreath);
     if (uQuench > 0.001) col = mix(col, quenchSky(d, up), uQuench);
+    if (uHeat > 0.001) col = mix(col, heatSky(d, up), uHeat);
   }
   if (uCore > 0.001) col = mix(col, coreSky(d, up), uCore);
   gl_FragColor = vec4(col, 1.0);
@@ -257,6 +296,8 @@ export interface HeartSky {
   setBreath(k: number): void;
   /** Blend the main map's storm toward the Quench's calm cold sky. */
   setQuench(k: number): void;
+  /** Blend the main map's storm toward the Heat's smoke over the Hearth. */
+  setHeat(k: number): void;
 }
 
 /** The dome (and the slot's frame driver). */
@@ -277,6 +318,11 @@ export function buildHeartSky(opts: HeartSkyOptions): HeartSky {
       uQuenchHorizon: { value: new THREE.Color(SMITH_HEART_QUENCH_FOG.color) },
       uQuenchSun: {
         value: new THREE.Vector3(...SMITH_HEART_QUENCH_LIGHT.keyDirection).normalize(),
+      },
+      uHeat: { value: 0 },
+      uHeatHorizon: { value: new THREE.Color(SMITH_HEART_HEAT_FOG.color) },
+      uHeatSun: {
+        value: new THREE.Vector3(...SMITH_HEART_HEAT_LIGHT.keyDirection).normalize(),
       },
     },
     depthWrite: false,
@@ -299,8 +345,15 @@ export function buildHeartSky(opts: HeartSkyOptions): HeartSky {
   let core = -1;
   let breath = -1;
   let quench = -1;
+  let heat = -1;
   return {
     mesh,
+    setHeat(k) {
+      const q = Math.round(k * 200) / 200;
+      if (q === heat) return;
+      heat = q;
+      material.uniforms.uHeat.value = q;
+    },
     setQuench(k) {
       const q = Math.round(k * 200) / 200;
       if (q === quench) return;

@@ -23,6 +23,7 @@ import {
 } from './heart_mountain_core';
 import { heartHash } from './heart_plan_core';
 import { HEART_WALL_CLEAR, HEART_WALL_PATH_CLEAR, heartFloorClearance } from './heart_walls_core';
+import { HEAT_ROCK_GAIN, HEAT_ROCK_MIX, HEAT_ROCK_TONE, heatSootWeight } from './heat_soot_core';
 import {
   QUENCH_ROCK_GAIN,
   QUENCH_ROCK_MIX,
@@ -38,6 +39,7 @@ const ROCK_MID = new THREE.Color(0x48474c);
 const ROCK_HIGH = new THREE.Color(0x6a6766);
 const HAMMER_ROCK = new THREE.Color(HAMMER_ROCK_TONE);
 const QUENCH_ROCK = new THREE.Color(QUENCH_ROCK_TONE);
+const HEAT_ROCK = new THREE.Color(HEAT_ROCK_TONE);
 
 /** A Hammer step's shade (a gain): its own tone of the bed, the ledge's
  *  outer lip a touch paler, the crease where the next riser rises darker. */
@@ -103,6 +105,10 @@ export function buildHeartMountain(lowGfx: boolean): THREE.Mesh {
         c.lerp(QUENCH_ROCK, frost * QUENCH_ROCK_MIX).multiplyScalar(
           1 + frost * (QUENCH_ROCK_GAIN - 1),
         );
+      // The Heat's basalt (phase 2I): its mountain a sooted dark warm grey.
+      const soot = heatSootWeight(g.x0 + i * g.cell, g.z0 + j * g.cell);
+      if (soot > 0)
+        c.lerp(HEAT_ROCK, soot * HEAT_ROCK_MIX).multiplyScalar(1 + soot * (HEAT_ROCK_GAIN - 1));
       colors[k * 3] = c.r;
       colors[k * 3 + 1] = c.g;
       colors[k * 3 + 2] = c.b;

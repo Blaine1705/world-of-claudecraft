@@ -19,8 +19,14 @@
 //     ground bounce, a cold pale-blue mist that softens the far walls, so the
 //     frost and the ice read pale and clean and the braziers' fire is the one
 //     warm thing in it;
-//   - the rest of the main map (the Heat) keeps the storm-dusk grade it
-//     shares with the Sunken Bastion (`sunkenBastion`) until its phase;
+//   - the Heat (west, the Hearth) has its own, `smithHeartHeat` (phase 2I):
+//     a warm white-gold key low from the west, the Hearth's own light down
+//     the fissure, over a smoky warm-grey sky fill and a warm ground bounce
+//     (the fire under the floors), a smoke haze that thickens with distance,
+//     so the sooted basalt reads dark and warm, never black, and the first
+//     flame's crystal burns against it;
+//   - whatever of the main map no vein's light holds keeps the storm-dusk
+//     grade it shares with the Sunken Bastion (`sunkenBastion`);
 //   - the Heart (the separate final room) gets its own state,
 //     `smithHeartCore`: an ember-violet night air, nearer than the storm's so
 //     the chamber's crown closes round the platform, and a light rig lit from
@@ -202,6 +208,60 @@ export const SMITH_HEART_QUENCH_LIGHT = {
    *  throw long cold shadows north-west, and the frozen falls on the east
    *  walls take it full. */
   keyDirection: [0.56, 0.56, -0.6] as const,
+} as const;
+
+/** The fog state of the Heat (phase 2I). */
+export const SMITH_HEART_HEAT_FOG_STATE = 'smithHeartHeat';
+
+/** Does the Heat's light hold at instance-local (x, z)? West of the Ring
+ *  past its mouth (a camera standing back from a player in the hall stands
+ *  there), the Heat's light wins over the Ring's; elsewhere its area outside
+ *  the Ring's light. */
+export function inHeatLight(x: number, z: number): boolean {
+  const ring = Math.hypot(x - RING.x, z - RING.z);
+  if (x >= -64 || z >= 64 || z <= -64)
+    return smithHeartAreaAt(x, z) === 'heat' && ring > SMITH_HEART_RING_LIGHT_R;
+  // The hall starts at the Ring's rim: a camera past it down the mouth
+  // already stands in the Hearth's light.
+  return x < -(RING.outerR + 10) || ring > SMITH_HEART_RING_LIGHT_R;
+}
+
+/** Is the camera at world (x, z) in the Heat vein of its Smith's Heart
+ *  slot? (The Ring's own state keeps the Heat's mouth.) */
+export function smithHeartCameraInHeat(x: number, z: number): boolean {
+  const def = DUNGEONS.smith_heart;
+  if (!def) return false;
+  const o = instanceOrigin(def.index, instanceSlotForZ(z));
+  return inHeatLight(x - o.x, z - o.z);
+}
+
+/** The Heat's air (phase 2I): a warm smoke haze, a breath of grey-brown,
+ *  thin across the hall and the Forge so a telegraph and the guardian read
+ *  crisp, the far walls going into it (never an orange wash: the warm stays
+ *  in the light and the fire). */
+export const SMITH_HEART_HEAT_FOG = { color: 0x6e645c, near: 80, far: 560 } as const;
+
+/** The Heat's light rig (phase 2I): the Hearth's light, a warm white-gold
+ *  key low from the west down the fissure (the guardian and the altar-stone
+ *  throw long shadows east toward the door), over a cool slate smoke fill
+ *  and a dim umber ground bounce (the fire in the chasm and in the joints),
+ *  so every shaded face of the basalt is a cool dark grey, never black nor
+ *  a saturated brown, and the warm lives in the key and the fire; a gold
+ *  rim off the first flame on every silhouette. The sky's reflection a
+ *  trace. */
+export const SMITH_HEART_HEAT_LIGHT = {
+  sun: 2.45,
+  hemi: 2.0,
+  env: 0.03,
+  rim: 1.7,
+  sunColor: 0xffdcae,
+  // The smoke's cool slate fill (the painted world's L1: warm key, cool
+  // shade; a warm fill washed the whole vein one yellow).
+  hemiSky: 0x8a8c9a,
+  hemiGround: 0x5c4c42,
+  rimColor: 0xffbf6a,
+  /** Low in the west (from the ground toward it): the Hearth's side. */
+  keyDirection: [-0.72, 0.56, 0.16] as const,
 } as const;
 
 /** The Hammer's air: a grey quarry dust, thin near (the pit reads crisp
