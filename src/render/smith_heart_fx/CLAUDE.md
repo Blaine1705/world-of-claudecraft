@@ -12,7 +12,12 @@ offline and online look the same. The interior's static dressing and air are
 
 | Module | Role |
 |---|---|
-| `index.ts` | Public surface: `HammerFx`, `BreathFx`, `QuenchFx`, `HeatFx`, `FinalFx`, `SealShake`. |
+| `index.ts` | Public surface: `HammerFx`, `BreathFx`, `QuenchFx`, `HeatFx`, `FinalFx`, `CouncilFx`, `CouncilBodies`, `SealShake`. |
+| `council_fx_core.ts` | PURE (`RENDER_PURE_CORES`): the Hammer Council's look (design doc 5.18): a pillar's integrity on the model (`pillarLook`: seams, lean, heat, grit; `pillarPips`), its rise and fall timelines, the marks' footprints read off the sim's tuning (`COUNCIL_MARK_SPECS`, `RISE_SPOT_SPEC`) and their threat colours, the rock's fall, Resonance's ring, the heroic pulse's reach, the inheritance's arc, the energy's look, the cues it claims (`councilClaims`). |
+| `council_pillars_fx.ts` | `CouncilPillarsFx`, a part of `CouncilFx` (on its host: the root, the particles, the debris, the floor telegraph): the pillars (the Hammer kit's column, the rock kit's needle for a risen one) with their crack shells (the piece's own stone pushed out along its normals, a seam net that opens and burns per integrity), lean and pips, the rise, a lost piece, the fall into rubble (a danger footprint) and the sinking. |
+| `council_fx.ts` | `CouncilFx`: the host of the pillars' part, and the Wake and soak footprints round their players (the ghost pillar, the boulder dropping), the heir's locked rise spots, Resonance's ring, shimmer and thread to the pillar it cracks, Hammer's Weight's slam and mark, the Seam Bolt's shard, the inheritance's river of beads, the energy's gauge and glow, the heroic pulse. Every footprint, ring, gauge, pip, crack and lean on every tier; claims the council's own cues. |
+| `council_bodies_core.ts` | PURE (`RENDER_PURE_CORES`): the council's two provisional bodies (the Slabwright broad and blocky with slab shoulders, the Seam Singer tall and slender with amber seam crystals): joints, reach, pieces (kit node, joint, fitted box, light), the cast-to-motion mapping, the poses, the glow and the fall. Joints apart from pieces, so the final models replace the pieces only. |
+| `council_bodies.ts` | `CouncilBodies`: the Slabwright's and the Seam Singer's bodies over their bodyless targets: Hammer kit stone and Heart kit rock and crystal stitched by ochre threads, breath, swings, cast poses and the fall into rubble. |
 | `final_fx_core.ts` | PURE (`RENDER_PURE_CORES`, phase 2J): the Masterless Strength's numbers read off its sim template (Forge Fist's arc and reach, Forge Wrath's radius and bar, Forge Pour's cone), its body's joints (`COLOSSUS_SLOTS`, the two-bone reach `colossusArmIk`, the pieces' rest spots on the walk and in the chasm), the arrival's timeline (`ARRIVAL`: the heart rising, each piece tearing, flying and locking, the shockwave, `ARRIVAL_END`), the poses of its swing, Forge Fist, Forge Wrath and Forge Pour, the fall (`colossusFallPlan`, `heartDeathLevel`), the pools. |
 | `final_fx.ts` | `FinalFx` (phase 2J): the body (the Heart kit's rock pieces round the crystal heart, threads of the veins' light, the heart's own shader) following the bodyless boss; the arrival scene from the seal memory's `awakeSince` (whole for a late arrival, run on to its end by a pull); Forge Pour's cone through the shared floor telegraph on every tier and its fire on the floor, Forge Wrath's gather and wall of light, Forge Fist's strike; the fall and the room going dark (`../smith_heart/heart_final_core.ts`). |
 | `hammer_fx_core.ts` | PURE (`RENDER_PURE_CORES`): the Hammer guardian's numbers read off its sim template (never tuned here), the crack lines, Mountain's Wrath's charge and blast timelines (the dust wall rides the trash engine's `novaWave` front on the same clock), Hammerfall's heat, the Slab's break timeline and the once-per-change rule (`slabBreakDue`), the pool sizes. |
@@ -51,9 +56,15 @@ Rules:
   fixed pools, no per-frame allocation, no light.
 - The cracks are floor marks on the floor ladder's encounter band, over the sight
   field's fill and under its wave.
+- The Hammer Council's pillars, marks and footprints are actionable and drawn by `CouncilFx`
+  on EVERY tier (the threat colours: `control` for Wake the Stone's throw, `danger` for the
+  rubble, the heir's rising stone and the heroic pulse, `lethal` for Hammer's Weight, the
+  soak's gold to gather in, the vein's ochre on the accents only); dust, grit and debris
+  thin on the low tier. Mountain's Wrath stays `HammerFx`'s for whichever member holds it.
 - A new raid guardian's effects join here as their own module behind `index.ts`, never
   as a branch in `hammer_fx.ts`.
 
-Tests: `tests/smith_heart_hammer_fx.test.ts`, `tests/smith_heart_breath_fx.test.ts` and
+Tests: `tests/smith_heart_council_fx.test.ts`, `tests/smith_heart_council_bodies.test.ts`,
+`tests/smith_heart_hammer_fx.test.ts`, `tests/smith_heart_breath_fx.test.ts` and
 `tests/smith_heart_quench_fx.test.ts`, `tests/smith_heart_heat_fx.test.ts` and
 `tests/smith_heart_final_fx.test.ts` (each core and a smoke run over a fake world).

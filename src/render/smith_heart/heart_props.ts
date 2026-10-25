@@ -140,7 +140,9 @@ export function buildHeartProps(
     holder.position.set(prop.x, heartPropBase(prop.x, prop.z), prop.z);
     holder.rotation.y = prop.rot;
     if (prop.scale) holder.scale.setScalar(prop.scale);
-    for (const p of recipe) holder.add(partMesh(p));
+    // An encounter-owned body (the Hammer Council's columns) is drawn by its
+    // encounter: the placeholder keeps only its first part (the socket).
+    for (const p of prop.encounterOwned ? recipe.slice(0, 1) : recipe) holder.add(partMesh(p));
     (kitKinds.has(prop.kind) ? kitOwned : group).add(holder);
   }
   group.updateMatrixWorld(true);

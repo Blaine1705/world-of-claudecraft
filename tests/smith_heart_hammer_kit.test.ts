@@ -312,9 +312,12 @@ describe('hammer_kit_plan_core: the Hammer vein dressed', () => {
     const vein = F.props.filter((p) => HAMMER_KIT_KINDS.has(p.kind));
     expect(vein.length).toBeGreaterThan(15);
     for (const k of HAMMER_KIT_KINDS) expect(HEART_PROP_RECIPES[k], k).toBeDefined();
-    // Every prop has its piece (a column adds its socket).
+    // Every prop has its piece; a column's is only its socket (the column
+    // itself is the Hammer Council's pillar object: smith_heart_fx/council_fx.ts).
+    expect(props.length).toBe(vein.length);
     const columns = vein.filter((p) => p.kind === 'sh_pit_column').length;
-    expect(props.length).toBe(vein.length + columns);
+    expect(props.filter((p) => p.piece === 'Kit_PitColumnSocket').length).toBe(columns);
+    expect(props.some((p) => p.piece === 'Kit_PitColumn')).toBe(false);
     const colossi = props.filter((p) => p.piece.startsWith('Kit_Colossus'));
     expect(colossi.map((c) => c.piece).sort()).toEqual([...HAMMER_COLOSSI].sort());
     for (const c of colossi) {

@@ -54,7 +54,16 @@ import {
   RING_MAX_OPACITY,
   SWEEP_BASE_OPACITY,
 } from './rift_death_zone_core';
-import { BreathFx, FinalFx, HammerFx, HeatFx, QuenchFx, SealShake } from './smith_heart_fx';
+import {
+  BreathFx,
+  CouncilBodies,
+  CouncilFx,
+  FinalFx,
+  HammerFx,
+  HeatFx,
+  QuenchFx,
+  SealShake,
+} from './smith_heart_fx';
 import { SummonRiseFx } from './summon_rise_fx';
 import { BastionFx } from './sunken_bastion/bastion_fx';
 import { TrashEngineFx } from './trash_engine_fx';
@@ -150,6 +159,8 @@ export class RiftDeathZoneVisuals {
   // telegraphs, and the first flame's fire).
   private readonly heatFx: HeatFx;
   private readonly finalFx: FinalFx;
+  private readonly councilFx: CouncilFx;
+  private readonly councilBodies: CouncilBodies;
   // The Smith's Heart's seal moments felt in the camera.
   private readonly sealShake: SealShake;
 
@@ -293,6 +304,15 @@ export class RiftDeathZoneVisuals {
     this.quenchFx = new QuenchFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.heatFx = new HeatFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.finalFx = new FinalFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.councilFx = new CouncilFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.councilBodies = new CouncilBodies(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+    );
     this.sealShake = new SealShake(world, shake);
   }
 
@@ -376,6 +396,8 @@ export class RiftDeathZoneVisuals {
     this.quenchFx.update(dt);
     this.heatFx.update(dt);
     this.finalFx.update(dt);
+    this.councilFx.update(dt);
+    this.councilBodies.update(dt);
     this.sealShake.update();
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
@@ -425,6 +447,8 @@ export class RiftDeathZoneVisuals {
     this.quenchFx.dispose();
     this.heatFx.dispose();
     this.finalFx.dispose();
+    this.councilFx.dispose();
+    this.councilBodies.dispose();
     this.hoardPresentation.dispose();
   }
 
@@ -455,6 +479,8 @@ export class RiftDeathZoneVisuals {
     this.quenchFx.handleEvent(event);
     this.heatFx.handleEvent(event);
     this.finalFx.handleEvent(event);
+    this.councilBodies.handleEvent(event);
+    const council = this.councilFx.handleEvent(event);
     return (
       this.bastionFx.handleEvent(event) ||
       temple ||
@@ -462,7 +488,8 @@ export class RiftDeathZoneVisuals {
       sanctum ||
       sanctumBoss ||
       engine ||
-      crypt
+      crypt ||
+      council
     );
   }
 

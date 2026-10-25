@@ -2,7 +2,9 @@
 // hosted by ../rift_death_zone.ts beside the dungeons' own fx. Presentation
 // only, read from IWorld (the guardian's cast bar, its events, the mirrored
 // gate memory), so offline and online look the same:
-//  - Mountain's Wrath on its bar: molten cracks race out from the guardian's
+//  - Mountain's Wrath on its bar (cast by the Guardian or, the Guardian
+//    fallen, by the Hammer Council member that took up its Wrath): molten
+//    cracks race out from the caster's
 //    feet across the quarry floor, loose stones lift and hang round it, dust
 //    is drawn in toward it, grit shakes down; when it lands, a wall of rock
 //    dust rides the trash engine's wave front out to the nova's radius, the
@@ -28,6 +30,7 @@
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../sim/data';
+import { councilRoleOf } from '../../sim/encounters/smith_heart/council_ids';
 import { dungeonGateAt, dungeonGateStateOf } from '../../sim/instances/dungeon_gates';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
@@ -181,7 +184,7 @@ void main() {
 // ---- the rubble ---------------------------------------------------------------------
 
 /** A jagged chunk: an icosahedron pulled about by a fixed hash (no rng). */
-function chunkGeometry(): THREE.BufferGeometry {
+export function chunkGeometry(): THREE.BufferGeometry {
   const g = new THREE.IcosahedronGeometry(0.5, 0);
   const p = g.attributes.position;
   for (let i = 0; i < p.count; i++) {
@@ -192,10 +195,10 @@ function chunkGeometry(): THREE.BufferGeometry {
   return g;
 }
 
-const STONE_TONES = [0x9a8466, 0x7a664e, 0xb39c7c, 0x5e4f3e].map((c) => new THREE.Color(c));
+export const STONE_TONES = [0x9a8466, 0x7a664e, 0xb39c7c, 0x5e4f3e].map((c) => new THREE.Color(c));
 
 /** A fixed pool of tumbling stones: thrown, lying a moment, sinking away. */
-class Rubble {
+export class Rubble {
   readonly mesh: THREE.InstancedMesh;
   private readonly pos: Float32Array;
   private readonly vel: Float32Array;
@@ -552,7 +555,9 @@ export class HammerFx {
   private scan(world: IWorld): void {
     const now = sharedUniforms.uTime.value;
     for (const e of world.entities.values()) {
-      if (e.templateId === HAMMER_GUARDIAN) {
+      // The Hammer Council: whoever holds the Wrath (the Guardian, or its
+      // heir once it has fallen) gathers it the same way.
+      if (councilRoleOf(e.templateId) !== null) {
         if (!e.dead && e.castingAbility === MOUNTAINS_WRATH && !this.charges.has(e.id))
           this.startCharge(e);
         continue;

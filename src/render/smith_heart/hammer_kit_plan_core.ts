@@ -206,7 +206,9 @@ export function planHammerProps(): HeartKitPlacement[] {
         out.push({ ...at, piece: i % 2 ? 'Kit_GeodeB' : 'Kit_GeodeA' });
         break;
       case 'sh_pit_column':
-        out.push({ ...at, piece: 'Kit_PitColumn' });
+        // The column itself is the Hammer Council's (it cracks, falls and
+        // stands again: smith_heart_fx/council_fx.ts draws it from its
+        // pillar object); the socket it stands in stays.
         out.push({ ...at, piece: 'Kit_PitColumnSocket', noShadow: true });
         break;
       case 'sh_quarry_colossus':
