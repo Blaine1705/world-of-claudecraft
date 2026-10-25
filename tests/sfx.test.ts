@@ -1535,7 +1535,12 @@ describe('amb_tavern: the tavern bed follows the listener through its lowpass', 
   });
 
   it('the renderer hands the ambience the avatar eye it samples the biome beds at', () => {
-    const src = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    expect(renderer).toContain('updateCameraAudioListener(this, this.cameraLookAt);');
+    const src = readFileSync(
+      new URL('../src/render/camera_audio_listener.ts', import.meta.url),
+      'utf8',
+    );
     expect(src).toMatch(
       /sink\.ambience\(\s*amb\.biome,\s*amb\.inDungeon,\s*amb\.precip,\s*amb\.nearWater,\s*0,\s*points,\s*eye,?\s*\)/,
     );
