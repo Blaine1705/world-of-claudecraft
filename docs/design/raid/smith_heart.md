@@ -104,7 +104,7 @@ vein: a scorched, empty socket in the Hearth's crystal shows where.
 | Void | height `SMITH_HEART_VOID_HEIGHT`, map void `mist`, `cliffStep` 1.1 | `SMITH_HEART_FIELD` |
 | Group | `suggestedPlayers` 10; raid-only claim | `RAID_ALLOWED_DUNGEON_IDS` (`src/sim/instances/dungeons.ts`), `RAID_REQUIRED_DUNGEON_IDS` (`src/sim/instances/reset_cooldown_policy.ts`) |
 | Interior key | `smith_heart` (authored field) | `src/sim/instances/authored_field/registry.ts` |
-| Flags | `bossChainPull`, `areaCastsPlant` on; `guideVisible` false | `SMITH_HEART_DUNGEON_DEFS` |
+| Flags | `areaCastsPlant` on; `bossChainPull` off (a raid pulls each guardian on its own, `tests/smith_heart_pull.test.ts`); `guideVisible` false | `SMITH_HEART_DUNGEON_DEFS` |
 | Entry, exit | the Cleft (`SMITH_HEART_ANCHORS.entry`, `.exit`) | `SMITH_HEART_ANCHORS` |
 | Boss exit portal | on the Anvil of the World, opens when the final boss dies | `bossExitPortal` |
 | Entry gate | dev builds only while `SMITH_HEART_PLAYABLE` is false | `entry.ts` |
