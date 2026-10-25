@@ -3,15 +3,15 @@
 // (boxes, cylinders, cones and gems composed into each room's hero shapes,
 // until the per-room kits give each its own model), where a prop's base
 // stands, and the budgeted point lights (one colour key per vein at its
-// guardian's arena and at its mouth on the Ring, the seal, the forge's
-// crucibles and hearth, the basin's braziers, and the Heart's core, altars
-// and terrace).
+// guardian's arena and at its mouth on the Ring, the seal, the Hearth's
+// mouth, its crystal and wellspring and the fire in its chasm, the basin's
+// braziers, and the Heart's core, altars and terrace).
 //
 // Every room reads its theme by SHAPE first: the Quarry's kneeling colossi,
 // cut blocks and derrick; the Cornice's lightning rods and broken bellows; the
-// Basin's colossal sunk blades and heaped ice shelves; the Forge's great
-// hearth, giant anvil, bellows and casting channels; the Seal Dais's crown of
-// bronze tines.
+// Basin's colossal sunk blades and heaped ice shelves; the Hearth's mouth,
+// its altar-stone, its crystal and its ember boulders; the Seal Dais's crown
+// of tines.
 //
 // Three-free, DOM-free, deterministic: the painters (heart_props.ts,
 // heart_lights.ts) read these tables, and tests/smith_heart_render_core.test.ts
@@ -297,57 +297,54 @@ export const HEART_PROP_RECIPES: Readonly<Record<string, readonly HeartPart[]>> 
     part('box', 'glow', 'quench', [0.4, 4, 1.4], [0, 2, 0], { tiltZ: 0.15 }),
     part('box', 'bronze', 'quench', [1.6, 0.4, 0.5], [0.3, 4, 0], { tiltZ: 0.15 }),
   ],
-  // The Heat: crucibles, the great pour crucible, the great hearth, its
-  // bellows, the giant anvil and the casting channels.
+  // The Heat (phase 2I: the Hearth, never a forge; these stand in only until
+  // its kit lands): the crystal clusters, the wellspring, the Hearth's mouth,
+  // the ember boulders, the altar-stone and the seams of fire, in basalt and
+  // the first flame's crystal (the ids keep their old names).
   sh_crucible: [
-    part('cyl', 'bronze', 'heat', [4.6, 4.8, 5.2], [0, 2.4, 0]),
-    part('cyl', 'glow', 'heat', [4.2, 0.3, 4.2], [0, 4.9, 0]),
-    part('cyl', 'dark', 'heat', [5.2, 0.6, 5.2], [0, 0.3, 0]),
+    part('cyl', 'dark', 'heat', [4.6, 1.4, 5.2], [0, 0.7, 0]),
+    part('gem', 'glow', 'heat', [1.6, 6, 1.6], [0, 3.6, 0]),
+    part('gem', 'glow', 'heat', [1.1, 3.6, 1.1], [1.2, 2.4, 0.6], { tiltZ: -0.35 }),
+    part('gem', 'glow', 'heat', [1.0, 3.2, 1.0], [-1.1, 2.2, -0.5], { tiltZ: 0.4 }),
   ],
   sh_pour_crucible: [
-    part('cyl', 'dark', 'heat', [0.8, 4, 0.8], [-2, 2, -1.2]),
-    part('cyl', 'dark', 'heat', [0.8, 4, 0.8], [2, 2, -1.2]),
-    part('cyl', 'dark', 'heat', [0.8, 4, 0.8], [0, 2, 2.2]),
-    part('cyl', 'bronze', 'heat', [5.6, 5, 6], [0, 6.5, 0]),
-    part('cyl', 'glow', 'heat', [5.2, 0.3, 5.2], [0, 9.1, 0]),
-    part('cone', 'bronze', 'heat', [1.4, 2.6, 0], [0, 8.4, 3.4], { tiltX: 1.2 }),
+    part('cyl', 'dark', 'heat', [6.4, 2.4, 6.8], [0, 1.2, 0]),
+    part('cyl', 'glow', 'heat', [3.4, 0.3, 3.4], [0, 2.4, 0]),
+    part('gem', 'glow', 'heat', [1.4, 7, 1.4], [0, 5.5, -2], { tiltX: -0.2 }),
+    part('gem', 'glow', 'heat', [1.1, 5, 1.1], [-1.8, 4.6, -1.2], { tiltZ: 0.3 }),
+    part('gem', 'glow', 'heat', [1.1, 5, 1.1], [1.8, 4.6, -1.2], { tiltZ: -0.3 }),
   ],
-  // The great hearth in the rock behind the forge's west wall (local +z
-  // faces the arena): two piers, a stepped lintel and hood, the hearth bed
-  // and the white-gold fire inside. Nothing of it stands over the floor.
+  // The Hearth's mouth in the rock behind the Forge's west wall (local +z
+  // faces the arena): two jambs, a lintel, its throat full of the first
+  // flame's crystal. Nothing of it stands over the floor.
   sh_great_hearth: [
     part('box', 'dark', 'heat', [46, 4, 12], [0, -2, -5]),
     part('box', 'dark', 'heat', [7, 26, 10], [-17, 11, -5]),
     part('box', 'dark', 'heat', [7, 26, 10], [17, 11, -5]),
-    part('box', 'bronze', 'heat', [8, 1.2, 11], [-17, 23.6, -5]),
-    part('box', 'bronze', 'heat', [8, 1.2, 11], [17, 23.6, -5]),
     part('box', 'stone', 'heat', [4.4, 21, 10], [-9.2, 31, -5], { tiltZ: -0.62 }),
     part('box', 'stone', 'heat', [4.4, 21, 10], [9.2, 31, -5], { tiltZ: 0.62 }),
-    part('box', 'bronze', 'heat', [4.6, 4.6, 11], [0, 39.4, -5]),
     part('box', 'dark', 'heat', [52, 16, 12], [0, 48, -8]),
     part('box', 'ember', 'heat', [26, 30, 1], [0, 14, -10]),
-    part('cone', 'glow', 'heat', [5, 15, 0], [-8, 7.5, -7]),
-    part('cone', 'glow', 'heat', [6, 22, 0], [-2.5, 11, -7.5]),
-    part('cone', 'glow', 'heat', [5.4, 18, 0], [3.5, 9, -7.2]),
-    part('cone', 'glow', 'heat', [4.4, 12, 0], [8.5, 6, -6.8]),
-    part('box', 'glow', 'heat', [27, 2, 7], [0, 1, -5]),
+    part('gem', 'glow', 'heat', [5, 15, 5], [-8, 7.5, -7]),
+    part('gem', 'glow', 'heat', [6, 22, 6], [-2.5, 11, -7.5]),
+    part('gem', 'glow', 'heat', [5.4, 18, 5.4], [3.5, 9, -7.2]),
+    part('gem', 'glow', 'heat', [4.4, 12, 4.4], [8.5, 6, -6.8]),
   ],
   sh_great_bellows: [
-    part('box', 'dark', 'heat', [7, 0.7, 12], [0, 0.35, 0]),
-    part('box', 'dark', 'heat', [6.2, 3.2, 10], [0, 2.2, -0.4], { tiltX: 0.12 }),
-    part('box', 'bronze', 'heat', [7, 0.7, 12], [0, 4.4, -0.8], { tiltX: 0.3 }),
-    part('cone', 'bronze', 'heat', [1.6, 3, 0], [0, 1.6, 6.2], { tiltX: Math.PI / 2 }),
-    part('box', 'bronze', 'heat', [0.6, 0.6, 5], [0, 6.6, -6.4], { tiltX: 0.3 }),
+    part('box', 'dark', 'heat', [3.2, 4.6, 11.5], [-1.8, 2.3, 0], { tiltZ: 0.08 }),
+    part('box', 'stone', 'heat', [3.2, 4.2, 11], [1.8, 2.1, 0.2], { tiltZ: -0.08 }),
+    part('box', 'glow', 'heat', [0.5, 0.3, 10], [0, 0.4, 0]),
   ],
-  // The giant anvil, side-on to the arena's door: foot, waist, face, horn
-  // (north, local +z) and heel, a white-hot blank on its face.
+  // The altar-stone, side-on to the arena's door: its foot, waist and
+  // capstone of basalt, a seam of fire down its table, crystal at its north
+  // end (local +z).
   sh_giant_anvil: [
-    part('box', 'dark', 'heat', [6.2, 2.4, 10], [0, 1.2, 0]),
-    part('box', 'steel', 'heat', [4.2, 3, 7], [0, 3.9, 0]),
-    part('box', 'steel', 'heat', [6.4, 2.6, 13], [0, 6.7, 0]),
-    part('cone', 'steel', 'heat', [3.4, 7, 0], [0, 6.9, 10], { tiltX: Math.PI / 2 }),
-    part('box', 'steel', 'heat', [5.2, 1.8, 3], [0, 7.4, -7.6]),
-    part('box', 'glow', 'heat', [1.1, 0.5, 9], [0.8, 8.25, 0.6]),
+    part('box', 'dark', 'heat', [6.2, 1.4, 16.4], [0, 0.7, 0]),
+    part('box', 'dark', 'heat', [4.8, 2.8, 14.6], [0, 2.8, 0]),
+    part('box', 'stone', 'heat', [6.2, 1.6, 16.2], [0, 5, 0]),
+    part('box', 'glow', 'heat', [0.4, 0.2, 13], [0, 5.85, 0]),
+    part('gem', 'glow', 'heat', [1.4, 4.4, 1.4], [0, 7.6, 6.4]),
+    part('gem', 'glow', 'heat', [1.0, 3.0, 1.0], [0.9, 6.9, 5.6], { tiltZ: -0.4 }),
   ],
   sh_casting_channel: [
     part('box', 'dark', 'heat', [2.6, 0.06, 64], [0, 0.03, 0]),
@@ -456,6 +453,10 @@ function veinMouth(id: string, vein: SmithHeartVein, deg: number): HeartLightSpo
   };
 }
 
+/** Where the fire burns deep in the chasm the anvil bridge crosses (between
+ *  the casting floor's west lip and the Forge's east one). */
+export const HEAT_BRIDGE_CHASM = { x: -169, z: 0 } as const;
+
 /** Which of the Cornice's rods (in field order) carry a light. */
 const LIT_RODS: ReadonlySet<number> = new Set([1, 5]);
 
@@ -490,14 +491,28 @@ export function planHeartLights(): HeartLightSpot[] {
       intensity: 6,
       range: 34,
     },
+    // The Hearth's first flame (phase 2I): strong enough to lay its gold
+    // across the Forge and up the altar-stone from its mouth.
     {
       id: 'hearth',
       x: GREAT_HEARTH.x + 9,
       z: GREAT_HEARTH.z,
-      lift: 8,
+      lift: 9,
       color: SMITH_HEART_VEIN_COLORS.heat,
-      intensity: 9,
-      range: 44,
+      intensity: 16,
+      range: 54,
+    },
+    // The fire deep in the chasm under the anvil bridge, lighting its arch
+    // and the cliffs from below (phase 2I).
+    {
+      id: 'chasm:heat',
+      x: HEAT_BRIDGE_CHASM.x,
+      z: HEAT_BRIDGE_CHASM.z,
+      lift: -14,
+      color: SMITH_HEART_VEIN_COLORS.heat,
+      intensity: 14,
+      range: 34,
+      noHalo: true,
     },
     {
       id: 'core',
@@ -618,16 +633,21 @@ export function planHeartLights(): HeartLightSpot[] {
   // their tip's storm light; the rest only glow.
   let rod = 0;
   for (const p of SMITH_HEART_FIELD.props) {
-    if (p.kind === 'sh_crucible' || p.kind === 'sh_pour_crucible') {
-      spots.push(
-        warm(
-          `crucible:${p.x}:${p.z}`,
-          p.x,
-          p.z,
-          p.kind === 'sh_pour_crucible' ? 10 : 6,
-          SMITH_HEART_VEIN_COLORS.heat,
-        ),
-      );
+    if (p.kind === 'sh_crucible') {
+      // The fire crystal's clusters (phase 2I: the old crucibles' spots),
+      // a warm pool round each.
+      spots.push({
+        ...warm(`crystal:${p.x}:${p.z}`, p.x, p.z, 3.4, SMITH_HEART_VEIN_COLORS.heat),
+        intensity: 4,
+        range: 17,
+      });
+    } else if (p.kind === 'sh_pour_crucible') {
+      // The wellspring brimming (phase 2I), just over its fire.
+      spots.push({
+        ...warm(`wellspring:${p.x}:${p.z}`, p.x, p.z, 3.2, SMITH_HEART_VEIN_COLORS.heat),
+        intensity: 6,
+        range: 20,
+      });
     } else if (p.kind === 'sh_brazier') {
       // The Quench's fire bowls (phase 2H): the one warm light in the cold,
       // strong enough to lay a warm pool on the snow round each bowl.

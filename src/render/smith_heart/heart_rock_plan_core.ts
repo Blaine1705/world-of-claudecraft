@@ -67,6 +67,7 @@ import {
   heartFloorClearance,
   heartOpenAir,
 } from './heart_walls_core';
+import { HEAT_KIT_SHALLOW } from './heat_kit_plan_core';
 import { RING_KIT_FASCIA_DEPTH, RING_KIT_FASCIA_SURFACES } from './ring_kit_plan_core';
 
 /** A rock piece's measures (game yards, unscaled): `half` the half width of
@@ -579,11 +580,16 @@ function lipCrossesFloor(
 }
 
 /** The cliff runs of every walk falling into the chasm (not the floating
- *  islands', nor the Wind Bridge's, whose arch the Breath kit draws (phase
- *  2G), nor the hidden surfaces'), chained end to end per surface. */
+ *  islands', nor the Wind Bridge's and the anvil bridge's, whose arches the
+ *  Breath and the Heat kits draw (phases 2G, 2I), nor the hidden
+ *  surfaces'), chained end to end per surface. */
 function chasmChains(): FieldCliffRun[][] {
   const F = SMITH_HEART_FIELD;
-  const floating = new Set([...SMITH_HEART_FLOATING_SURFACES, ...BREATH_KIT_SHALLOW]);
+  const floating = new Set([
+    ...SMITH_HEART_FLOATING_SURFACES,
+    ...BREATH_KIT_SHALLOW,
+    ...HEAT_KIT_SHALLOW,
+  ]);
   const hidden = new Set(F.surfaces.filter((x) => x.hidden).map((x) => x.id));
   // The runs into the chasm, chained end to end per surface (a disc's
   // outline is many short runs: one chain, cut into modules along it).

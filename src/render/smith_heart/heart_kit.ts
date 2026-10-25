@@ -36,6 +36,10 @@ export const SMITH_HEART_BREATH_KIT_URL = '/models/props/smith_heart_breath_kit.
 /** The Quench's kit (phase 2H, quench_kit.ts): the basin's fire bowls, the
  *  lake's blades, the heaped ice, the walls over the void, the frozen falls. */
 export const SMITH_HEART_QUENCH_KIT_URL = '/models/props/smith_heart_quench_kit.glb';
+/** The Heat's kit (phase 2I, heat_kit.ts): the Hearth's mouth, the
+ *  altar-stone, the wellspring and the Pour Channel, the crystal, the
+ *  bridge's arch, the walls over the void. */
+export const SMITH_HEART_HEAT_KIT_URL = '/models/props/smith_heart_heat_kit.glb';
 
 /** A kit's material slots: KitStone (lit rock), KitGlow (emissive light) and
  *  KitIce (phase 2H: lit, glossy, a cold sheen at the grazing angles and a
@@ -166,6 +170,7 @@ if (typeof window !== 'undefined') {
   registerDeferredPreload(() => startKitLoad(SMITH_HEART_RING_KIT_URL));
   registerDeferredPreload(() => startKitLoad(SMITH_HEART_BREATH_KIT_URL));
   registerDeferredPreload(() => startKitLoad(SMITH_HEART_QUENCH_KIT_URL));
+  registerDeferredPreload(() => startKitLoad(SMITH_HEART_HEAT_KIT_URL));
 }
 
 /** Fetch and bake a kit once. Never rejects; resolves within the wait cap
