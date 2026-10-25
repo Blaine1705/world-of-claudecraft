@@ -365,6 +365,7 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/faction-rift-icons-v045/',
       '            /docs/screenshots/far-foliage-impostors/',
       '            /docs/screenshots/fenbridge-rebuild/',
+      '            /docs/screenshots/first-person-view/',
       '            /docs/screenshots/guild-bank-history/',
       '            /docs/screenshots/guild-bank-tab/',
       '            /docs/screenshots/guild-pledge-board/',

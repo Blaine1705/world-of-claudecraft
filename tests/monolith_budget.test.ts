@@ -1058,7 +1058,9 @@ const MONOLITHS: MonolithRow[] = [
     // (46f0679547): both parent pins for the record, the integration 12400 and the guild
     // 12381; the two sides' extractions compose to 12354 by wc -l on the merged tree.
     // Exact count.
-    ceiling: 12354,
+    // First-person camera integration extracts the spatial-audio listener.
+    // Keep the release branch ceiling ratcheted down by the same eight lines.
+    ceiling: 12346,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
