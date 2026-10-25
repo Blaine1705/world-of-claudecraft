@@ -1343,6 +1343,20 @@ describe('free-redesign window', () => {
     expect(tokens).toEqual({ Oldclient: true });
   });
 
+  it('shows a release grant after an earlier redesign was spent', async () => {
+    const tokens = await tokensFor([
+      charRow({
+        id: 8,
+        name: 'Granted',
+        created_at: after,
+        appearance: look,
+        appearance_reroll_used: true,
+        appearance_reroll_granted: true,
+      }),
+    ]);
+    expect(tokens).toEqual({ Granted: true });
+  });
+
   it('a spent token beats both arms', async () => {
     const tokens = await tokensFor([
       charRow({

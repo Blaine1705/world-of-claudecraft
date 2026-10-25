@@ -16,6 +16,7 @@ import { ACCOUNT_WEALTH_SCHEMA } from './account_wealth_db';
 import { AD_SPEND_SCHEMA } from './ad_spend_db';
 import { bustAdminGuildListReads } from './admin_guilds_read';
 import { ADMIN_GUILDS_SCHEMA } from './admin_guilds_schema';
+import { consumeAppearanceRerollOn } from './appearance_redesign_db';
 import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
 import { ACCOUNT_ATTRIBUTION_SCHEMA, accountAttributionForExport } from './attribution_db';
 import {
@@ -126,6 +127,8 @@ import { MEMBERSHIP_SCHEMA } from './membership_db';
 import { REFERRAL_ARMOUR_SCHEMA } from './referral_armour_db';
 import { REFERRAL_INVITES_SCHEMA } from './referral_invites_db';
 import { REFERRAL_CARDS_SCHEMA } from './referral_schema_db';
+import { REDESIGN_GRANT_SCHEMA } from './release_gifts_db';
+import { SCHEMA_ADVISORY_LOCK_KEY } from './schema_lock';
 
 export { recordReferral } from './referral_armour_db';
 
@@ -467,6 +470,7 @@ ALTER TABLE characters ADD COLUMN IF NOT EXISTS appearance JSONB;
 -- reroll endpoint in the same statement that writes the new appearance, so a
 -- token can never be spent twice.
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS appearance_reroll_used BOOLEAN NOT NULL DEFAULT FALSE;
+${REDESIGN_GRANT_SCHEMA};
 -- Max-Level XP Overflow leaderboard: indexed lifetime-XP sort key. The first
 -- index serves the realm-scoped in-game panel; the second serves the global
 -- (cross-realm) home-page board. Both are expression indexes on the bare
@@ -1231,8 +1235,6 @@ SELECT assoc.account_id, ib.reason
   JOIN daily_reward_ip_bans ib
     ON ib.ip_address = assoc.ip_address;
 `;
-
-const SCHEMA_ADVISORY_LOCK_KEY = 0x57_4f_43_01; // "WOC\x01"
 
 export async function ensureSchema(): Promise<void> {
   // In the process-per-realm model several server processes boot against the
@@ -2806,6 +2808,7 @@ export interface CharacterRow {
   // One-shot redesign token spent (see the reroll endpoint). Selected by the
   // list path only.
   appearance_reroll_used?: boolean;
+  appearance_reroll_granted?: boolean;
   // Selected by the list path only, for the reroll-cutoff check and the
   // char-select payload.
   created_at?: Date | string | null;
@@ -2832,7 +2835,7 @@ export { highestCharacterForAccount } from './character_roster_db';
 export async function listCharacters(accountId: number): Promise<CharacterRow[]> {
   const res = await pool.query(
     `SELECT c.id, c.account_id, c.name, c.class, c.level, c.state, c.is_gm, c.force_rename,
-            c.appearance, c.appearance_reroll_used, c.created_at, c.membership_slot,
+            c.appearance, c.appearance_reroll_used, c.appearance_reroll_granted, c.created_at, c.membership_slot,
             GREATEST(ps.last_played, totals.last_played) AS last_played,
             (COALESCE(ps.playtime_seconds, 0) + COALESCE(totals.playtime_seconds, 0))::bigint AS playtime_seconds
        FROM characters c
@@ -2952,25 +2955,15 @@ export async function consumeAppearanceReroll(
   helmHidden: boolean | null,
   createdBefore: Date,
 ): Promise<boolean> {
-  const res = await pool.query(
-    `UPDATE characters
-        SET appearance = $3::jsonb,
-            appearance_reroll_used = TRUE,
-            state = CASE
-                      WHEN state IS NULL OR $5::boolean IS NULL THEN state
-                      WHEN $5::boolean AND state->'helmHidden' IS DISTINCT FROM 'true'::jsonb
-                        THEN jsonb_set(state, '{helmHidden}', 'true'::jsonb, true)
-                      WHEN NOT $5::boolean AND state ? 'helmHidden'
-                        THEN state - 'helmHidden'
-                      ELSE state
-                    END,
-            updated_at = now()
-      WHERE id = $1 AND account_id = $2 AND realm = $4
-        AND (created_at < $6 OR appearance IS NULL)
-        AND appearance_reroll_used = FALSE`,
-    [characterId, accountId, JSON.stringify(appearance), REALM, helmHidden, createdBefore],
+  return consumeAppearanceRerollOn(
+    pool,
+    REALM,
+    accountId,
+    characterId,
+    appearance,
+    helmHidden,
+    createdBefore,
   );
-  return (res.rowCount ?? 0) > 0;
 }
 
 // Active character names on this realm for the public character sitemap, ranked
