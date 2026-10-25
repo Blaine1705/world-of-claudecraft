@@ -237,6 +237,25 @@ export function planQuenchDressing(): HeartKitPlacement[] {
       cosmetic: true,
     });
   }
+  // Drifts of snow banked against the low walls on the landings' rims, the
+  // shelf's and the sheet's (a yard in from the wall, along it).
+  for (const [i, w] of planQuenchWalls().entries()) {
+    if (heartHash(i, 23) > 0.4) continue;
+    const x = w.x - Math.sin(w.rot) * 1.3;
+    const z = w.z - Math.cos(w.rot) * 1.3;
+    const surf = authoredFieldSurfaceAt(F, x, z);
+    if (!surf || !QUENCH_WALK_SURFACES.has(surf.id) || surf.id === 'frozen_lake') continue;
+    out.push({
+      piece: heartHash(i, 29) < 0.7 ? 'Kit_SnowDriftA' : 'Kit_SnowDriftB',
+      x,
+      y: authoredFieldHeight(F, x, z) + 0.01,
+      z,
+      rot: w.rot + (heartHash(i, 31) - 0.5) * 0.2,
+      scale: 0.7 + heartHash(i, 37) * 0.4,
+      noShadow: true,
+      cosmetic: true,
+    });
+  }
   // Drifts of snow along the lake's edge, on the shelf just outside the ice.
   const drifts = 18;
   for (let k = 0; k < drifts; k++) {

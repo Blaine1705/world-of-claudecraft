@@ -415,14 +415,20 @@ describe('Smith Heart Quench kit: the plan', () => {
       expect(['singing_ice', 'frozen_lake'], `${p.piece} on ${s?.id}`).toContain(s?.id);
       expect(Math.abs(p.y - authoredFieldHeight(F, p.x, p.z))).toBeLessThan(0.05);
     }
-    expect(drifts.length).toBeGreaterThan(8);
+    // The drifts lie on Quench walks, never on the lake: a ring of them at
+    // the lake's edge and more banked against the low walls.
     const L = QUENCH.lake;
+    const edge = (p: { x: number; z: number }) =>
+      Math.hypot((p.x - L.x) / L.rx, (p.z - L.z) / L.rz);
     for (const p of drifts) {
-      expect(authoredFieldSurfaceAt(F, p.x, p.z)?.id).toBe('lake_shelf');
-      const e = Math.hypot((p.x - L.x) / L.rx, (p.z - L.z) / L.rz);
-      expect(e).toBeGreaterThan(1);
-      expect(e).toBeLessThan(1.12);
+      const s = authoredFieldSurfaceAt(F, p.x, p.z);
+      expect(QUENCH_WALK_SURFACES.has(s?.id ?? ''), `${p.piece} on ${s?.id}`).toBe(true);
+      expect(s?.id).not.toBe('frozen_lake');
+      expect(p.scale ?? 1).toBeLessThanOrEqual(1.1);
     }
+    const atLake = drifts.filter((p) => edge(p) > 1 && edge(p) < 1.12);
+    expect(atLake.length).toBeGreaterThan(8);
+    expect(drifts.length - atLake.length).toBeGreaterThan(8);
     for (const p of flat) {
       expect(p.cosmetic).toBe(true);
       expect(p.noShadow).toBe(true);

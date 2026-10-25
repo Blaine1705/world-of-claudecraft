@@ -1385,7 +1385,8 @@ const paintLakeIce: ColorPainter = (h, rgb, size, rnd) => {
     let y = y0;
     let a = a0;
     for (let s = 0; s < len; s += 0.8) {
-      a += (wobble[wrapAt(x, y, size)] - 0.5) * 0.12;
+      // Fractures run straight and kink now and then (never a scribble).
+      a += (wobble[wrapAt(x, y, size)] - 0.5) * 0.03 + (rnd() < 0.03 ? (rnd() - 0.5) * 0.9 : 0);
       x += Math.cos(a) * 0.8;
       y += Math.sin(a) * 0.8;
       const fade = 1 - s / len;

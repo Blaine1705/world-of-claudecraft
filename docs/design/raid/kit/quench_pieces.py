@@ -759,7 +759,7 @@ def ice_blade(bpy):
 def frost_stone(bpy):
     """A squat frost-cracked standing stone for a landing's rim: about 5.6
     tall, its touchable foot inside r 2.1, ice grown in its cracks."""
-    p = QP('FrostStone', seed=7601, ao=0.5, ao_dist=1.6)
+    p = QP('FrostStone', seed=7601, ao=0.32, ao_dist=1.4)
     rng = np.random.default_rng(7601)
     f = Sculpt((-2.6, -2.6, -0.6), (2.6, 2.6, 6.6), 0.06)
     # Two heavy blocks, the head turned on the body and leaning a breath,

@@ -38,7 +38,7 @@ export const LAKE_ICE_LOOK = {
 } as const;
 
 /** How far in from an edge the snow drifts over the ice (yards). */
-export const LAKE_ICE_EDGE = 2.0;
+export const LAKE_ICE_EDGE = 1.5;
 
 const v3 = (c: readonly number[]) => `vec3( ${c.map((v) => v.toFixed(3)).join(', ')} )`;
 
@@ -80,6 +80,7 @@ export function lakeIceDepthGlsl(layers: number, deepCracks: boolean): string {
         float iceSkin = 0.0;
         float iceSnow = 0.0;
         float iceGraze = 0.0;
+        float iceSheet = 0.0;
         {
           vec2 iceP = vIceLocal.xz;
           vec3 iceV = normalize( cameraPosition - vIceWorld );
@@ -99,18 +100,26 @@ export function lakeIceDepthGlsl(layers: number, deepCracks: boolean): string {
           vec2 sm = min( iceP - uIceSheet.xy, uIceSheet.zw - iceP );
           float sheetIn = min( sm.x, sm.y );
           float inside = max( lakeIn, sheetIn );
-          float rag = iceNoise( iceP * 0.35 ) * 1.4 + iceNoise( iceP * 1.3 ) * 0.5;
-          iceSnow = 1.0 - smoothstep( 0.0, ${LAKE_ICE_EDGE.toFixed(1)}, inside - rag + 0.6 );
+          // The ice clears paler over the shallows near its shore and sinks
+          // to the dark deep water toward the lake's middle.
+          float shallow = 1.0 - smoothstep( 0.0, 12.0, inside );
+          float deepMid = smoothstep( 14.0, 30.0, lakeIn );
+          iceDeep = mix( iceDeep, iceDeep * 1.6 + vec3( 0.025, 0.06, 0.08 ), shallow * 0.6 );
+          iceDeep *= 1.0 - deepMid * 0.35;
+          float rag = iceNoise( iceP * 0.35 ) * 0.8 + iceNoise( iceP * 1.3 ) * 0.35;
+          iceSnow = 1.0 - smoothstep( 0.0, ${LAKE_ICE_EDGE.toFixed(1)}, inside - rag + 0.4 );
           // The Singing Ice is crazed with fine frost cracks on top.
           float sheet = step( lakeIn, sheetIn ) * step( 0.0, sheetIn );
-          vec2 g = iceP / 2.2;
+          iceSheet = sheet;
+          vec2 g = iceP / 3.4;
           float ce = iceCellEdge( g );
           float craze = ( 1.0 - smoothstep( 0.0, fwidth( ce ) * 1.4 + 0.003, ce ) )
-            * smoothstep( 0.25, 0.55, iceNoise( g * 0.8 + 2.0 ) );
+            * smoothstep( 0.42, 0.7, iceNoise( g * 0.8 + 2.0 ) );
           iceSkin = max( iceSkin, craze * sheet );
           vec3 skin = diffuseColor.rgb;
           diffuseColor.rgb = mix( iceDeep, skin, iceSkin );
-          diffuseColor.rgb = mix( diffuseColor.rgb, ${v3(L.snow)}, iceSnow );
+          float drift = 0.86 + 0.14 * iceNoise( iceP * 0.8 + 11.0 );
+          diffuseColor.rgb = mix( diffuseColor.rgb, ${v3(L.snow)} * drift, iceSnow );
         }`;
 }
 
@@ -196,6 +205,9 @@ export function lakeIceMaterial(pair: DetailPair, lowGfx: boolean): THREE.Materi
         .replace(
           '#include <roughnessmap_fragment>',
           `#include <roughnessmap_fragment>
+        // The crazed Singing Ice is rougher than the lake's polish (no sun
+        // glare washing a telegraph out), the frost and the snow matte.
+        roughnessFactor = mix( roughnessFactor, 0.6, iceSheet );
         roughnessFactor = mix( roughnessFactor, 0.85, max( iceSkin * 0.55, iceSnow ) );`,
         )
         .replace(

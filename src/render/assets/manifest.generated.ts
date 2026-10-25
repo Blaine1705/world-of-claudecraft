@@ -1755,7 +1755,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/slag_cauldron.glb": "/media/models/props/slag_cauldron.d884ca344f1a.glb",
   "models/props/smith_heart_breath_kit.glb": "/media/models/props/smith_heart_breath_kit.090f5e460546.glb",
   "models/props/smith_heart_hammer_kit.glb": "/media/models/props/smith_heart_hammer_kit.b476ac83c2c3.glb",
-  "models/props/smith_heart_quench_kit.glb": "/media/models/props/smith_heart_quench_kit.5b3b149515af.glb",
+  "models/props/smith_heart_quench_kit.glb": "/media/models/props/smith_heart_quench_kit.501253732ce4.glb",
   "models/props/smith_heart_ring_kit.glb": "/media/models/props/smith_heart_ring_kit.6a483fd64bdf.glb",
   "models/props/smith_heart_rock_kit.glb": "/media/models/props/smith_heart_rock_kit.e6c9d4ab27b0.glb",
   "models/props/stag_shrine.glb": "/media/models/props/stag_shrine.212a9bf579fc.glb",
