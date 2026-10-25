@@ -30,7 +30,7 @@ import {
   SELTHE_ID,
   SELTHE_MERE_SURGE,
   SELTHE_MOONWATER_BOLT,
-  SELTHE_SEA_SONG,
+  SELTHE_SCORE,
   SELTHE_TUNING,
   YSOLEI_BECKONING_MOON,
   YSOLEI_CALL,
@@ -85,12 +85,12 @@ function tiers(
 const SELTHE: JournalBossDef = {
   mobId: SELTHE_ID,
   rank: 'boss',
-  overviewKey: k('selthe.overview'),
+  overviewKey: k('selthe.overviewRework'),
   phases: [
     {
       id: 'court',
       nameKey: k('selthe.phaseName'),
-      summaryKey: k('selthe.phaseSummary'),
+      summaryKey: k('selthe.phaseSummaryRework'),
       mechanics: [
         {
           id: 'chorus',
@@ -131,28 +131,45 @@ const SELTHE: JournalBossDef = {
           difficultyValues: tierScaled(D, SELTHE_ID, 'damage', S.soloDamage),
         },
         {
-          id: 'sea-song',
-          iconId: 'dgn_temple_sea_song',
-          nameKey: cast(SELTHE_SEA_SONG),
-          castId: SELTHE_SEA_SONG,
-          summaryKey: k('selthe.songSummary'),
-          responseKey: k('selthe.songResponse'),
-          roles: ['healer'],
-          flags: [],
-          values: { every: S.songEvery, cast: S.songCast },
-          difficultyValues: tierDamage(D, SELTHE_ID, S.songMin, S.songMax),
-          compare: true,
+          id: 'score',
+          iconId: 'dgn_temple_chorus',
+          nameKey: cast(SELTHE_SCORE),
+          castId: SELTHE_SCORE,
+          summaryKey: k('selthe.scoreSummary'),
+          responseKey: k('selthe.scoreResponse'),
+          roles: ['all'],
+          flags: ['important'],
+          values: {
+            first: S.scoreAt[0],
+            second: S.scoreAt[1],
+            notes: S.scoreNotes[0],
+            finalNotes: S.scoreNotes[1],
+            answer: S.scoreAnswer[0],
+            finalAnswer: S.scoreAnswer[1],
+            stun: S.brokenStun,
+            vulnerability: S.brokenVuln,
+            bonusSeconds: S.brokenVulnSeconds,
+          },
+          percentValues: ['first', 'second', 'vulnerability'],
+          difficultyValues: tiers(
+            tierDamage(D, SELTHE_ID, S.discordMin, S.discordMax),
+            tierScaled(D, SELTHE_ID, 'falseNote', S.falseNoteDamage),
+          ),
         },
         {
           id: 'moonwater-bolt',
           iconId: 'dgn_temple_moonwater_bolt',
           nameKey: cast(SELTHE_MOONWATER_BOLT),
-          castId: SELTHE_MOONWATER_BOLT,
-          summaryKey: k('selthe.boltSummary'),
-          responseKey: k('selthe.boltResponse'),
+          summaryKey: k('selthe.boltSummaryRework'),
+          responseKey: k('selthe.boltResponseRework'),
           roles: ['tank', 'damage'],
-          flags: ['interruptible'],
-          values: { cast: S.boltCast, mult: S.boltWeaponShare, quiet: S.kickQuiet },
+          flags: [],
+          values: {
+            every: S.boltEvery,
+            windup: S.boltWindup,
+            mult: S.boltWeaponShare,
+            quiet: S.kickQuiet,
+          },
         },
         {
           id: 'drowning-aria',
@@ -196,10 +213,9 @@ const SELTHE: JournalBossDef = {
   ],
   tips: {
     tank: k('selthe.tipTank'),
-    healer: k('selthe.tipHealer'),
+    healer: k('selthe.tipHealerRework'),
     damage: { normal: k('selthe.tipDamage'), heroic: k('selthe.tipDamageHeroic') },
   },
-  tipValues: { every: S.songEvery },
   choices: [
     {
       id: 'aria',
@@ -209,7 +225,12 @@ const SELTHE: JournalBossDef = {
       riskKey: k('selthe.choiceRisk'),
     },
   ],
-  heroicNotes: [common('heroicHarder'), k('selthe.heroicDuet'), k('selthe.heroicEcho')],
+  heroicNotes: [
+    common('heroicHarder'),
+    k('selthe.heroicDuet'),
+    k('selthe.heroicEcho'),
+    k('selthe.scoreHeroic'),
+  ],
   heroicNoteValues: { scale: heroicMechanicScale(D, SELTHE_ID), echo: S.echoAfter },
 };
 

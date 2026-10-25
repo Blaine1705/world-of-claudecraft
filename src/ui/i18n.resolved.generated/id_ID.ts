@@ -4311,6 +4311,7 @@ export const id_ID: EnTranslations = {
       "resetConfirmBody": "Tindakan ini meninggalkan instans kosong dari kesulitan yang sebelumnya dipilih. Jarahan yang belum diambil akan mencegah reset.",
       "resetConfirm": "Reset Instans",
       "resetCooldown": "Instans hanya dapat direset sekali setiap 5 menit.",
+      "resetAlreadyFresh": "Instance kamu sudah segar. Belum ada yang masuk sejak reset terakhir.",
       "resetUsage": "Gunakan /dungeon reset untuk meninggalkan instans kosong setelah mengubah kesulitan.",
       "entryMismatchNormal": "Instans ini diatur ke kesulitan Normal. Gunakan Reset Semua Instans untuk memulai perjalanan Heroik baru.",
       "entryMismatchHeroic": "Instans ini diatur ke kesulitan Heroik. Gunakan Reset Semua Instans untuk memulai perjalanan Normal baru."
@@ -4644,7 +4645,17 @@ export const id_ID: EnTranslations = {
         "pollinated": "Menyentuh Polong Benih langsung menumbuhkan Tunas Duri. Jauhi benih dan biarkan pemain yang bersih menginjaknya; polong yang tidak disentuh bertunas setelah {seconds} dtk (pada Heroik menggali ke tanah setelah {heroic} dtk dan muncul di samping pemain terdekat).",
         "prey": "Zulgar memburumu. Pancing melintasi glif matahari menyala untuk memperlambatnya {slow}%. Jika tertangkap, kamu Diterkam dengan {damage} kerusakan ({heroic} pada Heroik) dan dijatuhkan selama {stun} dtk.",
         "avatar": "Bergerak {pct}% lebih cepat dan memburu Mangsanya. Perlambatan dan jeratan tetap berlaku, dan pelumpuhan berlangsung separuh durasi.",
-        "vanished": "Tersembunyi dan kebal kerusakan. Ia akan menerkam pemain terjauh."
+        "vanished": "Tersembunyi dan kebal kerusakan. Ia akan menerkam pemain terjauh.",
+        "sunstruck": "Struck by a lit sun glyph: moves {pct}% slower.",
+        "sunstruckExposed": "Struck by a lit sun glyph: takes {pct}% more damage.",
+        "sunWary": "No sun glyph can strike him until this ends. A lit glyph he crosses stays lit.",
+        "pinned": "A Hunting Spear pins you in place. You bleed for {bleed} Physical damage ({heroicBleed} on Heroic) every {every} sec, and Wildheart Pulse hits you wherever you stand for {pulse}% more damage. A teammate can pull the spear out in {pull} sec. If nobody else stands free, pull it out yourself in {wrench} sec. It lets go after {seconds} sec.",
+        "idolAwake": "The stone jaguar is awake. Every {every} sec it breathes over one half of the terrace, then the other, after a {warning} sec warning on the floor: {min} to {max} Nature damage ({heroicMin} to {heroicMax} on Heroic) to everyone in that half. Zulgar stays the Jaguar Avatar until he dies and picks new Prey every {seconds} sec ({heroicSeconds} sec on Heroic)."
+      },
+      "temple": {
+        "scoreWard": "Singing the Score: she takes no damage until it ends. Step onto the moon tiles in the order they rang before the verse ends to break her voice. Take turns: after sounding a note, wait for another player to sound the next correct note. A lone survivor can finish alone. If the verse ends first, Discord deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone in the court.",
+        "brokenVoice": "Her voice is broken: she takes {pct}% more damage until this ends.",
+        "spentVoice": "You cannot sound another moon tile until another player sounds the next correct note. Stepping onto a tile while this lasts does not reset the answer or hurt you. Cannot be dispelled. Removed when you are the only living player in your instance or the Score ends."
       },
       "bastion": {
         "brineColumn": "Terjerat dalam pilar air laut: menerima {min} hingga {max} kerusakan Alam setiap {tick} dtk selama maksimal {seconds} dtk. Interupsi atau lumpuhkan Akolit Terikat Pasang untuk mematahkannya.",
@@ -6973,6 +6984,7 @@ export const id_ID: EnTranslations = {
         "summons_adds": "Memanggil bala bantuan",
         "lunar_tide": "Arus Bulan (kerusakan area berdenyut)",
         "chorus_and_solo": "Paduan Suara dan Solo (berkumpul pada satu tanda, berpencar dari tanda lainnya)",
+        "the_score": "The Score (twice she sings a melody on the moon tiles: step onto them in the order they rang to break her voice)",
         "tideglass_reflections": "Pantulan Kaca Pasang (bunuh bayangan cermin satu sama lain)",
         "hydra_three_elements": "Tiga Unsur (kepala kiri mengembuskan kerucut es 18 yard yang memperlambatmu 70 persen selama 4 detik, kepala tengah meludahkan bisa di bawah hingga 3 pemain yang meledak setelah 1,5 detik dan membakar selama 6 detik di tempat jatuhnya, dan kepala kanan menembakkan arus sepanjang jalur 26 yard yang melemparmu mundur 8 yard: keluar dari masing-masing. Saat kepala tumbang, kepala yang masih hidup mengambil alih serangannya)",
         "hydra_tsunami": "Tsunami (kepala tenggelam selama 4,5 detik, menerima 75 persen lebih sedikit kerusakan, dan gelombang menyapu separuh kolam, separuh lainnya pada giliran berikut: 160 hingga 190 kerusakan es pada normal dan dorongan 10 yard. Seberangi ke separuh lainnya atau berdiri di belakang kolom tepi; pada Heroik gelombang kembali menyapu separuh lain 3,5 detik kemudian. Tsunami pertama muncul 24 detik sejak pertempuran dimulai, berikutnya masing-masing 40 detik setelah yang terakhir berlalu)",
@@ -7097,6 +7109,23 @@ export const id_ID: EnTranslations = {
       "shadeLine": "Tinggalkan umpan ini. Serang Vael yang lenteranya menyala dalam sinar untuk mematahkan selubung",
       "timeAria": "Tersisa {seconds} detik"
     },
+    "templeAlert": {
+      "melodyTitle": "The Score",
+      "melodyLine": "Watch the moon tiles ring one after another. Repeat the order, taking turns with another player",
+      "melodyDarkLine": "Remember the order before the tiles go dark. Repeat it, taking turns with another player",
+      "answerTitle": "Answer the Score!",
+      "answerLine": "Take turns: step onto the moon tile marked {place}. Sounded: {done} of {total}",
+      "answerDarkLine": "Take turns and repeat the order from memory. Step off before stepping onto a tile again. Sounded: {done} of {total}",
+      "spentTitle": "Another voice must answer",
+      "spentLine": "You cannot sound a tile until another player sounds the next correct note. Sounded: {done} of {total}",
+      "stepOffTitle": "Step off, then back on",
+      "stepOffLine": "A moon tile sounds only when someone steps onto it. Leave this tile and step onto it again",
+      "falseTitle": "False Note!",
+      "falseLine": "That tile was out of turn. The answer starts over from the first tile",
+      "brokenTitle": "Selthe's voice is broken!",
+      "brokenLine": "She takes {pct}% more damage until this ends: use your strongest attacks now",
+      "timeAria": "{seconds} seconds left"
+    },
     "wildheartAlert": {
       "preyTitle": "Kamu adalah Mangsa!",
       "preyLine": "Pancing Zulgar melalui glif matahari menyala untuk memperlambatnya sebelum menangkap dan menerkammu",
@@ -7107,7 +7136,21 @@ export const id_ID: EnTranslations = {
       "pollinatedLine": "Hindari polong benih: menyentuhnya saat Terserbuki menciptakan musuh. Sekutu tanpa tanda dapat menginjaknya",
       "bondTitle": "Ikatan Kawanan",
       "bondLine": "Pisahkan Penakluk Binatang dan jaguar untuk menghapus pengurangan kerusakan dan bonus kerusakan mereka",
-      "timeAria": "Tersisa {seconds} detik"
+      "timeAria": "Tersisa {seconds} detik",
+      "preyAloneLine": "Nobody else can light the sun glyphs. Stand on a dark one for {seconds} sec to light it, then lure Zulgar across it",
+      "pinnedTitle": "Pinned!",
+      "pinnedLine": "A teammate must pull the Hunting Spear out. Wildheart Pulse hits you harder while you are Pinned",
+      "pinnedSelfLine": "Nobody is free to help: pull the Hunting Spear out yourself before Wildheart Pulse lands",
+      "sunstruckTitle": "Zulgar is Sunstruck!",
+      "sunstruckLine": "He takes {pct}% more damage until this ends: use your strongest attacks now",
+      "spearTitle": "An ally is Pinned!",
+      "spearLine": "Run to the Hunting Spear and pull it out before Wildheart Pulse lands",
+      "glyphTitle": "Light the sun glyphs",
+      "glyphLine": "Stand on a dark sun glyph for {seconds} sec to light it. When Zulgar crosses it he takes {pct}% more damage for {duration} sec",
+      "glyphLightingTitle": "Lighting the sun glyph",
+      "glyphLightingLine": "Stay on the glyph until it catches light. Stepping off starts it over",
+      "breathTitle": "Idol's Breath!",
+      "breathLine": "The stone jaguar is about to breathe over this half of the terrace. Cross to the other half"
     },
     "sanctumAlert": {
       "quenchTitle": "Dalam air pendingin!",
@@ -7196,6 +7239,13 @@ export const id_ID: EnTranslations = {
       "relightFar": "Dekati hingga dalam {range} yard untuk menyalakannya kembali",
       "relightAria": "Nyalakan kembali {name}",
       "relightUsingLine": "Terus salurkan untuk menyalakan lilin: kesehatan terkuras. Hantaman tidak menghentikan; bergerak atau pelumpuhan menghentikannya",
+      "freeLine": "Pull the spear out of the ground to free whoever it pins. Taking a hit does not stop you; moving or a stun does",
+      "freeKey": "Pull out the {name}",
+      "freeTap": "Tap here to pull out the {name}",
+      "freeClick": "Click here to pull out the {name}",
+      "freeFar": "Get within {range} yd to pull it out",
+      "freeAria": "Pull out the {name}",
+      "freeUsingLine": "Hold still to pull the spear out: moving or a stun stops you",
       "timeAria": "Tersisa {seconds} detik"
     },
     "cosmetics": {
@@ -8356,6 +8406,16 @@ export const id_ID: EnTranslations = {
         "heroicCloud": "Awan Serbuk Sari: berdiri dalam {cloudRadius} yard dari pemain Terserbuki selama {cloudSeconds} dtk membuatmu Terserbuki juga."
       },
       "zulgar": {
+        "pulseSummaryRework": "Every {every} sec, a {cast} sec cast hits everyone within {radius} yd for {min} to {max} damage. Pinned players take {pinMult} times this damage at any distance.",
+        "spearSummary": "A {cast} sec cast pins a non-tank player, or the tank if nobody else remains. The root lasts up to {seconds} sec and deals {bleed} damage every {tick} sec.",
+        "spearResponse": "Target the spear and interact within {range} yd to pull it out in {pull} sec. Damage does not interrupt the pull. If nobody else stands free on the terrace, the victim can interact to escape in {self} sec.",
+        "glyphSummaryRework": "The {count} glyphs start dark. While he hunts, an unmarked player lights one by standing on it for {kindle} sec. If no unmarked player remains, Prey can light it in {alone} sec. Moving off resets progress. Crossing a lit glyph slows him by {slow} and increases damage taken by {vulnerability} for {seconds} sec. The glyph cannot be relit for {dark} sec; he cannot be struck by another glyph for {wary} sec. During the hunt, stuns last half as long.",
+        "glyphResponseRework": "Unmarked players light glyphs ahead of the Prey. Lead him through them, then attack during Sunstruck. Glyphs go dark when the hunt ends.",
+        "idolSummary": "At {health} health, he stays a jaguar spirit until defeated. The tank can also become Prey.",
+        "idolHuntSummary": "He picks new Prey every {every} sec, then turns toward them for {turn} sec before chasing.",
+        "idolHuntHeroicSummary": "He marks a fresh pair every {pair} sec and switches between them every {switch} sec. Each switch gives the new Prey {turn} sec before he chases.",
+        "breathSummary": "Every {every} sec, one half of the terrace is marked for {warning} sec, then everyone in that half takes {min} to {max} Nature damage. Breaths alternate halves.",
+        "breathResponse": "Cross to the unmarked half before the warning ends. The centre line is safe. On Heroic, the breath also extinguishes lit glyphs in its half; they can be relit immediately.",
         "overview": "Imam tinggi cekungan. Pertempuran teratur dengan lingkaran berperingatan, sampai ia berubah menjadi roh jaguar dan memburu satu pemain. Pemain buruan memancingnya melintasi glif matahari menyala yang memperlambatnya.",
         "phaseShrineName": "Kuil",
         "phaseShrineSummary": "Ia bertarung jarak dekat dan memancarkan denyut lingkaran di sekelilingnya.",
@@ -8668,6 +8728,14 @@ export const id_ID: EnTranslations = {
     },
     "temple": {
       "selthe": {
+        "overviewRework": "Selthe never moves or melees. Stack for Chorus, leave the group for Solo, interrupt Drowning Aria and dodge Mere Surge. At two health thresholds, repeat her moon-tile melody with alternating singers.",
+        "phaseSummaryRework": "Her other attacks pause while the group answers the Score. Moonwater Bolts have no cast bar and cannot be interrupted.",
+        "boltSummaryRework": "Between other casts, a bolt lands every {every} sec after a {windup} sec visual warning, dealing {mult} times her weapon damage as Frost. Interrupting Drowning Aria stops bolts and Aria for {quiet} sec.",
+        "boltResponseRework": "Keep the tank in her line of sight. Save interrupts for Drowning Aria.",
+        "tipHealerRework": "Watch the Aria target and anyone caught alone by Chorus. During the Score, help sing the next note and heal mistakes.",
+        "scoreSummary": "At {first} and {second} health, she becomes immune and plays {notes}, then {finalNotes} notes. Repeat them within {answer}, then {finalAnswer} sec. A wrong tile deals {falseNote} Frost damage and resets progress, not the timer. Timeout deals {min} to {max} Frost damage to everyone. Success stuns her for {stun} sec and increases damage taken by {vulnerability} for {bonusSeconds} sec.",
+        "scoreResponse": "Watch the melody, then step onto tiles in order. Alternate correct notes with another living player; a sole survivor can finish alone. Blocked steps are harmless. Step off and enter again to sound a tile, including one occupied before the answer begins.",
+        "scoreHeroic": "During the answer, the tiles go dark. Remember the melody and take turns.",
         "overview": "Ibu Paduan Suara bernyanyi dari kolam dan tidak pernah bergerak atau menyerang jarak dekat. Ia menandai pemain untuk Paduan Suara bersama dan Solo sendirian, memancarkan aria yang meningkat pada satu pemain, dan mengirim gelombang melintasi pelataran. Proyektil dan arianya dapat diinterupsi.",
         "phaseName": "Pelataran Paduan Suara",
         "phaseSummary": "Satu fase dengan penghitungan waktu. Mekanik yang waktunya tiba saat rapalan menunggu sampai selesai.",
@@ -16286,6 +16354,8 @@ export const id_ID: EnTranslations = {
       "temple_moonwater_bolt": "Proyektil Air Bulan",
       "temple_drowning_aria": "Aria Penenggelaman",
       "temple_mere_surge": "Gelombang Danau",
+      "temple_score": "The Score",
+      "temple_score_answer": "Answer the Score",
       "temple_tideglass_fracture": "Retakan Kaca Pasang",
       "temple_undertow": "Arus Balik",
       "temple_lunar_tide": "Pasang Bulan",
@@ -16323,6 +16393,12 @@ export const id_ID: EnTranslations = {
       "wildheart_gorgebloom_gorge": "Lahap",
       "wildheart_zulgar_pulse": "Denyut Hati Liar",
       "wildheart_zulgar_spirit_hunt": "Roh Perburuan",
+      "wildheart_zulgar_hunting_spear": "Hunting Spear",
+      "wildheart_zulgar_idol_wakes": "The Idol Wakes",
+      "kituse_wildheart_pull_spear": "Pull the Spear",
+      "wildheart_idols_breath": "Idol's Breath",
+      "wildheart_sun_glyph_kindle": "Lighting",
+      "wildheart_sun_glyph_cold": "Cooling",
       "sanctum_cinder_breath": "Napas Bara",
       "sanctum_warming_rite": "Ritual Penghangatan",
       "sanctum_goad": "Pacu",
@@ -26134,6 +26210,9 @@ export const id_ID: EnTranslations = {
       },
       "thorn_sprout": {
         "name": "Tunas Duri"
+      },
+      "wildheart_hunting_spear": {
+        "name": "Hunting Spear"
       },
       "buddy_ember_fox": {
         "name": "Rubah Bara"

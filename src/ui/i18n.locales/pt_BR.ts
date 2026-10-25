@@ -6696,6 +6696,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Você não pode redefinir instâncias enquanto alguém ainda estiver dentro.',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     'Altere a dificuldade da masmorra antes de redefinir estas instâncias. Instâncias vazias são redefinidas automaticamente após 5 minutos.',
+  'hudChrome.dungeonDifficulty.resetAlreadyFresh':
+    'Suas instâncias já estão novas. Ninguém entrou nelas desde a última redefinição.',
   'hudChrome.dungeonDifficulty.resetUsage':
     'Use /dungeon reset para abandonar suas instâncias vazias após alterar a dificuldade.',
   'hudChrome.dungeonDifficulty.resetLoot':

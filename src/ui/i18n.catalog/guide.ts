@@ -1074,7 +1074,7 @@ export const guideStrings = {
       'Every dungeon with the zone its door sits in and the party size it is built for, plus the difficulty you are currently set to.',
     dungeonMode: 'Switch your dungeons between the normal and heroic difficulty.',
     dungeonReset:
-      'Abandon your own empty instances, which is what you do after changing difficulty.',
+      'Abandon your own empty instances so your next run starts fresh, at the same difficulty or a new one.',
 
     // Recovery and presence
     groupRecovery: 'Recovery and presence',
@@ -2042,11 +2042,11 @@ export const guideStrings = {
     heroicLockoutBody:
       "Normal dungeons can be run all day. Heroic asks patience: the final boss kill locks everyone in the run to one heroic clear of that dungeon per day, and the raid keeps a daily lockout for each difficulty. On a live realm every daily lockout clears together at the realm's own nightly reset hour, so a clear taken just before that hour and one taken just after fall on two different days; play offline in your browser instead and a lockout simply runs out a day after your own kill. A cleared five-player run stays open to its own party for corpse runs and loot, so nobody is locked away from what they earned there. The raid is stricter: once its kill locks you the door stays shut until the reset, and the only way back through it is a corpse run by someone who fell in the very run that locked them, so a living raider who walks out has walked out for the day. Collect your spoils before you leave the arena. Every one of these lockouts belongs to the character that earned it, so a clear on your main leaves your other characters free.",
 
-    // Reset All Instances: the difficulty-transition escape hatch. Spoiler-safe: no exact
+    // Reset All Instances: start a run fresh, same difficulty or a new one. Spoiler-safe: no exact
     // cooldown or timer lengths in the prose.
     resetTitle: 'Resetting your instances',
     resetBody:
-      'Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, only once every corpse in there has been looted clean, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid resets the same way, its own lockout and corpse-return rules still standing on top, but it skips the cooldown between resets: a raid that picked the wrong tier, or bounced off Heroic, can switch back at once, since its own lockout is what limits repeat runs.',
+      'Empty claimed runs linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset, and the next run starts fresh at your current difficulty. Switching difficulty does the same for runs on the old difficulty. A reset works only while nobody, living or fallen, remains inside, and only once every corpse in there has been looted clean. It never shortens a lockout: a locked heroic or raid stays locked until its reset, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid resets the same way, its own lockout and corpse-return rules still standing on top, and a raid switching tier skips the cooldown: a raid that picked the wrong tier, or bounced off Heroic, can switch back at once, since its own lockout is what limits repeat runs.',
 
     // Standalone, spoiler-safe lore for the Drowned Temple card (the goddess twist and any
     // boss names are withheld).

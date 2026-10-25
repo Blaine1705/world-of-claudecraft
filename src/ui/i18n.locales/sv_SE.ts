@@ -6537,6 +6537,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Du kan inte återställa instanser medan någon fortfarande är kvar inuti.',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     'Ändra fängelsehålans svårighetsgrad innan du återställer dessa instanser. Tomma instanser återställs automatiskt efter 5 minuter.',
+  'hudChrome.dungeonDifficulty.resetAlreadyFresh':
+    'Dina instanser är redan nollställda. Ingen har gått in i dem sedan den senaste återställningen.',
   'hudChrome.dungeonDifficulty.resetUsage':
     'Använd /dungeon reset för att överge dina tomma instanser efter att du har ändrat svårighetsgraden.',
   'hudChrome.dungeonDifficulty.resetLoot':

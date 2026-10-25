@@ -7269,6 +7269,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Vous ne pouvez pas réinitialiser les instances tant qu'une personne s'y trouve.",
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     "Changez la difficulté du donjon avant de réinitialiser ces instances. Les instances vides se réinitialisent d'elles-mêmes après 5 minutes.",
+  'hudChrome.dungeonDifficulty.resetAlreadyFresh':
+    "Vos instances sont déjà fraîches. Personne n'y est entré depuis la dernière réinitialisation.",
   'hudChrome.dungeonDifficulty.resetUsage':
     'Utilisez /dungeon reset pour abandonner vos instances vides après avoir changé la difficulté.',
   'hudChrome.dungeonDifficulty.resetLoot':

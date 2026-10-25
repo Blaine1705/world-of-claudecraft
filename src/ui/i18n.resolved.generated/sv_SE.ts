@@ -4311,6 +4311,7 @@ export const sv_SE: EnTranslations = {
       "resetConfirmBody": "Detta överger tomma instanser från din tidigare valda svårighetsgrad. Outhämtat byte förhindrar återställningen.",
       "resetConfirm": "Återställ instanser",
       "resetCooldown": "Instanser kan bara återställas en gång var 5:e minut.",
+      "resetAlreadyFresh": "Dina instanser är redan nollställda. Ingen har gått in i dem sedan den senaste återställningen.",
       "resetUsage": "Använd /dungeon reset för att överge dina tomma instanser efter att du har ändrat svårighetsgraden.",
       "entryMismatchNormal": "Den här instansen är inställd på Normal svårighetsgrad. Använd Återställ alla instanser för att starta en ny Heroisk omgång.",
       "entryMismatchHeroic": "Den här instansen är inställd på Heroisk svårighetsgrad. Använd Återställ alla instanser för att starta en ny Normal omgång."
@@ -4644,7 +4645,17 @@ export const sv_SE: EnTranslations = {
         "pollinated": "Om du rör en frökapsel växer genast ett taggskott ur den. Håll dig borta från fröna och låt en opåverkad spelare trampa sönder dem; en orörd kapsel gror efter {seconds} sek (i heroiskt läge gräver den ned sig efter {heroic} sek och kommer upp bredvid närmaste spelare).",
         "prey": "Zulgar jagar dig. Led honom över en tänd solglyf för att sakta honom med {slow}%. Om han hinner ikapp blir du sargad för {damage} skada ({heroic} i heroiskt läge) och nedslagen i {stun} sek.",
         "avatar": "Rör sig {pct}% snabbare och jagar sitt byte. Saktningar och rotningar fungerar, och bedövningar varar hälften så länge.",
-        "vanished": "Dold och immun mot skada. Han är på väg att kasta sig över den spelare som är längst bort."
+        "vanished": "Dold och immun mot skada. Han är på väg att kasta sig över den spelare som är längst bort.",
+        "sunstruck": "Struck by a lit sun glyph: moves {pct}% slower.",
+        "sunstruckExposed": "Struck by a lit sun glyph: takes {pct}% more damage.",
+        "sunWary": "No sun glyph can strike him until this ends. A lit glyph he crosses stays lit.",
+        "pinned": "A Hunting Spear pins you in place. You bleed for {bleed} Physical damage ({heroicBleed} on Heroic) every {every} sec, and Wildheart Pulse hits you wherever you stand for {pulse}% more damage. A teammate can pull the spear out in {pull} sec. If nobody else stands free, pull it out yourself in {wrench} sec. It lets go after {seconds} sec.",
+        "idolAwake": "The stone jaguar is awake. Every {every} sec it breathes over one half of the terrace, then the other, after a {warning} sec warning on the floor: {min} to {max} Nature damage ({heroicMin} to {heroicMax} on Heroic) to everyone in that half. Zulgar stays the Jaguar Avatar until he dies and picks new Prey every {seconds} sec ({heroicSeconds} sec on Heroic)."
+      },
+      "temple": {
+        "scoreWard": "Singing the Score: she takes no damage until it ends. Step onto the moon tiles in the order they rang before the verse ends to break her voice. Take turns: after sounding a note, wait for another player to sound the next correct note. A lone survivor can finish alone. If the verse ends first, Discord deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone in the court.",
+        "brokenVoice": "Her voice is broken: she takes {pct}% more damage until this ends.",
+        "spentVoice": "You cannot sound another moon tile until another player sounds the next correct note. Stepping onto a tile while this lasts does not reset the answer or hurt you. Cannot be dispelled. Removed when you are the only living player in your instance or the Score ends."
       },
       "bastion": {
         "brineColumn": "Rotad i en havsvattenpelare: du tar {min} till {max} naturskada var {tick}:e sek i upp till {seconds} sek. Avbryt eller bedöva den tidvattensbundna akolyten för att bryta effekten.",
@@ -6973,6 +6984,7 @@ export const sv_SE: EnTranslations = {
         "summons_adds": "Kallar förstärkningar",
         "lunar_tide": "Månflod (pulserande områdesskada)",
         "chorus_and_solo": "Kör och Solo (samlas på den ena markeringen, sprid ut er från den andra)",
+        "the_score": "The Score (twice she sings a melody on the moon tiles: step onto them in the order they rang to break her voice)",
         "tideglass_reflections": "Tidvattensglasets spegelbilder (döda varandras spegelbilder)",
         "hydra_three_elements": "Tre element (vänsterhuvudet andas en frostkon på 18 yard som saktar dig med 70 procent i 4 sekunder, mittenhuvudet spottar gift under upp till 3 spelare som brister efter 1,5 sekunder och bränner där det landar i 6 sekunder, och högerhuvudet skjuter en fors längs en bana på 26 yard som kastar dig 8 yard bakåt: gå ur var och en. När ett huvud faller tar de kvarvarande huvudena över dess attack)",
         "hydra_tsunami": "Flodvåg (huvudena sjunker i 4,5 sekunder och tar 75 procent mindre skada, och en våg rullar över ena halvan av bassängen, den andra halvan nästa gång: 160 till 190 frostskada i normalt läge och en knuff på 10 yard. Ta dig till andra halvan eller stå bakom en kantpelare; i heroiskt läge rullar vågen tillbaka över andra halvan 3,5 sekunder senare. Första flodvågen kommer 24 sekunder in i striden, varje senare våg 40 sekunder efter att den föregående passerat)",
@@ -7097,6 +7109,23 @@ export const sv_SE: EnTranslations = {
       "shadeLine": "Lämna denna skenbild. Attackera den Vael vars lykta flammar i strålen för att bryta slöjan",
       "timeAria": "{seconds} sekunder kvar"
     },
+    "templeAlert": {
+      "melodyTitle": "The Score",
+      "melodyLine": "Watch the moon tiles ring one after another. Repeat the order, taking turns with another player",
+      "melodyDarkLine": "Remember the order before the tiles go dark. Repeat it, taking turns with another player",
+      "answerTitle": "Answer the Score!",
+      "answerLine": "Take turns: step onto the moon tile marked {place}. Sounded: {done} of {total}",
+      "answerDarkLine": "Take turns and repeat the order from memory. Step off before stepping onto a tile again. Sounded: {done} of {total}",
+      "spentTitle": "Another voice must answer",
+      "spentLine": "You cannot sound a tile until another player sounds the next correct note. Sounded: {done} of {total}",
+      "stepOffTitle": "Step off, then back on",
+      "stepOffLine": "A moon tile sounds only when someone steps onto it. Leave this tile and step onto it again",
+      "falseTitle": "False Note!",
+      "falseLine": "That tile was out of turn. The answer starts over from the first tile",
+      "brokenTitle": "Selthe's voice is broken!",
+      "brokenLine": "She takes {pct}% more damage until this ends: use your strongest attacks now",
+      "timeAria": "{seconds} seconds left"
+    },
     "wildheartAlert": {
       "preyTitle": "Du är bytet!",
       "preyLine": "Locka Zulgar genom tända solglyfer för att sakta honom innan han fångar och sargar dig",
@@ -7107,7 +7136,21 @@ export const sv_SE: EnTranslations = {
       "pollinatedLine": "Undvik frökapslar: rör du dem medan du är pollinerad skapas fiender. Omarkerade bundsförvanter kan trampa sönder dem",
       "bondTitle": "Flockband",
       "bondLine": "Skilj bestmästaren och jaguaren åt för att ta bort deras skademinskning och skadebonus",
-      "timeAria": "{seconds} sekunder kvar"
+      "timeAria": "{seconds} sekunder kvar",
+      "preyAloneLine": "Nobody else can light the sun glyphs. Stand on a dark one for {seconds} sec to light it, then lure Zulgar across it",
+      "pinnedTitle": "Pinned!",
+      "pinnedLine": "A teammate must pull the Hunting Spear out. Wildheart Pulse hits you harder while you are Pinned",
+      "pinnedSelfLine": "Nobody is free to help: pull the Hunting Spear out yourself before Wildheart Pulse lands",
+      "sunstruckTitle": "Zulgar is Sunstruck!",
+      "sunstruckLine": "He takes {pct}% more damage until this ends: use your strongest attacks now",
+      "spearTitle": "An ally is Pinned!",
+      "spearLine": "Run to the Hunting Spear and pull it out before Wildheart Pulse lands",
+      "glyphTitle": "Light the sun glyphs",
+      "glyphLine": "Stand on a dark sun glyph for {seconds} sec to light it. When Zulgar crosses it he takes {pct}% more damage for {duration} sec",
+      "glyphLightingTitle": "Lighting the sun glyph",
+      "glyphLightingLine": "Stay on the glyph until it catches light. Stepping off starts it over",
+      "breathTitle": "Idol's Breath!",
+      "breathLine": "The stone jaguar is about to breathe over this half of the terrace. Cross to the other half"
     },
     "sanctumAlert": {
       "quenchTitle": "I kylvattnet!",
@@ -7196,6 +7239,13 @@ export const sv_SE: EnTranslations = {
       "relightFar": "Kom inom {range} yard för att tända igen",
       "relightAria": "Tänd {name} igen",
       "relightUsingLine": "Fortsätt kanalisera för att tända ljuset: det dränerar hälsa. Träffar avbryter inte; rörelse eller en bedövning gör det",
+      "freeLine": "Pull the spear out of the ground to free whoever it pins. Taking a hit does not stop you; moving or a stun does",
+      "freeKey": "Pull out the {name}",
+      "freeTap": "Tap here to pull out the {name}",
+      "freeClick": "Click here to pull out the {name}",
+      "freeFar": "Get within {range} yd to pull it out",
+      "freeAria": "Pull out the {name}",
+      "freeUsingLine": "Hold still to pull the spear out: moving or a stun stops you",
       "timeAria": "{seconds} sekunder kvar"
     },
     "cosmetics": {
@@ -8356,6 +8406,16 @@ export const sv_SE: EnTranslations = {
         "heroicCloud": "Pollenmoln: om du står inom {cloudRadius} yard från en pollinerad spelare i {cloudSeconds} sek pollineras du också."
       },
       "zulgar": {
+        "pulseSummaryRework": "Every {every} sec, a {cast} sec cast hits everyone within {radius} yd for {min} to {max} damage. Pinned players take {pinMult} times this damage at any distance.",
+        "spearSummary": "A {cast} sec cast pins a non-tank player, or the tank if nobody else remains. The root lasts up to {seconds} sec and deals {bleed} damage every {tick} sec.",
+        "spearResponse": "Target the spear and interact within {range} yd to pull it out in {pull} sec. Damage does not interrupt the pull. If nobody else stands free on the terrace, the victim can interact to escape in {self} sec.",
+        "glyphSummaryRework": "The {count} glyphs start dark. While he hunts, an unmarked player lights one by standing on it for {kindle} sec. If no unmarked player remains, Prey can light it in {alone} sec. Moving off resets progress. Crossing a lit glyph slows him by {slow} and increases damage taken by {vulnerability} for {seconds} sec. The glyph cannot be relit for {dark} sec; he cannot be struck by another glyph for {wary} sec. During the hunt, stuns last half as long.",
+        "glyphResponseRework": "Unmarked players light glyphs ahead of the Prey. Lead him through them, then attack during Sunstruck. Glyphs go dark when the hunt ends.",
+        "idolSummary": "At {health} health, he stays a jaguar spirit until defeated. The tank can also become Prey.",
+        "idolHuntSummary": "He picks new Prey every {every} sec, then turns toward them for {turn} sec before chasing.",
+        "idolHuntHeroicSummary": "He marks a fresh pair every {pair} sec and switches between them every {switch} sec. Each switch gives the new Prey {turn} sec before he chases.",
+        "breathSummary": "Every {every} sec, one half of the terrace is marked for {warning} sec, then everyone in that half takes {min} to {max} Nature damage. Breaths alternate halves.",
+        "breathResponse": "Cross to the unmarked half before the warning ends. The centre line is safe. On Heroic, the breath also extinguishes lit glyphs in its half; they can be relit immediately.",
         "overview": "Bassängens överstepräst. En jämn strid med en förvarnad ring tills han blir en jaguarande och jagar en spelare. Den jagade spelaren håller honom på avstånd över tända solglyfer som saktar honom.",
         "phaseShrineName": "Helgedomen",
         "phaseShrineSummary": "Han slåss i närstrid och pulserar en ring runt sig.",
@@ -8668,6 +8728,14 @@ export const sv_SE: EnTranslations = {
     },
     "temple": {
       "selthe": {
+        "overviewRework": "Selthe never moves or melees. Stack for Chorus, leave the group for Solo, interrupt Drowning Aria and dodge Mere Surge. At two health thresholds, repeat her moon-tile melody with alternating singers.",
+        "phaseSummaryRework": "Her other attacks pause while the group answers the Score. Moonwater Bolts have no cast bar and cannot be interrupted.",
+        "boltSummaryRework": "Between other casts, a bolt lands every {every} sec after a {windup} sec visual warning, dealing {mult} times her weapon damage as Frost. Interrupting Drowning Aria stops bolts and Aria for {quiet} sec.",
+        "boltResponseRework": "Keep the tank in her line of sight. Save interrupts for Drowning Aria.",
+        "tipHealerRework": "Watch the Aria target and anyone caught alone by Chorus. During the Score, help sing the next note and heal mistakes.",
+        "scoreSummary": "At {first} and {second} health, she becomes immune and plays {notes}, then {finalNotes} notes. Repeat them within {answer}, then {finalAnswer} sec. A wrong tile deals {falseNote} Frost damage and resets progress, not the timer. Timeout deals {min} to {max} Frost damage to everyone. Success stuns her for {stun} sec and increases damage taken by {vulnerability} for {bonusSeconds} sec.",
+        "scoreResponse": "Watch the melody, then step onto tiles in order. Alternate correct notes with another living player; a sole survivor can finish alone. Blocked steps are harmless. Step off and enter again to sound a tile, including one occupied before the answer begins.",
+        "scoreHeroic": "During the answer, the tiles go dark. Remember the melody and take turns.",
         "overview": "Körmodern sjunger från sin bassäng och varken rör sig eller slåss i närstrid. Hon markerar spelare för en delad Kör och ett ensamt Solo, riktar en stegrande aria mot en spelare och skickar en våg över gården. Hennes projektiler och aria kan avbrytas.",
         "phaseName": "Körgården",
         "phaseSummary": "En fas med tidsräknare. En mekanik som blir redo under en besvärjelse väntar tills den tar slut.",
@@ -16286,6 +16354,8 @@ export const sv_SE: EnTranslations = {
       "temple_moonwater_bolt": "Månvattensprojektil",
       "temple_drowning_aria": "Drunknandets aria",
       "temple_mere_surge": "Insjösvall",
+      "temple_score": "The Score",
+      "temple_score_answer": "Answer the Score",
       "temple_tideglass_fracture": "Tidvattensglasets bristning",
       "temple_undertow": "Underström",
       "temple_lunar_tide": "Måntidvatten",
@@ -16323,6 +16393,12 @@ export const sv_SE: EnTranslations = {
       "wildheart_gorgebloom_gorge": "Frossa",
       "wildheart_zulgar_pulse": "Vildhjärtats puls",
       "wildheart_zulgar_spirit_hunt": "Jaktens ande",
+      "wildheart_zulgar_hunting_spear": "Hunting Spear",
+      "wildheart_zulgar_idol_wakes": "The Idol Wakes",
+      "kituse_wildheart_pull_spear": "Pull the Spear",
+      "wildheart_idols_breath": "Idol's Breath",
+      "wildheart_sun_glyph_kindle": "Lighting",
+      "wildheart_sun_glyph_cold": "Cooling",
       "sanctum_cinder_breath": "Glödandedräkt",
       "sanctum_warming_rite": "Värmande rit",
       "sanctum_goad": "Spora",
@@ -26134,6 +26210,9 @@ export const sv_SE: EnTranslations = {
       },
       "thorn_sprout": {
         "name": "Taggskott"
+      },
+      "wildheart_hunting_spear": {
+        "name": "Hunting Spear"
       },
       "buddy_ember_fox": {
         "name": "Glödräv"

@@ -6605,6 +6605,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'İçeride hâlâ biri varken örnekleri sıfırlayamazsın.',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     'Bu örnekleri sıfırlamadan önce zindan zorluğunu değiştir. Boş örnekler 5 dakika sonra kendiliğinden sıfırlanır.',
+  'hudChrome.dungeonDifficulty.resetAlreadyFresh':
+    'Zindanların zaten sıfırlanmış durumda. Son sıfırlamadan beri kimse girmedi.',
   'hudChrome.dungeonDifficulty.resetUsage':
     'Zorluğu değiştirdikten sonra boş örneklerinden vazgeçmek için /dungeon reset kullan.',
   'hudChrome.dungeonDifficulty.resetLoot':

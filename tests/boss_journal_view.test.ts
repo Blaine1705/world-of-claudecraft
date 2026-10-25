@@ -12,7 +12,11 @@ import { sanctumTelegraphSpecs } from '../src/render/gravewyrm_sanctum_fx/sanctu
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
 import { finderActivity } from '../src/sim/content/dungeon_finder';
 import { MOBS } from '../src/sim/data';
-import { hydraRegrowShare, YSOLEI_MOON_TUNING } from '../src/sim/encounters/drowned_temple/ids';
+import {
+  hydraRegrowShare,
+  SELTHE_TUNING,
+  YSOLEI_MOON_TUNING,
+} from '../src/sim/encounters/drowned_temple/ids';
 import {
   KORGATH_BODY,
   KORGATH_CHAIN_FLAIL,
@@ -393,6 +397,27 @@ describe('Wildheart Basin facts', () => {
     );
   });
 
+  it('describes spear rescue, prepared glyphs and the permanent final hunt', () => {
+    const spear = mechanic('wildheart_high_priest', 'hunting-spear', 'heroic');
+    const factor = mechanicFactor('wildheart_basin', 'wildheart_high_priest', 'heroic');
+    expect(spear.values?.bleed).toBe(Math.round(ZULGAR_TUNING.pinBleed * factor));
+    expect(spear.values?.pull).toBe(ZULGAR_TUNING.spearPullSeconds);
+    expect(spear.values?.self).toBe(ZULGAR_TUNING.spearWrenchSeconds);
+    const glyphs = mechanic('wildheart_high_priest', 'sun-glyphs', 'normal');
+    expect(glyphs.values?.kindle).toBe(ZULGAR_TUNING.glyphKindleSeconds);
+    expect(glyphs.values?.dark).toBe(ZULGAR_TUNING.glyphColdSeconds);
+    expect(glyphs.values?.vulnerability).toBe(ZULGAR_TUNING.sunstruckVuln);
+    expect(rendered(glyphs.responseKey)).toContain('Unmarked players light glyphs');
+    expect(() => mechanic('wildheart_high_priest', 'enrage', 'normal')).toThrow();
+    expect(mechanic('wildheart_high_priest', 'idol-hunt', 'normal').values?.every).toBe(
+      ZULGAR_TUNING.finalPreySeconds,
+    );
+    const breath = mechanic('wildheart_high_priest', 'idol-breath', 'heroic');
+    expect(breath.values?.min).toBe(Math.round(ZULGAR_TUNING.breathMin * factor));
+    expect(breath.values?.max).toBe(Math.round(ZULGAR_TUNING.breathMax * factor));
+    expect(breath.values?.warning).toBe(ZULGAR_TUNING.breathWarning);
+  });
+
   it('says hunt stuns last half as long only while the sim halves them', () => {
     const glyphs = mechanic('wildheart_high_priest', 'sun-glyphs', 'normal');
     expect(rendered(glyphs.summaryKey, glyphs.values, glyphs.percentValues)).toContain(
@@ -530,11 +555,29 @@ describe('Drowned Temple facts', () => {
     ]);
   });
 
-  it('marks the bolt and the aria kickable, and the hydra regrowth per tier', () => {
+  it('replaces Sea-Song with Score thresholds, relay rules and scaled mistakes', () => {
+    expect(() => mechanic('choirmother_selthe', 'sea-song', 'normal')).toThrow();
+    for (const tier of TIERS) {
+      const score = mechanic('choirmother_selthe', 'score', tier);
+      const factor = mechanicFactor('drowned_temple', 'choirmother_selthe', tier);
+      expect([score.values?.first, score.values?.second]).toEqual(SELTHE_TUNING.scoreAt);
+      expect([score.values?.notes, score.values?.finalNotes]).toEqual(SELTHE_TUNING.scoreNotes);
+      expect([score.values?.answer, score.values?.finalAnswer]).toEqual(SELTHE_TUNING.scoreAnswer);
+      expect(score.values?.falseNote).toBe(Math.round(SELTHE_TUNING.falseNoteDamage * factor));
+      expect(score.values?.min).toBe(Math.round(SELTHE_TUNING.discordMin * factor));
+      expect(score.values?.max).toBe(Math.round(SELTHE_TUNING.discordMax * factor));
+      expect(score.values?.bonusSeconds).toBe(SELTHE_TUNING.brokenVulnSeconds);
+      expect(score.values?.vulnerability).toBe(SELTHE_TUNING.brokenVuln);
+      expect(rendered(score.responseKey)).toContain('Alternate correct notes');
+      expect(rendered(score.responseKey)).toContain('a sole survivor can finish alone');
+    }
+  });
+
+  it('marks only the aria kickable, and the hydra regrowth per tier', () => {
     expect(mechanic('choirmother_selthe', 'drowning-aria', 'normal').flags).toContain(
       'interruptible',
     );
-    expect(mechanic('choirmother_selthe', 'moonwater-bolt', 'normal').flags).toContain(
+    expect(mechanic('choirmother_selthe', 'moonwater-bolt', 'normal').flags).not.toContain(
       'interruptible',
     );
     expect(mechanic('mere_hydra_head_center', 'three-heads', 'normal').values?.share).toBe(

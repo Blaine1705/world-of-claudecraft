@@ -13,6 +13,24 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  "bossJournal.wildheart.zulgar.pulseSummaryRework": "Каждые {every} сек. он читает заклинание {cast} сек. и наносит от {min} до {max} урона всем в радиусе {radius} ярд. Пригвождённые получают в {pinMult} раза больше урона на любом расстоянии.",
+  "bossJournal.wildheart.zulgar.spearSummary": "За {cast} сек. пригвождает игрока, кроме танка; танка выбирает, если больше никого нет. Обездвиживание длится до {seconds} сек. и наносит {bleed} урона каждые {tick} сек.",
+  "bossJournal.wildheart.zulgar.spearResponse": "Выберите копьё и взаимодействуйте с ним в пределах {range} ярд.: извлечение занимает {pull} сек. Урон его не прерывает. Если на террасе нет свободных союзников, жертва может освободиться сама за {self} сек.",
+  "bossJournal.wildheart.zulgar.glyphSummaryRework": "Все {count} знаков сначала погашены. Во время охоты игрок без метки зажигает знак, стоя на нём {kindle} сек. Если таких игроков нет, добыча может зажечь его за {alone} сек. Уход сбрасывает прогресс. Пересекая горящий знак, он замедляется на {slow} и получает на {vulnerability} больше урона в течение {seconds} сек. Знак нельзя зажечь {dark} сек.; другой знак не может поразить его {wary} сек. Во время охоты оглушения длятся вдвое меньше.",
+  "bossJournal.wildheart.zulgar.glyphResponseRework": "Игроки без метки зажигают знаки впереди добычи. Проведите его через них и атакуйте, пока действует солнечный удар. После охоты знаки гаснут.",
+  "bossJournal.wildheart.zulgar.idolSummary": "При {health} здоровья он остаётся духом ягуара до гибели. Танк тоже может стать добычей.",
+  "bossJournal.wildheart.zulgar.idolHuntSummary": "Каждые {every} сек. выбирает новую добычу, поворачивается к ней {turn} сек. и начинает погоню.",
+  "bossJournal.wildheart.zulgar.idolHuntHeroicSummary": "Каждые {pair} сек. отмечает новую пару и меняет цель каждые {switch} сек. После смены у новой добычи есть {turn} сек. до начала погони.",
+  "bossJournal.wildheart.zulgar.breathSummary": "Каждые {every} сек. половина террасы отмечается на {warning} сек., затем все на ней получают от {min} до {max} урона от сил природы. Половины чередуются.",
+  "bossJournal.wildheart.zulgar.breathResponse": "Перейдите на неотмеченную половину до конца предупреждения. Центральная линия безопасна. В героическом режиме дыхание также гасит знаки на своей половине; их можно сразу зажечь снова.",
+  "bossJournal.temple.selthe.overviewRework": "Селте не двигается и не бьёт в ближнем бою. Собирайтесь для хора, отходите для соло, прерывайте арию утопления и избегайте волны. На двух порогах здоровья повторяйте мелодию на лунных плитах, чередуя исполнителей.",
+  "bossJournal.temple.selthe.phaseSummaryRework": "Пока группа отвечает на партитуру, остальные атаки прекращаются. У лунной стрелы нет полосы заклинания, и её нельзя прервать.",
+  "bossJournal.temple.selthe.boltSummaryRework": "Между другими заклинаниями стрела попадает каждые {every} сек., с видимым предупреждением за {windup} сек., нанося {mult} от урона оружия в виде урона от льда. Прерывание арии останавливает стрелы и арию на {quiet} сек.",
+  "bossJournal.temple.selthe.boltResponseRework": "Танк должен оставаться в её поле зрения. Сохраните прерывания для арии утопления.",
+  "bossJournal.temple.selthe.tipHealerRework": "Следите за целью арии и теми, кто принял хор в одиночку. Во время партитуры помогайте исполнить следующую ноту и лечите урон от ошибок.",
+  "bossJournal.temple.selthe.scoreSummary": "При {first} и {second} здоровья она становится неуязвимой и играет сначала {notes}, затем {finalNotes} нот. Повторите их за {answer} и {finalAnswer} сек. соответственно. Неверная плита наносит {falseNote} урона от льда и сбрасывает прогресс, но не таймер. По истечении времени все получают от {min} до {max} урона от льда. Успех оглушает её на {stun} сек. и одновременно увеличивает получаемый урон на {vulnerability} на {bonusSeconds} сек.",
+  "bossJournal.temple.selthe.scoreResponse": "Запомните мелодию и входите на плиты по порядку. Чередуйте верные ноты с другим живым игроком; единственный выживший может закончить один. Заблокированные шаги безвредны. Сойдите и войдите снова, чтобы сыграть ноту, даже если стояли на плите до начала ответа.",
+  "bossJournal.temple.selthe.scoreHeroic": "Во время ответа плиты темнеют. Запомните мелодию и играйте по очереди.",
   'editor.buildMode.materialNames.Cliff003': 'Изломанная скала',
   'editor.buildMode.materialNames.Cliff004': 'Выветрившийся утёс',
   'editor.buildMode.materialNames.Cliff005': 'Слоистый утёс',
@@ -5346,6 +5364,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Ожидающая смена сложности отменена, поскольку изменились группа или её лидер.',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     'Смените сложность подземелья перед сбросом этих подземелий. Пустые подземелья сбрасываются сами через 5 минут.',
+  'hudChrome.dungeonDifficulty.resetAlreadyFresh': 'Ваши подземелья уже обновлены. С последнего сброса в них никто не входил.',
   'hudChrome.dungeonDifficulty.resetUsage':
     'После смены сложности используйте /dungeon reset, чтобы отказаться от пустых подземелий.',
   'hudChrome.dungeonDifficulty.resetLoot':
@@ -25744,4 +25763,90 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Утонувшая луна: каждые {moonEvery} сек. из потока выбирается Лунное отродье.',
   'bossJournal.temple.ysolei.heroicTears':
     '{count} слёз за волну, а каст Падающей луны длится {cast} сек.',
+  // Zulgar's hunt rework (the sun glyphs, the Hunting Spear, The Idol Wakes):
+  // the M16 non-Latin fills of its new English.
+  'hudChrome.auraEffect.wildheart.sunstruck':
+    'Опалён горящим солнечным глифом: движется на {pct}% медленнее.',
+  'hudChrome.auraEffect.wildheart.sunstruckExposed':
+    'Опалён горящим солнечным глифом: получает на {pct}% больше урона.',
+  'hudChrome.auraEffect.wildheart.sunWary':
+    'Пока действует этот эффект, ни один солнечный глиф не может его опалить. Горящий глиф, по которому он пройдёт, останется горящим.',
+  'hudChrome.auraEffect.wildheart.pinned':
+    'Охотничье копьё пригвоздило вас к месту. Вы истекаете кровью: {bleed} физического урона ({heroicBleed} в героическом режиме) каждые {every} сек., а Импульс Дикого Сердца поражает вас, где бы вы ни стояли, и наносит на {pulse}% больше урона. Союзник может вырвать копьё за {pull} сек. Если помочь некому, вырвите его сами за {wrench} сек. Через {seconds} сек. оно отпустит само.',
+  'hudChrome.auraEffect.wildheart.idolAwake':
+    'Каменный ягуар пробудился. Каждые {every} сек. после предупреждения на полу в течение {warning} сек. он выдыхает на одну половину террасы, затем на другую: от {min} до {max} урона от сил природы (от {heroicMin} до {heroicMax} в героическом режиме) всем, кто стоит на этой половине. Зулгар остаётся Аватаром ягуара до самой смерти и меняет Добычу каждые {seconds} сек. ({heroicSeconds} сек. в героическом режиме).',
+  'hudChrome.wildheartAlert.preyAloneLine':
+    'Зажечь солнечные глифы больше некому. Встаньте на погасший глиф на {seconds} сек., чтобы зажечь его, затем проведите через него Зулгара',
+  'hudChrome.wildheartAlert.pinnedTitle': 'Вы пригвождены!',
+  'hudChrome.wildheartAlert.pinnedLine':
+    'Охотничье копьё должен вырвать союзник. Пока вы пригвождены, Импульс Дикого Сердца бьёт по вам сильнее',
+  'hudChrome.wildheartAlert.pinnedSelfLine':
+    'Помочь некому: вырвите Охотничье копьё сами, пока не ударил Импульс Дикого Сердца',
+  'hudChrome.wildheartAlert.sunstruckTitle': 'Зулгар опалён солнцем!',
+  'hudChrome.wildheartAlert.sunstruckLine':
+    'Пока действует эффект, он получает на {pct}% больше урона: бейте сильнейшими атаками сейчас',
+  'hudChrome.wildheartAlert.spearTitle': 'Союзник пригвождён!',
+  'hudChrome.wildheartAlert.spearLine':
+    'Бегите к Охотничьему копью и вырвите его, пока не ударил Импульс Дикого Сердца',
+  'hudChrome.wildheartAlert.glyphTitle': 'Зажгите солнечные глифы',
+  'hudChrome.wildheartAlert.glyphLine':
+    'Встаньте на погасший солнечный глиф на {seconds} сек., чтобы зажечь его. Когда Зулгар пройдёт через него, он {duration} сек. будет получать на {pct}% больше урона',
+  'hudChrome.wildheartAlert.glyphLightingTitle': 'Вы зажигаете солнечный глиф',
+  'hudChrome.wildheartAlert.glyphLightingLine':
+    'Оставайтесь на глифе, пока он не загорится. Если сойти с него, придётся начать заново',
+  'hudChrome.wildheartAlert.breathTitle': 'Дыхание идола!',
+  'hudChrome.wildheartAlert.breathLine':
+    'Каменный ягуар вот-вот выдохнет на эту половину террасы. Перейдите на другую половину',
+  'hudChrome.kitUse.freeLine':
+    'Вырвите копьё из земли, чтобы освободить пригвождённого. Полученный удар не прервёт вас, а движение или оглушение прервёт',
+  'hudChrome.kitUse.freeKey': 'Вырвать: {name}',
+  'hudChrome.kitUse.freeTap': 'Нажмите здесь, чтобы вырвать: {name}',
+  'hudChrome.kitUse.freeClick': 'Щёлкните здесь, чтобы вырвать: {name}',
+  'hudChrome.kitUse.freeFar': 'Подойдите ближе чем на {range} м, чтобы вырвать его',
+  'hudChrome.kitUse.freeAria': 'Вырвать: {name}',
+  'hudChrome.kitUse.freeUsingLine':
+    'Не двигайтесь, пока вырываете копьё: движение или оглушение прервёт вас',
+  'abilityUi.cast.wildheart_zulgar_hunting_spear': 'Охотничье копьё',
+  'abilityUi.cast.wildheart_zulgar_idol_wakes': 'Идол пробуждается',
+  'abilityUi.cast.kituse_wildheart_pull_spear': 'Вырвать копьё',
+  'abilityUi.cast.wildheart_idols_breath': 'Дыхание идола',
+  'abilityUi.cast.wildheart_sun_glyph_kindle': 'Зажигается',
+  'abilityUi.cast.wildheart_sun_glyph_cold': 'Остывает',
+  'entities.mobs.wildheart_hunting_spear.name': 'Охотничье копьё',
+  // Choirmother Selthe's Score (the Drowned Temple alert, her ward and her
+  // broken voice, her two bars): the M16 non-Latin fills of its new English.
+  'hudChrome.templeAlert.melodyTitle': 'Партитура',
+  'hudChrome.templeAlert.melodyLine':
+    'Следите, в каком порядке звучат лунные плиты. Повторите порядок, чередуясь с другим игроком',
+  'hudChrome.templeAlert.melodyDarkLine':
+    'Запомните порядок, пока плиты не погасли. Повторите его, чередуясь с другим игроком',
+  'hudChrome.templeAlert.answerTitle': 'Ответьте на Партитуру!',
+  'hudChrome.templeAlert.answerLine':
+    'Чередуйтесь: наступите на лунную плиту с отметкой {place}. Сыграно: {done} из {total}',
+  'hudChrome.templeAlert.answerDarkLine':
+    'Чередуйтесь и повторите порядок по памяти. Сойдите с плиты, прежде чем наступить снова. Сыграно: {done} из {total}',
+  'hudChrome.templeAlert.stepOffTitle': 'Сойдите и наступите снова',
+  'hudChrome.templeAlert.stepOffLine':
+    'Лунная плита звучит, только когда на неё наступают. Сойдите с этой плиты и наступите на неё снова',
+  'hudChrome.templeAlert.falseTitle': 'Фальшивая нота!',
+  'hudChrome.templeAlert.falseLine':
+    'Эта плита была не в свой черёд. Ответ начинается заново с первой плиты',
+  'hudChrome.templeAlert.brokenTitle': 'Голос Селте сорван!',
+  'hudChrome.templeAlert.brokenLine':
+    'Пока действует эффект, она получает на {pct}% больше урона: бейте сильнейшими атаками',
+  'hudChrome.templeAlert.timeAria': 'Осталось секунд: {seconds}',
+  'hudChrome.auraEffect.temple.scoreWard':
+    'Поёт Партитуру: не получает урона, пока та не закончится. Наступите на лунные плиты в том порядке, в котором они звучали, прежде чем закончится куплет, и её голос сорвётся. Чередуйтесь: сыграв ноту, дождитесь, пока другой игрок сыграет следующую верную ноту. Единственный выживший может закончить в одиночку. Если куплет закончится раньше, Диссонанс нанесёт всем во дворе от {min} до {max} ед. урона от льда (в героическом режиме от {heroicMin} до {heroicMax}).',
+  'hudChrome.auraEffect.temple.brokenVoice':
+    'Её голос сорван: пока действует эффект, она получает на {pct}% больше урона.',
+  'abilityUi.cast.temple_score': 'Партитура',
+  'abilityUi.cast.temple_score_answer': 'Ответ на Партитуру',
+  // The Dungeon Finder's line for Selthe's Score (M16).
+  'hudChrome.finder.mech.the_score':
+    'Партитура (дважды она поёт мелодию на лунных плитах: наступите на них в том порядке, в котором они звучали, и её голос сорвётся)',
+  'hudChrome.templeAlert.spentTitle': 'Теперь должен ответить другой голос',
+  'hudChrome.templeAlert.spentLine':
+    'Вы не можете озвучить плиту, пока другой игрок не сыграет следующую верную ноту. Сыграно: {done} из {total}',
+  'hudChrome.auraEffect.temple.spentVoice':
+    'Вы не можете озвучить лунную плиту, пока другой игрок не сыграет следующую верную ноту. Наступая на плиту под этим эффектом, вы не сбрасываете ответ и не получаете урон. Нельзя рассеять. Снимается, если вы остались единственным живым игроком в вашем экземпляре подземелья или партитура завершена.',
 };
