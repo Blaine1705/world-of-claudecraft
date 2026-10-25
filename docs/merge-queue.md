@@ -62,23 +62,22 @@ automatically instead of by hand.
   ceiling every job bound has to fit under, so keep this invariant true when
   resizing any bound: the `changes` bound, plus the largest REQUIRED job
   bound, plus runner-acquisition slack (which `timeout-minutes` does not count
-  but the queue's timer does) must stay comfortably under it. Today that is
-  8 + 50 (the `changes` bound plus the pr-gate shard bound, the largest
-  required one), so a required critical path of 58
-  minutes against a 90 minute ceiling, leaving 32 minutes for runner
-  acquisition and queue overhead. The shard bound was provisionally resized
-  on 2026-10-25: selective run 40147677739 had healthy jobs of 35m42s and
-  35m48s, while four other shards hit the former 37-minute cap during tests.
-  The new bound applies the existing 1.37 margin to the observed 35.8-minute
-  wall, rounded up to 50. A same-head shard in run 40142158673 took 22m06s
-  and 35m25s for the same test workload, so the observed slow wall already
-  includes the runner spread. The cancelled tails were not completed measurements.
-  This workflow edit widens PR validation to full mode, as the queue always uses;
-  those runs prove the merge. Selective-tail measurement remains for a later
-  ordinary PR; full-mode success does not prove selective timing.
-  The job-bound derivation is recorded beside pr-gate in ci.yml; these figures
-  are welded to its bounds by tests/ci_workflow.test.ts. A candidate that blows
-  the queue timeout is ejected, blocking an unproven merge, but it
+  but the queue's timer does) must stay under it. Today that is
+  8 + 79 (the `changes` bound plus the pr-gate shard bound, the largest
+  required one, re-derived 2026-10-25 from the completed 35m52s selective
+  shard 6 in run 40134416344; the long-sims lanes sit at 28), so a required
+  critical path of 87 minutes against a 90 minute ceiling. This leaves
+  only 3 minutes of runner-acquisition slack at the maximum bounds.
+  Read 87 as a ceiling, not an expectation: queue runs always execute FULL
+  mode (selection applies to pull requests only), while this bound uses
+  the measured selective workload and the established 1.60 slow-runner
+  ratio and 1.37 margin. Monitor actual queue walls and runner delays;
+  the timeout increase does not change the queue's 90-minute setting.
+  A workflow-editing PR widens to FULL, so its own run cannot remeasure
+  selective performance. These figures are welded to
+  the ci.yml bounds by `tests/ci_workflow.test.ts`, so resizing a bound
+  fails the pin until this sentence moves with it. A candidate that blows the queue timeout is ejected,
+  which blocks the merge rather than merging anything unproven, but it
   costs a full queue cycle and reads like a mystery without this number
   written down.
 - The queue merges with one repo-wide method (merge commit). The per-PR

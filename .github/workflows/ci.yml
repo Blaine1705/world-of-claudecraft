@@ -571,22 +571,17 @@ jobs:
     # packing, never from the simulation (the review round showed a
     # simulated 9.79m flat pack against a real 11.21m when one modeling
     # assumption was wrong).
-    # 2026-10-25 v0.45 remeasurement: run 40147677739 is SELECTIVE on
-    # df14cefa042. Shards 1 and 8 completed healthy in 35m42s and 35m48s;
-    # shards 2-5 were killed during tests at 37 minutes (not setup stalls).
-    # The corpus is now 6131 files, versus 2674 in the older sizing above.
-    # The same-head shard-8 comparison in run 40142158673 completed all
-    # 8916 tests in both attempts: 22m06s job wall before a jsdom teardown
-    # error, then a clean 35m25s retry, a 1.60x wall spread. The current
-    # healthy 35m48s is already at that observed slow end, so apply the
-    # existing 1.37 margin without multiplying the runner spread twice:
-    # ceil(35.8 * 1.37) = 50. The killed selective tails remain unmeasured.
-    # A workflow edit widens this PR to full; its PR/merge-group runs prove
-    # the merge, while selective-tail measurement needs a later ordinary PR.
-    # No test-selection, worker-count, required-check, or retry-policy
-    # changes accompany this provisional resize. Queue arithmetic
-    # stays 8 + 50 = 58, leaving 32 minutes for runner acquisition under 90.
-    timeout-minutes: 50
+    # 2026-10-25 v0.45 re-derivation: run 40134416344 at 8a9bd02c
+    # was SELECTIVE; its completed healthy shard 6 took 35m52s. Shard 5
+    # (attempt 1) and shard 7 (attempt 2) reached the 37-minute limit with
+    # passing tests still running. Use the completed wall, not an estimate
+    # from either cancelled leg: (35 + 52/60) x 1.60 x 1.37 = 78.62,
+    # rounded up to 79. Selection, worker counts, and test coverage stay
+    # unchanged. This workflow edit widens its own PR run to FULL, so that
+    # run cannot be used to remeasure selective performance. The queue's
+    # 90-minute response ceiling leaves only 3 minutes beyond the maximum
+    # 8 + 79 required path; actual FULL walls must be monitored separately.
+    timeout-minutes: 79
     runs-on: ubuntu-latest
 
     # The real-SQL merge bar (ruling R16, recorded in the woc-marketplace
