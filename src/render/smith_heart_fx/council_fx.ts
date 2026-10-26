@@ -35,7 +35,10 @@
 
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
-import { COUNCIL_TUNING as T } from '../../sim/encounters/smith_heart/council_ids';
+import {
+  type CouncilRole,
+  COUNCIL_TUNING as T,
+} from '../../sim/encounters/smith_heart/council_ids';
 import type { Aura, Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { type TelegraphFan, TelegraphKit } from '../floor_telegraph';
@@ -67,6 +70,7 @@ import {
   councilClaims,
   councilPillarOf,
   councilRoleOf,
+  councilSoulOf,
   energyLook,
   INHERIT_SECONDS,
   inheritArc,
@@ -76,10 +80,13 @@ import {
   RISE_SPOT_SPEC,
   resonanceRing,
   rockFall,
+  SOUL_COLORS,
+  SOUL_TAKE_SECONDS,
   WEIGHT_DROP_SECONDS,
   wakeGhost,
 } from './council_fx_core';
 import { type CouncilFxHost, CouncilPillarsFx, RISEN_HEIGHT } from './council_pillars_fx';
+import { CouncilSoulFx } from './council_soul_fx';
 import { chunkGeometry, Rubble } from './hammer_fx';
 
 const SCAN_SEC = 0.1;
@@ -204,6 +211,8 @@ interface StreamSlot {
   targetId: number;
   from: THREE.Vector3;
   acc: number;
+  /** Mythic: a soul flowing into its pillar (its colour, its arrival). */
+  soul: CouncilRole | null;
 }
 
 interface DropSlot {
@@ -277,6 +286,18 @@ function paint(fill: number, clock: number, range: number): typeof _paint {
 }
 /** Beads in one inheritance stream. */
 const BEADS = 26;
+const _beadColor = new THREE.Color();
+/** A soul's colour as particle rgb (0..1), built once per soul. */
+const SOUL_RGB_CACHE: Partial<Record<CouncilRole, [number, number, number]>> = {};
+function _soulRgb(soul: CouncilRole): [number, number, number] {
+  let c = SOUL_RGB_CACHE[soul];
+  if (!c) {
+    const hex = SOUL_COLORS[soul].hex;
+    c = [((hex >> 16) & 255) / 255, ((hex >> 8) & 255) / 255, (hex & 255) / 255];
+    SOUL_RGB_CACHE[soul] = c;
+  }
+  return c;
+}
 
 export class CouncilFx {
   readonly readyForEntry: Promise<void>;
@@ -290,6 +311,7 @@ export class CouncilFx {
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
   private readonly pillarsFx: CouncilPillarsFx;
+  private readonly soulFx: CouncilSoulFx;
   private readonly marks: MarkSlot[] = [];
   private readonly spots: SpotSlot[] = [];
   private readonly rocks: RockSlot[] = [];
@@ -357,6 +379,7 @@ export class CouncilFx {
     this.geometries.push(carrier);
     const host: CouncilFxHost = {
       root: this.root,
+      entity: (id) => this.world?.entities.get(id),
       uTime: this.uTime,
       particles: this.particles,
       debris: this.debris,
@@ -372,6 +395,7 @@ export class CouncilFx {
       materials: this.materials,
     };
     this.pillarsFx = new CouncilPillarsFx(host, carrier);
+    this.soulFx = new CouncilSoulFx(host, this.pillarsFx);
     const bandGeo = new THREE.CylinderGeometry(1, 1, 1, 40, 1, true).translate(0, 0.5, 0);
     const ringGeo = new THREE.RingGeometry(0.93, 1, 96, 1).rotateX(-Math.PI / 2);
     const threadGeo = new THREE.CylinderGeometry(1, 1, 1, 8, 1, true)
@@ -564,6 +588,7 @@ export class CouncilFx {
         targetId: -1,
         from: new THREE.Vector3(),
         acc: 0,
+        soul: null,
       });
     }
     // ---- the Wrath holder's gathering energy ----
@@ -595,8 +620,11 @@ export class CouncilFx {
     this.root.add(this.gauge);
     const beadGeo = new THREE.IcosahedronGeometry(0.42, 1);
     this.geometries.push(beadGeo);
+    // White, tinted per bead (the inheritance's ochre, a soul's own colour):
+    // every instance carries its colour from the start, so the program is
+    // the same one the gate linked.
     const beadMat = new THREE.MeshBasicMaterial({
-      color: 0xffc070,
+      color: 0xffffff,
       transparent: true,
       opacity: 0.9,
       blending: THREE.AdditiveBlending,
@@ -610,8 +638,11 @@ export class CouncilFx {
     this.beads.frustumCulled = false;
     this.beads.visible = false;
     this.beads.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-    for (let i = 0; i < POOLS.streams * BEADS; i++)
+    const ochre = new THREE.Color(0xffc070);
+    for (let i = 0; i < POOLS.streams * BEADS; i++) {
       this.beads.setMatrixAt(i, _m.makeScale(0, 0, 0));
+      this.beads.setColorAt(i, ochre);
+    }
     this.root.add(this.beads);
     // The kit's slot programs, so a council piece that shows before the
     // interior's gate settles links nothing in a live frame.
@@ -653,6 +684,7 @@ export class CouncilFx {
       if (!councilClaims(ev.ability)) return false;
       if (ev.ability === COUNCIL_CUES.collapse)
         this.pillarsFx.collapseAt(ev.x, ev.z, ev.radius ?? 4);
+      else if (ev.ability === COUNCIL_CUES.soulBurst) this.pillarsFx.soulBurstAt(ev.x, ev.z);
       else if (ev.ability === COUNCIL_CUES.rockImpact) this.rockImpact(ev.x, ev.z, ev.radius ?? 6);
       else if (ev.ability === COUNCIL_CUES.settle) this.pillarsFx.settleAt(ev.x, ev.z);
       return true;
@@ -663,8 +695,16 @@ export class CouncilFx {
     else if (ability === COUNCIL_CUES.crack) this.pillarsFx.cracked(ev.sourceId);
     else if (ability === COUNCIL_CUES.pulse) this.pillarsFx.pulse(ev.sourceId);
     else if (ability === COUNCIL_CUES.inherit) {
-      this.startStream(ev.sourceId, ev.targetId);
-    } else if (ability === COUNCIL_CASTS.bolt) {
+      this.startStream(ev.sourceId, ev.targetId, null);
+    } else if (ability === COUNCIL_CUES.soulTake) {
+      const src = this.world.entities.get(ev.sourceId);
+      const role = src ? councilRoleOf(src.templateId) : null;
+      this.startStream(ev.sourceId, ev.targetId, role ?? 'guardian');
+    } else if (ability === COUNCIL_CUES.soulPip) this.pillarsFx.soulPip(ev.sourceId);
+    else if (ability === COUNCIL_CUES.echoBlast) this.soulFx.echoBlast(ev.sourceId);
+    else if (ability === COUNCIL_CUES.songPulse) this.soulFx.songPulse(ev.sourceId);
+    else if (ability === COUNCIL_CUES.slabCrush) this.soulFx.slabCrush(ev.targetId);
+    else if (ability === COUNCIL_CASTS.bolt) {
       this.startBolt(ev.sourceId, ev.targetId);
     } else if (ability === COUNCIL_CASTS.weight) {
       this.startDrop(ev.targetId);
@@ -685,6 +725,7 @@ export class CouncilFx {
       this.scan(world);
     }
     this.updateHumming(world);
+    this.soulFx.update(dt, this.clock);
     this.pillarsFx.update(dt);
     this.updateMarks(world);
     this.updateSpots();
@@ -709,6 +750,7 @@ export class CouncilFx {
     const here = this.inRaid(world);
     // The pillars and the rubble.
     this.pillarsFx.beginScan();
+    this.soulFx.beginScan();
     for (const m of this.marks) m.seen = false;
     for (const r of this.rocks) r.seen = false;
     for (const r of this.rings) r.seen = false;
@@ -732,8 +774,12 @@ export class CouncilFx {
         }
         if (e.kind === 'object') {
           const pillar = councilPillarOf(e.templateId);
+          const soul = pillar ? null : councilSoulOf(e.templateId);
           if (pillar) this.pillarsFx.seePillar(e, pillar.integrity, pillar.risen);
-          else if (e.templateId === COUNCIL_RUBBLE) this.pillarsFx.seeRubble(e);
+          else if (soul) {
+            this.pillarsFx.seePillar(e, soul.pips, soul.risen, soul.role);
+            this.soulFx.seeSoul(e, soul.role);
+          } else if (e.templateId === COUNCIL_RUBBLE) this.pillarsFx.seeRubble(e);
           else if (e.templateId === COUNCIL_RISE_SPOT) this.seeSpot(e);
           continue;
         }
@@ -750,6 +796,7 @@ export class CouncilFx {
     this.haloHolder = holder;
     // What the scan no longer saw.
     this.pillarsFx.endScan();
+    this.soulFx.endScan();
     for (const m of this.marks) {
       if (m.playerId >= 0 && !m.seen) this.freeMark(m);
     }
@@ -1209,7 +1256,7 @@ export class CouncilFx {
 
   // ---- the stone remembers ------------------------------------------------------------------------
 
-  private startStream(sourceId: number, targetId: number): void {
+  private startStream(sourceId: number, targetId: number, soul: CouncilRole | null): void {
     const src = this.world?.entities.get(sourceId);
     if (!src) return;
     const s = this.streams.find((q) => !q.alive) ?? this.streams[0];
@@ -1218,18 +1265,24 @@ export class CouncilFx {
     s.sourceId = sourceId;
     s.targetId = targetId;
     s.acc = 0;
+    s.soul = soul;
     s.from.set(src.pos.x, this.groundY(src.pos.x, src.pos.z) + 2.5, src.pos.z);
-    // The fallen gives up its light.
-    this.particles.puff(s.from.x, s.from.y, s.from.z, 16, {
-      speed: 3,
+    // The beads take the stream's colour (one write per stream, not a frame).
+    _beadColor.setHex(soul ? SOUL_COLORS[soul].hex : 0xffc070);
+    const base = this.streams.indexOf(s) * BEADS;
+    for (let i = 0; i < BEADS; i++) this.beads.setColorAt(base + i, _beadColor);
+    if (this.beads.instanceColor) this.beads.instanceColor.needsUpdate = true;
+    // The fallen gives up its light (a soul tears free: brighter, its colour).
+    this.particles.puff(s.from.x, s.from.y, s.from.z, soul ? 30 : 16, {
+      speed: soul ? 5 : 3,
       up: 2,
       life: 1,
       size: [1.6, 3.6],
-      color: C.flash,
+      color: soul ? _soulRgb(soul) : C.flash,
       alpha: 0.7,
       pool: 'glow',
     });
-    this.particles.shockRing(s.from.x, s.from.z, C.ochre, 6, 0.7);
+    this.particles.shockRing(s.from.x, s.from.z, soul ? SOUL_COLORS[soul].hex : C.ochre, 6, 0.7);
   }
 
   private updateStreams(world: IWorld, dt: number): void {
@@ -1238,9 +1291,13 @@ export class CouncilFx {
       const s = this.streams[k];
       const base = k * BEADS;
       const age = this.clock - s.born;
+      const span = s.soul ? SOUL_TAKE_SECONDS : INHERIT_SECONDS;
       const target = s.alive ? world.entities.get(s.targetId) : undefined;
-      if (!s.alive || !target || age > INHERIT_SECONDS) {
-        if (s.alive && target) {
+      if (!s.alive || !target || age > span) {
+        if (s.alive && target && s.soul) {
+          // The soul arrives: its stone wakes.
+          this.pillarsFx.soulAwake(s.targetId, s.soul);
+        } else if (s.alive && target) {
           // It arrives: the survivor flares with the fallen one's light.
           const y = this.groundY(target.pos.x, target.pos.z) + 3;
           this.particles.puff(target.pos.x, y, target.pos.z, 24, {
@@ -1260,11 +1317,15 @@ export class CouncilFx {
         continue;
       }
       any = true;
-      _v2.set(target.pos.x, this.groundY(target.pos.x, target.pos.z) + 3, target.pos.z);
+      _v2.set(
+        target.pos.x,
+        this.groundY(target.pos.x, target.pos.z) + (s.soul ? 6 : 3),
+        target.pos.z,
+      );
       // A river of beads of stone light along the arc, its head racing out
       // to the survivor and its tail still leaving the fallen (every tier:
       // it is the inheritance's tell).
-      const head = Math.min(1.25, age / (INHERIT_SECONDS * 0.7));
+      const head = Math.min(1.25, age / (span * 0.7));
       for (let i = 0; i < BEADS; i++) {
         const u = head - i * 0.05;
         if (u < 0 || u > 1) {
@@ -1284,9 +1345,16 @@ export class CouncilFx {
         const arc = inheritArc(Math.min(1, Math.max(0, head - this.rand() * 0.4)), _arc);
         _v.lerpVectors(s.from, _v2, arc.along);
         _v.y += arc.lift;
-        _moteColor[0] = 1;
-        _moteColor[1] = 0.72 + this.rand() * 0.2;
-        _moteColor[2] = 0.36;
+        if (s.soul) {
+          const c = _soulRgb(s.soul);
+          _moteColor[0] = c[0];
+          _moteColor[1] = c[1];
+          _moteColor[2] = c[2];
+        } else {
+          _moteColor[0] = 1;
+          _moteColor[1] = 0.72 + this.rand() * 0.2;
+          _moteColor[2] = 0.36;
+        }
         this.particles.puff(_v.x, _v.y, _v.z, 1, _beadMote);
       }
     }

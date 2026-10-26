@@ -15,6 +15,7 @@ offline and online look the same. The interior's static dressing and air are
 | `index.ts` | Public surface: `HammerFx`, `BreathFx`, `QuenchFx`, `HeatFx`, `FinalFx`, `CouncilFx`, `CouncilBodies`, `SealShake`. |
 | `council_fx_core.ts` | PURE (`RENDER_PURE_CORES`): the Hammer Council's look (design doc 5.18): a pillar's integrity on the model (`pillarLook`: seams, lean, heat, grit; `pillarPips`), its rise and fall timelines, the marks' footprints read off the sim's tuning (`COUNCIL_MARK_SPECS`, `RISE_SPOT_SPEC`) and their threat colours, the rock's fall, Resonance's ring, the heroic pulse's reach, the inheritance's arc, the energy's look, the cues it claims (`councilClaims`). |
 | `council_pillars_fx.ts` | `CouncilPillarsFx`, a part of `CouncilFx` (on its host: the root, the particles, the debris, the floor telegraph): the pillars (the Hammer kit's column, the rock kit's needle for a risen one) with their crack shells (the piece's own stone pushed out along its normals, a seam net that opens and burns per integrity), lean and pips, the rise, a lost piece, the fall into rubble (a danger footprint) and the sinking. |
+| `council_soul_fx.ts` | `CouncilSoulFx`, a part of `CouncilFx` (mythic, Soul in the Stone): what each soul does: the Echo of Wrath's lethal ring and the shelter wedges behind every other pillar (`echoShelter`, never wider than the sim's cover), its blast; the Walking Slab's crush and grind footprints riding with it, a crush's impact; the Endless Song's floor ring growing with its pulses, its clock ring and the sound rings over the Quarry. The soul pillar's own look (lit cracks in the soul's colour, the sheath, the soul pips, the slab followed every frame) is `council_pillars_fx.ts`; the plan (`SOUL_COLORS`, `soulPillarLook`, `songLook`, `slabReach`) is `council_fx_core.ts`. |
 | `council_fx.ts` | `CouncilFx`: the host of the pillars' part, and the Wake and soak footprints round their players (the ghost pillar, the boulder dropping), the heir's locked rise spots, Resonance's ring, shimmer and thread to the pillar it cracks, Hammer's Weight's slam and mark, the Seam Bolt's shard, the inheritance's river of beads, the energy's gauge and glow, the heroic pulse. Every footprint, ring, gauge, pip, crack and lean on every tier; claims the council's own cues. |
 | `council_bodies_core.ts` | PURE (`RENDER_PURE_CORES`): the council's two provisional bodies (the Slabwright broad and blocky with slab shoulders, the Seam Singer tall and slender with amber seam crystals): joints, reach, pieces (kit node, joint, fitted box, light), the cast-to-motion mapping, the poses, the glow and the fall. Joints apart from pieces, so the final models replace the pieces only. |
 | `council_bodies.ts` | `CouncilBodies`: the Slabwright's and the Seam Singer's bodies over their bodyless targets: Hammer kit stone and Heart kit rock and crystal stitched by ochre threads, breath, swings, cast poses and the fall into rubble. |
@@ -61,10 +62,13 @@ Rules:
   rubble, the heir's rising stone and the heroic pulse, `lethal` for Hammer's Weight, the
   soak's gold to gather in, the vein's ochre on the accents only); dust, grit and debris
   thin on the low tier. Mountain's Wrath stays `HammerFx`'s for whichever member holds it.
+- Mythic's soul pillars are told apart on EVERY tier (the soul's colour in the cracks, the
+  sheath, the three soul pips), and the Echo's ring and shelter wedges, the slab's
+  footprints and the song's rings are actionable (every tier); motes, embers and dust thin.
 - A new raid guardian's effects join here as their own module behind `index.ts`, never
   as a branch in `hammer_fx.ts`.
 
-Tests: `tests/smith_heart_council_fx.test.ts`, `tests/smith_heart_council_bodies.test.ts`,
+Tests: `tests/smith_heart_council_fx.test.ts`, `tests/smith_heart_council_soul_fx.test.ts`, `tests/smith_heart_council_bodies.test.ts`,
 `tests/smith_heart_hammer_fx.test.ts`, `tests/smith_heart_breath_fx.test.ts` and
 `tests/smith_heart_quench_fx.test.ts`, `tests/smith_heart_heat_fx.test.ts` and
 `tests/smith_heart_final_fx.test.ts` (each core and a smoke run over a fake world).

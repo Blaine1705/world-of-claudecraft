@@ -17,9 +17,12 @@ import {
   COUNCIL_CUES,
   COUNCIL_RISE_SPOT,
   COUNCIL_RUBBLE,
+  type CouncilRole,
   councilPillarFull,
   councilPillarOf,
   councilRoleOf,
+  councilSoulOf,
+  endlessSongMult,
   COUNCIL_TUNING as T,
 } from '../../sim/encounters/smith_heart/council_ids';
 import { TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core';
@@ -33,6 +36,7 @@ export {
   COUNCIL_RUBBLE,
   councilPillarOf,
   councilRoleOf,
+  councilSoulOf,
 };
 
 /** The palette. Every footprint's RIM is a threat colour (the floor
@@ -86,6 +90,11 @@ export const COUNCIL_FX_POOLS = {
   bolts: 6,
   streams: 4,
   debris: 120,
+  /** Mythic: soul pillars standing at once (two is the punishment) and
+   *  one more bursting. */
+  souls: 3,
+  /** The Echo's shelter wedges: one per other pillar that can stand. */
+  wedges: T.pillarCap,
 } as const;
 
 // ---- the pillars ----------------------------------------------------------------------
@@ -319,7 +328,114 @@ export function councilClaims(ability: string | undefined): boolean {
     ability === COUNCIL_CUES.pulse ||
     ability === COUNCIL_CUES.inherit ||
     ability === COUNCIL_CUES.settle ||
+    ability === COUNCIL_CUES.soulTake ||
+    ability === COUNCIL_CUES.soulPip ||
+    ability === COUNCIL_CUES.soulBurst ||
+    ability === COUNCIL_CUES.echoBlast ||
+    ability === COUNCIL_CUES.songPulse ||
+    ability === COUNCIL_CUES.slabCrush ||
     ability === COUNCIL_CASTS.bolt ||
     ability === COUNCIL_CASTS.weight
   );
 }
+
+// ---- mythic: Soul in the Stone ------------------------------------------------------------
+
+/** Each soul's own light, far apart in hue so a soul pillar is told from a
+ *  plain one AND from another soul at a glance, on every tier: the
+ *  Guardian's wrath an ember red-orange, the Slabwright's stone a jade
+ *  green, the Seam Singer's song a sky blue (none of them the Wake circle's
+ *  violet or the soak's gold). `core`/`edge` light the cracks (linear 0..1),
+ *  `hex` the glow, the pips and the rings. */
+export const SOUL_COLORS: Readonly<
+  Record<
+    CouncilRole,
+    {
+      core: readonly [number, number, number];
+      edge: readonly [number, number, number];
+      hex: number;
+    }
+  >
+> = {
+  guardian: { core: [1.0, 0.72, 0.42], edge: [1.0, 0.3, 0.1], hex: 0xff6a32 },
+  slabwright: { core: [0.78, 1.0, 0.82], edge: [0.22, 0.86, 0.5], hex: 0x52e08a },
+  singer: { core: [0.55, 0.82, 1.0], edge: [0.12, 0.42, 1.0], hex: 0x5aa8ff },
+};
+
+/** A soul pillar's look: its cracks always open and lit in the soul's
+ *  colour (the more pips lost, the wider), its glow breathing, `charge`
+ *  (0 to 1: the Echo's bar, the song's clock) brightening both. Fills `out`. */
+export function soulPillarLook(
+  pips: number,
+  clock: number,
+  charge: number,
+  out: { crack: number; heat: number; glow: number } = { crack: 0, heat: 0, glow: 0 },
+): { crack: number; heat: number; glow: number } {
+  const lost = Math.max(0, T.soulPips - Math.max(0, Math.min(T.soulPips, pips)));
+  const c = Math.max(0, Math.min(1, charge));
+  const breath = 0.5 + 0.5 * Math.sin(clock * 2.2);
+  out.crack = Math.min(1, 0.55 + lost * 0.18 + c * 0.2);
+  out.heat = 0.9 + 0.35 * breath + c * 1.1;
+  out.glow = 0.34 + 0.12 * breath + c * 0.45;
+  return out;
+}
+
+/** The Echo of Wrath's ring round its pillar: the sim's own reach. */
+export const ECHO_SPEC = {
+  radius: T.echoRadius,
+  color: TELEGRAPH_THREAT_COLORS.lethal,
+  accent: SOUL_COLORS.guardian.hex,
+  /** The shelter behind another pillar: a dark wedge, a pale rim. */
+  shelter: 0x0e1626,
+  shelterRim: 0xa8e4ff,
+} as const;
+
+/** The shelter a pillar (centre p, radius r) casts from a soul pillar at s
+ *  out to the Echo's reach: the wedge's yaw (sim convention, away from s),
+ *  its arc in degrees and its range from p's centre; null when p is out of
+ *  reach or s stands inside it. Drawn from p's centre with the angle the
+ *  shadow subtends at s, it is never wider than the true shadow (a player
+ *  inside it is always covered). Pure. */
+export function echoShelter(
+  sx: number,
+  sz: number,
+  px: number,
+  pz: number,
+  r: number,
+  reach: number = T.echoRadius,
+): { yaw: number; arcDeg: number; range: number } | null {
+  const dx = px - sx;
+  const dz = pz - sz;
+  const d = Math.hypot(dx, dz);
+  if (d <= r + 0.1 || d >= reach) return null;
+  const half = Math.asin(Math.min(1, r / d));
+  return { yaw: Math.atan2(dx, dz), arcDeg: (half * 2 * 180) / Math.PI, range: reach - d };
+}
+
+/** The Walking Slab's footprints: under it (a crush, lethal) and near it
+ *  (the grind, danger), past its face. */
+export function slabReach(pillarR: number): { crush: number; grind: number } {
+  return { crush: pillarR + T.slabCrushReach, grind: pillarR + T.slabGrindReach };
+}
+
+/** The Endless Song's look at `pulses` sung: its next pulse's multiplier
+ *  (the sim's), the rings a pulse throws (1 to 4) and their brightness, and
+ *  the floor ring round the pillar (yards past its face). */
+export function songLook(pulses: number): {
+  mult: number;
+  rings: number;
+  bright: number;
+  floor: number;
+} {
+  const mult = endlessSongMult(pulses);
+  const share = (mult - 1) / (T.songPulseCap - 1);
+  return {
+    mult,
+    rings: 1 + Math.min(3, Math.floor(share * 4)),
+    bright: 0.45 + 0.55 * share,
+    floor: 1.2 + share * 3,
+  };
+}
+
+/** Seconds the soul takes to flow from the fallen into its pillar. */
+export const SOUL_TAKE_SECONDS = 1.8;

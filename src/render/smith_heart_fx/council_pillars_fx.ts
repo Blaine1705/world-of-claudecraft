@@ -12,7 +12,11 @@
 import * as THREE from 'three';
 import { QUARRY_PILLAR_SPOTS } from '../../sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin, instanceSlotForZ } from '../../sim/data';
-import { COUNCIL_TUNING as T } from '../../sim/encounters/smith_heart/council_ids';
+import {
+  type CouncilRole,
+  councilPillarRadius,
+  COUNCIL_TUNING as T,
+} from '../../sim/encounters/smith_heart/council_ids';
 import type { Entity } from '../../sim/types';
 import type { TelegraphFan, TelegraphKit } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
@@ -39,6 +43,8 @@ import {
   pillarRise,
   pulseRadius,
   resonanceShake,
+  SOUL_COLORS,
+  soulPillarLook,
 } from './council_fx_core';
 import type { Rubble } from './hammer_fx';
 import { fxHash } from './hammer_fx_core';
@@ -55,6 +61,34 @@ const SHELL_PUSH = 0.045;
 /** Per-frame scratch (the frame allocates nothing). */
 const _rise = { sunk: 0, shudder: 0 };
 const _hum = { jitter: 0, heat: 0 };
+const _soul = { crack: 0, heat: 0, glow: 0 };
+/** The souls' colours as particle rgb (0..1), built once. */
+const SOUL_RGB: Readonly<Record<CouncilRole, readonly [number, number, number]>> = {
+  guardian: hexRgb(SOUL_COLORS.guardian.hex),
+  slabwright: hexRgb(SOUL_COLORS.slabwright.hex),
+  singer: hexRgb(SOUL_COLORS.singer.hex),
+};
+function hexRgb(hex: number): readonly [number, number, number] {
+  return [((hex >> 16) & 255) / 255, ((hex >> 8) & 255) / 255, (hex & 255) / 255];
+}
+const _soulMote = {
+  speed: 0.5,
+  up: 2.2,
+  life: 1.6,
+  size: [0.5, 0.12] as const,
+  color: SOUL_RGB.guardian as readonly [number, number, number],
+  alpha: 0.9,
+  pool: 'glow' as const,
+};
+const _dust = {
+  speed: 1.4,
+  up: 0.5,
+  life: 1.6,
+  size: [1.2, 3.2] as const,
+  color: C.dust,
+  alpha: 0.42,
+  drag: 1.2,
+};
 const _rubblePaint = { fill: 1, clock: 0, range: 0, fade: 0.85 };
 const PILLAR_GRIT = {
   speed: 0.3,
@@ -70,6 +104,8 @@ const rgb = (c: readonly [number, number, number]) => new THREE.Color(c[0], c[1]
 /** What CouncilFx lends its parts: the root, the shared pools, the clock. */
 export interface CouncilFxHost {
   root: THREE.Group;
+  /** A mirrored entity by id (the Walking Slab is followed every frame). */
+  entity: (id: number) => Entity | undefined;
   uTime: { value: number };
   particles: EngineParticles;
   debris: Rubble;
@@ -179,6 +215,33 @@ void main() {
 }
 `;
 
+// ---- a soul pillar's glow ---------------------------------------------------------------
+
+const SOUL_VERT = /* glsl */ `
+varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`;
+/** A sheath of the soul's light round the stone: strongest at the foot,
+ *  veins of it climbing and flowing up, fading toward the crown. */
+const SOUL_FRAG = /* glsl */ `
+uniform float uAlpha;
+uniform float uTime;
+uniform vec3 uColor;
+varying vec2 vUv;
+void main() {
+  float rise = pow(1.0 - vUv.y, 1.4);
+  float veins = 0.5 + 0.5 * sin(vUv.x * 6.2831853 * 5.0 + sin(vUv.y * 9.0 + uTime) * 1.4);
+  float flow = 0.55 + 0.45 * sin(vUv.y * 18.0 - uTime * 3.4 + vUv.x * 12.566);
+  float lace = smoothstep(0.55, 0.95, veins * flow);
+  float a = uAlpha * (0.15 + 0.85 * rise) * (0.2 + 0.8 * lace);
+  gl_FragColor = vec4(uColor * (0.7 + 0.7 * lace), a);
+  #include <colorspace_fragment>
+}
+`;
+
 interface PillarSlot {
   id: number;
   state: 'idle' | 'standing' | 'falling' | 'sinking';
@@ -196,6 +259,12 @@ interface PillarSlot {
   shellMat: THREE.ShaderMaterial;
   pips: THREE.Mesh;
   pipsMat: THREE.ShaderMaterial;
+  /** Mythic: whose soul it holds (its look follows), else null. */
+  soul: CouncilRole | null;
+  soulGlow: THREE.Mesh;
+  soulGlowMat: THREE.ShaderMaterial;
+  /** Seconds of motes owed (a soul's light rising off its cracks). */
+  motes: number;
   height: number;
   radius: number;
   x: number;
@@ -233,6 +302,9 @@ export class CouncilPillarsFx {
   private readonly pendingRise = new Set<number>();
   /** The Resonance cracking each pillar this frame (pillar id to share). */
   readonly humming = new Map<number, number>();
+  /** Mythic: each soul pillar's charge this frame (pillar id to 0..1: the
+   *  Echo's bar, the song's clock), set by the soul part. */
+  readonly charge = new Map<number, number>();
 
   constructor(
     private readonly h: CouncilFxHost,
@@ -240,7 +312,8 @@ export class CouncilPillarsFx {
   ) {
     const pipGeo = new THREE.RingGeometry(1, 1.16, 72, 1).rotateX(-Math.PI / 2);
     const drumGeo = new THREE.CylinderGeometry(0.92, 1, 1, 12, 1).translate(0, 0.5, 0);
-    this.h.geometries.push(pipGeo, drumGeo);
+    const sheathGeo = new THREE.CylinderGeometry(1, 1.06, 1, 36, 1, true).translate(0, 0.5, 0);
+    this.h.geometries.push(pipGeo, drumGeo, sheathGeo);
     const drumMat = surfaceMat({ color: 0x8c8274, roughness: 0.9, flatShading: true });
     // ---- the pillars ----
     for (let i = 0; i < POOLS.pillars; i++) {
@@ -308,6 +381,27 @@ export class CouncilPillarsFx {
       pips.position.y = 0.06;
       pips.frustumCulled = false;
       holder.add(pips);
+      const soulGlowMat = new THREE.ShaderMaterial({
+        name: 'smithHeartSoulGlow',
+        uniforms: {
+          uAlpha: { value: 0 },
+          uTime: this.h.uTime,
+          uColor: { value: new THREE.Color(SOUL_COLORS.guardian.hex) },
+        },
+        vertexShader: SOUL_VERT,
+        fragmentShader: SOUL_FRAG,
+        transparent: true,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending,
+        toneMapped: false,
+      });
+      this.h.materials.push(soulGlowMat);
+      const soulGlow = new THREE.Mesh(sheathGeo, soulGlowMat);
+      soulGlow.name = 'smithHeartSoulGlow';
+      soulGlow.visible = false;
+      soulGlow.frustumCulled = false;
+      leanYaw.add(soulGlow);
       this.h.root.add(holder);
       this.pillars.push({
         id: -1,
@@ -326,6 +420,10 @@ export class CouncilPillarsFx {
         shellMat,
         pips,
         pipsMat,
+        soul: null,
+        soulGlow,
+        soulGlowMat,
+        motes: 0,
         height: 12,
         radius: 2.4,
         x: 0,
@@ -364,9 +462,26 @@ export class CouncilPillarsFx {
   }
 
   /** A standing pillar by its entity id (Resonance's thread aims at it). */
-  standing(id: number): { x: number; y: number; z: number; height: number } | null {
+  standing(id: number): { x: number; y: number; z: number; height: number; radius: number } | null {
     const s = this.pillars.find((p) => p.id === id && p.state === 'standing');
     return s ?? null;
+  }
+
+  /** The standing pillars that hold no soul (the Echo's shelters), into
+   *  `out` (reused: the frame allocates nothing past its first use). */
+  shelters(out: { x: number; z: number; r: number }[]): number {
+    let n = 0;
+    for (const s of this.pillars) {
+      if (s.state !== 'standing' || s.soul) continue;
+      if (n >= out.length) out.push({ x: 0, z: 0, r: 0 });
+      out[n].x = s.x;
+      out[n].z = s.z;
+      // The sim's own cover (its wall's radius plus the sight test's breath:
+      // council_pillars.ts pillarBetween), never the model's.
+      out[n].r = councilPillarRadius(s.risen) + 0.35;
+      n++;
+    }
+    return n;
   }
 
   /** A scan begins: nothing seen yet. */
@@ -503,12 +618,13 @@ export class CouncilPillarsFx {
     }
   }
 
-  seePillar(e: Entity, integrity: number, risen: boolean): void {
+  seePillar(e: Entity, integrity: number, risen: boolean, soul: CouncilRole | null = null): void {
     let s = this.pillars.find((p) => p.id === e.id && p.state === 'standing');
     if (!s) {
       s = this.pillars.find((p) => p.state === 'idle');
       if (!s) return;
       s.id = e.id;
+      this.setSoul(s, null);
       s.state = 'standing';
       s.risen = risen;
       s.integrity = integrity;
@@ -540,7 +656,123 @@ export class CouncilPillarsFx {
     }
     s.seen = true;
     s.integrity = integrity;
+    if (s.soul !== soul) this.setSoul(s, soul);
     this.dressPillar(s);
+  }
+
+  /** Light a pillar with a soul's colours (or put the stone's own back). */
+  private setSoul(s: PillarSlot, soul: CouncilRole | null): void {
+    s.soul = soul;
+    const u = s.shellMat.uniforms;
+    const pu = s.pipsMat.uniforms;
+    if (soul) {
+      const c = SOUL_COLORS[soul];
+      (u.uCore.value as THREE.Color).setRGB(c.core[0], c.core[1], c.core[2]);
+      (u.uEdge.value as THREE.Color).setRGB(c.edge[0], c.edge[1], c.edge[2]);
+      (pu.uOn.value as THREE.Color).setHex(c.hex);
+      (s.soulGlowMat.uniforms.uColor.value as THREE.Color).setHex(c.hex);
+      s.soulGlow.visible = s.state === 'standing';
+    } else {
+      (u.uCore.value as THREE.Color).setRGB(C.crackCore[0], C.crackCore[1], C.crackCore[2]);
+      (u.uEdge.value as THREE.Color).setRGB(C.crackEdge[0], C.crackEdge[1], C.crackEdge[2]);
+      (pu.uOn.value as THREE.Color).setHex(C.pipLit);
+      s.soulGlow.visible = false;
+    }
+  }
+
+  /** The soul pillar standing (or just fallen) at (x, z), if any. */
+  private soulSlotNear(x: number, z: number, reach = 2.5): PillarSlot | null {
+    let best: PillarSlot | null = null;
+    let bestD = reach;
+    for (const s of this.pillars) {
+      if (s.state === 'idle' || !s.soul) continue;
+      const d = Math.hypot(s.x - x, s.z - z);
+      if (d < bestD) {
+        bestD = d;
+        best = s;
+      }
+    }
+    return best;
+  }
+
+  /** The soul's stream arrived: the soul wakes in its stone. */
+  soulAwake(id: number, soul: CouncilRole): void {
+    const s = this.pillars.find((p) => p.id === id && p.state === 'standing');
+    if (!s) return;
+    if (s.soul !== soul) this.setSoul(s, soul);
+    s.crackAt = this.h.now();
+    this.h.particles.puff(s.x, s.y + s.height * 0.5, s.z, 26, {
+      speed: 4,
+      up: 2,
+      life: 1.1,
+      size: [1.6, 4.4],
+      color: SOUL_RGB[soul],
+      alpha: 0.85,
+      pool: 'glow',
+      radius: s.radius,
+    });
+    this.h.particles.shockRing(s.x, s.z, SOUL_COLORS[soul].hex, s.radius + 6, 0.8);
+    this.h.particles.shockRing(s.x, s.z, 0xfff4e0, s.radius + 2.5, 0.45);
+    this.h.shakeNear(s.x, s.z, 0.3, 35);
+  }
+
+  /** `heart_council_soul_pip`: a soul pip struck off. */
+  soulPip(id: number): void {
+    const s = this.pillars.find((p) => p.id === id && p.state === 'standing');
+    if (!s?.soul) return;
+    this.crack(s);
+    // The pip's light tears out of the stone's foot.
+    this.h.particles.puff(s.x, s.y + 0.6, s.z, 18, {
+      speed: 7,
+      up: 1.5,
+      life: 0.7,
+      size: [0.9, 0.25],
+      color: SOUL_RGB[s.soul],
+      alpha: 1,
+      pool: 'glow',
+      radius: s.radius,
+    });
+    this.h.particles.shockRing(s.x, s.z, SOUL_COLORS[s.soul].hex, s.radius + 3.5, 0.5);
+  }
+
+  /** `heart_council_soul_burst`: the soul pillar bursts, its soul climbing
+   *  out of the stone (its own collapse follows on the same frame). */
+  soulBurstAt(x: number, z: number): void {
+    const s = this.soulSlotNear(x, z);
+    const soul = s?.soul ?? null;
+    if (!s || !soul) return;
+    const y = this.h.groundY(x, z);
+    const rgb = SOUL_RGB[soul];
+    const h = s.height;
+    this.h.particles.puff(x, y + h * 0.5, z, 40, {
+      speed: 6,
+      up: 3,
+      life: 1.4,
+      size: [2, 6],
+      color: rgb,
+      alpha: 0.9,
+      pool: 'glow',
+      radius: 2.5,
+    });
+    // The soul dissipating: a slow column of its light climbing away.
+    const n = Math.round(44 * this.h.density);
+    _soulMote.color = rgb;
+    for (let i = 0; i < n; i++) {
+      const a = this.h.rand() * Math.PI * 2;
+      const r = this.h.rand() * 2.5;
+      _soulMote.up = 3 + this.h.rand() * 4;
+      _soulMote.life = 2 + this.h.rand() * 1.5;
+      this.h.particles.puff(
+        x + Math.sin(a) * r,
+        y + this.h.rand() * h,
+        z + Math.cos(a) * r,
+        1,
+        _soulMote,
+      );
+    }
+    this.h.particles.shockRing(x, z, SOUL_COLORS[soul].hex, 12, 1);
+    this.h.particles.shockRing(x, z, 0xffffff, 6, 0.5);
+    this.h.shakeNear(x, z, 0.5, 50);
   }
 
   /** A carved column's yaw: its socket's (the static plan's). */
@@ -711,6 +943,10 @@ export class CouncilPillarsFx {
       let sunk = 0;
       let jitter = 0;
       let tip = 0;
+      if (s.state === 'standing' && s.soul) {
+        this.updateSoul(s, dt);
+        continue;
+      }
       if (s.state === 'standing') {
         const rise = pillarRise(this.h.now() - s.riseAt, _rise);
         sunk = rise.sunk;
@@ -751,6 +987,7 @@ export class CouncilPillarsFx {
         tip = fall.tip;
         sunk = fall.sunk;
         s.pips.visible = false;
+        if (s.soul) s.soulGlowMat.uniforms.uAlpha.value = Math.max(0, 0.6 * fall.alpha);
         s.shellMat.uniforms.uCrack.value = 1;
         s.shellMat.uniforms.uHeat.value = 1.3;
         s.shell.visible = s.body !== null;
@@ -783,6 +1020,88 @@ export class CouncilPillarsFx {
     s.id = -1;
     s.holder.visible = false;
     s.shell.visible = false;
+    this.setSoul(s, null);
+  }
+
+  /** A standing soul pillar's frame: its cracks lit in the soul's colour,
+   *  the sheath of light, its three pips; the Walking Slab followed (eased)
+   *  every frame, grinding and trailing dust. Every tier draws the cracks,
+   *  the sheath and the pips; only the motes and the dust thin. */
+  private updateSoul(s: PillarSlot, dt: number): void {
+    const soul = s.soul as CouncilRole;
+    const now = this.h.now();
+    let jitter = 0;
+    if (soul === 'slabwright') {
+      const e = s.id >= 0 ? this.h.entity(s.id) : undefined;
+      if (e) {
+        const k = 1 - Math.exp(-dt * 10);
+        const nx = s.x + (e.pos.x - s.x) * k;
+        const nz = s.z + (e.pos.z - s.z) * k;
+        const step = Math.hypot(nx - s.x, nz - s.z);
+        s.x = nx;
+        s.z = nz;
+        s.y = this.h.groundY(nx, nz);
+        s.holder.position.set(s.x, s.y, s.z);
+        if (step > 1e-4) {
+          // The stone grinds round as it drags: a slow turn, a shudder.
+          s.bodyYaw.rotation.y += (step / Math.max(1, s.radius)) * 0.35;
+          jitter = 0.05;
+          s.grit += dt * 16 * this.h.density;
+          while (s.grit >= 1) {
+            s.grit -= 1;
+            const a = this.h.rand() * Math.PI * 2;
+            this.h.particles.puff(
+              s.x + Math.sin(a) * s.radius,
+              s.y + 0.3,
+              s.z + Math.cos(a) * s.radius,
+              1,
+              _dust,
+            );
+          }
+        }
+      }
+    }
+    const charge = this.charge.get(s.id) ?? 0;
+    const look = soulPillarLook(s.integrity, now, charge, _soul);
+    const flash = crackFlash(now - s.crackAt);
+    const rise = pillarRise(now - s.riseAt, _rise);
+    s.shellMat.uniforms.uCrack.value = look.crack;
+    s.shellMat.uniforms.uHeat.value = look.heat;
+    s.shellMat.uniforms.uFlash.value = flash;
+    s.shell.visible = s.body !== null;
+    s.soulGlow.visible = true;
+    s.soulGlow.scale.set(s.radius * 1.12, s.height * 1.02, s.radius * 1.12);
+    s.soulGlowMat.uniforms.uAlpha.value = look.glow * (1 + flash * 1.5);
+    s.pipsMat.uniforms.uLit.value = s.integrity;
+    s.pipsMat.uniforms.uSlots.value = T.soulPips;
+    s.pipsMat.uniforms.uFlash.value = flash;
+    s.pips.visible = true;
+    // Its light rising off the cracks.
+    if (this.h.density > 0.5) {
+      s.motes += dt * (6 + charge * 18);
+      _soulMote.color = SOUL_RGB[soul];
+      _soulMote.up = 2.2;
+      _soulMote.life = 1.6;
+      while (s.motes >= 1) {
+        s.motes -= 1;
+        const a = this.h.rand() * Math.PI * 2;
+        this.h.particles.puff(
+          s.x + Math.sin(a) * s.radius * 1.05,
+          s.y + s.height * this.h.rand() * 0.9,
+          s.z + Math.cos(a) * s.radius * 1.05,
+          1,
+          _soulMote,
+        );
+      }
+    }
+    jitter += rise.shudder + charge * 0.04;
+    if (this.h.reducedMotion()) jitter = 0;
+    s.lean.rotation.x = 0;
+    s.leanYaw.position.set(
+      jitter ? (this.h.rand() - 0.5) * 2 * jitter : 0,
+      -rise.sunk * s.height,
+      jitter ? (this.h.rand() - 0.5) * 2 * jitter : 0,
+    );
   }
 
   seeRubble(e: Entity): void {
