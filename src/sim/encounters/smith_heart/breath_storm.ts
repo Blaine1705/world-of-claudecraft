@@ -108,7 +108,8 @@ export function landStorm(s: BreathScope): void {
   st.forkTimer = T.barrageSeconds + T.forkFirst;
   st.cradleTimer = T.barrageSeconds + T.cradleFirst;
   st.drawnTimer = T.barrageSeconds + T.drawnFirst;
-  st.swellTimer = T.barrageSeconds + T.swellEvery;
+  // The swell counts only once the barrage is over (stepStorm).
+  st.swellTimer = T.swellEvery;
   st.gustTimer = T.barrageSeconds + T.gustFirst;
 }
 
