@@ -17,6 +17,7 @@ import {
   type CombatWallPlacement,
   isCombatWallTemplate,
   setCombatWalls,
+  wallAnchor,
 } from '../sim/instances/combat_wall_state';
 import type { Entity } from '../sim/types';
 
@@ -52,8 +53,8 @@ export function syncClientCombatWalls(world: CombatWallWireWorld): void {
     walls.push({
       id: e.id,
       templateId: e.templateId,
-      x: e.pos.x - o.x,
-      z: e.pos.z - o.z,
+      x: wallAnchor(e.templateId, e.pos.x - o.x),
+      z: wallAnchor(e.templateId, e.pos.z - o.z),
       y: e.pos.y,
       rot: e.facing,
       scale: e.scale,

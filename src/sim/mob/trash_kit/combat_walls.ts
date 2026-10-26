@@ -19,6 +19,7 @@ import {
   type CombatWallPlacement,
   isCombatWallTemplate,
   setCombatWalls,
+  wallAnchor,
 } from '../../instances/combat_wall_state';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
@@ -98,8 +99,8 @@ export function combatWallPlacements(
     out.push({
       id: e.id,
       templateId: e.templateId,
-      x: e.pos.x - ox,
-      z: e.pos.z - oz,
+      x: wallAnchor(e.templateId, e.pos.x - ox),
+      z: wallAnchor(e.templateId, e.pos.z - oz),
       y: e.pos.y,
       rot: e.facing,
       scale: e.scale,

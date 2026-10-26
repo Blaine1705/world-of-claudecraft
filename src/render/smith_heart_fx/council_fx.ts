@@ -65,10 +65,10 @@ import {
   COUNCIL_CASTS,
   COUNCIL_CUES,
   COUNCIL_MARK_SPECS,
-  COUNCIL_RISE_SPOT,
   COUNCIL_RUBBLE,
   councilClaims,
   councilPillarOf,
+  councilRiseSpotSeconds,
   councilRoleOf,
   councilSoulOf,
   energyLook,
@@ -163,6 +163,8 @@ interface SpotSlot {
   ghost: THREE.Mesh;
   ghostMat: THREE.ShaderMaterial;
   born: number;
+  /** Its warning (the spot's template carries it: mythic's is shorter). */
+  seconds: number;
   seen: boolean;
   x: number;
   y: number;
@@ -461,6 +463,7 @@ export class CouncilFx {
         ghost,
         ghostMat: gm,
         born: -99,
+        seconds: RISE_SPOT_SPEC.seconds,
         seen: false,
         x: 0,
         y: 0,
@@ -780,7 +783,7 @@ export class CouncilFx {
             this.pillarsFx.seePillar(e, soul.pips, soul.risen, soul.role);
             this.soulFx.seeSoul(e, soul.role);
           } else if (e.templateId === COUNCIL_RUBBLE) this.pillarsFx.seeRubble(e);
-          else if (e.templateId === COUNCIL_RISE_SPOT) this.seeSpot(e);
+          else if (councilRiseSpotSeconds(e.templateId) !== null) this.seeSpot(e);
           continue;
         }
         if (e.kind !== 'player' || e.dead || e.auras.length === 0) continue;
@@ -920,6 +923,7 @@ export class CouncilFx {
       sp.z = e.pos.z;
       sp.y = this.groundY(sp.x, sp.z);
       sp.born = this.clock;
+      sp.seconds = councilRiseSpotSeconds(e.templateId) ?? RISE_SPOT_SPEC.seconds;
       sp.fan.group.visible = true;
       sp.ghost.visible = true;
       this.kit.drapeFan(sp.fan, this.groundY, sp.x, sp.y, sp.z, 0, RISE_SPOT_SPEC.radius);
@@ -930,7 +934,7 @@ export class CouncilFx {
   private updateSpots(): void {
     for (const sp of this.spots) {
       if (sp.id < 0) continue;
-      const fill = Math.min(1, (this.clock - sp.born) / RISE_SPOT_SPEC.seconds);
+      const fill = Math.min(1, (this.clock - sp.born) / sp.seconds);
       this.kit.paintFan(sp.fan, paint(fill, this.clock, RISE_SPOT_SPEC.radius));
       const g = wakeGhost(fill);
       sp.ghost.position.set(sp.x, sp.y, sp.z);

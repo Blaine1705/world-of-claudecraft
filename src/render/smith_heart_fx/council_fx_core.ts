@@ -20,6 +20,7 @@ import {
   type CouncilRole,
   councilPillarFull,
   councilPillarOf,
+  councilRiseSpotSeconds,
   councilRoleOf,
   councilSoulOf,
   endlessSongMult,
@@ -35,6 +36,7 @@ export {
   COUNCIL_RISE_SPOT,
   COUNCIL_RUBBLE,
   councilPillarOf,
+  councilRiseSpotSeconds,
   councilRoleOf,
   councilSoulOf,
 };
@@ -421,20 +423,28 @@ export function slabReach(pillarR: number): { crush: number; grind: number } {
 /** The Endless Song's look at `pulses` sung: its next pulse's multiplier
  *  (the sim's), the rings a pulse throws (1 to 4) and their brightness, and
  *  the floor ring round the pillar (yards past its face). */
-export function songLook(pulses: number): {
-  mult: number;
-  rings: number;
-  bright: number;
-  floor: number;
-} {
+export function songLook(
+  pulses: number,
+  out: { mult: number; rings: number; bright: number; floor: number } = {
+    mult: 1,
+    rings: 1,
+    bright: 0,
+    floor: 0,
+  },
+): { mult: number; rings: number; bright: number; floor: number } {
   const mult = endlessSongMult(pulses);
   const share = (mult - 1) / (T.songPulseCap - 1);
-  return {
-    mult,
-    rings: 1 + Math.min(3, Math.floor(share * 4)),
-    bright: 0.45 + 0.55 * share,
-    floor: 1.2 + share * 3,
-  };
+  out.mult = mult;
+  out.rings = 1 + Math.min(3, Math.floor(share * 4));
+  out.bright = 0.45 + 0.55 * share;
+  out.floor = 1.2 + share * 3;
+  return out;
+}
+
+/** Pulses sung, read back off the song aura's next multiplier (its value:
+ *  the wire omits a stack count of one, the multiplier always rides). */
+export function songPulsesOf(nextMult: number): number {
+  return Math.max(0, Math.round((nextMult - 1) / T.songPulseGrowth));
 }
 
 /** Seconds the soul takes to flow from the fallen into its pillar. */

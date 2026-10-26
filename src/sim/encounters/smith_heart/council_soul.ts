@@ -362,9 +362,20 @@ function stepSlab(s: CouncilScope, soul: CouncilSoul, p: CouncilPillar, source: 
         const nx = at.x + Math.sin(a) * step;
         const nz = at.z + Math.cos(a) * step;
         if (!onQuarryFloor(nx, nz)) continue;
-        const blocked = others.some(
-          (q) => Math.hypot(q.e.pos.x - o.x - nx, q.e.pos.z - o.z - nz) < q.r + p.r + 0.3,
-        );
+        const blocked =
+          others.some(
+            (q) => Math.hypot(q.e.pos.x - o.x - nx, q.e.pos.z - o.z - nz) < q.r + p.r + 0.3,
+          ) ||
+          // Round the council's own bodies too (a wall never closes on a boss).
+          COUNCIL_ROLES.some((r) => {
+            const b = s.bodies[r];
+            return (
+              living(b) &&
+              Math.hypot(b.pos.x - o.x - nx, b.pos.z - o.z - nz) < p.r + T.slabClearOfBodies &&
+              Math.hypot(b.pos.x - o.x - nx, b.pos.z - o.z - nz) <
+                Math.hypot(b.pos.x - o.x - at.x, b.pos.z - o.z - at.z)
+            );
+          });
         if (blocked) continue;
         e.prevPos.x = e.pos.x;
         e.prevPos.y = e.pos.y;
@@ -383,7 +394,7 @@ function stepSlab(s: CouncilScope, soul: CouncilSoul, p: CouncilPillar, source: 
   // Under it: a heavy hit and a throw (once per player a breath); near it,
   // the grind each second.
   const clock = s.st.clock;
-  const shove = { ...source, pos: { ...e.pos } } as Entity;
+  let shove: Entity | null = null;
   for (const pl of s.players) {
     if (pl.dead) continue;
     const face = Math.hypot(pl.pos.x - e.pos.x, pl.pos.z - e.pos.z) - p.r;
@@ -401,6 +412,7 @@ function stepSlab(s: CouncilScope, soul: CouncilSoul, p: CouncilPillar, source: 
     });
     const amount = roll(s, source, T.slabCrushMin, T.slabCrushMax);
     ctx.dealDamage(source, pl, amount, false, 'physical', COUNCIL_NAMES.slab, 'hit', true);
+    shove ??= { ...source, pos: { ...e.pos } } as Entity;
     if (!pl.dead) ctx.applyKnockback(shove, pl, T.slabCrushKnockback);
   }
   soul.grind -= DT;
@@ -520,6 +532,7 @@ export function soulDevTrigger(
       if (!p.soul) continue;
       touched++;
       if (want > p.integrity) {
+        p.integrity = want;
         p.e.templateId = councilSoulTemplate(p.soul, p.risen, want);
         continue;
       }

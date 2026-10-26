@@ -34,8 +34,8 @@ import {
   COUNCIL_CASTS,
   COUNCIL_CUES,
   COUNCIL_NAMES,
-  COUNCIL_RISE_SPOT,
   type CouncilRole,
+  councilRiseSpotTemplate,
   fallingRockShare,
   JOB_HEIRS,
   COUNCIL_TUNING as T,
@@ -87,7 +87,7 @@ export function startWake(s: CouncilScope): boolean {
     const obj = spawnEncounterObject(
       s.ctx,
       s.inst,
-      COUNCIL_RISE_SPOT,
+      councilRiseSpotTemplate(s.rules.heirRiseWarn),
       'Rising Stone',
       lx,
       lz,

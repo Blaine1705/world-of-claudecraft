@@ -21,6 +21,8 @@ import {
   type CouncilFightState,
   type CouncilRole,
   councilPillarTemplate,
+  councilRiseSpotSeconds,
+  councilRiseSpotTemplate,
   councilScopeForDev,
   councilSoulOf,
   councilSoulTemplate,
@@ -31,7 +33,11 @@ import {
   COUNCIL_TUNING as T,
 } from '../src/sim/encounters/smith_heart';
 import { crackPillar } from '../src/sim/encounters/smith_heart/council_pillars';
-import { COMBAT_WALL_SHAPES, combatWallsAt } from '../src/sim/instances/combat_wall_state';
+import {
+  COMBAT_WALL_SHAPES,
+  combatWallsAt,
+  wallAnchor,
+} from '../src/sim/instances/combat_wall_state';
 import type { Entity } from '../src/sim/types';
 import { type CouncilFight, councilFight, hitsOf } from './helpers/council_fight';
 
@@ -162,6 +168,15 @@ describe('Hammer Council mythic: the switch', () => {
       expect(shape?.hw).toBe(soul.risen ? T.risenR : T.columnR);
     }
     expect(COUNCIL_SOUL_TEMPLATES.length).toBe(3 * 2 * T.soulPips);
+    // Only the walking soul's wall anchors on a grid; every other wall is exact.
+    expect(wallAnchor(councilSoulTemplate('slabwright', true, 2), 3.3)).toBe(3.5);
+    expect(wallAnchor(councilSoulTemplate('guardian', true, 2), 3.3)).toBe(3.3);
+    expect(wallAnchor('sh_council_pillar_2', 3.3)).toBe(3.3);
+    // The heir's rise spot keeps its shipped id at 2 s and carries any other.
+    expect(councilRiseSpotTemplate(2)).toBe('sh_council_rise_spot');
+    expect(councilRiseSpotSeconds(councilRiseSpotTemplate(1.5))).toBe(1.5);
+    expect(councilRiseSpotSeconds('sh_council_rise_spot')).toBe(2);
+    expect(councilRiseSpotSeconds('sh_council_rubble')).toBeNull();
     expect(councilSoulOf('sh_council_soul_guardian_c_0')).toBeNull();
     expect(councilSoulOf('sh_council_pillar_2')).toBeNull();
   });
@@ -472,7 +487,8 @@ describe("Soul in the Stone: the Slabwright's Walking Slab", () => {
     const wall = combatWallsAt(o.x, o.z).find(
       (w) =>
         w.type === 'circle' &&
-        Math.hypot(w.x - (slab.e.pos.x - o.x), w.z - (slab.e.pos.z - o.z)) < 0.01,
+        // On its half-yard anchor grid (wallAnchor), both worlds alike.
+        Math.hypot(w.x - (slab.e.pos.x - o.x), w.z - (slab.e.pos.z - o.z)) < 0.36,
     );
     expect(wall).toBeDefined();
     // Under it: struck hard and thrown back; near it: the grind.
@@ -603,6 +619,9 @@ describe('Hammer Council mythic: the rock and Resonance never stop', () => {
     f.tick();
     expect(f.st.riseSpots.length).toBeGreaterThan(0);
     expect(f.st.riseSpots[0].remaining).toBeCloseTo(1.5, 5);
+    // The spot's template carries the shorter warning to every client.
+    const spot = f.sim.ctx.entities.get(f.st.riseSpots[0].objectId);
+    expect(councilRiseSpotSeconds(spot?.templateId ?? '')).toBe(1.5);
     quiet(f.st);
     kill(f, 'singer');
     f.st.resonance = [];

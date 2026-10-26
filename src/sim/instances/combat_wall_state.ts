@@ -32,6 +32,18 @@ export interface CombatWallShape {
   /** Drawn by its own encounter's renderer, never as the engine's ice slab
    *  (the Hammer Council's pillars: render/smith_heart_fx). */
   ownLook?: boolean;
+  /** A wall that walks (the mythic Walking Slab): its collider anchors on a
+   *  grid this many yards wide (wallAnchor), so the slot's view republishes
+   *  a few times a second as it drags, never every tick. */
+  anchorStep?: number;
+}
+
+/** A wall's collider anchor along one axis (instance-local): its own spot,
+ *  or for a walking wall the nearest point of its grid. Both worlds publish
+ *  through it (combat_walls.ts, net/combat_wall_wire.ts), so they agree. */
+export function wallAnchor(templateId: string, v: number): number {
+  const step = COMBAT_WALL_SHAPES[templateId]?.anchorStep;
+  return step ? Math.round(v / step) * step : v;
 }
 
 /** Every wall shape, by the object template id that carries it. A new wall
@@ -65,10 +77,13 @@ function soulPillarShapes(): Record<string, CombatWallShape> {
   for (const role of ['guardian', 'slabwright', 'singer'])
     for (const kind of ['c', 'r'])
       for (const pips of [1, 2, 3])
-        out[`sh_council_soul_${role}_${kind}_${pips}`] =
-          kind === 'c'
+        out[`sh_council_soul_${role}_${kind}_${pips}`] = {
+          ...(kind === 'c'
             ? { hw: 2.6, hd: 2.6, height: 13, round: true, ownLook: true }
-            : { hw: 2.2, hd: 2.2, height: 10, round: true, ownLook: true };
+            : { hw: 2.2, hd: 2.2, height: 10, round: true, ownLook: true }),
+          // The Slabwright's soul walks (council_soul.ts stepSlab).
+          ...(role === 'slabwright' ? { anchorStep: 0.5 } : {}),
+        };
   return out;
 }
 

@@ -17,6 +17,7 @@ import {
   SOUL_COLORS,
   slabReach,
   songLook,
+  songPulsesOf,
   soulPillarLook,
 } from '../src/render/smith_heart_fx/council_fx_core';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
@@ -86,6 +87,9 @@ describe('council_fx_core: Soul in the Stone', () => {
     expect(songLook(500).mult).toBe(endlessSongMult(500));
     expect(songLook(500).rings).toBe(4);
     expect(songLook(10).bright).toBeGreaterThan(songLook(0).bright);
+    // The pulse count reads back off the aura's multiplier (the wire drops a
+    // stack count of one; the value always rides).
+    for (const n of [0, 1, 2, 7, 25]) expect(songPulsesOf(endlessSongMult(n))).toBe(n);
   });
 
   it('claims every soul cue', () => {

@@ -26,7 +26,7 @@ import {
   COUNCIL_CASTS,
   type CouncilRole,
   councilPillarRadius,
-  councilSoulOf,
+  COUNCIL_TUNING as T,
 } from '../../sim/encounters/smith_heart/council_ids';
 import type { Entity } from '../../sim/types';
 import type { TelegraphFan } from '../floor_telegraph';
@@ -38,8 +38,8 @@ import {
   echoShelter,
   COUNCIL_FX_POOLS as POOLS,
   SOUL_COLORS,
-  slabReach,
   songLook,
+  songPulsesOf,
 } from './council_fx_core';
 import type { CouncilFxHost, CouncilPillarsFx } from './council_pillars_fx';
 
@@ -149,6 +149,18 @@ const _ember = {
   spread: 0.12,
 };
 
+const _wave = {
+  speed: 14,
+  up: 0.6,
+  life: 1.8,
+  size: [2.5, 6] as const,
+  color: C.dust,
+  alpha: 0.5,
+  drag: 1.1,
+  dir: [0, 0.05, 0] as [number, number, number],
+  spread: 0.1,
+};
+
 function setRgb(hex: number): readonly [number, number, number] {
   _rgb[0] = ((hex >> 16) & 255) / 255;
   _rgb[1] = ((hex >> 8) & 255) / 255;
@@ -164,11 +176,15 @@ function paint(fill: number, clock: number, range: number, fade = 1): typeof _pa
   return _paint;
 }
 
-function auraStacks(e: Entity, id: string): number {
+/** The Endless Song's pulses sung, off its aura's multiplier (online, a
+ *  stack count of one is never on the wire; the value always is). */
+function songPulses(e: Entity): number {
   const auras = e.auras;
-  for (let i = 0; i < auras.length; i++) if (auras[i].id === id) return auras[i].stacks ?? 0;
+  for (let i = 0; i < auras.length; i++)
+    if (auras[i].id === COUNCIL_AURAS.endlessSong) return songPulsesOf(auras[i].value);
   return 0;
 }
+const _song = { mult: 1, rings: 1, bright: 0, floor: 0 };
 
 export class CouncilSoulFx {
   private readonly slots: SoulSlot[] = [];
@@ -449,12 +465,15 @@ export class CouncilSoulFx {
     at: { x: number; y: number; z: number; radius: number },
     clock: number,
   ): void {
-    // The sim's own footprint (its wall's radius), never the model's.
-    const reach = slabReach(councilPillarRadius(councilSoulOf(e.templateId)?.risen ?? true));
+    // The sim's own footprint (its wall's radius), never the model's: a
+    // walking soul pillar's template ends in its pips, its kind before them.
+    const r = councilPillarRadius(e.templateId.charAt(e.templateId.length - 3) !== 'c');
+    const grind = r + T.slabGrindReach;
+    const crush = r + T.slabCrushReach;
     // Re-drape once it has walked a stride; between, the fans ride along.
     if (!(Math.abs(at.x - s.drapedX) <= 0.6 && Math.abs(at.z - s.drapedZ) <= 0.6)) {
-      this.h.kit.drapeFan(s.outer, this.h.groundY, at.x, at.y, at.z, 0, reach.grind);
-      this.h.kit.drapeFan(s.inner, this.h.groundY, at.x, at.y, at.z, 0, reach.crush);
+      this.h.kit.drapeFan(s.outer, this.h.groundY, at.x, at.y, at.z, 0, grind);
+      this.h.kit.drapeFan(s.inner, this.h.groundY, at.x, at.y, at.z, 0, crush);
       s.drapedX = at.x;
       s.drapedZ = at.z;
     } else {
@@ -463,8 +482,8 @@ export class CouncilSoulFx {
       s.inner.group.position.x = at.x;
       s.inner.group.position.z = at.z;
     }
-    this.h.kit.paintFan(s.outer, paint(1, clock, reach.grind, 0.8));
-    this.h.kit.paintFan(s.inner, paint(1, clock, reach.crush));
+    this.h.kit.paintFan(s.outer, paint(1, clock, grind, 0.8));
+    this.h.kit.paintFan(s.inner, paint(1, clock, crush));
   }
 
   private updateSong(
@@ -473,7 +492,7 @@ export class CouncilSoulFx {
     at: { x: number; y: number; z: number; radius: number },
     clock: number,
   ): void {
-    const look = songLook(auraStacks(e, COUNCIL_AURAS.endlessSong));
+    const look = songLook(songPulses(e), _song);
     s.floor.position.set(at.x, at.y + 0.08, at.z);
     s.floor.scale.setScalar(at.radius + look.floor);
     s.floorMat.uniforms.uAlpha.value = look.bright * (0.75 + 0.25 * Math.sin(clock * 5));
@@ -513,22 +532,14 @@ export class CouncilSoulFx {
     const n = Math.round(36 * this.h.density);
     for (let i = 0; i < n; i++) {
       const a = (i / Math.max(1, n)) * Math.PI * 2 + this.h.rand() * 0.2;
+      _wave.dir[0] = Math.sin(a);
+      _wave.dir[2] = Math.cos(a);
       this.h.particles.puff(
         x + Math.sin(a) * (at.radius + 1),
         y + 0.6,
         z + Math.cos(a) * (at.radius + 1),
         1,
-        {
-          speed: 14,
-          up: 0.6,
-          life: 1.8,
-          size: [2.5, 6],
-          color: C.dust,
-          alpha: 0.5,
-          drag: 1.1,
-          dir: [Math.sin(a), 0.05, Math.cos(a)],
-          spread: 0.1,
-        },
+        _wave,
       );
     }
     this.h.shakeNear(x, z, 0.8, 55);
@@ -539,7 +550,7 @@ export class CouncilSoulFx {
     const at = this.pillars.standing(pillarId);
     const e = this.h.entity(pillarId);
     if (!at || !e) return;
-    const look = songLook(Math.max(0, auraStacks(e, COUNCIL_AURAS.endlessSong) - 1));
+    const look = songLook(Math.max(0, songPulses(e) - 1), _song);
     for (let i = 0; i < look.rings; i++) {
       const r = 50 - i * 9;
       this.h.particles.shockRing(

@@ -119,6 +119,22 @@ export const COUNCIL_RUBBLE = 'sh_council_rubble';
 /** An heir's rising pillar: the 2 s spot locked under a random player
  *  (scale = the knockback radius). */
 export const COUNCIL_RISE_SPOT = 'sh_council_rise_spot';
+
+/** A rise spot's template for a warning of `seconds`: the plain id at the
+ *  shipped 2 s (normal and heroic keep it), else `<id>_<tenths>` (mythic's
+ *  1.5 s), so the client fills the warning to the very moment it rises. */
+export function councilRiseSpotTemplate(seconds: number): string {
+  const tenths = Math.round(seconds * 10);
+  return tenths === 20 ? COUNCIL_RISE_SPOT : `${COUNCIL_RISE_SPOT}_${tenths}`;
+}
+
+/** A rise spot template's warning in seconds, or null when it is none. */
+export function councilRiseSpotSeconds(templateId: string): number | null {
+  if (templateId === COUNCIL_RISE_SPOT) return 2;
+  if (!templateId.startsWith(`${COUNCIL_RISE_SPOT}_`)) return null;
+  const n = Number(templateId.slice(COUNCIL_RISE_SPOT.length + 1));
+  return Number.isInteger(n) && n > 0 ? n / 10 : null;
+}
 /** Mythic: a pillar holding a fallen member's soul (Soul in the Stone):
  *  `sh_council_soul_<role>_<c|r>_<pips>` (c a carved column, r a risen
  *  pillar), a combat wall like the others. */
@@ -380,6 +396,8 @@ export const COUNCIL_TUNING = {
   slabGroupR: 8,
   /** It stops this far (centre) from the spot it walks to. */
   slabArrive: 1,
+  /** It keeps this far past its own face from a living council body. */
+  slabClearOfBodies: 1.6,
   /** Under it (this far past its face): a heavy hit and a throw, once per
    *  player in this many seconds. */
   slabCrushReach: 1.5,
