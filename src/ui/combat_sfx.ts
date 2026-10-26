@@ -1,5 +1,6 @@
 import { furyAudioClaimed } from '../game/fury_audio_core';
 import type { SfxId } from '../game/sfx_manifest.generated';
+import { councilSoundClaims } from '../game/smith_heart_council_audio_core';
 import { warriorRecoveryAudio } from '../game/warrior_recovery_core';
 import { ABILITIES, MOBS } from '../sim/data';
 import type { Aura, Entity, SimEvent } from '../sim/types';
@@ -486,6 +487,8 @@ export function impactCueForDamage(event: DamageEvent, target: Entity): SfxId | 
 
 export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number } | null {
   if (furyAudioClaimed(event)) return null;
+  // The Hammer Council's cues play their own samples (smith_heart_council_audio.ts).
+  if (councilSoundClaims(event.ability)) return null;
   if (event.fx === 'projectile') {
     if (event.school === 'physical') return { key: 'melee_bow', anchorId: event.sourceId };
     const school = magicSchool(event.school);

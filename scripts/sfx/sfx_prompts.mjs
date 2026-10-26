@@ -1221,6 +1221,120 @@ export const SFX = [
   { key: 'rift_ice_glide', custom: true, loop: true }, // point-source loop for a player currently gliding
   { key: 'rift_ice_stop', custom: true }, // skidding to a halt off the ice
   { key: 'rift_lava_tick', custom: true }, // the 1 Hz lava/blackwater hazard burn tick
+
+  // --- The Smith's Heart: the Hammer Council (ElevenLabs Sound Effects) ------
+  // Positioned one-shots and one loop for the council's moments, played by
+  // src/game/smith_heart_council_audio.ts off the council's own cues and cast
+  // bars (the base council and mythic's Soul in the Stone).
+  {
+    key: 'heart_council_wrath_charge',
+    duration: 4,
+    prompt:
+      'A deep earthquake rumble building over four seconds inside a stone quarry: grinding bedrock, small stones rattling loose, pressure rising to a peak. No music.',
+  },
+  {
+    key: 'heart_council_wrath_blast',
+    duration: 2,
+    prompt:
+      'A massive stone shockwave blast in a quarry: a huge boom of rock splitting, a wall of dust and gravel rushing outward, a deep sub impact. Single event, no music.',
+  },
+  {
+    key: 'heart_council_pillar_rise',
+    duration: 1.5,
+    prompt:
+      'A heavy stone pillar bursting up out of a rock floor: a violent grinding crack, debris thrown, a deep thud as it locks in place. No music.',
+  },
+  {
+    key: 'heart_council_pillar_crack',
+    duration: 1,
+    prompt:
+      'A large stone column cracking under strain: a sharp rock fracture snap with crumbling chips and a short gritty trickle of dust. No music.',
+  },
+  {
+    key: 'heart_council_pillar_collapse',
+    duration: 2.5,
+    prompt:
+      'A tall stone column toppling and breaking apart: a groaning tilt, then a massive crash of falling rubble and settling dust. No music.',
+  },
+  {
+    key: 'heart_council_pillar_pulse',
+    duration: 0.8,
+    prompt:
+      'A low resonant hum pulse from a stone pillar: one soft deep thrum of earth energy, short and dull. No music.',
+  },
+  {
+    key: 'heart_council_rock_fall',
+    duration: 1.2,
+    prompt:
+      'A huge boulder falling from high above: a deep rushing whoosh growing louder as it descends, no impact. No music.',
+  },
+  {
+    key: 'heart_council_rock_impact',
+    duration: 1.6,
+    prompt:
+      'A giant boulder slamming into a stone floor: a heavy crunching boom, rock shattering apart, a spray of gravel. Single impact, no music.',
+  },
+  {
+    key: 'heart_council_seam_bolt',
+    duration: 1,
+    prompt:
+      'A crystalline shard bolt flying and shattering on impact: a bright glassy whoosh ending in a ringing crystal break. No music.',
+  },
+  {
+    key: 'heart_council_song_cast',
+    duration: 3,
+    prompt:
+      'An eerie resonant hum swelling inside a cave, like an ore vein ringing: layered crystalline tones over a low drone, rising for three seconds. Wordless, no melody, no music.',
+  },
+  {
+    key: 'heart_council_soul_take',
+    duration: 2,
+    prompt:
+      'A rush of spectral energy pouring into stone: a deep ghostly whoosh that sinks into rock and ends in a low resonant awakening hum. No music, no voice.',
+  },
+  {
+    key: 'heart_council_echo_charge',
+    duration: 3,
+    prompt:
+      'A tense rising rumble with ember crackle charging inside a stone pillar over three seconds, pressure building to a peak. No music.',
+  },
+  {
+    key: 'heart_council_echo_blast',
+    duration: 1.8,
+    prompt:
+      'A fiery stone shockwave bursting from a pillar: a deep boom with an ember whoosh and rolling rock dust. Single event, no music.',
+  },
+  {
+    key: 'heart_council_slab_grind',
+    duration: 3,
+    loop: true,
+    prompt:
+      'A huge stone slab being dragged slowly across a rock floor: continuous heavy grinding and scraping over a deep rumble. Seamless loop, no music.',
+  },
+  {
+    key: 'heart_council_slab_crush',
+    duration: 1.2,
+    prompt:
+      'A massive stone slab slamming down and crushing: a heavy crunching thud with cracking rock. Single impact, no music.',
+  },
+  {
+    key: 'heart_council_song_pulse',
+    duration: 1.2,
+    prompt:
+      'A resonant crystalline sound pulse ringing out across a cavern: a deep bell-like ring of stone with a shimmering shockwave. Wordless, no melody, no music.',
+  },
+  {
+    key: 'heart_council_soul_pip',
+    duration: 0.8,
+    prompt:
+      'A sharp crystal chip breaking off a stone with a bright magical spark and a quick shimmer. Short, no music.',
+  },
+  {
+    key: 'heart_council_soul_burst',
+    duration: 2.5,
+    prompt:
+      'A stone pillar bursting with released spirit energy: a bright shattering crack, a ghostly whoosh rising and fading away, rubble falling. No music, no voice.',
+  },
 ];
 
 // Family ids that have creature vocalizations (used by the integration layer to

@@ -34,6 +34,8 @@
 // ladder's encounter band through the shared floor telegraph.
 
 import * as THREE from 'three';
+import { sfx } from '../../game/sfx';
+import { CouncilAudio } from '../../game/smith_heart_council_audio';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
 import {
   type CouncilRole,
@@ -88,6 +90,9 @@ import {
 import { type CouncilFxHost, CouncilPillarsFx, RISEN_HEIGHT } from './council_pillars_fx';
 import { CouncilSoulFx } from './council_soul_fx';
 import { chunkGeometry, Rubble } from './hammer_fx';
+
+/** What a soul pillar is to the council's sound. */
+const SOUL_SOUND = { guardian: 'echo', slabwright: 'slab', singer: 'song' } as const;
 
 const SCAN_SEC = 0.1;
 // ---- a soft additive band (the ghost pillar, Resonance, the threads) -----------------------
@@ -314,6 +319,9 @@ export class CouncilFx {
   private readonly materials: THREE.Material[] = [];
   private readonly pillarsFx: CouncilPillarsFx;
   private readonly soulFx: CouncilSoulFx;
+  /** The council's sounds (game/smith_heart_council_audio.ts), fed by this
+   *  painter's cues, scan and frame. */
+  private readonly audio = new CouncilAudio(sfx);
   private readonly marks: MarkSlot[] = [];
   private readonly spots: SpotSlot[] = [];
   private readonly rocks: RockSlot[] = [];
@@ -683,6 +691,12 @@ export class CouncilFx {
   /** Claims the council's own cues (the renderer's generic draw is skipped). */
   handleEvent(ev: SimEvent): boolean {
     if (!this.world || this.disposed) return false;
+    const world = this.world;
+    this.audio.event(
+      ev,
+      (id) => world.entities.get(id),
+      (x, z) => this.groundY(x, z),
+    );
     if (ev.type === 'spellfxAt') {
       if (!councilClaims(ev.ability)) return false;
       if (ev.ability === COUNCIL_CUES.collapse)
@@ -739,6 +753,7 @@ export class CouncilFx {
     this.updateBolts(world, dt);
     this.updateStreams(world, dt);
     this.updateEnergy(world, dt);
+    this.audio.update(dt, (id) => world.entities.get(id));
     this.debris.update(dt);
     this.particles.update(this.clock);
   }
@@ -754,6 +769,7 @@ export class CouncilFx {
     // The pillars and the rubble.
     this.pillarsFx.beginScan();
     this.soulFx.beginScan();
+    this.audio.beginScan();
     for (const m of this.marks) m.seen = false;
     for (const r of this.rocks) r.seen = false;
     for (const r of this.rings) r.seen = false;
@@ -765,6 +781,7 @@ export class CouncilFx {
     if (here) {
       for (const e of world.entities.values()) {
         if (e.kind === 'mob') {
+          if (!e.dead && councilRoleOf(e.templateId) !== null) this.audio.see(e, 'member');
           if (
             holder < 0 &&
             !e.dead &&
@@ -782,6 +799,7 @@ export class CouncilFx {
           else if (soul) {
             this.pillarsFx.seePillar(e, soul.pips, soul.risen, soul.role);
             this.soulFx.seeSoul(e, soul.role);
+            this.audio.see(e, SOUL_SOUND[soul.role]);
           } else if (e.templateId === COUNCIL_RUBBLE) this.pillarsFx.seeRubble(e);
           else if (councilRiseSpotSeconds(e.templateId) !== null) this.seeSpot(e);
           continue;
@@ -790,8 +808,10 @@ export class CouncilFx {
         for (const a of e.auras) {
           if (a.id === COUNCIL_AURAS.wakeMark || a.id === COUNCIL_AURAS.rockMark)
             this.seeMark(e, a.id);
-          if (a.id === COUNCIL_AURAS.rockMark) this.seeRock(e);
-          else if (a.id === COUNCIL_AURAS.resonance) this.seeRing(e);
+          if (a.id === COUNCIL_AURAS.rockMark) {
+            this.seeRock(e);
+            this.audio.see(e, 'rock');
+          } else if (a.id === COUNCIL_AURAS.resonance) this.seeRing(e);
           else if (a.id === COUNCIL_AURAS.weight) this.seeWeight(e);
         }
       }
@@ -800,6 +820,7 @@ export class CouncilFx {
     // What the scan no longer saw.
     this.pillarsFx.endScan();
     this.soulFx.endScan();
+    this.audio.endScan();
     for (const m of this.marks) {
       if (m.playerId >= 0 && !m.seen) this.freeMark(m);
     }
@@ -1416,5 +1437,6 @@ export class CouncilFx {
     this.debris.mesh.dispose();
     this.beads.dispose();
     this.glowTex?.dispose();
+    this.audio.dispose();
   }
 }

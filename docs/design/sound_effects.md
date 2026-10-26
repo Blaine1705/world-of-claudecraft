@@ -373,6 +373,32 @@ in and out never steps (`tests/tavern_ambience_core.test.ts`). The clip is a cus
 master baked as a seamless 16-bar loop; regenerate it with
 `node scripts/gen_tavern_ambience_sfx.mjs`, then `npm run sfx:manifest`.
 
+### The Smith's Heart: the Hammer Council (spatial one-shots, one loop)
+Played by `src/game/smith_heart_council_audio.ts` (plan: `smith_heart_council_audio_core.ts`)
+off the council's own cues, cast bars and marks; the HUD's generic nova never doubles one
+(`councilSoundClaims`). Generated with the ElevenLabs Sound Effects API through `gen_sfx.mjs`.
+
+| key | when | prompt summary |
+|---|---|---|
+| `heart_council_wrath_charge` | Mountain's Wrath's bar starts (fitted to the bar) | an earthquake rumble building to a peak |
+| `heart_council_wrath_blast` | the Wrath lands | a huge stone shockwave, dust and gravel rushing out |
+| `heart_council_pillar_rise` | a pillar bursts out of the floor | violent grinding crack, a deep locking thud |
+| `heart_council_pillar_crack` | a pillar loses a piece | a sharp rock fracture with a gritty trickle |
+| `heart_council_pillar_collapse` | a pillar falls (and, softer, the risen ones sinking) | a column toppling into a crash of rubble |
+| `heart_council_pillar_pulse` | heroic: the pillars pulse (low, cooled) | one soft deep thrum |
+| `heart_council_rock_fall` | the boulder comes into view over its soak | a deep descending whoosh |
+| `heart_council_rock_impact` | the rock lands (softer and higher: Hammer's Weight's slab) | a giant boulder crunching into stone |
+| `heart_council_seam_bolt` | a Seam Bolt lands | a glassy whoosh into a ringing crystal break |
+| `heart_council_song_cast` | the Song of the Seam's bar starts | an ore vein's ringing hum swelling, wordless |
+| `heart_council_soul_take` | mythic: a soul flows into its pillar (softer: the stone remembers) | a ghostly rush sinking into rock |
+| `heart_council_echo_charge` | mythic: the Echo of Wrath's bar starts | a rising rumble with ember crackle |
+| `heart_council_echo_blast` | mythic: the Echo lands | a fiery stone boom with rolling dust |
+| `heart_council_slab_grind` | mythic: loop while the Walking Slab drags | continuous heavy stone grinding |
+| `heart_council_slab_crush` | mythic: the slab crushes a player | a heavy crunching slam |
+| `heart_council_song_pulse` | mythic: each Endless Song pulse, louder and deeper as it grows | a deep bell-like ring of stone |
+| `heart_council_soul_pip` | mythic: a soul pip is struck off | a crystal chip with a bright spark |
+| `heart_council_soul_burst` | mythic: a soul pillar bursts | a shattering crack and a ghostly whoosh rising away |
+
 ### Interface and personal event cues
 
 These cues are non-positional, preload at startup, and keep the existing
