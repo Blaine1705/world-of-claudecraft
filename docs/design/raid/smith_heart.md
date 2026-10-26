@@ -842,10 +842,19 @@ The council's effects are `src/render/smith_heart_fx/council_fx.ts` (pure plan
 | Resonance | A notched ring round the player at the 3.5 yd reach and a shimmer round the body; while it cracks a pillar, a thread of light to that pillar and the pillar humming (shaking, its seams glowing) |
 | The stone remembers | A river of beads of stone light arcing from the fallen to each survivor, a flare on arrival |
 | Heroic pulse | A ring out to each pillar's reach every 2 s |
+| Mythic: the soul taking the stone | A river of beads in the soul's own colour from the fallen into the most intact pillar, a flare as it tears free, and on arrival the stone wakes: a burst of its light and two shock rings |
+| Mythic: a soul pillar | Its cracks always open and burning in the soul's colour (the Guardian an ember red-orange, the Slabwright jade green, the Seam Singer sky blue: none of them a mark's colour), a sheath of that light climbing the stone, three soul pips in it round the foot, motes rising off it; it brightens as its behaviour charges |
+| Mythic: a pip struck off | The stone flashes and chips, the pip's light tears out of its foot in sparks and a ring |
+| Mythic: a soul pillar bursting | A flare of the soul's light, a slow column of it climbing away (the soul dissipating), rings, then the usual fall into rubble |
+| Mythic: Echo of Wrath | While its bar runs: a lethal ring out to the Echo's 45 yd filling with it, a dark shelter wedge behind every other pillar (drawn never wider than the sim's cover), embers drawn into the pillar; on landing rings race out, a wave of dust rolls over the floor, a flash and a shake |
+| Mythic: the Walking Slab | The stone eased along its path every frame, grinding round with a shudder and a dust trail, its two footprints riding with it (the crush lethal, the grind danger); a crush throws shards and dust off its player |
+| Mythic: the Endless Song | A notched ring on the floor round the pillar that widens and brightens with every pulse sung, a clock ring closing on the stone until the next pulse, and the pulse's sound rings racing out over the whole Quarry, more of them and brighter as the song grows |
 
 Readability: every footprint (the floor telegraph), ring, gauge, pip, crack and lean draws
 on every tier; the static preset sheds only dust, grit and debris; reduced motion drops the
-shakes. Every material is built with the effects' root under one gated attach (the kits'
+shakes. On mythic the soul colours, the sheath, the soul pips, the Echo's ring and its
+shelter wedges, the slab's footprints and the song's rings draw on every tier too (which
+pillar holds a soul is never shed); only the motes, embers and dust thin. Every material is built with the effects' root under one gated attach (the kits'
 pieces draw with their shared slot materials, warmed with the interior), no light, fixed
 pools. The council's own cues are claimed (`councilClaims`), so no generic burst doubles
 them; the marks and cues are mirrored entity state, so online looks the same. The Hammer
@@ -947,7 +956,7 @@ number below is a SKETCH, unmeasured, to be calibrated with the meters harness.
 | Resonance | 15 s, a ring round the player; standing within 3.5 yd of a pillar's face for 3 s in a row knocks a piece off it, then the 3 s start again; nothing cleanses it (the play: hide behind the most damaged pillar at Wrath, keep off the whole ones). Not a walk-to-cleanse mark (Ignivar's Brand of the Pyre is one) | `council_song.ts` |
 | The stone remembers | When one falls, every survivor gains a stack of Memory of Stone (+15 percent damage dealt each) and takes up its job in a worse form: the Slabwright's pillars rise under RANDOM players on a locked spot with a 2 s warning (the Falling Rock stops with it); the Singer's song is sung by a survivor on 3 players and no kick stops it (the bolt stops with it); the Guardian's energy passes to a survivor (from empty) with a shorter Wrath (fills in 35 s, a 3 s bar, 380 to 450; Hammer's Weight stops with it). The heir is the first survivor in `JOB_HEIRS`; the last one carries every job | `council_scope.ts` (`jobHolder`), `council.ts` |
 | Heroic | All the above, plus Resonance overlapping the Wrath, Wake the Stone marking 2, every standing pillar pulsing 60 to 75 nature on whoever stands within 3 yd of its face every 2 s (Restless Stone), and every council number 25 percent higher. The raid has no heroic tier yet (`HEROIC_DUNGEON_IDS`), so a dev run switches it on (`/dev heart council heroic`) | `council_ids.ts` (`COUNCIL_DIFFICULTY`) |
-| Mythic seam | `CouncilDifficulty` is the encounter state's switch; a mythic is one more `COUNCIL_DIFFICULTY` row (stronger inheritances, one mythic-only mechanic); no dead code waits for it | `council_ids.ts` |
+| Mythic | A prototype behind a dev switch until the game has a mythic tier: one more `COUNCIL_DIFFICULTY` row (see "Mythic" below) | `council_ids.ts`, `council_soul.ts` |
 
 **Health (sketch, unmeasured).** Planning raid DPS about 600 (ten players at level 20;
 Varkhul's measured adds DPS was a median of 696 on heroic), a 4.5 minute fight at about 85
@@ -978,6 +987,45 @@ Seam Singer, Hammer Council, Hammer's Weight, Wake the Stone, Seam Bolt, Song of
 Memory of Stone, Rockfall Tremor, Crumbled Stone and Restless Stone returned no game use
 (CLEAR); Falling Rock (already shipped by the Buried Hoards) and Resonance are generic
 English.
+
+#### Mythic: Soul in the Stone (prototype, behind a dev switch until the game has a mythic tier)
+
+Designed with the owner (2026-10-26). The game has no mythic tier, so the council's own
+difficulty gained a `'mythic'` row reached only through `/dev heart council mythic on`
+(dev-gated like `heroic`; turning one on turns the other off). No global difficulty, no
+instance selector, and normal and heroic resolve exactly as before (their tests are
+unchanged, and `tests/smith_heart_council_mythic.test.ts` pins that neither ever holds a
+soul pillar). Every number here is a SKETCH, unmeasured.
+
+| Piece | Rule | Where |
+|---|---|---|
+| Heroic and more | Everything heroic has: Resonance overlapping the Wrath, Wake the Stone marking 2, the pillars' pulse, every number 25 percent higher | `COUNCIL_DIFFICULTY.mythic` |
+| Stronger inheritances | The Slabwright fallen: the random pillars rise under 2 players on a 1.5 s warning (`heirRiseWarn`). The Singer fallen: the unbroken song rings on 4 (`heirSongMarks`). The Guardian fallen: the heir's energy fills in 30 s, its Wrath a 3 s bar (`heirFillSeconds`). The last one carries every job | `council_stone.ts`, `council_song.ts`, `council_wrath.ts` |
+| The rock and Resonance never stop | With the Slabwright fallen, its first living heir keeps casting Falling Rock on its timer (`rockOutlivesSlabwright`, `rockCaster`); Resonance already outlives the Singer through the song's heir. They are the only things that break a soul pillar, so a living member always supplies both (pinned for all six kill orders) | `council_stone.ts` |
+| Soul in the Stone | When a member falls, its soul flows into the most intact standing pillar (highest integrity; on a tie the nearest to the body, then the lower id; `soulHost`). With no pillar standing, a fresh one rises where the body lies to hold it. It counts toward the cap of 7 but is never refused. A second fall while one stands takes a second pillar: two soul pillars at once is the punishment | `council_soul.ts` (`takeSoul`) |
+| The soul pillar | Its template id carries the soul, the pillar's kind and its 3 soul pips (`councilSoulTemplate`), so every client draws it with no wire change. Immune to every normal blow (`crackPillar` refuses it; pillars are objects, never targetable). It shields nobody from Mountain's Wrath or the Echo (its wall still stands: a player it alone hides is struck), but it keeps its collider | `council_soul.ts`, `council_wrath.ts` |
+| Its pips | Only two things strike one off: a Falling Rock landing within 6 yd of its face, and a Resonance carrier standing within 3.5 yd of it for 3 s (the timer restarts; by the Singer's soul, 1.5 s) | `council_stone.ts`, `council_song.ts` (`strikeSoulPip`) |
+| At 0 pips | It bursts (its soul dissipates, the usual collapse and rubble) and its behaviour stops. No reward: the survivors keep their Memory of Stone and their mythic inheritance | `council_soul.ts` |
+| The end and the wipe | The last fall crumbles every soul pillar with the council (no rubble left). A wipe stands the five columns whole again (a column a soul took is a plain column again, a walked one goes back to its socket) and the risen ones go | `council_soul.ts` (`crumbleSouls`), `council_pillars.ts` (`restorePillars`) |
+| Guardian's soul: Echo of Wrath | Every 20 s (first 12 s after the soul takes the stone) the pillar's own 3 s bar (`heart_echo_of_wrath`, never kicked), then 60 percent of a Wrath's roll on every player within 45 yd with no other (soulless) pillar between them and it; each pillar that shields someone loses a piece, like the Wrath. With the energy inherited too, the raid needs cover from two sources at once | `council_soul.ts` (`landEcho`) |
+| Slabwright's soul: the Walking Slab | The pillar drags itself at 1.5 yd a second toward the largest group (the player with the most others within 8 yd, roster order on a tie; its group's centre), re-picked every 3 s, swerving round other pillars and kept on the pit floor. Its wall moves with it (offline and online: the entity's position rides the snapshot and the combat-wall view follows it). Within 1.5 yd of its face: 380 to 440 and a throw, once per player every 1.5 s (Walking Slab); within 4 yd: 70 to 85 each second (Stone Drag). It shields nothing | `council_soul.ts` (`largestGroup`) |
+| Singer's soul: the Endless Song | A raid-wide pulse every 3 s (first 3 s after), 45 to 55 nature, each pulse 12 percent of the first louder, capped at 4 times it (`endlessSongMult`). The pulse count is a stack of an aura on the pillar and the clock to the next pulse is the pillar's own bar (`heart_endless_song`), so clients read both | `council_soul.ts` |
+
+Deterministic: every pick is ordered (integrity, distance, id; the group by roster order);
+the only rng draws are the damage rolls, in claim-player order, and only on mythic (no
+soul pillar ever stands on normal or heroic, so their draw order is untouched).
+
+The play it asks for: kill order now also decides which soul the raid carries; the soak
+and the Resonance carriers have a second duty (bring the rock and the marked to the soul
+pillar, away from the cover the Wrath and the Echo need); the Echo and the inherited Wrath
+want cover from two directions; the Walking Slab punishes a stacked raid; the Endless Song
+is a clock that only breaking its pillar stops.
+
+IP check (2026-10-26, exact phrase plus coined token on the major game wikis): Soul in the
+Stone, Echo of Wrath, Walking Slab and Endless Song returned no game use (CLEAR; the
+nearest were a Hytale "SoulStone" mod, Hearthstone's Echo keyword, Remnant 2's Ruin Slab,
+Final Fantasy's Nameless Song, all different). The grind's working name "Grinding Stone"
+sat too close to Guild Wars 2's "Grinding Stones" skill and shipped as Stone Drag (CLEAR).
 
 ### 7.2 Guardian of the Breath
 
@@ -1204,6 +1252,9 @@ on both difficulties (dungeon rework README, goal 4).
 | `/dev heart council energy <n>` | set the Wrath holder's energy (95: a Wrath in about 3 s) |
 | `/dev heart council <mechanic>` | force one mechanic now: wrath, weight, wake, rock, bolt, song (skips its timing guard), resonance [n] |
 | `/dev heart kill guardian`, `slabwright`, `singer` | kill one council member (try each order of the inheritance); `kill council` or `kill hammer` kills all three |
+| `/dev heart council mythic [on, off]` | the council's mythic prototype for this run (turning it on turns heroic off, and the other way round) |
+| `/dev heart council soul guardian`, `slabwright`, `singer` | that member's soul takes a pillar now (the most intact, as a fall would), even with the member alive |
+| `/dev heart council soulpip <n>` | leave every soul pillar at n pips (0 to 3; 0 bursts them as a last pip would) |
 
 Pinned by `tests/smith_heart_dev.test.ts`, including the refusal without
 `devCommands` and the door refusing a non-dev world.
