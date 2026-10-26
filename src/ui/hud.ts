@@ -8401,7 +8401,6 @@ export class Hud {
   private syncDailyRewardsSurfaceLabels(): void {
     const storeEnabled = this.claudiumHooks !== null;
     const titleKey = storeEnabled ? 'hudChrome.wocStore.title' : 'hudChrome.dailyRewards.title';
-    const labelKey = storeEnabled ? 'hudChrome.wocStore.title' : 'hudChrome.dailyRewards.title';
     const title = t(titleKey);
     for (const button of [this.dailyRewardsButtonEl, this.mobileDailyRewardsButtonEl]) {
       if (!button) continue;
@@ -8412,8 +8411,8 @@ export class Hud {
     }
     const label = this.mobileDailyRewardsButtonEl?.querySelector<HTMLElement>('.mobile-label');
     if (label) {
-      label.setAttribute('data-i18n', labelKey);
-      label.textContent = t(labelKey);
+      label.setAttribute('data-i18n', titleKey);
+      label.textContent = title;
     }
   }
 
