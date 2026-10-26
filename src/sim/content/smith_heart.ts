@@ -671,7 +671,7 @@ export const SMITH_HEART_PILLAR_OBJECTS: DungeonObjectSpawn[] = QUARRY_PILLAR_SP
   name: 'Carved Column',
   x: p.x,
   z: p.z,
-  templateId: 'sh_council_pillar_3',
+  templateId: 'sh_council_pillar_2',
   dungeonId: SMITH_HEART_DUNGEON,
   lootable: false,
 }));

@@ -34,6 +34,7 @@ import {
   pillarFall,
   pillarLeanYaw,
   pillarLook,
+  pillarPipSlots,
   pillarPips,
   pillarRise,
   pulseRadius,
@@ -153,9 +154,11 @@ void main() {
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `;
-/** Three arcs round the foot, `uLit` of them burning; the last one throbs. */
+/** `uSlots` arcs round the foot, `uLit` of them burning; the last one of a
+ *  pillar that started with more throbs. */
 const PIP_FRAG = /* glsl */ `
 uniform float uLit;
+uniform float uSlots;
 uniform float uFlash;
 uniform float uTime;
 uniform vec3 uOn;
@@ -164,12 +167,12 @@ varying vec2 vXZ;
 void main() {
   float a = atan(vXZ.x, vXZ.y);
   float t = fract(a / 6.2831853 + 0.5);
-  float k = floor(t * 3.0);
-  float local = fract(t * 3.0);
+  float k = floor(t * uSlots);
+  float local = fract(t * uSlots);
   float gap = smoothstep(0.04, 0.09, local) * (1.0 - smoothstep(0.91, 0.96, local));
   if (gap < 0.02) discard;
   float lit = step(k + 0.5, uLit);
-  float last = uLit < 1.5 ? 0.5 + 0.5 * sin(uTime * 7.0) : 1.0;
+  float last = uLit < 1.5 && uSlots > 1.5 ? 0.5 + 0.5 * sin(uTime * 7.0) : 1.0;
   vec3 col = mix(uOff, uOn * (1.0 + uFlash * 1.5) * (0.65 + 0.35 * last), lit);
   gl_FragColor = vec4(col, gap * mix(0.55, 0.95, lit));
   #include <colorspace_fragment>
@@ -284,7 +287,8 @@ export class CouncilPillarsFx {
       const pipsMat = new THREE.ShaderMaterial({
         name: 'smithHeartPillarPips',
         uniforms: {
-          uLit: { value: 3 },
+          uLit: { value: 2 },
+          uSlots: { value: 2 },
           uFlash: { value: 0 },
           uTime: this.h.uTime,
           uOn: { value: new THREE.Color(C.pipLit) },
@@ -309,7 +313,7 @@ export class CouncilPillarsFx {
         id: -1,
         state: 'idle',
         risen: false,
-        integrity: 3,
+        integrity: 2,
         holder,
         leanYaw,
         lean,
@@ -703,7 +707,7 @@ export class CouncilPillarsFx {
   updatePillars(dt: number): void {
     for (const s of this.pillars) {
       if (s.state === 'idle') continue;
-      const look = pillarLook(s.integrity);
+      const look = pillarLook(s.integrity, s.risen);
       let sunk = 0;
       let jitter = 0;
       let tip = 0;
@@ -723,7 +727,8 @@ export class CouncilPillarsFx {
         s.shellMat.uniforms.uHeat.value = look.heat + hum.heat;
         s.shellMat.uniforms.uFlash.value = flash;
         s.shell.visible = s.body !== null && (look.crack > 0 || flash > 0 || hum.heat > 0);
-        s.pipsMat.uniforms.uLit.value = pillarPips(s.integrity);
+        s.pipsMat.uniforms.uLit.value = pillarPips(s.integrity, s.risen);
+        s.pipsMat.uniforms.uSlots.value = pillarPipSlots(s.risen);
         s.pipsMat.uniforms.uFlash.value = flash;
         s.pips.visible = true;
         // Grit off a cracked pillar.

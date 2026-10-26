@@ -33,6 +33,7 @@ import {
   COUNCIL_CUES,
   COUNCIL_NAMES,
   COUNCIL_RUBBLE,
+  councilPillarFull,
   councilPillarOf,
   councilPillarRadius,
   councilPillarTemplate,
@@ -103,7 +104,7 @@ function spawnPillar(
   return spawnKitObject(
     ctx,
     inst,
-    councilPillarTemplate(T.integrity, risen),
+    councilPillarTemplate(councilPillarFull(risen), risen),
     'Pillar',
     o.x + lx,
     o.z + lz,
@@ -139,7 +140,7 @@ export function restorePillars(ctx: SimContext, inst: InstanceSlot): void {
   QUARRY_PILLAR_SPOTS.forEach((s, i) => {
     const e = columns.get(i);
     if (e) {
-      e.templateId = councilPillarTemplate(T.integrity, false);
+      e.templateId = councilPillarTemplate(councilPillarFull(false), false);
       e.kitObject ??= { kind: 'wall', remaining: PILLAR_WALL_LIFE };
     } else spawnPillar(ctx, inst, s.x, s.z, s.rot, false);
   });

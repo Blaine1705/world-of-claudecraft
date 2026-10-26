@@ -100,7 +100,7 @@ export const COUNCIL_AURAS = {
 } as const;
 
 /** The council's encounter object templates. Pillars carry their integrity
- *  (3 whole, 2 cracked, 1 about to fall) and stand as combat walls
+ *  (a carved column 2 then 1, a risen pillar 1: councilPillarFull) and stand as combat walls
  *  (instances/combat_wall_state.ts COMBAT_WALL_SHAPES). */
 export const COUNCIL_PILLAR_PREFIX = 'sh_council_pillar_';
 export const COUNCIL_RISEN_PREFIX = 'sh_council_risen_';
@@ -166,8 +166,8 @@ export interface CouncilDifficultyRules {
 }
 
 export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDifficultyRules>> = {
-  normal: { wakeMarks: 2, songAfterWrath: true, pillarPulse: false, damageMult: 1 },
-  heroic: { wakeMarks: 3, songAfterWrath: false, pillarPulse: true, damageMult: 1.25 },
+  normal: { wakeMarks: 1, songAfterWrath: true, pillarPulse: false, damageMult: 1 },
+  heroic: { wakeMarks: 2, songAfterWrath: false, pillarPulse: true, damageMult: 1.25 },
 };
 
 // ---- tuning (SKETCH, unmeasured) ------------------------------------------------------
@@ -175,7 +175,12 @@ export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDiffi
 export const COUNCIL_TUNING = {
   // The pillars.
   pillarCap: 7,
+  /** The most integrity any pillar template carries. */
   integrity: 3,
+  /** A carved column takes two blows; a risen pillar is one use (Jose's
+   *  playtest: risen cover is spent first, the columns saved for the end). */
+  columnIntegrity: 2,
+  risenIntegrity: 1,
   /** A carved column's radius and a risen pillar's (the combat wall rows). */
   columnR: 2.6,
   risenR: 2.2,
@@ -274,6 +279,11 @@ export const COUNCIL_TUNING = {
 } as const;
 
 // ---- pillar templates (pure) --------------------------------------------------------
+
+/** A fresh pillar's integrity: a carved column's or a risen one's. */
+export function councilPillarFull(risen: boolean): number {
+  return risen ? COUNCIL_TUNING.risenIntegrity : COUNCIL_TUNING.columnIntegrity;
+}
 
 /** A pillar's template: carved column or risen, with its integrity left. */
 export function councilPillarTemplate(integrity: number, risen: boolean): string {

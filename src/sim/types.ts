@@ -6085,7 +6085,7 @@ export interface DungeonObjectSpawn {
     // The Smith's Heart's quarry columns, the Hammer Council's starting
     // pillars (encounters/smith_heart/council_pillars.ts): the integrity left
     // rides the template id, and each stands as a combat wall.
-    | 'sh_council_pillar_3';
+    | 'sh_council_pillar_2';
   dungeonId?: string;
   /**
    * This object is an encounter mechanic players INTERACT with, never a pickup, even

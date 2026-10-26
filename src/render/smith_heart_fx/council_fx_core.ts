@@ -17,6 +17,7 @@ import {
   COUNCIL_CUES,
   COUNCIL_RISE_SPOT,
   COUNCIL_RUBBLE,
+  councilPillarFull,
   councilPillarOf,
   councilRoleOf,
   COUNCIL_TUNING as T,
@@ -108,13 +109,6 @@ const LOOK_WHOLE: PillarLook = Object.freeze({
   grit: 0,
   crownLoose: false,
 });
-const LOOK_CRACKED: PillarLook = Object.freeze({
-  crack: 0.55,
-  lean: 0.035,
-  heat: 0.45,
-  grit: 1.5,
-  crownLoose: false,
-});
 const LOOK_FAILING: PillarLook = Object.freeze({
   crack: 1,
   lean: 0.085,
@@ -123,11 +117,11 @@ const LOOK_FAILING: PillarLook = Object.freeze({
   crownLoose: true,
 });
 
-/** One of three shared frozen looks (read every frame, never allocated). */
-export function pillarLook(integrity: number): PillarLook {
-  if (integrity >= 3) return LOOK_WHOLE;
-  if (integrity === 2) return LOOK_CRACKED;
-  return LOOK_FAILING;
+/** One of two shared frozen looks (read every frame, never allocated): whole
+ *  at its full integrity (a fresh risen pillar is whole at 1), cracked open
+ *  and leaning once it has taken a blow (a carved column's last piece). */
+export function pillarLook(integrity: number, risen = false): PillarLook {
+  return integrity >= councilPillarFull(risen) ? LOOK_WHOLE : LOOK_FAILING;
 }
 
 /** The side a pillar leans toward (sim yaw), fixed per entity. */
@@ -177,8 +171,13 @@ export function pillarFall(age: number): { tip: number; sunk: number; alpha: num
 export const PILLAR_SETTLE_SECONDS = 1.6;
 
 /** How many of a pillar's three pips burn. */
-export function pillarPips(integrity: number): number {
-  return Math.max(0, Math.min(T.integrity, integrity));
+export function pillarPips(integrity: number, risen = false): number {
+  return Math.max(0, Math.min(councilPillarFull(risen), integrity));
+}
+
+/** How many arcs ring a pillar's foot: one per piece it starts with. */
+export function pillarPipSlots(risen: boolean): number {
+  return councilPillarFull(risen);
 }
 
 /** A crack's flash after it lost a piece (0 to 1 over its seconds). */

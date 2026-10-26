@@ -19,6 +19,7 @@ import {
   PILLAR_RISE_SECONDS,
   pillarFall,
   pillarLook,
+  pillarPipSlots,
   pillarPips,
   pillarRise,
   pulseRadius,
@@ -39,14 +40,20 @@ import type { IWorld } from '../src/world_api';
 
 describe('council_fx_core: integrity on the model', () => {
   it('cracks open, leans and dims a pip per piece lost', () => {
-    const [a, b, c] = [3, 2, 1].map(pillarLook);
+    // A carved column takes two blows: whole, then cracked open and leaning.
+    const [a, c] = [2, 1].map((n) => pillarLook(n));
     expect(a.crack).toBe(0);
     expect(a.lean).toBe(0);
-    expect(b.crack).toBeGreaterThan(a.crack);
-    expect(c.crack).toBeGreaterThan(b.crack);
-    expect(c.lean).toBeGreaterThan(b.lean);
-    expect(c.heat).toBeGreaterThan(b.heat);
-    expect([3, 2, 1, 0].map(pillarPips)).toEqual([3, 2, 1, 0]);
+    expect(c.crack).toBeGreaterThan(a.crack);
+    expect(c.lean).toBeGreaterThan(a.lean);
+    expect(c.heat).toBeGreaterThan(a.heat);
+    // A fresh risen pillar is one use, and whole while it stands.
+    expect(pillarLook(1, true)).toBe(a);
+    // Pips read against the pillar's own start: a carved column has two, a
+    // risen pillar one.
+    expect([2, 1, 0].map((n) => pillarPips(n))).toEqual([2, 1, 0]);
+    expect([1, 0].map((n) => pillarPips(n, true))).toEqual([1, 0]);
+    expect([pillarPipSlots(false), pillarPipSlots(true)]).toEqual([2, 1]);
   });
 
   it('a pillar bursts up out of the floor, and falls in tipping and sinking', () => {

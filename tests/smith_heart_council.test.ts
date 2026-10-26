@@ -19,6 +19,7 @@ import {
   COUNCIL_CASTS,
   COUNCIL_NAMES,
   type CouncilFightState,
+  councilPillarFull,
   councilPillarOf,
   councilPillarTemplate,
   fallingRockShare,
@@ -112,8 +113,9 @@ describe('Hammer Council: the pillars', () => {
     const f = councilFight(1);
     const pillars = f.pillars();
     expect(pillars.length).toBe(5);
-    for (const p of pillars) expect(p.e.templateId).toBe(councilPillarTemplate(3, false));
-    const shape = COMBAT_WALL_SHAPES[councilPillarTemplate(3, false)];
+    for (const p of pillars)
+      expect(p.e.templateId).toBe(councilPillarTemplate(councilPillarFull(false), false));
+    const shape = COMBAT_WALL_SHAPES[councilPillarTemplate(councilPillarFull(false), false)];
     expect(shape.hw).toBe(QUARRY_PILLAR_R);
     expect(shape.height).toBe(QUARRY_PILLAR_H);
     expect(shape.round).toBe(true);
@@ -131,7 +133,8 @@ describe('Hammer Council: the pillars', () => {
     expect(f.dev('/dev heart council wake')).toBe(true);
     f.tick(Math.ceil((T.wakeCast + 0.2) * 20));
     const marked = f.st.wakeMarks.map((m) => m.playerId);
-    expect(marked.length).toBe(2);
+    // Normal marks one player.
+    expect(marked.length).toBe(1);
     const spots = marked.map((id) => {
       const p = f.sim.ctx.entities.get(id) as Entity;
       expect(p.auras.some((x) => x.id === COUNCIL_AURAS.wakeMark)).toBe(true);
@@ -149,7 +152,7 @@ describe('Hammer Council: the pillars', () => {
         ),
     ).toBe(true);
     const risen = f.pillars().filter((p) => p.risen);
-    expect(f.pillars().length).toBe(before + 2);
+    expect(f.pillars().length).toBe(before + 1);
     for (const s of spots) {
       const near = risen.some((p) => {
         const at = f.local(p.e);
@@ -159,7 +162,7 @@ describe('Hammer Council: the pillars', () => {
       expect(near).toBe(true);
     }
     // The marked were standing on it: thrown back and hit.
-    expect(hitsOf(ev, COUNCIL_NAMES.wake).length).toBeGreaterThanOrEqual(2);
+    expect(hitsOf(ev, COUNCIL_NAMES.wake).length).toBeGreaterThanOrEqual(1);
     for (const id of marked) {
       const p = f.sim.ctx.entities.get(id) as Entity;
       const pl = risen[0];
@@ -201,8 +204,9 @@ describe('Hammer Council: the pillars', () => {
     const shield = f
       .pillars()
       .find((p) => Math.hypot(f.local(p.e).x - col.x, f.local(p.e).z - col.z) < 0.5);
-    expect(shield?.integrity).toBe(2);
-    expect(f.pillars().filter((p) => p.integrity === 3).length).toBe(4);
+    const full = councilPillarFull(false);
+    expect(shield?.integrity).toBe(full - 1);
+    expect(f.pillars().filter((p) => p.integrity === full).length).toBe(4);
     expect(f.st.wraths).toBe(1);
     expect(f.st.energy).toBeLessThan(5);
   });
@@ -220,18 +224,16 @@ describe('Hammer Council: the pillars', () => {
     f.tick(Math.ceil(T.resonanceCrackSeconds * 20) - 4);
     const pillarAt = () =>
       f.pillars().find((p) => Math.hypot(f.local(p.e).x - col.x, f.local(p.e).z - col.z) < 0.5);
-    expect(pillarAt()?.integrity).toBe(3);
+    const full = councilPillarFull(false);
+    expect(pillarAt()?.integrity).toBe(full);
     f.tick(6);
-    expect(pillarAt()?.integrity).toBe(2);
-    // The 3 s start again: another piece only after another 3 s.
+    expect(pillarAt()?.integrity).toBe(full - 1);
+    // The 3 s start again: the next blow only after another 3 s.
     f.tick(Math.ceil(T.resonanceCrackSeconds * 20) - 6);
-    expect(pillarAt()?.integrity).toBe(2);
+    expect(pillarAt()?.integrity).toBe(full - 1);
+    // The second blow fells the two-blow column.
     f.tick(8);
-    expect(pillarAt()?.integrity).toBe(1);
-    // Stepping away stops it.
-    f.put(marked, MID.x, MID.z - 10);
-    f.tick(Math.ceil(T.resonanceCrackSeconds * 20) + 10);
-    expect(pillarAt()?.integrity).toBe(1);
+    expect(pillarAt()).toBeUndefined();
   });
 
   it('a pillar at 0 falls: its wall goes, rubble lies and bites, then is gone; a wipe restores the five', () => {
@@ -265,7 +267,9 @@ describe('Hammer Council: the pillars', () => {
     for (let i = 0; i < 20 * 60 && f.state(); i++) f.sim.tick();
     expect(f.state()).toBeNull();
     expect(f.pillars().length).toBe(5);
-    expect(f.pillars().every((p) => p.integrity === 3 && !p.risen)).toBe(true);
+    expect(f.pillars().every((p) => p.integrity === councilPillarFull(false) && !p.risen)).toBe(
+      true,
+    );
   });
 });
 
@@ -305,7 +309,7 @@ describe('Hammer Council: the Falling Rock', () => {
     const p3 = f
       .pillars()
       .find((p) => Math.hypot(f.local(p.e).x - col.x, f.local(p.e).z - col.z) < 0.5);
-    expect(p3?.integrity).toBe(2);
+    expect(p3?.integrity).toBe(councilPillarFull(false) - 1);
   });
 });
 
@@ -426,7 +430,7 @@ describe('Hammer Council: difficulty', () => {
     expect(left).toBeLessThan(toNext);
   });
 
-  it('heroic: three marks, the pillars pulse, the song keeps its own clock', () => {
+  it('heroic: two marks, the pillars pulse, the song keeps its own clock', () => {
     const f = pulled(5);
     expect(f.dev('/dev heart council heroic on')).toBe(true);
     expect(f.st.difficulty).toBe('heroic');
@@ -437,12 +441,12 @@ describe('Hammer Council: difficulty', () => {
     f.put(a, col.x - dx * (QUARRY_PILLAR_R + 1.5), col.z - dz * (QUARRY_PILLAR_R + 1.5));
     const ev = f.tick(20 * 5);
     expect(hitsOf(ev, COUNCIL_NAMES.pulse, a.id).length).toBeGreaterThanOrEqual(2);
-    // Wake the Stone marks three (room under the cap: two columns down).
+    // Wake the Stone marks two (room under the cap: two columns down).
     for (const p of f.pillars().slice(0, 2)) f.sim.ctx.dropEntity(p.e.id);
     f.inst.objectIds = f.inst.objectIds.filter((id) => f.sim.ctx.entities.has(id));
     f.dev('/dev heart council wake');
     f.tick(Math.ceil((T.wakeCast + 0.2) * 20));
-    expect(f.st.wakeMarks.length).toBe(3);
+    expect(f.st.wakeMarks.length).toBe(2);
     // The song sings on its own clock, with no Wrath landed.
     quiet(f.st);
     f.st.songTimer = 0.5;
