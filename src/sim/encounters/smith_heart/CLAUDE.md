@@ -17,7 +17,8 @@ tick), then the seal and the arrival, then the portal hops.
 | `council_wrath.ts` | The Guardian's job: the energy (the holder's resource), Mountain's Wrath and the shielding pillars, Hammer's Weight. |
 | `council_stone.ts` | The Slabwright's job: Wake the Stone (its marks; an heir's locked rise spots), the Falling Rock and its split. |
 | `council_song.ts` | The Seam Singer's job: Seam Bolt, the Song of the Seam (a kick leaves one mark), Resonance's cracking. |
-| `council.ts` | The coordinator: one pull (`keepTogether`), the fallen and their heirs, Memory of Stone, the bars, the wipe's reset (`regrowHead`), the finish, the dev switch for heroic and the `/dev heart council` triggers. |
+| `council_soul.ts` | Mythic only (the prototype behind `/dev heart council mythic`): Soul in the Stone. A fallen member's soul takes the most intact pillar (`soulHost`, `takeSoul`); its pips (`strikeSoulPip`: only the rock and Resonance), its burst, the last kill's crumble; the Guardian's Echo of Wrath (`landEcho`), the Slabwright's Walking Slab (`largestGroup`, the moving wall), the Singer's Endless Song; the `soul` and `soulpip` dev verbs. |
+| `council.ts` | The coordinator: one pull (`keepTogether`), the fallen and their heirs, Memory of Stone, the bars, the wipe's reset (`regrowHead`), the finish, the dev switches for heroic and mythic (`setCouncilDevTier`) and the `/dev heart council` triggers. |
 
 Rules:
 - Deterministic: every pick is hashed (`pickMarkTargets`) or ordered (roles, roster, entity
@@ -32,4 +33,5 @@ Rules:
   damage and aura names are matched by `src/ui/sim_i18n.ts`.
 - Tests: `tests/smith_heart_council.test.ts` (on `tests/helpers/council_fight.ts`),
   `tests/smith_heart_council_ui.test.ts`, `tests/smith_heart_gating.test.ts`,
-  `tests/smith_heart_pull.test.ts`, `tests/smith_heart_dev.test.ts`.
+  `tests/smith_heart_pull.test.ts`, `tests/smith_heart_dev.test.ts`,
+  `tests/smith_heart_council_mythic.test.ts` (the mythic row and Soul in the Stone).

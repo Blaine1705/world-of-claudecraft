@@ -13,7 +13,11 @@
 //                     the marked hide behind the most damaged pillar at Wrath
 //                     and keep off the whole ones.
 //   Heir              the Singer fallen, a survivor sings the song itself, on 3
-//                     players, and no kick stops it; the bolt stops with it.
+//                     players (4 on mythic), and no kick stops it; the bolt
+//                     stops with it.
+//   Soul pillars      a Resonance carrier by a soul pillar for 3 s strikes a
+//                     soul pip off (council_soul.ts) instead of a piece; by the
+//                     Seam Singer's own soul, in 1.5 s.
 //
 // The kick: between two council passes only a player interrupt clears the
 // Singer's bar (bosses take no spell pushback; a reset or a death runs the
@@ -36,6 +40,7 @@ import {
   raidWarn,
   roll,
 } from './council_scope';
+import { soulResonanceSeconds, strikeSoulPip } from './council_soul';
 import { secondsToNextWrath } from './council_wrath';
 
 /** Seam Bolt: the Singer's own. */
@@ -145,9 +150,9 @@ export function applyResonance(s: CouncilScope, singer: Entity, count: number): 
   return marked;
 }
 
-/** The song was sung out. */
-export function landSong(s: CouncilScope, singer: Entity): void {
-  applyResonance(s, singer, T.songMarks);
+/** The song was sung out (by an heir: the difficulty's heir count). */
+export function landSong(s: CouncilScope, singer: Entity, heir = false): void {
+  applyResonance(s, singer, heir ? s.rules.heirSongMarks : T.songMarks);
 }
 
 /** A kickable bar was cut: the bolt fizzles, the song rings on one only. */
@@ -170,11 +175,14 @@ export function stepResonance(s: CouncilScope): void {
       r.pillarId = id;
       r.near = 0;
     }
+    // A soul pillar's own pace (the Singer's soul: twice as fast).
+    const need = near?.soul ? soulResonanceSeconds(near.soul) : T.resonanceCrackSeconds;
     if (near) {
       r.near += DT;
-      if (r.near >= T.resonanceCrackSeconds - 1e-9) {
+      if (r.near >= need - 1e-9) {
         r.near = 0;
-        crackPillar(s.ctx, s.inst, s.st, near);
+        if (near.soul) strikeSoulPip(s, near, 'resonance');
+        else crackPillar(s.ctx, s.inst, s.st, near);
         // A fallen pillar is gone from this tick's list.
         if (!s.ctx.entities.has(near.e.id)) {
           pillars.splice(pillars.indexOf(near), 1);
@@ -185,7 +193,7 @@ export function stepResonance(s: CouncilScope): void {
     // The ring shows the climb (tenths, so the snapshot cache keeps eliding).
     const aura = p.auras.find((a) => a.id === COUNCIL_AURAS.resonance);
     if (aura) {
-      aura.value = Math.floor((r.near / T.resonanceCrackSeconds) * 10) / 10;
+      aura.value = Math.floor((r.near / need) * 10) / 10;
       aura.value2 = r.pillarId ?? 0;
     }
   }

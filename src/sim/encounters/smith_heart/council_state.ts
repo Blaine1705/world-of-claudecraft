@@ -51,6 +51,26 @@ export interface CouncilBar {
   targetId: number | null;
 }
 
+/** Mythic: a fallen member's soul in a pillar (council_soul.ts). Its pips,
+ *  whose soul and the pillar's kind ride the pillar's template id. */
+export interface CouncilSoul {
+  role: CouncilRole;
+  pillarId: number;
+  /** The behaviour's clock: the Echo's next bar, the song's next pulse. */
+  timer: number;
+  /** The Echo's bar in flight (seconds left), or null. */
+  echo: number | null;
+  /** The Endless Song: pulses sung. */
+  pulses: number;
+  /** The Walking Slab: where it drags itself (instance-local), the seconds
+   *  to its next pick, its grind's clock, and who it last crushed when
+   *  (player id to the fight clock). */
+  goal: { x: number; z: number } | null;
+  retarget: number;
+  grind: number;
+  crushed: Record<number, number>;
+}
+
 export interface CouncilFightState {
   kind: 'council';
   difficulty: CouncilDifficulty;
@@ -90,4 +110,6 @@ export interface CouncilFightState {
   lines: string[];
   /** Mechanic casts started (the deterministic salt of every pick). */
   casts: number;
+  /** Mythic: the souls standing in pillars, in the order they took them. */
+  souls: CouncilSoul[];
 }

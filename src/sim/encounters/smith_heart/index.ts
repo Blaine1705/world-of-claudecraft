@@ -8,11 +8,20 @@ export {
   councilScopeForDev,
   councilState,
   setCouncilDevHeroic,
+  setCouncilDevTier,
   tickHammerCouncil,
 } from './council';
 export * from './council_ids';
 export { councilPillars, nearestRiseSpot, onQuarryFloor, pillarBetween } from './council_pillars';
-export type { CouncilFightState } from './council_state';
+export {
+  landEcho,
+  largestGroup,
+  soulHost,
+  soulResonanceSeconds,
+  strikeSoulPip,
+  takeSoul,
+} from './council_soul';
+export type { CouncilFightState, CouncilSoul } from './council_state';
 export { SMITH_HEART_CLOSED_TEXT, SMITH_HEART_PLAYABLE, smithHeartEntryOpen } from './entry';
 export {
   SMITH_HEART_PORTAL_HOP_TEXT,

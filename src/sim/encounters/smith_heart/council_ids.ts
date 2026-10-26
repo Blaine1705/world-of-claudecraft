@@ -74,6 +74,12 @@ export const COUNCIL_CASTS = {
   song: 'heart_song_of_the_seam',
   /** The same song sung by an heir: no kick table lists it. */
   songUnbroken: 'heart_song_of_the_seam_unbroken',
+  /** Mythic: the Guardian's soul in a pillar casts its own Wrath (the
+   *  pillar's own bar, never kicked). */
+  echo: 'heart_echo_of_wrath',
+  /** Mythic: the Seam Singer's soul pillar's clock between two pulses of the
+   *  Endless Song (the pillar's own bar, never kicked). */
+  endlessSong: 'heart_endless_song',
 } as const;
 
 /** The interruptible ones (spread into mob/healer_channel.ts
@@ -97,6 +103,10 @@ export const COUNCIL_AURAS = {
   resonance: 'heart_resonance',
   /** On a council member: one stack per fallen member, more damage dealt. */
   memory: 'heart_memory_of_stone',
+  /** Mythic: on the Seam Singer's soul pillar, one stack per pulse the
+   *  Endless Song has sung (value = the next pulse's multiplier). The
+   *  pillar is an object: the sim never ticks it, the council sets it. */
+  endlessSong: 'heart_endless_song',
 } as const;
 
 /** The council's encounter object templates. Pillars carry their integrity
@@ -109,6 +119,10 @@ export const COUNCIL_RUBBLE = 'sh_council_rubble';
 /** An heir's rising pillar: the 2 s spot locked under a random player
  *  (scale = the knockback radius). */
 export const COUNCIL_RISE_SPOT = 'sh_council_rise_spot';
+/** Mythic: a pillar holding a fallen member's soul (Soul in the Stone):
+ *  `sh_council_soul_<role>_<c|r>_<pips>` (c a carved column, r a risen
+ *  pillar), a combat wall like the others. */
+export const COUNCIL_SOUL_PREFIX = 'sh_council_soul_';
 
 /** The spellfx ability ids of the council's moments (the renderer keys them). */
 export const COUNCIL_CUES = {
@@ -127,6 +141,21 @@ export const COUNCIL_CUES = {
   inherit: 'heart_council_inherit',
   /** The council settles after its fall: the risen pillars sink. */
   settle: 'heart_council_settle',
+  /** Mythic: a fallen member's soul flows into its pillar (spellfx 'beam',
+   *  source the fallen, target the pillar). */
+  soulTake: 'heart_council_soul_take',
+  /** Mythic: a soul pip is struck off (spellfx 'nova' on the pillar). */
+  soulPip: 'heart_council_soul_pip',
+  /** Mythic: a soul pillar bursts and its soul is gone (spellfxAt 'burst'
+   *  where it stood, just before the pillar's own collapse). */
+  soulBurst: 'heart_council_soul_burst',
+  /** Mythic: the Echo of Wrath lands (spellfx 'nova' on the pillar). */
+  echoBlast: 'heart_echo_of_wrath_blast',
+  /** Mythic: the Endless Song pulses (spellfx 'nova' on the pillar). */
+  songPulse: 'heart_endless_song_pulse',
+  /** Mythic: the Walking Slab crushes a player under it (spellfx 'nova'
+   *  from the pillar on the player). */
+  slabCrush: 'heart_walking_slab_crush',
 } as const;
 
 /** The damage names (combat log and floating text; re-localized by
@@ -143,17 +172,22 @@ export const COUNCIL_NAMES = {
   memory: 'Memory of Stone',
   rubble: 'Crumbled Stone',
   pulse: 'Restless Stone',
+  echo: 'Echo of Wrath',
+  slab: 'Walking Slab',
+  grind: 'Stone Drag',
+  endlessSong: 'Endless Song',
 } as const;
 
 // ---- difficulty -----------------------------------------------------------------------
 
-/** The council's difficulty. A later mythic adds its own row (stronger
- *  inheritances, its own mechanic) here and in COUNCIL_DIFFICULTY; nothing
- *  else switches on the tier by name. */
-export type CouncilDifficulty = 'normal' | 'heroic';
+/** The council's difficulty. Each tier is one COUNCIL_DIFFICULTY row (the
+ *  mythic is a prototype behind a dev switch while the game has no mythic
+ *  tier: council.ts setCouncilDevTier); nothing else switches on the tier by
+ *  name. */
+export type CouncilDifficulty = 'normal' | 'heroic' | 'mythic';
 
 export interface CouncilDifficultyRules {
-  /** How many players Wake the Stone marks. */
+  /** How many players Wake the Stone marks (and the heir's random rise). */
   wakeMarks: number;
   /** The song waits for a Wrath to land and its Resonance runs out before
    *  the next one (normal); false: the song keeps its own clock and the two
@@ -163,11 +197,56 @@ export interface CouncilDifficultyRules {
   pillarPulse: boolean;
   /** Every mechanic's damage, on top of the claim's own multiplier. */
   damageMult: number;
+  /** The heir's random rise: seconds of warning on its locked spot. */
+  heirRiseWarn: number;
+  /** The heir's unbroken song: how many players it rings on. */
+  heirSongMarks: number;
+  /** The Wrath's heir: seconds its energy takes to fill. */
+  heirFillSeconds: number;
+  /** A survivor keeps casting Falling Rock once the Slabwright has fallen
+   *  (mythic: the rock and Resonance are the only things that break a soul
+   *  pillar, so a living member always supplies both). */
+  rockOutlivesSlabwright: boolean;
+  /** Soul in the Stone: a fallen member's soul takes a pillar
+   *  (council_soul.ts). */
+  soulInTheStone: boolean;
 }
 
 export const COUNCIL_DIFFICULTY: Readonly<Record<CouncilDifficulty, CouncilDifficultyRules>> = {
-  normal: { wakeMarks: 1, songAfterWrath: true, pillarPulse: false, damageMult: 1 },
-  heroic: { wakeMarks: 2, songAfterWrath: false, pillarPulse: true, damageMult: 1.25 },
+  normal: {
+    wakeMarks: 1,
+    songAfterWrath: true,
+    pillarPulse: false,
+    damageMult: 1,
+    heirRiseWarn: 2,
+    heirSongMarks: 3,
+    heirFillSeconds: 35,
+    rockOutlivesSlabwright: false,
+    soulInTheStone: false,
+  },
+  heroic: {
+    wakeMarks: 2,
+    songAfterWrath: false,
+    pillarPulse: true,
+    damageMult: 1.25,
+    heirRiseWarn: 2,
+    heirSongMarks: 3,
+    heirFillSeconds: 35,
+    rockOutlivesSlabwright: false,
+    soulInTheStone: false,
+  },
+  // Everything heroic has, the inheritances stronger, and the souls.
+  mythic: {
+    wakeMarks: 2,
+    songAfterWrath: false,
+    pillarPulse: true,
+    damageMult: 1.25,
+    heirRiseWarn: 1.5,
+    heirSongMarks: 4,
+    heirFillSeconds: 30,
+    rockOutlivesSlabwright: true,
+    soulInTheStone: true,
+  },
 };
 
 // ---- tuning (SKETCH, unmeasured) ------------------------------------------------------
@@ -276,6 +355,51 @@ export const COUNCIL_TUNING = {
   /** Seconds of plain melee after a bar lands before the same body starts
    *  another (nothing chains bar into bar). */
   barGap: 1.2,
+  // Mythic: Soul in the Stone (council_soul.ts).
+  /** A soul pillar's pips. */
+  soulPips: 3,
+  /** A Falling Rock landing within this of its face strikes a pip off. */
+  soulRockReach: 6,
+  /** A Resonance-marked player this close to its face for this long strikes
+   *  a pip off (the Seam Singer's soul: twice as fast). */
+  soulResonanceReach: 3.5,
+  soulResonanceSeconds: 3,
+  singerSoulResonanceSeconds: 1.5,
+  // The Guardian's soul: Echo of Wrath.
+  echoFirst: 12,
+  echoEvery: 20,
+  echoCast: 3,
+  echoRadius: 45,
+  /** A share of Mountain's Wrath's own roll. */
+  echoShare: 0.6,
+  // The Slabwright's soul: the Walking Slab.
+  slabSpeed: 1.5,
+  /** Seconds between two picks of the largest group. */
+  slabRetarget: 3,
+  /** A player within this of another counts toward its group. */
+  slabGroupR: 8,
+  /** It stops this far (centre) from the spot it walks to. */
+  slabArrive: 1,
+  /** Under it (this far past its face): a heavy hit and a throw, once per
+   *  player in this many seconds. */
+  slabCrushReach: 1.5,
+  slabCrushMin: 380,
+  slabCrushMax: 440,
+  slabCrushKnockback: 9,
+  slabCrushEvery: 1.5,
+  /** Near it (this far past its face): light damage each second. */
+  slabGrindReach: 4,
+  slabGrindMin: 70,
+  slabGrindMax: 85,
+  slabGrindEvery: 1,
+  // The Seam Singer's soul: the Endless Song.
+  songPulseFirst: 3,
+  songPulseEvery: 3,
+  songPulseMin: 45,
+  songPulseMax: 55,
+  /** Each pulse sings this much louder than the first, up to the cap. */
+  songPulseGrowth: 0.12,
+  songPulseCap: 4,
 } as const;
 
 // ---- pillar templates (pure) --------------------------------------------------------
@@ -306,9 +430,14 @@ export function councilPillarRadius(risen: boolean): number {
   return risen ? COUNCIL_TUNING.risenR : COUNCIL_TUNING.columnR;
 }
 
-/** Seconds the Wrath's energy takes to fill, by holder and Wraths landed. */
-export function councilFillSeconds(heir: boolean, wraths: number): number {
-  const base = heir ? COUNCIL_TUNING.heirFillSeconds : COUNCIL_TUNING.energyFillSeconds;
+/** Seconds the Wrath's energy takes to fill, by holder and Wraths landed
+ *  (`heirSeconds`: the difficulty's heir fill, COUNCIL_DIFFICULTY). */
+export function councilFillSeconds(
+  heir: boolean,
+  wraths: number,
+  heirSeconds: number = COUNCIL_TUNING.heirFillSeconds,
+): number {
+  const base = heir ? heirSeconds : COUNCIL_TUNING.energyFillSeconds;
   return wraths >= COUNCIL_TUNING.enrageAfterWraths ? base / COUNCIL_TUNING.enrageFillMult : base;
 }
 
@@ -324,4 +453,42 @@ export function fallingRockShare(
     each: Math.round((total / n) * (short ? COUNCIL_TUNING.rockPenaltyMult : 1)),
     tremor: short,
   };
+}
+
+// ---- soul pillars (pure) -------------------------------------------------------------
+
+/** A soul pillar's template: whose soul, carved column or risen, pips left. */
+export function councilSoulTemplate(role: CouncilRole, risen: boolean, pips: number): string {
+  const n = Math.max(1, Math.min(COUNCIL_TUNING.soulPips, Math.round(pips)));
+  return `${COUNCIL_SOUL_PREFIX}${role}_${risen ? 'r' : 'c'}_${n}`;
+}
+
+/** A soul pillar template's soul, kind and pips, or null when `templateId`
+ *  is no soul pillar. Pure (the renderer reads the mirrored entity). */
+export function councilSoulOf(
+  templateId: string,
+): { role: CouncilRole; risen: boolean; pips: number } | null {
+  if (!templateId.startsWith(COUNCIL_SOUL_PREFIX)) return null;
+  const [role, kind, n] = templateId.slice(COUNCIL_SOUL_PREFIX.length).split('_');
+  if (!COUNCIL_ROLES.includes(role as CouncilRole) || (kind !== 'c' && kind !== 'r')) return null;
+  const pips = Number(n);
+  if (!Number.isInteger(pips) || pips < 1 || pips > COUNCIL_TUNING.soulPips) return null;
+  return { role: role as CouncilRole, risen: kind === 'r', pips };
+}
+
+/** Every soul pillar template (the combat wall rows, the client's mirror). */
+export const COUNCIL_SOUL_TEMPLATES: readonly string[] = COUNCIL_ROLES.flatMap((role) =>
+  [false, true].flatMap((risen) =>
+    Array.from({ length: COUNCIL_TUNING.soulPips }, (_, i) =>
+      councilSoulTemplate(role, risen, i + 1),
+    ),
+  ),
+);
+
+/** The Endless Song's multiplier on its `pulse`-th pulse (0 the first). */
+export function endlessSongMult(pulse: number): number {
+  return Math.min(
+    COUNCIL_TUNING.songPulseCap,
+    1 + COUNCIL_TUNING.songPulseGrowth * Math.max(0, pulse),
+  );
 }

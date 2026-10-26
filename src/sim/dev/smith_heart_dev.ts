@@ -23,9 +23,14 @@
 //   /dev heart council               the Hammer Council's readout
 //   /dev heart council <what>        pull (all three onto you), reset (whole
 //                                    again, the five columns too), heroic
-//                                    [on|off] (this run's council), energy <n>,
+//                                    [on|off] or mythic [on|off] (this run's
+//                                    council; one tier at a time), energy <n>,
 //                                    wrath, weight, wake, rock, bolt, song,
-//                                    resonance [n] (force one mechanic now)
+//                                    resonance [n] (force one mechanic now),
+//                                    soul guardian|slabwright|singer (that
+//                                    member's soul takes a pillar now),
+//                                    soulpip <n> (leave every soul pillar at
+//                                    n pips; 0 bursts them)
 //   /dev heart kill guardian|slabwright|singer|council
 //                                    one council member (to test each order of
 //                                    the inheritance) or all three (= hammer)
@@ -113,7 +118,7 @@ const GUARDIAN_IDS: ReadonlySet<string> = new Set([
 const COUNCIL_IDS: ReadonlySet<string> = new Set(COUNCIL_TEMPLATE_IDS);
 
 const HELP =
-  '[dev] /dev heart enter [normal] | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|guardian|slabwright|singer|council|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | arrival | reset | council [pull|reset|heroic [on|off]|energy <n>|wrath|weight|wake|rock|bolt|song|resonance [n]]';
+  '[dev] /dev heart enter [normal] | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|guardian|slabwright|singer|council|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | arrival | reset | council [pull|reset|heroic [on|off]|mythic [on|off]|energy <n>|wrath|weight|wake|rock|bolt|song|resonance [n]|soul <guardian|slabwright|singer>|soulpip <n>]';
 
 function log(ctx: SimContext, pid: number, text: string): void {
   ctx.emit({ type: 'log', text, pid });
@@ -306,7 +311,14 @@ export function handleSmithHeartDevChat(ctx: SimContext, raw: string, pid: numbe
     // unpulled council resets its fight on the next tick).
     const verbName = arg.split(' ')[0];
     const bodies = councilBodies(ctx, inst);
-    if (verbName !== 'reset' && verbName !== 'heroic' && bodies && !councilState(bodies)) pullAll();
+    if (
+      verbName !== 'reset' &&
+      verbName !== 'heroic' &&
+      verbName !== 'mythic' &&
+      bodies &&
+      !councilState(bodies)
+    )
+      pullAll();
     const reply = councilDevTrigger(ctx, inst, arg);
     if (reply === null) {
       ctx.error(pid, HELP);

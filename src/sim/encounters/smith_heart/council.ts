@@ -23,10 +23,13 @@
 //                  that no kick stops, a shorter Wrath. The last one carries
 //                  both.
 //
-// Difficulty: the claim's (heroic Resonance overlaps Wrath, three marks for
+// Difficulty: the claim's (heroic Resonance overlaps Wrath, two marks for
 // Wake the Stone, the pillars pulse), with a dev switch for a run while the
-// raid has no heroic tier of its own (setCouncilDevHeroic). A later mythic is
-// one more COUNCIL_DIFFICULTY row.
+// raid has no heroic tier of its own (setCouncilDevHeroic). Mythic, a
+// prototype behind its own dev switch until the game has a mythic tier
+// (setCouncilDevTier), is one more COUNCIL_DIFFICULTY row: stronger
+// inheritances, the rock outliving the Slabwright, and Soul in the Stone
+// (council_soul.ts: a fallen member's soul takes a pillar).
 //
 // Deterministic: every pick is hashed or ordered (roles, roster, entity ids);
 // the only rng draws are damage rolls, in claim-player order. Every visible
@@ -80,6 +83,7 @@ import {
   startSong,
   stepResonance,
 } from './council_song';
+import { crumbleSouls, soulDevTrigger, soulReadout, stepSouls, takeSoul } from './council_soul';
 import type { CouncilFightState } from './council_state';
 import {
   clearStone,
@@ -101,22 +105,35 @@ import {
   syncEnergyBars,
 } from './council_wrath';
 
-// ---- the dev heroic switch ------------------------------------------------------------
+// ---- the dev difficulty switches ------------------------------------------------------
 
-/** Claims a dev playtest switched to heroic (`/dev heart council heroic`),
- *  keyed by the claim's identity and its exit so a recycled slot never
- *  inherits it. Dev-gated by its one caller (sim/dev/smith_heart_dev.ts). */
-const devHeroic = new WeakMap<InstanceSlot, number>();
+/** Claims a dev playtest switched to heroic or mythic (`/dev heart council
+ *  heroic|mythic`), keyed by the claim's identity and its exit so a recycled
+ *  slot never inherits it; one tier at a time (switching one on switches
+ *  the other off). Dev-gated by its one caller (sim/dev/smith_heart_dev.ts). */
+const devTier = new WeakMap<InstanceSlot, { exitId: number; tier: 'heroic' | 'mythic' }>();
+
+export function setCouncilDevTier(
+  inst: InstanceSlot,
+  tier: 'heroic' | 'mythic',
+  on: boolean,
+): void {
+  if (on && inst.exitId !== null) devTier.set(inst, { exitId: inst.exitId, tier });
+  else if (devTier.get(inst)?.tier === tier) devTier.delete(inst);
+}
 
 export function setCouncilDevHeroic(inst: InstanceSlot, on: boolean): void {
-  if (on && inst.exitId !== null) devHeroic.set(inst, inst.exitId);
-  else devHeroic.delete(inst);
+  setCouncilDevTier(inst, 'heroic', on);
 }
 
 /** The council's difficulty in a claim. */
 export function councilDifficulty(inst: InstanceSlot): CouncilDifficulty {
+  const dev = inst.exitId !== null ? devTier.get(inst) : undefined;
+  const tier = dev && dev.exitId === inst.exitId ? dev.tier : null;
+  // Mythic exists only behind its dev switch (the game has no mythic tier).
+  if (tier === 'mythic') return 'mythic';
   if (inst.difficulty === 'heroic') return 'heroic';
-  return inst.exitId !== null && devHeroic.get(inst) === inst.exitId ? 'heroic' : 'normal';
+  return tier === 'heroic' ? 'heroic' : 'normal';
 }
 
 // ---- the bodies and the state -----------------------------------------------------------
@@ -181,6 +198,7 @@ function freshState(difficulty: CouncilDifficulty): CouncilFightState {
     fallen: [],
     lines: [],
     casts: 0,
+    souls: [],
   };
 }
 
@@ -261,6 +279,8 @@ function noteFallen(s: CouncilScope, role: CouncilRole, dead: Entity): void {
   if (survivor) raidWarn(s, survivor, `fell_${role}`, FALLEN_LINES[role]);
   // The Wrath's heir starts its own (shorter) fill from empty.
   if (role === 'guardian') s.st.energy = 0;
+  // Mythic: its soul takes the most intact pillar (council_soul.ts).
+  if (survivor && s.rules.soulInTheStone) takeSoul(s, role, dead);
 }
 
 // ---- the bars -----------------------------------------------------------------------------
@@ -289,7 +309,7 @@ function landBar(s: CouncilScope, role: CouncilRole, body: Entity): void {
       return;
     case COUNCIL_CASTS.song:
     case COUNCIL_CASTS.songUnbroken:
-      landSong(s, body);
+      landSong(s, body, bar.heir);
       return;
   }
 }
@@ -438,6 +458,8 @@ function finishCouncil(
 ): void {
   st.finished = true;
   const s = scopeOf(ctx, inst, st, bodies);
+  // Every soul pillar crumbles with the council.
+  crumbleSouls(s);
   clearStone(s);
   clearSong(s);
   clearRubble(ctx, inst, st);
@@ -495,6 +517,7 @@ export function tickHammerCouncil(ctx: SimContext, inst: InstanceSlot): void {
   stepRises(s);
   stepRock(s);
   stepResonance(s);
+  stepSouls(s);
   const source = COUNCIL_ROLES.map((r) => bodies[r]).find(living);
   if (source) {
     stepRubble(ctx, inst, st, source, s.players, damageMult(s, source));
@@ -547,13 +570,15 @@ export function councilDevTrigger(
     }
     return 'The Hammer Council stands whole again, the five columns with it.';
   }
-  if (verb === 'heroic') {
+  if (verb === 'heroic' || verb === 'mythic') {
     const on = arg !== 'off';
-    setCouncilDevHeroic(inst, on);
+    setCouncilDevTier(inst, verb, on);
     const st = councilBodies(ctx, inst);
     const live = st ? councilState(st) : null;
     if (live) live.difficulty = councilDifficulty(inst);
-    return on ? 'The council fights on heroic for this run.' : 'The council fights on normal.';
+    return on
+      ? `The council fights on ${verb} for this run.`
+      : `The council fights on ${councilDifficulty(inst)}.`;
   }
   const s = councilScopeForDev(ctx, inst);
   if (!s) return 'This run holds no council.';
@@ -602,6 +627,8 @@ export function councilDevTrigger(
     s.st.quiet = 0;
     return startSong(s, true) ? 'Song of the Seam.' : 'Nobody can sing it.';
   }
+  const soulReply = soulDevTrigger(s, verb, arg);
+  if (soulReply !== null) return soulReply;
   if (verb === 'resonance') {
     const holder = COUNCIL_ROLES.map((r) => s.bodies[r]).find(living);
     if (!holder) return 'The council has fallen.';
@@ -623,5 +650,6 @@ export function councilReadout(ctx: SimContext, inst: InstanceSlot): string {
   };
   const head = `[dev] Council (${councilDifficulty(inst)}): ${COUNCIL_ROLES.map(part).join(', ')}`;
   if (!st) return `${head}; not fighting.`;
-  return `${head}; energy ${Math.round(st.energy)}, wraths ${st.wraths}, fallen ${st.fallen.join(' > ') || 'none'}.`;
+  const souls = st.souls.length > 0 ? `, souls ${soulReadout({ ctx, inst, st })}` : '';
+  return `${head}; energy ${Math.round(st.energy)}, wraths ${st.wraths}, fallen ${st.fallen.join(' > ') || 'none'}${souls}.`;
 }

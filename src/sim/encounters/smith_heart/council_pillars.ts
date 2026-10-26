@@ -33,10 +33,12 @@ import {
   COUNCIL_CUES,
   COUNCIL_NAMES,
   COUNCIL_RUBBLE,
+  type CouncilRole,
   councilPillarFull,
   councilPillarOf,
   councilPillarRadius,
   councilPillarTemplate,
+  councilSoulOf,
   COUNCIL_TUNING as T,
 } from './council_ids';
 import type { CouncilFightState } from './council_state';
@@ -52,6 +54,10 @@ export interface CouncilPillar {
   integrity: number;
   risen: boolean;
   r: number;
+  /** Mythic: whose soul it holds (council_soul.ts), else null. A soul
+   *  pillar's `integrity` is its pips; nothing but a soul's own rules strikes
+   *  them (crackPillar refuses it). */
+  soul: CouncilRole | null;
 }
 
 /** The claim's standing pillars, in object-roster order. */
@@ -61,7 +67,25 @@ export function councilPillars(ctx: SimContext, inst: InstanceSlot): CouncilPill
     const e = ctx.entities.get(id);
     if (!e) continue;
     const p = councilPillarOf(e.templateId);
-    if (p) out.push({ e, integrity: p.integrity, risen: p.risen, r: councilPillarRadius(p.risen) });
+    if (p) {
+      out.push({
+        e,
+        integrity: p.integrity,
+        risen: p.risen,
+        r: councilPillarRadius(p.risen),
+        soul: null,
+      });
+      continue;
+    }
+    const soul = councilSoulOf(e.templateId);
+    if (soul)
+      out.push({
+        e,
+        integrity: soul.pips,
+        risen: soul.risen,
+        r: councilPillarRadius(soul.risen),
+        soul: soul.role,
+      });
   }
   return out;
 }
@@ -120,11 +144,19 @@ function local(ctx: SimContext, inst: InstanceSlot, e: Entity): { x: number; z: 
   return { x: e.pos.x - o.x, z: e.pos.z - o.z };
 }
 
-/** A wipe: the five columns stand whole at their sockets again, the risen
- *  pillars and every rubble patch go. */
+/** A wipe: the five columns stand whole at their sockets again (a column a
+ *  soul took is a plain column again), the risen pillars and every rubble
+ *  patch go. */
 export function restorePillars(ctx: SimContext, inst: InstanceSlot): void {
   const columns = new Map<number, Entity>();
   for (const p of councilPillars(ctx, inst)) {
+    if (p.soul) {
+      // The soul's own bar and song go with it.
+      p.e.castingAbility = null;
+      p.e.castRemaining = 0;
+      p.e.castTotal = 0;
+      p.e.auras = [];
+    }
     if (p.risen) {
       dropKitObject(ctx, inst, p.e.id);
       continue;
@@ -173,7 +205,7 @@ export function clearRubble(ctx: SimContext, inst: InstanceSlot, st: CouncilFigh
 }
 
 /** A pillar falls: its wall goes this tick and a patch of rubble lies there. */
-function collapse(
+export function collapsePillar(
   ctx: SimContext,
   inst: InstanceSlot,
   st: CouncilFightState,
@@ -212,9 +244,11 @@ export function crackPillar(
   st: CouncilFightState,
   p: CouncilPillar,
 ): boolean {
+  // A soul pillar takes no normal blow (council_soul.ts strikes its pips).
+  if (p.soul) return false;
   const left = p.integrity - 1;
   if (left <= 0) {
-    collapse(ctx, inst, st, p);
+    collapsePillar(ctx, inst, st, p);
     return true;
   }
   p.integrity = left;
@@ -301,9 +335,11 @@ export function raisePillar(
   x: number,
   z: number,
   damageMult: number,
+  /** A soul's host (council_soul.ts): never refused by the cap. */
+  force = false,
 ): Entity | null {
   const standing = councilPillars(ctx, inst);
-  if (standing.length >= T.pillarCap) return null;
+  if (!force && standing.length >= T.pillarCap) return null;
   const pillarSpots = standing.map((p) => local(ctx, inst, p.e));
   const bodySpots = bodies.filter((b) => !b.dead).map((b) => local(ctx, inst, b));
   const spot = nearestRiseSpot(pillarSpots, bodySpots, x, z);
@@ -420,6 +456,8 @@ export function pulsePillars(
 ): number {
   let hits = 0;
   for (const p of councilPillars(ctx, inst)) {
+    // A soul pillar keeps to its soul's behaviour (council_soul.ts).
+    if (p.soul) continue;
     ctx.emit({
       type: 'spellfx',
       sourceId: p.e.id,

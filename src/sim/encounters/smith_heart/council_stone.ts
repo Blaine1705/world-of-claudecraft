@@ -15,6 +15,10 @@
 //   Heir            the Slabwright fallen, a survivor keeps raising pillars,
 //                   but under RANDOM players with only a 2 s warning on a
 //                   locked spot (nobody chooses); the rock stops with it.
+//                   Mythic: a 1.5 s warning, and a survivor keeps the rock
+//                   too (with Resonance it is all that breaks a soul pillar).
+//   Soul pillars    a rock landing within 6 yd of one strikes a soul pip off
+//                   (council_soul.ts) instead of a piece.
 //
 // Zero rng in every pick (hashed marks); the draws are the damage rolls.
 
@@ -31,7 +35,9 @@ import {
   COUNCIL_CUES,
   COUNCIL_NAMES,
   COUNCIL_RISE_SPOT,
+  type CouncilRole,
   fallingRockShare,
+  JOB_HEIRS,
   COUNCIL_TUNING as T,
 } from './council_ids';
 import { councilPillars, crackPillar, raisePillar } from './council_pillars';
@@ -47,6 +53,7 @@ import {
   raidWarn,
   roll,
 } from './council_scope';
+import { strikeSoulPip } from './council_soul';
 
 /** Free pillar places under the cap (marks never outnumber them). */
 function freePlaces(s: CouncilScope): number {
@@ -88,7 +95,7 @@ export function startWake(s: CouncilScope): boolean {
       T.riseKnockRadius,
     );
     obj.dungeonId = s.inst.dungeonId;
-    s.st.riseSpots.push({ x: lx, z: lz, remaining: T.heirRiseWarn, objectId: obj.id });
+    s.st.riseSpots.push({ x: lx, z: lz, remaining: s.rules.heirRiseWarn, objectId: obj.id });
   }
   raidWarn(s, holder.body, 'wakeHeir', `The stone wakes under ${namesOf(marked)}: move!`, {
     players: namesOf(marked),
@@ -174,12 +181,22 @@ export function stepRises(s: CouncilScope): void {
   }
 }
 
-/** Falling Rock: the Slabwright's own (it stops when the Slabwright falls). */
+/** Who drops the rock: the Slabwright; once it has fallen, nobody, or on
+ *  mythic its first living heir (the rock outlives it there). */
+export function rockCaster(s: CouncilScope): CouncilRole | null {
+  if (living(s.bodies.slabwright)) return 'slabwright';
+  if (!s.rules.rockOutlivesSlabwright) return null;
+  for (const r of JOB_HEIRS.pillars) if (living(s.bodies[r])) return r;
+  return null;
+}
+
+/** Falling Rock: the Slabwright's own (it stops when the Slabwright falls,
+ *  but on mythic). */
 export function startRock(s: CouncilScope): boolean {
-  const sw = s.bodies.slabwright;
-  if (!living(sw) || s.st.rock || !memberFree(s, 'slabwright')) return false;
+  const role = rockCaster(s);
+  if (role === null || s.st.rock || !memberFree(s, role)) return false;
   s.st.rockTimer = T.rockEvery;
-  beginBar(s, 'slabwright', COUNCIL_CASTS.rock, T.rockCast, null, false);
+  beginBar(s, role, COUNCIL_CASTS.rock, T.rockCast, null, role !== 'slabwright');
   return true;
 }
 
@@ -253,9 +270,14 @@ export function stepRock(s: CouncilScope): number {
       );
     }
   }
-  // Every pillar within the blow loses a piece.
+  // Every pillar within the blow loses a piece (a soul pillar, a pip).
   for (const pl of councilPillars(s.ctx, s.inst)) {
-    if (Math.hypot(pl.e.pos.x - at.x, pl.e.pos.z - at.z) - pl.r > T.rockRadius) continue;
+    const d = Math.hypot(pl.e.pos.x - at.x, pl.e.pos.z - at.z) - pl.r;
+    if (pl.soul) {
+      if (d <= T.soulRockReach) strikeSoulPip(s, pl, 'rock');
+      continue;
+    }
+    if (d > T.rockRadius) continue;
     crackPillar(s.ctx, s.inst, s.st, pl);
   }
   return under.length;

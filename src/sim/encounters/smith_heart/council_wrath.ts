@@ -58,7 +58,7 @@ export function fillEnergy(s: CouncilScope): void {
   const holder = jobHolder(s, 'wrath');
   if (!holder) return;
   if (s.st.bars[holder.role]?.castId === COUNCIL_CASTS.wrath) return;
-  const per = T.energyMax / councilFillSeconds(holder.heir, s.st.wraths);
+  const per = T.energyMax / councilFillSeconds(holder.heir, s.st.wraths, s.rules.heirFillSeconds);
   s.st.energy = Math.min(T.energyMax, s.st.energy + per * DT);
 }
 
@@ -67,7 +67,7 @@ export function fillEnergy(s: CouncilScope): void {
 export function secondsToNextWrath(s: CouncilScope): number {
   const holder = jobHolder(s, 'wrath');
   if (!holder) return Number.POSITIVE_INFINITY;
-  const per = T.energyMax / councilFillSeconds(holder.heir, s.st.wraths);
+  const per = T.energyMax / councilFillSeconds(holder.heir, s.st.wraths, s.rules.heirFillSeconds);
   const cast = holder.heir ? T.heirWrathCast : T.wrathCast;
   return Math.max(0, T.energyMax - s.st.energy) / per + cast;
 }
@@ -104,13 +104,22 @@ export function landWrath(s: CouncilScope, caster: Entity, heir: boolean): numbe
     fx: 'nova',
     ability: COUNCIL_CASTS.wrath,
   });
-  const pillars = councilPillars(ctx, inst);
+  const all = councilPillars(ctx, inst);
+  // A soul pillar shields nobody (mythic, council_soul.ts): its wall still
+  // stands in the sight line, so a player it alone hides is struck anyway.
+  const pillars = all.some((p) => p.soul) ? all.filter((p) => !p.soul) : all;
+  const souls = pillars === all ? null : all.filter((p) => p.soul);
   const shields = new Set<number>();
   let struck = 0;
   for (const p of s.players) {
     if (p.dead) continue;
     if (Math.hypot(p.pos.x - caster.pos.x, p.pos.z - caster.pos.z) > T.wrathRadius) continue;
-    if (ctx.hasLineOfSight(caster, p)) {
+    const seen =
+      ctx.hasLineOfSight(caster, p) ||
+      (souls !== null &&
+        pillarBetween(pillars, caster.pos, p.pos) === null &&
+        pillarBetween(souls, caster.pos, p.pos) !== null);
+    if (seen) {
       const amount = heir
         ? roll(s, caster, T.heirWrathMin, T.heirWrathMax)
         : roll(s, caster, T.wrathMin, T.wrathMax);

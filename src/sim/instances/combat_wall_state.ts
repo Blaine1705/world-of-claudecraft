@@ -52,7 +52,25 @@ export const COMBAT_WALL_SHAPES: Readonly<Record<string, CombatWallShape>> = {
   sh_council_risen_3: { hw: 2.2, hd: 2.2, height: 10, round: true, ownLook: true },
   sh_council_risen_2: { hw: 2.2, hd: 2.2, height: 10, round: true, ownLook: true },
   sh_council_risen_1: { hw: 2.2, hd: 2.2, height: 10, round: true, ownLook: true },
+  // Mythic: a pillar holding a fallen member's soul (encounters/smith_heart/
+  // council_soul.ts, council_ids.ts councilSoulTemplate), by soul, kind (c a
+  // carved column, r a risen pillar) and pips left; the column's or the
+  // risen pillar's own size (pinned by the soul tests).
+  ...soulPillarShapes(),
 };
+
+/** The soul pillars' rows: `sh_council_soul_<role>_<c|r>_<pips>`. */
+function soulPillarShapes(): Record<string, CombatWallShape> {
+  const out: Record<string, CombatWallShape> = {};
+  for (const role of ['guardian', 'slabwright', 'singer'])
+    for (const kind of ['c', 'r'])
+      for (const pips of [1, 2, 3])
+        out[`sh_council_soul_${role}_${kind}_${pips}`] =
+          kind === 'c'
+            ? { hw: 2.6, hd: 2.6, height: 13, round: true, ownLook: true }
+            : { hw: 2.2, hd: 2.2, height: 10, round: true, ownLook: true };
+  return out;
+}
 
 /** Is `templateId` a combat wall's? */
 export function isCombatWallTemplate(templateId: string): boolean {
