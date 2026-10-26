@@ -21812,4 +21812,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.council.rockMark': "効果が切れると岩が落ちてくる：{total}のダメージを{radius}ヤード以内の全員で分け合う。{soakers}人未満だと各自が{penalty}%多く受け、レイド全体が{tremorMin}から{tremorMax}を受ける。{radius}ヤード以内の柱はすべて欠けるので、遮蔽物から離れて受けよう。ヒロイック：ダメージ{heroic}%増加。",
   'hudChrome.auraEffect.council.resonance': "柱から{reach}ヤード以内に{seconds}秒続けて立つと柱が一つ欠け、そこにいる限り{seconds}秒ごとにまた欠ける。解除はできない：一番傷んだ柱のそばで山の怒りをやり過ごし、無傷の柱には近づかないこと。",
   'hudChrome.auraEffect.council.memory': "与えるダメージが{pct}%増加：槌の評議会の倒れた仲間1人につき{per}%。",
+  // The Hammer Council's mythic, Soul in the Stone (M16 fills).
+  'abilityUi.cast.heart_echo_of_wrath': "怒りの残響",
+  'abilityUi.cast.heart_endless_song': "終わらぬ歌",
+  'hudChrome.council.warn.soul_guardian': "守護者の魂が石に宿った！その柱から怒りの残響が放たれる。",
+  'hudChrome.council.warn.soul_slabwright': "石板の匠の魂が石に宿った！歩む石板が君たちを追って這い寄る。",
+  'hudChrome.council.warn.soul_singer': "鉱脈の歌い手の魂が石に宿った！終わらぬ歌は脈打つたびに強まる。",
+  'hudChrome.council.warn.echo': "怒りの残響！魂の柱との間に別の柱を挟め！",
+  'hudChrome.council.warn.soulBreak_guardian': "守護者の魂の柱が砕けた！残響が静まる。",
+  'hudChrome.council.warn.soulBreak_slabwright': "石板の匠の魂の柱が砕けた！歩む石板が止まる。",
+  'hudChrome.council.warn.soulBreak_singer': "鉱脈の歌い手の魂の柱が砕けた！終わらぬ歌が途絶える。",
 };

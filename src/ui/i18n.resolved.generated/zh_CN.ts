@@ -6674,7 +6674,14 @@ export const zh_CN: EnTranslations = {
         "resonance": "{players}获得共鸣：去震裂最破损的石柱，远离完好的石柱！",
         "fell_guardian": "重锤守护者倒下了。它的怒火传入了剩下的岩石！",
         "fell_slabwright": "石板匠倒下了。现在岩石会随意升起！",
-        "fell_singer": "矿脉歌者倒下了。它的歌声被传承下去，再也无法打断！"
+        "fell_singer": "矿脉歌者倒下了。它的歌声被传承下去，再也无法打断！",
+        "soul_guardian": "守护者之魂附入了岩石！怒火回响将从那根石柱中爆发。",
+        "soul_slabwright": "石板匠之魂附入了岩石！行走石板正拖着身躯向你们逼近。",
+        "soul_singer": "矿脉歌者之魂附入了岩石！无尽之歌每一次脉动都更加响亮。",
+        "echo": "怒火回响！让另一根石柱挡在你和灵魂石柱之间！",
+        "soulBreak_guardian": "守护者的灵魂石柱碎裂了！它的回响归于沉寂。",
+        "soulBreak_slabwright": "石板匠的灵魂石柱碎裂了！行走石板停了下来。",
+        "soulBreak_singer": "矿脉歌者的灵魂石柱碎裂了！无尽之歌归于沉寂。"
       },
       "alert": {
         "wakeTitle": "唤醒岩石！",
@@ -15170,6 +15177,8 @@ export const zh_CN: EnTranslations = {
       "heart_seam_bolt": "矿脉箭",
       "heart_song_of_the_seam": "矿脉之歌",
       "heart_song_of_the_seam_unbroken": "矿脉之歌",
+      "heart_echo_of_wrath": "怒火回响",
+      "heart_endless_song": "无尽之歌",
       "kituse_sanctum_topple_brazier": "推倒火盆",
       "trash_demo_nova": "Test Nova",
       "trash_demo_nova_unstoppable": "Test Nova",

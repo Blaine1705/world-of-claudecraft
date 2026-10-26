@@ -6674,7 +6674,14 @@ export const ko_KR: EnTranslations = {
         "resonance": "{players}에게 공명: 가장 손상된 기둥을 깨고, 멀쩡한 기둥에서는 떨어지세요!",
         "fell_guardian": "망치의 수호자가 쓰러졌습니다. 그 분노가 남은 돌에게 넘어갑니다!",
         "fell_slabwright": "석판장이가 쓰러졌습니다. 이제 돌이 제멋대로 솟아오릅니다!",
-        "fell_singer": "광맥의 노래꾼이 쓰러졌습니다. 그 노래가 이어지며, 이제 아무도 막을 수 없습니다!"
+        "fell_singer": "광맥의 노래꾼이 쓰러졌습니다. 그 노래가 이어지며, 이제 아무도 막을 수 없습니다!",
+        "soul_guardian": "수호자의 영혼이 돌에 깃들었습니다! 그 기둥에서 분노의 메아리가 터져 나옵니다.",
+        "soul_slabwright": "석판장이의 영혼이 돌에 깃들었습니다! 걷는 석판이 여러분을 향해 끌려옵니다.",
+        "soul_singer": "광맥의 노래꾼의 영혼이 돌에 깃들었습니다! 끝없는 노래가 울릴 때마다 커집니다.",
+        "echo": "분노의 메아리! 영혼의 기둥과 자신 사이에 다른 기둥을 두세요!",
+        "soulBreak_guardian": "수호자의 영혼의 기둥이 부서졌습니다! 메아리가 잠잠해집니다.",
+        "soulBreak_slabwright": "석판장이의 영혼의 기둥이 부서졌습니다! 걷는 석판이 멈춥니다.",
+        "soulBreak_singer": "광맥의 노래꾼의 영혼의 기둥이 부서졌습니다! 끝없는 노래가 그칩니다."
       },
       "alert": {
         "wakeTitle": "돌 깨우기!",
@@ -15170,6 +15177,8 @@ export const ko_KR: EnTranslations = {
       "heart_seam_bolt": "광맥 화살",
       "heart_song_of_the_seam": "광맥의 노래",
       "heart_song_of_the_seam_unbroken": "광맥의 노래",
+      "heart_echo_of_wrath": "분노의 메아리",
+      "heart_endless_song": "끝없는 노래",
       "kituse_sanctum_topple_brazier": "화로 넘어뜨리기",
       "trash_demo_nova": "Test Nova",
       "trash_demo_nova_unstoppable": "Test Nova",

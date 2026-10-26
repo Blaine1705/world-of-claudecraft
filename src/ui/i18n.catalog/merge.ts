@@ -778,6 +778,9 @@ const mergeStringsEn = {
       heart_seam_bolt: 'Seam Bolt',
       heart_song_of_the_seam: 'Song of the Seam',
       heart_song_of_the_seam_unbroken: 'Song of the Seam',
+      // Mythic: a soul pillar's own bars (council_soul.ts), never kicked.
+      heart_echo_of_wrath: 'Echo of Wrath',
+      heart_endless_song: 'Endless Song',
       // The player's own bar while kicking a Soul Brazier over (the trash
       // engine's G3 use, trash_kit/encounter_use.ts).
       kituse_sanctum_topple_brazier: 'Topple Brazier',

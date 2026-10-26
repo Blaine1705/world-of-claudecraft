@@ -9598,6 +9598,17 @@ export const hudChromeStrings = {
         'The Guardian of the Hammer falls. Its wrath passes into the stone that remains!',
       fell_slabwright: 'The Slabwright falls. Now the stone rises where it will!',
       fell_singer: 'The Seam Singer falls. Its song passes on, and no one can stop it now!',
+      // Mythic: Soul in the Stone (encounters/smith_heart/council_soul.ts).
+      soul_guardian:
+        "The Guardian's soul takes the stone! Its Echo of Wrath will strike from the pillar.",
+      soul_slabwright:
+        "The Slabwright's soul takes the stone! The Walking Slab drags itself after you.",
+      soul_singer:
+        "The Seam Singer's soul takes the stone! Its Endless Song grows with every pulse.",
+      echo: 'Echo of Wrath! Put another pillar between you and the soul pillar!',
+      soulBreak_guardian: "The Guardian's soul pillar breaks! Its Echo falls silent.",
+      soulBreak_slabwright: "The Slabwright's soul pillar breaks! The Walking Slab is still.",
+      soulBreak_singer: "The Seam Singer's soul pillar breaks! The Endless Song falls silent.",
     },
     alert: {
       wakeTitle: 'Wake the Stone!',

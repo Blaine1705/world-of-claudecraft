@@ -6674,7 +6674,14 @@ export const en: EnTranslations = {
         "resonance": "Resonance on {players}: crack the weakest pillar, keep off the whole ones!",
         "fell_guardian": "The Guardian of the Hammer falls. Its wrath passes into the stone that remains!",
         "fell_slabwright": "The Slabwright falls. Now the stone rises where it will!",
-        "fell_singer": "The Seam Singer falls. Its song passes on, and no one can stop it now!"
+        "fell_singer": "The Seam Singer falls. Its song passes on, and no one can stop it now!",
+        "soul_guardian": "The Guardian's soul takes the stone! Its Echo of Wrath will strike from the pillar.",
+        "soul_slabwright": "The Slabwright's soul takes the stone! The Walking Slab drags itself after you.",
+        "soul_singer": "The Seam Singer's soul takes the stone! Its Endless Song grows with every pulse.",
+        "echo": "Echo of Wrath! Put another pillar between you and the soul pillar!",
+        "soulBreak_guardian": "The Guardian's soul pillar breaks! Its Echo falls silent.",
+        "soulBreak_slabwright": "The Slabwright's soul pillar breaks! The Walking Slab is still.",
+        "soulBreak_singer": "The Seam Singer's soul pillar breaks! The Endless Song falls silent."
       },
       "alert": {
         "wakeTitle": "Wake the Stone!",
@@ -15170,6 +15177,8 @@ export const en: EnTranslations = {
       "heart_seam_bolt": "Seam Bolt",
       "heart_song_of_the_seam": "Song of the Seam",
       "heart_song_of_the_seam_unbroken": "Song of the Seam",
+      "heart_echo_of_wrath": "Echo of Wrath",
+      "heart_endless_song": "Endless Song",
       "kituse_sanctum_topple_brazier": "Topple Brazier",
       "trash_demo_nova": "Test Nova",
       "trash_demo_nova_unstoppable": "Test Nova",

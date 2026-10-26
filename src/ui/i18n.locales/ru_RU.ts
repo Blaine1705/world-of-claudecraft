@@ -22220,4 +22220,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.council.rockMark': "Когда эффект закончится, на вас упадёт камень: {total} урона делится между всеми в пределах {radius} м. Если под ним меньше {soakers}, каждый получает на {penalty}% больше, а весь рейд получает от {tremorMin} до {tremorMax}. Каждая колонна в пределах {radius} м теряет кусок, так что делите удар подальше от укрытий. Героический режим: урон выше на {heroic}%.",
   'hudChrome.auraEffect.council.resonance': "Если простоять в пределах {reach} м от колонны {seconds} с подряд, от неё откалывается кусок, и снова каждые {seconds} с, пока вы рядом. Снять нельзя: переждите Гнев горы у самой повреждённой колонны и держитесь подальше от целых.",
   'hudChrome.auraEffect.council.memory': "Наносит на {pct}% больше урона: по {per}% за каждого павшего члена Совета Молота.",
+  // The Hammer Council's mythic, Soul in the Stone (M16 fills).
+  'abilityUi.cast.heart_echo_of_wrath': "Эхо гнева",
+  'abilityUi.cast.heart_endless_song': "Бесконечная песнь",
+  'hudChrome.council.warn.soul_guardian': "Душа Стража вселяется в камень! Эхо гнева ударит из колонны.",
+  'hudChrome.council.warn.soul_slabwright': "Душа Плитотёса вселяется в камень! Шагающая плита ползёт за вами.",
+  'hudChrome.council.warn.soul_singer': "Душа Певца Жилы вселяется в камень! Бесконечная песнь крепнет с каждым ударом.",
+  'hudChrome.council.warn.echo': "Эхо гнева! Встаньте так, чтобы между вами и колонной души была другая колонна!",
+  'hudChrome.council.warn.soulBreak_guardian': "Колонна души Стража рушится! Его эхо смолкает.",
+  'hudChrome.council.warn.soulBreak_slabwright': "Колонна души Плитотёса рушится! Шагающая плита замирает.",
+  'hudChrome.council.warn.soulBreak_singer': "Колонна души Певца Жилы рушится! Бесконечная песнь смолкает.",
 };

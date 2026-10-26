@@ -214,6 +214,8 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.heart_seam_bolt': true,
   'abilityUi.cast.heart_song_of_the_seam': true,
   'abilityUi.cast.heart_song_of_the_seam_unbroken': true,
+  'abilityUi.cast.heart_echo_of_wrath': true,
+  'abilityUi.cast.heart_endless_song': true,
   // The Wildheart Basin's three bosses.
   'abilityUi.cast.wildheart_beast_pit_quake': true,
   'abilityUi.cast.wildheart_jaguar_heel': true,

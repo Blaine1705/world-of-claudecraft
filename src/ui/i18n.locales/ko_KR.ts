@@ -21807,4 +21807,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.council.rockMark': "효과가 끝나면 바위가 떨어집니다: {total}의 피해를 {radius}야드 안의 모두가 나눠 받습니다. {soakers}명 미만이면 각자 {penalty}% 더 받고 공격대 전체가 {tremorMin}에서 {tremorMax}의 피해를 받습니다. {radius}야드 안의 모든 기둥이 한 조각씩 깨지니 엄폐물에서 떨어져 나눠 맞으세요. 영웅: 피해 {heroic}% 증가.",
   'hudChrome.auraEffect.council.resonance': "기둥에서 {reach}야드 안에 {seconds}초 동안 계속 서 있으면 기둥이 한 조각 깨지고, 머무는 동안 {seconds}초마다 다시 깨집니다. 제거할 수 없습니다: 가장 손상된 기둥 옆에서 산의 분노를 버티고 멀쩡한 기둥에서는 떨어지세요.",
   'hudChrome.auraEffect.council.memory': "주는 피해가 {pct}% 증가합니다: 쓰러진 망치 의회 구성원 1명당 {per}%.",
+  // The Hammer Council's mythic, Soul in the Stone (M16 fills).
+  'abilityUi.cast.heart_echo_of_wrath': "분노의 메아리",
+  'abilityUi.cast.heart_endless_song': "끝없는 노래",
+  'hudChrome.council.warn.soul_guardian': "수호자의 영혼이 돌에 깃들었습니다! 그 기둥에서 분노의 메아리가 터져 나옵니다.",
+  'hudChrome.council.warn.soul_slabwright': "석판장이의 영혼이 돌에 깃들었습니다! 걷는 석판이 여러분을 향해 끌려옵니다.",
+  'hudChrome.council.warn.soul_singer': "광맥의 노래꾼의 영혼이 돌에 깃들었습니다! 끝없는 노래가 울릴 때마다 커집니다.",
+  'hudChrome.council.warn.echo': "분노의 메아리! 영혼의 기둥과 자신 사이에 다른 기둥을 두세요!",
+  'hudChrome.council.warn.soulBreak_guardian': "수호자의 영혼의 기둥이 부서졌습니다! 메아리가 잠잠해집니다.",
+  'hudChrome.council.warn.soulBreak_slabwright': "석판장이의 영혼의 기둥이 부서졌습니다! 걷는 석판이 멈춥니다.",
+  'hudChrome.council.warn.soulBreak_singer': "광맥의 노래꾼의 영혼의 기둥이 부서졌습니다! 끝없는 노래가 그칩니다.",
 };

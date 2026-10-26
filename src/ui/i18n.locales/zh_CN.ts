@@ -20745,4 +20745,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.council.rockMark': "结束时，一块巨石砸向你：{total}点伤害由{radius}码内的所有人分担。若不足{soakers}人分担，每人多受{penalty}%伤害，且全团受到{tremorMin}到{tremorMax}点伤害。{radius}码内的每根石柱都会损失一块，所以要远离掩体分担。英雄难度：伤害提高{heroic}%。",
   'hudChrome.auraEffect.council.resonance': "在石柱{reach}码内连续站立{seconds}秒会震落它的一块，之后每多待{seconds}秒再震落一块。无法移除：在最破损的石柱旁躲过山岳之怒，远离完好的石柱。",
   'hudChrome.auraEffect.council.memory': "造成的伤害提高{pct}%：重锤议会每倒下一名成员提高{per}%。",
+  // The Hammer Council's mythic, Soul in the Stone (M16 fills).
+  'abilityUi.cast.heart_echo_of_wrath': "怒火回响",
+  'abilityUi.cast.heart_endless_song': "无尽之歌",
+  'hudChrome.council.warn.soul_guardian': "守护者之魂附入了岩石！怒火回响将从那根石柱中爆发。",
+  'hudChrome.council.warn.soul_slabwright': "石板匠之魂附入了岩石！行走石板正拖着身躯向你们逼近。",
+  'hudChrome.council.warn.soul_singer': "矿脉歌者之魂附入了岩石！无尽之歌每一次脉动都更加响亮。",
+  'hudChrome.council.warn.echo': "怒火回响！让另一根石柱挡在你和灵魂石柱之间！",
+  'hudChrome.council.warn.soulBreak_guardian': "守护者的灵魂石柱碎裂了！它的回响归于沉寂。",
+  'hudChrome.council.warn.soulBreak_slabwright': "石板匠的灵魂石柱碎裂了！行走石板停了下来。",
+  'hudChrome.council.warn.soulBreak_singer': "矿脉歌者的灵魂石柱碎裂了！无尽之歌归于沉寂。",
 };

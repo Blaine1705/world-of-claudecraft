@@ -6674,7 +6674,14 @@ export const ja_JP: EnTranslations = {
         "resonance": "{players}に共鳴：一番傷んだ柱を割れ、無傷の柱には近づくな！",
         "fell_guardian": "槌の守護者が倒れた。その怒りは残された石へと移る！",
         "fell_slabwright": "石板の匠が倒れた。これからは石が好きな場所にせり上がる！",
-        "fell_singer": "鉱脈の歌い手が倒れた。その歌は受け継がれ、もう誰にも止められない！"
+        "fell_singer": "鉱脈の歌い手が倒れた。その歌は受け継がれ、もう誰にも止められない！",
+        "soul_guardian": "守護者の魂が石に宿った！その柱から怒りの残響が放たれる。",
+        "soul_slabwright": "石板の匠の魂が石に宿った！歩む石板が君たちを追って這い寄る。",
+        "soul_singer": "鉱脈の歌い手の魂が石に宿った！終わらぬ歌は脈打つたびに強まる。",
+        "echo": "怒りの残響！魂の柱との間に別の柱を挟め！",
+        "soulBreak_guardian": "守護者の魂の柱が砕けた！残響が静まる。",
+        "soulBreak_slabwright": "石板の匠の魂の柱が砕けた！歩む石板が止まる。",
+        "soulBreak_singer": "鉱脈の歌い手の魂の柱が砕けた！終わらぬ歌が途絶える。"
       },
       "alert": {
         "wakeTitle": "石の目覚め！",
@@ -15170,6 +15177,8 @@ export const ja_JP: EnTranslations = {
       "heart_seam_bolt": "鉱脈の矢",
       "heart_song_of_the_seam": "鉱脈の歌",
       "heart_song_of_the_seam_unbroken": "鉱脈の歌",
+      "heart_echo_of_wrath": "怒りの残響",
+      "heart_endless_song": "終わらぬ歌",
       "kituse_sanctum_topple_brazier": "火鉢倒し",
       "trash_demo_nova": "Test Nova",
       "trash_demo_nova_unstoppable": "Test Nova",

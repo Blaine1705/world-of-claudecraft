@@ -1545,6 +1545,11 @@ const baseEnTable = {
   'mechanic.heartSongOfTheSeam': 'Song of the Seam',
   'mechanic.heartCrumbledStone': 'Crumbled Stone',
   'mechanic.heartRestlessStone': 'Restless Stone',
+  // Mythic: Soul in the Stone (encounters/smith_heart/council_soul.ts).
+  'mechanic.heartEchoOfWrath': 'Echo of Wrath',
+  'mechanic.heartWalkingSlab': 'Walking Slab',
+  'mechanic.heartStoneDrag': 'Stone Drag',
+  'mechanic.heartEndlessSong': 'Endless Song',
   'aura.heartResonance': 'Resonance',
   'aura.heartMemoryOfStone': 'Memory of Stone',
   'log.sanctumTuskerSpill':
@@ -18256,6 +18261,10 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Song of the Seam': 'mechanic.heartSongOfTheSeam',
   'Crumbled Stone': 'mechanic.heartCrumbledStone',
   'Restless Stone': 'mechanic.heartRestlessStone',
+  'Echo of Wrath': 'mechanic.heartEchoOfWrath',
+  'Walking Slab': 'mechanic.heartWalkingSlab',
+  'Stone Drag': 'mechanic.heartStoneDrag',
+  'Endless Song': 'mechanic.heartEndlessSong',
   Resonance: 'aura.heartResonance',
   'Memory of Stone': 'aura.heartMemoryOfStone',
   'Creeping Rime': 'aura.sanctumCreepingRime',
