@@ -4235,6 +4235,17 @@ export const zh_CN: EnTranslations = {
         "resonance": "在石柱{reach}码内连续站立{seconds}秒会震落它的一块，之后每多待{seconds}秒再震落一块。无法移除：在最破损的石柱旁躲过山岳之怒，远离完好的石柱。史诗难度：在灵魂石柱旁等待同样的时间会改为击碎它的一个灵魂印记（矿脉歌者的石柱为{singerSeconds}秒），印记耗尽时碎裂。",
         "memory": "造成的伤害提高{pct}%：重锤议会每倒下一名成员提高{per}%。"
       },
+      "breathGuardian": {
+        "wind": "气息守护者的风以每秒{speed}码的速度将你带往它吹去的方向。逆风而行便能站稳，它不会打断你的施法。被压在边缘的墙上时，你每秒受到{pinMin}到{pinMax}点伤害。墙壁破损处没有任何阻挡：你会坠入虚空。",
+        "draw": "守护者吸气，以每秒{speed}码的速度将你拉向它。它嘴前的漩涡每{tick}秒对站在其中的人造成{min}到{max}点伤害。随后风箱狂风对崖台上的所有人造成{gustMin}到{gustMax}点伤害，并将他们向外击飞{throw}码。",
+        "pinned": "被风压在边缘的墙上：在风停歇或你离开墙边之前，每秒受到{min}到{max}点伤害。",
+        "anchor": "瑟萨莉队长的宁静稳住了你：风、拉扯、冲击和击飞都无法移动你。伤害照常生效。",
+        "spent": "你的锚定已经耗尽：在此效果结束前，瑟萨莉队长的宁静之环无法再次锚定你。",
+        "drawn": "每{every}秒会有一道闪电落在你所站之处：{warn}秒后对{radius}码内的所有人造成{min}到{max}点伤害，并留下带电的地面，在{charged}秒内每秒造成{cmin}到{cmax}点伤害。保持移动，把落雷引向远离团队的边缘。",
+        "cradled": "被举入风暴，持续{hold}秒。随后的放电造成{total}点伤害，由你和你下方{radius}码内的所有人分担。分担人数少于{soakers}人（英雄难度为{heroicSoakers}人）时，每人多承受{penalty}%，且崖台上的所有人受到{bmin}到{bmax}点伤害。",
+        "stormForm": "撕裂为闪电之躯：战斗的风暴后半段，直到气息守护者倒下。",
+        "swell": "每{every}秒，膨胀的风暴对崖台上的所有人造成{min}到{max}点伤害，之前每次脉动使其增强{growth}%：目前已有{stacks}次。"
+      },
       "sharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。",
       "varkhulSharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。每缺少一名玩家，还会对整个团队（包括圈内玩家）造成最大生命值 {missingPenalty}% 的伤害。",
       "makersBrand": "持续 {duration} 秒，每层使你受到瓦尔库尔的伤害提高 {pct}%。最多叠加 {max} 层。坦克应在 {swap} 层时换坦。",
@@ -6721,6 +6732,39 @@ export const zh_CN: EnTranslations = {
         "weightTitle": "重锤之压",
         "weightLine": "你受到双倍物理伤害：另一名坦克必须接手守护者",
         "timeAria": "剩余{seconds}秒"
+      }
+    },
+    "breathGuardian": {
+      "warn": {
+        "inhale": "守护者正在吸气！别站在它嘴前的漩涡里！",
+        "gust": "风箱狂风！准备承受冲击！",
+        "gales": "游荡的狂风横扫崖台！离它们远点！",
+        "circle": "瑟萨莉队长布下了宁静之环！最多可容{seats}人。",
+        "fell": "{player}被卷入了虚空！",
+        "storm": "风暴爆发了！闪电将落满整个崖台！",
+        "fork": "分叉雷击落在{player}身上！散开！",
+        "cradle": "{player}被举入了风暴！到他的下方集合！",
+        "drawn": "引雷落在{player}身上！把落雷引向边缘！",
+        "stormGust": "风暴阵风正在聚集！顶住风！"
+      },
+      "say": {
+        "guardian_pull": "你们爬上山巅，是来偷走它的气息吗？那就与我一同呼吸吧。",
+        "guardian_blow": "感受风向的转变。边缘比你想的更近。",
+        "guardian_inhale": "靠近些。所有人。",
+        "guardian_storm": "气息够了。现在，迎接风暴！",
+        "guardian_cradle": "升起吧，小家伙。让他们接住你。",
+        "guardian_drawn": "天空选中了你。跑吧，它会紧随而至。",
+        "guardian_wipe": "被吹散了，就像山巅的尘埃。",
+        "guardian_death": "气息……回归……群山……",
+        "thessaly_pull": "高望与你们并肩！当心墙上的缺口：风会把你们从那里扔出去！",
+        "thessaly_circle_a": "快进我的宁静之中！最多三人，不能再多！",
+        "thessaly_circle_b": "这里！站在我身边，让风撞碎在我们身上！",
+        "thessaly_circle_c": "石上的宁静！三个人，现在就来！",
+        "thessaly_inhale": "它在吸气！绕到它的两侧，千万别站在它嘴前！",
+        "thessaly_storm": "风暴要爆发了！我的宁静挡不住这个。散开！",
+        "thessaly_fall": "抓紧岩石！",
+        "thessaly_victory": "气息自由了。高望会记住这次攀登。",
+        "thessaly_wipe": "退后，喘口气。我们再来一次。"
       }
     },
     "sanctumAlert": {
@@ -15206,6 +15250,11 @@ export const zh_CN: EnTranslations = {
       "heart_song_of_the_seam_unbroken": "矿脉之歌",
       "heart_echo_of_wrath": "怒火回响",
       "heart_endless_song": "无尽之歌",
+      "heart_breath_inhale": "深吸之息",
+      "heart_breath_storm_break": "风暴破裂",
+      "heart_breath_forking_bolt": "分叉雷击",
+      "heart_breath_thunders_cradle": "雷霆摇篮",
+      "heart_breath_drawn_lightning": "引雷",
       "kituse_sanctum_topple_brazier": "推倒火盆",
       "trash_demo_nova": "Test Nova",
       "trash_demo_nova_unstoppable": "Test Nova",
@@ -25481,6 +25530,11 @@ export const zh_CN: EnTranslations = {
         "name": "瑟萨莉队长",
         "title": "高望队长",
         "greeting": "这面墙已经站了两百年，{className}。只要我守着它，它就不会倒，虽然它正在呻吟。"
+      },
+      "heart_captain_thessaly": {
+        "name": "瑟萨莉队长",
+        "title": "高望队长",
+        "greeting": "站稳脚跟，{className}。当风箱呼吸时，进入我的宁静之中，让风撞碎在我们身上。"
       },
       "brother_aldric_highwatch": {
         "name": "奥德里克修士",

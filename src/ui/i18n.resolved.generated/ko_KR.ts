@@ -4235,6 +4235,17 @@ export const ko_KR: EnTranslations = {
         "resonance": "기둥에서 {reach}야드 안에 {seconds}초 동안 계속 서 있으면 기둥이 한 조각 깨지고, 머무는 동안 {seconds}초마다 다시 깨집니다. 제거할 수 없습니다: 가장 손상된 기둥 옆에서 산의 분노를 버티고 멀쩡한 기둥에서는 떨어지세요. 신화: 영혼의 기둥 옆에서 같은 시간을 버티면 대신 영혼 표식이 하나 사라지고(광맥의 노래꾼의 기둥은 {singerSeconds}초), 표식이 없어지면 부서집니다.",
         "memory": "주는 피해가 {pct}% 증가합니다: 쓰러진 망치 의회 구성원 1명당 {per}%."
       },
+      "breathGuardian": {
+        "wind": "숨결의 수호자의 바람이 부는 방향으로 초당 {speed}야드씩 당신을 실어 갑니다. 바람을 거슬러 걸으면 버틸 수 있으며, 시전은 끊기지 않습니다. 가장자리 벽에 밀려 붙으면 매초 {pinMin}~{pinMax}의 피해를 입습니다. 벽이 무너진 곳에서는 막아 줄 것이 없어 공허로 떨어집니다.",
+        "draw": "수호자가 숨을 들이쉬며 초당 {speed}야드씩 당신을 끌어당깁니다. 입 앞의 소용돌이는 그 안에 선 이에게 {tick}초마다 {min}~{max}의 피해를 줍니다. 이어서 풀무 돌풍이 벼랑 위의 모두에게 {gustMin}~{gustMax}의 피해를 주고 {throw}야드 바깥으로 날려 보냅니다.",
+        "pinned": "바람에 밀려 가장자리 벽에 붙어 있습니다: 바람이 잦아들거나 벽에서 벗어날 때까지 매초 {min}~{max}의 피해.",
+        "anchor": "테살리 대장의 고요가 당신을 붙잡고 있습니다: 바람도, 끌어당김도, 폭발도, 날려 보내기도 당신을 움직일 수 없습니다. 피해는 그대로 받습니다.",
+        "spent": "닻이 다했습니다: 이것이 끝날 때까지 테살리 대장의 고요의 원은 당신을 다시 붙잡을 수 없습니다.",
+        "drawn": "{every}초마다 당신이 선 곳에 번개가 떨어집니다: {warn}초 뒤 {radius}야드 안의 모두에게 {min}~{max}의 피해를 주고, {charged}초 동안 매초 {cmin}~{cmax}의 피해를 주는 대전된 땅을 남깁니다. 계속 움직이며 낙뢰를 공격대에서 먼 가장자리로 유도하세요.",
+        "cradled": "폭풍 속으로 들어 올려져 {hold}초 동안 붙잡힙니다. 이후 방전이 {total}의 피해를 주며, 당신과 아래 {radius}야드 안의 모두가 나눠 받습니다. 나눠 받는 인원이 {soakers}명 미만이면(영웅 난이도는 {heroicSoakers}명) 각자 {penalty}% 더 받고 벼랑 위의 모두가 {bmin}~{bmax}의 피해를 받습니다.",
+        "stormForm": "찢어져 번개의 몸이 되었습니다: 숨결의 수호자가 쓰러질 때까지 이어지는 전투의 폭풍 후반부.",
+        "swell": "{every}초마다 부풀어 오르는 폭풍이 벼랑 위의 모두에게 {min}~{max}의 피해를 주며, 앞선 맥동마다 {growth}%씩 강해집니다: 지금까지 {stacks}번."
+      },
       "sharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).",
       "varkhulSharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%). 부족한 플레이어 1명당 원 안의 플레이어를 포함한 공격대 전체가 최대 생명력의 {missingPenalty}%에 해당하는 피해를 추가로 받습니다.",
       "makersBrand": "{duration}초 동안 중첩당 발쿨에게 받는 피해가 {pct}% 증가합니다. 최대 {max}회 중첩됩니다. 탱커는 {swap}중첩에서 교대하세요.",
@@ -6721,6 +6732,39 @@ export const ko_KR: EnTranslations = {
         "weightTitle": "망치의 무게",
         "weightLine": "받는 물리 피해가 두 배가 됩니다: 다른 탱커가 수호자를 맡아야 합니다",
         "timeAria": "{seconds}초 남음"
+      }
+    },
+    "breathGuardian": {
+      "warn": {
+        "inhale": "수호자가 숨을 들이쉽니다! 입 앞의 소용돌이에 들어가지 마세요!",
+        "gust": "풀무 돌풍! 충격에 대비하세요!",
+        "gales": "떠도는 돌풍이 벼랑을 휩씁니다! 가까이 가지 마세요!",
+        "circle": "테살리 대장이 고요의 원을 펼쳤습니다! {seats}명까지 설 수 있습니다.",
+        "fell": "{player} 님이 공허로 휩쓸려 갔습니다!",
+        "storm": "폭풍이 터집니다! 벼랑 곳곳에 번개가 떨어집니다!",
+        "fork": "{player} 님에게 갈래 번개! 산개하세요!",
+        "cradle": "{player} 님이 폭풍 속으로 들어 올려졌습니다! 그 아래로 모이세요!",
+        "drawn": "{player} 님에게 끌려오는 번개! 낙뢰를 가장자리로 유도하세요!",
+        "stormGust": "폭풍 돌풍이 모입니다! 바람에 대비하세요!"
+      },
+      "say": {
+        "guardian_pull": "산의 꼭대기까지 올라와 그 숨결을 훔치려는가? 그렇다면 나와 함께 숨 쉬어라.",
+        "guardian_blow": "바람이 방향을 바꾸는 것을 느껴라. 가장자리는 생각보다 가깝다.",
+        "guardian_inhale": "가까이 오너라. 모두 다.",
+        "guardian_storm": "숨은 이걸로 충분하다. 이제 폭풍이다!",
+        "guardian_cradle": "올라라, 작은 것아. 저들이 너를 받아 주게 하라.",
+        "guardian_drawn": "하늘이 너를 골랐다. 달아나라, 번개가 따라간다.",
+        "guardian_wipe": "날려 갔구나. 산꼭대기의 먼지처럼.",
+        "guardian_death": "숨결은... 산으로... 돌아간다...",
+        "thessaly_pull": "하이워치가 함께합니다! 벽의 틈을 조심하세요. 바람에 밀려 떨어집니다!",
+        "thessaly_circle_a": "어서 제 고요 속으로! 셋까지만, 그 이상은 안 됩니다!",
+        "thessaly_circle_b": "여기요! 제 곁에 서서 바람을 함께 받아 냅시다!",
+        "thessaly_circle_c": "돌 위에 고요를! 셋, 지금 당장!",
+        "thessaly_inhale": "놈이 숨을 들이쉽니다! 입 앞이 아니라 옆으로 가세요!",
+        "thessaly_storm": "폭풍이 터집니다! 제 고요로는 버틸 수 없어요. 산개하세요!",
+        "thessaly_fall": "돌을 붙잡으세요!",
+        "thessaly_victory": "숨결이 풀려났습니다. 하이워치는 이 등반을 기억할 겁니다.",
+        "thessaly_wipe": "물러나서 숨을 고르세요. 다시 갑니다."
       }
     },
     "sanctumAlert": {
@@ -15206,6 +15250,11 @@ export const ko_KR: EnTranslations = {
       "heart_song_of_the_seam_unbroken": "광맥의 노래",
       "heart_echo_of_wrath": "분노의 메아리",
       "heart_endless_song": "끝없는 노래",
+      "heart_breath_inhale": "들이쉬는 숨",
+      "heart_breath_storm_break": "폭풍 붕괴",
+      "heart_breath_forking_bolt": "갈래 번개",
+      "heart_breath_thunders_cradle": "천둥의 요람",
+      "heart_breath_drawn_lightning": "끌려오는 번개",
       "kituse_sanctum_topple_brazier": "화로 넘어뜨리기",
       "trash_demo_nova": "Test Nova",
       "trash_demo_nova_unstoppable": "Test Nova",
@@ -25481,6 +25530,11 @@ export const ko_KR: EnTranslations = {
         "name": "대장 테살리",
         "title": "하이워치 대장",
         "greeting": "이 성벽은 이백 년을 버텼습니다, {className}. 내가 지키는 동안 무너지지는 않겠지만, 신음하고 있습니다."
+      },
+      "heart_captain_thessaly": {
+        "name": "대장 테살리",
+        "title": "하이워치 대장",
+        "greeting": "발을 단단히 딛으세요, {className}. 풀무가 숨을 쉬면 제 고요 속으로 들어와 바람이 우리에게 부딪혀 흩어지게 하세요."
       },
       "brother_aldric_highwatch": {
         "name": "알드릭 수사",

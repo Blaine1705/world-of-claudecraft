@@ -4235,6 +4235,17 @@ export const ja_JP: EnTranslations = {
         "resonance": "柱から{reach}ヤード以内に{seconds}秒続けて立つと柱が一つ欠け、そこにいる限り{seconds}秒ごとにまた欠ける。解除はできない：一番傷んだ柱のそばで山の怒りをやり過ごし、無傷の柱には近づかないこと。ミシック：魂の柱のそばで同じだけ待つと代わりに魂の印が一つ消え（鉱脈の歌い手の柱なら{singerSeconds}秒）、印がなくなると砕ける。",
         "memory": "与えるダメージが{pct}%増加：槌の評議会の倒れた仲間1人につき{per}%。"
       },
+      "breathGuardian": {
+        "wind": "息吹の守護者の風が、吹く方向へ毎秒{speed}ヤードあなたを運ぶ。風に逆らって歩けば踏みとどまれ、詠唱は中断されない。縁の壁に押しつけられると毎秒{pinMin}から{pinMax}のダメージを受ける。壁が崩れた場所では止めるものがなく、虚空へ落ちる。",
+        "draw": "守護者が息を吸い込み、あなたを毎秒{speed}ヤード引き寄せる。口の前の渦は、そこに立つ者に{tick}秒ごとに{min}から{max}のダメージを与える。その後、ふいごの突風が岩棚の全員に{gustMin}から{gustMax}のダメージを与え、{throw}ヤード外へ吹き飛ばす。",
+        "pinned": "風で縁の壁に押しつけられている：風が凪ぐか壁から離れるまで、毎秒{min}から{max}のダメージ。",
+        "anchor": "テサリー隊長の凪があなたを支えている：風も吸引も爆風も吹き飛ばしも、あなたを動かせない。ダメージは受ける。",
+        "spent": "錨の効果が切れた：これが消えるまで、テサリー隊長の凪の円はあなたを再び支えられない。",
+        "drawn": "{every}秒ごとに足元へ雷が落ちる：{warn}秒後、{radius}ヤード以内の全員に{min}から{max}のダメージを与え、{charged}秒間毎秒{cmin}から{cmax}のダメージを与える帯電した地面を残す。動き続け、落雷を味方から離れた縁へ導こう。",
+        "cradled": "嵐の中へ持ち上げられ、{hold}秒間拘束される。その後の放電は{total}のダメージで、あなたと真下{radius}ヤード以内の全員で分け合う。分け合う人数が{soakers}人未満（ヒロイックでは{heroicSoakers}人）だと各自が{penalty}%多く受け、岩棚の全員が{bmin}から{bmax}を受ける。",
+        "stormForm": "裂けて雷の体となった：息吹の守護者が倒れるまで続く、戦いの嵐の後半。",
+        "swell": "{every}秒ごとに膨れ上がる嵐が岩棚の全員に{min}から{max}のダメージを与え、前の脈動ごとに{growth}%ずつ強くなる：これまでに{stacks}回。"
+      },
       "sharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。",
       "varkhulSharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。不足しているプレイヤー1人につき、サークル内を含むレイド全体が最大体力の{missingPenalty}%のダメージを受ける。",
       "makersBrand": "{duration}秒間、1スタックごとにヴァルクルから受けるダメージが{pct}%増加する。最大{max}スタック。タンクは{swap}スタックで交代すること。",
@@ -6721,6 +6732,39 @@ export const ja_JP: EnTranslations = {
         "weightTitle": "槌の重み",
         "weightLine": "物理ダメージが倍になる：もう一人のタンクが守護者を引き受けよう",
         "timeAria": "残り{seconds}秒"
+      }
+    },
+    "breathGuardian": {
+      "warn": {
+        "inhale": "守護者が息を吸い込む！口の前の渦に入るな！",
+        "gust": "ふいごの突風！衝撃に備えろ！",
+        "gales": "はぐれ旋風が岩棚を駆け巡る！近づくな！",
+        "circle": "テサリー隊長が凪の円を置いた！入れるのは{seats}人まで。",
+        "fell": "{player}が虚空へ吹き飛ばされた！",
+        "storm": "嵐が裂ける！岩棚じゅうに雷が落ちてくる！",
+        "fork": "{player}に分岐する雷撃！散開しろ！",
+        "cradle": "{player}が嵐の中へ持ち上げられた！その真下に集まれ！",
+        "drawn": "{player}に招雷！落雷を縁へ導け！",
+        "stormGust": "嵐の突風が集まる！風に備えろ！"
+      },
+      "say": {
+        "guardian_pull": "山の頂まで登り、その息吹を盗みに来たか？ならば我と共に息をせよ。",
+        "guardian_blow": "風が向きを変えるのを感じよ。縁は思うより近いぞ。",
+        "guardian_inhale": "近う寄れ。皆、残らず。",
+        "guardian_storm": "息はもう十分だ。今こそ嵐を！",
+        "guardian_cradle": "昇れ、小さき者よ。仲間に受け止めてもらうがいい。",
+        "guardian_drawn": "空がお前を選んだ。逃げよ、雷は追ってくる。",
+        "guardian_wipe": "吹き飛ばされた。頂の塵のように。",
+        "guardian_death": "息吹は……山へ……還る……",
+        "thessaly_pull": "ハイウォッチは共に戦う！壁の裂け目に気をつけろ、風に押し出されるぞ！",
+        "thessaly_circle_a": "急げ、私の凪の中へ！入れるのは三人までだ！",
+        "thessaly_circle_b": "ここだ！私と並べ、風をこの身で受け止める！",
+        "thessaly_circle_c": "石の上に凪を！三人、今すぐ！",
+        "thessaly_inhale": "奴が息を吸っている！口の前ではなく横へ回れ！",
+        "thessaly_storm": "嵐が裂ける！私の凪ではもう持たない。散開しろ！",
+        "thessaly_fall": "石にしがみつけ！",
+        "thessaly_victory": "息吹は解き放たれた。ハイウォッチはこの登攀を忘れない。",
+        "thessaly_wipe": "下がって息を整えろ。もう一度行くぞ。"
       }
     },
     "sanctumAlert": {
@@ -15206,6 +15250,11 @@ export const ja_JP: EnTranslations = {
       "heart_song_of_the_seam_unbroken": "鉱脈の歌",
       "heart_echo_of_wrath": "怒りの残響",
       "heart_endless_song": "終わらぬ歌",
+      "heart_breath_inhale": "吸い込む息",
+      "heart_breath_storm_break": "嵐の決壊",
+      "heart_breath_forking_bolt": "分岐する雷撃",
+      "heart_breath_thunders_cradle": "雷のゆりかご",
+      "heart_breath_drawn_lightning": "招雷",
       "kituse_sanctum_topple_brazier": "火鉢倒し",
       "trash_demo_nova": "Test Nova",
       "trash_demo_nova_unstoppable": "Test Nova",
@@ -25481,6 +25530,11 @@ export const ja_JP: EnTranslations = {
         "name": "隊長テサリー",
         "title": "ハイウォッチ隊長",
         "greeting": "この壁は二百年立ち続けています、{className}。私が守る限り崩れませんが、悲鳴を上げています。"
+      },
+      "heart_captain_thessaly": {
+        "name": "隊長テサリー",
+        "title": "ハイウォッチ隊長",
+        "greeting": "足を踏ん張れ、{className}。ふいごが息をしたら、私の凪の中へ入り、風を我らで受け止めろ。"
       },
       "brother_aldric_highwatch": {
         "name": "アルドリック修道士",

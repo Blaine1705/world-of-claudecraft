@@ -120,6 +120,7 @@ import {
   VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_NORMAL,
 } from '../sim/varkhul_shared_pyre';
 import { bastionAuraEffectDescriptor } from './bastion_aura_effect';
+import { breathAuraEffectDescriptor } from './breath_aura_effect';
 import { councilAuraEffectDescriptor } from './council_aura_effect';
 import { cryptAuraEffectDescriptor } from './crypt_aura_effect';
 import { sanctumAuraEffectDescriptor } from './sanctum_aura_effect';
@@ -193,6 +194,9 @@ export function auraEffectDescriptor(
   // The Smith's Heart's Hammer Council marks say theirs (council_aura_effect.ts).
   const council = councilAuraEffectDescriptor(a);
   if (council) return council;
+  // The Guardian of the Breath's wind, calm and storm say theirs (breath_aura_effect.ts).
+  const breath = breathAuraEffectDescriptor(a);
+  if (breath) return breath;
   // The Sunken Bastion's marks say theirs (bastion_aura_effect.ts).
   const bastion = bastionAuraEffectDescriptor(a);
   if (bastion) return bastion;

@@ -5456,6 +5456,25 @@ export const hudChromeStrings = {
         "Standing within {reach} yd of a pillar for {seconds} sec in a row knocks a piece off it, and again every {seconds} sec you stay. Nothing removes it: wait out the Wrath by the most damaged pillar and keep off the whole ones. Mythic: by a soul pillar the same wait strikes off a soul pip instead ({singerSeconds} sec by the Seam Singer's), and it breaks at none.",
       memory: 'Deals {pct}% more damage: {per}% for each fallen member of the Hammer Council.',
     },
+    // The Smith's Heart's Guardian of the Breath (src/ui/breath_aura_effect.ts).
+    breathGuardian: {
+      wind: "The Guardian of the Breath's wind carries you {speed} yd a second the way it blows. Walk against it to hold your ground; it does not interrupt your casts. Pressed against the rim's wall you take {pinMin} to {pinMax} damage every second. Where the wall is broken there is nothing to stop you: you fall into the void.",
+      draw: 'The Guardian draws breath and pulls you toward it, {speed} yd a second. Its vortex deals {min} to {max} damage every {tick} sec to whoever stands before its mouth. Then Bellows Gust deals {gustMin} to {gustMax} damage to everyone on the Cornice and throws them {throw} yd outward.',
+      pinned:
+        "Pressed against the rim's wall by the wind: {min} to {max} damage every second until the wind falls calm or you walk clear of the wall.",
+      anchor:
+        "Captain Thessaly's calm holds you: no wind, pull, blast or throw can move you. Damage still lands.",
+      spent:
+        "Your anchor has run out: Captain Thessaly's circle of calm cannot anchor you again until this ends.",
+      drawn:
+        'A lightning strike falls where you stand every {every} sec: after {warn} sec it deals {min} to {max} damage to everyone within {radius} yd and leaves charged ground that deals {cmin} to {cmax} every second for {charged} sec. Keep moving, and lead the strikes to the edge, away from the raid.',
+      cradled:
+        'Lifted into the storm and held for {hold} sec. Then the discharge deals {total} damage, split between you and everyone within {radius} yd beneath you. With fewer than {soakers} sharing it ({heroicSoakers} on Heroic), each takes {penalty}% more and everyone on the Cornice takes {bmin} to {bmax}.',
+      stormForm:
+        'Torn open into a body of lightning: the Storm half of the fight, until the Guardian of the Breath falls.',
+      swell:
+        'Every {every} sec the swelling storm deals {min} to {max} damage to everyone on the Cornice, {growth}% more for every pulse before it: {stacks} so far.',
+    },
     sharedPyre:
       "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
     varkhulSharedPyre:
@@ -9652,6 +9671,44 @@ export const hudChromeStrings = {
       weightTitle: "Hammer's Weight",
       weightLine: 'You take double physical damage: the other tank must take the Guardian',
       timeAria: '{seconds} seconds left',
+    },
+  },
+  // The Smith's Heart's Guardian of the Breath (encounters/smith_heart/
+  // breath*.ts): the raid warnings of its fight and what the guardian and
+  // Captain Thessaly SAY (breath_voice.ts BREATH_LINES, the same English).
+  breathGuardian: {
+    warn: {
+      inhale: 'The Guardian draws breath! Keep out of the vortex before its mouth!',
+      gust: 'Bellows Gust! Brace for the blast!',
+      gales: 'Loose gales tear across the Cornice! Keep clear of them!',
+      circle: 'Captain Thessaly plants a circle of calm! {seats} may stand in it.',
+      fell: '{player} is swept into the void!',
+      storm: 'The storm breaks! Lightning will fall across the Cornice!',
+      fork: 'Forking Bolt on {player}! Spread out!',
+      cradle: '{player} is lifted into the storm! Gather beneath them!',
+      drawn: 'Drawn Lightning on {player}! Lead the strikes to the edge!',
+      stormGust: 'A storm gust gathers! Brace against the wind!',
+    },
+    say: {
+      guardian_pull:
+        'You climbed to the top of the mountain to steal its breath? Then breathe with me.',
+      guardian_blow: 'Feel the wind turn. The edge is closer than you think.',
+      guardian_inhale: 'Come closer. All of you.',
+      guardian_storm: 'Enough breath. Now the storm!',
+      guardian_cradle: 'Rise, little one. Let them catch you.',
+      guardian_drawn: 'The sky has chosen you. Run, and it follows.',
+      guardian_wipe: 'Blown away, like dust from the summit.',
+      guardian_death: 'The Breath... goes back... to the mountain...',
+      thessaly_pull:
+        'Highwatch stands with you! Mind the gaps in the wall: the wind will throw you through them!',
+      thessaly_circle_a: 'Into my calm, quickly! It holds three, no more!',
+      thessaly_circle_b: 'Here! Stand with me and let the wind break on us!',
+      thessaly_circle_c: 'Calm on the stone! Three of you, now!',
+      thessaly_inhale: 'It is drawing breath! Get to its sides, never before its mouth!',
+      thessaly_storm: 'The storm is breaking! My calm cannot hold this. Spread out!',
+      thessaly_fall: 'Hold on to the stone!',
+      thessaly_victory: 'The Breath is free. Highwatch will remember this climb.',
+      thessaly_wipe: 'Fall back and catch your breath. We go again.',
     },
   },
   // The Gravewyrm Sanctum's encounter alert (src/ui/hud/dungeon/sanctum_alert_view.ts).

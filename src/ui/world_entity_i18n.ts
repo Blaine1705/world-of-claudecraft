@@ -504,6 +504,8 @@ const NPC_IDS = [
   'herbalist_yara',
   'scout_maren',
   'captain_thessaly',
+  // The same captain on the Smith's Heart's Storm Cornice (content/smith_heart.ts).
+  'heart_captain_thessaly',
   'brother_aldric_highwatch',
   'scout_maren_highwatch',
   'quartermaster_bree',
