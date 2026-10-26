@@ -1335,6 +1335,103 @@ export const SFX = [
     prompt:
       'A stone pillar bursting with released spirit energy: a bright shattering crack, a ghostly whoosh rising and fading away, rubble falling. No music, no voice.',
   },
+
+  // --- The Smith's Heart: the Guardian of the Breath (ElevenLabs Sound Effects)
+  // Positioned one-shots and two loops for the Storm Cornice fight, played by
+  // src/game/smith_heart_breath_audio.ts off the fight's cues, its wind's
+  // phases and the guardian's bars.
+  {
+    key: 'heart_breath_gather',
+    duration: 2.5,
+    prompt:
+      'A great gale gathering on a mountain summit: a deep rising howl of wind swelling through hollow stone, a huge creature drawing breath, building to a peak. No music, no voice.',
+  },
+  {
+    key: 'heart_breath_blow_loop',
+    duration: 5,
+    loop: true,
+    prompt:
+      'A steady, powerful gale roaring across an exposed mountaintop plateau, wind rushing and buffeting, grit hissing over stone, constant and loopable. No music.',
+  },
+  {
+    key: 'heart_breath_calm',
+    duration: 2.5,
+    prompt:
+      'A roaring gale dying away to a long soft sigh of wind over stone, the air falling still. No music, no voice.',
+  },
+  {
+    key: 'heart_breath_inhale',
+    duration: 5,
+    prompt:
+      'An enormous stone creature inhaling: air sucked violently in through a vast hollow throat, a vortex of wind roaring inward and rising in pitch and pressure. No music, no voice.',
+  },
+  {
+    key: 'heart_breath_exhale',
+    duration: 2,
+    prompt:
+      'A colossal exhaled blast of wind: a deep whump of air pressure and a roaring gust hurled outward, grit and pebbles scattering across stone. Single event, no music.',
+  },
+  {
+    key: 'heart_breath_storm_break',
+    duration: 4,
+    prompt:
+      'Wind sucked inward to a sudden tense silence, then electric static crackling and building, a deep stone groan straining under pressure. No music, no voice.',
+  },
+  {
+    key: 'heart_breath_tear',
+    duration: 3,
+    prompt:
+      'A stone shell bursting apart with a huge thunderclap: rock fragments flung outward, a roaring surge of crackling lightning, thunder rolling across the sky. No music.',
+  },
+  {
+    key: 'heart_breath_strike',
+    duration: 1.5,
+    prompt:
+      'A close lightning strike hitting stone: a sharp searing crack of electricity and a short booming thunder snap. Single event, no music.',
+  },
+  {
+    key: 'heart_breath_fork',
+    duration: 1.2,
+    prompt:
+      'Chain lightning leaping from target to target: rapid sharp electric zaps and crackles jumping in quick succession. No music.',
+  },
+  {
+    key: 'heart_breath_discharge',
+    duration: 2.5,
+    prompt:
+      'A massive bolt of lightning discharging into the ground: a blinding electric crack, a deep thunder boom and a crackling electric hum fading. No music.',
+  },
+  {
+    key: 'heart_breath_gale_loop',
+    duration: 4,
+    loop: true,
+    prompt:
+      'A small whirling tornado spinning across stone: a twisting whooshing wind vortex with debris rattling, constant and loopable. No music.',
+  },
+  {
+    key: 'heart_breath_toss',
+    duration: 1,
+    prompt:
+      'A sudden whoosh of whirlwind flinging something into the air, a sharp gust and a tumble. Short, no music.',
+  },
+  {
+    key: 'heart_breath_calm_land',
+    duration: 1.8,
+    prompt:
+      'A gentle protective blessing landing on stone: a soft bright chime and a hush as the wind around falls quiet, calm and reassuring. No music, no voice.',
+  },
+  {
+    key: 'heart_breath_swell',
+    duration: 2,
+    prompt:
+      'Rolling thunder rumbling across a dark storm sky, deep and growing, with distant crackles of lightning. No music.',
+  },
+  {
+    key: 'heart_breath_fall',
+    duration: 1.8,
+    prompt:
+      'A rush of wind howling down past a cliff edge into a deep chasm, falling away into the distance. No music, no voice.',
+  },
 ];
 
 // Family ids that have creature vocalizations (used by the integration layer to

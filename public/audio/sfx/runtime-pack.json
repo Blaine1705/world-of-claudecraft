@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "ac6b7c5ae5a2d48b72afeeb39a053ec6187cf6d237fb43566a94cac593cd3e46",
-  "catalogHash": "48ca653fcf88125cfd0217f18af53c4a499901b2d9b382c155cb0be79eec0ebc",
+  "bundleId": "be4d86ced16e78cc8e2f07068be84e5617d9183465f872b8836721602593056e",
+  "catalogHash": "8018247a496de90e67680f78d71bbcc51e57d5bcaa8c2980af5910f74c41b839",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -842,6 +842,186 @@
         }
       ],
       "gain": 1.840772,
+      "playbackRate": 1
+    },
+    "heart_breath_blow_loop": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_breath_blow_loop.mp3?v=888697074c0a",
+          "bytes": 121670,
+          "sha256": "888697074c0a66379077ff59393ccc35381c06d999b19c1c64ee7e6150e436a6"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_breath_calm": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_breath_calm.mp3?v=7b97529cf207",
+          "bytes": 60857,
+          "sha256": "7b97529cf207f1bebdac59e8ccdb83f012898ee0244a76da0884977da2555a24"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_breath_calm_land": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_breath_calm_land.mp3?v=9f36de92153c",
+          "bytes": 43929,
+          "sha256": "9f36de92153cc029dbdf20a6e744687c2f723b5a54c7eb89aeef25cb3e705de3"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_breath_discharge": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_breath_discharge.mp3?v=8e209a978e84",
+          "bytes": 60857,
+          "sha256": "8e209a978e8417fbf1cf793e348fb5fa918c6376eb6d0bbae3f8e2b250373766"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_breath_exhale": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_breath_exhale.mp3?v=973a72b5ae60",
+          "bytes": 49572,
+          "sha256": "973a72b5ae6016ab0834571e0189ca6d0363144fe4591c5d76b260646b7660ef"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_breath_fall": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_breath_fall.mp3?v=6ced5e96d35e",
+          "bytes": 43929,
+          "sha256": "6ced5e96d35ec6d802f98088a3219fcb37ac6c739dd492ee2f1be6e13794d4d1"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_breath_fork": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_breath_fork.mp3?v=af3f14c90749",
+          "bytes": 30137,
+          "sha256": "af3f14c90749ab8170ba6b19ea08499bb85fdd7b52e875abb13554c5ff35b07c"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_breath_gale_loop": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_breath_gale_loop.mp3?v=eba3998fb6aa",
+          "bytes": 97846,
+          "sha256": "eba3998fb6aafe06307bfeb72ac53bf965d9feac4a80cf39531706e33c416570"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_breath_gather": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_breath_gather.mp3?v=158ab06304c3",
+          "bytes": 60857,
+          "sha256": "158ab06304c369ac216766ea69bb5e8ec6267a9bf1e082bfb274d35206ea0bef"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_breath_inhale": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_breath_inhale.mp3?v=101928b5eeb2",
+          "bytes": 121670,
+          "sha256": "101928b5eeb242d9e227a4990bf1876d11c6821874b26207325bd31e88fedbe4"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_breath_storm_break": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_breath_storm_break.mp3?v=b51ca36cd43a",
+          "bytes": 97846,
+          "sha256": "b51ca36cd43a28e02bd039a0a6c12721adf29323ecc76c212132008da75d568b"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_breath_strike": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_breath_strike.mp3?v=b9dfa0a50364",
+          "bytes": 37033,
+          "sha256": "b9dfa0a503642c55a1d097eff6f89f8634e32c25bc18b8bfedd04e09f4302ff6"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_breath_swell": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_breath_swell.mp3?v=ca91fea7068d",
+          "bytes": 49572,
+          "sha256": "ca91fea7068d0ce78a351415de99cd08c176d2d252968e727cba3aec499cd46b"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_breath_tear": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_breath_tear.mp3?v=c3fcfc0e34b6",
+          "bytes": 73395,
+          "sha256": "c3fcfc0e34b6af01ea160c79249f03511e570f9bf1e1372c296f2fc70186b5ff"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_breath_toss": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_breath_toss.mp3?v=30803d04b10b",
+          "bytes": 25748,
+          "sha256": "30803d04b10bcbf62ae0990a7849f4b077c6d6ec7d90baea9285a48ce10ae322"
+        }
+      ],
+      "gain": 1,
       "playbackRate": 1
     },
     "heart_council_echo_blast": {

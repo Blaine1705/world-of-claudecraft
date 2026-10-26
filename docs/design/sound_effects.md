@@ -399,6 +399,30 @@ off the council's own cues, cast bars and marks; the HUD's generic nova never do
 | `heart_council_soul_pip` | mythic: a soul pip is struck off | a crystal chip with a bright spark |
 | `heart_council_soul_burst` | mythic: a soul pillar bursts | a shattering crack and a ghostly whoosh rising away |
 
+### The Smith's Heart: the Guardian of the Breath (spatial one-shots, two loops)
+Played by `src/game/smith_heart_breath_audio.ts` (plan: `smith_heart_breath_audio_core.ts`)
+off the fight's own cues, the wind object's phases and the guardian's bars; the HUD's
+generic nova and burst never double one (`breathSoundClaims`). Generated with the
+ElevenLabs Sound Effects API through `gen_sfx.mjs`.
+
+| key | when | prompt summary |
+|---|---|---|
+| `heart_breath_gather` | a blow (or a phase-2 gust) gathers | a gale's howl rising through hollow stone, a vast breath drawn |
+| `heart_breath_blow_loop` | loop while the wind blows | a steady roaring gale over a summit, grit hissing |
+| `heart_breath_calm` | the blow dies into the calm | the gale falling to a long sigh |
+| `heart_breath_inhale` | the indrawn breath's bar starts (fitted to it) | air sucked into a vast stone throat, a vortex rising |
+| `heart_breath_exhale` | Bellows Gust (the exhale) lands | a colossal whump of air hurled outward |
+| `heart_breath_storm_break` | the storm breaking's bar starts | the wind drawn to silence, static building, stone straining |
+| `heart_breath_tear` | the guardian tears open into lightning | a shell bursting, a thunderclap, a roar of lightning |
+| `heart_breath_strike` | a barrage or conductor strike lands (cooled) | a close searing crack and a thunder snap |
+| `heart_breath_fork` | each leg of the Forking Bolt | rapid electric zaps leaping |
+| `heart_breath_discharge` | the Thunder's Cradle discharges | a blinding bolt into the ground, a deep boom |
+| `heart_breath_gale_loop` | heroic: loop at the nearest loose gale | a small whirling tornado over stone |
+| `heart_breath_toss` | a loose gale tosses a player | a whoosh flinging into the air |
+| `heart_breath_calm_land` | Thessaly's circle lands (softer and higher: an anchor taken) | a soft bright chime, the wind hushed |
+| `heart_breath_swell` | the swelling storm pulses (cooled) | rolling thunder, distant crackle |
+| `heart_breath_fall` | a player goes over a gap's lip | wind howling down past a cliff into a chasm |
+
 ### Interface and personal event cues
 
 These cues are non-positional, preload at startup, and keep the existing
