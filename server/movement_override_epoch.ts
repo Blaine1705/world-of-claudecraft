@@ -1,6 +1,7 @@
 import type { PlayerMeta, Sim } from '../src/sim/sim';
 import { slipperyGrip } from '../src/sim/slippery_ground';
 import { DT, type Entity, RUN_SPEED, type Vec3 } from '../src/sim/types';
+import { windDriftSpeed } from '../src/sim/wind_drift';
 import { ferryMovementFrame } from './transport_head';
 
 const OVERRIDE_CC_KINDS = new Set(['stun', 'root', 'incapacitate', 'polymorph']);
@@ -145,7 +146,10 @@ function positionDiscontinuous(
   if (active || previousActive) {
     return false;
   }
-  const maxIntentStep = RUN_SPEED * Math.max(moveSpeedMult, previousMoveSpeedMult) * DT;
+  // An encounter's wind (src/sim/wind_drift.ts) carries the body on top of
+  // its walk; both hosts step it, so it is no server-driven jump.
+  const maxIntentStep =
+    (RUN_SPEED * Math.max(moveSpeedMult, previousMoveSpeedMult) + windDriftSpeed(entity)) * DT;
   return Math.hypot(dx, dz) > maxIntentStep + POSITION_EPSILON;
 }
 
