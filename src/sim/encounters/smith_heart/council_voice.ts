@@ -78,7 +78,7 @@ export function councilLineKey(role: CouncilRole, moment: CouncilMoment): string
 export const SAY_EVERY = 45;
 /** Seconds into the pull of the first line, and between the three. */
 export const PULL_FIRST = 0.5;
-export const PULL_GAP = 2.5;
+export const PULL_GAP = 4;
 
 const JOB_MOMENTS: ReadonlySet<CouncilMoment> = new Set(['wrath', 'wake', 'rock', 'song']);
 
