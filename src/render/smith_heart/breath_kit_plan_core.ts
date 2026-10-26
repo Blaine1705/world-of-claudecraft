@@ -27,7 +27,11 @@ import {
   SMITH_HEART_FIELD,
   WIND_BRIDGE,
 } from '../../sim/content/smith_heart_layout';
-import { authoredFieldHeight, authoredFieldSurfaceAt } from '../../sim/instances/authored_field';
+import {
+  authoredFieldCliffRuns,
+  authoredFieldHeight,
+  authoredFieldSurfaceAt,
+} from '../../sim/instances/authored_field';
 import type { HeartKitPlacement } from './heart_kit_core';
 import { heartHash, heartPropBase } from './heart_plan_core';
 import { lipWallClear, planLipWalls } from './lip_walls_core';
@@ -242,6 +246,91 @@ export function planBreathDressing(): HeartKitPlacement[] {
   return out;
 }
 
+/** Where the Cornice's rim wall breaks at its gaps (the field's
+ *  lipOpenings: the open lip runs): each end of an open stretch, with its
+ *  outward normal and the direction along the lip away from the gap. */
+export function breathGapEnds(): {
+  x: number;
+  z: number;
+  nx: number;
+  nz: number;
+  ux: number;
+  uz: number;
+}[] {
+  const open = authoredFieldCliffRuns(F).filter((r) => r.open);
+  const ends: { x: number; z: number; nx: number; nz: number; ux: number; uz: number }[] = [];
+  const touches = (x: number, z: number, self: number) =>
+    open.some(
+      (r, i) =>
+        i !== self &&
+        (Math.hypot(r.ax - x, r.az - z) < 0.05 || Math.hypot(r.bx - x, r.bz - z) < 0.05),
+    );
+  open.forEach((r, i) => {
+    const len = Math.hypot(r.bx - r.ax, r.bz - r.az) || 1;
+    const ux = (r.bx - r.ax) / len;
+    const uz = (r.bz - r.az) / len;
+    if (!touches(r.ax, r.az, i))
+      ends.push({ x: r.ax, z: r.az, nx: r.nx, nz: r.nz, ux: -ux, uz: -uz });
+    if (!touches(r.bx, r.bz, i)) ends.push({ x: r.bx, z: r.bz, nx: r.nx, nz: r.nz, ux, uz });
+  });
+  return ends;
+}
+
+/** The gaps' broken coping: at each end of an open stretch a short broken
+ *  stub of the rim wall (past the lip, over the drop, like the walls) and a
+ *  tumbled coping block hanging over the lip's edge, and a couple of chips
+ *  lying flat on the floor where the wall came down. Nothing solid stands
+ *  over the open lip: the stubs and blocks are past it, the chips a hand
+ *  high (cosmetic, shed on the low tier). */
+export function planBreathGaps(): HeartKitPlacement[] {
+  const out: HeartKitPlacement[] = [];
+  const H = BREATH.cornice.h;
+  breathGapEnds().forEach((e, i) => {
+    const rot = Math.atan2(e.nx, e.nz);
+    // The stub: a short module of the wall, just past the lip, beyond the
+    // gap's end (along the lip away from the opening).
+    out.push({
+      piece: 'Kit_BreathWallB',
+      x: e.x + e.nx * 0.5 + e.ux * 0.7,
+      y: H,
+      z: e.z + e.nz * 0.5 + e.uz * 0.7,
+      rot,
+      stretch: 0.32,
+      shear: (heartHash(i, 401) - 0.5) * 0.5,
+      noShadow: true,
+    });
+    // A coping block tumbled half over the edge, its outer end sunk.
+    out.push({
+      piece: 'Kit_BreathWallA',
+      x: e.x + e.nx * 1.0 - e.ux * 0.9,
+      y: H - 0.45,
+      z: e.z + e.nz * 1.0 - e.uz * 0.9,
+      rot: rot + (heartHash(i, 409) - 0.5) * 0.9,
+      scale: 0.55,
+      stretch: 0.5,
+      shear: 0.35,
+      noShadow: true,
+      cosmetic: true,
+    });
+    // Chips on the floor inside the lip where the wall came down.
+    for (let k = 0; k < 2; k++) {
+      const a = heartHash(i * 7 + k, 419) * Math.PI * 2;
+      const back = 1.2 + heartHash(i * 7 + k, 421) * 1.4;
+      out.push({
+        piece: 'Kit_StormStone',
+        x: e.x - e.nx * back - e.ux * (0.6 + k),
+        y: H - 0.05,
+        z: e.z - e.nz * back - e.uz * (0.6 + k),
+        rot: a,
+        scale: 0.03 + heartHash(i * 7 + k, 431) * 0.02,
+        noShadow: true,
+        cosmetic: true,
+      });
+    }
+  });
+  return out;
+}
+
 /** The whole Breath kit's dressing. */
 export function planBreathKit(): HeartKitPlacement[] {
   return [
@@ -249,5 +338,6 @@ export function planBreathKit(): HeartKitPlacement[] {
     ...planBreathWalls(),
     ...planBreathChannels(),
     ...planBreathDressing(),
+    ...planBreathGaps(),
   ];
 }

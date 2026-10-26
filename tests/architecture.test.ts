@@ -1029,6 +1029,9 @@ const RENDER_PURE_CORES = [
   'src/render/smith_heart_fx/final_fx_core.ts',
   'src/render/smith_heart_fx/council_fx_core.ts',
   'src/render/smith_heart_fx/council_bodies_core.ts',
+  // The Guardian of the Breath's body (its storm form) and its fight's effects.
+  'src/render/smith_heart_fx/breath_body_core.ts',
+  'src/render/smith_heart_fx/breath_fight_fx_core.ts',
   'src/render/drowned_temple/temple_rising_stair_core.ts',
   // The Mere Hydra's Tsunami: the breaking wave's profile, timeline, spray and foam.
   'src/render/drowned_temple/temple_tsunami_core.ts',

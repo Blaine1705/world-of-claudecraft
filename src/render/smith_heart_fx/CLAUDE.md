@@ -12,7 +12,7 @@ offline and online look the same. The interior's static dressing and air are
 
 | Module | Role |
 |---|---|
-| `index.ts` | Public surface: `HammerFx`, `BreathFx`, `QuenchFx`, `HeatFx`, `FinalFx`, `CouncilFx`, `CouncilBodies`, `SealShake`. |
+| `index.ts` | Public surface: `HammerFx`, `BreathFx`, `BreathFightFx`, `BreathBody`, `QuenchFx`, `HeatFx`, `FinalFx`, `CouncilFx`, `CouncilBodies`, `SealShake`. |
 | `council_fx_core.ts` | PURE (`RENDER_PURE_CORES`): the Hammer Council's look (design doc 5.18): a pillar's integrity on the model (`pillarLook`: seams, lean, heat, grit; `pillarPips`), its rise and fall timelines, the marks' footprints read off the sim's tuning (`COUNCIL_MARK_SPECS`, `RISE_SPOT_SPEC`) and their threat colours, the rock's fall, Resonance's ring, the heroic pulse's reach, the inheritance's arc, the energy's look, the cues it claims (`councilClaims`). |
 | `council_pillars_fx.ts` | `CouncilPillarsFx`, a part of `CouncilFx` (on its host: the root, the particles, the debris, the floor telegraph): the pillars (the Hammer kit's column, the rock kit's needle for a risen one) with their crack shells (the piece's own stone pushed out along its normals, a seam net that opens and burns per integrity), lean and pips, the rise, a lost piece, the fall into rubble (a danger footprint) and the sinking. |
 | `council_shelter_fx.ts` | `CouncilShelters`, a part of `CouncilFx`: the REAL safe shadow behind every soulless pillar while Mountain's Wrath's bar or the Echo of Wrath's runs (`coverShadow`, `shadowPoint`: between the tangents from the blast, from the pillar's far face out, drawn a hair inside the sim's cover, `SHELTER_PAD`): a dark wedge with a bright rim on every tier, a faint light curtain along its edges (shed on the low tier). |
@@ -29,6 +29,10 @@ offline and online look the same. The interior's static dressing and air are
 | `seal_shake.ts` | `SealShake` (phase 2F): the seal's moments felt in the camera (the arrival's thud, the opening's tremor, jolt and aftershock), read from the slot's seal memory, scaled by distance, through the shake sink (reduced motion honoured). |
 | `breath_fx_core.ts` | PURE (`RENDER_PURE_CORES`, phase 2G): the Breath guardian's numbers read off its sim template (the gust's radius and shove, the lance's length and width, both bars), the gust's charge and wall timelines, the lance's bolt, scorch and charge looks, the bolt's path (always inside the lane's half width), the pool sizes. |
 | `breath_fx.ts` | `BreathFx` (phase 2G): Bellows Gust's and Storm Lance's footprints through the shared floor telegraph (`../floor_telegraph`, every tier: the ring at the gust's exact radius, the lane at the lance's exact length and width, filling with the bar), the gust's breath drawn in, its whirl of stones and funnel, its wall of wind riding out to the shove's end with grit and rings; the lance's crackle and sparks, its bolt from the cloud onto the guardian and down the lane, the scorch smouldering. |
+| `breath_body_core.ts` | PURE (`RENDER_PURE_CORES`): the Guardian of the Breath's provisional body (design doc 7.2): a living bellows of storm granite, crystal and storm, no metal (a barrel chest between two bellows plates, `Kit_WindShelter`; a wind-horn mouth; fluted wind-blade wings; crystal spines; rock arms ending in wind-carved claws; a whirl of loose stones for legs), about 3.5 players tall; the joints and slots kept apart from the pieces; what the bars and the wind's phases do to it (`breathBodyAction`, `breathBodyLook`: the bellows' swell, the head's lift, the wings' spread, the exhale, the freeze's jitter, the tear), the storm body's shard rings (`stormShardSlot`) and lightning core (`STORM_CORE`), the arms, the fall. |
+| `breath_body.ts` | `BreathBody`: the body over the bodyless guardian (Breath kit and Heart kit pieces recoloured a storm slate that reads on the pale Cornice, teal threads and seams); it turns its mouth to the wind object's bearing as a blow gathers and exhales through it; the storm bar draws in, freezes and tears open; through phase 2 (`BREATH_AURAS.stormForm`) every stone rings a core of living lightning (a storm figure, lightning wings, a white heart, arcs to the shards); the fall. |
+| `breath_fight_fx_core.ts` | PURE (`RENDER_PURE_CORES`): the Breath fight's look: the wind's field per phase (`windFieldLook`: chevrons, streaks, the gather's sweeping edge, inward while it draws breath), the gaps' lips read off the field's open cliff runs (`gapLips`) and their flare (`gapThreat`), the calm's states and seats, the timed spots' fills, the strike bolt's path, the objects' kinds, the claimed cues, the palette, the pools. |
+| `breath_fight_fx.ts` | `BreathFightFx`: the wind's chevron field over the whole Cornice floor and the gaps' burning lips (every tier); every fight object's footprint at its exact radius through the shared floor telegraph (the calm's mint, the vortex and the strikes and charged ground in danger, the loose gales in control, the cradle in the soak's gold) and the bars' footprints round their targets (the fork's jump reach, the cradle's spot, the conductor's mark); the anchored, pinned and conductor marks; the strikes' bolts and scorches, the fork's and the anchor's beams, the crown over the lifted player, the calm's beam and dome, the funnels, the air's streaks and the gaps' updraft (cosmetic). Feeds `../../game/smith_heart_breath_audio.ts`. |
 | `quench_fx_core.ts` | PURE (`RENDER_PURE_CORES`, phase 2H): the Quench guardian's numbers read off its sim template (Tempering Strike's arc and reach, Quenching Breath's cone, range and bar), the breath's charge, sweep and frost timelines, the strike's rise, hold and shatter, the strike's spikes (always inside its arc and reach), the pool sizes. |
 | `quench_fx.ts` | `QuenchFx` (phase 2H): Quenching Breath's cone through the shared floor telegraph (every tier, the exact angle and range, filling with the bar), the cold drawn in and the frost creeping under it; when it lands the freezing gust, the ice ripping up behind its front and shattering, the floor frosted; Tempering Strike's spikes of ice in its arc (from the swing's windup event, no bar). |
 | `heat_fx_core.ts` | PURE (`RENDER_PURE_CORES`, phase 2I): the Heat guardian's numbers read off its sim template (Molten Pour's lane, length, width and bar; Searing Knell's radius and bar, its id still `heart_anvil_clang`), the pour's gather, seams and flow timelines, the knell's gather, cracks and wave, the seam and crack paths (always inside the lane and the radius), the pool sizes. |
@@ -61,6 +65,13 @@ Rules:
   fixed pools, no per-frame allocation, no light.
 - The cracks are floor marks on the floor ladder's encounter band, over the sight
   field's fill and under its wave.
+- The Guardian of the Breath's wind direction (the floor's chevron field), the gaps' lips,
+  and every fight footprint and mark (`BreathFightFx`) draw on EVERY tier; the air's
+  streaks, the grit, the motes, the calm's dome, the funnels' density, the sparks and the
+  shakes thin or go. Which body it wears (stone, or the storm's lightning) is phase 2's
+  tell and never thins. The exhale's Bellows Gust keeps its ring at the sim's exact
+  radius (the whole Cornice) in `BreathFx`; its whirl stays the guardian's own size.
+  The fight's sounds are `../../game/smith_heart_breath_audio.ts`, fed by `BreathFightFx`.
 - The Hammer Council's pillars, marks and footprints are actionable and drawn by `CouncilFx`
   on EVERY tier (the threat colours: `control` for Wake the Stone's throw, `danger` for the
   rubble, the heir's rising stone and the heroic pulse, `lethal` for Hammer's Weight, the
@@ -76,6 +87,7 @@ Rules:
   as a branch in `hammer_fx.ts`.
 
 Tests: `tests/smith_heart_council_fx.test.ts`, `tests/smith_heart_council_soul_fx.test.ts`, `tests/smith_heart_council_bodies.test.ts`,
-`tests/smith_heart_hammer_fx.test.ts`, `tests/smith_heart_breath_fx.test.ts` and
+`tests/smith_heart_hammer_fx.test.ts`, `tests/smith_heart_breath_fx.test.ts`,
+`tests/smith_heart_breath_fight_fx.test.ts` and `tests/smith_heart_breath_body.test.ts` and
 `tests/smith_heart_quench_fx.test.ts`, `tests/smith_heart_heat_fx.test.ts` and
 `tests/smith_heart_final_fx.test.ts` (each core and a smoke run over a fake world).

@@ -60,6 +60,8 @@ import { fxHash } from './hammer_fx_core';
 
 const SCAN_SEC = 0.1;
 const C = BREATH_FX_COLORS;
+/** The gust's whirl and funnel never grow past this round the guardian. */
+const GUST_WHIRL_MAX = 14;
 
 // ---- the wind wall ----------------------------------------------------------------
 
@@ -544,14 +546,25 @@ export class BreathFx {
     const R = this.sim.gustRadius;
     if (c.fan) {
       this.kit.drapeFan(c.fan, this.groundY, c.x, c.y, c.z, 0, R);
-      this.kit.paintFan(c.fan, { fill: c.progress, clock: this.clock, range: R });
+      // The exhale's ring is the whole Cornice: its fill drawn softer so the
+      // raid and the anchors still read through it (the rim stays full).
+      this.kit.paintFan(c.fan, {
+        fill: c.progress,
+        clock: this.clock,
+        range: R,
+        fade: R > GUST_WHIRL_MAX * 2 ? 0.55 : 1,
+      });
     }
     const look = gustChargeLook(c.progress);
-    // The breath drawn in along the floor from past the ring.
+    // The whirl round the guardian keeps its own size: the exhale's footprint
+    // is the whole Cornice (the ring above, at the sim's exact radius), and a
+    // whirl that wide would read as weather, not as the bellows gathering.
+    const W = Math.min(R, GUST_WHIRL_MAX);
+    // The breath drawn in along the floor from round the whirl.
     for (let k = 0; k < 2; k++) {
       if (this.rand() > dt * 40 * look.inhale * this.density) continue;
       const a = this.rand() * Math.PI * 2;
-      const r = R * (0.8 + this.rand() * 0.9);
+      const r = W * (0.8 + this.rand() * 0.9);
       this.particles.puff(
         c.x + Math.sin(a) * r,
         c.y + 0.4 + this.rand() * 2,
@@ -578,7 +591,7 @@ export class BreathFx {
         continue;
       }
       const a = fxHash(i, 211) * Math.PI * 2 + this.clock * look.spin * (0.7 + fxHash(i, 5) * 0.6);
-      const r = (3 + fxHash(i, 213) * (R - 3)) * look.radius;
+      const r = (3 + fxHash(i, 213) * (W - 3)) * look.radius;
       const h =
         look.lift * (0.5 + fxHash(i, 217) * 4.5) + Math.sin(this.clock * 3 + i) * 0.2 * look.lift;
       const size = 0.3 + fxHash(i, 219) * 0.7;
@@ -591,7 +604,7 @@ export class BreathFx {
     // The funnel tightening round the guardian.
     this.funnel.visible = true;
     this.funnel.position.set(c.x, c.y, c.z);
-    const fr = R * 0.75 * look.radius;
+    const fr = W * 0.75 * look.radius;
     this.funnel.scale.set(fr, 7 + 5 * look.lift, fr);
     this.funnelMat.uniforms.uSpin.value = look.spin * 1.4;
     this.funnelMat.uniforms.uAlpha.value =

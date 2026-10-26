@@ -41,8 +41,11 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // Final: their own models (the official pipeline), the same joints.
   heart_slabwright: 'smith_heart_slabwright',
   heart_seam_singer: 'smith_heart_seam_singer',
-  // Final: a towering storm colossus with a body of wind and slate shards.
-  heart_breath_guardian: 'mob_hoard_storm_caller',
+  // The Guardian of the Breath: a bodyless target; its provisional body (a
+  // living bellows of storm granite, crystal and lightning, its phase-2 storm
+  // body too) is drawn by smith_heart_fx/breath_body.ts. Final: its own model
+  // (the official pipeline), the same joints.
+  heart_breath_guardian: 'smith_heart_breath_guardian',
   // Final: a glacier giant of clear ice with the lake's cold light inside.
   heart_quench_guardian: 'mob_hoard_rime_elemental',
   // Final: an anvil-bodied forge giant pouring white-gold metal. (The heavy

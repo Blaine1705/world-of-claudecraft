@@ -1,5 +1,6 @@
 import { furyAudioClaimed } from '../game/fury_audio_core';
 import type { SfxId } from '../game/sfx_manifest.generated';
+import { breathSoundClaims } from '../game/smith_heart_breath_audio_core';
 import { councilSoundClaims } from '../game/smith_heart_council_audio_core';
 import { warriorRecoveryAudio } from '../game/warrior_recovery_core';
 import { ABILITIES, MOBS } from '../sim/data';
@@ -489,6 +490,8 @@ export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number 
   if (furyAudioClaimed(event)) return null;
   // The Hammer Council's cues play their own samples (smith_heart_council_audio.ts).
   if (councilSoundClaims(event.ability)) return null;
+  // So do the Guardian of the Breath's (smith_heart_breath_audio.ts).
+  if (breathSoundClaims(event.ability)) return null;
   if (event.fx === 'projectile') {
     if (event.school === 'physical') return { key: 'melee_bow', anchorId: event.sourceId };
     const school = magicSchool(event.school);

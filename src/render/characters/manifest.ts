@@ -4034,6 +4034,19 @@ export const VISUALS: Record<string, VisualDef> = {
     bodyless: true,
     clickRadius: 1.0,
   },
+  // The Guardian of the Breath (the Storm Cornice, design doc 7.2): a
+  // bodyless target, its click capsule, nameplate and bars over the
+  // provisional living bellows of storm granite and crystal the raid's own
+  // effects draw (smith_heart_fx/breath_body.ts) until its own model ships.
+  // Height times the template's scale (3.4) is the body's crown, about three
+  // and a half players.
+  smith_heart_breath_guardian: {
+    url: `${CREATURES}/golelingevolved.glb`,
+    height: 2.0,
+    clips: ELEMENTAL_FLOATING,
+    bodyless: true,
+    clickRadius: 1.6,
+  },
   mob_ignivar: {
     url: `${CREATURES}/ignivar_herald.glb`,
     authoredAtlas: true, // baked Tripo/contributor atlas: low-tier floor rides the map
@@ -8313,6 +8326,9 @@ const NPC_KEYS: Record<string, string> = {
   marshal_redbrook: 'npc_knight',
   warden_fenwick: 'npc_knight',
   captain_thessaly: 'npc_knight',
+  // Captain Thessaly at the head of the Storm Cornice (the Smith's Heart's
+  // Guardian of the Breath): the same captain, the same knight.
+  heart_captain_thessaly: 'npc_knight',
   // The two WARFARE quartermasters (one stock, two placements). Both sell the
   // game's most prestigious armor and both fell through to the tinted villager
   // body before this, which read as a townsperson selling epics; the armored

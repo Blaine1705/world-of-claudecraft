@@ -55,6 +55,8 @@ import {
   SWEEP_BASE_OPACITY,
 } from './rift_death_zone_core';
 import {
+  BreathBody,
+  BreathFightFx,
   BreathFx,
   CouncilBodies,
   CouncilFx,
@@ -152,6 +154,9 @@ export class RiftDeathZoneVisuals {
   // Its Breath guardian (Bellows Gust, Storm Lance: their telegraphs and
   // their wind and lightning).
   private readonly breathFx: BreathFx;
+  /** The Guardian of the Breath's fight on the Storm Cornice, and its body. */
+  private readonly breathFight: BreathFightFx;
+  private readonly breathBody: BreathBody;
   // Its Quench guardian (Quenching Breath's cone telegraph and its frost,
   // Tempering Strike's ice).
   private readonly quenchFx: QuenchFx;
@@ -301,6 +306,8 @@ export class RiftDeathZoneVisuals {
     this.summonRise = new SummonRiseFx(playGesture);
     this.hammerFx = new HammerFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.breathFx = new BreathFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.breathFight = new BreathFightFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.breathBody = new BreathBody(scene, groundY, world, compileGate, reducedMotion, shake);
     this.quenchFx = new QuenchFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.heatFx = new HeatFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.finalFx = new FinalFx(scene, groundY, world, compileGate, reducedMotion, shake);
@@ -393,6 +400,8 @@ export class RiftDeathZoneVisuals {
     this.summonRise.update(dt);
     this.hammerFx.update(dt);
     this.breathFx.update(dt);
+    this.breathFight.update(dt);
+    this.breathBody.update(dt);
     this.quenchFx.update(dt);
     this.heatFx.update(dt);
     this.finalFx.update(dt);
@@ -444,6 +453,8 @@ export class RiftDeathZoneVisuals {
     this.trashEngine.dispose();
     this.hammerFx.dispose();
     this.breathFx.dispose();
+    this.breathFight.dispose();
+    this.breathBody.dispose();
     this.quenchFx.dispose();
     this.heatFx.dispose();
     this.finalFx.dispose();
@@ -476,6 +487,8 @@ export class RiftDeathZoneVisuals {
     this.summonRise.handleEvent(event);
     this.hammerFx.handleEvent(event);
     this.breathFx.handleEvent(event);
+    this.breathBody.handleEvent(event);
+    const breath = this.breathFight.handleEvent(event);
     this.quenchFx.handleEvent(event);
     this.heatFx.handleEvent(event);
     this.finalFx.handleEvent(event);
@@ -489,7 +502,8 @@ export class RiftDeathZoneVisuals {
       sanctumBoss ||
       engine ||
       crypt ||
-      council
+      council ||
+      breath
     );
   }
 
