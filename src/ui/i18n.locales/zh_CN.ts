@@ -2047,6 +2047,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountBankEmpty': '此银行是空的。',
   'hudChrome.bank.accountBagsEmpty': '你的背包是空的。',
   'hudChrome.wocStore.subscription.tokenTitle': '可交易会员代币',
+  'hudChrome.wocStore.subscription.tokenPrice': '30天{price}',
   'hudChrome.wocStore.subscription.tokenTerms':
     '一次支付{price}，获得30天会员代币。代币将邮寄给此角色，可兑换为会员时长，也可在拍卖行出售。',
   'hudChrome.wocStore.subscription.tokenBuy': '购买会员代币',
@@ -2077,6 +2078,17 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.terms':
     '每月自动续费。通过 Stripe 使用法定货币付款。可在账单设置中取消。',
   'hudChrome.wocStore.subscription.subscribe': '订阅',
+  'hudChrome.wocStore.subscription.addMonth': '增加1个月',
+  'hudChrome.wocStore.subscription.addYear': '增加12个月',
+  'hudChrome.wocStore.subscription.stackTerms':
+    '立即付款。时长将追加到当前会员的结束时间之后，之后按此方案续订。',
+  'hudChrome.wocStore.subscription.stackCapped':
+    '会员时长最多可同时持有2年。请在临近续订日期时再试。',
+  'hudChrome.wocStore.subscription.stackUnavailable': '目前无法增加会员时长。请稍后再试。',
+  'hudChrome.wocStore.subscription.billingBlocked':
+    '增加会员时长前，请先在“管理订阅”中更新付款信息。',
+  'hudChrome.wocStore.subscription.renewsOn': '将于{date}续订',
+  'hudChrome.wocStore.subscription.endsOn': '会员将于{date}结束',
   'hudChrome.wocStore.subscription.manage': '管理订阅',
   'hudChrome.wocStore.subscription.ending': '将在当前账单周期结束时取消',
   'hudChrome.wocStore.subscription.error': '无法打开账单页面。请允许弹出窗口后重试。',
@@ -4132,8 +4144,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.title': 'WOC 商店',
   'hudChrome.wocStore.close': '关闭 WOC 商店',
   'hudChrome.wocStore.tabsLabel': 'WOC 商店分区',
-  'hudChrome.wocStore.storeTab': '商店',
-  'hudChrome.wocStore.rewardsTab': '每日奖励',
+  'hudChrome.wocStore.storeTab': '外观商店',
+  'hudChrome.wocStore.membershipsTab': '会员',
+  'hudChrome.wocStore.membershipsUnavailable': '会员服务目前不可用。请稍后再试。',
   'hudChrome.wocStore.mountsEyebrow': '账号坐骑',
   'hudChrome.wocStore.mountsTitle': '机械马厩',
   'hudChrome.wocStore.mountBuyAria': '购买{item}',
@@ -22090,7 +22103,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualTerms':
     '每年以相同价格续订。通过Stripe使用法定货币付款。可在账单设置中取消。',
   'hudChrome.wocStore.subscription.annualMount':
-    '付款后，请使用购买此礼包的角色通过邮件领取灵魂绑定的夜翼奇美拉缰绳。会员到期后，你仍将拥有这只坐骑。',
+    '为你账号下的所有角色解锁夜翼奇美拉坐骑，灵魂绑定的缰绳将通过邮件发送给购买的角色。每个账号限一只，会员到期后仍归你所有。',
   'hudChrome.wocStore.subscription.trialTerms':
     '每个账户可免费试用一次，共{days}天。需要提供付款方式。除非取消，否则试用结束时将收取{price}。',
   'hudChrome.wocStore.subscription.startTrial': '开始7天免费试用',
@@ -22098,11 +22111,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualPending':
     '付款后，请返回购买礼包的角色领取坐骑。如果付款正在处理或仍在试用期，请在付费成功后重试。',
   'hudChrome.wocStore.subscription.annualDelivered': '礼包坐骑钥匙已通过邮件送达。',
-  'hudChrome.wocStore.subscription.resumeCheckout': '继续结账',
   'entities.letters.membership_annual_reward.sender': '鸦羽邮局',
   'entities.letters.membership_annual_reward.subject': '您的年度会员坐骑',
   'entities.letters.membership_annual_reward.body':
-    '你的年度会员付款已完成。随信附上坐骑缰绳。将缰绳保存在背包或银行中即可拥有这只坐骑。会员到期后，它仍属于你。需要骑术。',
+    '你的年度会员付款已完成。夜翼奇美拉现已为你账号下的所有角色解锁，随信附上它的缰绳。会员到期后，它仍属于你。需要骑术。',
   'hudChrome.wocStore.subscription.checkoutClosed':
     '此结账流程已结束，且没有待领取奖励。请重新选择会员方案，开始新的结账流程。',
   'itemUi.tooltip.referralFullSet':

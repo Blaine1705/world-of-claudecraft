@@ -8401,7 +8401,7 @@ export class Hud {
   private syncDailyRewardsSurfaceLabels(): void {
     const storeEnabled = this.claudiumHooks !== null;
     const titleKey = storeEnabled ? 'hudChrome.wocStore.title' : 'hudChrome.dailyRewards.title';
-    const labelKey = storeEnabled ? 'hudChrome.wocStore.storeTab' : 'hudChrome.dailyRewards.title';
+    const labelKey = storeEnabled ? 'hudChrome.wocStore.title' : 'hudChrome.dailyRewards.title';
     const title = t(titleKey);
     for (const button of [this.dailyRewardsButtonEl, this.mobileDailyRewardsButtonEl]) {
       if (!button) continue;
@@ -16513,9 +16513,9 @@ export class Hud {
     if (this.dailyRewardsWindow.isOpen) this.dailyRewardsLauncher.refresh(true);
   }
 
-  openWocStore(): void {
+  openWocStore(tab: 'store' | 'memberships' = 'store'): void {
     if (!this.dailyRewardsEnabled()) return;
-    this.dailyRewardsWindow.openStore();
+    this.dailyRewardsWindow.openStore(tab);
     this.dailyRewardsLauncher.refresh(true);
   }
 
@@ -16583,6 +16583,7 @@ export class Hud {
     this.storePromoCard = mountStorePromoCard(host, {
       slides: storePromoSlides({
         openStore: () => this.openWocStore(),
+        openMemberships: () => this.openWocStore('memberships'),
         openReferralCards: () => this.referralCards.open(),
         membershipActive: () => this.sim.player?.membershipActive === true,
       }),

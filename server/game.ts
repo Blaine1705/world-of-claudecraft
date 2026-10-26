@@ -1763,6 +1763,7 @@ export class GameServer {
       observeCost: (ms) => this.tickProfiler.add('membership', ms),
       database: (job, signal) => this.withBackgroundDbPermit(job, signal),
       mailWrite: (job, signal) => this.enqueueMarketWriteForSave(signal, job),
+      grantAnnualMount: (accountId) => this.cosmetics.grantMembershipMount(accountId),
     });
     this.sim.onBuddyGranted = (pid) => this.accountBuddies.granted(pid);
     this.referral = new ReferralGameAdapter({

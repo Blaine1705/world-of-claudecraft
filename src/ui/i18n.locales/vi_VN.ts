@@ -14435,7 +14435,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.rarity.legendary': 'Huyền thoại',
   'hudChrome.wocStore.rarity.rare': 'Hiếm',
   'hudChrome.wocStore.rarity.uncommon': 'Không phổ biến',
-  'hudChrome.wocStore.rewardsTab': 'Phần thưởng hàng ngày',
   'hudChrome.wocStore.scene.day': 'Ngày',
   'hudChrome.wocStore.scene.dusk': 'Chạng vạng',
   'hudChrome.wocStore.scene.night': 'Đêm',
@@ -14586,7 +14585,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Thép bạc và cung băng xanh, lõi đông lạnh màu lục lam phát sáng trong ống đứng, một mũi tên có móc bằng băng rắn, hơi lạnh.',
   'hudChrome.wocStore.skins.winterbite.lore':
     'Một cây cung bằng thép bạc và băng Thornpeak, phần nâng của nó được thắp sáng bởi lõi màu lục lam lạnh lẽo có tác dụng đóng băng mũi tên vào dây. Nó tạo thành một trục băng sông băng rắn chắc cải cách mỗi lần vẽ; người bắn cung không mang theo ống tên trên tường, chỉ mang theo cái lạnh. Highwatch đã giữ Rình Rậper Ridge vượt qua một cuộc bao vây với một người giống như vậy: họ nói, một cung thủ duy nhất và những mũi tên giá trị cho cả một mùa đông luôn ở đó.',
-  'hudChrome.wocStore.storeTab': 'Cửa hàng',
+  'hudChrome.wocStore.storeTab': 'Cửa hàng mỹ phẩm',
   'hudChrome.wocStore.tabsLabel': 'Các phần của Cửa hàng WOC',
   'hudChrome.wocStore.title': 'Cửa hàng WOC',
   'hudChrome.wocStore.tryOn': 'Dùng thử',
@@ -23137,7 +23136,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualDelivered':
     'Chìa khóa thú cưỡi trong gói đã được gửi qua thư.',
   'hudChrome.wocStore.subscription.annualMount':
-    'Sau thanh toán, nhận dây cương Chimera Cánh Đêm khóa hồn qua thư trên nhân vật mua gói. Thú cưỡi vẫn là của bạn sau khi tư cách thành viên hết hạn.',
+    'Mở khóa thú cưỡi Chimera Cánh Đêm cho mọi nhân vật trong tài khoản, dây cương khóa hồn được gửi thư tới nhân vật mua. Mỗi tài khoản một con, và vẫn là của bạn sau khi tư cách thành viên kết thúc.',
   'hudChrome.wocStore.subscription.annualPending':
     'Quay về nhân vật mua sau thanh toán để nhận thú cưỡi gói. Nếu thanh toán đang xử lý hoặc còn dùng thử, thử lại sau khi khoản phí trả tiền được thu.',
   'hudChrome.wocStore.subscription.annualPrice': '{price} cho 12 tháng, trả trước',
@@ -23162,7 +23161,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.manage': 'Quản Lý Đăng Ký',
   'hudChrome.wocStore.subscription.monthlyTitle': 'Thành Viên Hằng Tháng',
   'hudChrome.wocStore.subscription.price': '{price} mỗi tháng',
-  'hudChrome.wocStore.subscription.resumeCheckout': 'Tiếp Tục Thanh Toán',
   'hudChrome.wocStore.subscription.startTrial': 'Bắt Đầu Dùng Thử Miễn Phí 7 Ngày',
   'hudChrome.wocStore.subscription.status.active': 'Đang Hiệu Lực',
   'hudChrome.wocStore.subscription.status.canceled': 'Đã Hủy',
@@ -25028,7 +25026,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.wyrmshadow_tunic.name': 'Áo Chẽn Bóng Rồng',
   'entities.items.wyrmshadow_vest.name': 'Áo Gi-lê Bóng Rồng',
   'entities.letters.membership_annual_reward.body':
-    'Thanh toán thành viên hằng năm đã hoàn tất. Dây cương thú cưỡi được đính kèm. Giữ dây cương trong túi hoặc ngân hàng để sở hữu thú cưỡi. Nó vẫn là của bạn sau khi tư cách thành viên hết hạn. Cần kỹ năng cưỡi.',
+    'Thanh toán thành viên hằng năm đã hoàn tất. Chimera Cánh Đêm giờ đã được mở khóa cho mọi nhân vật trong tài khoản, và dây cương được đính kèm. Nó vẫn là của bạn sau khi tư cách thành viên hết hạn. Cần kỹ năng cưỡi.',
   'entities.letters.membership_annual_reward.sender': 'Bưu Cục Quạ',
   'entities.letters.membership_annual_reward.subject': 'Thú cưỡi thành viên hằng năm của bạn',
   'entities.letters.membership_token_delivery.body':

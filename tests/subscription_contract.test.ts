@@ -103,6 +103,42 @@ describe('subscription wire contract', () => {
       expect(result.canManage).toBe(true);
     }
   });
+  it('offers stacking only to a live membership with a valid limit', () => {
+    const live = {
+      ...valid,
+      status: 'active',
+      canCheckout: false,
+      currentPeriodEnd: 1_800_000_000,
+    };
+    expect(
+      subscriptionSnapshot({ ...live, canStack: true, stackLimit: 1_860_000_000 }),
+    ).toMatchObject({ canStack: true, stackLimit: 1_860_000_000, canCheckout: false });
+    expect(
+      subscriptionSnapshot({
+        ...live,
+        status: 'trialing',
+        canStack: true,
+        stackLimit: 1_860_000_000,
+      }).canStack,
+    ).toBe(true);
+    // Legacy service, unpaid states, or a missing limit never stack.
+    expect(subscriptionSnapshot(live).canStack).toBeUndefined();
+    for (const status of ['past_due', 'unpaid', 'paused', 'incomplete', 'none'])
+      expect(
+        subscriptionSnapshot({ ...live, status, canStack: true, stackLimit: 1_860_000_000 })
+          .canStack,
+      ).toBeUndefined();
+    expect(
+      subscriptionSnapshot({ ...live, canStack: true, stackLimit: null }).canStack,
+    ).toBeUndefined();
+    for (const bad of [
+      { canStack: 'yes' },
+      { stackLimit: -1 },
+      { stackLimit: 1.5 },
+      { stackLimit: '1' },
+    ])
+      expect(subscriptionSnapshot({ ...live, ...bad })).toEqual(SUBSCRIPTION_OFF);
+  });
   it('allows only HTTPS links on the correct Stripe host', () => {
     expect(
       subscriptionLink({ ok: true, url: 'https://checkout.stripe.com/c/pay/cs_test_1' }, 'checkout')
