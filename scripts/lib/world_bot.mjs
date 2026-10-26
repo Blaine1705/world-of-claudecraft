@@ -147,8 +147,24 @@ export class WorldBot {
     throw new Error(`${this.username}: could not create a ${this.cls}`);
   }
 
-  /** Open the world socket and wait for the hello. */
+  /** Open the world socket and wait for the hello. A character whose last
+   *  socket died without a logout stays in the world until the server's
+   *  linkdead grace runs out (server/linkdead.ts, five minutes): wait it out. */
   async connect() {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        await this.connectOnce();
+        return;
+      } catch (err) {
+        if (!/already in world/.test(String(err?.message)) || attempt >= 36) throw err;
+        if (attempt === 0)
+          console.log(`${this.name}: still in the world from an old socket, waiting`);
+        await sleep(10000);
+      }
+    }
+  }
+
+  async connectOnce() {
     // The browser client's timer handshake (src/net/world_auth_message.ts):
     // the snapshot then carries auras the way the real client receives them.
     const authExtra = this.stable ? { timerWire: STABLE_TIMER_WIRE } : {};
@@ -175,7 +191,11 @@ export class WorldBot {
           resolve();
         } else if (msg.t === 'snap') this.applySnap(msg);
         else if (msg.t === 'events') this.events.push(...msg.list);
-        else if (msg.t === 'error' || msg.t === 'kick') {
+        else if (msg.t === 'error' && this.pid < 0) {
+          clearTimeout(to);
+          this.ws.close();
+          reject(new Error(`${this.name}: ${msg.error ?? msg.text ?? 'refused'}`));
+        } else if (msg.t === 'error' || msg.t === 'kick') {
           this.errors.push(msg);
           if (msg.t === 'kick') reject(new Error(`${this.name}: kicked ${JSON.stringify(msg)}`));
         }
