@@ -4098,17 +4098,21 @@
     flex-direction: column;
     gap: 6px;
     padding: 16px;
-    border: 1px solid #6f592d;
+    border: 1px solid var(--color-membership-border);
     border-radius: 10px;
-    background: linear-gradient(160deg, rgb(200 163 74 / 10%), rgb(5 10 15 / 60%) 55%);
+    background: linear-gradient(
+      160deg,
+      var(--color-membership-highlight),
+      var(--color-membership-surface) 55%
+    );
   }
   .membership-badge--current {
-    border-color: #c8a34a;
-    box-shadow: 0 0 0 1px #c8a34a inset;
+    border-color: var(--color-membership-current);
+    box-shadow: 0 0 0 1px var(--color-membership-current) inset;
   }
   .membership-badge-head h3 {
     margin: 0;
-    color: #f3dfaa;
+    color: var(--color-membership-heading);
     font-family: var(--title-font);
     letter-spacing: 0.04em;
   }

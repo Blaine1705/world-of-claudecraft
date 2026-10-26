@@ -10,6 +10,7 @@ import {
   membershipBatchAccountIds,
   parseMembershipSubscriptionBatch,
 } from '../../server/membership_batch';
+import { createMembershipGameServices } from '../../server/membership_game_services';
 import { GAME_SUBSCRIPTION_PLAN, GAME_SUBSCRIPTION_PRICE } from '../../src/subscription_contract';
 
 const row = (accountId: number) => ({
@@ -30,6 +31,35 @@ afterEach(() => {
 });
 
 describe('bounded membership batch hydration', () => {
+  it('wires realm boot without eager work and admits each batch before querying', async () => {
+    vi.stubEnv('WOC_SUBSCRIPTIONS_ENABLED', '0');
+    let admit!: () => void;
+    const permit = new Promise<void>((resolve) => {
+      admit = resolve;
+    });
+    const database = vi.fn(async <T>(job: () => Promise<T>): Promise<T> => {
+      await permit;
+      return job();
+    });
+    // Construction captures the remaining host ports without calling them.
+    const service = createMembershipGameServices({ database } as unknown as Parameters<
+      typeof createMembershipGameServices
+    >[0]);
+    expect(database).not.toHaveBeenCalled();
+    expect(io.query).not.toHaveBeenCalled();
+    io.query.mockResolvedValue({ rows: [] });
+    const pending = loadMembershipBatch([7]);
+    expect(database).toHaveBeenCalledOnce();
+    expect(io.query).not.toHaveBeenCalled();
+    admit();
+    expect((await pending).get(7)).toEqual({ prepaid: null, recurring: null });
+    expect(io.query).toHaveBeenCalledExactlyOnceWith(
+      expect.stringContaining('account_id = ANY($1::int[])'),
+      [[7]],
+    );
+    service.stop();
+  });
+
   it('rejects malformed batches and repeated or unrequested response identities', () => {
     expect(() => membershipBatchAccountIds(Array.from({ length: 251 }, (_, i) => i + 1))).toThrow();
     expect(() => membershipBatchAccountIds([0])).toThrow();

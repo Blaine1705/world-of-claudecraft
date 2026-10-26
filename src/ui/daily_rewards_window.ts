@@ -14,11 +14,12 @@ import { CharterFitMemory } from './charter_fit_memory';
 import type { StoreSpendResult } from './claudium_purchase_bridge';
 import {
   dailyRewardsLoadingHtml,
+  dailyRewardsRemainingText,
+  dailyRewardsSummaryHtml,
   dailyRewardsTitleHtml,
   wocStoreTabsHtml,
 } from './daily_rewards_chrome_view';
 import { dailyRewardsHistoryHtml, dailyRewardsLeaderboardHtml } from './daily_rewards_ranks_view';
-import { dailyRewardReasonText } from './daily_rewards_reason_view';
 import { SpinOverlay } from './daily_rewards_spin_controller';
 import { spinSectionHtml } from './daily_rewards_spin_view';
 import {
@@ -30,7 +31,7 @@ import { dailyRewardsWalletCardHtml } from './daily_rewards_wallet_card_view';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import { captureFocusKey, findFocusKey, focusedWithin, focusKeyAttr } from './focus_restore';
-import { formatDateTime, formatNumber, t } from './i18n';
+import { formatNumber, t } from './i18n';
 import { MountInspect } from './mount_inspect_controller';
 import { hydratePortraits } from './portrait_chip';
 import { durableIntents, type PurchaseIntentLedger } from './purchase_intent_durability';
@@ -49,7 +50,6 @@ import type { dailyRewardsStoreSnapshot } from './store_snapshot_adapter';
 import { storeSpendControllers } from './store_spend_controllers';
 import { StoreSubscription } from './store_subscription';
 import { StoreSurfaceRuntime } from './store_surface_runtime';
-import { usdDollarsText } from './usd_text';
 import {
   type ArmorySection,
   type ArmorySkinRow,
@@ -1177,7 +1177,7 @@ export class DailyRewardsWindow {
       return;
     }
     body.innerHTML =
-      this.summaryHtml(view) +
+      dailyRewardsSummaryHtml(view, Date.now()) +
       dailyRewardsWalletCardHtml(view) +
       spinSectionHtml(view) +
       this.tasksHtml(view) +
@@ -1214,62 +1214,14 @@ export class DailyRewardsWindow {
     return this.deps.storeEnabled?.() ?? this.deps.storeSnapshot !== undefined;
   }
 
-  private summaryHtml(view: Extract<DailyRewardsView, { kind: 'ready' }>): string {
-    const s = view.status;
-    const prize =
-      s.prizePoolSol === null
-        ? t('hudChrome.dailyRewards.unknown')
-        : `${t('hudChrome.dailyRewards.sol', {
-            amount: formatNumber(s.prizePoolSol, { maximumFractionDigits: 3 }),
-          })} (${t('hudChrome.dailyRewards.usd', {
-            amount: usdDollarsText(s.prizePoolUsd),
-          })})`;
-    const reset = formatDateTime(new Date(s.resetAt), { hour: 'numeric', minute: '2-digit' });
-    const remaining = this.remainingText(s.resetAt);
-    const value =
-      s.eligibility.usdValue === null
-        ? t('hudChrome.dailyRewards.unknown')
-        : t('hudChrome.dailyRewards.usd', {
-            amount: usdDollarsText(s.eligibility.usdValue),
-          });
-    const reason = dailyRewardReasonText(s.eligibility, Date.now());
-    return (
-      `<p class="dr-intro">${esc(t('hudChrome.dailyRewards.intro'))}</p>` +
-      `<p class="dr-disclaimer">${esc(t('hudChrome.dailyRewards.disclaimer'))}</p>` +
-      `<div class="dr-summary ui-card">` +
-      `<div class="ui-card-tile"><span>${esc(t('hudChrome.dailyRewards.prize'))}</span><strong>${esc(prize)}</strong></div>` +
-      `<div class="ui-card-tile"><span>${esc(t('hudChrome.dailyRewards.reset'))}</span><strong>${esc(reset)}</strong></div>` +
-      `<div class="dr-countdown ui-card-tile"><span data-daily-rewards-countdown="${esc(s.resetAt)}">${esc(t('hudChrome.dailyRewards.endsIn', { time: remaining }))}</span></div>` +
-      `<div class="ui-card-tile"><span>${esc(t('hudChrome.dailyRewards.score'))}</span><strong>${formatNumber(s.score, { maximumFractionDigits: 0 })}</strong></div>` +
-      `<div class="ui-card-tile"><span>${esc(t('hudChrome.dailyRewards.walletValue'))}</span><strong>${esc(value)}</strong></div>` +
-      `<p class="${view.locked ? 'dr-lock' : 'dr-ok'}">${esc(reason)}</p>` +
-      `</div>`
-    );
-  }
-
-  private remainingText(resetAt: string): string {
-    const ms = Date.parse(resetAt) - Date.now();
-    const totalMinutes = Math.max(0, Math.ceil(ms / 60_000));
-    if (totalMinutes < 1) return t('hudChrome.dailyRewards.remainingLessThanMinute');
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-    if (hours <= 0) {
-      return t('hudChrome.dailyRewards.remainingMinutes', {
-        minutes: formatNumber(minutes, { maximumFractionDigits: 0 }),
-      });
-    }
-    return t('hudChrome.dailyRewards.remainingHoursMinutes', {
-      hours: formatNumber(hours, { maximumFractionDigits: 0 }),
-      minutes: formatNumber(minutes, { maximumFractionDigits: 0 }),
-    });
-  }
-
   private paintCountdowns(): void {
     const root = this.deps.root();
     root.querySelectorAll<HTMLElement>('[data-daily-rewards-countdown]').forEach((el) => {
       const resetAt = el.dataset.dailyRewardsCountdown;
       if (!resetAt) return;
-      el.textContent = t('hudChrome.dailyRewards.endsIn', { time: this.remainingText(resetAt) });
+      el.textContent = t('hudChrome.dailyRewards.endsIn', {
+        time: dailyRewardsRemainingText(resetAt, Date.now()),
+      });
     });
   }
 
