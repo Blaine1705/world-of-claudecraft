@@ -25495,4 +25495,20 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.pvpEntry': 'Vstup do aktivního kruhu zapne světové PvP.',
   'hudChrome.hill.pvpBanner': 'PvP',
   'hudChrome.nameplate.hillBountyTag': 'Cena {honor}',
+  'hudChrome.wocStore.membershipsTab': 'Členství',
+  'hudChrome.wocStore.membershipsUnavailable':
+    'Členství momentálně nejsou dostupná. Zkus to znovu za chvíli.',
+  'hudChrome.wocStore.subscription.addMonth': 'Přidat 1 měsíc',
+  'hudChrome.wocStore.subscription.addYear': 'Přidat 12 měsíců',
+  'hudChrome.wocStore.subscription.billingBlocked':
+    'Než přidáš dobu členství, aktualizuj své platební údaje v části Spravovat předplatné.',
+  'hudChrome.wocStore.subscription.endsOn': 'Členství končí {date}',
+  'hudChrome.wocStore.subscription.renewsOn': 'Obnoví se {date}',
+  'hudChrome.wocStore.subscription.stackCapped':
+    'Najednou můžeš mít předplacené až 2 roky členství. Zkus to znovu blíže k datu obnovení.',
+  'hudChrome.wocStore.subscription.stackTerms':
+    'Platba proběhne ihned. Doba se přidá na konec tvého současného členství, které se pak obnoví podle tohoto plánu.',
+  'hudChrome.wocStore.subscription.stackUnavailable':
+    'Dobu členství momentálně nelze přidat. Zkus to znovu za chvíli.',
+  'hudChrome.wocStore.subscription.tokenPrice': '{price} za 30 dní',
 };

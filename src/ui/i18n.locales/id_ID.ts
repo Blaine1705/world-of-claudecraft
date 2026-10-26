@@ -25886,4 +25886,20 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.pvpEntry': 'Memasuki lingkaran aktif mengaktifkan PvP Dunia.',
   'hudChrome.hill.pvpBanner': 'PvP',
   'hudChrome.nameplate.hillBountyTag': 'Hadiah {honor}',
+  'hudChrome.wocStore.membershipsTab': 'Keanggotaan',
+  'hudChrome.wocStore.membershipsUnavailable':
+    'Keanggotaan tidak tersedia saat ini. Coba lagi sebentar lagi.',
+  'hudChrome.wocStore.subscription.addMonth': 'Tambah 1 bulan',
+  'hudChrome.wocStore.subscription.addYear': 'Tambah 12 bulan',
+  'hudChrome.wocStore.subscription.billingBlocked':
+    'Perbarui detail pembayaranmu di Kelola langganan sebelum menambahkan waktu keanggotaan.',
+  'hudChrome.wocStore.subscription.endsOn': 'Keanggotaan berakhir pada {date}',
+  'hudChrome.wocStore.subscription.renewsOn': 'Diperbarui pada {date}',
+  'hudChrome.wocStore.subscription.stackCapped':
+    'Kamu dapat mengakumulasi hingga 2 tahun keanggotaan sekaligus. Coba lagi mendekati tanggal perpanjanganmu.',
+  'hudChrome.wocStore.subscription.stackTerms':
+    'Dibayar sekarang. Waktunya ditambahkan setelah masa keanggotaanmu saat ini berakhir, lalu keanggotaan diperpanjang dengan paket ini.',
+  'hudChrome.wocStore.subscription.stackUnavailable':
+    'Penambahan waktu keanggotaan tidak tersedia saat ini. Coba lagi sebentar lagi.',
+  'hudChrome.wocStore.subscription.tokenPrice': '{price} untuk 30 hari',
 };

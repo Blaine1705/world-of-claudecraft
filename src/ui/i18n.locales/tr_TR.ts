@@ -25585,4 +25585,20 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.pvpEntry': "Aktif çembere girmek Dünya PvP'yi açar.",
   'hudChrome.hill.pvpBanner': 'PvP',
   'hudChrome.nameplate.hillBountyTag': 'Ödül {honor}',
+  'hudChrome.wocStore.membershipsTab': 'Üyelikler',
+  'hudChrome.wocStore.membershipsUnavailable':
+    'Üyelikler şu anda kullanılamıyor. Kısa süre sonra tekrar dene.',
+  'hudChrome.wocStore.subscription.addMonth': '1 ay ekle',
+  'hudChrome.wocStore.subscription.addYear': '12 ay ekle',
+  'hudChrome.wocStore.subscription.billingBlocked':
+    'Üyelik süresi eklemeden önce Aboneliği yönet bölümünden ödeme bilgilerini güncelle.',
+  'hudChrome.wocStore.subscription.endsOn': 'Üyelik bitiş tarihi: {date}',
+  'hudChrome.wocStore.subscription.renewsOn': 'Yenileme tarihi: {date}',
+  'hudChrome.wocStore.subscription.stackCapped':
+    'Bir seferde en fazla 2 yıllık üyelik süresi biriktirebilirsin. Yenileme tarihin yaklaştığında tekrar dene.',
+  'hudChrome.wocStore.subscription.stackTerms':
+    'Ödeme şimdi alınır. Süre, mevcut üyeliğinin sonuna eklenir; ardından üyeliğin bu planla yenilenir.',
+  'hudChrome.wocStore.subscription.stackUnavailable':
+    'Üyelik süresi ekleme şu anda kullanılamıyor. Kısa süre sonra tekrar dene.',
+  'hudChrome.wocStore.subscription.tokenPrice': '30 gün için {price}',
 };

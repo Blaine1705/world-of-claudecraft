@@ -26150,4 +26150,20 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.worldPvpPage.hillBody':
     "Ogni due ore compare una collina in Drakelands, La Distesa di Frostveil o Amberfall. Il reame riceve un preavviso di quindici minuti e il cerchio viene segnato su terreno aperto. La collina resta attiva per trenta minuti. Entrare nel cerchio attivo alza la bandiera PvP mondiale secondo i normali requisiti di livello, anche per i membri di un'incursione. Il gruppo con più giocatori idonei all'interno conquista la collina dopo un minuto di maggioranza ininterrotta; un giocatore solo conta come gruppo di uno, ma i membri di incursioni e i giocatori sotto il livello PvP richiesto non possono conquistare né guadagnare Onore della collina. Ogni difensore all'interno guadagna Onore a un ritmo crescente. Le assegnazioni e la loro crescita sono più rapide, mantenendo l'Onore totale del precedente evento di quarantacinque minuti. Un cambio di controllo azzera la crescita. Uscire mantiene la bandiera alzata; /pvp off richiede i soliti cinque minuti e non può completarsi dentro una collina attiva o in combattimento. La barra mostra controllo, numero di giocatori e progresso di conquista; /hill indica la posizione.",
   'hudChrome.nameplate.hillBountyTag': 'Taglia {honor}',
+  'hudChrome.wocStore.membershipsTab': 'Abbonamenti',
+  'hudChrome.wocStore.membershipsUnavailable':
+    'Gli abbonamenti non sono disponibili al momento. Riprova tra poco.',
+  'hudChrome.wocStore.subscription.addMonth': 'Aggiungi 1 mese',
+  'hudChrome.wocStore.subscription.addYear': 'Aggiungi 12 mesi',
+  'hudChrome.wocStore.subscription.billingBlocked':
+    "Aggiorna i dati di pagamento in Gestisci abbonamento prima di aggiungere tempo all'abbonamento.",
+  'hudChrome.wocStore.subscription.endsOn': "L'abbonamento termina il {date}",
+  'hudChrome.wocStore.subscription.renewsOn': 'Si rinnova il {date}',
+  'hudChrome.wocStore.subscription.stackCapped':
+    'Puoi accumulare fino a 2 anni di abbonamento alla volta. Riprova quando si avvicina la data di rinnovo.',
+  'hudChrome.wocStore.subscription.stackTerms':
+    "Pagamento immediato. Il tempo viene aggiunto alla fine dell'abbonamento attuale, che poi si rinnova con questo piano.",
+  'hudChrome.wocStore.subscription.stackUnavailable':
+    "Al momento non è possibile aggiungere tempo all'abbonamento. Riprova tra poco.",
+  'hudChrome.wocStore.subscription.tokenPrice': '{price} per 30 giorni',
 };

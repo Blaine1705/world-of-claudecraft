@@ -26159,4 +26159,20 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'guide.worldPvpPage.hillBody':
     'Cada dos horas aparece una colina en Las Tierras del Dragón, El Velo de Escarcha o La Cascada de Ámbar. El reino recibe un aviso con quince minutos de antelación y el círculo queda marcado en terreno abierto. La colina permanece activa treinta minutos. Entrar en el círculo activo activa la bandera JcJ mundial según los requisitos de nivel habituales, también para los miembros de bandas. El grupo con más jugadores aptos dentro captura la colina tras un minuto de mayoría ininterrumpida; un jugador solo cuenta como grupo de uno, pero los miembros de bandas y los jugadores por debajo del nivel requerido para JcJ no pueden capturar ni ganar Honor de la colina. Cada defensor dentro gana Honor a un ritmo creciente. Los pagos y su aumento son más rápidos y conservan el Honor total del antiguo evento de cuarenta y cinco minutos. Al cambiar de dueño, el aumento empieza de nuevo. Salir mantiene tu bandera activa; /pvp off tarda los cinco minutos habituales y no puede completarse dentro de una colina activa ni durante el combate. La barra muestra el control, los efectivos y el progreso de captura; /hill indica la ubicación.',
   'hudChrome.nameplate.hillBountyTag': 'Recompensa {honor}',
+  'hudChrome.wocStore.membershipsTab': 'Membresías',
+  'hudChrome.wocStore.membershipsUnavailable':
+    'Las membresías no están disponibles ahora. Inténtalo de nuevo en breve.',
+  'hudChrome.wocStore.subscription.addMonth': 'Añadir 1 mes',
+  'hudChrome.wocStore.subscription.addYear': 'Añadir 12 meses',
+  'hudChrome.wocStore.subscription.billingBlocked':
+    'Actualiza tus datos de pago en Gestionar suscripción antes de añadir tiempo de membresía.',
+  'hudChrome.wocStore.subscription.endsOn': 'La membresía termina el {date}',
+  'hudChrome.wocStore.subscription.renewsOn': 'Se renueva el {date}',
+  'hudChrome.wocStore.subscription.stackCapped':
+    'Puedes acumular hasta 2 años de membresía a la vez. Inténtalo de nuevo cuando se acerque la fecha de renovación.',
+  'hudChrome.wocStore.subscription.stackTerms':
+    'Se paga ahora. El tiempo se añade al final de tu membresía actual y después se renueva con este plan.',
+  'hudChrome.wocStore.subscription.stackUnavailable':
+    'Ahora no se puede añadir tiempo de membresía. Inténtalo de nuevo en breve.',
+  'hudChrome.wocStore.subscription.tokenPrice': '{price} por 30 días',
 };

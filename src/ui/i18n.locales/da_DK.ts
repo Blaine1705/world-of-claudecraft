@@ -25607,4 +25607,20 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.pvpEntry': 'Verdens-PvP aktiveres, når du går ind i den aktive cirkel.',
   'hudChrome.hill.pvpBanner': 'PvP',
   'hudChrome.nameplate.hillBountyTag': 'Dusør {honor}',
+  'hudChrome.wocStore.membershipsTab': 'Medlemskaber',
+  'hudChrome.wocStore.membershipsUnavailable':
+    'Medlemskaber er ikke tilgængelige lige nu. Prøv igen om lidt.',
+  'hudChrome.wocStore.subscription.addMonth': 'Tilføj 1 måned',
+  'hudChrome.wocStore.subscription.addYear': 'Tilføj 12 måneder',
+  'hudChrome.wocStore.subscription.billingBlocked':
+    'Opdater dine betalingsoplysninger under Administrer abonnement, før du tilføjer medlemstid.',
+  'hudChrome.wocStore.subscription.endsOn': 'Medlemskabet slutter den {date}',
+  'hudChrome.wocStore.subscription.renewsOn': 'Fornyes den {date}',
+  'hudChrome.wocStore.subscription.stackCapped':
+    'Du kan samle op til 2 års medlemskab ad gangen. Prøv igen tættere på din fornyelsesdato.',
+  'hudChrome.wocStore.subscription.stackTerms':
+    'Betaling sker nu. Tiden lægges til i slutningen af dit nuværende medlemskab, som derefter fornys med denne plan.',
+  'hudChrome.wocStore.subscription.stackUnavailable':
+    'Det er ikke muligt at tilføje medlemstid lige nu. Prøv igen om lidt.',
+  'hudChrome.wocStore.subscription.tokenPrice': '{price} for 30 dage',
 };

@@ -25636,4 +25636,20 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.pvpEntry': 'Världs-PvP aktiveras när du går in i den aktiva cirkeln.',
   'hudChrome.hill.pvpBanner': 'PvP',
   'hudChrome.nameplate.hillBountyTag': 'Belöning {honor}',
+  'hudChrome.wocStore.membershipsTab': 'Medlemskap',
+  'hudChrome.wocStore.membershipsUnavailable':
+    'Medlemskap är inte tillgängliga just nu. Försök igen om en stund.',
+  'hudChrome.wocStore.subscription.addMonth': 'Lägg till 1 månad',
+  'hudChrome.wocStore.subscription.addYear': 'Lägg till 12 månader',
+  'hudChrome.wocStore.subscription.billingBlocked':
+    'Uppdatera dina betalningsuppgifter under Hantera prenumeration innan du lägger till medlemstid.',
+  'hudChrome.wocStore.subscription.endsOn': 'Medlemskapet upphör den {date}',
+  'hudChrome.wocStore.subscription.renewsOn': 'Förnyas den {date}',
+  'hudChrome.wocStore.subscription.stackCapped':
+    'Du kan samla upp till 2 års medlemskap åt gången. Försök igen närmare ditt förnyelsedatum.',
+  'hudChrome.wocStore.subscription.stackTerms':
+    'Betalningen sker nu. Tiden läggs till efter ditt nuvarande medlemskap, som sedan förnyas enligt denna plan.',
+  'hudChrome.wocStore.subscription.stackUnavailable':
+    'Det går inte att lägga till medlemstid just nu. Försök igen om en stund.',
+  'hudChrome.wocStore.subscription.tokenPrice': '{price} för 30 dagar',
 };

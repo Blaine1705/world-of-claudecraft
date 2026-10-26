@@ -26178,4 +26178,20 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.worldPvpPage.hillBody':
     'Alle zwei Stunden erscheint ein Hügel in einem der Gebiete Die Drakenlande, Der Frostschleier oder Der Bernsteinfall. Der Realm erhält fünfzehn Minuten vorher eine Warnung, und der Kreis wird auf offenem Boden markiert. Der Hügel bleibt dreißig Minuten aktiv. Das Betreten des aktiven Kreises setzt nach den üblichen Stufenregeln die Welt-PvP-Flagge, auch bei Schlachtzugsmitgliedern. Die Gruppe mit den meisten berechtigten Spielern im Kreis erobert den Hügel nach einer Minute ununterbrochener Mehrheit. Ein Einzelspieler zählt als Einpersonengruppe; Schlachtzugsmitglieder und Spieler unter der PvP-Mindeststufe können weder erobern noch Hügelehre verdienen. Jedes Mitglied der haltenden Gruppe im Kreis erhält Ehre mit steigender Rate. Auszahlungen und ihre Steigerung erfolgen schneller, sodass die Gesamtehre des früheren fünfundvierzigminütigen Ereignisses erhalten bleibt. Ein Besitzerwechsel setzt die Steigerung zurück. Beim Verlassen bleibt die Flagge bestehen. /pvp off nutzt die üblichen fünf Minuten und kann innerhalb eines aktiven Hügels oder im Kampf nicht abgeschlossen werden. Die Hügelleiste zeigt Kontrolle, Spielerzahlen und Eroberungsfortschritt; /hill meldet den Standort.',
   'hudChrome.nameplate.hillBountyTag': 'Kopfgeld {honor}',
+  'hudChrome.wocStore.membershipsTab': 'Mitgliedschaften',
+  'hudChrome.wocStore.membershipsUnavailable':
+    'Mitgliedschaften sind derzeit nicht verfügbar. Versuche es in Kürze erneut.',
+  'hudChrome.wocStore.subscription.addMonth': '1 Monat hinzufügen',
+  'hudChrome.wocStore.subscription.addYear': '12 Monate hinzufügen',
+  'hudChrome.wocStore.subscription.billingBlocked':
+    'Aktualisiere deine Zahlungsdaten unter Abonnement verwalten, bevor du Mitgliedschaftszeit hinzufügst.',
+  'hudChrome.wocStore.subscription.endsOn': 'Mitgliedschaft endet am {date}',
+  'hudChrome.wocStore.subscription.renewsOn': 'Verlängert sich am {date}',
+  'hudChrome.wocStore.subscription.stackCapped':
+    'Du kannst bis zu 2 Jahre Mitgliedschaft auf einmal ansammeln. Versuche es näher an deinem Verlängerungsdatum erneut.',
+  'hudChrome.wocStore.subscription.stackTerms':
+    'Die Zahlung erfolgt sofort. Die Zeit wird an deine aktuelle Mitgliedschaft angehängt. Danach verlängert sie sich mit diesem Tarif.',
+  'hudChrome.wocStore.subscription.stackUnavailable':
+    'Das Hinzufügen von Mitgliedschaftszeit ist derzeit nicht verfügbar. Versuche es in Kürze erneut.',
+  'hudChrome.wocStore.subscription.tokenPrice': '{price} für 30 Tage',
 };

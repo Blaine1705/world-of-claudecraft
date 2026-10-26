@@ -25948,4 +25948,20 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Bij het betreden van de actieve cirkel wordt wereld-PvP ingeschakeld.',
   'hudChrome.hill.pvpBanner': 'PvP',
   'hudChrome.nameplate.hillBountyTag': 'Premie {honor}',
+  'hudChrome.wocStore.membershipsTab': 'Lidmaatschappen',
+  'hudChrome.wocStore.membershipsUnavailable':
+    'Lidmaatschappen zijn momenteel niet beschikbaar. Probeer het over even opnieuw.',
+  'hudChrome.wocStore.subscription.addMonth': '1 maand toevoegen',
+  'hudChrome.wocStore.subscription.addYear': '12 maanden toevoegen',
+  'hudChrome.wocStore.subscription.billingBlocked':
+    'Werk je betaalgegevens bij onder Abonnement beheren voordat je lidmaatschapstijd toevoegt.',
+  'hudChrome.wocStore.subscription.endsOn': 'Lidmaatschap eindigt op {date}',
+  'hudChrome.wocStore.subscription.renewsOn': 'Wordt verlengd op {date}',
+  'hudChrome.wocStore.subscription.stackCapped':
+    'Je kunt maximaal 2 jaar lidmaatschap tegelijk opbouwen. Probeer het opnieuw wanneer je verlengingsdatum dichterbij is.',
+  'hudChrome.wocStore.subscription.stackTerms':
+    'Je betaalt nu. De tijd wordt toegevoegd aan het einde van je huidige lidmaatschap, waarna het volgens dit plan wordt verlengd.',
+  'hudChrome.wocStore.subscription.stackUnavailable':
+    'Lidmaatschapstijd toevoegen is momenteel niet mogelijk. Probeer het over even opnieuw.',
+  'hudChrome.wocStore.subscription.tokenPrice': '{price} voor 30 dagen',
 };

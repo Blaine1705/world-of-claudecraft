@@ -25928,4 +25928,20 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.pvpEntry': 'Entrar no círculo ativo ativa o PvP Mundial.',
   'hudChrome.hill.pvpBanner': 'PvP',
   'hudChrome.nameplate.hillBountyTag': 'Recompensa {honor}',
+  'hudChrome.wocStore.membershipsTab': 'Assinaturas',
+  'hudChrome.wocStore.membershipsUnavailable':
+    'As assinaturas estão indisponíveis no momento. Tente novamente em breve.',
+  'hudChrome.wocStore.subscription.addMonth': 'Adicionar 1 mês',
+  'hudChrome.wocStore.subscription.addYear': 'Adicionar 12 meses',
+  'hudChrome.wocStore.subscription.billingBlocked':
+    'Atualize seus dados de pagamento em Gerenciar assinatura antes de adicionar tempo de assinatura.',
+  'hudChrome.wocStore.subscription.endsOn': 'A assinatura termina em {date}',
+  'hudChrome.wocStore.subscription.renewsOn': 'Renova em {date}',
+  'hudChrome.wocStore.subscription.stackCapped':
+    'Você pode acumular até 2 anos de assinatura de uma vez. Tente novamente quando a data de renovação estiver mais próxima.',
+  'hudChrome.wocStore.subscription.stackTerms':
+    'O pagamento é feito agora. O tempo é adicionado ao final da sua assinatura atual, que depois será renovada neste plano.',
+  'hudChrome.wocStore.subscription.stackUnavailable':
+    'Não é possível adicionar tempo de assinatura no momento. Tente novamente em breve.',
+  'hudChrome.wocStore.subscription.tokenPrice': '{price} por 30 dias',
 };

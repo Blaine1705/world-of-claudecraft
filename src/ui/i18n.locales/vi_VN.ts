@@ -25577,4 +25577,20 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.pvpEntry': 'Bước vào vòng tròn đang hoạt động sẽ bật PvP Thế Giới.',
   'hudChrome.hill.pvpBanner': 'PvP',
   'hudChrome.nameplate.hillBountyTag': 'Tiền Thưởng {honor}',
+  'hudChrome.wocStore.membershipsTab': 'Gói Thành Viên',
+  'hudChrome.wocStore.membershipsUnavailable':
+    'Hiện không có gói thành viên khả dụng. Vui lòng thử lại sau ít phút.',
+  'hudChrome.wocStore.subscription.addMonth': 'Thêm 1 tháng',
+  'hudChrome.wocStore.subscription.addYear': 'Thêm 12 tháng',
+  'hudChrome.wocStore.subscription.billingBlocked':
+    'Cập nhật thông tin thanh toán trong Quản Lý Đăng Ký trước khi thêm thời gian thành viên.',
+  'hudChrome.wocStore.subscription.endsOn': 'Tư cách thành viên kết thúc vào {date}',
+  'hudChrome.wocStore.subscription.renewsOn': 'Gia hạn vào {date}',
+  'hudChrome.wocStore.subscription.stackCapped':
+    'Bạn có thể tích lũy tối đa 2 năm thành viên cùng lúc. Vui lòng thử lại khi gần đến ngày gia hạn.',
+  'hudChrome.wocStore.subscription.stackTerms':
+    'Thanh toán ngay. Thời gian được cộng vào cuối kỳ thành viên hiện tại, sau đó tư cách thành viên sẽ được gia hạn theo gói này.',
+  'hudChrome.wocStore.subscription.stackUnavailable':
+    'Hiện không thể thêm thời gian thành viên. Vui lòng thử lại sau ít phút.',
+  'hudChrome.wocStore.subscription.tokenPrice': '{price} cho 30 ngày',
 };
