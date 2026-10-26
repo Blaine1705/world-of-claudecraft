@@ -9684,7 +9684,7 @@ export const hudChromeStrings = {
       circle: 'Captain Thessaly plants a circle of calm! {seats} may stand in it.',
       fell: '{player} is swept into the void!',
       storm: 'The storm breaks! Lightning will fall across the Cornice!',
-      fork: 'Forking Bolt on {player}! Spread out!',
+      fork: 'Leaping Bolt on {player}! Spread out!',
       cradle: '{player} is lifted into the storm! Gather beneath them!',
       drawn: 'Drawn Lightning on {player}! Lead the strikes to the edge!',
       stormGust: 'A storm gust gathers! Brace against the wind!',

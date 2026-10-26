@@ -7,7 +7,7 @@
 //                      aura on it every client draws). For 10 s strikes fall
 //                      across the Cornice on telegraphed spots (one on a
 //                      player each volley, one on the floor).
-//   Forking Bolt       a 2.5 s bar at a player: the bolt strikes them, then
+//   Leaping Bolt       a 2.5 s bar at a player: the bolt strikes them, then
 //                      jumps to the nearest player within 8 yd, again and
 //                      again (breath_ids.ts forkPath): spread.
 //   Thunder's Cradle   a 1.5 s bar at a player: they are lifted into the
@@ -243,15 +243,15 @@ function stepSpots(s: BreathScope): void {
   st.spots = keep.concat(fresh);
 }
 
-// ---- Forking Bolt ---------------------------------------------------------------------------
+// ---- Leaping Bolt ---------------------------------------------------------------------------
 
-/** Begin the Forking Bolt on a hashed player. Exported for the dev trigger. */
+/** Begin the Leaping Bolt on a hashed player. Exported for the dev trigger. */
 export function startFork(s: BreathScope): boolean {
   const [t] = pickMarks(s, 1);
   if (!t) return false;
   beginBar(s, BREATH_CASTS.fork, T.forkCast, t.id);
   s.st.forkTimer = T.forkEvery;
-  raidWarn(s, s.boss, 'fork', `Forking Bolt on ${t.name}! Spread out!`, { player: t.name });
+  raidWarn(s, s.boss, 'fork', `Leaping Bolt on ${t.name}! Spread out!`, { player: t.name });
   return true;
 }
 

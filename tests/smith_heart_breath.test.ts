@@ -5,7 +5,7 @@
 // Captain Thessaly's circle (three seats, the anchor's immunity to the wind,
 // the indrawn breath, the exhale and every throw, none in phase 2), the
 // indrawn breath and Bellows Gust, the storm breaking at half health, the
-// Forking Bolt's reach, the Thunder's Cradle's split and its soakers, Drawn
+// Leaping Bolt's reach, the Thunder's Cradle's split and its soakers, Drawn
 // Lightning's strikes and charged ground, the swelling storm, heroic's spent
 // anchors, loose gales and storm gusts, the wipe putting the Cornice back, the
 // Breath vein and the seal's quarter lit by its fall, and determinism.
@@ -348,7 +348,7 @@ describe('Guardian of the Breath: the Storm', () => {
     return f;
   }
 
-  it('the Forking Bolt jumps to anyone within 8 yd, again and again, and no farther', () => {
+  it('the Leaping Bolt jumps to anyone within 8 yd, again and again, and no farther', () => {
     const at = (id: number, x: number) => ({ id, pos: { x, z: 0 } });
     const line = [at(1, 0), at(2, 6), at(3, 12), at(4, 18), at(5, 30)];
     expect(forkPath(line[0], line).map((p) => p.id)).toEqual([1, 2, 3, 4]);

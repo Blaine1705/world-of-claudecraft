@@ -6742,7 +6742,7 @@ export const pt_BR: EnTranslations = {
         "circle": "Captain Thessaly plants a circle of calm! {seats} may stand in it.",
         "fell": "{player} is swept into the void!",
         "storm": "The storm breaks! Lightning will fall across the Cornice!",
-        "fork": "Forking Bolt on {player}! Spread out!",
+        "fork": "Leaping Bolt on {player}! Spread out!",
         "cradle": "{player} is lifted into the storm! Gather beneath them!",
         "drawn": "Drawn Lightning on {player}! Lead the strikes to the edge!",
         "stormGust": "A storm gust gathers! Brace against the wind!"
@@ -15252,7 +15252,7 @@ export const pt_BR: EnTranslations = {
       "heart_endless_song": "Endless Song",
       "heart_breath_inhale": "Indrawn Breath",
       "heart_breath_storm_break": "The Storm Breaks",
-      "heart_breath_forking_bolt": "Forking Bolt",
+      "heart_breath_forking_bolt": "Leaping Bolt",
       "heart_breath_thunders_cradle": "Thunder's Cradle",
       "heart_breath_drawn_lightning": "Drawn Lightning",
       "kituse_sanctum_topple_brazier": "Topple Brazier",

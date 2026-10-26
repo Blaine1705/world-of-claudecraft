@@ -6742,7 +6742,7 @@ export const en_XA: EnTranslations = {
         "circle": "[Çáþţáíñ Ţĥéššáļý þļáñţš á çíŕçļé óƒ çáļɱ! {seats} ɱáý šţáñð íñ íţ.]",
         "fell": "[{player} íš šŵéþţ íñţó ţĥé ʋóíð!]",
         "storm": "[Ţĥé šţóŕɱ ƀŕéáķš! Ļíĝĥţñíñĝ ŵíļļ ƒáļļ áçŕóšš ţĥé Çóŕñíçé!]",
-        "fork": "[Ƒóŕķíñĝ Ɓóļţ óñ {player}! Šþŕéáð óúţ!]",
+        "fork": "[Ļéáþíñĝ Ɓóļţ óñ {player}! Šþŕéáð óúţ!]",
         "cradle": "[{player} íš ļíƒţéð íñţó ţĥé šţóŕɱ! Ĝáţĥéŕ ƀéñéáţĥ ţĥéɱ!]",
         "drawn": "[Ðŕáŵñ Ļíĝĥţñíñĝ óñ {player}! Ļéáð ţĥé šţŕíķéš ţó ţĥé éðĝé!]",
         "stormGust": "[Á šţóŕɱ ĝúšţ ĝáţĥéŕš! Ɓŕáçé áĝáíñšţ ţĥé ŵíñð!]"
@@ -15252,7 +15252,7 @@ export const en_XA: EnTranslations = {
       "heart_endless_song": "[Éñðļéšš Šóñĝ]",
       "heart_breath_inhale": "[Íñðŕáŵñ Ɓŕéáţĥ]",
       "heart_breath_storm_break": "[Ţĥé Šţóŕɱ Ɓŕéáķš]",
-      "heart_breath_forking_bolt": "[Ƒóŕķíñĝ Ɓóļţ]",
+      "heart_breath_forking_bolt": "[Ļéáþíñĝ Ɓóļţ]",
       "heart_breath_thunders_cradle": "[Ţĥúñðéŕ'š Çŕáðļé]",
       "heart_breath_drawn_lightning": "[Ðŕáŵñ Ļíĝĥţñíñĝ]",
       "kituse_sanctum_topple_brazier": "[Ţóþþļé Ɓŕážíéŕ]",

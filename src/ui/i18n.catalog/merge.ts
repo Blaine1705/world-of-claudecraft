@@ -784,7 +784,7 @@ const mergeStringsEn = {
       // The Guardian of the Breath's bars (encounters/smith_heart/breath_ids.ts).
       heart_breath_inhale: 'Indrawn Breath',
       heart_breath_storm_break: 'The Storm Breaks',
-      heart_breath_forking_bolt: 'Forking Bolt',
+      heart_breath_forking_bolt: 'Leaping Bolt',
       heart_breath_thunders_cradle: "Thunder's Cradle",
       heart_breath_drawn_lightning: 'Drawn Lightning',
       // The player's own bar while kicking a Soul Brazier over (the trash

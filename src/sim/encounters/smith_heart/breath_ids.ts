@@ -97,7 +97,7 @@ export const BREATH_CUES = {
   gust: 'heart_bellows_gust',
   /** A strike lands (spellfxAt 'burst', radius = the strike). */
   strike: 'heart_breath_strike',
-  /** A forking bolt jumps (spellfx 'beam', from the last struck to the next;
+  /** A leaping bolt jumps (spellfx 'beam', from the last struck to the next;
    *  the first leg from the guardian). */
   fork: 'heart_breath_fork',
   /** The cradle discharges (spellfxAt 'burst', radius = the gather circle). */
@@ -130,7 +130,7 @@ export const BREATH_NAMES = {
   gale: 'Loose Gale',
   storm: 'The Storm Breaks',
   strike: 'Breaking Storm',
-  fork: 'Forking Bolt',
+  fork: 'Leaping Bolt',
   cradle: "Thunder's Cradle",
   backlash: 'Cradle Backlash',
   drawn: 'Drawn Lightning',
@@ -261,7 +261,7 @@ export const BREATH_TUNING = {
   strikeR: 3.5,
   strikeMin: 320,
   strikeMax: 380,
-  // Phase 2: the Forking Bolt.
+  // Phase 2: the Leaping Bolt.
   forkFirst: 6,
   forkEvery: 22,
   forkCast: 2.5,
@@ -359,7 +359,7 @@ export function cradleShare(
   };
 }
 
-/** The forking bolt's path: from the first struck, each next the nearest
+/** The leaping bolt's path: from the first struck, each next the nearest
  *  player not yet struck within `jump` of the last (ties: the lower id), up
  *  to `maxHops` jumps. Pure over positions. */
 export function forkPath<P extends { id: number; pos: { x: number; z: number } }>(

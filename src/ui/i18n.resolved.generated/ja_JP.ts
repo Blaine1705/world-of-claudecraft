@@ -6742,7 +6742,7 @@ export const ja_JP: EnTranslations = {
         "circle": "テサリー隊長が凪の円を置いた！入れるのは{seats}人まで。",
         "fell": "{player}が虚空へ吹き飛ばされた！",
         "storm": "嵐が裂ける！岩棚じゅうに雷が落ちてくる！",
-        "fork": "{player}に分岐する雷撃！散開しろ！",
+        "fork": "{player}に跳ねる雷撃！散開しろ！",
         "cradle": "{player}が嵐の中へ持ち上げられた！その真下に集まれ！",
         "drawn": "{player}に招雷！落雷を縁へ導け！",
         "stormGust": "嵐の突風が集まる！風に備えろ！"
@@ -15252,7 +15252,7 @@ export const ja_JP: EnTranslations = {
       "heart_endless_song": "終わらぬ歌",
       "heart_breath_inhale": "吸い込む息",
       "heart_breath_storm_break": "嵐の決壊",
-      "heart_breath_forking_bolt": "分岐する雷撃",
+      "heart_breath_forking_bolt": "跳ねる雷撃",
       "heart_breath_thunders_cradle": "雷のゆりかご",
       "heart_breath_drawn_lightning": "招雷",
       "kituse_sanctum_topple_brazier": "火鉢倒し",

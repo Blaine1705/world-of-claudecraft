@@ -6742,7 +6742,7 @@ export const ko_KR: EnTranslations = {
         "circle": "테살리 대장이 고요의 원을 펼쳤습니다! {seats}명까지 설 수 있습니다.",
         "fell": "{player} 님이 공허로 휩쓸려 갔습니다!",
         "storm": "폭풍이 터집니다! 벼랑 곳곳에 번개가 떨어집니다!",
-        "fork": "{player} 님에게 갈래 번개! 산개하세요!",
+        "fork": "{player} 님에게 튀어 오르는 번개! 산개하세요!",
         "cradle": "{player} 님이 폭풍 속으로 들어 올려졌습니다! 그 아래로 모이세요!",
         "drawn": "{player} 님에게 끌려오는 번개! 낙뢰를 가장자리로 유도하세요!",
         "stormGust": "폭풍 돌풍이 모입니다! 바람에 대비하세요!"
@@ -15252,7 +15252,7 @@ export const ko_KR: EnTranslations = {
       "heart_endless_song": "끝없는 노래",
       "heart_breath_inhale": "들이쉬는 숨",
       "heart_breath_storm_break": "폭풍 붕괴",
-      "heart_breath_forking_bolt": "갈래 번개",
+      "heart_breath_forking_bolt": "튀어 오르는 번개",
       "heart_breath_thunders_cradle": "천둥의 요람",
       "heart_breath_drawn_lightning": "끌려오는 번개",
       "kituse_sanctum_topple_brazier": "화로 넘어뜨리기",

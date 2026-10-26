@@ -11,7 +11,7 @@
 //   The storm breaks (50)  the wind drawn in, the guardian frozen and torn
 //                          open into a body of lightning, a barrage of strikes
 //                          (breath_storm.ts).
-//   The Storm (50 to 0)    the Forking Bolt, the Thunder's Cradle, Drawn
+//   The Storm (50 to 0)    the Leaping Bolt, the Thunder's Cradle, Drawn
 //                          Lightning, the swelling storm; heroic's short gusts.
 //   One wipe               the fight ends when the guardian stops fighting:
 //                          the wind still, every circle, anchor, mark, gale,
@@ -461,7 +461,7 @@ export function breathDevTrigger(ctx: SimContext, inst: InstanceSlot, what: stri
   if (verb === 'chain' || verb === 'fork') {
     cutBar(s);
     s.boss.castingAbility = null;
-    return startFork(s) ? 'Forking Bolt.' : 'Nobody on the Cornice to strike.';
+    return startFork(s) ? 'Leaping Bolt.' : 'Nobody on the Cornice to strike.';
   }
   if (verb === 'eye' || verb === 'cradle') {
     cutBar(s);

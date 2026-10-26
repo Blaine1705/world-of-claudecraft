@@ -6742,7 +6742,7 @@ export const zh_CN: EnTranslations = {
         "circle": "瑟萨莉队长布下了宁静之环！最多可容{seats}人。",
         "fell": "{player}被卷入了虚空！",
         "storm": "风暴爆发了！闪电将落满整个崖台！",
-        "fork": "分叉雷击落在{player}身上！散开！",
+        "fork": "跳跃雷击落在{player}身上！散开！",
         "cradle": "{player}被举入了风暴！到他的下方集合！",
         "drawn": "引雷落在{player}身上！把落雷引向边缘！",
         "stormGust": "风暴阵风正在聚集！顶住风！"
@@ -15252,7 +15252,7 @@ export const zh_CN: EnTranslations = {
       "heart_endless_song": "无尽之歌",
       "heart_breath_inhale": "深吸之息",
       "heart_breath_storm_break": "风暴破裂",
-      "heart_breath_forking_bolt": "分叉雷击",
+      "heart_breath_forking_bolt": "跳跃雷击",
       "heart_breath_thunders_cradle": "雷霆摇篮",
       "heart_breath_drawn_lightning": "引雷",
       "kituse_sanctum_topple_brazier": "推倒火盆",

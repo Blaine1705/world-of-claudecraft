@@ -6742,7 +6742,7 @@ export const ru_RU: EnTranslations = {
         "circle": "Капитан Тессали ставит круг затишья! В нём поместятся {seats}.",
         "fell": "{player} уносит в пустоту!",
         "storm": "Буря разражается! Молнии падают по всему Карнизу!",
-        "fork": "Ветвящаяся молния на {player}! Рассредоточьтесь!",
+        "fork": "Скачущая молния на {player}! Рассредоточьтесь!",
         "cradle": "{player} поднят в бурю! Соберитесь под ним!",
         "drawn": "Притянутая молния на {player}! Уводите удары к краю!",
         "stormGust": "Собирается штормовой порыв! Держитесь против ветра!"
@@ -15252,7 +15252,7 @@ export const ru_RU: EnTranslations = {
       "heart_endless_song": "Бесконечная песнь",
       "heart_breath_inhale": "Вдох",
       "heart_breath_storm_break": "Разрыв бури",
-      "heart_breath_forking_bolt": "Ветвящаяся молния",
+      "heart_breath_forking_bolt": "Скачущая молния",
       "heart_breath_thunders_cradle": "Колыбель грома",
       "heart_breath_drawn_lightning": "Притянутая молния",
       "kituse_sanctum_topple_brazier": "Опрокинуть жаровню",
