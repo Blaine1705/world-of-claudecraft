@@ -75,8 +75,28 @@ function entryFrame(entry: PredictionEntry): PredictionFrame {
   return { ct: entry.ct, mi: entry.mi, facing: entry.facing };
 }
 
-function stepFrom(state: MotionState, frame: PredictionFrame, stepFn: PredictionStep): MotionState {
+/** The mirrored (non-kinematic) fields a frame was predicted with: the
+ *  auras the kernel reads (an encounter's wind among them, src/sim/
+ *  wind_drift.ts), the ghost, sitting, the cast, the mount. */
+function adoptMirrored(state: MotionState, from: MotionState): void {
+  state.auras = from.auras.slice();
+  state.ghost = from.ghost;
+  state.sitting = from.sitting;
+  state.castingAbility = from.castingAbility;
+  state.maxHp = from.maxHp;
+  state.mountKey = from.mountKey;
+  state.mountCastRemaining = from.mountCastRemaining;
+  state.mountCastKey = from.mountCastKey;
+}
+
+function stepFrom(
+  state: MotionState,
+  frame: PredictionFrame,
+  stepFn: PredictionStep,
+  mirrored?: MotionState,
+): MotionState {
   const next = copyMotionState(state);
+  if (mirrored) adoptMirrored(next, mirrored);
   next.prevPos.x = next.pos.x;
   next.prevPos.y = next.pos.y;
   next.prevPos.z = next.pos.z;
@@ -197,7 +217,11 @@ export function reconcile(
   applyAuthoritativePose(acknowledged.pose, authoritative);
   let state = acknowledged.pose;
   for (const entry of replayed) {
-    state = stepFrom(state, entryFrame(entry), stepFn);
+    // Each frame replays with the mirrored state it was first predicted with
+    // (the auras it knew then), never the acknowledged pose's: a replay that
+    // carried the old auras forward would replay a wind's every tick without
+    // it and mismatch the next acknowledgement for ever.
+    state = stepFrom(state, entryFrame(entry), stepFn, entry.pose);
     entry.pose = state;
   }
   const newHead = replayed[replayed.length - 1]?.pose ?? acknowledged.pose;
