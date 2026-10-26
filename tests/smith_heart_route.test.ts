@@ -18,7 +18,11 @@
 //   the North Stair from the Ring's north, each enough on its own, and the
 //   North Stair cuts the walk from the Breath's mouth to the portal;
 // - walked floor never steps more than a body's step between neighbours
-//   without a collider between them, and every path is at least 12 yd wide.
+//   without a collider between them, and every path is at least 12 yd wide;
+// - nobody falls anywhere but at the Storm Cornice's four broken gaps (the
+//   Guardian of the Breath's fight, design doc 7.2): there, and only there,
+//   the lip stands open to the void (a body stepping in falls; the floods
+//   below never step into the void, a fall is no walk).
 
 import { describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
@@ -30,6 +34,7 @@ import {
 } from '../src/sim/content/smith_heart';
 import {
   BREATH,
+  CORNICE_GAPS,
   GALLERY_LANDINGS,
   GRAND_STAIR,
   HAMMER_PIT,
@@ -66,10 +71,17 @@ function cell(x: number, z: number): number {
   return (Math.round(z) - minZ) * W + (Math.round(x) - minX);
 }
 
-/** Every one-yard cell a body reaches from `start` with `open` gates. */
+/** Is a one-yard cell the void (no floor: a body stepping there falls)? */
+function voidCell(x: number, z: number): boolean {
+  return authoredFieldHeight(FIELD, x, z) <= FIELD.voidHeight + 1;
+}
+
+/** Every one-yard cell a body reaches from `start` with `open` gates (never
+ *  stepping into the void: `intoVoid` lets it, to find where the rim is open). */
 function flood(
   open: readonly string[],
   start: { x: number; z: number } = DUNGEON.entry,
+  intoVoid = false,
 ): Uint8Array {
   setOpenDungeonGates(O.x, O.z, [...open]);
   const seen = new Uint8Array(W * H);
@@ -91,6 +103,8 @@ function flood(
       if (seen[i]) continue;
       if (isBlocked(SEED, O.x + nx, O.z + nz, 0.5)) continue;
       seen[i] = 1;
+      // A body that steps into the void falls: it walks on from nowhere.
+      if (!intoVoid && voidCell(nx, nz)) continue;
       queue.push(nx, nz);
     }
   }
@@ -124,6 +138,7 @@ function walkSteps(
       const i = cell(nx, nz);
       if (steps[i] >= 0 || cut(nx, nz)) continue;
       if (isBlocked(SEED, O.x + nx, O.z + nz, 0.5)) continue;
+      if (voidCell(nx, nz)) continue;
       steps[i] = here + 1;
       queue.push(nx, nz);
     }
@@ -356,6 +371,8 @@ describe("the Smith's Heart route", () => {
             [0, 1],
           ]) {
             if (!seen[cell(x + dx, z + dz)]) continue;
+            // A gap's lip is a fall, not a step (pinned below).
+            if (voidCell(x, z) || voidCell(x + dx, z + dz)) continue;
             const step = Math.abs(authoredFieldHeight(FIELD, x + dx, z + dz) - h);
             if (step > Math.max(MAX_STEP_HEIGHT, FIELD.cliffStep) + 0.05) {
               bad.push(`(${x},${z}) step ${step.toFixed(2)}`);
@@ -364,6 +381,28 @@ describe("the Smith's Heart route", () => {
         }
     }
     expect(bad.slice(0, 10)).toEqual([]);
+  });
+
+  it("opens the rim to the void only at the Storm Cornice's four gaps", () => {
+    // With every gate open, the only void a body can step into from the
+    // whole main map lies in a gap's throat; each gap opens onto it.
+    const seen = flood(ALL_GATES);
+    const strays: string[] = [];
+    const opened = new Set<number>();
+    for (let z = minZ; z <= maxZ; z++)
+      for (let x = minX; x <= maxX; x++) {
+        if (!seen[cell(x, z)] || !voidCell(x, z)) continue;
+        const g = CORNICE_GAPS.findIndex((p) => Math.hypot(x - p.x, z - p.z) <= p.r + 1.5);
+        if (g < 0) strays.push(`(${x},${z})`);
+        else opened.add(g);
+      }
+    expect(strays.slice(0, 10)).toEqual([]);
+    expect(opened.size).toBe(CORNICE_GAPS.length);
+    // The gaps never cut the walk: the Cornice and the guardian are reached
+    // without stepping through one (the flood above never steps on from
+    // the void), and the corpse run from the Cleft still reaches the portal.
+    expect(reaches(seen, SMITH_HEART_BOSS_SPOTS.breath)).toBe(true);
+    expect(reaches(seen, SPOTS.portal)).toBe(true);
   });
 
   it('every walkway is at least 12 yd wide (a raid of ten moves through it)', () => {

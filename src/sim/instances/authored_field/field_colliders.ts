@@ -17,6 +17,8 @@ const CLIFF_END_PAD = 0.5;
 export function authoredFieldColliders(def: AuthoredFieldDef, floorY: number): Collider[] {
   const out: Collider[] = [];
   for (const run of authoredFieldCliffRuns(def)) {
+    // A break in the wall over the void (AuthoredFieldDef.lipOpenings).
+    if (run.open) continue;
     const dx = run.bx - run.ax;
     const dz = run.bz - run.az;
     const len = Math.hypot(dx, dz);

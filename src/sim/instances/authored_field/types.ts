@@ -150,6 +150,12 @@ export interface AuthoredFieldDef {
   voidHeight: number;
   /** A drop taller than this between neighbouring ground becomes a cliff wall. */
   cliffStep: number;
+  /** Breaks in the walls over the void (the Smith's Heart's Storm Cornice
+   *  gaps): a cliff sample inside one of these discs whose low side is the
+   *  void builds no collider, so a body walks, or is blown, off the lip there
+   *  and falls. The run is still derived (its rock face is drawn), marked
+   *  `open` (cliffs.ts FieldCliffRun). */
+  lipOpenings?: readonly { x: number; z: number; r: number }[];
   /** Ordered: a later surface wins where two overlap. */
   surfaces: readonly FieldSurface[];
   walls: readonly FieldWall[];

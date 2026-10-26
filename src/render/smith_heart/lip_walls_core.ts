@@ -41,6 +41,9 @@ export function lipChains(
   const runs = authoredFieldCliffRuns(F).filter(
     (r) =>
       surfaces.has(r.surface) &&
+      // A break in the wall (the field's lipOpenings: the Cornice's gaps)
+      // stands bare; its broken coping is the Breath fight's own dressing.
+      !r.open &&
       r.low <= F.voidHeight + 1 &&
       r.high - r.low >= 4 &&
       Math.hypot(r.bx - r.ax, r.bz - r.az) > 1e-3,

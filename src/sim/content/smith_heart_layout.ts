@@ -210,6 +210,22 @@ export const CORNICE_CHANNELS: readonly { deg: number; depth: number; halfDeg: n
   { deg: 332, depth: 15, halfDeg: 6 },
 ];
 
+/** The Storm Cornice's broken gaps (the Guardian of the Breath's fight,
+ *  design doc 7.2): the throats of four of the wind channels, where the rim's
+ *  wall has fallen and the lip lies open to the void. A body walked or blown
+ *  into one falls (the field builds no wall there: `lipOpenings`); everywhere
+ *  else the rim stays walled. The eastern channel (78) keeps its wall. */
+export const CORNICE_GAP_DEGREES: readonly number[] = [22, 128, 182, 332];
+/** A gap's reach round its throat (yards): the lip inside it is open. */
+export const CORNICE_GAP_R = 6;
+export const CORNICE_GAPS: readonly { deg: number; x: number; z: number; r: number }[] =
+  CORNICE_GAP_DEGREES.map((deg) => {
+    const ch = CORNICE_CHANNELS.find((c) => c.deg === deg) ?? CORNICE_CHANNELS[0];
+    const C = BREATH.cornice;
+    const [x, z] = bearingPoint(C.x, C.z, deg, C.rx - ch.depth * 0.9, C.rz - ch.depth * 0.9);
+    return { deg, x, z, r: CORNICE_GAP_R };
+  });
+
 // ---- the main map: the Quench (east, low) -------------------------------------------
 
 /** The Quench: two landings, the Singing Ice sheet, the Quench Basin (its
@@ -1135,6 +1151,7 @@ export const SMITH_HEART_FIELD: AuthoredFieldDef = {
   bounds: { minX: -258, maxX: 248, minZ: -246, maxZ: 238 },
   voidHeight: SMITH_HEART_VOID_HEIGHT,
   cliffStep: 1.1,
+  lipOpenings: CORNICE_GAPS.map(({ x, z, r }) => ({ x, z, r })),
   mapVoid: 'mist',
   surfaces: SURFACES,
   walls: [],
