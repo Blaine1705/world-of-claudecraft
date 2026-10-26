@@ -77,8 +77,10 @@ This closes the commit-accounting gap for the post-v0.44.0 hotfix graph. It does
 not claim a fresh semantic audit of all 1,286 commits introduced between
 v0.43.3 and v0.44.0, nor prove every runtime interaction correct.
 
-The Crucible meteor report remains unresolved. No historical v0.44.x meteor
-exclusion patch was identified. The local full gate remains blocked by the
+Reuben confirmed that Crucible is not an issue. It is cleared from the recovery
+scope; no Crucible gameplay change is required.
+
+The local full gate remains blocked by the
 bundled ffprobe architecture mismatch and the unchanged Studio missing-Git-object
 lookup timeout. The earlier PR revision also had two CI long-simulation
 timeouts, not assertion mismatches, in `eastbrook_gameplay_integration` and

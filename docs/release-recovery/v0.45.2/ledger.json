@@ -8525,8 +8525,10 @@
     "fix": "Route live method through warfarePurchaseConfirmBody; preserve BuddyVendorOffer names and Honor prices.",
     "status": "Verification recorded in README and named local logs."
   },
+  "clarifications": [
+    "Reuben confirmed that Crucible is not an issue; cleared from recovery scope with no gameplay change required."
+  ],
   "limits": [
-    "Crucible meteor report remains unresolved; no v0.44.x meteor exclusion patch identified.",
     "The full canonical local gate remains blocked by the bundled ffprobe architecture and unchanged Studio missing-object lookup timeout.",
     "Suite-level cached results can include skipped opt-in bodies; named PostgreSQL logs establish actual DB coverage.",
     "Line-presence, tree equality and merge reconstruction are evidence aids; they cannot certify every runtime interaction."
