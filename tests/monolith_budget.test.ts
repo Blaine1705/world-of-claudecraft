@@ -550,7 +550,9 @@ const MONOLITHS: MonolithRow[] = [
     // the tavern's rest badge read (rest_indicator.ts restStateOf) pays for the tavern's wiring.
     // wc -l on the merged tree. Exact count.
     // Combined guild extractions and integration changes, measured with wc -l.
-    ceiling: 17996,
+    // v0.45.2 recovery: reuse the Warfare confirmation formatter for gold,
+    // Honor and companions. Measured after recovery integration, zero slack.
+    ceiling: 17733,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

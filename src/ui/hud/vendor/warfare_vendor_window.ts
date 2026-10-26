@@ -29,6 +29,7 @@ import { BUDDY_PORTRAIT_URLS } from '../../target_portrait_view';
 // are honest data and a future caller may want them; this painter simply renders
 // none of it.
 
+import type { BuddyVendorOffer } from '../../../sim/content/buddy_offers';
 import { talentsFor } from '../../../sim/content/talents';
 import type { ItemDef, PlayerClass } from '../../../sim/types';
 import { buddyDisplayName } from '../../buddy_event_lines';
@@ -67,9 +68,9 @@ function priceText(offer: Pick<WarfareShopOffer, 'honor' | 'copper'>): string {
 
 /** The purchase confirm's body for one item, priced the way the shop sells it.
  *  Shared with the Hud coordinator so the dialog and the tile cannot disagree. */
-export function warfarePurchaseConfirmBody(item: ItemDef): string {
-  const name = itemDisplayName(item);
-  const copper = Math.max(0, Math.floor(item.buyValue ?? 0));
+export function warfarePurchaseConfirmBody(item: ItemDef | Readonly<BuddyVendorOffer>): string {
+  const name = item.kind === 'companion' ? buddyDisplayName(item.buddy) : itemDisplayName(item);
+  const copper = item.kind === 'companion' ? 0 : Math.max(0, Math.floor(item.buyValue ?? 0));
   if (copper > 0) {
     return t('hudChrome.warfareShop.buyConfirmBodyGold', {
       item: name,

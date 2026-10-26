@@ -14703,14 +14703,7 @@ export class Hud {
     // Shared Heroic shop title/accept/cancel keys must remain currency-neutral.
     this.confirmDialog(
       t('heroicShop.buyConfirmTitle'),
-      t('hudChrome.warfareShop.buyConfirmBody', {
-        item: item.kind === 'companion' ? buddyDisplayName(item.buddy) : itemDisplayName(item),
-        honor: t('hudChrome.warfare.honorAmount', {
-          amount: formatNumber(Math.max(0, Math.floor(item.priceHonor ?? 0)), {
-            maximumFractionDigits: 0,
-          }),
-        }),
-      }),
+      warfarePurchaseConfirmBody(item),
       t('heroicShop.buyConfirmAccept'),
       t('heroicShop.buyConfirmCancel'),
       () => this.sim.buyItem(npcId, itemId),
