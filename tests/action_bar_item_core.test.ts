@@ -84,6 +84,7 @@ function controllerHarness() {
       playerName: 'ConsumableTester',
       playerLevel: () => 1,
       talentSpec: () => null,
+      talentAllocation: () => ({ spec: 'arms', rows: {} }),
       knownAbilityIds: () => [],
       hasAura: () => false,
       showAttackButton: () => false,

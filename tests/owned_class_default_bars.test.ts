@@ -290,6 +290,7 @@ function controllerFor(
     playerName: 'OwnedDefaultTester',
     playerLevel: () => 20,
     talentSpec: () => spec,
+    talentAllocation: () => ({ spec, rows: {} }),
     knownAbilityIds: () => [...known],
     hasAura: () => false,
     showAttackButton: () => true,

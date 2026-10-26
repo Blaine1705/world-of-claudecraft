@@ -25,7 +25,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DEEDS } from '../src/sim/content/deeds';
 import { MOUNTS } from '../src/sim/content/mounts';
-import { SEASON2_SETS } from '../src/sim/content/pvp_honor_season2';
+import { SEASON2_JEWELRY_IDS, SEASON2_SETS } from '../src/sim/content/pvp_honor_season2';
 import {
   FIELD_NOTE_PROFESSIONS,
   RELIQUARY_HORIZON_TITLES,

@@ -473,7 +473,6 @@ import {
   setAccountFieldMsg,
 } from './ui/account_portal_dom';
 import { technicalErrorMessage, userFacingApiError } from './ui/api_error_i18n';
-import { formatFooterVersion } from './ui/app_version';
 import { type AppearanceCustomizer, mountAppearanceEditor } from './ui/appearance_editor_mount';
 import {
   appearancePanelIsStale,
@@ -530,6 +529,7 @@ import { refreshEpicLinkStatus, wireEpicLink } from './ui/epic_link';
 import { esc } from './ui/esc';
 import { showFatalOverlay } from './ui/fatal_overlay_controller';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
+import { syncBuildInfo, syncFooterLegalLinks } from './ui/footer_shell';
 import {
   attachGatherNodeHoverTooltip,
   gatherNodeToolGateFor,
@@ -780,13 +780,6 @@ declare const __APP_VERSION__: string;
 declare const __APP_BUILD_ID__: string;
 declare const __APP_BUILD_DATE__: string;
 
-function syncBuildInfo(): void {
-  const el = document.getElementById('game-version');
-  if (!el) return;
-  el.textContent = `v${formatFooterVersion(__APP_VERSION__)} · build ${__APP_BUILD_ID__}`;
-  el.title = t('meta.builtOn', { date: __APP_BUILD_DATE__ });
-}
-
 function syncAppViewport(): void {
   syncAppViewportShared();
   applyMobileHudLayout();
@@ -808,7 +801,8 @@ function syncCommunityMenuMode(): void {
 // tablet+keyboard player who chose Desktop never flashes the touch UI on load.
 setInterfaceMode(interfaceModeFromSetting(new Settings().get('interfaceMode')));
 syncAppViewport();
-syncBuildInfo();
+syncBuildInfo(__APP_VERSION__, __APP_BUILD_ID__, __APP_BUILD_DATE__);
+syncFooterLegalLinks();
 scheduleNativeUpdateCheck(__APP_VERSION__);
 void notifyOtaAppReady();
 // Visible OTA gate (native shells only; installOtaUpdateGate is inert

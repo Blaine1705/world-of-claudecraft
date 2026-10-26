@@ -188,8 +188,12 @@ export class QuestTrackerController {
         (!!progress.wispMaze && !progress.wispMaze.paused && progress.wispMaze.phase !== 'won') ||
         progress.glider?.phase === 'countdown' ||
         progress.glider?.phase === 'flying';
+      // The daily reward stays complete during practice, but an active lesson
+      // still needs its live instructions until the player leaves or finishes.
+      const practicingLesson = progress.state === 'active' && (lessonRunning || !!progress.shadow);
       const complete =
         worldQuestReadsCompleted(progress) &&
+        !practicingLesson &&
         !(progress.wispMaze && progress.wispMaze.phase !== 'won') &&
         progress.glider?.phase !== 'countdown' &&
         progress.glider?.phase !== 'flying';
@@ -239,7 +243,7 @@ export class QuestTrackerController {
                     quest.objective.type === 'tracing'
                       ? worldQuestTraceProgressInstruction(progress, quest)
                       : worldQuestObjectiveLabel(progress.questId),
-                  current: Math.min(progress.count, quest.count),
+                  current: complete ? quest.count : Math.min(progress.count, quest.count),
                   total: quest.count,
                   ...(quest.objective.type === 'tracing' ? { instruction: true } : {}),
                 },

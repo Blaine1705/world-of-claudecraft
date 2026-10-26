@@ -3885,14 +3885,15 @@ export const hudChromeStrings = {
     realmDisabled: 'World PvP is disabled on this realm.',
     // The stakes list, in reading order: where you can fight, what raises your
     // flag for you, what a kill moves, and how to put the flag back down.
-    groundSanctuary: 'The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP at all.',
+    groundSanctuary:
+      'The Proving Shore is the only sanctuary: you cannot enable World PvP or fight other players there.',
     groundContested: 'Everywhere else is contested: only two flagged players can fight.',
     groundFfa:
-      'The Drakelands, the Frostveil Reach and the Amberfall are free-for-all: everyone there can fight, flag or not.',
+      'The Drakelands, the Frostveil Reach and the Amberfall use normal PvP flags. Entering an active King of the Hill circle enables your flag.',
     groupLine:
       'Party and raid members are never hostile to each other. Guildmates outside your group can fight.',
     markLine:
-      'Attacking an unflagged player there raises your own flag; attacking a flagged one never does.',
+      'Entering an active hill circle enables World PvP. Leaving the circle keeps your flag up.',
     aidLine: 'Healing, shielding or buffing a flagged player in a world fight raises your flag.',
     stakeLine: 'The loser pays {cap} or {percent} of their purse, whichever is less.',
     spoilsLine:
@@ -3900,7 +3901,7 @@ export const hudChromeStrings = {
     // One looted trophy skull (src/sim/pvp/world_pvp_spoils.ts): {name} is the
     // defeated player's name, carried on the copy.
     skullName: "{name}'s Skull",
-    noStakeLine: 'An unflagged player killed on free-for-all ground loses no gold.',
+    noStakeLine: 'Unflagged players cannot be attacked in the open world.',
     noTakeLine:
       'An unflagged fighter takes no gold either: it only moves between two flagged players.',
     honorLine: '{honor} Honor per kill, split between everyone who helped.',
@@ -3908,7 +3909,8 @@ export const hudChromeStrings = {
     repeatLine:
       'Repeat kills of one player pay {second}, then {third}, then nothing; the count clears {reset} after the first kill.',
     greyLine: 'Players more than {levels} levels below you pay nothing.',
-    disarmLine: 'Switching off takes {minutes} minutes and waits for combat to end.',
+    disarmLine:
+      'Switching off takes {minutes} minutes and waits until you leave the active hill and combat ends.',
     record: 'Record: {kills} kills, {deaths} deaths',
     enable: 'Enable World PvP',
     disable: 'Disable World PvP',
@@ -3944,6 +3946,20 @@ export const hudChromeStrings = {
     distance: '{yards} yd to the circle',
     rises: 'Rises in {minutes}',
     falls: 'Falls in {minutes}',
+    pvpEntry: 'Entering the active circle enables World PvP.',
+    pvpBanner: 'PvP',
+    // The King of the Hill announcer (src/sim/pvp/hill_bounty.ts): League of
+    // Legends' kill streak calls, shown to everyone in the hill's zone. {name}
+    // and {killer}/{victim} are character names, spliced verbatim.
+    callout: {
+      killingSpree: '{name} is on a Killing Spree!',
+      rampage: '{name} is on a Rampage!',
+      unstoppable: '{name} is Unstoppable!',
+      dominating: '{name} is Dominating!',
+      godlike: '{name} is Godlike!',
+      legendary: '{name} is Legendary!',
+      shutDown: '{killer} has shut down {victim}!',
+    },
     standingRaid: 'Raid members do not count: only parties can hold the hill',
   },
   // The World PvP Skull Bag (src/sim/pvp/skull_bag.ts): the sub-inventory pane
@@ -4008,6 +4024,9 @@ export const hudChromeStrings = {
     // confirm gate matches the Heroic Marks shop's, whose title, accept and
     // cancel labels are currency-neutral and reused verbatim.
     buyConfirmBody: 'Buy {item} for {honor}? Honor purchases cannot be refunded.',
+    // Season 1 rows sell for gold (WARFARE_SEASON1_PRICE_COPPER); still
+    // soulbound with no sell value, so the same no-refund rule.
+    buyConfirmBodyGold: 'Buy {item} for {price}? This purchase cannot be refunded.',
   },
   // Character sheet showcase layout: the four titled stat-panel headings under
   // the primary attribute tiles (a 2x2 block: Offense beside Spell, Defense
@@ -5698,9 +5717,9 @@ export const hudChromeStrings = {
         'Whoever is nearest hits the Bone Spike: a few hits from anyone shatter it, whatever they deal. Healers keep the impaled alive while the spikes fall.',
       graveEruptionName: 'Grave Eruption',
       graveEruptionSummary:
-        'Every {everyNormal} sec, skeletal hands mark {countNormal} circles of {radius} yd under raiders. After {warning} sec each circle erupts for {burstNormal} of maximum health as Shadow damage, then burns as Grave Flame for {flameNormal} sec, dealing {tickNormal} of maximum health every second to anyone standing in it.',
+        'Every {everyNormal} sec, skeletal hands mark {countNormal} circles of {radius} yd under raiders. After {warning} sec each circle erupts for {burstNormal} of maximum health as Shadow damage, then burns as Grave Flame for {flameNormal} sec, dealing {tickNormal} of maximum health every second to anyone standing in it. It never begins while Soul Rend marks are live or within {gap} sec of them clearing.',
       graveEruptionHeroicSummary:
-        'Every {everyHeroic} sec, skeletal hands mark {countHeroic} circles of {radius} yd under raiders. After {warning} sec each circle erupts for {burstHeroic} of maximum health as Shadow damage, then burns as Grave Flame for {flameHeroic} sec, dealing {tickHeroic} of maximum health every second to anyone standing in it.',
+        'Every {everyHeroic} sec, skeletal hands mark {countHeroic} circles of {radius} yd under raiders. After {warning} sec each circle erupts for {burstHeroic} of maximum health as Shadow damage, then burns as Grave Flame for {flameHeroic} sec, dealing {tickHeroic} of maximum health every second to anyone standing in it. It never begins while Soul Rend marks are live or within {gap} sec of them clearing.',
       graveEruptionResponse:
         'Step out of every warning circle before it erupts and stay off the burning ground. Tanks pull Nythraxis clear of the flames so melee keeps room to work.',
       bindingSigilName: 'Binding Sigil',
@@ -6342,6 +6361,9 @@ export const hudChromeStrings = {
     // /afk tag prefixed to a player's overhead name (nameplate_painter.ts wraps
     // it in angle brackets: "<AFK> Name"). Short label, not a sentence.
     afkTag: 'AFK',
+    // King of the Hill: the Honor this player is worth while a kill streak runs
+    // (src/ui/hill_bounty_tag.ts wraps it in < >, like the PvP and AFK tags).
+    hillBountyTag: 'Bounty {honor}',
     // The World PvP flag tag, same bracket convention as afkTag.
     pvpTag: 'PvP',
     // The World PvP bounty tag (src/sim/pvp/world_pvp_bounty.ts), same bracket
@@ -7131,12 +7153,11 @@ export const hudChromeStrings = {
     memberSinceDays: '{days}d in the Discord',
     roleTag: {
       levyst: 'Levy St',
-      admin: 'Admin',
       coredevs: 'Core Dev',
       devs: 'Dev',
-      seniormods: 'Senior Mod',
+      seniormods: 'Sentinel',
       mods: 'Mod',
-      juniormods: 'Junior Mod',
+      juniormods: 'Observer',
       artists: 'Artist',
       contentcreator: 'Content Creator',
       legend: 'LEGEND',
@@ -7928,6 +7949,16 @@ export const hudChromeStrings = {
     offlineHeader: 'Offline ({n})',
     hideOffline: 'Hide offline',
     hideOfflineTitle: 'Hide offline guild members',
+    // The Friends footer's presence setting (server/presence_privacy.ts): who sees
+    // you online through friends lists and the guild roster.
+    presence: {
+      label: 'Show me online to',
+      everyone: 'Everyone',
+      friends: 'Friends only',
+      none: 'No one',
+      title:
+        'Who sees you online in friends lists and the guild roster, with your zone and map position. Your party always sees you.',
+    },
     // The guild billboard: a short officer-set message (announcements, Discord
     // links) pinned atop the Guild tab. Rendered as plain escaped text only,
     // deliberately (player-controlled; never linkified). {name} in setBy is the

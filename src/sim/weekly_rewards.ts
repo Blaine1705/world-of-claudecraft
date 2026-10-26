@@ -71,6 +71,7 @@ export const WEEKLY_THRESHOLDS = {
   world: [2, 4, 8],
   pvp: [1, 3, 5],
 } as const;
+const WEEKLY_RAID_CLEAR_LIMIT = WEEKLY_THRESHOLDS.raid[WEEKLY_THRESHOLDS.raid.length - 1];
 // Persisted index order. Append future encounters; never reorder existing entries.
 export const WEEKLY_RAID_BOSSES: readonly string[] = [
   NYTHRAXIS_BOSS_ID,
@@ -105,12 +106,17 @@ export interface WeeklyRewardState {
   /** Independent of equipped talents. Absent means all class gear. */
   lootSpec?: string;
   claimSequence: number;
+  /** Best three raid clear difficulties this week, including repeat bosses. */
+  raidClears: number[];
+  /** Legacy per-boss best difficulty, retained for save compatibility. */
   raids: number[];
   dungeons: number[];
   world: number;
   pvp: number;
   raidUnlocks: number[];
   bossUnlocks?: WeeklyBossUnlocks;
+  /** Bosses killed during this reset week; missing on pre-deploy saves. */
+  weeklyBossUnlocks?: WeeklyBossUnlocks;
   vaults: WeeklyVaultBatch[];
   overflowed: boolean;
   legacyPending?: number[];
@@ -127,6 +133,7 @@ export function emptyWeeklyRewards(resetAtMs = 0): WeeklyRewardState {
   return {
     resetAtMs,
     claimSequence: 0,
+    raidClears: [],
     raids: WEEKLY_RAID_BOSSES.map(() => 0),
     dungeons: [],
     world: 0,
@@ -138,6 +145,17 @@ export function emptyWeeklyRewards(resetAtMs = 0): WeeklyRewardState {
 }
 function bounded(n: unknown, max: number): number {
   return typeof n === 'number' && Number.isSafeInteger(n) && n >= 0 ? Math.min(n, max) : 0;
+}
+function bestRaidClearTiers(raw: readonly unknown[]): number[] {
+  const best: number[] = [];
+  for (const value of raw) {
+    const tier = bounded(value, 2);
+    if (!tier) continue;
+    best.push(tier);
+    best.sort((a, b) => b - a);
+    if (best.length > WEEKLY_RAID_CLEAR_LIMIT) best.pop();
+  }
+  return best;
 }
 export function sanitizeWeeklyRewards(
   raw: unknown,
@@ -153,6 +171,9 @@ export function sanitizeWeeklyRewards(
     : sanitizeWeeklyLootSpec(r.lootSpec);
   if (lootSpec) state.lootSpec = lootSpec;
   state.raids = state.raids.map((_, i) => bounded(Array.isArray(r.raids) ? r.raids[i] : 0, 2));
+  // Older saves only have the per-boss array. Each nonzero entry represents
+  // one known clear; later saves keep repeats in the separate bounded list.
+  state.raidClears = bestRaidClearTiers(Array.isArray(r.raidClears) ? r.raidClears : state.raids);
   state.dungeons = Array.isArray(r.dungeons)
     ? r.dungeons
         .slice(0, 8)
@@ -167,6 +188,7 @@ export function sanitizeWeeklyRewards(
   );
   state.overflowed = r.overflowed === true;
   state.bossUnlocks = sanitizeWeeklyBossUnlocks(r.bossUnlocks);
+  state.weeklyBossUnlocks = sanitizeWeeklyBossUnlocks(r.weeklyBossUnlocks);
   const legacy = r.legacyPending ?? (!Array.isArray(r.vaults) ? r.pending : undefined);
   if (Array.isArray(legacy))
     state.legacyPending = WEEKLY_POOL_IDS.map((_, i) => bounded(legacy[i], 3));
@@ -225,7 +247,7 @@ export function sanitizeWeeklyRewards(
 }
 export function earnedWeeklyRolls(state: WeeklyRewardState): number[] {
   const earned = WEEKLY_POOL_IDS.map(() => 0);
-  const tiers = [state.raids.filter(Boolean).sort((a, b) => b - a), state.dungeons];
+  const tiers = [state.raidClears, state.dungeons];
   for (const [index, thresholds] of [WEEKLY_THRESHOLDS.raid, WEEKLY_THRESHOLDS.dungeon].entries()) {
     for (const required of thresholds) {
       const tier = tiers[index][required - 1];
@@ -245,6 +267,8 @@ export function advanceWeeklyRewards(
   if (!Number.isFinite(nowMs) || nowMs < 0) return;
   if (state.resetAtMs > nowMs) return;
   if (state.resetAtMs > 0) {
+    // Direct callers may still pass a pre-deploy state without the weekly map.
+    const weeklyBossUnlocks = state.weeklyBossUnlocks ?? state.bossUnlocks ?? {};
     const earned = earnedWeeklyRolls(state);
     const choices: WeeklyChoice[] = [];
     if (state.vaults.length < WEEKLY_BACKLOG_LIMIT) {
@@ -259,12 +283,14 @@ export function advanceWeeklyRewards(
           resetAtMs: state.resetAtMs,
           choices,
           raidUnlocks: [...state.raidUnlocks],
-          bossUnlocks: { ...state.bossUnlocks },
+          bossUnlocks: { ...weeklyBossUnlocks },
         });
     } else if (earned.some(Boolean)) state.overflowed = true;
     state.raids.fill(0);
+    state.raidClears = [];
     state.dungeons = [];
     state.world = state.pvp = 0;
+    state.weeklyBossUnlocks = {};
   }
   const next = nextReset(nowMs);
   state.resetAtMs = Number.isSafeInteger(next) && next > nowMs ? next : Math.floor(nowMs) + WEEK_MS;
@@ -280,6 +306,9 @@ export function stateFor(ctx: SimContext, meta: PlayerMeta): WeeklyRewardState {
       if (tier) state.bossUnlocks[bossId] = Math.max(state.bossUnlocks[bossId] ?? 0, tier);
     }
   }
+  // A missing field identifies a pre-deploy save. Keep its earned slots
+  // eligible for this one week, then use only new kills after rollover.
+  state.weeklyBossUnlocks ??= { ...state.bossUnlocks };
   if (state.legacyPending) {
     const choices: WeeklyChoice[] = [];
     for (const [i, count] of state.legacyPending.entries()) {
@@ -295,7 +324,7 @@ export function stateFor(ctx: SimContext, meta: PlayerMeta): WeeklyRewardState {
   advanceWeeklyRewards(state, ctx.lockoutNowMs(), ctx.weeklyRaidResetMs, (pool) =>
     needsWeeklyBossTable(pool)
       ? weeklyAvailableBossTables(
-          { resetAtMs: state.resetAtMs, choices: [], bossUnlocks: state.bossUnlocks },
+          { resetAtMs: state.resetAtMs, choices: [], bossUnlocks: state.weeklyBossUnlocks },
           { pool },
           meta.cls,
         ).length > 0
@@ -323,6 +352,7 @@ export function weeklyRewardInfoFor(ctx: SimContext, pid: number): WeeklyRewardI
   const r = ctx.resolve(pid);
   if (!r) return null;
   const state = stateFor(ctx, r.meta);
+  const atKeeper = nearWeeklyKeeper(ctx, r.e);
   return {
     state: {
       resetAtMs: state.resetAtMs,
@@ -331,10 +361,12 @@ export function weeklyRewardInfoFor(ctx: SimContext, pid: number): WeeklyRewardI
       world: state.world,
       pvp: state.pvp,
       overflowed: state.overflowed,
+      raidClears: [...state.raidClears],
       raids: [...state.raids],
       dungeons: [...state.dungeons],
       raidUnlocks: [...state.raidUnlocks],
       bossUnlocks: { ...state.bossUnlocks },
+      weeklyBossUnlocks: { ...state.weeklyBossUnlocks },
       vaults: state.vaults.slice(0, 1).map((batch) => ({
         resetAtMs: batch.resetAtMs,
         // Legacy weeks have no historical snapshot. Use proven lifetime clears
@@ -415,12 +447,14 @@ export function recordWeeklyBossKill(
     const state = stateFor(ctx, meta);
     const tier = inst.difficulty === 'heroic' ? 2 : 1;
     state.bossUnlocks![bossId] = Math.max(state.bossUnlocks![bossId] ?? 0, tier);
+    state.weeklyBossUnlocks![bossId] = Math.max(state.weeklyBossUnlocks![bossId] ?? 0, tier);
     if (tuning.finalBossId !== bossId) continue;
     if (raid) {
       const i = WEEKLY_RAID_BOSSES.indexOf(bossId);
       if (i >= 0) {
         state.raids[i] = Math.max(state.raids[i], tier);
         state.raidUnlocks[i] = Math.max(state.raidUnlocks[i], tier);
+        state.raidClears = bestRaidClearTiers([...state.raidClears, tier]);
       }
     } else {
       state.dungeons = [...state.dungeons, tier].sort((a, b) => b - a).slice(0, 8);

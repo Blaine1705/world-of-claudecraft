@@ -319,6 +319,8 @@ describe('v0.36 placeholder-art completion evidence', () => {
       'vanguard_oath_blade',
       'vanguard_fang_dagger',
       'vanguard_warstaff',
+      // Restored Season 2 feral staff has its own September art batch.
+      'vanguard_feral_staff',
       // The Mirefen world boss's maul (balgath-boss-icons-2026-08-18) and
       // Skerrit's Shardpike (shardpike-mechanic-icons-2026-08-20) postdate
       // the campaign the same way, each painted in its own later batch.

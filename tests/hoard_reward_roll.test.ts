@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { HOARD_LOOT_CLASS_BIAS } from '../src/sim/content/hoard_loot';
 import { HARVEST_COMPONENT_SPECIMENS } from '../src/sim/content/professions';
-import { VAULT_MATERIAL_POOL, VAULT_PAYOUTS } from '../src/sim/content/treasure_maps';
+import {
+  VAULT_GUEST_GEAR_CHANCE,
+  VAULT_MATERIAL_POOL,
+  VAULT_PAYOUTS,
+} from '../src/sim/content/treasure_maps';
 import { ITEMS } from '../src/sim/data';
 import { rollHoardReward } from '../src/sim/rift/hoard_reward_roll';
 import { Rng } from '../src/sim/rng';
@@ -26,6 +30,27 @@ function scriptedRng(ints: number[], chances: boolean[]) {
 }
 
 describe('rollHoardReward', () => {
+  it.each([
+    ['common', 0.0025],
+    ['rare', 0.005],
+    ['epic', 0.0075],
+    ['legendary', 0.01],
+  ] as const)('rolls the %s mount chance from the chest', (rarity, mountChance) => {
+    const script = scriptedRng([0], [false, false, false, false]);
+    rollHoardReward(script.rng, {
+      rarity,
+      cls: 'hunter',
+      level: 20,
+      owner: true,
+      guestCapped: false,
+      mountOwned: false,
+    });
+    expect(script.calls.filter(([kind]) => kind === 'chance').at(-2)).toEqual([
+      'chance',
+      mountChance,
+    ]);
+  });
+
   it('preserves the owners full payout and exact draw order', () => {
     // The trailing 0 is the gear piece's loot-quality draw: Ordinary, and last.
     const script = scriptedRng([1, 0, 0], [true, true, true, true, true]);
@@ -90,19 +115,26 @@ describe('rollHoardReward', () => {
     ]);
   });
 
-  it('returns a capped guest with no payout and no random draws', () => {
-    const script = scriptedRng([], []);
-    expect(
-      rollHoardReward(script.rng, {
-        rarity: 'legendary',
-        cls: 'druid',
-        level: 20,
-        owner: false,
-        guestCapped: true,
-        mountOwned: false,
-      }),
-    ).toEqual({ capped: true, copper: 0, items: [] });
-    expect(script.calls).toEqual([]);
+  it('pays a guest with old capped state', () => {
+    const script = scriptedRng([0], [false, false, false, false]);
+    const reward = rollHoardReward(script.rng, {
+      rarity: 'legendary',
+      cls: 'druid',
+      level: 20,
+      owner: false,
+      guestCapped: true,
+      mountOwned: false,
+    });
+    expect(reward.capped).toBe(false);
+    expect(reward.copper).toBeGreaterThan(0);
+    expect(reward.items.length).toBeGreaterThan(0);
+    expect(script.calls).toEqual([
+      ['int', 0, 4],
+      ['chance', VAULT_GUEST_GEAR_CHANCE.legendary],
+      ['chance', VAULT_PAYOUTS.legendary.markChance],
+      ['chance', VAULT_PAYOUTS.legendary.mountChance],
+      ['chance', VAULT_PAYOUTS.legendary.nextMapChance],
+    ]);
   });
 
   it('draws the mount chance even when already owned', () => {

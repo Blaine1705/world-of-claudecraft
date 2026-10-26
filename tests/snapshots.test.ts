@@ -6760,6 +6760,7 @@ describe('full self-state snapshot delta fixture', () => {
       kills: 2,
       deaths: 1,
       zone: 'contested', // the fixture leader stands on contested ground
+      rewardPause: 'instance', // inside the delve the armed streak is paused
       enabled: true,
       // skb -> worldPvpInfo.skullBag (merged by social_self_wire.ts)
       skullBag: {
@@ -6772,11 +6773,12 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.player.bounty).toBe(true); // bty -> e.bounty (entity_status_wire.ts)
     // hill -> hillInfo (social_self_wire.ts): the standing hill from the
     // leader's seat (outside its zone, so the live fields are zero; the
-    // fixture leader is ungrouped, so counts as a group of one).
+    // fixture leader is below level 10, so cannot count on the hill).
+    expect(client.player.level).toBeLessThan(10);
     expect(client.hillInfo).toMatchObject({
       radius: 50,
       phase: 'active',
-      standing: 'counted',
+      standing: 'level',
       holder: 'none',
       inZone: false,
       inside: false,

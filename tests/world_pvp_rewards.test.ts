@@ -192,7 +192,7 @@ describe('World PvP rewards', () => {
     for (const [where, x, z] of paused) {
       expect(at(x, z), where).toBe(where.includes('sanctuary') ? 'sanctuary' : 'instance');
     }
-    expect(at(0, 0), 'Eastbrook Vale').toBe('sanctuary');
+    expect(at(0, 0), 'Eastbrook Vale uses the mutual-flag rule').toBeNull();
     expect(at(60, 700), 'Thornpeak Heights').toBeNull();
     expect(at(DUNGEON_X_THRESHOLD, 0), 'the plane edge').toBeNull();
     // Death outranks the ground: a corpse is never reachable, wherever it lies.

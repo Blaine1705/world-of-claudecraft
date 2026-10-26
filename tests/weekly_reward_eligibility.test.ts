@@ -39,11 +39,18 @@ function expectAllowedStats(cls: PlayerClass, item: ItemDef): void {
     expect(item.spellPower ?? 0, `${cls}: ${item.id} Spell Power`).toBeLessThanOrEqual(0);
     expect(item.healPower ?? 0, `${cls}: ${item.id} Healing Power`).toBeLessThanOrEqual(0);
   }
-  if (cls === 'warlock')
+  if (cls === 'warlock' && !(item.kind === 'weapon' && (item.spellPower ?? 0) > 0))
     expect(item.healPower ?? 0, `${cls}: ${item.id} Healing Power`).toBeLessThanOrEqual(0);
 }
 
 describe('weekly vault class restrictions', () => {
+  it('admits the shared caster Warstaff for warlocks while refusing healer-only weapons', () => {
+    const staff = ITEMS.vanguard_warstaff;
+    expect(staff.spellPower).toBe(34);
+    expect(staff.healPower).toBe(34);
+    expect(weeklyRewardFitsClass('warlock', staff)).toBe(true);
+    expect(weeklyRewardFitsClass('warlock', { ...staff, spellPower: 0 })).toBe(false);
+  });
   it.each(['mage', 'priest', 'warlock'] as const)(
     'excludes Strength and Agility for %s across all equipment, including mixed stats',
     (cls) => {

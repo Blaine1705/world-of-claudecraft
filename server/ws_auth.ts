@@ -18,7 +18,6 @@ import type { WebSocket, WebSocketServer } from 'ws';
 import { MEMBERSHIP_OFF, membershipCharacterLocked } from '../src/membership_contract';
 import { type AccountLedger, freshAccountLedger } from '../src/sim/account_ledger';
 import { setReferralArmour } from '../src/sim/referral_armour';
-import { worldQuestCycleForResetDay } from '../src/sim/world_quest_rotation';
 import {
   type BankBonusSource,
   DUNGEON_ENTRY_FACING_WIRE_VERSION,
@@ -92,9 +91,12 @@ const WS_UPGRADE_PATH = '/ws';
 
 // Every failed handshake check sends exactly one {t:'error'} frame (the shape the
 // client parses in online.ts onMessage), then closes the socket. Centralizes both
-// the frame shape and the send-then-close ordering in one place.
+// the frame shape and the send-then-close ordering in one place. The frame goes
+// out uncompressed: a compressed send makes ws allocate the socket's ~256 KiB
+// deflate stream (server/ws_compression.ts), which a client that never answers
+// the close would hold for ws's close timeout, so rejected sockets never get one.
 function rejectHandshake(ws: WebSocket, error: string): void {
-  ws.send(JSON.stringify({ t: 'error', error }));
+  ws.send(JSON.stringify({ t: 'error', error }), { compress: false });
   ws.close();
 }
 
@@ -166,7 +168,6 @@ export interface WsAuthDeps {
   bankBonusForAccount: (
     accountId: number,
   ) => Promise<{ bonusSlots: number; sources: BankBonusSource[] }>;
-  guestPayoutsForCycle: (characterId: number, cycle: string) => Promise<number>;
 }
 
 export interface WsAuthHandlers {
@@ -196,7 +197,6 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     acquireCharacterLease,
     releaseCharacterLease,
     bankBonusForAccount,
-    guestPayoutsForCycle,
   } = deps;
 
   // Character ids whose lease-acquire-through-join section is in flight in THIS
@@ -412,6 +412,9 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         // The character's stored action-bar layout, sent once to the owning client
         // so it restores at login on any device (game.join re-validates it).
         hotbarLayout: character.hotbar_layout ?? null,
+        // Presence privacy, known before the session joins anyone's roster
+        // (game.join validates it; server/presence_privacy.ts).
+        presenceMode: character.presence_mode ?? null,
         // The authored modular look (own column). Rides the join so the world
         // entity carries it and every client in view composes this character's
         // real body (identity wire key `app`).
@@ -565,21 +568,6 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
               throw err;
             }
             const moderation = chatModerationHydration.resolve(freshModeration);
-            const vaultGuestCycle = worldQuestCycleForResetDay(game.sim.resetDay);
-            let vaultGuestPayouts = 0;
-            try {
-              if (vaultGuestCycle)
-                vaultGuestPayouts = await guestPayoutsForCycle(
-                  admittedCharacter.id,
-                  vaultGuestCycle,
-                );
-            } catch (error) {
-              await releaseCharacterLease(character.id, leaseNonce).catch((releaseError) =>
-                console.error('lease release failed:', releaseError),
-              );
-              leaseNonce = undefined;
-              throw error;
-            }
             if (membershipLocked(admittedCharacter)) {
               await releaseCharacterLease(character.id, leaseNonce).catch((error) =>
                 console.error('lease release failed:', error),
@@ -601,10 +589,10 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
                 // The fresh arm re-read the row after the lease: that copy, or
                 // the still-queued document captured before it, supersedes the
                 // ownership-read copy joinMeta carries (game.join re-validates).
+                presenceMode: admittedCharacter.presence_mode ?? null,
                 hotbarLayout: queuedHotbarLayout ?? admittedCharacter.hotbar_layout ?? null,
                 leaseNonce,
                 bankBonus,
-                vaultGuestUsage: { cycle: vaultGuestCycle, payouts: vaultGuestPayouts },
                 mutedUntil: moderation.mutedUntil,
                 reason: moderation.reason,
                 chatStrikes: moderation.strikes,

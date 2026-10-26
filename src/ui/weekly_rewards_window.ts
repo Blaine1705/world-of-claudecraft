@@ -48,7 +48,7 @@ export class WeeklyRewardsTab {
     },
     private readonly options?: { readOnly?: boolean },
   ) {
-    this.claimFlow = new WeeklyRewardClaimController(deps);
+    this.claimFlow = new WeeklyRewardClaimController(deps, options);
   }
   close(): void {
     this.claimFlow.close();

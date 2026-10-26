@@ -759,8 +759,8 @@ export const en_CA: EnTranslations = {
       "heroicUpgradeOne": "{count} more Heroic dungeon clear to upgrade",
       "heroicUpgradeMany": "{count} more Heroic dungeon clears to upgrade",
       "completedTask": {
-        "raidOne": "{count} Raid Encounter Cleared",
-        "raidMany": "{count} Raid Encounters Cleared",
+        "raidOne": "{count} Raid Clear",
+        "raidMany": "{count} Raid Clears",
         "dungeonOne": "{count} Dungeon Cleared",
         "dungeonMany": "{count} Dungeons Cleared",
         "worldOne": "{count} World Quest Completed",
@@ -771,8 +771,8 @@ export const en_CA: EnTranslations = {
         "pvpWinMany": "{count} PvP Wins"
       },
       "requiredTask": {
-        "raidOne": "Clear {count} Raid Encounter",
-        "raidMany": "Clear {count} Raid Encounters",
+        "raidOne": "Complete {count} Raid Clear",
+        "raidMany": "Complete {count} Raid Clears",
         "dungeonOne": "Clear {count} Dungeon",
         "dungeonMany": "Clear {count} Dungeons",
         "worldOne": "Complete {count} World Quest",
@@ -786,7 +786,6 @@ export const en_CA: EnTranslations = {
       "claimLastWeek": "Claim last week's reward",
       "readyTitle": "Your weekly rewards are ready",
       "readyDescription": "A completed week of rewards is waiting. Open your earned vaults, then choose one item to claim.",
-      "previewClaimNotice": "Rewards are waiting. Visit the Vault Keeper in Eastbrook to open your vaults and claim a reward.",
       "notNow": "Not now",
       "completedWeek": "Week ended {date}",
       "currentWeek": "Back to this week's progress",
@@ -825,7 +824,7 @@ export const en_CA: EnTranslations = {
         "pvp": "PvP"
       },
       "task": {
-        "raid": "Defeat different raid encounters. Each encounter counts once; a Heroic clear upgrades its credit.",
+        "raid": "Every raid clear counts, including repeat encounters. Your best clears set each reward difficulty.",
         "dungeon": "Complete dungeons. Your best clears determine the reward difficulty at each milestone.",
         "world": "Complete rotating world quests. Story quests do not count.",
         "pvp": "Win ranked arena or rated battleground matches. Practice matches and forfeits do not count."
@@ -837,7 +836,8 @@ export const en_CA: EnTranslations = {
         "dungeon_heroic": "Heroic dungeon loot",
         "world": "World quest loot",
         "pvp": "WARFARE equipment"
-      }
+      },
+      "previewClaimNotice": "Rewards are waiting. Visit the Vault Keeper in Eastbrook to open and claim."
     },
     "guildHall": {
       "title": "Lantern Hall",
@@ -3446,22 +3446,22 @@ export const en_CA: EnTranslations = {
       "zoneContested": "Contested ground: only flagged players fight here.",
       "zoneFfa": "Free-for-all ground: everyone here is fair game.",
       "realmDisabled": "World PvP is disabled on this realm.",
-      "groundSanctuary": "The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP at all.",
+      "groundSanctuary": "The Proving Shore is the only sanctuary: you cannot enable World PvP or fight other players there.",
       "groundContested": "Everywhere else is contested: only two flagged players can fight.",
-      "groundFfa": "The Drakelands, the Frostveil Reach and the Amberfall are free-for-all: everyone there can fight, flag or not.",
+      "groundFfa": "The Drakelands, the Frostveil Reach and the Amberfall use normal PvP flags. Entering an active King of the Hill circle enables your flag.",
       "groupLine": "Party and raid members are never hostile to each other. Guildmates outside your group can fight.",
-      "markLine": "Attacking an unflagged player there raises your own flag; attacking a flagged one never does.",
+      "markLine": "Entering an active hill circle enables World PvP. Leaving the circle keeps your flag up.",
       "aidLine": "Healing, shielding or buffing a flagged player in a world fight raises your flag.",
       "stakeLine": "The loser pays {cap} or {percent} of their purse, whichever is less.",
       "spoilsLine": "When both of you are flagged, the killing blow's gold drops on the body with the loser's skull.",
       "skullName": "{name}'s Skull",
-      "noStakeLine": "An unflagged player killed on free-for-all ground loses no gold.",
+      "noStakeLine": "Unflagged players cannot be attacked in the open world.",
       "noTakeLine": "An unflagged fighter takes no gold either: it only moves between two flagged players.",
       "honorLine": "{honor} Honor per kill, split between everyone who helped.",
       "splitLine": "A clean 1v1 pays the whole pot; helpers and their healers share it.",
       "repeatLine": "Repeat kills of one player pay {second}, then {third}, then nothing; the count clears {reset} after the first kill.",
       "greyLine": "Players more than {levels} levels below you pay nothing.",
-      "disarmLine": "Switching off takes {minutes} minutes and waits for combat to end.",
+      "disarmLine": "Switching off takes {minutes} minutes and waits until you leave the active hill and combat ends.",
       "record": "Record: {kills} kills, {deaths} deaths",
       "enable": "Enable World PvP",
       "disable": "Disable World PvP",
@@ -3491,6 +3491,17 @@ export const en_CA: EnTranslations = {
       "distance": "{yards} yd to the circle",
       "rises": "Rises in {minutes}",
       "falls": "Falls in {minutes}",
+      "pvpEntry": "Entering the active circle enables World PvP.",
+      "pvpBanner": "PvP",
+      "callout": {
+        "killingSpree": "{name} is on a Killing Spree!",
+        "rampage": "{name} is on a Rampage!",
+        "unstoppable": "{name} is Unstoppable!",
+        "dominating": "{name} is Dominating!",
+        "godlike": "{name} is Godlike!",
+        "legendary": "{name} is Legendary!",
+        "shutDown": "{killer} has shut down {victim}!"
+      },
       "standingRaid": "Raid members do not count: only parties can hold the hill"
     },
     "skullBag": {
@@ -3523,7 +3534,8 @@ export const en_CA: EnTranslations = {
       "owned": "Owned",
       "buyAria": "Buy {item} for {honor}",
       "buyOwnedAria": "Buy {item} for {honor}, already owned",
-      "buyConfirmBody": "Buy {item} for {honor}? Honor purchases cannot be refunded."
+      "buyConfirmBody": "Buy {item} for {honor}? Honor purchases cannot be refunded.",
+      "buyConfirmBodyGold": "Buy {item} for {price}? This purchase cannot be refunded."
     },
     "charSheet": {
       "offense": "Offense",
@@ -4606,8 +4618,8 @@ export const en_CA: EnTranslations = {
         "boneSpikeHeroicSummary": "Every {everyHeroic} sec, Nythraxis impales {victimsHeroic} raiders other than his current target on Bone Spikes. An impaled raider cannot act and loses {drainHeroic} of maximum health every second until their spike is shattered. A spike shatters after {hitsHeroic} hits from anyone, whatever the hits deal. A raider who has been impaled cannot be chosen again for {cooldown} sec, so the spikes spread across the raid.",
         "boneSpikeResponse": "Whoever is nearest hits the Bone Spike: a few hits from anyone shatter it, whatever they deal. Healers keep the impaled alive while the spikes fall.",
         "graveEruptionName": "Grave Eruption",
-        "graveEruptionSummary": "Every {everyNormal} sec, skeletal hands mark {countNormal} circles of {radius} yd under raiders. After {warning} sec each circle erupts for {burstNormal} of maximum health as Shadow damage, then burns as Grave Flame for {flameNormal} sec, dealing {tickNormal} of maximum health every second to anyone standing in it.",
-        "graveEruptionHeroicSummary": "Every {everyHeroic} sec, skeletal hands mark {countHeroic} circles of {radius} yd under raiders. After {warning} sec each circle erupts for {burstHeroic} of maximum health as Shadow damage, then burns as Grave Flame for {flameHeroic} sec, dealing {tickHeroic} of maximum health every second to anyone standing in it.",
+        "graveEruptionSummary": "Every {everyNormal} sec, skeletal hands mark {countNormal} circles of {radius} yd under raiders. After {warning} sec each circle erupts for {burstNormal} of maximum health as Shadow damage, then burns as Grave Flame for {flameNormal} sec, dealing {tickNormal} of maximum health every second to anyone standing in it. It never begins while Soul Rend marks are live or within {gap} sec of them clearing.",
+        "graveEruptionHeroicSummary": "Every {everyHeroic} sec, skeletal hands mark {countHeroic} circles of {radius} yd under raiders. After {warning} sec each circle erupts for {burstHeroic} of maximum health as Shadow damage, then burns as Grave Flame for {flameHeroic} sec, dealing {tickHeroic} of maximum health every second to anyone standing in it. It never begins while Soul Rend marks are live or within {gap} sec of them clearing.",
         "graveEruptionResponse": "Step out of every warning circle before it erupts and stay off the burning ground. Tanks pull Nythraxis clear of the flames so melee keeps room to work.",
         "bindingSigilName": "Binding Sigil",
         "bindingSigilSummary": "Every {everyNormal} sec, a sigil of the old wards flares on one of the two platforms flanking the throne, {sideOffset} yd to the raid's left or right of where Nythraxis stood at the pull, switching sides every cast, and he begins Deathless Ascension, gaining {ascensionNormal} damage and attack speed every {ascensionEvery} sec. If he stands on the sigil within {bindNormal} sec he is Bound: the Ascension is purged, he is stunned for {stunNormal} sec, and he takes {vulnerability} more damage for {boundNormal} sec. Otherwise every raider takes {unboundHitNormal} of maximum health as Shadow damage and he keeps {unboundBonusNormal} more damage until the next binding.",
@@ -5010,6 +5022,7 @@ export const en_CA: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
+      "hillBountyTag": "Bounty {honor}",
       "pvpTag": "PvP",
       "bountyTag": "Bounty",
       "cheaterTag": "< Cheater >",
@@ -5435,12 +5448,11 @@ export const en_CA: EnTranslations = {
       "memberSinceDays": "{days}d in the Discord",
       "roleTag": {
         "levyst": "Levy St",
-        "admin": "Admin",
         "coredevs": "Core Dev",
         "devs": "Dev",
-        "seniormods": "Senior Mod",
+        "seniormods": "Sentinel",
         "mods": "Mod",
-        "juniormods": "Junior Mod",
+        "juniormods": "Observer",
         "artists": "Artist",
         "contentcreator": "Content Creator",
         "legend": "LEGEND",
@@ -5985,6 +5997,13 @@ export const en_CA: EnTranslations = {
       "offlineHeader": "Offline ({n})",
       "hideOffline": "Hide offline",
       "hideOfflineTitle": "Hide offline guild members",
+      "presence": {
+        "label": "Show me online to",
+        "everyone": "Everyone",
+        "friends": "Friends only",
+        "none": "No one",
+        "title": "Who sees you online in friends lists and the guild roster, with your zone and map position. Your party always sees you."
+      },
       "billboard": {
         "label": "Guild Billboard",
         "empty": "Nothing on the billboard yet.",
@@ -8077,6 +8096,12 @@ export const en_CA: EnTranslations = {
       "admin_target": "Operator accounts cannot be kicked.",
       "target_offline": "That player is no longer online on this realm."
     },
+    "world_quest_block": {
+      "admin_target": "Operator accounts cannot be blocked from world quests.",
+      "reason_required": "A reason is required.",
+      "already_blocked": "That account is already blocked from world quests.",
+      "not_blocked": "That account is not blocked from world quests."
+    },
     "woc_market": {
       "invalid_input": "Invalid input.",
       "disabled": "The $WOC Exchange is not available on this realm.",
@@ -9103,7 +9128,14 @@ export const en_CA: EnTranslations = {
       "discord": "Join the Discord",
       "communityWiki": "Community Wiki",
       "rights": "World of ClaudeCraft",
-      "linksLabel": "Play and community links"
+      "linksLabel": "Play and community links",
+      "guidesLabel": "Player guides",
+      "guideFree": "Free MMORPGs",
+      "guideGamesLikeWow": "Games like WoW",
+      "guideBest": "Best MMORPGs",
+      "guideNew": "New MMORPGs",
+      "guideBrowser": "Browser MMORPGs",
+      "guideGamesLikeDiablo": "Games like Diablo"
     },
     "language": {
       "label": "Language",
@@ -9619,7 +9651,9 @@ export const en_CA: EnTranslations = {
       "session": "What you have done since you logged in: kills, deaths, damage and experience.",
       "arena": "Your Ashen Coliseum standing in both brackets: rating, wins, losses and win rate for 1v1 and for 2v2.",
       "pvp": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other anywhere; switching off takes 5 minutes.",
-      "pvpZones": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other on contested ground, sanctuaries allow no world fighting at all, and the free-for-all zones allow it with or without a flag; switching off takes 5 minutes.",
+      "pvpZones": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other on contested ground, sanctuaries allow no world fighting at all, and entering an active King of the Hill circle raises your flag; switching off takes 5 minutes.",
+      "presence": "Who sees you online in friends lists, your guild roster and /who: /presence everyone (the default), /presence friends (only players on your friends list), or /presence none. Hidden, they see no online dot, zone or map position for you, though whispers and invites still reach you; your party always sees you. A plain /presence tells you which is set.",
+      "flair": "Shows or hides your Discord role for other players, meaning your colored name, role tag and verified chat tag: /flair on shows it, /flair off hides it, and a plain /flair tells you which is set. Needs a linked Discord account.",
       "listings": "Your own listings on the World Market, with the asking price, the time each has left, and how much room you have for more.",
       "buyback": "What you sold to a vendor recently and could still buy back.",
       "groupState": "How you are right now",
@@ -9759,7 +9793,7 @@ export const en_CA: EnTranslations = {
       "honorTerm": "Honor",
       "honorDef": "What fighting other players pays out: arena victories, Thornhollow Fields wins, and honorable kills all add to it. You spend it on the Warfare sets.",
       "warfareTerm": "Warfare",
-      "warfareDef": "The gear side of player-versus-player. A quartermaster sells sets of Warfare armor for Honor, and the Warfare rating they carry counts only in fights against other players.",
+      "warfareDef": "The gear side of player-versus-player. The quartermasters sell sets of Warfare armor, the newest season for Honor and the last season for gold, and the Warfare rating they carry counts only in fights against other players.",
       "fatigueTerm": "Fatigue",
       "fatigueDef": "Swim far enough out into open sea and the water begins to sap you: a warning comes first, then rising damage until you turn back toward land.",
       "unstuckTerm": "Unstuck Sickness",
@@ -10384,7 +10418,8 @@ export const en_CA: EnTranslations = {
       "warfareTradeBody": "That is the deliberate trade. Warfare gear is built for fighting players, not as a shortcut past the dungeon tiers: a Warfare piece never carries the combat ratings a dungeon epic in the same slot does, and everything it does bring is spent on other players. If you want to hold your own in the arena, buy it. If you want to clear heroics faster, earn your gear in the dungeons.",
       "warfareTradeBodyRatingSpent": "That is the deliberate trade. Warfare gear is built for fighting players, not as a shortcut past the dungeon tiers: a Warfare piece never carries the combat ratings a dungeon epic in the same slot does, and the Warfare rating and set bonuses it carries instead are spent entirely on other players. If you want to hold your own in the arena, buy it. If you want to clear heroics faster, earn your gear in the dungeons.",
       "vanguardHeading": "Vanguard gear: Warfare Season 2",
-      "vanguardBody": "Vanguard gear is the second season of Warfare gear, sold by the same two quartermasters above the original tier, which stays on sale. Every spec has its own Vanguard set of five pieces, for the head, shoulders, chest, legs and hands, and the shop lists only the three sets your class can wear, followed by the Vanguard weapons you can wield. A Vanguard piece carries the same Warfare ratings as the original tier at a higher item level, and each set has two bonuses, at two and four pieces, that change one of your spec's abilities. Unlike the original sets, those bonuses work everywhere, monsters included, but they are built for fighting players, so a raid set stays the better choice inside a raid."
+      "vanguardBody": "Vanguard gear is the second season of Warfare gear, sold by the same two quartermasters above the original tier, which stays on sale. Every spec has its own Vanguard set of five pieces, for the head, shoulders, chest, legs and hands, and the shop lists only the three sets your class can wear, followed by the Vanguard weapons you can wield. A Vanguard piece carries the same Warfare ratings as the original tier at a higher item level, and each set has two bonuses, at two and four pieces, that change one of your spec's abilities. Unlike the original sets, those bonuses work everywhere, monsters included, but they are built for fighting players, so a raid set stays the better choice inside a raid.",
+      "vanguardStatsBody": "Unlike the original tier, Vanguard gear also carries combat ratings: each Vanguard armor piece, weapon and necklace has Crit Rating or Haste Rating, and the spellcaster and healer pieces add Spell Power or Healing Power. The Vanguard rings and necklaces are sold beside the weapons, and every class can wear them. Two of the Vanguard melee rings give exactly the Hit Rating that removes the base chance of your attacks missing a player of your own level, and two spellcasting rings do the same for your spells being resisted. Auto-attacks while dual-wielding keep their extra miss chance. The healer ring carries Haste Rating instead."
     },
     "worldPvpPage": {
       "heading": "World PvP",
@@ -10395,18 +10430,18 @@ export const en_CA: EnTranslations = {
       "stakesBody": "When flagged players defeat a flagged player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
       "limitsHeading": "Fair play rules",
       "limitsBody": "Defeating the same player again and again pays less each time and soon nothing, and the counter resets with the daily reset. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
-      "introZones": "Open-world player-versus-player is opt-in, and the ground you are standing on decides what that means. Raise your PvP flag and every other flagged player who is not in your party or raid becomes an enemy on contested ground; lower it and, after a short delay, you are a bystander again. Two zones are sanctuaries where no world fighting happens at all, and the three northernmost zones are free-for-all ground where everyone present is fair game, flag or no flag. Party and raid mates are never enemies of yours anywhere; guildmates outside your group are fair game like anyone else.",
+      "introZones": "Open-world player-versus-player is opt-in, and the ground you are standing on decides what that means. Raise your PvP flag and every other flagged player who is not in your party or raid becomes an enemy on contested ground; lower it and, after a short delay, you are a bystander again. The Proving Shore is the only sanctuary, where no world fighting happens at all, and the three northernmost zones use the same opt-in flag rules as the rest of the world. Entering an active King of the Hill circle raises your flag automatically. Party and raid mates are never enemies of yours anywhere; guildmates outside your group are fair game like anyone else.",
       "zonesHeading": "Where world PvP happens",
-      "zonesBody": "The world has three kinds of ground. The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP happens there at all, flagged or not, so a new character can never be fought before they know what the flag is. Most of the world is contested, where the flag rule above is the whole story. The Drakelands, the Frostveil Reach and the Amberfall, the three northernmost zones, are free-for-all ground: everyone standing in them can attack everyone else standing in them, with or without a flag, and you are told as you cross in and again as you leave. Attacking a player who is not flagged there raises your own flag, so an aggressor always ends up carrying the risk. Hitting a player who is already flagged never raises it, which means defending yourself, or defending somebody who is not flagged, costs you nothing.",
+      "zonesBody": "The Proving Shore is the only sanctuary: no world PvP happens there, and you cannot raise your flag. An existing flag stays on, but its played-time title progress pauses until you leave. Everywhere else, including the Drakelands, the Frostveil Reach and the Amberfall, only flagged players can fight. Entering an active King of the Hill circle automatically raises your flag if you meet the normal level requirement. The warning circle does not flag you. Leaving the active circle keeps your flag up; use /pvp off to start the normal five-minute countdown, which cannot finish while you are inside an active hill or still in combat.",
       "flagBodyAid": "Type /pvp in chat, or open the PvP window on G and use the World PvP tab, which also shows your record and the stakes. Raising the flag is instant once you are past the starting levels. Lowering it starts a countdown of a few minutes, and the flag will not drop while you are still fighting, so switching off is never an escape from a fight you started. Healing, shielding or buffing a flagged player who is in a fight raises your own flag as well, so nobody sustains a fighter from behind a flag they do not wear; aiding a player who is not flagged raises nothing.",
       "stakesUnflaggedTake": "Nor does an unflagged fighter take any: gold only changes hands between two flagged players, though everyone who helped still earns the Honor.",
-      "stakesBodyFlagged": "When a flagged player is defeated by another player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. A player who was not flagged pays no gold at all, even when they fall in a free-for-all zone. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
+      "stakesBodyFlagged": "When a flagged player is defeated by another player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. An unflagged player cannot be attacked in the open world. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
       "hillHeading": "King of the Hill",
-      "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "hillBody": "Every two hours, a hill rises in the Drakelands, the Frostveil Reach or the Amberfall. The realm receives a fifteen-minute warning, and the circle is marked on open ground. The hill stays active for thirty minutes. Entering the active circle raises your World PvP flag under the normal level rules, including for raid members. The party with the most eligible players inside takes the hill after a minute of unbroken majority; a lone player counts as a party of one, but raid members and players below the PvP level requirement cannot capture or earn hill Honor. Each holder standing inside earns Honor at an increasing rate. Payouts and their ramp are faster, preserving the total Honor of the former forty-five-minute event. A change of holder restarts the ramp. Leaving the circle keeps your flag up; /pvp off uses the normal five-minute delay and cannot finish inside an active hill or during combat. The hill bar shows control, numbers and capture progress; /hill reports its location.",
       "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
       "hillBodyRamp": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
-      "hillBodyFlat": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns the same Honor every minute, however long they have held it, so a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "hillBodyFlat": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the northern zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns the same Honor every minute, however long they have held it, so a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "limitsBodyRaids": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor. Raids earn nothing from world kills: a raid member takes no Honor or gold and does not shrink anyone else's share, so fight as a party to be paid."
     },
     "thornhollowPage": {
@@ -10649,7 +10684,7 @@ export const en_CA: EnTranslations = {
       "offhandBody": "What the off hand takes depends on your class. A shield goes there, and so does a held focus such as an orb or a tome, or a quiver for a hunter. Classes that can dual wield put a second weapon in it instead, at a price worth knowing: fighting with a weapon in each hand makes your ordinary swings miss noticeably more often, though it leaves your abilities alone. A two-handed weapon normally needs both hands, so equipping one benches whatever the off hand was holding, unless your specialization is one of the rare ones that can carry two of them at once.",
       "bagsSort": "When the pack gets messy, the Sort button in the bags window tidies it in one press. Partial stacks of the same thing are merged together, and everything is laid back out in a readable order: weapons and armor first, then bags, consumables, tools, and mounts, then crafting materials with each fine grade sitting beside its plain version, then quest items, with grey junk last so you can see at a glance what to sell. Nothing is ever created or lost, only rearranged, so it is always safe to press.",
       "requiredLevelBody": "Some pieces also carry a required level, shown on the tooltip. You can loot, buy, or be handed such a piece at any level, but you cannot wear it until you get there. The requirement follows where the piece came from rather than its color alone, so a rare you win at your own level is usually wearable straight away, while a hand-me-down from far above you waits in your bags until you catch up.",
-      "sourcesHonor": "Honor is what fighting other players pays, and the honor quartermasters, FURY in Eastbrook and Warmarshal Draven Kole in Highwatch, keep the Warfare stores that Honor alone buys: whole armor families, jewelry, and weapons no coin merchant carries. The arena page covers how the Honor itself is earned.",
+      "sourcesHonor": "Honor is what fighting other players pays, and the honor quartermasters, FURY in Eastbrook and Warmarshal Draven Kole in Highwatch, keep the Warfare stores: the newest season of armor and weapons, sold for Honor alone, beside the armor families, jewelry, and weapons of the last season, now sold for gold. The arena page covers how the Honor itself is earned.",
       "sourcesRifts": "Rifts add one more source once you are at the level cap, and a rift is a race: the group that clears one first wins its rewards. That first clear pays gear on top of everything else the run leaves behind, including a Riftbound band cut to your class role, a ring you will not find anywhere else in the world. A group that finishes second still finishes its own run and keeps the credit for the clear; what it forfeits are the first-clear rewards. The rifts page covers the race itself.",
       "bindOnTradeBody": "A softer version of the same idea also exists: some things bind on trade, meaning they can change hands exactly once and then belong to whoever received them. A crafted piece made on commission binds when the crafter hands it over. A copy under that rule never rides the market or the post, which are anonymous; it passes face to face or not at all, and once it has passed, it is bound. The tooltip says which rule a piece follows, so check before you plan to resell it.",
       "cosmeticsWeapons": "Weapon skins are a third line, and they change what you carry rather than who carries it. A skin repaints a weapon type, so the look follows whichever sword, staff, or bow you have equipped, and it never touches the weapon's stats, reach, or speed. Skins unlock for your whole account rather than one character, and they come in collections with rarity tiers like everything else. They are offered in the Armory's seasonal collections rather than found out in the world, and the Armory is also where you set them, one per weapon type, rather than from the appearance row. Everyone standing near you sees the skin you are wearing.",
@@ -11118,7 +11153,7 @@ export const en_CA: EnTranslations = {
       "marketPost": "Posting: choose a stack from your bags, set your price, and list it. The goods are held by the Merchant until someone buys them. Unsold listings come back to you after a while, and you can reclaim one early if you change your mind. Listing itself is free, so an optimistic price costs you nothing but time.",
       "marketCollect": "Collecting: when your goods sell, your proceeds wait for you at the Merchant. Return to collect the coin, along with anything that came back unsold. The Merchant takes a small cut of every completed sale. The Collect tab itemizes what is waiting, one line per completed sale with the goods, the buyer, and what you made, so you can see exactly what sold before you take the coin.",
       "marketPricing": "Pricing is up to you. Listing a little under what others are asking tends to sell faster, while a steep price may sit untouched. Browse first to see what the going rate looks like before you post.",
-      "honorBody": "Fighting other players pays a third currency, Honor. Winning a ranked arena bout pays it, and a played-out match on Thornhollow Fields pays it whether you win or lose, so a hard-fought loss on the Fields is never a wasted match. Honor collects on your character sheet without ever mixing with your coin. You spend it with the honor quartermasters, FURY in Eastbrook and Warmarshal Draven Kole in Highwatch, who share one stock between them: the Warfare armor families, jewelry, and weapons that Honor alone buys. Those purchases are final, and the gear binds to you the moment you buy it, so read a piece before you confirm it. The arena page covers how Honor is earned.",
+      "honorBody": "Fighting other players pays a third currency, Honor. Winning a ranked arena bout pays it, and a played-out match on Thornhollow Fields pays it whether you win or lose, so a hard-fought loss on the Fields is never a wasted match. Honor collects on your character sheet without ever mixing with your coin. You spend it with the honor quartermasters, FURY in Eastbrook and Warmarshal Draven Kole in Highwatch, who share one stock between them: the newest season of Warfare armor and weapons sells for Honor alone, while the armor families, jewelry, and weapons of the last season sell for gold. Those purchases are final, and the gear binds to you the moment you buy it, so read a piece before you confirm it. The arena page covers how Honor is earned.",
       "guildBankNote": "Your guild keeps a vault of its own alongside your personal one, opened at the same bursar and reached from a tab in the same window: a shared treasury of coin and a pooled store of goods. Every member can look at it, and officers are the ones who may move things in and out. The social page has the details."
     },
     "social": {
@@ -13507,7 +13542,14 @@ export const en_CA: EnTranslations = {
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
     "discordLabel": "Join the Discord",
-    "levyStreet": "Levy Street"
+    "levyStreet": "Levy Street",
+    "guidesLabel": "Player guides",
+    "guideFree": "Free MMORPGs",
+    "guideGamesLikeWow": "Games like WoW",
+    "guideBest": "Best MMORPGs",
+    "guideNew": "New MMORPGs",
+    "guideBrowser": "Browser MMORPGs",
+    "guideGamesLikeDiablo": "Games like Diablo"
   },
   "settings": {
     "languageLoading": "Loading language...",
@@ -16156,6 +16198,7 @@ export const en_CA: EnTranslations = {
       "cooldownMinutes": "{minutes}m",
       "attackTooltip": "Toggle auto-attack on your target. Right-clicking an enemy also attacks.",
       "attackRemoveHint": "Right-click to remove it from the bar and free the slot.",
+      "moveHint": "Shift-drag to move",
       "emptySlot": "Empty slot",
       "slotAria": "Action slot {slot}: {ability}",
       "emptySlotAria": "Action slot {slot}: empty",
@@ -16975,6 +17018,7 @@ export const en_CA: EnTranslations = {
       "dps": "({dps} damage per second)",
       "armorStat": "{value} Armour",
       "stat": "+{value} {stat}",
+      "warfareMainHandOnly": "Warfare counts only in the main hand.",
       "useFood": "Use: Restores {amount} health over {seconds} sec. Must remain seated while eating.",
       "useDrink": "Use: Restores {amount} mana over {seconds} sec. Must remain seated while drinking.",
       "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Replaces any other elixir or scroll of the same stat. Usable in combat.",
@@ -24217,6 +24261,33 @@ export const en_CA: EnTranslations = {
       "moonwrack_stave": {
         "name": "Moonwrack Stave"
       },
+      "vanguard_feral_staff": {
+        "name": "Vanguard's Feral Staff"
+      },
+      "vanguard_band_of_might": {
+        "name": "Vanguard's Band of Might"
+      },
+      "vanguard_band_of_precision": {
+        "name": "Vanguard's Band of Precision"
+      },
+      "vanguard_band_of_focus": {
+        "name": "Vanguard's Band of Focus"
+      },
+      "vanguard_band_of_mending": {
+        "name": "Vanguard's Band of Mending"
+      },
+      "vanguard_pendant_of_might": {
+        "name": "Vanguard's Pendant of Might"
+      },
+      "vanguard_pendant_of_precision": {
+        "name": "Vanguard's Pendant of Precision"
+      },
+      "vanguard_pendant_of_focus": {
+        "name": "Vanguard's Pendant of Focus"
+      },
+      "vanguard_pendant_of_mending": {
+        "name": "Vanguard's Pendant of Mending"
+      },
       "membership_staff": {
         "name": "Staff of Changing"
       },
@@ -30558,8 +30629,8 @@ export const en_CA: EnTranslations = {
       },
       "vanguard_druid_feral": {
         "name": "Bloodmane Hide",
-        "bonus2": "Bruin Rush's cooldown is reduced by 3 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Bruin Rush shields you for 6 percent of your maximum health for 6 sec."
+        "bonus2": "Reduces the cooldowns of Lunge and Bruin Rush by 3 sec. Damage taken no longer delays your spellcasting.",
+        "bonus4": "Dash's cooldown is reduced by 15 sec."
       },
       "vanguard_druid_restoration": {
         "name": "Thistlebloom Vestment",

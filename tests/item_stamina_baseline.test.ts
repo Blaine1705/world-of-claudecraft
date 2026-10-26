@@ -180,7 +180,8 @@ const UNTIERED_WITH_PROXY_FLOOR = 77;
 // variants (tests/lower_dungeon_blues.test.ts names the base pieces).
 const GENERATED_ITEM_COUNT = 149;
 const WARFARE_STOCK_COUNT = 47;
-const SEASON2_STOCK_COUNT = 139;
+// Original Season 2 stock plus the restored feral staff and eight jewelry rows.
+const SEASON2_STOCK_COUNT = 148;
 const HEROIC_VARIANT_COUNT = 116;
 
 // Items with no derivable source (vendor, starter and quest oddities) have no

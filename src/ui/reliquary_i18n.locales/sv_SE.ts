@@ -144,7 +144,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_gallery: {
     name: 'Krigföringsgalleri',
-    desc: 'De fem stridsutrustningarna för Krigföring, förtjänade del för del med ära.',
+    desc: 'De fem Krigsförings stridsutrustningarna från första säsongen, nu sålda bit för bit för guld.',
   },
   conquerors_warfare_armory: {
     name: 'Krigföringens vapenkammare',

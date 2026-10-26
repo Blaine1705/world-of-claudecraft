@@ -895,11 +895,12 @@ describe('item-art audit builder', () => {
       // `node scripts/item_art_audit.mjs --verify-only` (catalog +523 bytes).
       // + the sprite buddy's whistle render: 2186 / 2215, re-measured with --verify-only.
       // Release adds five painted owners; measured with --verify-only on the combined tree.
-      catalogSha256: 'fbacd30b55a12eb85c81e76aa431312079634c9b4fa233135ca2707550776b75',
-      catalogBytes: 1178060,
+      // Restored feral staff and eight jewelry paintings; measured with --verify-only.
+      catalogSha256: '14c4ebd9b13939840b19ee2aae4374db4bd88bce88571f2b7953d5b587ce7deb',
+      catalogBytes: 1182978,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 2155,
-      liveItemCount: 2184,
+      catalogCount: 2164,
+      liveItemCount: 2193,
       generatedHeroicDefinitions: 116,
       heroicDefinitionsWithOwnWebp: 86,
       heroicWeaponArtAliases: 30,
@@ -917,7 +918,7 @@ describe('item-art audit builder', () => {
         identity: 45,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '0144a235ce50be3b4d507153485842c5213f24d959e6b06c094852e83c61c802',
+      shippingCatalogSha256: '21a26de395561c44c1fa71f4d0a808f5aedfb9619c51b2344f8a0a09a5aa4c65',
       machineChecksPassed: true,
       verdict: null,
     });

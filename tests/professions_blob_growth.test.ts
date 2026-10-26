@@ -53,6 +53,7 @@ import {
   GATHERING_PROFESSIONS,
   HARVEST_COMPONENT_ITEMS,
 } from '../src/sim/content/professions';
+import { SEASON2_JEWELRY_IDS } from '../src/sim/content/pvp_honor_season2';
 import { recipeById } from '../src/sim/content/recipes';
 import { REFERRAL_ITEMS } from '../src/sim/content/referral';
 import { REFERRAL_STAMP_ITEMS } from '../src/sim/content/referral_rewards';
@@ -2044,10 +2045,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // skull 42 + Titan 26 + PvP titles 138 + Hard maze 34 + skull bag 62
     // + vault retune 119 + quiver 66 + quest shields 68. No storage limit changes.
     // Advanced riding adds the sparse ridingTier scalar (+15, PR 4390).
-    expect(baselineBytes).toBe(258582);
+    expect(baselineBytes).toBe(259346);
     expect(bytes - baselineBytes).toBe(8284);
     // 266,699 -> 266,721 with Wobbles the Slime's reins (+22, kept).
-    expect(bytes).toBe(266866);
+    expect(bytes).toBe(267630);
     // Keep the warning threshold unchanged: saves above it remain whole.
     expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
     process.stdout.write(
@@ -2319,7 +2320,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // (`"membership_staff",`, +19, PR 4281), isolated with membership below.
     // 249,984 -> 250,006 with Wobbles the Slime's reins (+22, kept).
     // Advanced riding adds the sparse ridingTier scalar (+15, PR 4390).
-    expect(beforeReferralBytes).toBe(250151);
+    expect(beforeReferralBytes).toBe(250915);
     expect(bytes - stampCardBytes - beforeReferralBytes).toBe(122);
     expect(
       fieldBytes(beforeStampCards, 'deedStats') - fieldBytes(withoutReferral, 'deedStats'),
@@ -2345,7 +2346,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(membershipIds.size).toBe(9);
     const beforeMembershipBytes = Buffer.byteLength(JSON.stringify(withoutMembership), 'utf8');
     // 249,810 -> 249,832 with Wobbles the Slime's reins (+22, kept).
-    expect(beforeMembershipBytes).toBe(249977);
+    expect(beforeMembershipBytes).toBe(250741);
     expect(beforeReferralBytes - beforeMembershipBytes).toBe(174);
     expect(
       fieldBytes(withoutReferral, 'deedStats') - fieldBytes(withoutMembership, 'deedStats'),
@@ -2783,6 +2784,13 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // 139 honor item ids (deedStats.itemsDiscovered +4,648 and the reliquary
         // rows +8,848, the release's own attribution).
         13496 +
+        // The feral staff adds one discovery (23 bytes) and one existing-page
+        // Reliquary entry (53 bytes), isolated below.
+        76 +
+        // The eight Season 2 rings and necks (2026-10-02): eight discoveries
+        // (+224, each id plus 3 bytes) and eight existing-page Reliquary entries
+        // (+464, each id plus 33 bytes), isolated below. MEASURED.
+        688 +
         // Plus 154 at the fourth release/v0.44.0 base merge (the ferry deed and
         // its four visit marks, attributed above).
         154 +
@@ -2926,8 +2934,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // Then -> 21,354: the 36 legacy buddy item ids add 706 discovery bytes.
       // Then -> 21,373 with the Staff of Changing's discovery id (+19, PR 4281).
       // +18 for the sprite buddy's whistle id in itemsDiscovered: 21373 -> 21436.
-      deedStats: 20833,
-      reliquary: 14048,
+      deedStats: 21080,
+      reliquary: 14565,
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
     // pre-field-kit, pre-Bramblehide baseline WITH the hammer content still
@@ -2976,7 +2984,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // The Staff of Changing's discovery id adds 19 (247,136, PR 4281).
       // The sprite buddy's whistle id adds 18 (247,154).
       // Advanced riding contributes 15 bytes for the armed ridingTier scalar.
-    ).toBe(247281);
+    ).toBe(248045);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -3018,7 +3026,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // The Staff of Changing's discovery id adds 19 (249,946, PR 4281); reins_nightwing_chimera adds 26 (249,972).
       // reins_wobbles_slime adds 22 (249,994).
       // Advanced riding contributes the same 15 bytes here.
-    ).toBe(250139);
+    ).toBe(250903);
     const priorContent = withoutCrucibleContent(withoutReferral);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -3167,8 +3175,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // Release composition: 250,982 bytes excluding referral cards; retain the 381-byte band.
     // RE-BASED for advanced riding: up exactly 15 for the sparse ridingTier
     // scalar (250,273). Same 381-byte band.
-    expect(bytes - stampCardBytes, reMint).toBeGreaterThan(249893);
-    expect(bytes - stampCardBytes, reMint).toBeLessThan(250274);
+    expect(bytes - stampCardBytes, reMint).toBeGreaterThan(250657);
+    expect(bytes - stampCardBytes, reMint).toBeLessThan(251038);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

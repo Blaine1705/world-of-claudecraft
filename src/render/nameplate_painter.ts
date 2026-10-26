@@ -27,6 +27,7 @@ import { devTierBadgeDataUrl, devTierByIndex, devTierNameOutlineColor } from '..
 import { discordRoleTagLabel } from '../ui/discord_role_tag';
 import { entityDisplayName } from '../ui/entity_display_core';
 import { tEntity } from '../ui/entity_i18n';
+import { hillBountyTagLabel } from '../ui/hill_bounty_tag';
 import { holderTierBadgeDataUrl, holderTierByIndex } from '../ui/holder_tier';
 import { formatNumber, getI18nRevision, t } from '../ui/i18n';
 import {
@@ -245,6 +246,10 @@ export class NameplatePainter {
   private edgeArrowLabel = '';
   private readonly surface: NameplateCanvasSurface;
   private readonly states = new Map<number, NameplateCanvasState>();
+  /** The King of the Hill bounty each plate's name row was built with (absent
+   *  for none): like the /pvp flag, a change re-resolves the row the same frame.
+   *  Kept here, not on the canvas state, and pruned with it. */
+  private readonly plateBounty = new Map<number, number>();
   private readonly traceLabels = new WorldQuestTraceLabels();
   private readonly tmpV = new THREE.Vector3();
   private readonly tmpV2 = new THREE.Vector3();
@@ -412,12 +417,18 @@ export class NameplatePainter {
       this.updateDynamicState(state, entity, player, plan, languageChanged);
       // The /pvp flag is the one content input read every pass: a flip
       // re-resolves the row THIS frame (state.pvpFlag), never on the tier cadence.
-      const pvpFlipped = state.pvpFlag !== (entity.pvpFlag === true);
+      const pvpFlipped =
+        state.pvpFlag !== (entity.pvpFlag === true) ||
+        this.plateBounty.get(id) !== entity.hillBounty;
       // Play Dead (hunter feign death) hides a player's bar the frame it lands.
       const feignFlipped = entity.kind === 'player' && state.hpVisible === shownDead(entity);
       const flipped = pvpFlipped || bountyFlipped || feignFlipped;
       if (!state.initialized || fullPass || plan.urgent || languageChanged || flipped) {
         this.resolveContent(state, entity, player, plan, showOwnNameplate, showDevBadges);
+        // Recorded here, not inside resolveContent's early-returning branches,
+        // so a hidden own plate with a bounty does not re-resolve every frame.
+        if (entity.hillBounty) this.plateBounty.set(id, entity.hillBounty);
+        else this.plateBounty.delete(id);
       }
 
       const anchor = this.anchorScratch[this.anchorCount];
@@ -568,6 +579,7 @@ export class NameplatePainter {
 
   remove(id: number): void {
     this.states.delete(id);
+    this.plateBounty.delete(id);
     for (let i = 0; i < this.anchorCount; i++) {
       const anchor = this.anchorScratch[i];
       if (anchor.id !== id) continue;
@@ -583,6 +595,7 @@ export class NameplatePainter {
   dispose(): void {
     this.anchorCount = 0;
     this.states.clear();
+    this.plateBounty.clear();
     this.paintGate.invalidate();
     this.surface.dispose();
   }
@@ -784,7 +797,9 @@ export class NameplatePainter {
       const afkTag = entity.afk ? `<${t('hudChrome.nameplate.afkTag')}> ` : '';
       // The bounty's non-colour cue (forced colours flatten the blood red).
       const bountyTag = state.bounty ? `<${t('hudChrome.nameplate.bountyTag')}> ` : '';
-      state.name = `${bountyTag}${pvpTag}${afkTag}${baseName}`;
+      const hillLabel = hillBountyTagLabel(entity);
+      const hillTag = hillLabel ? `${hillLabel} ` : '';
+      state.name = `${bountyTag}${pvpTag}${hillTag}${afkTag}${baseName}`;
       state.nameColor = roleColor ?? '#7fb8ff';
       // A member's line is their guild; a PLEDGE (docs/prd/guild-pledge-board.md)
       // borrows the same line with the localized pledge wording, so an

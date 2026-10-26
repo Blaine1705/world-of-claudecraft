@@ -1357,7 +1357,7 @@
       "tick": 103,
       "time": 5.15,
       "nextId": 1015,
-      "state": "a4e64200",
+      "state": "5cbecd2a",
       "events": "b563aeaa",
       "rng": {
         "draws": 545,
@@ -1494,7 +1494,8 @@
               0,
               0
             ],
-            "resetAtMs": 604805099
+            "resetAtMs": 604805099,
+            "weeklyBossUnlocks": {}
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
@@ -1629,7 +1630,8 @@
               0,
               0
             ],
-            "resetAtMs": 604805099
+            "resetAtMs": 604805099,
+            "weeklyBossUnlocks": {}
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
@@ -2106,7 +2108,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1015,
-      "state": "7bda2622",
+      "state": "f841bff4",
       "events": "741638a5",
       "rng": {
         "draws": 761,
@@ -2117,7 +2119,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 1015,
-      "state": "9b67387a",
+      "state": "97e6530c",
       "events": "741638a5",
       "rng": {
         "draws": 1026,
@@ -2128,7 +2130,7 @@
       "tick": 175,
       "time": 8.75,
       "nextId": 1015,
-      "state": "bbe98e2b",
+      "state": "15503d1d",
       "events": "741638a5",
       "rng": {
         "draws": 1335,
@@ -2139,7 +2141,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 1015,
-      "state": "f66d1d21",
+      "state": "a8f7a443",
       "events": "741638a5",
       "rng": {
         "draws": 1668,
@@ -2150,7 +2152,7 @@
       "tick": 225,
       "time": 11.25,
       "nextId": 1015,
-      "state": "b0efcc3b",
+      "state": "0137c8ed",
       "events": "e79e3029",
       "rng": {
         "draws": 1881,
@@ -2161,7 +2163,7 @@
       "tick": 243,
       "time": 12.15,
       "nextId": 1015,
-      "state": "6020130e",
+      "state": "9433a640",
       "events": "741638a5",
       "rng": {
         "draws": 2018,
@@ -2298,7 +2300,8 @@
               0,
               0
             ],
-            "resetAtMs": 604805099
+            "resetAtMs": 604805099,
+            "weeklyBossUnlocks": {}
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
@@ -2433,7 +2436,8 @@
               0,
               0
             ],
-            "resetAtMs": 604805099
+            "resetAtMs": 604805099,
+            "weeklyBossUnlocks": {}
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
@@ -2915,7 +2919,7 @@
       "tick": 243,
       "time": 12.15,
       "nextId": 1015,
-      "state": "6020130e",
+      "state": "9433a640",
       "events": "741638a5",
       "rng": {
         "draws": 2018,
@@ -3052,7 +3056,8 @@
               0,
               0
             ],
-            "resetAtMs": 604805099
+            "resetAtMs": 604805099,
+            "weeklyBossUnlocks": {}
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
@@ -3187,7 +3192,8 @@
               0,
               0
             ],
-            "resetAtMs": 604805099
+            "resetAtMs": 604805099,
+            "weeklyBossUnlocks": {}
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}

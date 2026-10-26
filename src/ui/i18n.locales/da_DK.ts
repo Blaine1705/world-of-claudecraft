@@ -1379,24 +1379,21 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.confirmCancel': 'Annuller',
   'hudChrome.worldPvp.disable': 'Deaktiver Verden PvP',
   'hudChrome.worldPvp.disarmLine':
-    'At skifte fra tager {minutes} minutter og venter på kampen slutter.',
+    'Det tager {minutes} minutter at slå flaget fra, og det venter, til du har forladt den aktive bakke, og kampen er slut.',
   'hudChrome.worldPvp.enable': 'Aktivér Verden PvP',
   'hudChrome.worldPvp.greyLine': 'Spillere mere end {levels} niveauer under dig betaler intet.',
   'hudChrome.worldPvp.groundContested':
     'Overalt andet er omstridt: kun to markerede spillere kan kæmpe.',
   'hudChrome.worldPvp.groundFfa':
-    'Drakelands, Frostveil Reach og Amberfall er free-for-all: alle der kan kæmpe, markeret eller ej.',
-  'hudChrome.worldPvp.groundSanctuary':
-    'Proving Shore og Eastbrook Vale er helligdommer: ingen verden PvP overhovedet.',
+    'Dragelandet, Frostsløret og Ravfaldet bruger normale PvP-flag. Dit flag aktiveres, når du går ind i en aktiv cirkel i Konge af Bakken.',
   'hudChrome.worldPvp.groupLine':
     'Gruppe- og raidmedlemmer er aldrig fjendtlige over for hinanden. Gildekammerater uden for din gruppe kan kæmpe.',
   'hudChrome.worldPvp.honorLine': '{honor} Ære pr. drab, delt blandt alle der hjalp.',
   'hudChrome.worldPvp.keepUp': 'Hold Flag Oppe',
   'hudChrome.worldPvp.levelReq': 'Kræver niveau {level}.',
   'hudChrome.worldPvp.markLine':
-    'At angribe en umarkeret spiller der rejser din egen markering; at angribe en markeret gør det aldrig.',
-  'hudChrome.worldPvp.noStakeLine':
-    'En umarkeret spiller drbt på free-for-all-grund mister ingen guld.',
+    'Verdens-PvP aktiveres, når du går ind i en aktiv bakkecirkel. Dit flag forbliver aktivt, når du forlader cirklen.',
+  'hudChrome.worldPvp.noStakeLine': 'Spillere uden flag kan ikke angribes i den åbne verden.',
   'hudChrome.worldPvp.noTakeLine':
     'En umarkeret kæmper tager heller ikke guld: det flytter kun mellem to markerede spillere.',
   'hudChrome.worldPvp.pending': 'Venter på din PvP-status fra riget.',
@@ -2420,8 +2417,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.vanguardHeading': 'Vanguard-udstyr: Krigsførelse Sæson 2',
   'guide.combat.unstuckBodyWindow':
     'Hvis verden fanger dig et sted, du ikke kan komme ud af, skriv /unstuck. Du skal være uden for kamp og stå stille, ikke holdt af et stun eller rod, og ikke i en duel eller en arena-kamp: en kort nedtælling går, og bevægelse eller skade annullerer det. Når det er færdigt, bliver du sat af ved nærmeste kirkegård. Det drebes dig aldrig og efterlader ingen lig, og hvis du allerede var nede rejser det dig der i stedet. Den første brug på en time koster dig ingenting. Brug det igen inden for en time efter den seneste og prisen er Fastfrosset Sygdom, en midlertidig svækkelse af alt det du er, der er brugt op mod det tidspunkt, du kunne bruge kommandoen igen, og som Vejers Told sparer det helt nye karakterer helt.',
+  'guide.commandsPage.flair':
+    'Viser eller skjuler din Discord-rolle for andre spillere, altså dit farvede navn, dit rollemærke og dit bekræftede chatmærke: /flair on viser den, /flair off skjuler den, og /flair alene fortæller dig, hvad der er valgt. Kræver en tilknyttet Discord-konto.',
   'guide.commandsPage.pvpZones':
-    'Verden PvP-flag: /pvp slår det til/fra, /pvp on og /pvp off sætter det. Flaggede spillere kan kæmpe hinanden på omstridt grund, helligdomme tillader ingen verden-kamp overhovedet, og fri-for-alt-zonerne tillader det med eller uden flag; at slå fra tager 5 minutter.',
+    'Flag til verdens-PvP: /pvp skifter tilstand, /pvp on slår det til, og /pvp off slår det fra. Spillere med flag kan kæmpe mod hinanden på omstridt jord, fristeder tillader ingen verdenskampe, og dit flag aktiveres, når du går ind i en aktiv cirkel i Konge af Bakken; det tager 5 minutter at slå det fra.',
   'guide.commandsPage.unstuckWindow':
     'Vejen ud når verden har fanget dig. Stå stille gennem en kort nedtælling og du bliver flyttet til nærmeste kirkegård og rejst der, hvis du allerede var faldet. Den første brug på en time er gratis. Brug det igen inden for en time efter den seneste og det efterlader dig svækket af Fastfrosset Sygdom i et stykke tid derefter, så det er en redning snarere end en genvej.',
   'guide.factionsPage.automatonsBody':
@@ -2492,20 +2491,16 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.worldPvpPage.flagHeading': 'At hæve og sænke flaget',
   'guide.worldPvpPage.heading': 'Verden PvP',
   'guide.worldPvpPage.hillBodyRamp':
-    'Hver tredje time, på et tidspunkt ingen kan forudsige, hele riget fortalt at en bakke vil stige i en af fri-for-alt-zonerne på femten minutter, og cirklen hvor det vil stå markeres på åbent land. Når det stiger står det i 45 minutter, derefter falder. Partiet med de fleste spillere stående indenfor strides bakken, og efter et minuts ubrudt majoritet bakken er deres; en ensom spiller tæller som et parti på en, men raid-medlemmer tæller slet ikke. Mens en parti holder bakken, hver af dets medlemmer stående indenfor tjener Ære hver minut, og jo længere det samme parti holder det, jo mere hver minut betaler: et fuldt parti holder en omstridt bakke for hele sit stå tjener omkring så meget som tre battleground sejre. Når bakken skifter hænder, start de nye indehavere tællingen fra begyndelsen. En bar over marken viser hvem der holder det, dine numre mod deres, og konkurrenceuret; /hill i chat siger hvor det står.',
+    'Hver anden time dukker en bakke op i Dragelandet, Frostsløret eller Ravfaldet. Riget får et varsel femten minutter før, og cirklen markeres på åbent land. Bakken er aktiv i tredive minutter. Når du går ind i den aktive cirkel, aktiveres dit flag til verdens-PvP efter de normale niveauregler, også for raidmedlemmer. Gruppen med flest kvalificerede spillere i cirklen indtager bakken efter et minut med uafbrudt flertal; en enkelt spiller tæller som en gruppe på én, men raidmedlemmer og spillere under niveaukravet for PvP kan hverken indtage bakken eller optjene Ære fra den. Hver indehaver i cirklen optjener Ære med stigende hastighed. Udbetalingerne kommer hyppigere og stiger hurtigere, så den samlede Ære fra den tidligere begivenhed på femogfyrre minutter bevares. Når bakken skifter ejer, begynder stigningen forfra. Dit flag forbliver aktivt, når du forlader cirklen; /pvp off bruger den normale forsinkelse på fem minutter og kan ikke afsluttes på en aktiv bakke eller under kamp. Bakkens bjælke viser kontrollen, antallet af spillere og fremskridtet i erobringen; /hill oplyser dens placering.',
   'guide.worldPvpPage.hillHeading': 'Konge af Bakken',
-  'guide.worldPvpPage.introZones':
-    'Åben verden spiller-mod-spiller er opt-in, og det grund du står på afgør hvad det betyder. Hæv dit PvP-flag og enhver anden flagget spiller der ikke er i din parti eller raid bliver en fjende på omstridt grund; sænk det og, efter en kort forsinkelse, du er en tilskuer igen. To zoner er helligdomme hvor ingen verden kamp sker overhovedet, og de tre nordligste zoner er fri-for-alt-grund hvor alle til stede er fair spil, flag eller nej. Parti og raid-kammerater er aldrig fjender til dig et hvilken som helst sted; guildmates uden for din gruppe er fair spil som alle andre.',
   'guide.worldPvpPage.limitsBodyRaids':
     'Besejring det samme spiller igen og igen betaler mindre hver gang og snart ingenting, og din tælling mod det spiller kun starter over omkring en time efter først af disse drab, så lejring en offer er aldrig værd ventetid. Et mål langt under dit niveau betaler ingenting overhovedet. Battlegrounds og Arenaer køre deres egne regler mens du er inden i dem, og de betaler mere Ære end åben verden, så verden PvP er den langsommere vej til samme forhandler. Raids tjener ingenting fra verden drab: et raid medlem tager ingen Ære eller guld og gør ikke skrumpe nogen anden aktie, så kæmp som en parti til at blive betalt.',
   'guide.worldPvpPage.limitsHeading': 'Fair play regler',
   'guide.worldPvpPage.stakesBodyFlagged':
-    'Når en flagget spiller besejres af en anden spiller, taberen betaler en lille del af guldet i deres pung, grænsesat til et beskedent beløb, og vindererne tjener Ære mod Krigsførelse-udstyr. En spiller der ikke var flagget betaler ingen guld overhovedet, selv når de falder i en fri-for-alt zone. Alle der hjalp dele både: det dødbringende slag, hvem som helst der skadede målet kort før, og lægefolkene der holdt disse krigers stående. En ren en-mod-en betaler hele potten; en gruppe deler det.',
+    'Når en spiller med flag besejres af en anden spiller, betaler taberen en lille del af guldet i sin pung, begrænset til et beskedent beløb, og vinderne optjener Ære til Krigsførelse-udstyr. En spiller uden flag kan ikke angribes i den åbne verden. Alle, der hjalp, deler både guld og Ære: spilleren, der gav dødsstødet, alle, der skadede målet kort forinden, og healerne, der holdt disse kæmpere på benene. En ren en-mod-en-kamp giver hele puljen; en gruppe deler den.',
   'guide.worldPvpPage.stakesHeading': 'Hvad et drab værd',
   'guide.worldPvpPage.stakesUnflaggedTake':
     'En uflaget kæmper får heller intet: guld skifter kun hænder mellem to flagede spillere, selvom alle der hjalp stadig optjener Ære.',
-  'guide.worldPvpPage.zonesBody':
-    'Verden har tre slags grund. Prøvestranden og Østbæk Dal er fredede områder: der foregår ingen verdenskamp dér overhovedet, flaget eller ej, så en ny karakter kan aldrig blive angrebet før de ved, hvad flaget betyder. Størstedelen af verden er omstridt, hvor flagereglerne ovenfor er hele historien. Dragelandet, Frostsløret og Ravfaldet, de tre nordligste zoner, er frit fremme-område: alle der står i dem kan angribe alle andre der står i dem, med eller uden flag, og du bliver advaret når du træder ind og igen når du forlader. At angribe en spiller der ikke er flaget der rejser dit eget flag, så en angriber bærer altid risikoen. At ramme en spiller der allerede er flaget rejser det aldrig, hvilket betyder at forsvare dig selv, eller forsvare nogen der ikke er flaget, koster dig intet.',
   'guide.worldPvpPage.zonesHeading': 'Hvor verdenskamp foregår',
   'landing.headline': 'Eventyr med venner.',
   'landing.contribute': 'Bidrag til spillet',
@@ -6086,9 +6081,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cameraPrompt.title': 'Vælg dit kamera',
   'hudChrome.discord.link.joinServer': 'Tilslut dig Discord-serveren',
   'hudChrome.discord.roleTag.contentcreator': 'Indholdsskaber',
-  'hudChrome.discord.roleTag.juniormods': 'Junior-mod',
+  'hudChrome.discord.roleTag.juniormods': 'Observatør',
   'hudChrome.discord.roleTag.legend': 'LEGENDE',
-  'hudChrome.discord.roleTag.seniormods': 'Senior-mod',
+  'hudChrome.discord.roleTag.seniormods': 'Vogter',
   'hudChrome.discord.roleTag.shill': 'FORKÆMPER',
   'hudChrome.discord.roleTagChatTitle': 'Verificeret serverrolle: {role}',
   'hudChrome.finder.accept': 'Accepter',
@@ -7167,7 +7162,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.resurrectAtHealer': 'Den Blege Vogter (Vogterens Klokke)',
   'hudChrome.death.spiritHealerAlive':
     'Den Blege Vogter våger over de døde. Du er stadig blandt de levende.',
-  'hudChrome.discord.roleTag.admin': 'Admin',
   'hudChrome.frameReset.label': 'Nulstil rammepositioner',
   'hudChrome.mailbox.arrivedBanner': 'Ravnen er landet: post fra {name}.',
   'hudChrome.mailbox.arrivedLog': 'Du har ny post fra {name}.',
@@ -17979,6 +17973,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': 'Operatørkonti kan ikke sparkes.',
   'apiError.kick.reason_required': 'En grund er påkrævet.',
   'apiError.kick.target_offline': 'Den spiller er ikke længere online i dette rige.',
+  'apiError.world_quest_block.admin_target': 'Operatørkonti kan ikke blokeres fra verdenquester.',
+  'apiError.world_quest_block.reason_required': 'En grund er påkrævet.',
+  'apiError.world_quest_block.already_blocked': 'Den konto er allerede blokeret fra verdenquester.',
+  'apiError.world_quest_block.not_blocked': 'Den konto er ikke blokeret fra verdenquester.',
   'entities.abilities.melting_acid.description':
     'Smører dit våben i 30 min. Hvert af dine nærkampshug sprøjter målet med ætsende syre og reducerer dets rustning med 5 % i 12 sek.',
   'entities.abilities.nightshade_coating.description':
@@ -18356,12 +18354,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.dreadCurseSummary':
     'Hvert {every} sek rammer Nythraxis sin nuværende tank for {hitNormal} af maksimal sundhed som Skyggeskade og tilføjer en stak Rædselsforbandelse. I {duration} sek øger hver stak den skade, den tank tager fra Nythraxis, med {perStackNormal}, op til {max} stakke.',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionHeroicSummary':
-    'Hvert {everyHeroic} sek markerer skelethænder {countHeroic} cirkler på {radius} yd under raiddeltagere. Efter {warning} sek bryder hver cirkel ud for {burstHeroic} af maksimal sundhed som Skyggeskade og brænder derefter som Gravflamme i {flameHeroic} sek, hvilket giver {tickHeroic} af maksimal sundhed hvert sekund til alle, der står i den.',
+    'Hvert {everyHeroic} sek markerer skelethænder {countHeroic} cirkler på {radius} yd under raiddeltagere. Efter {warning} sek bryder hver cirkel ud for {burstHeroic} af maksimal sundhed som Skyggeskade og brænder derefter som Gravflamme i {flameHeroic} sek, hvilket giver {tickHeroic} af maksimal sundhed hvert sekund til alle, der står i den. Det sker aldrig, mens Sjæleflængen-mærker er aktive, eller inden for {gap} sek efter, at de er forsvundet.',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionName': 'Gravudbrud',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionResponse':
     'Træd ud af hver advarselscirkel, før den bryder ud, og hold jer væk fra brændende jord. Tanks trækker Nythraxis væk fra flammerne, så nærkampsspillere har plads til at arbejde.',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionSummary':
-    'Hvert {everyNormal} sek markerer skelethænder {countNormal} cirkler på {radius} yd under raiddeltagere. Efter {warning} sek bryder hver cirkel ud for {burstNormal} af maksimal sundhed som Skyggeskade og brænder derefter som Gravflamme i {flameNormal} sek, hvilket giver {tickNormal} af maksimal sundhed hvert sekund til alle, der står i den.',
+    'Hvert {everyNormal} sek markerer skelethænder {countNormal} cirkler på {radius} yd under raiddeltagere. Efter {warning} sek bryder hver cirkel ud for {burstNormal} af maksimal sundhed som Skyggeskade og brænder derefter som Gravflamme i {flameNormal} sek, hvilket giver {tickNormal} af maksimal sundhed hvert sekund til alle, der står i den. Det sker aldrig, mens Sjæleflængen-mærker er aktive, eller inden for {gap} sek efter, at de er forsvundet.',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerName': 'Gravbryder',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerResponse':
     'Tanks holder Nythraxis vendt væk fra raidet. Alle andre står bag eller ved siden af ham og krydser aldrig keglen.',
@@ -19893,7 +19891,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mapAtlas.resizeRailHint':
     'Træk for at ændre størrelsen på kortets sidebjælke. Dobbeltklik for at nulstille.',
   'guide.worldPvpPage.hillBodyFlat':
-    'En gang hver tredje time får hele riget på et uforudsigeligt tidspunkt besked om, at en bakke dukker op i en zone med fri kamp om femten minutter. Dens cirkel markeres på åbent terræn. Bakken bliver stående i femogfyrre minutter og forsvinder så. Imens meddeles dens placering og grupperne med den længste samlede kontroltid hvert femte minut. Gruppen med flest spillere i cirklen kæmper om bakken og erobrer den efter i alt tredive sekunders overtal. En rivaliserende gruppe sætter kun tælleren på pause, indtil din gruppe fører igen; den starter først forfra, når der ikke er nogen levende fra din gruppe tilbage i cirklen. En solospiller tæller som en gruppe på én og beholder sin bakke, når en gruppe dannes, men raidmedlemmer tæller slet ikke. Hvert medlem af gruppen, der holder bakken og står i cirklen, modtager lige meget Ære hvert minut, uanset hvor længe gruppen har holdt den. En fuld gruppe, som holder bakken uforstyrret i hele dens levetid, tjener omtrent det samme som for tre sejre på slagmarker. Når bakken forsvinder, får alle, som stod i cirklen i mindst ét minut under den førende gruppes kontrol og stadig er i gruppen, én sejr til PvP-rækken i den ugentlige hvælving, hvis gruppen med længst samlet kontrol holdt den i mindst ti minutter. En bjælke over området viser indehaveren, antallet af spillere på begge sider og erobringstælleren; /hill i chatten viser placeringen.',
+    'En gang hver tredje time får hele riget på et uforudsigeligt tidspunkt besked om, at en bakke dukker op i en af de nordlige zoner om femten minutter. Dens cirkel markeres på åbent terræn. Bakken bliver stående i femogfyrre minutter og forsvinder så. Imens meddeles dens placering og grupperne med den længste samlede kontroltid hvert femte minut. Gruppen med flest spillere i cirklen kæmper om bakken og erobrer den efter i alt tredive sekunders overtal. En rivaliserende gruppe sætter kun tælleren på pause, indtil din gruppe fører igen; den starter først forfra, når der ikke er nogen levende fra din gruppe tilbage i cirklen. En solospiller tæller som en gruppe på én og beholder sin bakke, når en gruppe dannes, men raidmedlemmer tæller slet ikke. Hvert medlem af gruppen, der holder bakken og står i cirklen, modtager lige meget Ære hvert minut, uanset hvor længe gruppen har holdt den. En fuld gruppe, som holder bakken uforstyrret i hele dens levetid, tjener omtrent det samme som for tre sejre på slagmarker. Når bakken forsvinder, får alle, som stod i cirklen i mindst ét minut under den førende gruppes kontrol og stadig er i gruppen, én sejr til PvP-rækken i den ugentlige hvælving, hvis gruppen med længst samlet kontrol holdt den i mindst ti minutter. En bjælke over området viser indehaveren, antallet af spillere på begge sider og erobringstælleren; /hill i chatten viser placeringen.',
   'errors.noUpdateFound': 'Ingen opdatering fundet. Prøv igen om lidt.',
   'errors.searchUpdates': 'Søg efter opdateringer',
   'errors.updateSearchFailed': 'Kunne ikke søge efter opdateringer. Prøv igen.',
@@ -25556,4 +25554,59 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Ridedyr er kosmetiske udseender til din trænede ridning. De giver ingen rustning, skade eller kampstatistik. Ridetræning øger rejsehastigheden på land, og spring til hest klarer større højder. Alle ridedyr bliver på jorden, og ingen kan svømme.',
   'guide.progression.ridingBody':
     'På niveau {level} lærer staldmester Marla dig grundlæggende ridning for guld og tilbyder derefter en avanceret rang. Træning bestemmer hastigheden til hest. Vælg dit ridedyrsudseende i Kosmetik; samlede udseender deles, så længe tøjlerne ligger i en vilkårlig figurs tasker eller bank.',
+  'footer.guideBest': "Bedste MMORPG'er",
+  'footer.guideBrowser': "Browser-MMORPG'er",
+  'footer.guideFree': "Gratis MMORPG'er",
+  'footer.guideGamesLikeDiablo': 'Spil som Diablo',
+  'footer.guideGamesLikeWow': 'Spil som WoW',
+  'footer.guideNew': "Nye MMORPG'er",
+  'footer.guidesLabel': 'Spillerguides',
+  'guide.footer.guideBest': "Bedste MMORPG'er",
+  'guide.footer.guideBrowser': "Browser-MMORPG'er",
+  'guide.footer.guideFree': "Gratis MMORPG'er",
+  'guide.footer.guideGamesLikeDiablo': 'Spil som Diablo',
+  'guide.footer.guideGamesLikeWow': 'Spil som WoW',
+  'guide.footer.guideNew': "Nye MMORPG'er",
+  'guide.footer.guidesLabel': 'Spillerguides',
+  'hudChrome.hill.callout.dominating': '{name} dominerer!',
+  'hudChrome.hill.callout.godlike': '{name} er guddommelig!',
+  'hudChrome.hill.callout.killingSpree': '{name} er på en drabsserie!',
+  'hudChrome.hill.callout.legendary': '{name} er legendarisk!',
+  'hudChrome.hill.callout.rampage': '{name} raser!',
+  'hudChrome.hill.callout.shutDown': '{killer} har stoppet {victim}!',
+  'hudChrome.hill.callout.unstoppable': '{name} er ustoppelig!',
+  'hudChrome.social.presence.everyone': 'Alle',
+  'hudChrome.social.presence.friends': 'Kun venner',
+  'hudChrome.social.presence.label': 'Vis mig online til',
+  'hudChrome.social.presence.none': 'Ingen',
+  'hudChrome.social.presence.title':
+    'Hvem der ser dig online på vennelister og laugsmandtal, med din zone og kortposition. Dit hold ser altid dig.',
+  'hudChrome.warfareShop.buyConfirmBodyGold':
+    'Køb {item} for {price}? Dette køb kan ikke refunderes.',
+  'itemUi.tooltip.warfareMainHandOnly': 'Krigsførelse tæller kun i hovedhånden.',
+  'entities.items.vanguard_band_of_focus.name': 'Avantgardes Ring af Fokus',
+  'entities.items.vanguard_band_of_mending.name': 'Avantgardes Ring af Helbredelse',
+  'entities.items.vanguard_band_of_might.name': 'Avantgardes Ring af Styrke',
+  'entities.items.vanguard_band_of_precision.name': 'Avantgardes Ring af Præcision',
+  'entities.items.vanguard_pendant_of_focus.name': 'Avantgardes Anheng af Fokus',
+  'entities.items.vanguard_pendant_of_mending.name': 'Avantgardes Anheng af Helbredelse',
+  'entities.items.vanguard_pendant_of_might.name': 'Avantgardes Anheng af Styrke',
+  'entities.items.vanguard_pendant_of_precision.name': 'Avantgardes Anheng af Præcision',
+  'guide.arenaPage.vanguardStatsBody':
+    'I modsætning til det oprindelige lag bærer Avantgarde-udstyr også kampvurderinger: hver Avantgarde-rustningsdel, våben og halskæde har Kritvurdering eller Hastevurdering, og delene for tryllebrugeren og læger tilføjer Besværgelseskraft eller Helbredelseskraft. Avantgarde-ringene og halskederne sælges ved siden af væbnerne, og enhver klasse kan tage dem på. To af Avantgardes nærkampiringe giver nøjagtigt Rammevurderingen, der fjerner basischancen for, at dine angreb mangler en spiller på dit eget niveau, og to tryllebrugeres ringe gør det samme for dine besværgelser, der bliver modstået. Autoangreb under dobbeltkamp beholder deres ekstra manglende chance. Læger-ringen bærer i stedet Hastevurdering.',
+  'guide.commandsPage.presence':
+    'Hvem der ser dig online på vennelister, dit laugsmandtal og /who: /presence everyone (standarden), /presence friends (kun spillere på din venneliste) eller /presence none. Skjult ser de ingen online prik, zone eller kortposition for dig, skønt hvisker og invitationer stadig når dig; dit hold ser altid dig. En almindelig /presence fortæller dig, hvad der er sat.',
+  'abilityUi.actionBar.moveHint': 'Hold Skift nede, og træk for at flytte',
+  'entities.items.vanguard_feral_staff.name': 'Fortroppens vilde stav',
+  'hudChrome.worldPvp.groundSanctuary':
+    'Prøvestranden er det eneste fristed: du kan ikke aktivere verdens-PvP eller kæmpe mod andre spillere der.',
+  'guide.worldPvpPage.introZones':
+    'PvP i den åbne verden er frivilligt og afhænger af området. På omstridt jord gør dit aktive PvP-flag alle spillere med flag uden for din gruppe eller dit raid til fjender; slår du det fra, bliver du tilskuer igen efter en kort forsinkelse. Prøvestranden er det eneste fristed uden verdenskampe, og de tre nordligste områder bruger samme frivillige flagregler som resten af verden. Dit flag aktiveres automatisk, når du går ind i en aktiv cirkel i Konge af Bakken. Gruppe- og raidfæller er aldrig dine fjender; guildmedlemmer uden for din gruppe er mål som alle andre.',
+  'guide.worldPvpPage.zonesBody':
+    'Prøvestranden er det eneste fristed: der foregår ingen verdens-PvP, og du kan ikke aktivere dit flag. Et aktivt flag forbliver aktivt, men fremskridt mod titler baseret på spilletid sættes på pause, indtil du forlader området. Alle andre steder, også i Dragelandet, Frostsløret og Ravfaldet, kan kun spillere med flag kæmpe. Når du går ind i en aktiv cirkel i Konge af Bakken, aktiveres dit flag automatisk, hvis du opfylder det normale niveaukrav. Varslingscirklen aktiverer ikke dit flag. Flaget forbliver aktivt, når du forlader den aktive cirkel; brug /pvp off til at starte den normale nedtælling på fem minutter, som ikke kan slutte, mens du er på en aktiv bakke eller stadig er i kamp.',
+  'guide.worldPvpPage.hillBody':
+    'Hver anden time dukker en bakke op i Dragelandet, Frostsløret eller Ravfaldet. Riget får et varsel femten minutter før, og cirklen markeres på åbent land. Bakken er aktiv i tredive minutter. Når du går ind i den aktive cirkel, aktiveres dit flag til verdens-PvP efter de normale niveauregler, også for raidmedlemmer. Gruppen med flest kvalificerede spillere i cirklen indtager bakken efter et minut med uafbrudt flertal; en enkelt spiller tæller som en gruppe på én, men raidmedlemmer og spillere under niveaukravet for PvP kan hverken indtage bakken eller optjene Ære fra den. Hver indehaver i cirklen optjener Ære med stigende hastighed. Udbetalingerne kommer hyppigere og stiger hurtigere, så den samlede Ære fra den tidligere begivenhed på femogfyrre minutter bevares. Når bakken skifter ejer, begynder stigningen forfra. Dit flag forbliver aktivt, når du forlader cirklen; /pvp off bruger den normale forsinkelse på fem minutter og kan ikke afsluttes på en aktiv bakke eller under kamp. Bakkens bjælke viser kontrollen, antallet af spillere og fremskridtet i erobringen; /hill oplyser dens placering.',
+  'hudChrome.hill.pvpEntry': 'Verdens-PvP aktiveres, når du går ind i den aktive cirkel.',
+  'hudChrome.hill.pvpBanner': 'PvP',
+  'hudChrome.nameplate.hillBountyTag': 'Dusør {honor}',
 };

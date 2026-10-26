@@ -109,6 +109,7 @@ const inventoryController = new ActionBarController({
   playerName: 'IconArtInventory',
   playerLevel: () => 1,
   talentSpec: () => null,
+  talentAllocation: () => ({ spec: null, rows: {} }),
   knownAbilityIds: () => [],
   hasAura: () => false,
   showAttackButton: () => true,

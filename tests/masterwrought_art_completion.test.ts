@@ -841,7 +841,8 @@ describe('Masterwrought art completion evidence', () => {
     // The icon backlog adds 135 Season 2 paintings, five referral rewards, the horse, and Nightwing Chimaera.
     // Wobbles the Slime's reins owner (outside the dated universe too): 2,183.
     // + the sprite buddy's whistle render: 2,184.
-    expect(currentOwnerIds).toHaveLength(2155);
+    // Restored feral staff and eight Season 2 jewelry paintings add nine owners.
+    expect(currentOwnerIds).toHaveLength(2164);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -1000,9 +1001,20 @@ describe('Masterwrought art completion evidence', () => {
       'vanguard_oath_blade',
       'vanguard_fang_dagger',
       'vanguard_warstaff',
+      'vanguard_feral_staff',
     ]);
     expect(datedIds.filter((id) => season2WeaponIds.has(id))).toEqual([]);
-    expect(currentOwnerIds.filter((id) => season2WeaponIds.has(id))).toHaveLength(4);
+    expect(currentOwnerIds.filter((id) => season2WeaponIds.has(id))).toHaveLength(5);
+    // The Warfare Season 2 jewelry icons, one SVG batch
+    // (vanguard-jewelry-icons-2026-10-03): 8 ids, additive the same way.
+    const season2JewelryIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => batchId === 'vanguard-jewelry-icons-2026-10-03')
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(season2JewelryIds.size).toBe(8);
+    expect(datedIds.filter((id) => season2JewelryIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => season2JewelryIds.has(id))).toHaveLength(8);
 
     // The Buried Hoards branch's three batches (faction reward paintings,
     // treasure-map family, hoard boss loot): 18 + 5 + 96 = 119 ids, additive
@@ -1217,6 +1229,7 @@ describe('Masterwrought art completion evidence', () => {
         id !== 'pvp_trophy_skull' &&
         id !== 'pvp_skull_bag' &&
         !season2WeaponIds.has(id) &&
+        !season2JewelryIds.has(id) &&
         !hoardBranchIds.has(id) &&
         !questShieldIds.has(id) &&
         !questGearIds.has(id) &&

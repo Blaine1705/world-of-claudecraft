@@ -69,6 +69,7 @@ function rig() {
 describe('/spectate leaves the moderator body in the world', () => {
   it('a hill holder who spectates another player keeps the hill and earns its Honor', () => {
     const { server, moderator, target, body, arms } = rig();
+    server.sim.setPlayerLevel(20, moderator.pid);
     const hill = spawnHillNow(server.sim.ctx, 'drakelands');
     if (!hill) throw new Error('no hill spot');
     body.pos = server.sim.groundPos(hill.x, hill.z);

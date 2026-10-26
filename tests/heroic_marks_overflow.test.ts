@@ -105,7 +105,8 @@ describe('Heroic Marks reject overflowing credits without losing their carriers'
     expect(meta.heroicMarks).toBe(MAX - 1);
     expect(sim.countItem('thorium_ore', pid)).toBe(3);
     expect(meta.copper).toBe(copper + 42);
-    expect(meta.vaultGuestPayouts).toBe(1);
+    // Guest payout caps were removed; overflow still preserves the earned parcel.
+    expect(meta.vaultGuestPayouts).toBe(0);
     expect(meta.clueCasketsOpened).toBe(1);
     expect(
       sim.serializeMail().mail.find((m) => m.letterId === 'heroic_marks_reward')?.items,
@@ -121,22 +122,17 @@ describe('Heroic Marks reject overflowing credits without losing their carriers'
     state.heroicMarks = MAX - 1;
     const before = structuredClone(state);
     expect(() =>
-      addVaultRewardToCharacterState(
-        state,
-        {
-          characterId: 7,
-          recipientName: 'Synthetic',
-          items: [
-            { itemId: 'thorium_ore', count: 3 },
-            { itemId: MARK, count: 1 },
-            { itemId: MARK, count: 1 },
-          ],
-          copper: 42,
-          mailDueAt: '2026-10-19T00:00:00Z',
-        },
-        '7:1',
-        true,
-      ),
+      addVaultRewardToCharacterState(state, {
+        characterId: 7,
+        recipientName: 'Synthetic',
+        items: [
+          { itemId: 'thorium_ore', count: 3 },
+          { itemId: MARK, count: 1 },
+          { itemId: MARK, count: 1 },
+        ],
+        copper: 42,
+        mailDueAt: '2026-10-19T00:00:00Z',
+      }),
     ).toThrow(/overflow/);
     expect(state).toEqual(before);
   });
@@ -210,18 +206,13 @@ describe('Heroic Marks preserve supported large balances', () => {
     const { sim, pid } = rig();
     const state = expectDefined(sim.serializeCharacter(pid));
     state.heroicMarks = balance - 3;
-    addVaultRewardToCharacterState(
-      state,
-      {
-        characterId: 7,
-        recipientName: 'Synthetic',
-        items: [{ itemId: MARK, count: 3 }],
-        copper: 0,
-        mailDueAt: '2026-10-19T00:00:00Z',
-      },
-      '7:1',
-      true,
-    );
+    addVaultRewardToCharacterState(state, {
+      characterId: 7,
+      recipientName: 'Synthetic',
+      items: [{ itemId: MARK, count: 3 }],
+      copper: 0,
+      mailDueAt: '2026-10-19T00:00:00Z',
+    });
     const loaded = rig().sim;
     const loadedPid = loaded.addPlayer('warrior', 'Claimed', { state });
     expect(expectDefined(loaded.meta(loadedPid)).heroicMarks).toBe(balance);

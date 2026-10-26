@@ -45,13 +45,7 @@ export async function commitVaultDirectClaim(
     if (error instanceof HeroicMarksCapacityError) return 'retry';
     throw error;
   }
-  const state = addVaultRewardToCharacterState(
-    args.state,
-    args.claim,
-    args.attemptId,
-    args.owner,
-    args.preparedItems,
-  );
+  const state = addVaultRewardToCharacterState(args.state, args.claim, args.preparedItems);
   let client: VaultRewardClient;
   try {
     client = await deps.pool.connect();

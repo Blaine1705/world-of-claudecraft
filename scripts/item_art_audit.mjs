@@ -168,8 +168,9 @@ const build = await buildItemArtAudit({
     // Completed Season 2 painted armor leaves the pending ledger, plus Nightwing Chimaera mount.
     // Wobbles the Slime's reins add one owner and one live definition.
     // + the sprite whistle and Lantern Hall seal/reins: 2186 owners / 2215 live items.
-    catalogCount: 2155,
-    liveItemCount: 2184,
+    // Recovered Season 2 feral staff and eight jewelry items, each with its own art.
+    catalogCount: 2164,
+    liveItemCount: 2193,
     // Companion items are removed; only the Infernal Quiver awaits artwork.
     pendingArtCount: 1,
     generatedHeroicDefinitions: 116,

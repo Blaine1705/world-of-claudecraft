@@ -18,6 +18,7 @@ const MARKUP = `
         <button type="button" class="mt-tab on" data-tab="dmg"></button>
         <button type="button" class="mt-tab" data-tab="heal"></button>
         <button type="button" class="mt-tab" data-tab="threat"></button>
+        <button type="button" class="mt-tab" data-tab="deaths"></button>
       </span>
       <button type="button" class="mt-prev"></button>
       <button type="button" class="mt-next"></button>
