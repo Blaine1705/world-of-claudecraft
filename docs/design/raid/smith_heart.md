@@ -119,7 +119,12 @@ Compass angles are degrees clockwise from north (`ringPoint`).
 Open air throughout: every vein is a fissure open to the storm sky, never a roofed
 tunnel, so the camera never meets a vault (the reworked dungeons' authored-field
 precedent: Hollow Crypt, Wildheart Basin). Floors end in cliffs that drop into the
-misted void; cliffs are walls, nobody falls.
+misted void; cliffs are walls, nobody falls, with one exception: the Storm Cornice's four
+broken gaps (`CORNICE_GAPS`, the throats of four wind channels), where the rim's wall has
+fallen and the lip lies open to the void for the Guardian of the Breath's fight (section
+7.2). A body walked or blown into one falls and dies, on every difficulty
+(`tests/smith_heart_route.test.ts` pins that the void is open there and nowhere else, and
+that neither the walk to the guardian nor the corpse run crosses a gap).
 
 ```
                     b3 (+40) ---- CORNICE CLIMB ---- STORM CORNICE (+60)
@@ -152,7 +157,7 @@ rather than repeating numbers that would rot.
 | The Ring | flat annulus sector round the seal, two curved stairs to the Balcony | `RING`, `RING_ARC` |
 | The Seal Dais | a round island a little below the Ring, floating over the chasm; the seal at its centre, the portal over the seal | `SEAL_DAIS`, `HEART_SEAL`, `RING_PORTAL` |
 | The Breath | b1, the chimney, b2, the Wind Bridge, b3, the climb | `BREATH`, `WIND_BRIDGE` |
-| The Storm Cornice (Breath arena) | a cracked plateau about 100 by 80 yd at the top of the mountain, its rim cut by five wind channels | `BREATH.cornice`, `CORNICE_CHANNELS` |
+| The Storm Cornice (Breath arena) | a cracked plateau about 100 by 80 yd at the top of the mountain, its rim cut by five wind channels; the throats of four of them are broken gaps open to the void (the eastern channel keeps its wall) | `BREATH.cornice`, `CORNICE_CHANNELS`, `CORNICE_GAPS` (field `lipOpenings`) |
 | The Quench | q1, q2, the Singing Ice, the lake descent | `QUENCH` |
 | The Quench Basin (Quench arena) | a rock shelf about 96 by 92 yd with the frozen lake on it | `QUENCH.shelf`, `QUENCH.lake` |
 | The Heat | the hall, the casting floor, the Pour Channel, the bridge (the layout's ids keep their forge names: `forge_hall`, `anvil_bridge`) | `HEAT`, `POUR_CHANNEL` |
@@ -872,6 +877,47 @@ The heroic pulse is one soft hum, cooled. The members speak as boss yells
 (`council_voice.ts`, `hudChrome.council.say.*`); their voices are auditions only until the
 designer picks one (`scripts/audition_raid_boss_voices.mjs --set council`).
 
+### 5.19 The Guardian of the Breath's look (prototype)
+
+The fight's effects are `src/render/smith_heart_fx/breath_fight_fx.ts` (pure plan
+`breath_fight_fx_core.ts`) and its provisional body `breath_body.ts` (pure plan
+`breath_body_core.ts`), both hosted by `rift_death_zone.ts` beside `BreathFx` (which keeps
+Storm Lance and Bellows Gust) and read from IWorld only. The vein's art rule holds: living
+granite, crystal and storm, no metal, no machinery; the "bellows" is a creature that
+breathes (the old brass chains are gone with 2G's rule).
+
+| Moment | Look |
+|---|---|
+| The body | A living bellows of storm granite and crystal, about 3.5 players tall: a barrel chest between two bellows plates that swell and empty, a wind-horn mouth, fluted wind-blade wings, crystal spines, rock arms ending in wind-carved claws, a whirl of loose stones for legs, held by threads of the vein's teal. Built from the Breath and Heart kits' pieces; its joints are kept apart from the pieces so the official pipeline's model replaces the pieces only |
+| Its motion | Idle breathing, a swipe on each swing; as a blow gathers it turns its mouth to the coming bearing and fills, through the blow it exhales down it; it swells past full on the indrawn breath and hunches, then throws itself wide, on Bellows Gust; on its casts it raises one arm and thrusts the other |
+| The storm breaks | On its bar it draws the wind in, freezes with every seam blazing, then tears open: from then on every stone rings in three orbits round a core of living lightning (a storm figure, two lightning wings, a white heart, arcs to the shards). A player arriving late sees the storm body whole at once; on its fall the pieces drop |
+| The wind | A field of chevrons and streaks over the whole Cornice floor, on every tier: during the gather the arrows build toward the coming bearing behind a leading edge sweeping across; through the blow they are full; they die in the calm; while it draws breath (and while the storm breaks) they point inward at the guardian |
+| The gaps | A lethal red light curtain and floor band on each gap's open lip (read off the field's own open cliff runs), on every tier, flaring when the wind blows toward it; past the lip, broken wall stubs, a coping block tumbled over the edge, flat chips |
+| Pinned | A danger arc at the player's feet facing the wall, grit off the coping |
+| Thessaly's circle | Its footprint at its exact radius in mint (the shared floor telegraph): filling while it lands under a falling beam of light, then holding with a pip for each seat still free, dim when spent; a calm dome on the high tier. An anchored player wears a mint ring; a mint arc of light runs from Thessaly as the anchor takes them |
+| The indrawn breath | The vortex at its exact radius (danger), the inward field, the streaks drawn in |
+| The storm's strikes | Each spot at its exact radius (danger), filling with its warning; then a bolt from the sky, a scorch, sparks and a ring |
+| Leaping Bolt | Its 8 yd jump reach round its first target while the bar runs; jagged beams leg by leg |
+| Thunder's Cradle | The cradle spot while the bar runs, then the gather circle at its exact radius in the soak's gold, filling with the hold, and a crown of storm round the lifted player; the discharge's bolt and ring |
+| Drawn Lightning | A red ring and a tall lightning beacon on the conductor, each strike's warning at their feet, the charged ground at its exact radius (danger) |
+| The swelling storm | A ring across the whole Cornice each pulse and a lightning flicker over the floor that grows with the stacks |
+| Heroic | The loose gales' footprints at their exact radius (control) under translucent funnels; the storm gusts as a blow |
+
+Readability: the wind's direction, the gaps' lips, every footprint and every mark draw on
+every tier; the low tier sheds only particles, the dome and the streaks' detail; reduced
+motion drops the shakes. Everything is built in the constructors under one gated root
+(`attachSceneGroupGated`, the kits' program warmers), fixed pools, no light. The fight's
+cues are claimed so no generic burst doubles them (Bellows Gust stays `BreathFx`'s).
+
+**Sound.** Sampled cues through the SFX pipeline (`heart_breath_*`, catalogued in
+`docs/design/sound_effects.md`), played by `src/game/smith_heart_breath_audio.ts`: the
+gather's call before each blow, the gale's loop through it and a sigh into the calm, the
+indrawn breath and the storm's breaking fitted to their bars, the exhale, the tear, a
+strike, the Leaping Bolt, the discharge, a loose gale's loop at the nearest, a toss, the
+circle landing, the swell, a fall over the lip. The guardian's and Thessaly's lines are
+boss yells (`breath_voice.ts`, `hudChrome.breathGuardian.say.*`); the guardian's voice is
+a later audition.
+
 ## 6. Set pieces (phase 2 specs)
 
 None of these is built in phase 1; their floors, props and anchors are. Every
@@ -905,7 +951,9 @@ room rule, `docs/design/boss-rooms/README.md`).
 - Behaviour: gusts arrive in a steady rhythm across the arch. A gust pushes players
   toward the windward shelters, never off the arch; a player behind a shelter is
   not pushed. Cross between gusts. Balustrade edges plus field cliffs mean nobody
-  falls.
+  falls on the bridge (the only falls in the raid are the Storm Cornice's four gaps,
+  section 7.2). When it is built it rides the same kernel wind as the Cornice
+  (`src/sim/wind_drift.ts`).
 - Telegraph: a visible wind band sweeping in plus an audible bellows intake before
   each gust.
 - Low tier: cloud and spray shed; the band and audio cue stay.
@@ -1062,15 +1110,61 @@ sat too close to Guild Wars 2's "Grinding Stones" skill and shipped as Stone Dra
 
 ### 7.2 Guardian of the Breath
 
-- Look: a winged bellows colossus of wind, brass chains hanging; fights on the
-  Cornice behind low walls.
-- Phase 1 (`heart_breath_guardian`): Bellows Gust (cast-bar knockback around it,
-  cliffs are walls); Storm Lance (cast-bar line, step out).
-- Target: chained lightning between players standing close (spread), rhythmic gusts
-  that push toward the balustrade (wind always ends at a wall), a phase where the
-  bellows inhales and pulls everyone in.
-- Presentation (phase 2G, section 5.14): Bellows Gust and Storm Lance telegraph on every
-  tier and have their wind and lightning. Mechanics and numbers unchanged.
+The Storm Cornice's boss (`heart_breath_guardian`, id frozen: its death lights the Breath
+vein and the seal's quarter exactly as before), one body and two halves, with Captain
+Thessaly fighting beside the raid. Designed with the owner (2026-10-26) and built as a
+playable Normal and Heroic prototype: every number below is a SKETCH, unmeasured, to be
+calibrated with the meters harness. The code is `src/sim/encounters/smith_heart/breath*.ts`
+(the leaf `breath_ids.ts`: ids, rules, tuning; the geometry `breath_geometry.ts`, pure, for
+the bots to reuse later).
+
+| Piece | Rule | Where |
+|---|---|---|
+| The bellows breathes | From the pull, a calm of 3 s, then the wind's telegraph (2.5 s: the coming bearing drawn across the floor, the guardian turning), a 10 s blow toward one bearing across the whole Cornice, then a calm whose last 2.5 s telegraph the next bearing. The calm (telegraph included) is 5 s at full health and shortens to 3 s at half (`calmSeconds`). The bearings turn through `BLOW_BEARINGS` (182, 22, 300, 128, 332, 75: four at a gap's throat, two at a walled stretch, each a wide turn from the last), the start hashed per pull | `breath_gale.ts` |
+| The push | Every non-anchored player on the Cornice (its plateau and the climb's top inside the gate) wears the kernel's wind aura: 3.2 yd a second on normal, 3.6 on heroic (a run is 7). The shared motion kernel adds it to the step through the same gates and collision (`src/sim/wind_drift.ts`), so a player walks against it, keeps casting while it carries them (it is no input), and both hosts step the same push: the online client PREDICTS it (only a blow's first and last ticks are ever replayed) | `breath_gale.ts`, `player_motion.ts` |
+| The rim | Where the wall stands, a body the wind presses against it (the floor ends within 1.3 yd downwind, no gap there) takes 90 to 110 nature every second (Pressed to the Rim). At a gap there is no wall: the body walks off the lip and falls into the void, on every difficulty; a body come to rest down there (a fall, or a throw that carried it over) is dead | `breath_gale.ts`, `breath_geometry.ts` |
+| Captain Thessaly | The Highwatch captain (an NPC, `heart_captain_thessaly`, no quests) stands at the head of the Cornice climb, inside the gate (the wind never moves her). Through the Wind half only, every 20 s (first at 9) she plants a circle of calm (3.5 yd) 12 yd upwind of the guardian for the blow now blowing or the next: a 2 s telegraph where it lands, then 6 s holding. The first three players to step in are anchored for 15 s: no wind, pull, blast or throw moves them (damage still lands). Then it reads spent. She speaks at the pull, each circle (three lines in turn), the indrawn breath, the storm, a fall, the victory and a wipe | `breath_thessaly.ts`, `breath_voice.ts` |
+| The indrawn breath | About every 45 s (first at 38), only between blows: a 5 s bar, planted, the guardian turned toward the raid (the tank aside). The wind turns and draws everyone toward it at 4 yd a second (the kernel's pull aura, stopping 3.5 yd short); a vortex 7 yd before its mouth (4.5 yd) bites 90 to 110 every half second. Then Bellows Gust (its old id: the old gust merged into the exhale), a 1.5 s bar, then 160 to 200 to everyone on the Cornice and an 18 yd throw outward (the anchored keep their feet; a throw through a gap is a fall). The wind then comes back from a calm | `breath_gale.ts` |
+| Storm Lance | Kept, unchanged: the trash kit's own line (34 yd, 2.5 yd half width, every 11 s, 240 to 280), in both halves; the fight's bars wait for it | content `trashKit.line` |
+| The storm breaks | At half health, the guardian free: a 4 s bar, planted. The wind stops at once (no blow, pull or circle; the anchors already given run out), the guardian draws it in and freezes, then tears open into its body of lightning (`heart_breath_storm_unbound` on it). For 10 s a volley of strikes every 0.8 s: one on a player where they stand, one hashed over the floor (never at a gap), each a 1.6 s warning, then 320 to 380 within 3.5 yd (Breaking Storm) | `breath_storm.ts` |
+| Leaping Bolt | Phase 2, every 22 s: a 2.5 s bar at a hashed non-tank, then 240 to 280 on them, jumping to the nearest player not yet struck within 8 yd, again and again (up to nine jumps): spread | `breath_storm.ts` (`forkPath`) |
+| Thunder's Cradle | Phase 2, every 40 s: a 1.5 s bar at a hashed non-tank; they are lifted 5 yd into the storm (carried, an unbreakable stun) over a 6 yd gather circle. 6 s on, the discharge: 2,600 split between everyone under it, the lifted included. Fewer than 4 under it (5 on heroic): each share 60 percent heavier and everyone on the Cornice takes 180 to 220 (Cradle Backlash): lethal for one or two. Then they are set down | `breath_storm.ts` (`cradleShare`) |
+| Drawn Lightning | Phase 2, every 30 s: a 1 s bar at a hashed non-tank; for 10 s a strike falls where they stand every 2 s (a 1.2 s warning, 280 to 320 within 3 yd), each leaving charged ground (3 yd, 60 to 75 every second for 18 s): they walk the edge to keep the floor clean | `breath_storm.ts` |
+| The swelling storm | After the barrage, every 5 s: 35 to 42 nature to everyone on the Cornice, each pulse 8 percent harder than the first, without end (a stack of `heart_breath_swelling_storm` on the guardian): the soft enrage | `breath_storm.ts` (`swellMult`) |
+| Heroic | Every number 25 percent higher, the wind 3.6 yd a second, the Cradle wants 5, plus: Calm Spent (an anchor that ran out leaves its player unable to take another for 60 s: the raid rotates them); loose gales (three wander the Cornice on deterministic paths for 20 s after each exhale, 120 to 150 and an 11 yd toss to whoever they touch, once per player per gale in 2 s; a toss can carry a body out through a gap); storm gusts (in phase 2, every 24 s: a 2 s telegraph, then a 3.5 s gust toward a bearing, pushing like a blow, no circles). The raid has no heroic tier yet, so a dev run switches it on (`/dev heart breath heroic`) | `breath_ids.ts` (`BREATH_DIFFICULTY`) |
+| Mythic | Not now: one more `BREATH_DIFFICULTY` row, today heroic's whole (the circle rule included), behind its own dev switch (`/dev heart breath mythic`); a later mythic-only mechanic is one more field there and its own module | `breath.ts` (`setBreathDevTier`) |
+| One wipe | The fight ends when the guardian stops fighting: the wind still, every circle, anchor, spent mark, pin, vortex, gale, strike, patch and cradle gone, the lifted set down, the stone body back. Thessaly stays at her post; the gaps are the Cornice's, they stay | `breath.ts` (`resetBreath`) |
+
+**Health (sketch, unmeasured).** 43,000 base (about 99,000 after the elite factor) for a
+4.5 minute fight at about 85 percent uptime and the bot raid's measured 400 to 460 a
+second (the council's anchor): the Wind half runs to about 2.2 minutes, the Storm after.
+
+**Damage (sketch, unmeasured).** Anchored to the level-20 cloth reference (about 1,135 to
+1,345 health) and the dungeon rework's bands: the pin about 8 percent a second (leave the
+wall), the vortex about 15 percent a second (never stand before the mouth), a strike about
+30 percent (a must-avoid), the Leaping Bolt about 20 percent per player it reaches, a full
+Cradle share about 55 percent with four under it, the swell's first pulse about 3 percent
+rising without end.
+
+Role jobs: tanks keep the guardian in the middle and turn it from the raid for the indrawn
+breath; everyone walks against the blows and keeps off the walls and away from the gaps
+the wind points at; three take Thessaly's circle when the wind is strongest (on heroic in
+turns); healers recover the exhale and the Cradle; in phase 2 the raid spreads for the
+bolt, gathers under the lifted, spreads again, and the marked conductor leads the strikes
+to the edge.
+
+IP check (2026-10-27, exact phrase plus coined token on the major game wikis): Thunder's
+Cradle, Drawn Lightning, Storm Unbound, Circle of Calm, Anchored in Calm, Calm Spent, Loose
+Gale, Breath Vortex, Bellows Wind, Indrawn Breath, Pressed to the Rim, Breaking Storm and
+Cradle Backlash returned no game use (CLEAR; the nearest were Pathfinder's spell "Draw the
+Lightning", Skyrim's "Unbounded Storms", Guild Wars 2's "Gale Breath", all different).
+Swelling Storm appears only as a fan homebrew spell on a D&D blog: generic English, kept.
+The bolt's working name "Forking Bolt" sat too close to Magic: The Gathering's "Forked Bolt"
+(and its Korean fill matched the shaman's Chain Lightning) and shipped as Leaping Bolt
+(CLEAR; the nearest, Baldur's Gate 3's "Leaping Static", is different). The brief's own
+warnings were kept: no "Eye of the Storm", "Lightning Rod", "Squall Line", "Static Shock",
+"Wind Burst" or "Cyclone". Bellows Gust, Storm Lance, Charged Ground (the Buried Hoard's)
+and Captain Thessaly were already shipped.
 
 ### 7.3 Guardian of the Quench
 
@@ -1256,6 +1350,23 @@ on both difficulties (dungeon rework README, goal 4).
   look's pure plans and both painters over a fake world.
 - `tests/smith_heart_dev.test.ts`: the `/dev heart` family (the portal forcing and the
   hop included) and the dev-only door.
+- `tests/smith_heart_breath.test.ts` (on `tests/helpers/breath_fight.ts`): the Guardian of
+  the Breath over a real claim: the blow cycle and its turns, the calm shortening, the push
+  and the walk against it, a gap killing (blown and walked), the wall pinning, Thessaly's
+  circle (three seats, the anchor's immunity to the wind, the indrawn breath, the exhale,
+  none in phase 2), the indrawn breath and Bellows Gust, the storm breaking at half health,
+  the Leaping Bolt's reach, the Thunder's Cradle's split and soakers, Drawn Lightning and
+  its charged ground, the swelling storm, heroic's spent anchors, loose gales and storm
+  gusts, mythic as heroic, the wipe putting the Cornice back, the vein and the seal lit by
+  its fall, determinism. `tests/smith_heart_breath_ui.test.ts`: every warning and line
+  resolving to the English the sim sent, the tooltips, the names, the debuff bar.
+  `tests/smith_heart_breath_wire.test.ts`: the whole fight's state through the real server
+  snapshot into the online mirror. `tests/wind_drift.test.ts` and
+  `tests/wind_drift_online.test.ts`: the kernel's wind (drift, headway, casts kept, the
+  pull's stop, bit-for-bit client parity, the server's step check) and one real client
+  predicting through a blow over a 120 ms link with every steady acknowledgement matched.
+  `tests/smith_heart_breath_fight_fx.test.ts` and `tests/smith_heart_breath_body.test.ts`:
+  the look's pure plans and both painters over a fake world.
 - `tests/smith_heart_council_soul_wire.test.ts`: the Mythic soul pillars over the real
   server snapshot path into the online mirror on the browser's timer wire (the soul and
   its pips, the Walking Slab's position and collider, the Echo's and the Endless Song's
@@ -1297,6 +1408,18 @@ on both difficulties (dungeon rework README, goal 4).
 | `/dev heart council mythic [on, off]` | the council's mythic prototype for this run (turning it on turns heroic off, and the other way round); mid-fight it applies whole: off, every soul leaves its pillar; on, every member already fallen takes its soul |
 | `/dev heart council soul guardian`, `slabwright`, `singer` | that member's soul takes a pillar now (the most intact, as a fall would), even with the member alive |
 | `/dev heart council soulpip <n>` | leave every soul pillar at n pips (0 to 3; 0 bursts them as a last pip would) |
+| `/dev heart breath` | the Guardian of the Breath's readout (difficulty, health, half, the wind's phase and bearing, blows, the next indrawn breath, the swell) |
+| `/dev heart breath pull` | set you down on the Storm Cornice beside the guardian and pull it |
+| `/dev heart breath reset` | the guardian whole, home and out of its fight; the wind still |
+| `/dev heart breath heroic [on, off]`, `mythic [on, off]` | this run's tier for the fight (mythic is heroic whole for now); a live fight takes it at once |
+| `/dev heart breath phase2` | the storm breaks now (the guardian set to half health) |
+| `/dev heart breath blow [deg, n, ne, e, se, s, sw, w, nw]` | a 10 s blow toward that bearing now (the four gaps sit at 22, 128, 182 and 332) |
+| `/dev heart breath calm` | the wind falls calm now |
+| `/dev heart breath circle` | Captain Thessaly plants a circle of calm now (refused once the storm has broken) |
+| `/dev heart breath inhale` | the indrawn breath now (then Bellows Gust) |
+| `/dev heart breath tornado` (`gale`) | three loose gales now, on any tier |
+| `/dev heart breath gust [deg]` | a phase-2 storm gust now, on any tier |
+| `/dev heart breath chain` (`fork`), `eye` (`cradle`), `conductor` (`drawn`) | the Leaping Bolt, the Thunder's Cradle or Drawn Lightning now, on a hashed player |
 
 Pinned by `tests/smith_heart_dev.test.ts`, including the refusal without
 `devCommands` and the door refusing a non-dev world.
@@ -1316,8 +1439,10 @@ captures and review before the next:
 2. **The Ring and the Seal Dais**: the seal and the tines as real models; the Ring's
    pillars; the Balcony and the Grand Stair carved.
 3. **The Breath**: DRESSED in phase 2G (section 5.14: the kit, the scoured floor, its
-   light, sky and weather, the guardian's effects). Still to build: the wind bridge's
-   gust mechanic (its look is in), the guardian's target kit and its own body.
+   light, sky and weather, the guardian's effects). Its guardian's two-half fight is a
+   playable prototype (section 7.2, look 5.19: the wind, the gaps, Captain Thessaly, the
+   storm). Still to build: the wind bridge's gust mechanic (its look is in), the fight's
+   numbers measured, the raid bots' tactics for it, and the guardian's own model.
 4. **The Quench**: DRESSED in phase 2H (section 5.15: the kit, the frost-bound and lake-ice
    floors, its light, sky, frost and weather, the Singing Ice's look, the guardian's effects).
    Still to build: the singing ice's mechanic (its look is in), the brazier cold-cleansing
