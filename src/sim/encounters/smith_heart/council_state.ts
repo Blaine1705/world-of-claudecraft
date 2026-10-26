@@ -108,6 +108,9 @@ export interface CouncilFightState {
   fallen: CouncilRole[];
   /** Lines said this pull (each once). */
   lines: string[];
+  /** The members' spoken lines (council_voice.ts): `<role>_<moment>` to the
+   *  fight clock it was last said at. */
+  said: Record<string, number>;
   /** Mechanic casts started (the deterministic salt of every pick). */
   casts: number;
   /** Mythic: the souls standing in pillars, in the order they took them. */

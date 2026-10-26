@@ -4230,9 +4230,9 @@ export const de_DE: EnTranslations = {
         "icedOver": "Frozen solid by Creeping Rime: unable to move or act."
       },
       "council": {
-        "wakeMark": "When this ends, a pillar bursts out of the floor where you stand, dealing {min} to {max} damage to everyone within {radius} yd and throwing them back. Stand where the raid needs cover. Heroic: {heroic}% more damage.",
-        "rockMark": "When this ends, a rock falls on you: {total} damage shared between everyone within {radius} yd. With fewer than {soakers} under it, each takes {penalty}% more and the whole raid takes {tremorMin} to {tremorMax}. Every pillar within {radius} yd loses a piece, so share it away from cover. Heroic: {heroic}% more damage.",
-        "resonance": "Standing within {reach} yd of a pillar for {seconds} sec in a row knocks a piece off it, and again every {seconds} sec you stay. Nothing removes it: wait out the Wrath by the most damaged pillar and keep off the whole ones.",
+        "wakeMark": "When this ends, a pillar bursts out of the floor where you stand, dealing {min} to {max} damage to everyone within {radius} yd and throwing them back. Stand where the raid needs cover. Heroic and Mythic: {heroic}% more damage.",
+        "rockMark": "When this ends, a rock falls on you: {total} damage shared between everyone within {radius} yd. With fewer than {soakers} under it, each takes {penalty}% more and the whole raid takes {tremorMin} to {tremorMax}. Every pillar within {radius} yd loses a piece, so share it away from cover. Mythic: a soul pillar within {soulReach} yd loses a soul pip instead, and breaks at none. Heroic and Mythic: {heroic}% more damage.",
+        "resonance": "Standing within {reach} yd of a pillar for {seconds} sec in a row knocks a piece off it, and again every {seconds} sec you stay. Nothing removes it: wait out the Wrath by the most damaged pillar and keep off the whole ones. Mythic: by a soul pillar the same wait strikes off a soul pip instead ({singerSeconds} sec by the Seam Singer's), and it breaks at none.",
         "memory": "Deals {pct}% more damage: {per}% for each fallen member of the Hammer Council."
       },
       "sharedPyre": "Verursacht {total}% der maximalen Gesundheit jedes Spielers, aufgeteilt durch die Anzahl der Spieler im Kreis ({perPlayer}% je Spieler bei {players} Spielern).",
@@ -6683,6 +6683,30 @@ export const de_DE: EnTranslations = {
         "soulBreak_slabwright": "The Slabwright's soul pillar breaks! The Walking Slab is still.",
         "soulBreak_singer": "The Seam Singer's soul pillar breaks! The Endless Song falls silent."
       },
+      "say": {
+        "guardian_pull": "Strangers in the Quarry. The Hammer's strength does not yield to flesh.",
+        "guardian_wrath": "The mountain answers me! Hide, if the stone will have you!",
+        "guardian_death": "My strength... I give it to the stone.",
+        "guardian_remember": "The stone remembers. What was theirs is mine.",
+        "guardian_soul": "I am the stone now. My wrath has no body left to fail.",
+        "guardian_wipe": "Dust. As all flesh becomes.",
+        "guardian_defeat": "The Hammer's strength... is yours to carry.",
+        "slabwright_pull": "More stone for the wall. Hold still, and I will set you in it.",
+        "slabwright_wake": "Stand there. The stone rises where you stand!",
+        "slabwright_rock": "Look up, little ones! The mountain is falling!",
+        "slabwright_death": "The slab... splits...",
+        "slabwright_remember": "The stone remembers. I will finish the work.",
+        "slabwright_soul": "No hands left, but I will drag this stone to you.",
+        "slabwright_wipe": "Set, and buried. Good work.",
+        "slabwright_defeat": "The Quarry... falls quiet.",
+        "singer_pull": "Hear the seam sing? It has waited so long for your voices.",
+        "singer_song": "Sing with me, and break!",
+        "singer_death": "My song... runs into the rock...",
+        "singer_remember": "The stone remembers. Listen, it still sings.",
+        "singer_soul": "Listen. In the stone, my song never ends.",
+        "singer_wipe": "Hush now. The seam is still.",
+        "singer_defeat": "The last note... fades."
+      },
       "alert": {
         "wakeTitle": "Wake the Stone!",
         "wakeLine": "A pillar rises where you stand: put the cover where the raid needs it",
@@ -6691,6 +6715,9 @@ export const de_DE: EnTranslations = {
         "resonanceTitle": "Resonance",
         "resonanceLine": "Near a pillar you crack it: wait by the most damaged one",
         "resonanceCracking": "Cracking a pillar: move away to spare it",
+        "rockLineSoul": "Gather at least three allies on you, away from cover and beside a soul pillar",
+        "resonanceLineSoul": "Wait by a soul pillar to break its soul pips, never by the whole pillars",
+        "resonanceBreaking": "Breaking a soul pip: stay by the soul pillar",
         "weightTitle": "Hammer's Weight",
         "weightLine": "You take double physical damage: the other tank must take the Guardian",
         "timeAria": "{seconds} seconds left"

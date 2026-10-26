@@ -4230,9 +4230,9 @@ export const ko_KR: EnTranslations = {
         "icedOver": "스며드는 서리에 얼어붙었습니다: 이동하거나 행동할 수 없습니다."
       },
       "council": {
-        "wakeMark": "효과가 끝나면 서 있는 자리의 바닥에서 기둥이 솟구쳐 {radius}야드 안의 모두에게 {min}에서 {max}의 피해를 주고 밀쳐냅니다. 공격대에 엄폐물이 필요한 곳에 서세요. 영웅: 피해 {heroic}% 증가.",
-        "rockMark": "효과가 끝나면 바위가 떨어집니다: {total}의 피해를 {radius}야드 안의 모두가 나눠 받습니다. {soakers}명 미만이면 각자 {penalty}% 더 받고 공격대 전체가 {tremorMin}에서 {tremorMax}의 피해를 받습니다. {radius}야드 안의 모든 기둥이 한 조각씩 깨지니 엄폐물에서 떨어져 나눠 맞으세요. 영웅: 피해 {heroic}% 증가.",
-        "resonance": "기둥에서 {reach}야드 안에 {seconds}초 동안 계속 서 있으면 기둥이 한 조각 깨지고, 머무는 동안 {seconds}초마다 다시 깨집니다. 제거할 수 없습니다: 가장 손상된 기둥 옆에서 산의 분노를 버티고 멀쩡한 기둥에서는 떨어지세요.",
+        "wakeMark": "효과가 끝나면 서 있는 자리의 바닥에서 기둥이 솟구쳐 {radius}야드 안의 모두에게 {min}에서 {max}의 피해를 주고 밀쳐냅니다. 공격대에 엄폐물이 필요한 곳에 서세요. 영웅·신화: 피해 {heroic}% 증가.",
+        "rockMark": "효과가 끝나면 바위가 떨어집니다: {total}의 피해를 {radius}야드 안의 모두가 나눠 받습니다. {soakers}명 미만이면 각자 {penalty}% 더 받고 공격대 전체가 {tremorMin}에서 {tremorMax}의 피해를 받습니다. {radius}야드 안의 모든 기둥이 한 조각씩 깨지니 엄폐물에서 떨어져 나눠 맞으세요. 신화: {soulReach}야드 안의 영혼의 기둥은 대신 영혼 표식을 하나 잃고, 표식이 없어지면 부서집니다. 영웅·신화: 피해 {heroic}% 증가.",
+        "resonance": "기둥에서 {reach}야드 안에 {seconds}초 동안 계속 서 있으면 기둥이 한 조각 깨지고, 머무는 동안 {seconds}초마다 다시 깨집니다. 제거할 수 없습니다: 가장 손상된 기둥 옆에서 산의 분노를 버티고 멀쩡한 기둥에서는 떨어지세요. 신화: 영혼의 기둥 옆에서 같은 시간을 버티면 대신 영혼 표식이 하나 사라지고(광맥의 노래꾼의 기둥은 {singerSeconds}초), 표식이 없어지면 부서집니다.",
         "memory": "주는 피해가 {pct}% 증가합니다: 쓰러진 망치 의회 구성원 1명당 {per}%."
       },
       "sharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).",
@@ -6683,6 +6683,30 @@ export const ko_KR: EnTranslations = {
         "soulBreak_slabwright": "석판장이의 영혼의 기둥이 부서졌습니다! 걷는 석판이 멈춥니다.",
         "soulBreak_singer": "광맥의 노래꾼의 영혼의 기둥이 부서졌습니다! 끝없는 노래가 그칩니다."
       },
+      "say": {
+        "guardian_pull": "채석장에 낯선 자들이라. 망치의 힘은 살덩이에 굴하지 않는다.",
+        "guardian_wrath": "산이 내게 응답한다! 돌이 받아 준다면 숨어 보아라!",
+        "guardian_death": "나의 힘을... 돌에 맡긴다.",
+        "guardian_remember": "돌은 기억한다. 그들의 것은 이제 나의 것이다.",
+        "guardian_soul": "이제 나는 돌이다. 나의 분노에는 쓰러질 몸이 없다.",
+        "guardian_wipe": "먼지로다. 모든 살덩이가 그러하듯.",
+        "guardian_defeat": "망치의 힘은... 이제 너희가 짊어져라.",
+        "slabwright_pull": "벽에 쓸 돌이 더 필요하지. 가만히 있어라, 너희를 쌓아 넣어 주마.",
+        "slabwright_wake": "거기 서라. 네가 선 자리에서 돌이 솟는다!",
+        "slabwright_rock": "위를 봐라, 꼬맹이들! 산이 무너진다!",
+        "slabwright_death": "석판이... 갈라진다...",
+        "slabwright_remember": "돌은 기억한다. 일은 내가 마무리하마.",
+        "slabwright_soul": "손은 남지 않았지만, 이 돌을 너희에게 끌고 가겠다.",
+        "slabwright_wipe": "쌓고, 묻었다. 잘된 일이다.",
+        "slabwright_defeat": "채석장이... 조용해진다.",
+        "singer_pull": "광맥의 노래가 들리나요? 너무 오래 당신들의 목소리를 기다렸어요.",
+        "singer_song": "나와 함께 노래하고, 부서지세요!",
+        "singer_death": "나의 노래가... 바위로 흘러들어...",
+        "singer_remember": "돌은 기억해요. 들어 봐요, 아직 노래하고 있어요.",
+        "singer_soul": "들어 봐요. 돌 속에서 나의 노래는 끝나지 않아요.",
+        "singer_wipe": "쉿. 광맥이 잠잠해졌어요.",
+        "singer_defeat": "마지막 음이... 사라져요."
+      },
       "alert": {
         "wakeTitle": "돌 깨우기!",
         "wakeLine": "서 있는 곳에서 기둥이 솟아오릅니다: 공격대에 필요한 곳에 엄폐물을 만드세요",
@@ -6691,6 +6715,9 @@ export const ko_KR: EnTranslations = {
         "resonanceTitle": "공명",
         "resonanceLine": "기둥 근처에 있으면 기둥을 깹니다: 가장 손상된 기둥 옆에서 기다리세요",
         "resonanceCracking": "기둥을 깨는 중: 지키려면 멀어지세요",
+        "rockLineSoul": "엄폐물에서 떨어져 영혼의 기둥 옆에 아군을 3명 이상 모으세요",
+        "resonanceLineSoul": "영혼의 기둥 옆에서 기다려 영혼 표식을 깨세요. 멀쩡한 기둥 옆에는 가지 마세요",
+        "resonanceBreaking": "영혼 표식을 깨는 중: 영혼의 기둥 옆에 머무세요",
         "weightTitle": "망치의 무게",
         "weightLine": "받는 물리 피해가 두 배가 됩니다: 다른 탱커가 수호자를 맡아야 합니다",
         "timeAria": "{seconds}초 남음"

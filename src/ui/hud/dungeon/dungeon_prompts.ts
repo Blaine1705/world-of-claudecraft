@@ -36,7 +36,7 @@
 import { BASTION_ALERT_KINDS, buildBastionAlertView } from './bastion_alert_view';
 import { type CageEscapeDeps, CageEscapePrompt } from './cage_escape_painter';
 import { buildCageEscapeView } from './cage_escape_view';
-import { buildCouncilAlertView, COUNCIL_ALERT_KINDS } from './council_alert_view';
+import { buildCouncilAlertView, COUNCIL_ALERT_KINDS, CouncilSoulScan } from './council_alert_view';
 import { CryptAlertSceneScan, type CryptSceneEntity } from './crypt_alert_scene_core';
 import {
   buildCryptAlertView,
@@ -118,6 +118,7 @@ export class DungeonPrompts {
   private readonly crypt: EncounterAlert;
   private readonly council: EncounterAlert;
   private readonly cryptScene = new CryptAlertSceneScan();
+  private readonly councilSoul = new CouncilSoulScan();
   private readonly kitUse: EncounterAlert;
   private readonly kitUseScene = new KitUseSceneScan();
   /** The body a press on the use prompt targets (-1: none on offer). */
@@ -239,7 +240,7 @@ export class DungeonPrompts {
       : HINT_HIDDEN;
     const cryptSoft = crypt.visible && CRYPT_SOFT_ALERT_KINDS.has(crypt.kind);
     const council = dungeonPromptEnabled('council', hints)
-      ? buildCouncilAlertView({ auras: p.auras })
+      ? buildCouncilAlertView({ auras: p.auras, soul: this.councilSoul.frame(f.world) })
       : HINT_HIDDEN;
     this.council.paint(council);
     // The use prompt last: it yields the shared slot to any prompt showing

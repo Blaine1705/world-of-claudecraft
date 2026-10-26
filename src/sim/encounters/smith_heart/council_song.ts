@@ -41,6 +41,7 @@ import {
   roll,
 } from './council_scope';
 import { soulResonanceSeconds, strikeSoulPip } from './council_soul';
+import { councilSay } from './council_voice';
 import { secondsToNextWrath } from './council_wrath';
 
 /** Seam Bolt: the Singer's own. */
@@ -111,6 +112,7 @@ export function startSong(s: CouncilScope, force = false): boolean {
   if (!holder.heir) {
     s.st.kickable = COUNCIL_CASTS.song;
     raidWarn(s, holder.body, 'song', 'Song of the Seam! Interrupt it!');
+    councilSay(s, holder.role, 'song');
   }
   return true;
 }

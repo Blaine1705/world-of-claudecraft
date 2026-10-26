@@ -39,6 +39,7 @@ import {
   raidWarn,
   roll,
 } from './council_scope';
+import { councilSay } from './council_voice';
 
 /** Every member carries the energy bar's frame; only the Wrath's holder's
  *  fills (an empty bar on the others says the stone could take it up). */
@@ -87,6 +88,7 @@ export function startWrath(s: CouncilScope): boolean {
     holder.heir,
   );
   raidWarn(s, holder.body, 'wrath', "Mountain's Wrath! Hide behind a pillar!");
+  if (!holder.heir) councilSay(s, holder.role, 'wrath');
   return true;
 }
 

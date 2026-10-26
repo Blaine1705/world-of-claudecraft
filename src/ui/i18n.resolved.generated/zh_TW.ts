@@ -4230,9 +4230,9 @@ export const zh_TW: EnTranslations = {
         "icedOver": "被蔓延霜凇凍結：無法移動或行動。"
       },
       "council": {
-        "wakeMark": "結束時，一根石柱會從你腳下的地面衝出，對{radius}碼內的所有人造成{min}到{max}點傷害並將其擊退。站到團隊需要掩體的位置。英雄難度：傷害提高{heroic}%。",
-        "rockMark": "結束時，一塊巨石砸向你：{total}點傷害由{radius}碼內的所有人分擔。若不足{soakers}人分擔，每人多受{penalty}%傷害，且全團受到{tremorMin}到{tremorMax}點傷害。{radius}碼內的每根石柱都會損失一塊，所以要遠離掩體分擔。英雄難度：傷害提高{heroic}%。",
-        "resonance": "在石柱{reach}碼內連續站立{seconds}秒會震落它的一塊，之後每多待{seconds}秒再震落一塊。無法移除：在最破損的石柱旁躲過山岳之怒，遠離完好的石柱。",
+        "wakeMark": "結束時，一根石柱會從你腳下的地面衝出，對{radius}碼內的所有人造成{min}到{max}點傷害並將其擊退。站到團隊需要掩體的位置。英雄和傳奇難度：傷害提高{heroic}%。",
+        "rockMark": "結束時，一塊巨石砸向你：{total}點傷害由{radius}碼內的所有人分擔。若不足{soakers}人分擔，每人多受{penalty}%傷害，且全團受到{tremorMin}到{tremorMax}點傷害。{radius}碼內的每根石柱都會損失一塊，所以要遠離掩體分擔。傳奇難度：{soulReach}碼內的靈魂石柱改為失去一個靈魂印記，印記耗盡時碎裂。英雄和傳奇難度：傷害提高{heroic}%。",
+        "resonance": "在石柱{reach}碼內連續站立{seconds}秒會震落它的一塊，之後每多待{seconds}秒再震落一塊。無法移除：在最破損的石柱旁躲過山岳之怒，遠離完好的石柱。傳奇難度：在靈魂石柱旁等待同樣的時間會改為擊碎它的一個靈魂印記（礦脈歌者的石柱為{singerSeconds}秒），印記耗盡時碎裂。",
         "memory": "造成的傷害提高{pct}%：重錘議會每倒下一名成員提高{per}%。"
       },
       "sharedPyre": "造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。",
@@ -6683,6 +6683,30 @@ export const zh_TW: EnTranslations = {
         "soulBreak_slabwright": "石板匠的靈魂石柱碎裂了！行走石板停了下來。",
         "soulBreak_singer": "礦脈歌者的靈魂石柱碎裂了！無盡之歌歸於沉寂。"
       },
+      "say": {
+        "guardian_pull": "採石場來了外人。鐵鎚之力絕不向血肉屈服。",
+        "guardian_wrath": "群山回應了我！若岩石肯收留你們，就躲起來吧！",
+        "guardian_death": "我的力量……交給岩石。",
+        "guardian_remember": "岩石銘記。它們的一切，如今歸我。",
+        "guardian_soul": "如今我即是岩石。我的怒火再無會倒下的軀體。",
+        "guardian_wipe": "塵土。一切血肉終歸如此。",
+        "guardian_defeat": "鐵鎚之力……由你們來承擔。",
+        "slabwright_pull": "牆還缺石頭。別動，我把你們砌進去。",
+        "slabwright_wake": "站在那兒。岩石會從你腳下升起！",
+        "slabwright_rock": "抬頭看，小傢伙們！山要塌了！",
+        "slabwright_death": "石板……裂開了……",
+        "slabwright_remember": "岩石銘記。這活兒我來幹完。",
+        "slabwright_soul": "我已沒有雙手，但我會把這塊石頭拖到你們面前。",
+        "slabwright_wipe": "砌好，埋好。幹得漂亮。",
+        "slabwright_defeat": "採石場……安靜了。",
+        "singer_pull": "聽見礦脈在歌唱嗎？它等你們的聲音等了好久。",
+        "singer_song": "與我同唱，然後碎裂吧！",
+        "singer_death": "我的歌……流入了岩石……",
+        "singer_remember": "岩石銘記。聽，它仍在歌唱。",
+        "singer_soul": "聽啊。在岩石之中，我的歌永不終結。",
+        "singer_wipe": "噓。礦脈已歸於寂靜。",
+        "singer_defeat": "最後一個音……消散了。"
+      },
       "alert": {
         "wakeTitle": "喚醒岩石！",
         "wakeLine": "石柱會在你站的地方升起：把掩體放在團隊需要的位置",
@@ -6691,6 +6715,9 @@ export const zh_TW: EnTranslations = {
         "resonanceTitle": "共鳴",
         "resonanceLine": "靠近石柱就會震裂它：在最破損的石柱旁等待",
         "resonanceCracking": "正在震裂石柱：離開它以保住它",
+        "rockLineSoul": "遠離掩體，在靈魂石柱旁聚集至少三名隊友",
+        "resonanceLineSoul": "在靈魂石柱旁等待以擊碎靈魂印記，不要靠近完好的石柱",
+        "resonanceBreaking": "正在擊碎靈魂印記：留在靈魂石柱旁",
         "weightTitle": "重錘之壓",
         "weightLine": "你受到雙倍物理傷害：另一名坦克必須接手守護者",
         "timeAria": "剩餘{seconds}秒"

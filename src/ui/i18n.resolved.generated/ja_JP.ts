@@ -4230,9 +4230,9 @@ export const ja_JP: EnTranslations = {
         "icedOver": "忍び寄る霧氷で凍りついた：移動も行動もできない。"
       },
       "council": {
-        "wakeMark": "効果が切れると、立っている場所の床から柱が突き出し、{radius}ヤード以内の全員に{min}から{max}のダメージを与えて吹き飛ばす。レイドが遮蔽物を必要とする場所に立とう。ヒロイック：ダメージ{heroic}%増加。",
-        "rockMark": "効果が切れると岩が落ちてくる：{total}のダメージを{radius}ヤード以内の全員で分け合う。{soakers}人未満だと各自が{penalty}%多く受け、レイド全体が{tremorMin}から{tremorMax}を受ける。{radius}ヤード以内の柱はすべて欠けるので、遮蔽物から離れて受けよう。ヒロイック：ダメージ{heroic}%増加。",
-        "resonance": "柱から{reach}ヤード以内に{seconds}秒続けて立つと柱が一つ欠け、そこにいる限り{seconds}秒ごとにまた欠ける。解除はできない：一番傷んだ柱のそばで山の怒りをやり過ごし、無傷の柱には近づかないこと。",
+        "wakeMark": "効果が切れると、立っている場所の床から柱が突き出し、{radius}ヤード以内の全員に{min}から{max}のダメージを与えて吹き飛ばす。レイドが遮蔽物を必要とする場所に立とう。ヒロイック・ミシック：ダメージ{heroic}%増加。",
+        "rockMark": "効果が切れると岩が落ちてくる：{total}のダメージを{radius}ヤード以内の全員で分け合う。{soakers}人未満だと各自が{penalty}%多く受け、レイド全体が{tremorMin}から{tremorMax}を受ける。{radius}ヤード以内の柱はすべて欠けるので、遮蔽物から離れて受けよう。ミシック：{soulReach}ヤード以内の魂の柱は代わりに魂の印を一つ失い、印がなくなると砕ける。ヒロイック・ミシック：ダメージ{heroic}%増加。",
+        "resonance": "柱から{reach}ヤード以内に{seconds}秒続けて立つと柱が一つ欠け、そこにいる限り{seconds}秒ごとにまた欠ける。解除はできない：一番傷んだ柱のそばで山の怒りをやり過ごし、無傷の柱には近づかないこと。ミシック：魂の柱のそばで同じだけ待つと代わりに魂の印が一つ消え（鉱脈の歌い手の柱なら{singerSeconds}秒）、印がなくなると砕ける。",
         "memory": "与えるダメージが{pct}%増加：槌の評議会の倒れた仲間1人につき{per}%。"
       },
       "sharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。",
@@ -6683,6 +6683,30 @@ export const ja_JP: EnTranslations = {
         "soulBreak_slabwright": "石板の匠の魂の柱が砕けた！歩む石板が止まる。",
         "soulBreak_singer": "鉱脈の歌い手の魂の柱が砕けた！終わらぬ歌が途絶える。"
       },
+      "say": {
+        "guardian_pull": "採石場によそ者か。槌の力は肉などに屈しはせぬ。",
+        "guardian_wrath": "山が我に応える！石が匿ってくれるなら隠れるがいい！",
+        "guardian_death": "我が力を……石に託す。",
+        "guardian_remember": "石は覚えている。あの者のものは、今や我がものだ。",
+        "guardian_soul": "我はもはや石そのもの。我が怒りには、朽ちる体などない。",
+        "guardian_wipe": "塵だ。肉はすべてそうなる。",
+        "guardian_defeat": "槌の力は……お前たちが担え。",
+        "slabwright_pull": "壁に石が足りん。じっとしていろ、お前たちを積み込んでやる。",
+        "slabwright_wake": "そこに立て。お前の足元から石がせり上がる！",
+        "slabwright_rock": "上を見ろ、ちびども！山が落ちてくるぞ！",
+        "slabwright_death": "石板が……割れる……",
+        "slabwright_remember": "石は覚えている。仕事は俺が仕上げる。",
+        "slabwright_soul": "手はもうない。だがこの石をお前たちのもとへ引きずっていくぞ。",
+        "slabwright_wipe": "据えて、埋めた。いい仕事だ。",
+        "slabwright_defeat": "採石場が……静まる。",
+        "singer_pull": "鉱脈の歌が聞こえる？ずっとあなたたちの声を待っていたの。",
+        "singer_song": "一緒に歌って、そして砕けなさい！",
+        "singer_death": "私の歌が……岩へと流れていく……",
+        "singer_remember": "石は覚えている。聞いて、まだ歌っている。",
+        "singer_soul": "聞いて。石の中で、私の歌は終わらない。",
+        "singer_wipe": "静かに。鉱脈は眠ったわ。",
+        "singer_defeat": "最後の音が……消えていく。"
+      },
       "alert": {
         "wakeTitle": "石の目覚め！",
         "wakeLine": "立っている場所に柱がせり上がる：レイドが必要な場所に遮蔽物を置こう",
@@ -6691,6 +6715,9 @@ export const ja_JP: EnTranslations = {
         "resonanceTitle": "共鳴",
         "resonanceLine": "柱の近くにいると割ってしまう：一番傷んだ柱のそばで待とう",
         "resonanceCracking": "柱を割っている：守るなら離れよう",
+        "rockLineSoul": "遮蔽物から離れ、魂の柱のそばで少なくとも3人の味方を集めよう",
+        "resonanceLineSoul": "魂の柱のそばで待って魂の印を砕こう、無傷の柱には近づかないこと",
+        "resonanceBreaking": "魂の印を砕いている：魂の柱のそばにとどまろう",
         "weightTitle": "槌の重み",
         "weightLine": "物理ダメージが倍になる：もう一人のタンクが守護者を引き受けよう",
         "timeAria": "残り{seconds}秒"

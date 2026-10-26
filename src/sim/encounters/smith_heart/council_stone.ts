@@ -54,6 +54,7 @@ import {
   roll,
 } from './council_scope';
 import { strikeSoulPip } from './council_soul';
+import { councilSay } from './council_voice';
 
 /** Free pillar places under the cap (marks never outnumber them). */
 function freePlaces(s: CouncilScope): number {
@@ -73,6 +74,7 @@ export function startWake(s: CouncilScope): boolean {
     if (!memberFree(s, holder.role)) return false;
     s.st.wakeTimer = T.wakeEvery;
     beginBar(s, holder.role, COUNCIL_CASTS.wake, T.wakeCast, null, false);
+    councilSay(s, holder.role, 'wake');
     return true;
   }
   // The heir: no bar, no choice. The spots lock under random players now.
@@ -197,6 +199,7 @@ export function startRock(s: CouncilScope): boolean {
   if (role === null || s.st.rock || !memberFree(s, role)) return false;
   s.st.rockTimer = T.rockEvery;
   beginBar(s, role, COUNCIL_CASTS.rock, T.rockCast, null, role !== 'slabwright');
+  if (role === 'slabwright') councilSay(s, role, 'rock');
   return true;
 }
 

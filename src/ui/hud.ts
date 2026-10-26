@@ -12329,7 +12329,7 @@ export class Hud {
                   bubbleSpeaker?.templateId,
                   ev.classId,
                 ),
-                localizeAuthoredYellText(ev.text, bubbleSpeaker?.kind, ev.classId),
+                localizeAuthoredYellText(localizeChatBody(ev), bubbleSpeaker?.kind, ev.classId),
                 CHAT_TEMPLATE_KEYS.yell,
                 'yell',
                 ev.fromPid,
@@ -12466,7 +12466,7 @@ export class Hud {
           if (bubbleStyle && typeof bubbleSpeakerId === 'number') {
             const visibleText =
               ev.channel === 'yell'
-                ? localizeAuthoredYellText(ev.text, bubbleSpeaker?.kind, ev.classId)
+                ? localizeAuthoredYellText(localizeChatBody(ev), bubbleSpeaker?.kind, ev.classId)
                 : ev.text;
             const masked = this.maskChat(this.chatLinkPlainText(visibleText));
             const bubble = ev.channel === 'emote' ? `${ev.from} ${masked}` : masked;

@@ -18,7 +18,8 @@ tick), then the seal and the arrival, then the portal hops.
 | `council_stone.ts` | The Slabwright's job: Wake the Stone (its marks; an heir's locked rise spots), the Falling Rock and its split. |
 | `council_song.ts` | The Seam Singer's job: Seam Bolt, the Song of the Seam (a kick leaves one mark), Resonance's cracking. |
 | `council_soul.ts` | Mythic only (the prototype behind `/dev heart council mythic`): Soul in the Stone. A fallen member's soul takes the most intact pillar (`soulHost`, `takeSoul`); its pips (`strikeSoulPip`: only the rock and Resonance), its burst, the last kill's crumble; the Guardian's Echo of Wrath (`landEcho`), the Slabwright's Walking Slab (`largestGroup`, the moving wall), the Singer's Endless Song; the `soul` and `soulpip` dev verbs. |
-| `council.ts` | The coordinator: one pull (`keepTogether`), the fallen and their heirs, Memory of Stone, the bars, the wipe's reset (`regrowHead`), the finish, the dev switches for heroic and mythic (`setCouncilDevTier`) and the `/dev heart council` triggers. |
+| `council_voice.ts` | What the three members SAY: boss yells carrying their catalog key (`hudChrome.council.say.<role>_<moment>`, `COUNCIL_LINES` the same English): the pull's three lines a breath apart, each member's own job lines (never an heir's, at most once in `SAY_EVERY`), a fall's line (its soul's on mythic) and a survivor's "the stone remembers", the last fall's defeat, a wipe. Voices are auditions only (`scripts/voices/raid_boss_voice_prompts.mjs` `HAMMER_COUNCIL_VOICE_PROMPTS`). |
+| `council.ts` | The coordinator: one pull (`keepTogether`), the fallen and their heirs, Memory of Stone, the bars, the wipe's reset (`regrowHead`), the finish, the dev switches for heroic and mythic (`setCouncilDevTier`; a switch mid-fight applies whole through `council_soul.ts` `syncSoulsToTier`) and the `/dev heart council` triggers. |
 
 Rules:
 - Deterministic: every pick is hashed (`pickMarkTargets`) or ordered (roles, roster, entity
@@ -36,5 +37,6 @@ Rules:
   `tests/smith_heart_pull.test.ts`, `tests/smith_heart_dev.test.ts`,
   `tests/smith_heart_council_mythic.test.ts` (the mythic row and Soul in the Stone),
   `tests/smith_heart_council_soul_wire.test.ts` (the soul pillars through the server into
-  the online mirror). A live raid of bots fights it over a dev server:
+  the online mirror), `tests/smith_heart_council_voice.test.ts` (the lines and the mythic
+  player text). A live raid of bots fights it over a dev server:
   `scripts/heart_council_raid.mjs`.

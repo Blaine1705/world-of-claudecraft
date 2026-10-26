@@ -44,13 +44,18 @@ export function councilAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescr
           penalty: pct(T.rockPenaltyMult - 1),
           tremorMin: T.rockTremorMin,
           tremorMax: T.rockTremorMax,
+          soulReach: T.soulRockReach,
           heroic: pct(COUNCIL_DIFFICULTY.heroic.damageMult - 1),
         },
       };
     case COUNCIL_AURAS.resonance:
       return {
         key: `${KEY}.resonance`,
-        nums: { reach: T.resonanceReach, seconds: T.resonanceCrackSeconds },
+        nums: {
+          reach: T.resonanceReach,
+          seconds: T.resonanceCrackSeconds,
+          singerSeconds: T.singerSoulResonanceSeconds,
+        },
       };
     case COUNCIL_AURAS.memory:
       return {

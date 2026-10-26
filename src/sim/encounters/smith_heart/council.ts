@@ -102,6 +102,7 @@ import {
   stepRises,
   stepRock,
 } from './council_stone';
+import { councilSay, sayFallen, stepCouncilVoice } from './council_voice';
 import {
   clearWrathBars,
   fillEnergy,
@@ -204,6 +205,7 @@ function freshState(difficulty: CouncilDifficulty): CouncilFightState {
     rubble: [],
     fallen: [],
     lines: [],
+    said: {},
     casts: 0,
     souls: [],
     soulsSpent: [],
@@ -288,7 +290,8 @@ function noteFallen(s: CouncilScope, role: CouncilRole, dead: Entity): void {
   // The Wrath's heir starts its own (shorter) fill from empty.
   if (role === 'guardian') s.st.energy = 0;
   // Mythic: its soul takes the most intact pillar (council_soul.ts).
-  if (survivor && s.rules.soulInTheStone) takeSoul(s, role, dead);
+  const soul = survivor && s.rules.soulInTheStone ? takeSoul(s, role, dead) !== null : false;
+  if (survivor) sayFallen(s, role, soul);
 }
 
 // ---- the bars -----------------------------------------------------------------------------
@@ -466,6 +469,9 @@ function finishCouncil(
 ): void {
   st.finished = true;
   const s = scopeOf(ctx, inst, st, bodies);
+  // The last to fall says its last line.
+  const last = COUNCIL_ROLES.find((r) => !st.fallen.includes(r));
+  if (last) councilSay(s, last, 'defeat');
   // Every soul pillar crumbles with the council.
   crumbleSouls(s);
   clearStone(s);
@@ -506,7 +512,14 @@ export function tickHammerCouncil(ctx: SimContext, inst: InstanceSlot): void {
   }
   const engaged = alive.some((r) => fighting(bodies[r]));
   if (!engaged) {
-    if (st0) resetCouncil(ctx, inst, bodies);
+    if (st0) {
+      // The raid lies dead on the floor: a survivor says so.
+      if (!st0.finished && quarryPlayers(ctx, inst).length === 0) {
+        const speaker = alive[0];
+        if (speaker) councilSay(scopeOf(ctx, inst, st0, bodies), speaker, 'wipe');
+      }
+      resetCouncil(ctx, inst, bodies);
+    }
     return;
   }
   const st = st0 ?? beginCouncil(ctx, inst, bodies);
@@ -519,6 +532,7 @@ export function tickHammerCouncil(ctx: SimContext, inst: InstanceSlot): void {
     if (b && !living(b) && !st.fallen.includes(r)) noteFallen(s, r, b);
   }
   syncMemory(s);
+  stepCouncilVoice(s);
   stepBars(s);
   fillEnergy(s);
   syncEnergyBars(s);
