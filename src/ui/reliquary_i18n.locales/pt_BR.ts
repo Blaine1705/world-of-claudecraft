@@ -144,7 +144,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_gallery: {
     name: 'Galeria de Guerra',
-    desc: 'Os cinco kits de batalha de Guerra, conquistados peça por peça com honra.',
+    desc: 'Os cinco kits de batalha de Guerra da primeira temporada, agora vendidos peça por peça por ouro.',
   },
   conquerors_warfare_armory: {
     name: 'Arsenal de Guerra',

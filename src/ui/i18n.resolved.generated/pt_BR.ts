@@ -786,7 +786,6 @@ export const pt_BR: EnTranslations = {
       "claimLastWeek": "Resgatar a recompensa da semana passada",
       "readyTitle": "Suas recompensas semanais estão prontas",
       "readyDescription": "Uma semana completa de recompensas está esperando. Abra seus cofres conquistados e escolha um item para resgatar.",
-      "previewClaimNotice": "Há recompensas esperando. Visite o Guardião do Cofre em Eastbrook para abri-las e resgatá-las.",
       "notNow": "Agora não",
       "completedWeek": "Semana encerrada em {date}",
       "currentWeek": "Voltar ao progresso desta semana",
@@ -837,7 +836,8 @@ export const pt_BR: EnTranslations = {
         "dungeon_heroic": "Saque de masmorra Heroica",
         "world": "Saque de missão mundial",
         "pvp": "Equipamento de GUERRA"
-      }
+      },
+      "previewClaimNotice": "Há recompensas esperando. Visite o Guardião do Cofre em Eastbrook para abri-las e resgatá-las."
     },
     "guildHall": {
       "title": "Salão da Lanterna",
@@ -1327,15 +1327,15 @@ export const pt_BR: EnTranslations = {
         "annualTitle": "Pacote de assinatura de 12 meses",
         "annualPrice": "{price} por 12 meses, pagos antecipadamente",
         "annualTerms": "Renova anualmente pelo mesmo preço. Pague em moeda fiduciária pelo Stripe. Cancele nas configurações de cobrança.",
-        "annualMount": "Após pagar, colete pelo correio as rédeas vinculadas à alma da Quimera de Asa Noturna no personagem que comprou o pacote. A montaria continua sua depois que a assinatura vence.",
+        "annualMount": "Desbloqueia a montaria Quimera de Asa Noturna para todos os personagens da sua conta, e as rédeas vinculadas à alma chegam pelo correio ao personagem que a compra. Uma por conta, e continua sua depois que a assinatura termina.",
         "trialTerms": "Teste a assinatura gratuitamente por {days} dias, uma vez por conta. É necessário um método de pagamento. Você será cobrado em {price} ao terminar o teste, a menos que cancele.",
         "startTrial": "Iniciar teste gratuito de 7 dias",
-        "resumeCheckout": "Retomar pagamento",
         "checkoutClosed": "Este pagamento foi encerrado sem recompensa pendente. Escolha um plano de assinatura novamente para iniciar outro pagamento.",
         "annualClaim": "Coletar montaria do pacote",
         "annualPending": "Volte ao personagem comprador após pagar para coletar a montaria do pacote. Se o pagamento estiver processando ou o teste ativo, tente novamente após a cobrança paga.",
         "annualDelivered": "A chave de montaria do seu pacote foi entregue pelo correio.",
         "tokenTitle": "Ficha de assinatura negociável",
+        "tokenPrice": "{price} por 30 dias",
         "benefitsTitle": "Benefícios de assinatura ativos",
         "benefitBank": "Acesse os bancos dos outros personagens em qualquer banqueiro.",
         "benefitSlots": "Desbloqueie 10 espaços adicionais de personagem.",
@@ -1351,6 +1351,14 @@ export const pt_BR: EnTranslations = {
         "price": "{price} por mês",
         "terms": "Renova mensalmente. Pague em moeda fiduciária pelo Stripe. Cancele nas configurações de cobrança.",
         "subscribe": "Assinar",
+        "addMonth": "Adicionar 1 mês",
+        "addYear": "Adicionar 12 meses",
+        "stackTerms": "O pagamento é feito agora. O tempo é adicionado ao final da sua assinatura atual, que depois será renovada neste plano.",
+        "stackCapped": "Você pode acumular até 2 anos de assinatura de uma vez. Tente novamente quando a data de renovação estiver mais próxima.",
+        "stackUnavailable": "Não é possível adicionar tempo de assinatura no momento. Tente novamente em breve.",
+        "billingBlocked": "Atualize seus dados de pagamento em Gerenciar assinatura antes de adicionar tempo de assinatura.",
+        "renewsOn": "Renova em {date}",
+        "endsOn": "A assinatura termina em {date}",
         "manage": "Gerenciar assinatura",
         "ending": "Cancela ao fim do período de cobrança",
         "error": "Não foi possível abrir a cobrança. Permita janelas pop-up e tente novamente.",
@@ -1369,8 +1377,9 @@ export const pt_BR: EnTranslations = {
       "title": "Loja WOC",
       "close": "Fechar loja WOC",
       "tabsLabel": "Seções da loja WOC",
-      "storeTab": "Loja",
-      "rewardsTab": "Recompensas Diárias",
+      "storeTab": "Loja de cosméticos",
+      "membershipsTab": "Assinaturas",
+      "membershipsUnavailable": "As assinaturas estão indisponíveis no momento. Tente novamente em breve.",
       "mountsEyebrow": "Montagens de conta",
       "mountsTitle": "Máquina estável",
       "mountBuyAria": "Comprar {item}",
@@ -3446,22 +3455,22 @@ export const pt_BR: EnTranslations = {
       "zoneContested": "Terreno contestado: aqui só lutam jogadores marcados.",
       "zoneFfa": "Terreno livre para todos: aqui todo mundo é alvo válido.",
       "realmDisabled": "O PvP Mundial está desativado neste reino.",
-      "groundSanctuary": "A Costa da Provação e o Vale de Eastbrook são santuários: nenhum PvP Mundial ali.",
+      "groundSanctuary": "A Costa da Provação é o único santuário: você não pode ativar o PvP mundial nem lutar contra outros jogadores lá.",
       "groundContested": "Todo o restante é contestado: só dois jogadores marcados podem lutar.",
-      "groundFfa": "Drakelands, os Confins de Frostveil e Amberfall são livres para todos: qualquer um lá pode lutar, marcado ou não.",
+      "groundFfa": "Drakelands, os Confins de Frostveil e Amberfall usam bandeiras normais de PvP. Entrar em um círculo ativo do Rei da Colina ativa sua bandeira.",
       "groupLine": "Membros de grupo e raide nunca são hostis entre si. Colegas de guilda fora do seu grupo podem lutar.",
-      "markLine": "Atacar um jogador não marcado ali levanta sua própria bandeira; atacar um marcado nunca faz isso.",
+      "markLine": "Entrar em um círculo ativo da colina ativa o PvP Mundial. Sair do círculo mantém sua bandeira ligada.",
       "aidLine": "Curar, proteger ou fortalecer um jogador marcado em um combate no mundo aberto levanta sua bandeira.",
       "stakeLine": "O perdedor paga {cap} ou {percent} da própria bolsa, o que for menor.",
       "spoilsLine": "Se ambos estiverem marcados, o ouro do golpe fatal cai no corpo junto com o crânio do perdedor.",
       "skullName": "Crânio de {name}",
-      "noStakeLine": "Um jogador não marcado morto em terreno livre para todos não perde ouro.",
+      "noStakeLine": "Jogadores sem bandeira não podem ser atacados no mundo aberto.",
       "noTakeLine": "Um lutador não marcado também não leva ouro: ele só passa de mão entre dois jogadores marcados.",
       "honorLine": "{honor} de Honra por abate, dividida entre todos que ajudaram.",
       "splitLine": "Um 1x1 limpo paga o montante inteiro; ajudantes e seus curandeiros o dividem entre si.",
       "repeatLine": "Abates repetidos do mesmo jogador pagam {second}, depois {third}, depois nada; a contagem zera {reset} após o primeiro abate.",
       "greyLine": "Jogadores mais de {levels} níveis abaixo de você não pagam nada.",
-      "disarmLine": "Desativar leva {minutes} minutos e espera o combate terminar.",
+      "disarmLine": "Desativar leva {minutes} minutos e espera até você sair da colina ativa e o combate terminar.",
       "record": "Histórico: {kills} abates, {deaths} mortes",
       "enable": "Ativar PvP Mundial",
       "disable": "Desativar PvP Mundial",
@@ -3491,6 +3500,17 @@ export const pt_BR: EnTranslations = {
       "distance": "{yards} jardas até o círculo",
       "rises": "Surge em {minutes}",
       "falls": "Cai em {minutes}",
+      "pvpEntry": "Entrar no círculo ativo ativa o PvP Mundial.",
+      "pvpBanner": "PvP",
+      "callout": {
+        "killingSpree": "{name} está em Matança Crescente!",
+        "rampage": "{name} está Descontrolado!",
+        "unstoppable": "{name} é Imparável!",
+        "dominating": "{name} está Dominando!",
+        "godlike": "{name} é Divino!",
+        "legendary": "{name} é Lendário!",
+        "shutDown": "{killer} derrubou {victim}!"
+      },
       "standingRaid": "Membros de raide não contam: apenas grupos podem controlar a colina"
     },
     "skullBag": {
@@ -3523,7 +3543,8 @@ export const pt_BR: EnTranslations = {
       "owned": "Possuído",
       "buyAria": "Comprar {item} por {honor}",
       "buyOwnedAria": "Comprar {item} por {honor}, já possuído",
-      "buyConfirmBody": "Comprar {item} por {honor}? Compras com Honra não podem ser reembolsadas."
+      "buyConfirmBody": "Comprar {item} por {honor}? Compras com Honra não podem ser reembolsadas.",
+      "buyConfirmBodyGold": "Comprar {item} por {price}? Esta compra não pode ser reembolsada."
     },
     "charSheet": {
       "offense": "Ataque",
@@ -4606,8 +4627,8 @@ export const pt_BR: EnTranslations = {
         "boneSpikeHeroicSummary": "A cada {everyHeroic} s, Nythraxis empala {victimsHeroic} raiders que não sejam seu alvo atual em Espinhos ósseos. Um raider empalado não pode agir e perde {drainHeroic} da vida máxima a cada segundo até que seu espinho seja destruído. Um espinho se despedaça após {hitsHeroic} acertos de qualquer um, não importa o dano causado. Um jogador que já foi empalado não pode ser escolhido de novo por {cooldown} s, então os espinhos se espalham por toda a raide.",
         "boneSpikeResponse": "Quem estiver mais perto ataca o Espinho ósseo: alguns acertos de qualquer um o despedaçam, não importa o dano. Os curandeiros mantêm os empalados vivos enquanto os espinhos caem.",
         "graveEruptionName": "Erupção sepulcral",
-        "graveEruptionSummary": "A cada {everyNormal} s, mãos esqueléticas marcam {countNormal} círculos de {radius} yd sob raiders. Após {warning} s, cada círculo explode causando {burstNormal} da vida máxima como dano de Sombra, depois queima como Chama sepulcral por {flameNormal} s, causando {tickNormal} da vida máxima por segundo a quem ficar nele.",
-        "graveEruptionHeroicSummary": "A cada {everyHeroic} s, mãos esqueléticas marcam {countHeroic} círculos de {radius} yd sob raiders. Após {warning} s, cada círculo explode causando {burstHeroic} da vida máxima como dano de Sombra, depois queima como Chama sepulcral por {flameHeroic} s, causando {tickHeroic} da vida máxima por segundo a quem ficar nele.",
+        "graveEruptionSummary": "A cada {everyNormal} s, mãos esqueléticas marcam {countNormal} círculos de {radius} yd sob raiders. Após {warning} s, cada círculo explode causando {burstNormal} da vida máxima como dano de Sombra, depois queima como Chama sepulcral por {flameNormal} s, causando {tickNormal} da vida máxima por segundo a quem ficar nele. Isso nunca acontece enquanto houver marcas de Rasgo de alma ativas nem nos {gap} s após elas sumirem.",
+        "graveEruptionHeroicSummary": "A cada {everyHeroic} s, mãos esqueléticas marcam {countHeroic} círculos de {radius} yd sob raiders. Após {warning} s, cada círculo explode causando {burstHeroic} da vida máxima como dano de Sombra, depois queima como Chama sepulcral por {flameHeroic} s, causando {tickHeroic} da vida máxima por segundo a quem ficar nele. Isso nunca acontece enquanto houver marcas de Rasgo de alma ativas nem nos {gap} s após elas sumirem.",
         "graveEruptionResponse": "Saia de cada círculo de aviso antes que ele exploda e fique fora do chão em chamas. Os tanks puxam Nythraxis para longe das chamas para que os corpo a corpo tenham espaço.",
         "bindingSigilName": "Selo vinculante",
         "bindingSigilSummary": "A cada {everyNormal} s, um selo das antigas proteções brilha em uma das duas plataformas que ladeiam o trono, a {sideOffset} yd à esquerda ou à direita (do ponto de vista da raide) de onde Nythraxis estava no início do combate, alternando o lado a cada conjuração e ele inicia Ascensão imortal, ganhando {ascensionNormal} de dano e velocidade de ataque a cada {ascensionEvery} s. Se ele ficar sobre o selo em até {bindNormal} s, fica Vinculado: a Ascensão é purificada, ele fica atordoado por {stunNormal} s e sofre {vulnerability} a mais de dano por {boundNormal} s. Caso contrário, cada raider sofre {unboundHitNormal} da vida máxima como dano de Sombra e ele mantém {unboundBonusNormal} a mais de dano até o próximo vínculo.",
@@ -5010,6 +5031,7 @@ export const pt_BR: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
+      "hillBountyTag": "Recompensa {honor}",
       "pvpTag": "JcJ",
       "bountyTag": "Recompensa pela cabeça",
       "cheaterTag": "< Trapaceiro >",
@@ -5435,12 +5457,11 @@ export const pt_BR: EnTranslations = {
       "memberSinceDays": "{days}d no Discord",
       "roleTag": {
         "levyst": "Levy St",
-        "admin": "Administrador",
         "coredevs": "Dev Principal",
         "devs": "Dev",
-        "seniormods": "Moderador Sênior",
+        "seniormods": "Sentinela",
         "mods": "Mod",
-        "juniormods": "Moderador Júnior",
+        "juniormods": "Observador",
         "artists": "Artista",
         "contentcreator": "Criador de Conteúdo",
         "legend": "LENDA",
@@ -5985,6 +6006,13 @@ export const pt_BR: EnTranslations = {
       "offlineHeader": "Offline ({n})",
       "hideOffline": "Ocultar offline",
       "hideOfflineTitle": "Ocultar membros da guilda offline",
+      "presence": {
+        "label": "Mostrar-me online para",
+        "everyone": "Todos",
+        "friends": "Só amigos",
+        "none": "Ninguém",
+        "title": "Quem vê você online em listas de amigos e na lista da guilda, com sua zona e posição no mapa. Seu grupo sempre vê você."
+      },
       "billboard": {
         "label": "Mural da Guilda",
         "empty": "Ainda não há nada no mural.",
@@ -8077,6 +8105,12 @@ export const pt_BR: EnTranslations = {
       "admin_target": "As contas dos operadores não podem ser kickadas.",
       "target_offline": "Esse jogador não está mais online neste reino."
     },
+    "world_quest_block": {
+      "admin_target": "As contas dos operadores não podem ser bloqueadas das missões mundiais.",
+      "reason_required": "É necessário um motivo.",
+      "already_blocked": "Essa conta já está bloqueada das missões mundiais.",
+      "not_blocked": "Essa conta não está bloqueada das missões mundiais."
+    },
     "woc_market": {
       "invalid_input": "Entrada inválida.",
       "disabled": "A Bolsa $WOC não está disponível neste reino.",
@@ -9103,7 +9137,14 @@ export const pt_BR: EnTranslations = {
       "discord": "Entre no Discord",
       "communityWiki": "Wiki da Comunidade",
       "rights": "World of ClaudeCraft",
-      "linksLabel": "Links de jogo e comunidade"
+      "linksLabel": "Links de jogo e comunidade",
+      "guidesLabel": "Guias de Jogadores",
+      "guideFree": "MMORPGs Gratuitos",
+      "guideGamesLikeWow": "Jogos como WoW",
+      "guideBest": "Melhores MMORPGs",
+      "guideNew": "Novos MMORPGs",
+      "guideBrowser": "MMORPGs de Navegador",
+      "guideGamesLikeDiablo": "Jogos como Diablo"
     },
     "language": {
       "label": "Idioma",
@@ -9619,7 +9660,9 @@ export const pt_BR: EnTranslations = {
       "session": "O que você fez desde que entrou no jogo: abates, mortes, dano e experiência.",
       "arena": "Sua posição no Coliseu das Cinzas em ambas as categorias: classificação, vitórias, derrotas e taxa de vitórias para 1v1 e 2v2.",
       "pvp": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other anywhere; switching off takes 5 minutes.",
-      "pvpZones": "Bandeira de JcJ Mundial: /pvp alterna; /pvp on e /pvp off a definem diretamente. Jogadores com bandeira podem lutar entre si em terreno contestado; santuários não permitem nenhuma luta mundial; e as zonas de todos contra todos permitem lutar com ou sem bandeira. Desativá-la leva 5 minutos.",
+      "pvpZones": "Bandeira de PvP Mundial: /pvp alterna o estado, /pvp on ativa e /pvp off desativa. Jogadores com bandeira podem lutar entre si em áreas disputadas, santuários não permitem nenhum combate no mundo, e entrar em um círculo ativo do Rei da Colina ativa sua bandeira; a desativação leva 5 minutos.",
+      "presence": "Quem vê você online em listas de amigos, sua lista de guilda e /who: /presence everyone (o padrão), /presence friends (apenas jogadores em sua lista de amigos), ou /presence none. Oculto, eles não veem um ponto online, zona ou posição do mapa para você, mas sussurros e convites ainda chegam a você; seu grupo sempre vê você. Um simples /presence diz a você qual está configurado.",
+      "flair": "Mostra ou oculta seu cargo do Discord para outros jogadores, ou seja, seu nome colorido, sua etiqueta de cargo e sua etiqueta verificada no chat: /flair on mostra, /flair off oculta e /flair sozinho informa qual está ativo. Requer uma conta do Discord vinculada.",
       "listings": "Suas próprias listagens no Mercado Mundial, com o preço pedido, o tempo restante de cada uma, e quanto espaço você ainda tem para mais.",
       "buyback": "O que você vendeu recentemente para um vendedor e ainda pode recomprar.",
       "groupState": "Como você está agora",
@@ -10384,7 +10427,8 @@ export const pt_BR: EnTranslations = {
       "warfareTradeBody": "Essa é a troca deliberada. O equipamento de Guerra é feito para lutar contra jogadores, não como um atalho para pular os níveis de masmorra: uma peça de Guerra nunca carrega os índices de combate que um Épico de masmorra no mesmo encaixe carrega, e tudo o que ela realmente traz é gasto contra outros jogadores. Se você quer se sair bem na arena, compre-o. Se você quer concluir os heroicos mais rápido, conquiste seu equipamento nas masmorras.",
       "warfareTradeBodyRatingSpent": "Essa é a troca deliberada. O equipamento de Guerra foi feito para lutar contra jogadores, não para pular os níveis das masmorras: uma peça de Guerra nunca traz as classificações de combate que um épico de masmorra no mesmo espaço traz, e as classificações de Guerra e os bônus de conjunto que ela traz são gastos inteiramente contra outros jogadores. Se quiser se garantir na arena, compre-o. Se quiser limpar heroicas mais rápido, conquiste seu equipamento nas masmorras.",
       "vanguardHeading": "Equipamento de Guerra da Vanguarda: Temporada 2",
-      "vanguardBody": "O equipamento da Vanguarda é a segunda temporada do equipamento de Guerra, vendido pelos mesmos dois intendentes, acima do nível original, que continua à venda. Cada especialização tem seu próprio conjunto da Vanguarda de cinco peças, para cabeça, ombros, peito, pernas e mãos, e a loja lista apenas os três conjuntos que sua classe pode usar, seguidos das armas da Vanguarda que você pode empunhar. Uma peça da Vanguarda carrega as mesmas classificações de Guerra do nível original, em um nível de item mais alto, e cada conjunto tem dois bônus, em duas e quatro peças, que alteram uma das habilidades da sua especialização. Diferente dos conjuntos originais, esses bônus funcionam em qualquer lugar, incluindo contra monstros, mas foram feitos para lutar contra jogadores, então um conjunto de raide continua sendo a melhor escolha dentro de uma raide."
+      "vanguardBody": "O equipamento da Vanguarda é a segunda temporada do equipamento de Guerra, vendido pelos mesmos dois intendentes, acima do nível original, que continua à venda. Cada especialização tem seu próprio conjunto da Vanguarda de cinco peças, para cabeça, ombros, peito, pernas e mãos, e a loja lista apenas os três conjuntos que sua classe pode usar, seguidos das armas da Vanguarda que você pode empunhar. Uma peça da Vanguarda carrega as mesmas classificações de Guerra do nível original, em um nível de item mais alto, e cada conjunto tem dois bônus, em duas e quatro peças, que alteram uma das habilidades da sua especialização. Diferente dos conjuntos originais, esses bônus funcionam em qualquer lugar, incluindo contra monstros, mas foram feitos para lutar contra jogadores, então um conjunto de raide continua sendo a melhor escolha dentro de uma raide.",
+      "vanguardStatsBody": "Diferentemente do nível original, o equipamento da Vanguarda também traz classificações de combate: cada peça de armadura, arma e colar da Vanguarda tem Índice de Crítico ou Índice de Aceleração, e as peças de lançador de feitiço e curador adicionam Poder Mágico ou Poder de Cura. Os anéis e colares da Vanguarda são vendidos junto com as armas, e todas as classes podem usá-los. Dois dos anéis de combate corpo a corpo da Vanguarda dão exatamente a Classificação de Acerto que remove a chance base de seus ataques errarem um jogador de seu próprio nível, e dois anéis de lançador de feitiço fazem o mesmo para seus feitiços serem resistidos. Ataques automáticos enquanto se empunha duas armas mantêm sua chance de erro extra. O anel de curador carrega Índice de Aceleração em seu lugar."
     },
     "worldPvpPage": {
       "heading": "JcJ Mundial",
@@ -10395,18 +10439,18 @@ export const pt_BR: EnTranslations = {
       "stakesBody": "When flagged players defeat a flagged player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
       "limitsHeading": "Regras de jogo justo",
       "limitsBody": "Defeating the same player again and again pays less each time and soon nothing, and the counter resets with the daily reset. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
-      "introZones": "O JcJ em mundo aberto é opcional, e o terreno onde você está determina o que isso significa. Erga sua bandeira de JcJ e todo outro jogador com bandeira que não esteja no seu grupo ou raide se torna um inimigo em terreno contestado; baixe-a e, depois de um breve atraso, você volta a ser um espectador. Duas zonas são santuários onde nenhuma luta mundial acontece, e as três zonas mais ao norte são terreno de todos contra todos, onde todos os presentes são alvo válido, com ou sem bandeira. Colegas de grupo e de raide nunca são seus inimigos em lugar nenhum; colegas de guilda fora do seu grupo são alvo válido como qualquer outro.",
+      "introZones": "O PvP em mundo aberto é opcional e depende do terreno. Em áreas disputadas, ativar sua bandeira de PvP torna inimigos todos os jogadores com bandeira fora do seu grupo ou raide; desativá-la torna você espectador novamente após um breve atraso. A Costa da Provação é o único santuário, sem combates no mundo, e as três áreas mais ao norte seguem as mesmas regras de bandeira opcional do restante do mundo. Entrar em um círculo ativo do Rei da Colina ativa sua bandeira automaticamente. Companheiros de grupo e raide nunca são seus inimigos em lugar algum; membros da guilda fora do seu grupo podem ser atacados como qualquer outro jogador.",
       "zonesHeading": "Onde o JcJ mundial acontece",
-      "zonesBody": "O mundo tem três tipos de terreno. A Costa da Provação e o Vale de Eastbrook são santuários: nenhum JcJ mundial acontece ali, com ou sem bandeira, então um personagem novo nunca pode ser atacado antes de saber o que é a bandeira. A maior parte do mundo é contestada, onde a regra da bandeira acima é toda a história. As Drakelands, os Confins de Frostveil e o Amberfall, as três zonas mais ao norte, são terreno de todos contra todos: todos que estão nelas podem atacar todos os outros que também estão nelas, com ou sem bandeira, e você é avisado ao entrar e de novo ao sair. Atacar ali um jogador sem bandeira ergue a sua própria bandeira, então um agressor sempre acaba correndo o risco. Atingir um jogador que já está com bandeira nunca a ergue, o que significa que se defender, ou defender alguém sem bandeira, não custa nada.",
+      "zonesBody": "A Costa da Provação é o único santuário: não há PvP Mundial ali e você não pode ativar sua bandeira. Uma bandeira já ativa permanece, mas o progresso de títulos por tempo jogado fica pausado até você sair. Em todos os outros lugares, incluindo Drakelands, os Confins de Frostveil e Amberfall, somente jogadores com bandeira podem lutar. Entrar em um círculo ativo do Rei da Colina ativa sua bandeira automaticamente se você cumprir o requisito normal de nível. O círculo de aviso não ativa sua bandeira. Sair do círculo ativo mantém sua bandeira ligada; use /pvp off para iniciar a contagem normal de cinco minutos, que não pode terminar enquanto você estiver dentro de uma colina ativa ou ainda em combate.",
       "flagBodyAid": "Digite /pvp no chat, ou abra a janela de JcJ em G e use a aba JcJ Mundial, que também mostra seu histórico e as apostas. Erguer a bandeira é instantâneo assim que você passa dos níveis iniciais. Baixá-la inicia uma contagem regressiva de alguns minutos, e a bandeira não cai enquanto você ainda está lutando, então desativá-la nunca é uma forma de escapar de uma luta que você começou. Curar, escudar ou fortalecer um jogador com bandeira que está em uma luta também ergue a sua própria bandeira, então ninguém sustenta um lutador escondido atrás de uma bandeira que não usa; ajudar um jogador sem bandeira não ergue nada.",
       "stakesUnflaggedTake": "Um lutador sem bandeira também não recebe nada: o ouro só muda de mãos entre dois jogadores com bandeira, embora todos que ajudaram ainda ganhem a Honra.",
-      "stakesBodyFlagged": "Quando um jogador com bandeira é derrotado por outro jogador, o perdedor paga uma pequena parte do ouro da sua bolsa, limitada a uma quantia modesta, e os vencedores ganham Honra para o equipamento de Guerra. Um jogador sem bandeira não paga ouro nenhum, mesmo se cair em uma zona de todos contra todos. Todos que ajudaram compartilham os dois prêmios: o golpe fatal, qualquer um que tenha causado dano ao alvo pouco antes, e os curandeiros que mantiveram esses lutadores de pé. Um confronto limpo de um contra um paga o prêmio inteiro; um grupo o divide.",
+      "stakesBodyFlagged": "Quando um jogador com bandeira é derrotado por outro jogador, o perdedor paga uma pequena parte do ouro da sua bolsa, limitada a uma quantia modesta, e os vencedores ganham Honra para o equipamento de Guerra. Um jogador sem bandeira não pode ser atacado no mundo aberto. Todos que ajudaram compartilham tanto o ouro quanto a Honra: quem deu o golpe fatal, qualquer um que tenha causado dano ao alvo pouco antes e os curandeiros que mantiveram esses lutadores de pé. Um confronto limpo de um contra um paga o prêmio inteiro; um grupo o divide.",
       "hillHeading": "Rei da Colina",
-      "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "hillBody": "A cada duas horas, uma colina surge em Drakelands, nos Confins de Frostveil ou em Amberfall. O reino recebe um aviso com quinze minutos de antecedência, e o círculo é marcado em terreno aberto. A colina permanece ativa por trinta minutos. Entrar no círculo ativo ativa sua bandeira de PvP Mundial pelas regras normais de nível, inclusive para membros de raide. O grupo com mais jogadores elegíveis dentro do círculo conquista a colina após um minuto de maioria ininterrupta; um jogador sozinho conta como um grupo de um, mas membros de raide e jogadores abaixo do nível exigido para PvP não podem capturar a colina nem ganhar Honra por ela. Cada integrante do grupo que a controla e está dentro do círculo ganha Honra em ritmo crescente. Os pagamentos são mais frequentes e aumentam mais rápido, preservando a Honra total do antigo evento de quarenta e cinco minutos. Uma mudança de controle reinicia o aumento das recompensas. Sair do círculo mantém sua bandeira ligada; /pvp off usa o atraso normal de cinco minutos e não pode terminar dentro de uma colina ativa ou durante o combate. A barra da colina mostra o controle, os números de jogadores e o progresso de captura; /hill informa sua localização.",
       "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
-      "hillBodyRamp": "Uma vez a cada três horas, em um momento que ninguém pode prever, todo o reino é avisado de que uma colina vai surgir em uma das zonas de todos contra todos dentro de quinze minutos, e o círculo onde ela vai ficar é marcado em terreno aberto. Quando surge, ela permanece por quarenta e cinco minutos, depois desaparece. O grupo com mais jogadores dentro dela disputa a colina, e depois de um minuto de maioria ininterrupta a colina é dele; um jogador sozinho conta como um grupo de um, mas membros de raide não contam de forma alguma. Enquanto um grupo controla a colina, cada um dos seus membros dentro dela ganha Honra a cada minuto, e quanto mais tempo o mesmo grupo a controla, mais cada minuto paga: um grupo completo controlando uma colina sem disputa durante toda a sua duração ganha cerca do mesmo que três vitórias em campo de batalha. Quando a colina muda de mãos, os novos donos recomeçam a contagem do zero. Uma barra sobre o campo mostra quem a controla, seus números contra os deles, e o relógio da disputa; /hill no chat informa onde ela está.",
+      "hillBodyRamp": "A cada duas horas, uma colina surge em Drakelands, nos Confins de Frostveil ou em Amberfall. O reino recebe um aviso com quinze minutos de antecedência, e o círculo é marcado em terreno aberto. A colina permanece ativa por trinta minutos. Entrar no círculo ativo ativa sua bandeira de PvP Mundial pelas regras normais de nível, inclusive para membros de raide. O grupo com mais jogadores elegíveis dentro do círculo conquista a colina após um minuto de maioria ininterrupta; um jogador sozinho conta como um grupo de um, mas membros de raide e jogadores abaixo do nível exigido para PvP não podem capturar a colina nem ganhar Honra por ela. Cada integrante do grupo que a controla e está dentro do círculo ganha Honra em ritmo crescente. Os pagamentos são mais frequentes e aumentam mais rápido, preservando a Honra total do antigo evento de quarenta e cinco minutos. Uma mudança de controle reinicia o aumento das recompensas. Sair do círculo mantém sua bandeira ligada; /pvp off usa o atraso normal de cinco minutos e não pode terminar dentro de uma colina ativa ou durante o combate. A barra da colina mostra o controle, os números de jogadores e o progresso de captura; /hill informa sua localização.",
       "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
-      "hillBodyFlat": "Uma vez a cada três horas, em um momento imprevisível, todo o reino é avisado de que uma colina surgirá em uma das zonas de combate livre em quinze minutos, e seu círculo é marcado em terreno aberto. Ela permanece por quarenta e cinco minutos e depois desaparece. Enquanto isso, a cada cinco minutos são anunciados sua localização e os grupos com os maiores tempos totais de controle. O grupo com mais jogadores dentro do círculo disputa a colina e a captura após acumular trinta segundos de superioridade numérica. A entrada de um grupo rival apenas pausa a contagem até o seu voltar à liderança; ela só recomeça do zero se não restar nenhum integrante vivo do seu grupo dentro do círculo. Um jogador sozinho conta como um grupo de uma pessoa e mantém a colina ao formar um grupo, mas integrantes de raide não contam. Cada membro do grupo que controla a colina e está dentro recebe a mesma quantidade de Honra por minuto, independentemente do tempo de controle. Um grupo completo que a mantenha sem oposição durante toda a sua existência ganha aproximadamente o mesmo que por três vitórias em campos de batalha. Quando ela desaparece, se o grupo com o maior tempo total de controle acumulou pelo menos dez minutos, todos que ficaram dentro por pelo menos um minuto durante o controle desse grupo e ainda fazem parte dele recebem uma vitória para a linha de PvP do Cofre Semanal. Uma barra sobre o campo mostra quem a controla, a quantidade de jogadores dos dois lados e a contagem de captura; /hill no chat informa onde ela está.",
+      "hillBodyFlat": "Uma vez a cada três horas, em um momento imprevisível, todo o reino é avisado de que uma colina surgirá em uma das zonas do norte em quinze minutos, e seu círculo é marcado em terreno aberto. Ela permanece por quarenta e cinco minutos e depois desaparece. Enquanto isso, a cada cinco minutos são anunciados sua localização e os grupos com os maiores tempos totais de controle. O grupo com mais jogadores dentro do círculo disputa a colina e a captura após acumular trinta segundos de superioridade numérica. A entrada de um grupo rival apenas pausa a contagem até o seu voltar à liderança; ela só recomeça do zero se não restar nenhum integrante vivo do seu grupo dentro do círculo. Um jogador sozinho conta como um grupo de uma pessoa e mantém a colina ao formar um grupo, mas integrantes de raide não contam. Cada membro do grupo que controla a colina e está dentro recebe a mesma quantidade de Honra por minuto, independentemente do tempo de controle. Um grupo completo que a mantenha sem oposição durante toda a sua existência ganha aproximadamente o mesmo que por três vitórias em campos de batalha. Quando ela desaparece, se o grupo com o maior tempo total de controle acumulou pelo menos dez minutos, todos que ficaram dentro por pelo menos um minuto durante o controle desse grupo e ainda fazem parte dele recebem uma vitória para a linha de PvP do Cofre Semanal. Uma barra sobre o campo mostra quem a controla, a quantidade de jogadores dos dois lados e a contagem de captura; /hill no chat informa onde ela está.",
       "limitsBodyRaids": "Derrotar o mesmo jogador repetidamente paga cada vez menos e logo nada, e sua contagem contra aquele jogador só recomeça cerca de uma hora depois da primeira dessas mortes, então esperar de tocaia por uma única vítima nunca compensa a espera. Um alvo muito abaixo do seu nível não paga nada. Campos de Batalha e Arenas seguem suas próprias regras enquanto você está dentro deles, e pagam mais Honra que o mundo aberto, então o JcJ mundial é o caminho mais lento até o mesmo vendedor. Raides não ganham nada com mortes no mundo: um membro de raide não recebe Honra nem ouro e não reduz a parte de mais ninguém, então lute em grupo para ser pago."
     },
     "thornhollowPage": {
@@ -13507,7 +13551,14 @@ export const pt_BR: EnTranslations = {
     "terms": "Termos de serviço",
     "privacy": "Política de privacidade",
     "discordLabel": "Juntar-se ao Discord",
-    "levyStreet": "Levy Street"
+    "levyStreet": "Levy Street",
+    "guidesLabel": "Guias de Jogadores",
+    "guideFree": "MMORPGs Gratuitos",
+    "guideGamesLikeWow": "Jogos como WoW",
+    "guideBest": "Melhores MMORPGs",
+    "guideNew": "Novos MMORPGs",
+    "guideBrowser": "MMORPGs de Navegador",
+    "guideGamesLikeDiablo": "Jogos como Diablo"
   },
   "settings": {
     "languageLoading": "Carregando idioma...",
@@ -16156,6 +16207,7 @@ export const pt_BR: EnTranslations = {
       "cooldownMinutes": "{minutes}m",
       "attackTooltip": "Ativa ou desativa o autoataque no alvo. Clicar com o botão direito em um inimigo também ataca.",
       "attackRemoveHint": "Clique com o botão direito para removê-lo da barra e liberar o espaço.",
+      "moveHint": "Segure Shift e arraste para mover",
       "emptySlot": "Espaço vazio",
       "slotAria": "Espaço de ação {slot}: {ability}",
       "emptySlotAria": "Espaço de ação {slot}: vazio",
@@ -16975,6 +17027,7 @@ export const pt_BR: EnTranslations = {
       "dps": "({dps} de dano por segundo)",
       "armorStat": "{value} de armadura",
       "stat": "+{value} {stat}",
+      "warfareMainHandOnly": "Guerra se conta apenas na mão principal.",
       "useFood": "Usar: restaura {amount} de vida ao longo de {seconds} s. É preciso permanecer sentado enquanto come.",
       "useDrink": "Usar: restaura {amount} de mana ao longo de {seconds} s. É preciso permanecer sentado enquanto bebe.",
       "useElixir": "Uso: aumenta seu {stat} em {value} por {minutes} min. Substitui qualquer outro elixir ou pergaminho do mesmo atributo. Pode ser usado em combate.",
@@ -24217,6 +24270,33 @@ export const pt_BR: EnTranslations = {
       "moonwrack_stave": {
         "name": "Cajado da ruína lunar"
       },
+      "vanguard_feral_staff": {
+        "name": "Cajado Feral da Vanguarda"
+      },
+      "vanguard_band_of_might": {
+        "name": "Anel da Vanguarda de Poder"
+      },
+      "vanguard_band_of_precision": {
+        "name": "Anel da Vanguarda de Precisão"
+      },
+      "vanguard_band_of_focus": {
+        "name": "Anel da Vanguarda de Foco"
+      },
+      "vanguard_band_of_mending": {
+        "name": "Anel da Vanguarda de Cura"
+      },
+      "vanguard_pendant_of_might": {
+        "name": "Pingente da Vanguarda de Poder"
+      },
+      "vanguard_pendant_of_precision": {
+        "name": "Pingente da Vanguarda de Precisão"
+      },
+      "vanguard_pendant_of_focus": {
+        "name": "Pingente da Vanguarda de Foco"
+      },
+      "vanguard_pendant_of_mending": {
+        "name": "Pingente da Vanguarda de Cura"
+      },
       "membership_staff": {
         "name": "Cajado da mudança"
       },
@@ -30304,7 +30384,7 @@ export const pt_BR: EnTranslations = {
       "membership_annual_reward": {
         "sender": "O Correio do Corvo",
         "subject": "Sua montaria de assinatura anual",
-        "body": "O pagamento da sua assinatura anual foi concluído. As rédeas da montaria estão anexas. Mantenha as rédeas nas bolsas ou no banco para possuir esta montaria. Ela continua sua após o fim da assinatura. É necessária habilidade de montaria."
+        "body": "O pagamento da sua assinatura anual foi concluído. A Quimera de Asa Noturna agora está desbloqueada para todos os personagens da sua conta, e as rédeas estão anexas. Ela continua sua após o fim da assinatura. É necessária habilidade de montaria."
       },
       "woc_market_return": {
         "sender": "O Corretor da Bolsa",

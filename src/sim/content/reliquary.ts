@@ -2012,7 +2012,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     id: 'conquerors_warfare_gallery',
     shelf: 'conquerors',
     name: 'Warfare Gallery',
-    desc: 'The five Warfare battle kits, earned piece by piece with honor.',
+    desc: 'The five Warfare battle kits of the first season, now sold piece by piece for gold.',
     clearSource: { kind: 'none' },
     relics: items(...WARFARE_GALLERY_ITEM_IDS.map((id) => [id, WARFARE_VENDOR_HINTS] as const)),
   },

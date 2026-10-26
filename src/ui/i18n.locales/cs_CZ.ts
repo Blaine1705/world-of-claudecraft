@@ -1393,23 +1393,22 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Ostatní hráči se zvednutou vlajkou tě budou moct napadnout kdekoli a při výhře ti vzít až {cap} z měšce. Můžeš to zase vypnout, ale trvá to {minutes} minut.',
   'hudChrome.worldPvp.confirmCancel': 'Zrušit',
   'hudChrome.worldPvp.disable': 'Vypnout světové PvP',
-  'hudChrome.worldPvp.disarmLine': 'Vypnutí trvá {minutes} minut a čeká na konec boje.',
+  'hudChrome.worldPvp.disarmLine':
+    'Vypnutí trvá {minutes} minut a čeká, až opustíte aktivní kopec a skončí boj.',
   'hudChrome.worldPvp.enable': 'Zapnout světové PvP',
   'hudChrome.worldPvp.greyLine': 'Hráči o víc než {levels} úrovní níž než ty neplatí nic.',
   'hudChrome.worldPvp.groundContested':
     'Všude jinde je území sporné: bojovat mohou jen dva hráči se zvednutou vlajkou.',
   'hudChrome.worldPvp.groundFfa':
-    'Dračí země, Kraj Mrazivého závoje a Jantarový pád jsou volné území: tam může bojovat kdokoli, s vlajkou i bez ní.',
-  'hudChrome.worldPvp.groundSanctuary':
-    'Zkušební pobřeží a Eastbrookské údolí jsou útočiště: žádné světové PvP tam vůbec neprobíhá.',
+    'Dračí země, Kraj Mrazivého závoje a Jantarový pád používají běžné příznaky PvP. Vstup do aktivního kruhu Krále kopce zapne váš příznak.',
   'hudChrome.worldPvp.groupLine':
     'Členové skupiny a raidu vůči sobě nikdy nejsou nepřátelští. Cechovní spolubojovníci mimo tvou skupinu mohou bojovat.',
   'hudChrome.worldPvp.honorLine': '{honor} cti za zabití, rozděleno mezi všechny, kdo pomohli.',
   'hudChrome.worldPvp.keepUp': 'Nechat vlajku nahoře',
   'hudChrome.worldPvp.levelReq': 'Vyžaduje úroveň {level}.',
   'hudChrome.worldPvp.markLine':
-    'Napadení hráče bez vlajky tam zvedne tvou vlastní vlajku; napadení hráče se zvednutou vlajkou ji nezvedne nikdy.',
-  'hudChrome.worldPvp.noStakeLine': 'Hráč bez vlajky zabitý na volném území neztrácí žádné zlato.',
+    'Vstup do aktivního kruhu kopce zapne světové PvP. Po opuštění kruhu zůstává příznak zapnutý.',
+  'hudChrome.worldPvp.noStakeLine': 'Neoznačené hráče nelze v otevřeném světě napadnout.',
   'hudChrome.worldPvp.noTakeLine':
     'Bojovník bez vlajky také nezískává žádné zlato: to se přesouvá jen mezi dvěma hráči se zvednutou vlajkou.',
   'hudChrome.worldPvp.pending': 'Čeká se na tvůj PvP stav od říše.',
@@ -2437,8 +2436,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.vanguardHeading': 'Výbava Předvoje: Válečnictví, sezóna 2',
   'guide.combat.unstuckBodyWindow':
     'Pokud tě svět někam uvězní a nemůžeš se odtamtud dostat, napiš /unstuck. Musíš být mimo boj a stát na místě, nesmíš být držen omráčením ani zakořeněním a nesmíš být v duelu ani v zápase arény: proběhne krátké odpočítávání a pohyb nebo utrpěné zranění ho zruší. Po jeho konci tě to postaví na nejbližší hřbitov. Nikdy tě to nezabije a nezanechá to žádné tělo, a pokud jsi už předtím padl(a), místo toho tě to tam oživí. První použití za hodinu tě nic nestojí. Použiješ-li ho znovu do hodiny od posledního použití, cena je Nemoc z vyproštění, dočasné oslabení všeho, čím jsi, které odezní dřív, než bys mohl(a) příkaz použít znovu, a stejně jako Strážcovo mýtné se úplně vyhýbá zbrusu novým postavám.',
+  'guide.commandsPage.flair':
+    'Zobrazí nebo skryje tvou roli z Discordu pro ostatní hráče, tedy barevné jméno, štítek role a ověřený štítek v chatu: /flair on ji zobrazí, /flair off ji skryje a samotné /flair ti řekne, co je nastaveno. Vyžaduje propojený účet Discord.',
   'guide.commandsPage.pvpZones':
-    'PvP vlajka ve světě: /pvp ji přepne, /pvp on a /pvp off ji nastaví. Označení hráči proti sobě mohou bojovat na sporném území, svatyně nedovolují žádný světový boj vůbec a zóny volno pro všechny ho dovolují s vlajkou i bez ní; vypnutí trvá 5 minut.',
+    'Příznak světového PvP: /pvp jej přepíná, /pvp on jej zapne a /pvp off vypne. Označení hráči spolu mohou bojovat ve sporných oblastech, útočiště nepovolují žádné boje ve světě a vstup do aktivního kruhu Krále kopce zapne váš příznak; vypnutí trvá 5 minut.',
   'guide.commandsPage.unstuckWindow':
     'Cesta ven, když tě svět uvězní. Vydrž stát nehybně po krátké odpočítávání a přemístí tě to na nejbližší hřbitov, a oživí tě tam, pokud jsi už padl(a). První použití za hodinu je zdarma. Použiješ-li ho znovu do hodiny od posledního použití, na chvíli tě to oslabí Nemocí z vyproštění, takže je to poslední záchrana, ne zkratka.',
   'guide.factionsPage.automatonsBody':
@@ -2509,20 +2510,16 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.worldPvpPage.flagHeading': 'Zvednutí a stažení vlajky',
   'guide.worldPvpPage.heading': 'Světové PvP',
   'guide.worldPvpPage.hillBodyRamp':
-    'Jednou za tři hodiny, v okamžiku, který nikdo nedokáže předvídat, se celé říši oznámí, že za patnáct minut vyroste kopec v jedné ze zón volno pro všechny, a kruh, kde bude stát, je vyznačen na volné zemi. Když vyroste, stojí čtyřicet pět minut, pak padne. O kopec soupeří skupina s nejvíce hráči uvnitř, a po minutě nepřerušené většiny kopec připadne jí; osamělý hráč se počítá jako skupina o jednom, ale členové výpravy se nepočítají vůbec. Dokud skupina drží kopec, každý její člen uvnitř získává každou minutu Čest, a čím déle stejná skupina kopec drží, tím víc každá minuta vyplácí: plná skupina, která drží nesporný kopec po celou dobu jeho stání, vydělá zhruba tolik jako tři výhry na bojišti. Když kopec změní držitele, noví držitelé začnou počítat od začátku. Lišta nad bojištěm ukazuje, kdo kopec drží, tvá čísla proti jejich a čas souboje; /hill v chatu řekne, kde kopec stojí.',
+    'Každé dvě hodiny se v Dračích zemích, Kraji Mrazivého závoje nebo Jantarovém pádu objeví kopec. Říše dostane varování patnáct minut předem a kruh je vyznačen na otevřeném prostranství. Kopec zůstává aktivní třicet minut. Vstup do aktivního kruhu zapne příznak světového PvP podle běžných pravidel úrovně, a to i členům nájezdu. Skupina s největším počtem způsobilých hráčů uvnitř získá kopec po minutě nepřerušené převahy; samotný hráč se počítá jako jednočlenná skupina, ale členové nájezdu a hráči pod požadovanou úrovní pro PvP nemohou kopec obsadit ani získávat Čest z kopce. Každý držitel uvnitř získává Čest stále rychleji. Odměny přicházejí častěji a jejich výše roste rychleji, takže celková Čest zůstává stejná jako při dřívější pětačtyřicetiminutové události. Změna držitele spustí růst odměn od začátku. Po opuštění kruhu zůstává příznak zapnutý; /pvp off používá běžnou pětiminutovou prodlevu a nemůže doběhnout uvnitř aktivního kopce ani během boje. Lišta kopce ukazuje držitele, počty hráčů a postup obsazování; /hill oznámí jeho polohu.',
   'guide.worldPvpPage.hillHeading': 'Král kopce',
-  'guide.worldPvpPage.introZones':
-    'Boj hráč proti hráči v otevřeném světě je dobrovolný, a to, na jaké zemi zrovna stojíš, rozhoduje, co to znamená. Zvedni svou PvP vlajku a každý jiný označený hráč, který není v tvé skupině ani výpravě, se na sporném území stane nepřítelem; stáhni ji a po krátkém zpoždění jsi zase jen přihlížející. Dvě zóny jsou svatyně, kde se vůbec neodehrává žádný světový boj, a tři nejsevernější zóny jsou území volno pro všechny, kde je každý přítomný férovým cílem, ať má vlajku, nebo ne. Spoluhráči ze skupiny a výpravy nejsou nikdy nikde tvými nepřáteli; spoluhráči z gildy mimo tvou skupinu jsou férovým cílem jako kdokoli jiný.',
   'guide.worldPvpPage.limitsBodyRaids':
     'Porážení stejného hráče znovu a znovu vyplácí pokaždé méně a brzy nic, a tvůj počet proti tomu hráči se resetuje až zhruba hodinu po prvním z těch zabití, takže čekání na jedné oběti se nikdy nevyplatí. Cíl hluboko pod tvou úrovní nevyplatí vůbec nic. Bojiště a Arény se řídí vlastními pravidly, dokud jsi uvnitř, a vyplácí víc Cti než otevřený svět, takže světové PvP je pomalejší cesta ke stejnému obchodníkovi. Výpravy nezískávají ze světových zabití nic: člen výpravy nedostane žádnou Čest ani zlato a nezmenší podíl nikoho jiného, takže boj jako skupina se vyplatí.',
   'guide.worldPvpPage.limitsHeading': 'Pravidla fair play',
   'guide.worldPvpPage.stakesBodyFlagged':
-    'Když je označený hráč poražen jiným hráčem, poražený zaplatí malý podíl zlata ze svého měšce, zastropovaný na skromnou částku, a vítězové získají Čest k výbavě Válečnictví. Hráč, který nebyl označen, neplatí žádné zlato, ani když padne v zóně volno pro všechny. O obojí se dělí každý, kdo pomohl: zásah, který zabil, každý, kdo cíl krátce předtím poškodil, a léčitelé, kteří ty bojovníky drželi na nohou. Čistý souboj jednoho na jednoho vyplatí celý balík; skupina si ho rozdělí.',
+    'Když označeného hráče porazí jiný hráč, poražený zaplatí malý podíl zlata ze svého měšce, omezený na skromnou částku, a vítězové získají Čest na výbavu Válečnictví. Neoznačeného hráče nelze v otevřeném světě napadnout. O zlato i Čest se dělí všichni, kdo pomohli: hráč, který zasadil smrtící úder, každý, kdo cíl krátce předtím zranil, a léčitelé, kteří tyto bojovníky udrželi na nohou. V čistém souboji jeden na jednoho připadne vítězi celá částka; skupina si ji rozdělí.',
   'guide.worldPvpPage.stakesHeading': 'Co vyplácí zabití',
   'guide.worldPvpPage.stakesUnflaggedTake':
     'Ani neoznačený bojovník nedostane nic: zlato mění majitele jen mezi dvěma označenými hráči, i když Čest si stále vydělá každý, kdo pomohl.',
-  'guide.worldPvpPage.zonesBody':
-    'Svět má tři druhy území. Zkušební pobřeží a Eastbrookské údolí jsou svatyně: neodehrává se tam vůbec žádné světové PvP, s vlajkou ani bez ní, takže nová postava nikdy nemůže být napadena dřív, než pozná, co vlajka znamená. Většina světa je sporné území, kde výše popsané pravidlo vlajky je celý příběh. Dračí země, Kraj Mrazivého závoje a Jantarový pád, tři nejsevernější zóny, jsou území volno pro všechny: každý, kdo v nich stojí, může zaútočit na kohokoli jiného, kdo v nich stojí, s vlajkou i bez ní, a je ti to řečeno, jakmile do nich vstoupíš, a znovu, když je opustíš. Útok na hráče, který tam není označen, zvedne tvou vlastní vlajku, takže útočník vždy nakonec nese riziko. Zásah hráče, který je už označen, ji nikdy nezvedne, což znamená, že bránit sebe sama, nebo bránit někoho, kdo není označen, tě nic nestojí.',
   'guide.worldPvpPage.zonesHeading': 'Kde se odehrává světové PvP',
   'landing.headline': 'Dobrodružství s přáteli.',
   'landing.contribute': 'Přispěj do hry',
@@ -6074,9 +6071,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.link.joinServer': 'Připojit se na Discord server',
   'hudChrome.discord.roleTag.contentcreator': 'Tvůrce obsahu',
   'hudChrome.discord.roleTagChatTitle': 'Ověřená serverová role: {role}',
-  'hudChrome.discord.roleTag.juniormods': 'Junior moderátor',
+  'hudChrome.discord.roleTag.juniormods': 'Pozorovatel',
   'hudChrome.discord.roleTag.legend': 'LEGENDA',
-  'hudChrome.discord.roleTag.seniormods': 'Senior moderátor',
+  'hudChrome.discord.roleTag.seniormods': 'Strážce',
   'hudChrome.discord.roleTag.shill': 'HLASATEL',
   'hudChrome.finder.accept': 'Přijmout',
   'hudChrome.finder.acceptApplicantAria': 'Přijmout {name}',
@@ -9135,7 +9132,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.wts.hint': 'Nabídni předmět nebo službu k prodeji',
   'hudChrome.discord.relay.wts.label': 'Chci prodat',
   'hudChrome.discord.rewards': 'Odměny',
-  'hudChrome.discord.roleTag.admin': 'Admin',
   'hudChrome.discord.roleTag.artists': 'Umělec',
   'hudChrome.discord.roleTag.devs': 'Dev',
   'hudChrome.discord.roleTag.levyst': 'Levy St',
@@ -14603,7 +14599,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.rarity.legendary': 'Legendární',
   'hudChrome.wocStore.rarity.rare': 'Vzácný',
   'hudChrome.wocStore.rarity.uncommon': 'Neobvyklý',
-  'hudChrome.wocStore.rewardsTab': 'Denní odměny',
   'hudChrome.wocStore.scene.day': 'Den',
   'hudChrome.wocStore.scene.dusk': 'Soumrak',
   'hudChrome.wocStore.scene.night': 'Noc',
@@ -14751,7 +14746,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Luk z postříbřené oceli a modrého ledu, ve středu září azurové zmrzlé jádro, na tětivě čeká šíp z pevného ledu a kolem proudí studená pára.',
   'hudChrome.wocStore.skins.winterbite.lore':
     'Luk z postříbřené oceli a thornpeakského ledu, jehož střed osvětluje studené azurové jádro, které přimrazí šíp k tětivě. S každým natažením se znovu vytvoří šíp z pevného ledovcového ledu. Lučištník na zdi nenosí toulec, jen chlad. Highwatch s podobným lukem udržel Stopařův hřeben během obléhání. Jediný lučištník, říká se, a zásoba šípů na celou zimu, které byly vždy připravené.',
-  'hudChrome.wocStore.storeTab': 'Obchod',
+  'hudChrome.wocStore.storeTab': 'Obchod s kosmetikou',
   'hudChrome.wocStore.tabsLabel': 'Sekce obchodu WOC',
   'hudChrome.wocStore.title': 'Obchod WOC',
   'hudChrome.wocStore.tryOn': 'Vyzkoušet',
@@ -17931,6 +17926,10 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': 'Účty operátorů nelze vykopnout.',
   'apiError.kick.reason_required': 'Je vyžadován důvod.',
   'apiError.kick.target_offline': 'Tento hráč již není v této sféře online.',
+  'apiError.world_quest_block.admin_target': 'Účty operátorů nelze zablokovat pro světové úkoly.',
+  'apiError.world_quest_block.reason_required': 'Je vyžadován důvod.',
+  'apiError.world_quest_block.already_blocked': 'Tento účet už má světové úkoly zablokované.',
+  'apiError.world_quest_block.not_blocked': 'Tento účet nemá světové úkoly zablokované.',
   'entities.abilities.melting_acid.description':
     'Na 30 minut potáhne vaši zbraň. Každý útok zblízka potřísní cíl žíravou kyselinou a sníží jeho brnění o 5 % na 12 sekund.',
   'entities.abilities.nightshade_coating.description':
@@ -18308,12 +18307,12 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.dreadCurseSummary':
     'Každých {every} s Nythraxis zasáhne svého aktuálního tanka za {hitNormal} maximálního zdraví jako stínové poškození a přidá sadu Děsivé kletby. Po dobu {duration} s každá sada zvyšuje poškození, které tank utrpí od Nythraxise, o {perStackNormal}, až do {max} sad.',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionHeroicSummary':
-    'Každých {everyHeroic} s kostlivé ruce označí {countHeroic} kruhů o poloměru {radius} yardů pod raidery. Po {warning} s každý kruh vybuchne za {burstHeroic} maximálního zdraví jako stínové poškození, potom hoří jako hrobový plamen po dobu {flameHeroic} s a každou sekundu způsobuje {tickHeroic} maximálního zdraví každému, kdo v něm stojí.',
+    'Každých {everyHeroic} s kostlivé ruce označí {countHeroic} kruhů o poloměru {radius} yardů pod raidery. Po {warning} s každý kruh vybuchne za {burstHeroic} maximálního zdraví jako stínové poškození, potom hoří jako hrobový plamen po dobu {flameHeroic} s a každou sekundu způsobuje {tickHeroic} maximálního zdraví každému, kdo v něm stojí. Nikdy k tomu nedojde, dokud jsou aktivní značky Trhání duše, ani do {gap} s po jejich zmizení.',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionName': 'Hrobová erupce',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionResponse':
     'Ustupte z každého varovného kruhu, než vybuchne, a nestůjte na hořící zemi. Tankové odtáhnou Nythraxise od plamenů, aby měli bojovníci nablízko prostor.',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionSummary':
-    'Každých {everyNormal} s kostlivé ruce označí {countNormal} kruhů o poloměru {radius} yardů pod raidery. Po {warning} s každý kruh vybuchne za {burstNormal} maximálního zdraví jako stínové poškození, potom hoří jako hrobový plamen po dobu {flameNormal} s a každou sekundu způsobuje {tickNormal} maximálního zdraví každému, kdo v něm stojí.',
+    'Každých {everyNormal} s kostlivé ruce označí {countNormal} kruhů o poloměru {radius} yardů pod raidery. Po {warning} s každý kruh vybuchne za {burstNormal} maximálního zdraví jako stínové poškození, potom hoří jako hrobový plamen po dobu {flameNormal} s a každou sekundu způsobuje {tickNormal} maximálního zdraví každému, kdo v něm stojí. Nikdy k tomu nedojde, dokud jsou aktivní značky Trhání duše, ani do {gap} s po jejich zmizení.',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerName': 'Hrobobijec',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerResponse':
     'Tankové drží Nythraxise otočeného pryč od raidu. Všichni ostatní stojí za ním nebo vedle něj a nikdy nekříží kužel.',
@@ -19826,7 +19825,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mapAtlas.resizeRailHint':
     'Tažením změníte šířku postranního panelu mapy. Dvojklikem ji resetujete.',
   'guide.worldPvpPage.hillBodyFlat':
-    'Jednou za tři hodiny se v nepředvídatelnou chvíli celé říši oznámí, že za patnáct minut v jedné ze zón volného boje vyroste kopec. Jeho kruh se vyznačí na otevřeném prostranství. Kopec vydrží čtyřicet pět minut a pak zmizí. Během této doby se každých pět minut oznamuje jeho poloha a skupiny s nejdelším celkovým držením. Skupina s nejvíce hráči v kruhu o kopec usiluje a po celkem třiceti sekundách početní převahy jej získá. Příchod soupeřů pouze pozastaví počítadlo, dokud vaše skupina znovu nezíská převahu; od začátku se počítá jen tehdy, když v kruhu nezůstane žádný živý člen vaší skupiny. Samotný hráč se počítá jako jednočlenná skupina a při založení skupiny si držený kopec ponechá, ale členové raidu se nepočítají vůbec. Každý člen držící skupiny stojící v kruhu získává každou minutu stejně Cti bez ohledu na délku držení. Plná skupina, která kopec nerušeně drží po celou jeho dobu, získá přibližně tolik jako za tři vítězství na bojištích. Když kopec zmizí a skupina s nejdelším celkovým držením jej držela alespoň deset minut, každý, kdo během jejího držení stál v kruhu alespoň minutu a stále je členem této skupiny, získá jedno vítězství do PvP řádku Týdenního trezoru. Lišta nad bojištěm ukazuje držitele, počty hráčů na obou stranách a počítadlo obsazování; /hill v chatu sdělí polohu.',
+    'Jednou za tři hodiny se v nepředvídatelnou chvíli celé říši oznámí, že za patnáct minut v jedné ze severních zón vyroste kopec. Jeho kruh se vyznačí na otevřeném prostranství. Kopec vydrží čtyřicet pět minut a pak zmizí. Během této doby se každých pět minut oznamuje jeho poloha a skupiny s nejdelším celkovým držením. Skupina s nejvíce hráči v kruhu o kopec usiluje a po celkem třiceti sekundách početní převahy jej získá. Příchod soupeřů pouze pozastaví počítadlo, dokud vaše skupina znovu nezíská převahu; od začátku se počítá jen tehdy, když v kruhu nezůstane žádný živý člen vaší skupiny. Samotný hráč se počítá jako jednočlenná skupina a při založení skupiny si držený kopec ponechá, ale členové raidu se nepočítají vůbec. Každý člen držící skupiny stojící v kruhu získává každou minutu stejně Cti bez ohledu na délku držení. Plná skupina, která kopec nerušeně drží po celou jeho dobu, získá přibližně tolik jako za tři vítězství na bojištích. Když kopec zmizí a skupina s nejdelším celkovým držením jej držela alespoň deset minut, každý, kdo během jejího držení stál v kruhu alespoň minutu a stále je členem této skupiny, získá jedno vítězství do PvP řádku Týdenního trezoru. Lišta nad bojištěm ukazuje držitele, počty hráčů na obou stranách a počítadlo obsazování; /hill v chatu sdělí polohu.',
   'errors.noUpdateFound': 'Nebyla nalezena žádná aktualizace. Zkus to za chvíli znovu.',
   'errors.searchUpdates': 'Vyhledat aktualizace',
   'errors.updateSearchFailed': 'Aktualizace se nepodařilo ověřit. Zkus to prosím znovu.',
@@ -20407,7 +20406,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualDelivered':
     'Klíč k jízdnímu zvířeti z balíčku byl doručen poštou.',
   'hudChrome.wocStore.subscription.annualMount':
-    'Po zaplacení si na postavě, která zakoupila tento balíček, vyzvedni poštou otěže Chiméry nočního křídla vázané na duši. Jízdní zvíře ti zůstane i po vypršení členství.',
+    'Odemkne jízdní zvíře Chiméra nočního křídla pro všechny postavy na tvém účtu a otěže vázané na duši pošle poštou postavě, která ho koupí. Jednou na účet a zůstane ti i po skončení členství.',
   'hudChrome.wocStore.subscription.annualPending':
     'Po zaplacení se vrať na postavu, která nákup provedla, a vyzvedni si jízdní zvíře z balíčku. Pokud se platba zpracovává nebo běží zkušební období, zkus to znovu po stržení platby.',
   'hudChrome.wocStore.subscription.annualPrice': '{price} za 12 měsíců, platba předem',
@@ -20433,7 +20432,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.manage': 'Spravovat předplatné',
   'hudChrome.wocStore.subscription.monthlyTitle': 'Měsíční členství',
   'hudChrome.wocStore.subscription.price': '{price} měsíčně',
-  'hudChrome.wocStore.subscription.resumeCheckout': 'Pokračovat v platbě',
   'hudChrome.wocStore.subscription.startTrial': 'Zahájit bezplatné zkušební období na 7 dní',
   'hudChrome.wocStore.subscription.status.active': 'Aktivní',
   'hudChrome.wocStore.subscription.status.canceled': 'Zrušeno',
@@ -23312,7 +23310,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'referralCards.waiting': 'Čekání na přijetí propojeným přítelem.',
   'referralCards.yourCard': 'Kartička s razítky postavy {name}',
   'entities.letters.membership_annual_reward.body':
-    'Platba za roční členství byla dokončena. Otěže tvého jízdního zvířete jsou přiloženy. Pro vlastnictví zvířete ponech otěže v brašnách nebo bance. Zůstane tvé i po vypršení členství. Vyžaduje dovednost jízdy.',
+    'Platba za roční členství byla dokončena. Chiméra nočního křídla je nyní odemčená pro všechny postavy na tvém účtu a její otěže jsou přiloženy. Zůstane tvá i po vypršení členství. Vyžaduje dovednost jízdy.',
   'entities.letters.membership_annual_reward.sender': 'Havraní pošta',
   'entities.letters.membership_annual_reward.subject': 'Tvé jízdní zvíře za roční členství',
   'entities.letters.membership_token_delivery.body':
@@ -25443,4 +25441,74 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Jízdní zvířata jsou kosmetické vzhledy pro vaši vycvičenou jízdu. Nedávají zbroj, poškození ani bojové statistiky. Jezdecký výcvik zvyšuje rychlost cestování po zemi a skoky v sedle dosáhnou výše. Všechna jízdní zvířata zůstávají na zemi a žádné neumí plavat.',
   'guide.progression.ridingBody':
     'Na úrovni {level} stájová mistryně Marla učí základní jízdu za zlato a poté nabízí pokročilý stupeň. Výcvik určuje rychlost jízdy. Vzhled vyberte v Kosmetice; sběratelské vzhledy jsou sdílené, dokud jejich otěže zůstávají v brašnách nebo bance libovolné postavy.',
+  'footer.guideBest': 'Nejlepší MMORPG',
+  'footer.guideBrowser': 'Prohlížečové MMORPG',
+  'footer.guideFree': 'MMORPG zdarma',
+  'footer.guideGamesLikeDiablo': 'Hry podobné Diablu',
+  'footer.guideGamesLikeWow': 'Hry podobné WoW',
+  'footer.guideNew': 'Nové MMORPG',
+  'footer.guidesLabel': 'Průvodce pro hráče',
+  'guide.footer.guideBest': 'Nejlepší MMORPG',
+  'guide.footer.guideBrowser': 'Prohlížečové MMORPG',
+  'guide.footer.guideFree': 'MMORPG zdarma',
+  'guide.footer.guideGamesLikeDiablo': 'Hry podobné Diablu',
+  'guide.footer.guideGamesLikeWow': 'Hry podobné WoW',
+  'guide.footer.guideNew': 'Nové MMORPG',
+  'guide.footer.guidesLabel': 'Průvodce pro hráče',
+  'hudChrome.hill.callout.dominating': '{name} dominuje!',
+  'hudChrome.hill.callout.godlike': '{name} je božský!',
+  'hudChrome.hill.callout.killingSpree': '{name} je na vražedné řádě!',
+  'hudChrome.hill.callout.legendary': '{name} je legendární!',
+  'hudChrome.hill.callout.rampage': '{name} řádí!',
+  'hudChrome.hill.callout.shutDown': '{killer} zastavil(a) {victim}!',
+  'hudChrome.hill.callout.unstoppable': '{name} je nezastavitelný!',
+  'hudChrome.social.presence.everyone': 'Všichni',
+  'hudChrome.social.presence.friends': 'Pouze přátelé',
+  'hudChrome.social.presence.label': 'Ukázat mi jako online',
+  'hudChrome.social.presence.none': 'Nikdo',
+  'hudChrome.social.presence.title':
+    'Kdo tě vidí jako online v seznamech přátel a v seznamu cechu, tvoji zónu a pozici na mapě. Tvá skupina tě vždy vidí.',
+  'hudChrome.warfareShop.buyConfirmBodyGold': 'Koupit {item} za {price}? Tento nákup nelze vrátit.',
+  'itemUi.tooltip.warfareMainHandOnly': 'Válečnictví se počítá pouze v hlavní ruce.',
+  'entities.items.vanguard_band_of_focus.name': 'Předvojovo pásmo zaměření',
+  'entities.items.vanguard_band_of_mending.name': 'Předvojovo pásmo hojení',
+  'entities.items.vanguard_band_of_might.name': 'Předvojovo pásmo moci',
+  'entities.items.vanguard_band_of_precision.name': 'Předvojovo pásmo přesnosti',
+  'entities.items.vanguard_pendant_of_focus.name': 'Předvojův přívěsek zaměření',
+  'entities.items.vanguard_pendant_of_mending.name': 'Předvojův přívěsek hojení',
+  'entities.items.vanguard_pendant_of_might.name': 'Předvojův přívěsek moci',
+  'entities.items.vanguard_pendant_of_precision.name': 'Předvojův přívěsek přesnosti',
+  'guide.arenaPage.vanguardStatsBody':
+    'Na rozdíl od původní úrovně nese výbava Předvoje také bojová hodnocení: každý Předvojův kus zbroje, zbraň a náhrdelník má Hodnocení kritického zásahu nebo Hodnocení rychlosti, a kouzelnickovské a léčitelské kusy přidávají Sílu kouzel nebo Sílu léčení. Předvojské prsteny a náhrdelníky se prodávají vedle zbraní a nosit je mohou všechny třídy. Dva z Předvojských melee prstenů dávají přesně Hodnocení zásahu, které odstraňuje základní šanci, že tvůj útok mine hráče tvé úrovně, a dva kouzelnictví prsteny dělají totéž pro tvá kouzla, aby byla odolávána. Auto-útoky při duálním držení zbraní si zachovávají svou zvýšenou šanci zmeškat. Léčitelský prsten nese místo toho Hodnocení rychlosti.',
+  'guide.commandsPage.presence':
+    'Kdo tě vidí jako online v seznamech přátel, v seznamu cechu a v /who: /presence everyone (výchozí), /presence friends (pouze hráči na tvém seznamu přátel), nebo /presence none. Když jsi skrytý, nevidí žádný online bod, tvoji zónu ani pozici na mapě, i když ti šepoty a pozvánky stále docházejí; tvá skupina tě vždy vidí. Pouhý /presence ti řekne, co je nastaveno.',
+  'abilityUi.actionBar.moveHint': 'Přesunete přetažením se stisknutým Shiftem',
+  'entities.items.vanguard_feral_staff.name': 'Divoká hůl Předvoje',
+  'hudChrome.worldPvp.groundSanctuary':
+    'Zkušební pobřeží je jediným útočištěm: nelze tam zapnout světové PvP ani bojovat s jinými hráči.',
+  'guide.worldPvpPage.introZones':
+    'PvP v otevřeném světě je dobrovolné a záleží na oblasti. Ve sporných oblastech z vás zapnutý příznak PvP dělá nepřítele všech označených hráčů mimo vaši skupinu či nájezd; po vypnutí a krátké prodlevě jste opět pozorovatelem. Zkušební pobřeží je jediné útočiště bez bojů ve světě a tři nejsevernější oblasti používají stejná pravidla dobrovolného příznaku jako zbytek světa. Vstup do aktivního kruhu Krále kopce automaticky zapne váš příznak. Členové skupiny a nájezdu nikdy nejsou vašimi nepřáteli; členové cechu mimo vaši skupinu jsou běžné cíle.',
+  'guide.worldPvpPage.zonesBody':
+    'Zkušební pobřeží je jediné útočiště: není tam světové PvP a příznak nelze zapnout. Již zapnutý příznak zůstává, ale postup k titulu za odehraný čas se do odchodu pozastaví. Všude jinde, včetně Dračích zemí, Kraje Mrazivého závoje a Jantarového pádu, mohou bojovat pouze označení hráči. Vstup do aktivního kruhu Krále kopce automaticky zapne váš příznak, pokud splňujete běžný požadavek na úroveň. Varovný kruh příznak nezapíná. Po opuštění aktivního kruhu zůstává příznak zapnutý; pomocí /pvp off zahájíte běžný pětiminutový odpočet, který nemůže skončit, dokud jste uvnitř aktivního kopce nebo stále bojujete.',
+  'guide.worldPvpPage.hillBody':
+    'Každé dvě hodiny se v Dračích zemích, Kraji Mrazivého závoje nebo Jantarovém pádu objeví kopec. Říše dostane varování patnáct minut předem a kruh je vyznačen na otevřeném prostranství. Kopec zůstává aktivní třicet minut. Vstup do aktivního kruhu zapne příznak světového PvP podle běžných pravidel úrovně, a to i členům nájezdu. Skupina s největším počtem způsobilých hráčů uvnitř získá kopec po minutě nepřerušené převahy; samotný hráč se počítá jako jednočlenná skupina, ale členové nájezdu a hráči pod požadovanou úrovní pro PvP nemohou kopec obsadit ani získávat Čest z kopce. Každý držitel uvnitř získává Čest stále rychleji. Odměny přicházejí častěji a jejich výše roste rychleji, takže celková Čest zůstává stejná jako při dřívější pětačtyřicetiminutové události. Změna držitele spustí růst odměn od začátku. Po opuštění kruhu zůstává příznak zapnutý; /pvp off používá běžnou pětiminutovou prodlevu a nemůže doběhnout uvnitř aktivního kopce ani během boje. Lišta kopce ukazuje držitele, počty hráčů a postup obsazování; /hill oznámí jeho polohu.',
+  'hudChrome.hill.pvpEntry': 'Vstup do aktivního kruhu zapne světové PvP.',
+  'hudChrome.hill.pvpBanner': 'PvP',
+  'hudChrome.nameplate.hillBountyTag': 'Cena {honor}',
+  'hudChrome.wocStore.membershipsTab': 'Členství',
+  'hudChrome.wocStore.membershipsUnavailable':
+    'Členství momentálně nejsou dostupná. Zkus to znovu za chvíli.',
+  'hudChrome.wocStore.subscription.addMonth': 'Přidat 1 měsíc',
+  'hudChrome.wocStore.subscription.addYear': 'Přidat 12 měsíců',
+  'hudChrome.wocStore.subscription.billingBlocked':
+    'Než přidáš dobu členství, aktualizuj své platební údaje v části Spravovat předplatné.',
+  'hudChrome.wocStore.subscription.endsOn': 'Členství končí {date}',
+  'hudChrome.wocStore.subscription.renewsOn': 'Obnoví se {date}',
+  'hudChrome.wocStore.subscription.stackCapped':
+    'Najednou můžeš mít předplacené až 2 roky členství. Zkus to znovu blíže k datu obnovení.',
+  'hudChrome.wocStore.subscription.stackTerms':
+    'Platba proběhne ihned. Doba se přidá na konec tvého současného členství, které se pak obnoví podle tohoto plánu.',
+  'hudChrome.wocStore.subscription.stackUnavailable':
+    'Dobu členství momentálně nelze přidat. Zkus to znovu za chvíli.',
+  'hudChrome.wocStore.subscription.tokenPrice': '{price} za 30 dní',
 };

@@ -387,12 +387,12 @@ export const VANGUARD_ITEM_SETS: Record<string, ItemSet> = {
       {
         pieces: 2,
         effect: {},
-        text: "Bruin Rush's cooldown is reduced by 3 sec. Damage taken no longer delays your spellcasting.",
+        text: 'Reduces the cooldowns of Lunge and Bruin Rush by 3 sec. Damage taken no longer delays your spellcasting.',
       },
       {
         pieces: 4,
         effect: {},
-        text: 'Bruin Rush shields you for 6 percent of your maximum health for 6 sec.',
+        text: "Dash's cooldown is reduced by 15 sec.",
       },
     ],
   },

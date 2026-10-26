@@ -786,7 +786,6 @@ export const da_DK: EnTranslations = {
       "claimLastWeek": "Gør krav på sidste uges belønning",
       "readyTitle": "Dine ugentlige belønninger er klar",
       "readyDescription": "En gennemført uge med belønninger venter. Åbn dine opnåede hvælvinger, derefter vælg ét element for at gøre krav.",
-      "previewClaimNotice": "Belønninger venter. Besøg Skattekammerkeperen i Eastbrook for at åbne og hente dem.",
       "notNow": "Ikke nu",
       "completedWeek": "Uge endt {date}",
       "currentWeek": "Tilbage til denne uges fremgang",
@@ -837,7 +836,8 @@ export const da_DK: EnTranslations = {
         "dungeon_heroic": "Heroisk dungeon-bytte",
         "world": "Verdenquest-bytte",
         "pvp": "KRIGSUDSPRING udstyr"
-      }
+      },
+      "previewClaimNotice": "Belønninger venter. Besøg Skattekammerkeperen i Eastbrook for at åbne og hente dem."
     },
     "guildHall": {
       "title": "Lygtehallen",
@@ -1327,15 +1327,15 @@ export const da_DK: EnTranslations = {
         "annualTitle": "Medlemskabspakke til 12 måneder",
         "annualPrice": "{price} for 12 måneder, betalt på forhånd",
         "annualTerms": "Fornyes årligt til samme pris. Betal med almindelig valuta via Stripe. Opsig i faktureringsindstillingerne.",
-        "annualMount": "Hent de sjælebundne tøjler til den natvingede kimære med posten efter betalingen på den figur, der købte pakken. Ridedyret forbliver dit, når medlemskabet udløber.",
+        "annualMount": "Låser den natvingede kimære op som ridedyr for alle figurer på din konto, og de sjælebundne tøjler sendes med posten til den figur, der køber den. Én pr. konto, og den forbliver din, når medlemskabet slutter.",
         "trialTerms": "Prøv medlemskab gratis i {days} dage, én gang pr. konto. En betalingsmetode kræves. Du opkræves {price}, når prøveperioden slutter, medmindre du opsiger.",
         "startTrial": "Start 7 dages gratis prøveperiode",
-        "resumeCheckout": "Genoptag betaling",
         "checkoutClosed": "Denne betaling er lukket uden en udestående belønning. Vælg en medlemskabsplan igen for at starte en ny betaling.",
         "annualClaim": "Hent pakkens ridedyr",
         "annualPending": "Vend tilbage til den købende figur efter betalingen for at hente pakkens ridedyr. Hvis betalingen behandles, eller prøveperioden er aktiv, prøv igen efter den betalte opkrævning.",
         "annualDelivered": "Nøglen til dit pakkeridedyr er leveret med posten.",
         "tokenTitle": "Omsættelig medlemskabspolet",
+        "tokenPrice": "{price} for 30 dage",
         "benefitsTitle": "Fordele ved aktivt medlemskab",
         "benefitBank": "Få adgang til dine andre figurers banker hos enhver bankier.",
         "benefitSlots": "Lås 10 ekstra figurpladser op.",
@@ -1351,6 +1351,14 @@ export const da_DK: EnTranslations = {
         "price": "{price} pr. måned",
         "terms": "Fornyes månedligt. Betal med almindelig valuta via Stripe. Opsig i faktureringsindstillingerne.",
         "subscribe": "Abonner",
+        "addMonth": "Tilføj 1 måned",
+        "addYear": "Tilføj 12 måneder",
+        "stackTerms": "Betaling sker nu. Tiden lægges til i slutningen af dit nuværende medlemskab, som derefter fornys med denne plan.",
+        "stackCapped": "Du kan samle op til 2 års medlemskab ad gangen. Prøv igen tættere på din fornyelsesdato.",
+        "stackUnavailable": "Det er ikke muligt at tilføje medlemstid lige nu. Prøv igen om lidt.",
+        "billingBlocked": "Opdater dine betalingsoplysninger under Administrer abonnement, før du tilføjer medlemstid.",
+        "renewsOn": "Fornyes den {date}",
+        "endsOn": "Medlemskabet slutter den {date}",
         "manage": "Administrer abonnement",
         "ending": "Opsiges ved faktureringsperiodens slutning",
         "error": "Kunne ikke åbne fakturering. Tillad pop op-vinduer, og prøv igen.",
@@ -1369,8 +1377,9 @@ export const da_DK: EnTranslations = {
       "title": "WOC-butik",
       "close": "Luk WOC-butikken",
       "tabsLabel": "Sektioner i WOC-butikken",
-      "storeTab": "Butik",
-      "rewardsTab": "Daglige belønninger",
+      "storeTab": "Kosmetikbutik",
+      "membershipsTab": "Medlemskaber",
+      "membershipsUnavailable": "Medlemskaber er ikke tilgængelige lige nu. Prøv igen om lidt.",
       "mountsEyebrow": "Kontomontering",
       "mountsTitle": "Maskinstabil",
       "mountBuyAria": "Køb {item}",
@@ -3446,22 +3455,22 @@ export const da_DK: EnTranslations = {
       "zoneContested": "Omstridt område: kun markerede spillere kæmper her.",
       "zoneFfa": "Free-for-all-område: alle her er fair game.",
       "realmDisabled": "Verden PvP er deaktiveret på denne rige.",
-      "groundSanctuary": "Proving Shore og Eastbrook Vale er helligdommer: ingen verden PvP overhovedet.",
+      "groundSanctuary": "Prøvestranden er det eneste fristed: du kan ikke aktivere verdens-PvP eller kæmpe mod andre spillere der.",
       "groundContested": "Overalt andet er omstridt: kun to markerede spillere kan kæmpe.",
-      "groundFfa": "Drakelands, Frostveil Reach og Amberfall er free-for-all: alle der kan kæmpe, markeret eller ej.",
+      "groundFfa": "Dragelandet, Frostsløret og Ravfaldet bruger normale PvP-flag. Dit flag aktiveres, når du går ind i en aktiv cirkel i Konge af Bakken.",
       "groupLine": "Gruppe- og raidmedlemmer er aldrig fjendtlige over for hinanden. Gildekammerater uden for din gruppe kan kæmpe.",
-      "markLine": "At angribe en umarkeret spiller der rejser din egen markering; at angribe en markeret gør det aldrig.",
+      "markLine": "Verdens-PvP aktiveres, når du går ind i en aktiv bakkecirkel. Dit flag forbliver aktivt, når du forlader cirklen.",
       "aidLine": "Helbredelse, skjold eller buff på en markeret spiller i en verdenskamp rejser din markering.",
       "stakeLine": "Taberen betaler {cap} eller {percent} af deres pengepung, alt efter hvad der er mindre.",
       "spoilsLine": "Når I begge har PvP slået til, ligger guldet fra det dræbende slag på liget sammen med taberens kranie.",
       "skullName": "{name}s kranie",
-      "noStakeLine": "En umarkeret spiller drbt på free-for-all-grund mister ingen guld.",
+      "noStakeLine": "Spillere uden flag kan ikke angribes i den åbne verden.",
       "noTakeLine": "En umarkeret kæmper tager heller ikke guld: det flytter kun mellem to markerede spillere.",
       "honorLine": "{honor} Ære pr. drab, delt blandt alle der hjalp.",
       "splitLine": "En ren 1v1 betaler hele potten; hjælpere og deres healbøtter deler den.",
       "repeatLine": "Gentagne drab af én spiller betaler {second}, derefter {third}, derefter intet; tællingen clearer {reset} efter første drab.",
       "greyLine": "Spillere mere end {levels} niveauer under dig betaler intet.",
-      "disarmLine": "At skifte fra tager {minutes} minutter og venter på kampen slutter.",
+      "disarmLine": "Det tager {minutes} minutter at slå flaget fra, og det venter, til du har forladt den aktive bakke, og kampen er slut.",
       "record": "Rekord: {kills} drab, {deaths} død",
       "enable": "Aktivér Verden PvP",
       "disable": "Deaktiver Verden PvP",
@@ -3491,6 +3500,17 @@ export const da_DK: EnTranslations = {
       "distance": "{yards} yd til cirklen",
       "rises": "Stiger om {minutes}",
       "falls": "Falder om {minutes}",
+      "pvpEntry": "Verdens-PvP aktiveres, når du går ind i den aktive cirkel.",
+      "pvpBanner": "PvP",
+      "callout": {
+        "killingSpree": "{name} er på en drabsserie!",
+        "rampage": "{name} raser!",
+        "unstoppable": "{name} er ustoppelig!",
+        "dominating": "{name} dominerer!",
+        "godlike": "{name} er guddommelig!",
+        "legendary": "{name} er legendarisk!",
+        "shutDown": "{killer} har stoppet {victim}!"
+      },
       "standingRaid": "Raidmedlemmer tæller ikke: kun partier kan holde bakken"
     },
     "skullBag": {
@@ -3523,7 +3543,8 @@ export const da_DK: EnTranslations = {
       "owned": "Ejet",
       "buyAria": "Køb {item} for {honor}",
       "buyOwnedAria": "Køb {item} for {honor}, allerede ejet",
-      "buyConfirmBody": "Køb {item} for {honor}? Køb med Ære kan ikke refunderes."
+      "buyConfirmBody": "Køb {item} for {honor}? Køb med Ære kan ikke refunderes.",
+      "buyConfirmBodyGold": "Køb {item} for {price}? Dette køb kan ikke refunderes."
     },
     "charSheet": {
       "offense": "Angreb",
@@ -4606,8 +4627,8 @@ export const da_DK: EnTranslations = {
         "boneSpikeHeroicSummary": "Hvert {everyHeroic} sek spidder Nythraxis {victimsHeroic} raiddeltagere ud over sit nuværende mål på Knoglespyd. En spiddet raiddeltager kan ikke handle og mister {drainHeroic} af maksimal sundhed hvert sekund, indtil spyddet ødelægges. Et spyd splintres efter {hitsHeroic} træffere fra hvem som helst, uanset hvor meget de gør. En spiller, der allerede er blevet spiddet, kan ikke vælges igen i {cooldown} sek., så spyddene fordeles over hele raidet.",
         "boneSpikeResponse": "Den nærmeste slår på Knoglespyddet: et par træffere fra hvem som helst splintrer det, uanset skaden. Healere holder de spiddede i live, mens spyddene falder.",
         "graveEruptionName": "Gravudbrud",
-        "graveEruptionSummary": "Hvert {everyNormal} sek markerer skelethænder {countNormal} cirkler på {radius} yd under raiddeltagere. Efter {warning} sek bryder hver cirkel ud for {burstNormal} af maksimal sundhed som Skyggeskade og brænder derefter som Gravflamme i {flameNormal} sek, hvilket giver {tickNormal} af maksimal sundhed hvert sekund til alle, der står i den.",
-        "graveEruptionHeroicSummary": "Hvert {everyHeroic} sek markerer skelethænder {countHeroic} cirkler på {radius} yd under raiddeltagere. Efter {warning} sek bryder hver cirkel ud for {burstHeroic} af maksimal sundhed som Skyggeskade og brænder derefter som Gravflamme i {flameHeroic} sek, hvilket giver {tickHeroic} af maksimal sundhed hvert sekund til alle, der står i den.",
+        "graveEruptionSummary": "Hvert {everyNormal} sek markerer skelethænder {countNormal} cirkler på {radius} yd under raiddeltagere. Efter {warning} sek bryder hver cirkel ud for {burstNormal} af maksimal sundhed som Skyggeskade og brænder derefter som Gravflamme i {flameNormal} sek, hvilket giver {tickNormal} af maksimal sundhed hvert sekund til alle, der står i den. Det sker aldrig, mens Sjæleflængen-mærker er aktive, eller inden for {gap} sek efter, at de er forsvundet.",
+        "graveEruptionHeroicSummary": "Hvert {everyHeroic} sek markerer skelethænder {countHeroic} cirkler på {radius} yd under raiddeltagere. Efter {warning} sek bryder hver cirkel ud for {burstHeroic} af maksimal sundhed som Skyggeskade og brænder derefter som Gravflamme i {flameHeroic} sek, hvilket giver {tickHeroic} af maksimal sundhed hvert sekund til alle, der står i den. Det sker aldrig, mens Sjæleflængen-mærker er aktive, eller inden for {gap} sek efter, at de er forsvundet.",
         "graveEruptionResponse": "Træd ud af hver advarselscirkel, før den bryder ud, og hold jer væk fra brændende jord. Tanks trækker Nythraxis væk fra flammerne, så nærkampsspillere har plads til at arbejde.",
         "bindingSigilName": "Bindingssigil",
         "bindingSigilSummary": "Hvert {everyNormal} sek flammer et sigil fra de gamle værn op på en af de to platforme, der flankerer tronen, {sideOffset} yd til venstre eller højre (set fra raidet) for det sted, hvor Nythraxis stod ved pullet, skiftevis for hvert kast, og han begynder Dødsløs Opstigning, der giver ham {ascensionNormal} skade og angrebshastighed hvert {ascensionEvery} sek. Hvis han står på sigillet inden for {bindNormal} sek, er han Bundet: Opstigningen renses, han bedøves i {stunNormal} sek, og han tager {vulnerability} mere skade i {boundNormal} sek. Ellers tager hver raiddeltager {unboundHitNormal} af maksimal sundhed som Skyggeskade, og han beholder {unboundBonusNormal} mere skade indtil næste binding.",
@@ -5010,6 +5031,7 @@ export const da_DK: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
+      "hillBountyTag": "Dusør {honor}",
       "pvpTag": "PvP",
       "bountyTag": "Dusør",
       "cheaterTag": "< Snyder >",
@@ -5435,12 +5457,11 @@ export const da_DK: EnTranslations = {
       "memberSinceDays": "{days}d på Discord",
       "roleTag": {
         "levyst": "Levy St",
-        "admin": "Admin",
         "coredevs": "Kerneudvikler",
         "devs": "Udvikler",
-        "seniormods": "Senior-mod",
+        "seniormods": "Vogter",
         "mods": "Moderator",
-        "juniormods": "Junior-mod",
+        "juniormods": "Observatør",
         "artists": "Kunstner",
         "contentcreator": "Indholdsskaber",
         "legend": "LEGENDE",
@@ -5985,6 +6006,13 @@ export const da_DK: EnTranslations = {
       "offlineHeader": "Offline ({n})",
       "hideOffline": "Skjul offline",
       "hideOfflineTitle": "Skjul offline gildemedlemmer",
+      "presence": {
+        "label": "Vis mig online til",
+        "everyone": "Alle",
+        "friends": "Kun venner",
+        "none": "Ingen",
+        "title": "Hvem der ser dig online på vennelister og laugsmandtal, med din zone og kortposition. Dit hold ser altid dig."
+      },
       "billboard": {
         "label": "Laugsopslagstavle",
         "empty": "Der er intet på opslagstavlen endnu.",
@@ -8077,6 +8105,12 @@ export const da_DK: EnTranslations = {
       "admin_target": "Operatørkonti kan ikke sparkes.",
       "target_offline": "Den spiller er ikke længere online i dette rige."
     },
+    "world_quest_block": {
+      "admin_target": "Operatørkonti kan ikke blokeres fra verdenquester.",
+      "reason_required": "En grund er påkrævet.",
+      "already_blocked": "Den konto er allerede blokeret fra verdenquester.",
+      "not_blocked": "Den konto er ikke blokeret fra verdenquester."
+    },
     "woc_market": {
       "invalid_input": "Ugyldigt input.",
       "disabled": "$WOC-Børsen er ikke tilgængelig på dette rige.",
@@ -9103,7 +9137,14 @@ export const da_DK: EnTranslations = {
       "discord": "Bliv en del af Discord",
       "communityWiki": "Fællesskabswiki",
       "rights": "World of ClaudeCraft",
-      "linksLabel": "Spil- og fællesskabslinks"
+      "linksLabel": "Spil- og fællesskabslinks",
+      "guidesLabel": "Spillerguides",
+      "guideFree": "Gratis MMORPG'er",
+      "guideGamesLikeWow": "Spil som WoW",
+      "guideBest": "Bedste MMORPG'er",
+      "guideNew": "Nye MMORPG'er",
+      "guideBrowser": "Browser-MMORPG'er",
+      "guideGamesLikeDiablo": "Spil som Diablo"
     },
     "language": {
       "label": "Sprog",
@@ -9619,7 +9660,9 @@ export const da_DK: EnTranslations = {
       "session": "Hvad du har gjort, siden du loggede ind: drab, dødsfald, skade og erfaring.",
       "arena": "Din placering i Det Askegrå Colosseum i begge kategorier: rating, sejre, nederlag og sejrsrate for 1v1 og for 2v2.",
       "pvp": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other anywhere; switching off takes 5 minutes.",
-      "pvpZones": "Verden PvP-flag: /pvp slår det til/fra, /pvp on og /pvp off sætter det. Flaggede spillere kan kæmpe hinanden på omstridt grund, helligdomme tillader ingen verden-kamp overhovedet, og fri-for-alt-zonerne tillader det med eller uden flag; at slå fra tager 5 minutter.",
+      "pvpZones": "Flag til verdens-PvP: /pvp skifter tilstand, /pvp on slår det til, og /pvp off slår det fra. Spillere med flag kan kæmpe mod hinanden på omstridt jord, fristeder tillader ingen verdenskampe, og dit flag aktiveres, når du går ind i en aktiv cirkel i Konge af Bakken; det tager 5 minutter at slå det fra.",
+      "presence": "Hvem der ser dig online på vennelister, dit laugsmandtal og /who: /presence everyone (standarden), /presence friends (kun spillere på din venneliste) eller /presence none. Skjult ser de ingen online prik, zone eller kortposition for dig, skønt hvisker og invitationer stadig når dig; dit hold ser altid dig. En almindelig /presence fortæller dig, hvad der er sat.",
+      "flair": "Viser eller skjuler din Discord-rolle for andre spillere, altså dit farvede navn, dit rollemærke og dit bekræftede chatmærke: /flair on viser den, /flair off skjuler den, og /flair alene fortæller dig, hvad der er valgt. Kræver en tilknyttet Discord-konto.",
       "listings": "Dine egne opslag på Verdensmarkedet, med udbudsprisen, tiden hvert har tilbage, og hvor meget plads du har til flere.",
       "buyback": "Hvad du for nylig solgte til en handlende, og som du stadig kan købe tilbage.",
       "groupState": "Hvordan du har det lige nu",
@@ -10384,7 +10427,8 @@ export const da_DK: EnTranslations = {
       "warfareTradeBody": "Det er den bevidste handel. Krigsførelsesudstyr er bygget til at kæmpe mod spillere, ikke som en genvej forbi fangekælderniveauerne: et stykke Krigsførelsesudstyr bærer aldrig de kampvurderinger, en fangekælderepisk i samme plads gør, og alt, det bringer, er brugt på andre spillere. Vil du klare dig i arenaen, så køb det. Vil du rydde heroiske fangekældre hurtigere, så optjen dit udstyr i fangekældrene.",
       "warfareTradeBodyRatingSpent": "Det er den tilsigtede handel. Krigsudstyr er bygget til at kæmpe mod spillere, ikke som en genvej forbi dungeon-niveauerne: Et krigsstykke har aldrig de kampratings, som en dungeon-episk genstand i samme plads har, og de krigsvurderinger og sætbonusser, det i stedet har, bruges fuldstændigt på andre spillere. Hvis du vil kunne klare dig i arenaen, så køb det. Hvis du vil rydde heroiske dungeons hurtigere, så tjen dit udstyr i dungeons.",
       "vanguardHeading": "Vanguard-udstyr: Krigsførelse Sæson 2",
-      "vanguardBody": "Vanguard-udstyr er anden sæson af Krigsførelse-udstyr, solgt af de samme to kvartermestrene over det oprindelige lag, som forbliver til salg. Hver spec har sit eget Vanguard-sæt af fem dele, til hoved, skuldre, bryst, ben og hænder, og butikken viser kun de tre sæt din klasse kan bære, efterfulgt af de Vanguard-våben du kan føre. En Vanguard-del bærer de samme Krigsførelse-ratings som det oprindelige lag på et højere gjenstandsniveau, og hvert sæt har to bonusser, ved to og fire dele, der ændrer en af din specs evner. I modsætning til de oprindelige sæt fungerer disse bonusser overalt, udjegede inkluderet, men de er bygget til at kampe mod spillere, så et raid-sæt forbliver det bedre valg inde i et raid."
+      "vanguardBody": "Vanguard-udstyr er anden sæson af Krigsførelse-udstyr, solgt af de samme to kvartermestrene over det oprindelige lag, som forbliver til salg. Hver spec har sit eget Vanguard-sæt af fem dele, til hoved, skuldre, bryst, ben og hænder, og butikken viser kun de tre sæt din klasse kan bære, efterfulgt af de Vanguard-våben du kan føre. En Vanguard-del bærer de samme Krigsførelse-ratings som det oprindelige lag på et højere gjenstandsniveau, og hvert sæt har to bonusser, ved to og fire dele, der ændrer en af din specs evner. I modsætning til de oprindelige sæt fungerer disse bonusser overalt, udjegede inkluderet, men de er bygget til at kampe mod spillere, så et raid-sæt forbliver det bedre valg inde i et raid.",
+      "vanguardStatsBody": "I modsætning til det oprindelige lag bærer Avantgarde-udstyr også kampvurderinger: hver Avantgarde-rustningsdel, våben og halskæde har Kritvurdering eller Hastevurdering, og delene for tryllebrugeren og læger tilføjer Besværgelseskraft eller Helbredelseskraft. Avantgarde-ringene og halskederne sælges ved siden af væbnerne, og enhver klasse kan tage dem på. To af Avantgardes nærkampiringe giver nøjagtigt Rammevurderingen, der fjerner basischancen for, at dine angreb mangler en spiller på dit eget niveau, og to tryllebrugeres ringe gør det samme for dine besværgelser, der bliver modstået. Autoangreb under dobbeltkamp beholder deres ekstra manglende chance. Læger-ringen bærer i stedet Hastevurdering."
     },
     "worldPvpPage": {
       "heading": "Verden PvP",
@@ -10395,18 +10439,18 @@ export const da_DK: EnTranslations = {
       "stakesBody": "When flagged players defeat a flagged player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
       "limitsHeading": "Fair play regler",
       "limitsBody": "Defeating the same player again and again pays less each time and soon nothing, and the counter resets with the daily reset. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
-      "introZones": "Åben verden spiller-mod-spiller er opt-in, og det grund du står på afgør hvad det betyder. Hæv dit PvP-flag og enhver anden flagget spiller der ikke er i din parti eller raid bliver en fjende på omstridt grund; sænk det og, efter en kort forsinkelse, du er en tilskuer igen. To zoner er helligdomme hvor ingen verden kamp sker overhovedet, og de tre nordligste zoner er fri-for-alt-grund hvor alle til stede er fair spil, flag eller nej. Parti og raid-kammerater er aldrig fjender til dig et hvilken som helst sted; guildmates uden for din gruppe er fair spil som alle andre.",
+      "introZones": "PvP i den åbne verden er frivilligt og afhænger af området. På omstridt jord gør dit aktive PvP-flag alle spillere med flag uden for din gruppe eller dit raid til fjender; slår du det fra, bliver du tilskuer igen efter en kort forsinkelse. Prøvestranden er det eneste fristed uden verdenskampe, og de tre nordligste områder bruger samme frivillige flagregler som resten af verden. Dit flag aktiveres automatisk, når du går ind i en aktiv cirkel i Konge af Bakken. Gruppe- og raidfæller er aldrig dine fjender; guildmedlemmer uden for din gruppe er mål som alle andre.",
       "zonesHeading": "Hvor verdenskamp foregår",
-      "zonesBody": "Verden har tre slags grund. Prøvestranden og Østbæk Dal er fredede områder: der foregår ingen verdenskamp dér overhovedet, flaget eller ej, så en ny karakter kan aldrig blive angrebet før de ved, hvad flaget betyder. Størstedelen af verden er omstridt, hvor flagereglerne ovenfor er hele historien. Dragelandet, Frostsløret og Ravfaldet, de tre nordligste zoner, er frit fremme-område: alle der står i dem kan angribe alle andre der står i dem, med eller uden flag, og du bliver advaret når du træder ind og igen når du forlader. At angribe en spiller der ikke er flaget der rejser dit eget flag, så en angriber bærer altid risikoen. At ramme en spiller der allerede er flaget rejser det aldrig, hvilket betyder at forsvare dig selv, eller forsvare nogen der ikke er flaget, koster dig intet.",
+      "zonesBody": "Prøvestranden er det eneste fristed: der foregår ingen verdens-PvP, og du kan ikke aktivere dit flag. Et aktivt flag forbliver aktivt, men fremskridt mod titler baseret på spilletid sættes på pause, indtil du forlader området. Alle andre steder, også i Dragelandet, Frostsløret og Ravfaldet, kan kun spillere med flag kæmpe. Når du går ind i en aktiv cirkel i Konge af Bakken, aktiveres dit flag automatisk, hvis du opfylder det normale niveaukrav. Varslingscirklen aktiverer ikke dit flag. Flaget forbliver aktivt, når du forlader den aktive cirkel; brug /pvp off til at starte den normale nedtælling på fem minutter, som ikke kan slutte, mens du er på en aktiv bakke eller stadig er i kamp.",
       "flagBodyAid": "Skriv /pvp i chat, eller åbn PvP-vinduet på G og brug Verden PvP-fanen, der også viser din rekord og indsatser. At hæve flaget er øjeblikkeligt når du er forbi start-niveauerne. At sænke det starter en nedtælling på et par minutter, og flaget vil ikke falde mens du stadig kæmper, så at slå fra er aldrig flugt fra en kamp du startede. At hele, skjolde eller buffe en flagget spiller der er i en kamp hæver dine egne flag som godt, så ingen opretholder en kriger fra bag et flag de ikke bærer; at aide en spiller der ikke er flagget hæver ingenting.",
       "stakesUnflaggedTake": "En uflaget kæmper får heller intet: guld skifter kun hænder mellem to flagede spillere, selvom alle der hjalp stadig optjener Ære.",
-      "stakesBodyFlagged": "Når en flagget spiller besejres af en anden spiller, taberen betaler en lille del af guldet i deres pung, grænsesat til et beskedent beløb, og vindererne tjener Ære mod Krigsførelse-udstyr. En spiller der ikke var flagget betaler ingen guld overhovedet, selv når de falder i en fri-for-alt zone. Alle der hjalp dele både: det dødbringende slag, hvem som helst der skadede målet kort før, og lægefolkene der holdt disse krigers stående. En ren en-mod-en betaler hele potten; en gruppe deler det.",
+      "stakesBodyFlagged": "Når en spiller med flag besejres af en anden spiller, betaler taberen en lille del af guldet i sin pung, begrænset til et beskedent beløb, og vinderne optjener Ære til Krigsførelse-udstyr. En spiller uden flag kan ikke angribes i den åbne verden. Alle, der hjalp, deler både guld og Ære: spilleren, der gav dødsstødet, alle, der skadede målet kort forinden, og healerne, der holdt disse kæmpere på benene. En ren en-mod-en-kamp giver hele puljen; en gruppe deler den.",
       "hillHeading": "Konge af Bakken",
-      "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "hillBody": "Hver anden time dukker en bakke op i Dragelandet, Frostsløret eller Ravfaldet. Riget får et varsel femten minutter før, og cirklen markeres på åbent land. Bakken er aktiv i tredive minutter. Når du går ind i den aktive cirkel, aktiveres dit flag til verdens-PvP efter de normale niveauregler, også for raidmedlemmer. Gruppen med flest kvalificerede spillere i cirklen indtager bakken efter et minut med uafbrudt flertal; en enkelt spiller tæller som en gruppe på én, men raidmedlemmer og spillere under niveaukravet for PvP kan hverken indtage bakken eller optjene Ære fra den. Hver indehaver i cirklen optjener Ære med stigende hastighed. Udbetalingerne kommer hyppigere og stiger hurtigere, så den samlede Ære fra den tidligere begivenhed på femogfyrre minutter bevares. Når bakken skifter ejer, begynder stigningen forfra. Dit flag forbliver aktivt, når du forlader cirklen; /pvp off bruger den normale forsinkelse på fem minutter og kan ikke afsluttes på en aktiv bakke eller under kamp. Bakkens bjælke viser kontrollen, antallet af spillere og fremskridtet i erobringen; /hill oplyser dens placering.",
       "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
-      "hillBodyRamp": "Hver tredje time, på et tidspunkt ingen kan forudsige, hele riget fortalt at en bakke vil stige i en af fri-for-alt-zonerne på femten minutter, og cirklen hvor det vil stå markeres på åbent land. Når det stiger står det i 45 minutter, derefter falder. Partiet med de fleste spillere stående indenfor strides bakken, og efter et minuts ubrudt majoritet bakken er deres; en ensom spiller tæller som et parti på en, men raid-medlemmer tæller slet ikke. Mens en parti holder bakken, hver af dets medlemmer stående indenfor tjener Ære hver minut, og jo længere det samme parti holder det, jo mere hver minut betaler: et fuldt parti holder en omstridt bakke for hele sit stå tjener omkring så meget som tre battleground sejre. Når bakken skifter hænder, start de nye indehavere tællingen fra begyndelsen. En bar over marken viser hvem der holder det, dine numre mod deres, og konkurrenceuret; /hill i chat siger hvor det står.",
+      "hillBodyRamp": "Hver anden time dukker en bakke op i Dragelandet, Frostsløret eller Ravfaldet. Riget får et varsel femten minutter før, og cirklen markeres på åbent land. Bakken er aktiv i tredive minutter. Når du går ind i den aktive cirkel, aktiveres dit flag til verdens-PvP efter de normale niveauregler, også for raidmedlemmer. Gruppen med flest kvalificerede spillere i cirklen indtager bakken efter et minut med uafbrudt flertal; en enkelt spiller tæller som en gruppe på én, men raidmedlemmer og spillere under niveaukravet for PvP kan hverken indtage bakken eller optjene Ære fra den. Hver indehaver i cirklen optjener Ære med stigende hastighed. Udbetalingerne kommer hyppigere og stiger hurtigere, så den samlede Ære fra den tidligere begivenhed på femogfyrre minutter bevares. Når bakken skifter ejer, begynder stigningen forfra. Dit flag forbliver aktivt, når du forlader cirklen; /pvp off bruger den normale forsinkelse på fem minutter og kan ikke afsluttes på en aktiv bakke eller under kamp. Bakkens bjælke viser kontrollen, antallet af spillere og fremskridtet i erobringen; /hill oplyser dens placering.",
       "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
-      "hillBodyFlat": "En gang hver tredje time får hele riget på et uforudsigeligt tidspunkt besked om, at en bakke dukker op i en zone med fri kamp om femten minutter. Dens cirkel markeres på åbent terræn. Bakken bliver stående i femogfyrre minutter og forsvinder så. Imens meddeles dens placering og grupperne med den længste samlede kontroltid hvert femte minut. Gruppen med flest spillere i cirklen kæmper om bakken og erobrer den efter i alt tredive sekunders overtal. En rivaliserende gruppe sætter kun tælleren på pause, indtil din gruppe fører igen; den starter først forfra, når der ikke er nogen levende fra din gruppe tilbage i cirklen. En solospiller tæller som en gruppe på én og beholder sin bakke, når en gruppe dannes, men raidmedlemmer tæller slet ikke. Hvert medlem af gruppen, der holder bakken og står i cirklen, modtager lige meget Ære hvert minut, uanset hvor længe gruppen har holdt den. En fuld gruppe, som holder bakken uforstyrret i hele dens levetid, tjener omtrent det samme som for tre sejre på slagmarker. Når bakken forsvinder, får alle, som stod i cirklen i mindst ét minut under den førende gruppes kontrol og stadig er i gruppen, én sejr til PvP-rækken i den ugentlige hvælving, hvis gruppen med længst samlet kontrol holdt den i mindst ti minutter. En bjælke over området viser indehaveren, antallet af spillere på begge sider og erobringstælleren; /hill i chatten viser placeringen.",
+      "hillBodyFlat": "En gang hver tredje time får hele riget på et uforudsigeligt tidspunkt besked om, at en bakke dukker op i en af de nordlige zoner om femten minutter. Dens cirkel markeres på åbent terræn. Bakken bliver stående i femogfyrre minutter og forsvinder så. Imens meddeles dens placering og grupperne med den længste samlede kontroltid hvert femte minut. Gruppen med flest spillere i cirklen kæmper om bakken og erobrer den efter i alt tredive sekunders overtal. En rivaliserende gruppe sætter kun tælleren på pause, indtil din gruppe fører igen; den starter først forfra, når der ikke er nogen levende fra din gruppe tilbage i cirklen. En solospiller tæller som en gruppe på én og beholder sin bakke, når en gruppe dannes, men raidmedlemmer tæller slet ikke. Hvert medlem af gruppen, der holder bakken og står i cirklen, modtager lige meget Ære hvert minut, uanset hvor længe gruppen har holdt den. En fuld gruppe, som holder bakken uforstyrret i hele dens levetid, tjener omtrent det samme som for tre sejre på slagmarker. Når bakken forsvinder, får alle, som stod i cirklen i mindst ét minut under den førende gruppes kontrol og stadig er i gruppen, én sejr til PvP-rækken i den ugentlige hvælving, hvis gruppen med længst samlet kontrol holdt den i mindst ti minutter. En bjælke over området viser indehaveren, antallet af spillere på begge sider og erobringstælleren; /hill i chatten viser placeringen.",
       "limitsBodyRaids": "Besejring det samme spiller igen og igen betaler mindre hver gang og snart ingenting, og din tælling mod det spiller kun starter over omkring en time efter først af disse drab, så lejring en offer er aldrig værd ventetid. Et mål langt under dit niveau betaler ingenting overhovedet. Battlegrounds og Arenaer køre deres egne regler mens du er inden i dem, og de betaler mere Ære end åben verden, så verden PvP er den langsommere vej til samme forhandler. Raids tjener ingenting fra verden drab: et raid medlem tager ingen Ære eller guld og gør ikke skrumpe nogen anden aktie, så kæmp som en parti til at blive betalt."
     },
     "thornhollowPage": {
@@ -13507,7 +13551,14 @@ export const da_DK: EnTranslations = {
     "terms": "Servicevilkår",
     "privacy": "Privatlivspolitik",
     "discordLabel": "Bliv medlem af Discord",
-    "levyStreet": "Levy Street"
+    "levyStreet": "Levy Street",
+    "guidesLabel": "Spillerguides",
+    "guideFree": "Gratis MMORPG'er",
+    "guideGamesLikeWow": "Spil som WoW",
+    "guideBest": "Bedste MMORPG'er",
+    "guideNew": "Nye MMORPG'er",
+    "guideBrowser": "Browser-MMORPG'er",
+    "guideGamesLikeDiablo": "Spil som Diablo"
   },
   "settings": {
     "languageLoading": "Indlæser sprog...",
@@ -16156,6 +16207,7 @@ export const da_DK: EnTranslations = {
       "cooldownMinutes": "{minutes}m",
       "attackTooltip": "Slå automatisk angreb til/fra på dit mål. Højreklik på en fjende angriber også.",
       "attackRemoveHint": "Højreklik for at fjerne den fra bjælken og frigøre pladsen.",
+      "moveHint": "Hold Skift nede, og træk for at flytte",
       "emptySlot": "Tom plads",
       "slotAria": "Handlingsplads {slot}: {ability}",
       "emptySlotAria": "Handlingsplads {slot}: tom",
@@ -16975,6 +17027,7 @@ export const da_DK: EnTranslations = {
       "dps": "({dps} skade i sekundet)",
       "armorStat": "{value} Rustning",
       "stat": "+{value} {stat}",
+      "warfareMainHandOnly": "Krigsførelse tæller kun i hovedhånden.",
       "useFood": "Brug: Genopretter {amount} helbred over {seconds} sek. Skal forblive siddende mens du spiser.",
       "useDrink": "Brug: Genopretter {amount} mana over {seconds} sek. Skal forblive siddende mens du drikker.",
       "useElixir": "Brug: Øger din {stat} med {value} i {minutes} minutter. Erstatter enhver anden eliksir eller rulle med samme egenskab. Kan bruges i kamp.",
@@ -24217,6 +24270,33 @@ export const da_DK: EnTranslations = {
       "moonwrack_stave": {
         "name": "Månevragets stav"
       },
+      "vanguard_feral_staff": {
+        "name": "Fortroppens vilde stav"
+      },
+      "vanguard_band_of_might": {
+        "name": "Avantgardes Ring af Styrke"
+      },
+      "vanguard_band_of_precision": {
+        "name": "Avantgardes Ring af Præcision"
+      },
+      "vanguard_band_of_focus": {
+        "name": "Avantgardes Ring af Fokus"
+      },
+      "vanguard_band_of_mending": {
+        "name": "Avantgardes Ring af Helbredelse"
+      },
+      "vanguard_pendant_of_might": {
+        "name": "Avantgardes Anheng af Styrke"
+      },
+      "vanguard_pendant_of_precision": {
+        "name": "Avantgardes Anheng af Præcision"
+      },
+      "vanguard_pendant_of_focus": {
+        "name": "Avantgardes Anheng af Fokus"
+      },
+      "vanguard_pendant_of_mending": {
+        "name": "Avantgardes Anheng af Helbredelse"
+      },
       "membership_staff": {
         "name": "Forandringens stav"
       },
@@ -30304,7 +30384,7 @@ export const da_DK: EnTranslations = {
       "membership_annual_reward": {
         "sender": "Ravneposten",
         "subject": "Dit ridedyr fra årsmedlemskabet",
-        "body": "Din betaling for årsmedlemskabet er gennemført. Dit ridedyrs tøjler er vedlagt. Behold tøjlerne i dine tasker eller bank for at eje dette ridedyr. Det forbliver dit efter medlemskabets udløb. Ridefærdighed kræves."
+        "body": "Din betaling for årsmedlemskabet er gennemført. Den natvingede kimære er nu låst op for alle figurer på din konto, og dens tøjler er vedlagt. Den forbliver din efter medlemskabets udløb. Ridefærdighed kræves."
       },
       "woc_market_return": {
         "sender": "Børsmægleren",

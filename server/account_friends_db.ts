@@ -216,11 +216,11 @@ export class PgAccountFriendsDb {
           'DELETE FROM account_friendships WHERE account_id = $1 AND friend_account_id = $2',
           pair,
         );
-        await client.query('SELECT pg_notify($1, $2)', [
-          ACCOUNT_BLOCKS_NOTIFY_CHANNEL,
-          JSON.stringify({ accountId: pair[0] }),
-        ]);
       }
+      await client.query('SELECT pg_notify($1, $2)', [
+        ACCOUNT_BLOCKS_NOTIFY_CHANNEL,
+        JSON.stringify({ accountId: pair[0] }),
+      ]);
       await client.commit();
       return 'ok';
     } catch (error) {
@@ -265,6 +265,11 @@ export class PgAccountFriendsDb {
         'DELETE FROM account_friendships WHERE account_id = $1 AND friend_account_id = $2 RETURNING account_id',
         pair,
       );
+      if (res.rows.length)
+        await client.query('SELECT pg_notify($1, $2)', [
+          ACCOUNT_BLOCKS_NOTIFY_CHANNEL,
+          JSON.stringify({ accountId: pair[0] }),
+        ]);
       await client.commit();
       return res.rows.length ? 'removed' : 'missing';
     } catch (error) {
@@ -357,6 +362,50 @@ export class PgAccountFriendsDb {
         .filter((row) => row.id !== null)
         .map((row) => ({ ...row, activeTitle: row.activeTitle || null })),
     };
+  }
+
+  // Indexed pair probes bounded by online accounts, independent of UI pages.
+  async presenceEdgesForAccount(accountId: number, candidates: readonly number[]) {
+    const ids = [...new Set(candidates)].filter((id) => id !== accountId);
+    const rows: import('./account_presence_host').PresenceEdge[] = [];
+    for (let offset = 0; offset < ids.length; offset += 256) {
+      const result = await this.query(
+        `WITH candidates AS (SELECT unnest($2::int[]) AS id), edges AS (
+          SELECT c.id AS "accountId",
+            EXISTS (SELECT 1 FROM account_friendships f WHERE f.account_id = $1 AND f.friend_account_id = c.id) AS outgoing,
+            EXISTS (SELECT 1 FROM account_friendships f WHERE f.account_id = c.id AND f.friend_account_id = $1) AS incoming,
+            (EXISTS (SELECT 1 FROM referrals r WHERE r.referee_account_id = $1 AND r.referrer_account_id = c.id)
+              OR EXISTS (SELECT 1 FROM referrals r WHERE r.referee_account_id = c.id AND r.referrer_account_id = $1)) AS bound
+          FROM candidates c
+        ) SELECT "accountId", outgoing OR bound AS outgoing, incoming OR bound AS incoming
+          FROM edges WHERE outgoing OR incoming OR bound`,
+        [accountId, ids.slice(offset, offset + 256)],
+      );
+      rows.push(...result.rows);
+    }
+    return rows;
+  }
+
+  /** Listener recovery enumerates stored edges for bounded owner batches. */
+  async presenceEdgesForLiveAccounts(accountIds: readonly number[]) {
+    const ids = [...new Set(accountIds)];
+    const rows: import('./account_presence_host').LivePresenceEdge[] = [];
+    for (let offset = 0; offset < ids.length; offset += 256) {
+      const result = await this.query(
+        `SELECT f.account_id AS "ownerId", f.friend_account_id AS "friendId"
+          FROM account_friendships f
+          WHERE f.account_id = ANY($1::int[]) AND f.friend_account_id = ANY($2::int[])
+        UNION SELECT r.referee_account_id AS "ownerId", r.referrer_account_id AS "friendId"
+          FROM referrals r
+          WHERE r.referee_account_id = ANY($1::int[]) AND r.referrer_account_id = ANY($2::int[])
+        UNION SELECT r.referrer_account_id AS "ownerId", r.referee_account_id AS "friendId"
+          FROM referrals r
+          WHERE r.referrer_account_id = ANY($1::int[]) AND r.referee_account_id = ANY($2::int[])`,
+        [ids.slice(offset, offset + 256), ids],
+      );
+      rows.push(...result.rows);
+    }
+    return rows;
   }
 
   // Reverse notification lookup is one indexed query, not one lookup per alt.

@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 5767,
+    "files": 5765,
     "harvestedFiles": 3941,
     "carried": {
       "tests/_debug_i18n.test.ts": {
@@ -7282,17 +7282,6 @@
           5
         ]
       },
-      "tests/hoard_vault_rescale.test.ts": {
-        "ms": 2985,
-        "method": "local-median",
-        "measured": "2026-10-20",
-        "reason": "v0.45.0 integration: three batched local runs (vitest --maxWorkers=4) pending the first full-mode harvest after the integration lands",
-        "runs": [
-          2985,
-          2973,
-          4258
-        ]
-      },
       "tests/hollow_crypt_alert.test.ts": {
         "ms": 7454,
         "method": "local-median",
@@ -12414,17 +12403,6 @@
           1541,
           1645,
           1536
-        ]
-      },
-      "tests/server/vault_guest_cap.test.ts": {
-        "ms": 3,
-        "method": "local-median",
-        "measured": "2026-10-20",
-        "reason": "v0.45.0 integration: three batched local runs (vitest --maxWorkers=4) pending the first full-mode harvest after the integration lands",
-        "runs": [
-          3,
-          2,
-          3
         ]
       },
       "tests/server/vault_ledger_row_bound.test.ts": {
@@ -20643,7 +20621,6 @@
   "tests/hoard_valley.test.ts": 76,
   "tests/hoard_valley_core.test.ts": 9,
   "tests/hoard_valley_environment.test.ts": 7,
-  "tests/hoard_vault_rescale.test.ts": 2985,
   "tests/holder_broadcast.test.ts": 1986,
   "tests/holder_tier.test.ts": 25,
   "tests/hollow_crypt_alert.test.ts": 7454,
@@ -22892,7 +22869,6 @@
   "tests/server/varkhul_wire.test.ts": 15,
   "tests/server/vault_direct_claim.test.ts": 7,
   "tests/server/vault_direct_claim_host.test.ts": 1541,
-  "tests/server/vault_guest_cap.test.ts": 3,
   "tests/server/vault_ledger_row_bound.test.ts": 5,
   "tests/server/vault_mail_take_guard.test.ts": 112,
   "tests/server/vault_mail_take_recovery.test.ts": 2017,

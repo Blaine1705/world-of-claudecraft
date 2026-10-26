@@ -144,7 +144,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_gallery: {
     name: 'Galería de Guerra',
-    desc: 'Los cinco equipos de batalla de Guerra, conseguidos pieza a pieza con honor.',
+    desc: 'Los cinco equipos de batalla de Guerra de la primera temporada, ahora vendidos pieza a pieza por oro.',
   },
   conquerors_warfare_armory: {
     name: 'Armería de Guerra',

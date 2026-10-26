@@ -14,11 +14,12 @@ import { CharterFitMemory } from './charter_fit_memory';
 import type { StoreSpendResult } from './claudium_purchase_bridge';
 import {
   dailyRewardsLoadingHtml,
+  dailyRewardsRemainingText,
+  dailyRewardsSummaryHtml,
   dailyRewardsTitleHtml,
   wocStoreTabsHtml,
 } from './daily_rewards_chrome_view';
 import { dailyRewardsHistoryHtml, dailyRewardsLeaderboardHtml } from './daily_rewards_ranks_view';
-import { dailyRewardReasonText } from './daily_rewards_reason_view';
 import { SpinOverlay } from './daily_rewards_spin_controller';
 import { spinSectionHtml } from './daily_rewards_spin_view';
 import {
@@ -29,8 +30,8 @@ import {
 import { dailyRewardsWalletCardHtml } from './daily_rewards_wallet_card_view';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
-import { captureFocusKey, focusedWithin, focusKeyAttr } from './focus_restore';
-import { formatDateTime, formatNumber, t } from './i18n';
+import { captureFocusKey, findFocusKey, focusedWithin, focusKeyAttr } from './focus_restore';
+import { formatNumber, t } from './i18n';
 import { MountInspect } from './mount_inspect_controller';
 import { hydratePortraits } from './portrait_chip';
 import { durableIntents, type PurchaseIntentLedger } from './purchase_intent_durability';
@@ -49,7 +50,6 @@ import type { dailyRewardsStoreSnapshot } from './store_snapshot_adapter';
 import { storeSpendControllers } from './store_spend_controllers';
 import { StoreSubscription } from './store_subscription';
 import { StoreSurfaceRuntime } from './store_surface_runtime';
-import { usdDollarsText } from './usd_text';
 import {
   type ArmorySection,
   type ArmorySkinRow,
@@ -139,7 +139,8 @@ export class DailyRewardsWindow {
   // The spin celebration's element, owned by its own painter
   // (src/ui/daily_rewards_spin_controller.ts) beside the pure wheel core.
   private readonly spinOverlay = new SpinOverlay();
-  private tab: 'store' | 'rewards' = 'store';
+  // 'rewards' is only the store-disabled fallback; the store itself has no rewards tab.
+  private tab: 'store' | 'memberships' | 'rewards' = 'store';
   private storeBalance: number | null = null;
   private storeItems: WocStoreItemInput[] = [];
   private armorySections: ArmorySection[] = [];
@@ -209,16 +210,16 @@ export class DailyRewardsWindow {
     return this.deps.root().style.display === 'block';
   }
 
-  openStore(): void {
+  openStore(tab: 'store' | 'memberships' = 'store'): void {
     if (!this.storeEnabled()) return;
     if (!this.isOpen) {
-      this.tab = 'store';
+      this.tab = tab;
       this.toggle();
       return;
     }
-    if (this.tab !== 'store') {
+    if (this.tab !== tab) {
       this.invalidateStoreSurface();
-      this.tab = 'store';
+      this.tab = tab;
     }
     void this.renderCurrent('open');
   }
@@ -396,7 +397,7 @@ export class DailyRewardsWindow {
     const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-woc-store-tab]'));
     const select = (button: HTMLButtonElement, focus: boolean): void => {
       const tab = button.dataset.wocStoreTab;
-      if (tab !== 'store' && tab !== 'rewards') return;
+      if (tab !== 'store' && tab !== 'memberships') return;
       if (tab !== this.tab) this.invalidateStoreSurface();
       this.tab = tab;
       this.syncTabs();
@@ -434,6 +435,10 @@ export class DailyRewardsWindow {
       await this.renderStore(focus, opts);
       return;
     }
+    if (this.tab === 'memberships') {
+      await this.renderMemberships(focus, opts);
+      return;
+    }
     await this.render(focus);
   }
 
@@ -443,11 +448,11 @@ export class DailyRewardsWindow {
       this.deps.root().classList.remove('store-active');
       return;
     }
-    this.deps.root().classList.toggle('store-active', this.tab === 'store');
+    this.deps.root().classList.toggle('store-active', this.tab !== 'rewards');
     const panel = this.deps.root().querySelector<HTMLElement>('.woc-store-body');
     panel?.setAttribute(
       'aria-labelledby',
-      this.tab === 'store' ? 'woc-store-tab-store' : 'woc-store-tab-rewards',
+      this.tab === 'memberships' ? 'woc-store-tab-memberships' : 'woc-store-tab-store',
     );
     this.deps
       .root()
@@ -474,7 +479,6 @@ export class DailyRewardsWindow {
     this.storeError = false;
     this.storeRuntime.setLoading(this.storeLoading);
     try {
-      if (!opts.background) await this.subscription.refresh();
       const snapshot = (await this.deps.storeSnapshot?.()) ?? {
         available: false,
         balance: null,
@@ -499,6 +503,40 @@ export class DailyRewardsWindow {
       }
     }
     if (this.storeRequestIsCurrent(generation)) this.paintStore(body, opts);
+  }
+
+  /** The Memberships tab: a cold section that refreshes on entry and after a checkout
+   *  completes, never on the store's background poll. */
+  private async renderMemberships(
+    focus: 'open' | null,
+    opts: { background?: boolean } = {},
+  ): Promise<void> {
+    const root = this.deps.root();
+    const body = root.querySelector<HTMLElement>('.dr-body');
+    if (!body) return;
+    if (focus === 'open')
+      root.querySelector<HTMLButtonElement>('[data-woc-store-tab="memberships"]')?.focus();
+    if (opts.background) return;
+    const seq = ++this.renderSeq;
+    this.storeLoading = true;
+    this.storeRuntime.setLoading(this.storeLoading);
+    try {
+      await this.subscription.refresh();
+    } finally {
+      if (seq === this.renderSeq) {
+        this.storeLoading = false;
+        this.storeRuntime.setLoading(this.storeLoading);
+      }
+    }
+    if (!this.isOpen || this.tab !== 'memberships' || seq !== this.renderSeq) return;
+    const focusKey = captureFocusKey(body);
+    // Not store markup: returning to the Cosmetic Store tab must repaint it.
+    this.paintedStoreBody = null;
+    body.innerHTML =
+      this.subscription.html() ||
+      `<div class="dr-empty" role="status">${esc(t('hudChrome.wocStore.membershipsUnavailable'))}</div>`;
+    this.subscription.bind(body, () => void this.renderMemberships(null));
+    if (focusKey) findFocusKey(body, focusKey)?.focus();
   }
 
   private storeRequestIsCurrent(generation: number): boolean {
@@ -592,7 +630,6 @@ export class DailyRewardsWindow {
       `<div class="woc-store-hero"><div><span>${esc(t('hudChrome.wocStore.armoryEyebrow'))}</span><h2>${esc(t('hudChrome.wocStore.armoryTitle'))}</h2><p>${esc(t('hudChrome.wocStore.armoryBody'))}</p></div>` +
       `<div class="woc-store-balance"><img src="/claudium/icons/claudium_coin_64.webp" alt=""><span>${esc(t('hudChrome.wocStore.balance'))}</span><strong>${balance}</strong><button type="button" data-buy-claudium${focusKeyAttr('topup')}>${esc(t('hudChrome.wocStore.buyClaudium'))}</button></div></div>` +
       notice +
-      this.subscription.html() +
       this.storeSpend.mounts.sectionHtml() +
       this.charterNoticeHtml() +
       armory +
@@ -671,8 +708,7 @@ export class DailyRewardsWindow {
     });
     const wiped = this.replaceStoreBody(
       body,
-      `<div class="dr-empty dr-error" role="alert">${esc(t('hudChrome.wocStore.error'))}</div>` +
-        this.subscription.html(),
+      `<div class="dr-empty dr-error" role="alert">${esc(t('hudChrome.wocStore.error'))}</div>`,
     );
     // An ELIDED repaint destroyed no control, so its target is still mounted and
     // the stash is still the right return place: same rule as the normal path.
@@ -714,7 +750,6 @@ export class DailyRewardsWindow {
     // the card they just used. Same idiom as the bank window's grid repaint.
     const scrollTop = body.scrollTop;
     body.innerHTML = markup;
-    this.subscription.bind(body);
     body.scrollTop = scrollTop;
     this.paintedStoreBody = body;
     this.paintedStoreMarkup = markup;
@@ -1142,7 +1177,7 @@ export class DailyRewardsWindow {
       return;
     }
     body.innerHTML =
-      this.summaryHtml(view) +
+      dailyRewardsSummaryHtml(view, Date.now()) +
       dailyRewardsWalletCardHtml(view) +
       spinSectionHtml(view) +
       this.tasksHtml(view) +
@@ -1179,62 +1214,14 @@ export class DailyRewardsWindow {
     return this.deps.storeEnabled?.() ?? this.deps.storeSnapshot !== undefined;
   }
 
-  private summaryHtml(view: Extract<DailyRewardsView, { kind: 'ready' }>): string {
-    const s = view.status;
-    const prize =
-      s.prizePoolSol === null
-        ? t('hudChrome.dailyRewards.unknown')
-        : `${t('hudChrome.dailyRewards.sol', {
-            amount: formatNumber(s.prizePoolSol, { maximumFractionDigits: 3 }),
-          })} (${t('hudChrome.dailyRewards.usd', {
-            amount: usdDollarsText(s.prizePoolUsd),
-          })})`;
-    const reset = formatDateTime(new Date(s.resetAt), { hour: 'numeric', minute: '2-digit' });
-    const remaining = this.remainingText(s.resetAt);
-    const value =
-      s.eligibility.usdValue === null
-        ? t('hudChrome.dailyRewards.unknown')
-        : t('hudChrome.dailyRewards.usd', {
-            amount: usdDollarsText(s.eligibility.usdValue),
-          });
-    const reason = dailyRewardReasonText(s.eligibility, Date.now());
-    return (
-      `<p class="dr-intro">${esc(t('hudChrome.dailyRewards.intro'))}</p>` +
-      `<p class="dr-disclaimer">${esc(t('hudChrome.dailyRewards.disclaimer'))}</p>` +
-      `<div class="dr-summary ui-card">` +
-      `<div class="ui-card-tile"><span>${esc(t('hudChrome.dailyRewards.prize'))}</span><strong>${esc(prize)}</strong></div>` +
-      `<div class="ui-card-tile"><span>${esc(t('hudChrome.dailyRewards.reset'))}</span><strong>${esc(reset)}</strong></div>` +
-      `<div class="dr-countdown ui-card-tile"><span data-daily-rewards-countdown="${esc(s.resetAt)}">${esc(t('hudChrome.dailyRewards.endsIn', { time: remaining }))}</span></div>` +
-      `<div class="ui-card-tile"><span>${esc(t('hudChrome.dailyRewards.score'))}</span><strong>${formatNumber(s.score, { maximumFractionDigits: 0 })}</strong></div>` +
-      `<div class="ui-card-tile"><span>${esc(t('hudChrome.dailyRewards.walletValue'))}</span><strong>${esc(value)}</strong></div>` +
-      `<p class="${view.locked ? 'dr-lock' : 'dr-ok'}">${esc(reason)}</p>` +
-      `</div>`
-    );
-  }
-
-  private remainingText(resetAt: string): string {
-    const ms = Date.parse(resetAt) - Date.now();
-    const totalMinutes = Math.max(0, Math.ceil(ms / 60_000));
-    if (totalMinutes < 1) return t('hudChrome.dailyRewards.remainingLessThanMinute');
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-    if (hours <= 0) {
-      return t('hudChrome.dailyRewards.remainingMinutes', {
-        minutes: formatNumber(minutes, { maximumFractionDigits: 0 }),
-      });
-    }
-    return t('hudChrome.dailyRewards.remainingHoursMinutes', {
-      hours: formatNumber(hours, { maximumFractionDigits: 0 }),
-      minutes: formatNumber(minutes, { maximumFractionDigits: 0 }),
-    });
-  }
-
   private paintCountdowns(): void {
     const root = this.deps.root();
     root.querySelectorAll<HTMLElement>('[data-daily-rewards-countdown]').forEach((el) => {
       const resetAt = el.dataset.dailyRewardsCountdown;
       if (!resetAt) return;
-      el.textContent = t('hudChrome.dailyRewards.endsIn', { time: this.remainingText(resetAt) });
+      el.textContent = t('hudChrome.dailyRewards.endsIn', {
+        time: dailyRewardsRemainingText(resetAt, Date.now()),
+      });
     });
   }
 

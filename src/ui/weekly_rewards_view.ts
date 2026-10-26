@@ -32,16 +32,19 @@ export function buildWeeklyRewardsView(
   options: { catalog?: WeeklyLootCatalog } = {},
 ) {
   const catalog = options.catalog ?? 'eligible';
-  const bossUnlocks = catalog === 'all' ? EVERY_WEEKLY_BOSS_UNLOCK : info.state.bossUnlocks;
+  const bossUnlocks =
+    catalog === 'all'
+      ? EVERY_WEEKLY_BOSS_UNLOCK
+      : (info.state.weeklyBossUnlocks ?? info.state.bossUnlocks);
   const earned = earnedWeeklyRolls(info.state);
   const progress = [
-    info.state.raids.filter(Boolean).length,
+    info.state.raidClears.length,
     info.state.dungeons.length,
     info.state.world,
     info.state.pvp,
   ];
   const tiers = {
-    raid: info.state.raids.filter(Boolean).sort((a, b) => b - a),
+    raid: info.state.raidClears,
     dungeon: info.state.dungeons,
   };
   return (['raid', 'dungeon', 'world', 'pvp'] as const).map((category, index) => ({

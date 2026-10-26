@@ -446,6 +446,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountBankEmpty': 'この銀行は空です。',
   'hudChrome.bank.accountBagsEmpty': 'バッグは空です。',
   'hudChrome.wocStore.subscription.tokenTitle': '取引可能なメンバーシップトークン',
+  'hudChrome.wocStore.subscription.tokenPrice': '30日分で{price}',
   'hudChrome.wocStore.subscription.tokenTerms':
     '{price}の一括払いで30日分。このキャラクターに郵便で届きます。使用してメンバーシップ期間を追加するか、オークションで売却できます。',
   'hudChrome.wocStore.subscription.tokenBuy': 'メンバーシップトークンを購入',
@@ -476,6 +477,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.terms':
     '毎月自動更新されます。Stripe で法定通貨によるお支払いができます。請求設定から解約できます。',
   'hudChrome.wocStore.subscription.subscribe': '定期購入する',
+  'hudChrome.wocStore.subscription.addMonth': '1か月追加',
+  'hudChrome.wocStore.subscription.addYear': '12か月追加',
+  'hudChrome.wocStore.subscription.stackTerms':
+    '今すぐお支払い。期間は現在のメンバーシップの終了日に追加され、その後このプランで更新されます。',
+  'hudChrome.wocStore.subscription.stackCapped':
+    'メンバーシップは一度に最大2年分まで保持できます。更新日が近づいてから再度お試しください。',
+  'hudChrome.wocStore.subscription.stackUnavailable':
+    '現在メンバーシップ期間を追加できません。しばらくしてから再度お試しください。',
+  'hudChrome.wocStore.subscription.billingBlocked':
+    'メンバーシップ期間を追加する前に、「定期購入を管理」で支払い情報を更新してください。',
+  'hudChrome.wocStore.subscription.renewsOn': '{date}に更新',
+  'hudChrome.wocStore.subscription.endsOn': 'メンバーシップは{date}に終了',
   'hudChrome.wocStore.subscription.manage': '定期購入を管理',
   'hudChrome.wocStore.subscription.ending': '現在の請求期間の終了時に解約されます',
   'hudChrome.wocStore.subscription.error':
@@ -1292,24 +1305,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '他のフラグを立てたプレイヤーがどこでもあなたを攻撃できるようになり、勝てば所持金から最大{cap}を奪われます。再びフラグを下ろすこともできますが、{minutes}分かかります。',
   'hudChrome.worldPvp.confirmCancel': 'キャンセル',
   'hudChrome.worldPvp.disable': 'ワールドPvPを無効化',
-  'hudChrome.worldPvp.disarmLine': 'フラグを下ろすには{minutes}分かかり、戦闘の終了を待ちます。',
+  'hudChrome.worldPvp.disarmLine':
+    '解除には{minutes}分かかり、開催中の丘から出て戦闘が終わるまで完了しません。',
   'hudChrome.worldPvp.enable': 'ワールドPvPを有効化',
   'hudChrome.worldPvp.greyLine': '自分より{levels}レベル以上低いプレイヤーからは何も得られません。',
   'hudChrome.worldPvp.groundContested':
     'それ以外の場所はすべて係争地です。フラグを立てたプレイヤー同士のみが戦えます。',
   'hudChrome.worldPvp.groundFfa':
-    'ドレイクランド、フロストヴェイルの果て、アンバーフォールは無差別戦闘地帯です。そこではフラグの有無に関わらず、誰もが戦えます。',
+    'ドレイクランド、フロストヴェイルの果て、アンバーフォールは通常のPvPフラグルールに従います。開催中の「丘の王」の円に入るとフラグが立ちます。',
   'hudChrome.worldPvp.groundSanctuary':
-    '修練の浜とイーストブルック渓谷は聖域です。ワールドPvPは一切起こりません。',
+    '修練の浜は唯一の聖域です。ここではワールドPvPを有効にしたり、他のプレイヤーと戦ったりできません。',
   'hudChrome.worldPvp.groupLine':
     'パーティとレイドの仲間同士は決して敵対しません。グループ外のギルドメンバーとは戦うことができます。',
   'hudChrome.worldPvp.honorLine': '撃破ごとに名誉{honor}、貢献した全員で分配。',
   'hudChrome.worldPvp.keepUp': 'フラグを維持',
   'hudChrome.worldPvp.levelReq': 'レベル{level}が必要です。',
   'hudChrome.worldPvp.markLine':
-    'そこでフラグを立てていないプレイヤーを攻撃すると自分のフラグが立ちますが、フラグを立てた相手を攻撃しても立ちません。',
-  'hudChrome.worldPvp.noStakeLine':
-    '無差別戦闘地帯でフラグを立てていないプレイヤーが倒されても、金貨を一切支払いません。',
+    '開催中の丘の円に入るとワールドPvPが有効になります。円から出てもフラグは残ります。',
+  'hudChrome.worldPvp.noStakeLine': 'フラグのないプレイヤーはオープンワールドで攻撃されません。',
   'hudChrome.worldPvp.noTakeLine':
     'フラグを立てていない戦闘者もゴールドは得られません。ゴールドが動くのはフラグを立てた2人のプレイヤーの間だけです。',
   'hudChrome.worldPvp.pending': 'レルムからのPvP状態を待っています。',
@@ -1563,6 +1576,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_warrior_prot_helmet.name': '鉄壁進撃の兜',
   'entities.items.vanguard_warrior_prot_legs.name': '鉄壁進撃の脚甲',
   'entities.items.vanguard_warrior_prot_shoulder.name': '鉄壁進撃の肩鎧',
+  'entities.items.vanguard_feral_staff.name': '先陣の野性の杖',
   'entities.items.vanguard_warstaff.name': 'ヴァンガードの戦杖',
   'entities.items.infernal_quiver.name': '業火の矢筒',
   'entities.items.brookwatch_robe.name': '小川監視のローブ',
@@ -1968,6 +1982,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.glider_apprentice.name': 'スカイ',
   'guide.arenaPage.vanguardBody':
     'ヴァンガード装備はウォーフェア装備の第2シーズンで、同じ二人の補給官が元の階層に加えて販売し続けます。元の階層も販売終了にはなりません。どのスペックにも頭、肩、胸、脚、手の五部位からなる専用のヴァンガードセットがあり、ショップにはあなたのクラスが装備できる三つのセットだけが並び、続けて装備できるヴァンガードの武器が並びます。ヴァンガードの部位は元の階層と同じウォーフェアレーティングを、より高いアイテムレベルで備えており、各セットには2点と4点でスペックのアビリティの一つを変化させる二つのボーナスがあります。元のセットと違い、それらのボーナスはモンスター相手を含めどこでも機能しますが、対プレイヤー戦向けに作られているため、レイド内ではレイドセットの方が依然として優れた選択です。',
+  'guide.arenaPage.vanguardStatsBody':
+    '元のティアと違い、ヴァンガード装備には戦闘レーティングも付いています。ヴァンガードの防具、武器、ペンダントにはそれぞれクリティカルレーティングかヘイストレーティングがあり、呪文使いとヒーラー向けの装備には呪文威力か治癒力も付きます。ヴァンガードの指輪とペンダントは武器と並んで販売され、どのクラスでも装備できます。ヴァンガードの近接用の指輪を2つ着けると、同じレベルのプレイヤーへの攻撃の基本ミス率をちょうど打ち消す命中レーティングになり、呪文用の指輪を2つ着けると呪文が抵抗される確率も同様に打ち消せます。二刀流のオートアタックには追加のミス率が残ります。ヒーラー用の指輪には代わりにヘイストレーティングが付きます。',
   'guide.arenaPage.vanguardHeading': 'ヴァンガード装備：ウォーフェアシーズン2',
   'guide.settingsPage.ifColorblindMode':
     'Nythraxisの床の危険地帯（墓所の噴出の警告円、墓炎と魂炎の溜まり、紫炎の直線、魂の裂傷の印）を、色覚異常でも見分けやすい配色に変更します。色相と明るさをはっきり分けているので、重なった円でも境界が見分けられます。大きさ、タイマー、位置は一切変わりません。',
@@ -2358,6 +2374,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
   'hudChrome.nameplate.mobLevel': '{level}',
   'hudChrome.nameplate.afkTag': '退席',
+  'hudChrome.nameplate.hillBountyTag': '賞金 {honor}',
   'hudChrome.nameplate.cheaterTag': '< チーター >',
   'hudChrome.nameplate.pledgeTag': '{guild}への誓約者',
   'hudChrome.nameplate.npcRoleTag': '<{role}>',
@@ -2586,8 +2603,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.title': 'WOCストア',
   'hudChrome.wocStore.close': 'WOCストアを閉じる',
   'hudChrome.wocStore.tabsLabel': 'WOCストアのセクション',
-  'hudChrome.wocStore.storeTab': 'ストア',
-  'hudChrome.wocStore.rewardsTab': 'デイリー報酬',
+  'hudChrome.wocStore.storeTab': 'コスメティックストア',
+  'hudChrome.wocStore.membershipsTab': 'メンバーシップ',
+  'hudChrome.wocStore.membershipsUnavailable':
+    '現在メンバーシップを利用できません。しばらくしてから再度お試しください。',
   'hudChrome.wocStore.mountsEyebrow': 'アカウント共有マウント',
   'hudChrome.wocStore.mountsTitle': '機械の厩舎',
   'hudChrome.wocStore.mountBuyAria': '{item}を購入',
@@ -3508,6 +3527,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.onlineHeader': 'オンライン ({n})',
   'hudChrome.social.offlineHeader': 'オフライン ({n})',
   'hudChrome.social.hideOffline': 'オフラインを非表示',
+  'hudChrome.social.presence.label': 'オンライン表示の相手',
+  'hudChrome.social.presence.everyone': '全員',
+  'hudChrome.social.presence.friends': 'フレンドのみ',
+  'hudChrome.social.presence.none': 'なし',
+  'hudChrome.social.presence.title':
+    'フレンドリストとギルド名簿で誰にオンライン状態、ゾーン、マップ上の位置を見せるか。パーティーメンバーには常に表示されます。',
   'hudChrome.social.hideOfflineTitle': 'オフラインのギルドメンバーを非表示',
   'hudChrome.social.billboard.label': 'ギルド掲示板',
   'hudChrome.social.billboard.empty': '掲示板にはまだ何もありません。',
@@ -3718,6 +3743,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.buyOwnedAria': '{item}を{honor}で購入、所有済み',
   'hudChrome.warfareShop.buyConfirmBody':
     '{item}を{honor}で購入しますか？名誉での購入は返金できません。',
+  'hudChrome.warfareShop.buyConfirmBodyGold':
+    '{item}を{price}で購入しますか？この購入は返金できません。',
   'hudChrome.keybinds.bgFlag': '戦場フラッグアクション',
   'hudChrome.keybinds.friendlyNameplates': '友好ネームプレート切り替え',
   'hudChrome.pvp.mobileLabel': 'PvP',
@@ -3843,8 +3870,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '偉業の書も評判を記録します。ある勢力で信頼に達すること、ある勢力でチャンピオンに達することがそれぞれ偉業として記録され、三勢力すべてでチャンピオンに達することは独自の偉業です。他の偉業と同じく、これらは見た目だけで力にはならず、チャンピオンの偉業は身に着けられる称号を授けます。',
   'guide.commandsPage.pvp':
     'ワールドPvPフラグ: /pvp で切り替え、/pvp on と /pvp off で直接設定します。フラグを立てたプレイヤー同士はどこでも戦えます。解除には5分かかります。',
+  'guide.commandsPage.presence':
+    'フレンドリスト、ギルド名簿、/who で誰にオンライン状態を見せるかを設定します。/presence everyone（初期設定）、/presence friends（自分のフレンドリストにいるプレイヤーのみ）、/presence none。非表示にすると、相手にはオンライン表示、ゾーン、マップ上の位置が見えなくなりますが、ウィスパーや招待は届きます。パーティーメンバーには常に表示されます。/presence だけで現在の設定を確認できます。',
+  'guide.commandsPage.flair':
+    '他のプレイヤーに見える Discord ロール（色付きの名前、ロールタグ、チャットの認証タグ）の表示を切り替えます。/flair on で表示、/flair off で非表示になり、/flair だけで現在の設定を確認できます。Discord アカウントの連携が必要です。',
   'guide.commandsPage.pvpZones':
-    'ワールドPvPフラグ: /pvp で切り替え、/pvp on と /pvp off で直接設定します。フラグを立てたプレイヤー同士は係争地で戦え、聖域ではワールドの戦闘は一切行われず、無差別戦闘地帯ではフラグの有無に関わらず戦えます。解除には5分かかります。',
+    'ワールドPvPフラグ：/pvpで切り替え、/pvp onと/pvp offで有効・無効にします。係争地域ではフラグを立てたプレイヤー同士が戦えますが、聖域ではワールドPvPはできません。開催中の「丘の王」の円に入るとフラグが立ちます。解除には5分かかります。',
   'guide.nav.worldPvp': 'ワールドPvP',
   'guide.worldPvpPage.heading': 'ワールドPvP',
   'guide.worldPvpPage.intro':
@@ -3859,14 +3890,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.worldPvpPage.limitsBody':
     '同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。カウントは日次リセットで元に戻ります。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。',
   'guide.worldPvpPage.introZones':
-    'オープンワールドの対人戦は任意参加で、その意味は足元の土地が決めます。PvPフラグを立てると、パーティやレイドに属さないフラグを立てた全プレイヤーが係争地で敵になります。フラグを下ろすと、少し経てば再び傍観者に戻ります。2つのゾーンはワールドの戦闘が一切起こらない聖域で、最北の3つのゾーンは、フラグの有無に関わらずその場の全員が攻撃対象となる無差別戦闘地帯です。パーティとレイドの仲間はどこでも敵になりませんが、グループ外のギルドメンバーは他の誰とも同じく攻撃対象です。',
+    'オープンワールドPvPへの参加は任意で、現在地によってルールが適用されます。係争地域でフラグを立てると、自分のパーティーやレイドに属さない他のフラグ所持者が敵になります。解除すると、短い待ち時間の後に再び傍観者になります。修練の浜は唯一の聖域で、ワールドPvPは一切ありません。最北の3地域も世界の他の地域と同じ任意参加のフラグルールに従います。開催中の「丘の王」の円に入ると自動的にフラグが立ちます。パーティーやレイドの仲間が敵になることはありませんが、グループ外のギルドメンバーは他のプレイヤーと同様に戦闘対象になります。',
   'guide.worldPvpPage.zonesHeading': 'ワールドPvPが起こる場所',
   'guide.worldPvpPage.zonesBody':
-    '世界の土地は3種類に分かれます。修練の浜とイーストブルック渓谷は聖域で、フラグの有無に関わらずワールドPvPは一切起こらないため、新しいキャラクターがフラグとは何かを知る前に戦いを挑まれることはありません。世界の大半は係争地で、そこでは上記のフラグの規則がすべてです。ドレイクランド、フロストヴェイルの果て、アンバーフォールは無差別戦闘地帯で、そこにいる全員がフラグの有無に関わらず、そこにいる他の全員を攻撃できます。境界を越えて入るときにも、出るときにも通知されます。そこでフラグを立てていないプレイヤーを攻撃すると自分のフラグが立つので、仕掛けた側が必ずリスクを背負います。すでにフラグを立てている相手を攻撃しても自分のフラグは立たないため、自衛や、フラグを立てていない誰かを守ることには何の代償もありません。',
+    '修練の浜は唯一の聖域です。ワールドPvPはなく、フラグも立てられません。既に立っているフラグは残りますが、称号のプレイ時間進捗は出るまで停止します。ドレイクランド、フロストヴェイルの果て、アンバーフォールを含む他のすべての場所では、フラグを立てたプレイヤーだけが戦えます。通常のレベル条件を満たしていれば、開催中の「丘の王」の円に入ると自動的にフラグが立ちます。予告中の円ではフラグは立ちません。開催中の円から出てもフラグは残ります。/pvp offで通常の5分間の解除待ちを開始できますが、開催中の丘の中や戦闘中は解除が完了しません。',
   'guide.worldPvpPage.flagBodyAid':
     'チャットで /pvp と入力するか、G キーで PvP ウィンドウを開いてワールドPvPタブを使います。タブには戦績と賭け金も表示されます。序盤のレベルを過ぎればフラグは即座に立ちます。下ろすと数分のカウントダウンが始まり、戦闘中はフラグが下りないので、自分から始めた戦いから逃げる手段にはなりません。戦闘中のフラグを立てたプレイヤーを回復、シールド、強化した場合も自分のフラグが立つため、自分はフラグを立てないまま戦う者を背後から支え続けることはできません。フラグを立てていないプレイヤーを支援しても、フラグは立ちません。',
   'guide.worldPvpPage.stakesBodyFlagged':
-    'フラグを立てたプレイヤーが他のプレイヤーに倒されると、敗者は所持金のわずかな割合（上限あり）を支払い、勝者は PvP 装備につながる名誉を得ます。フラグを立てていなかったプレイヤーは、無差別戦闘地帯で倒れても金貨を一切支払いません。貢献した全員が両方を分け合います。とどめを刺した人、直前にダメージを与えた人、そしてその戦士たちを支えたヒーラーです。純粋な1対1なら独占、集団なら分配です。',
+    'フラグを立てたプレイヤーが他のプレイヤーに倒されると、敗者は所持金のわずかな割合（上限あり）を支払い、勝者は PvP 装備につながる名誉を得ます。 フラグのないプレイヤーはオープンワールドで攻撃されません。 貢献した全員が両方を分け合います。とどめを刺した人、直前にダメージを与えた人、そしてその戦士たちを支えたヒーラーです。純粋な1対1なら独占、集団なら分配です。',
   'guide.worldPvpPage.stakesUnflaggedTake':
     'フラグを立てていない戦闘者もゴールドは得られません。ゴールドはフラグを立てた二人のプレイヤーの間でのみ動きますが、貢献した全員が名誉は得られます。',
   'guide.worldPvpPage.limitsBodyHour':
@@ -3879,7 +3910,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。そのプレイヤーに対するカウントは最初の撃破からおよそ1時間後にようやく元に戻るため、一人を狙い続けて待つ価値はありません。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。レイドはワールドでの撃破から何も得られません。レイドのメンバーは名誉もゴールドも受け取らず、他の人の取り分も減らさないため、報酬を得るにはパーティで戦いましょう。',
   'guide.worldPvpPage.hillHeading': '丘の王',
   'guide.worldPvpPage.hillBody':
-    '3時間に1度、予測できない時刻に、無差別戦闘地帯のいずれかに15分後に丘が現れることがレルム全体に告知され、丘が立つ円が開けた土地に示されます。丘は現れてから45分間立ち続け、その後消えます。円の中に立つプレイヤーが最も多いパーティが丘を争い、1分間途切れずに多数を保てば丘はそのパーティのものになります。単独のプレイヤーは一人のパーティとして数えますが、レイドのメンバーは一切数えられません。パーティが丘を占拠している間、円の中に立つそのメンバーは毎分わずかな名誉を得ます。そのため満員のパーティが誰にも争われずに丘が立っている間ずっと占拠し続けると、バトルグラウンドの勝利1回分より少し少ない名誉になります。フィールド上部のバーが、誰が占拠しているか、あなた側と相手の人数、そして争奪の時計を表示します。チャットで /hill と入力すると丘の場所が分かります。',
+    '2時間ごとにドレイクランド、フロストヴェイルの果て、アンバーフォールのいずれかに丘が出現します。レルム全体に15分前の予告が届き、開けた地面に円が表示されます。丘は30分間有効です。開催中の円に入ると、レイドメンバーも含め、通常のレベル条件に従ってワールドPvPフラグが立ちます。円内の参加資格を持つ人数が最も多いパーティーが、1分間連続で優勢を保つと丘を占領します。単独プレイヤーは1人パーティーとして扱われますが、レイドメンバーとPvP必要レベル未満のプレイヤーは占領も丘の名誉獲得もできません。占領側の円内の各メンバーは、次第に高まる割合で名誉を得ます。報酬の支給頻度と増加速度が上がり、以前の45分間のイベントと同じ名誉総量が保たれます。占領側が変わると増加は最初から始まります。円から出てもフラグは残ります。/pvp offは通常の5分待ちを使い、開催中の丘の中や戦闘中には完了しません。丘のバーには占領側、人数、占領進捗が表示され、/hillで場所を確認できます。',
   'guide.thornhollowPage.heading': 'ソーンホロウ平原',
   'guide.thornhollowPage.intro':
     'ソーンピークの下、古い森に抱かれた壁に囲まれた窪地で戦うランク制5対5の旗奪取戦場。峡谷の両端で二つの廃城が向かい合い、その間にはどちらの手にも落ちたことのない、より古い中庭が横たわる。五人ずつ、城は二つ、目的は一つ。相手の旗を奪い、こちらの旗を奪われる前に持ち帰れ。',
@@ -5419,6 +5450,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.actionBar.attackTooltip':
     '対象への自動攻撃を切り替えます。敵を右クリックしても攻撃します。',
   'abilityUi.actionBar.attackRemoveHint': '右クリックでバーから外し、スロットを空けます。',
+  'abilityUi.actionBar.moveHint': 'Shift-ドラッグで移動',
   'abilityUi.actionBar.emptySlot': '空きスロット',
   'abilityUi.actionBar.slotAria': 'アクションスロット {slot}: {ability}',
   'abilityUi.actionBar.emptySlotAria': 'アクションスロット {slot}: 空き',
@@ -5688,6 +5720,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.dps': '（秒間 {dps} ダメージ）',
   'itemUi.tooltip.armorStat': '防御力 {value}',
   'itemUi.tooltip.stat': '+{value} {stat}',
+  'itemUi.tooltip.warfareMainHandOnly': 'ウォーフェアはメインハンドでのみ有効です。',
   'itemUi.tooltip.useFood':
     '使用: {seconds}秒かけて体力を{amount}回復します。食事中は座ったままでいる必要があります。',
   'itemUi.tooltip.useDrink':
@@ -11159,9 +11192,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '最も近い者が骨の棘を攻撃する。誰の攻撃でも数回当てれば砕け、ダメージ量は問わない。ヒーラーは棘が砕けるまで串刺しにされた味方を生かし続ける。',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionName': '墓所の噴出',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionSummary':
-    '{everyNormal}秒ごとに、骸骨の手がレイドメンバーの足元に{radius}ヤードの円を{countNormal}個描く。{warning}秒後、各円は最大体力の{burstNormal}を闇ダメージとして噴出させ、その後{flameNormal}秒間墓炎として燃え続け、中に立つ者へ毎秒最大体力の{tickNormal}を与える。',
+    '{everyNormal}秒ごとに、骸骨の手がレイドメンバーの足元に{radius}ヤードの円を{countNormal}個描く。{warning}秒後、各円は最大体力の{burstNormal}を闇ダメージとして噴出させ、その後{flameNormal}秒間墓炎として燃え続け、中に立つ者へ毎秒最大体力の{tickNormal}を与える。魂の裂傷のマークが有効な間と、マークが消えてから{gap}秒以内には発生しない。',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionHeroicSummary':
-    '{everyHeroic}秒ごとに、骸骨の手がレイドメンバーの足元に{radius}ヤードの円を{countHeroic}個描く。{warning}秒後、各円は最大体力の{burstHeroic}を闇ダメージとして噴出させ、その後{flameHeroic}秒間墓炎として燃え続け、中に立つ者へ毎秒最大体力の{tickHeroic}を与える。',
+    '{everyHeroic}秒ごとに、骸骨の手がレイドメンバーの足元に{radius}ヤードの円を{countHeroic}個描く。{warning}秒後、各円は最大体力の{burstHeroic}を闇ダメージとして噴出させ、その後{flameHeroic}秒間墓炎として燃え続け、中に立つ者へ毎秒最大体力の{tickHeroic}を与える。魂の裂傷のマークが有効な間と、マークが消えてから{gap}秒以内には発生しない。',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionResponse':
     '噴出する前にすべての警告円から外へ出て、燃える地面を避け続ける。タンクはナイスラクシスを炎から引き離し、近接が動ける余地を確保する。',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilName': '拘束の印',
@@ -11659,12 +11692,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.open': 'Discord',
   'hudChrome.discord.viewCharacter': '{name}を表示',
   'hudChrome.discord.rank': 'ランク',
-  'hudChrome.discord.roleTag.admin': '管理者',
   'hudChrome.discord.roleTag.levyst': 'Levy St',
   'hudChrome.discord.roleTag.devs': '開発者',
   'hudChrome.discord.roleTag.mods': 'モデレーター',
-  'hudChrome.discord.roleTag.seniormods': 'シニアモデレーター',
-  'hudChrome.discord.roleTag.juniormods': 'ジュニアモデレーター',
+  'hudChrome.discord.roleTag.seniormods': 'センチネル',
+  'hudChrome.discord.roleTag.juniormods': 'オブザーバー',
   'hudChrome.discord.roleTag.contentcreator': 'コンテンツクリエイター',
   'hudChrome.discord.voice.channel': '{channel}に参加中',
   'hudChrome.discord.swag.title': 'グッズ',
@@ -14579,6 +14611,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '画面上の宝箱ボタンを押すと、デイリー報酬のウィンドウが開きます。毎日いくつかの課題が用意され、クエストを達成したり、灰の闘技場で戦ったり、ヴェイルカップの試合に勝ったりでき、さらに賞品ホイールを一日一回無料で回せます。これらはすべてその日の順位に向けたポイントになり、上位の獲得者たちは、任意のコミュニティトークンの保有者向けの賞金プールを分け合います。いずれもゲーム内で力を授けることはありません。ウィンドウにはその日のルールと参加資格が示され、リーダーボードが表示され、あなたの履歴も残されます。',
   'guide.economy.dailyTitle': 'デイリー報酬',
   'guide.footer.linksLabel': 'プレイとコミュニティのリンク',
+  'guide.footer.guidesLabel': 'プレイヤーガイド',
+  'guide.footer.guideGamesLikeWow': 'WoWに似たゲーム',
+  'guide.footer.guideBrowser': 'ブラウザMMORPG',
+  'guide.footer.guideGamesLikeDiablo': 'ディアブロに似たゲーム',
   'guide.gear.bagsBody':
     '拾ったものはすべて一つの共通の背嚢に入り、バッグを装備することでそれを広げます。バッグウィンドウにはバッグスロットが四つあります。背嚢の中のバッグをクリックすれば空きスロットに差し込めますし、身に着けたバッグはそれぞれ自分の収納を足します。素朴なバッグは安価な商人の品で、より広いものは獣が落とし、最上のものはダンジョンのボスから来るので、持てる量は装備と歩調を合わせて育ちます。積み重ねられる品はどれも、一つのスロットに何個入るかをツールチップに記しているので、ちょっとしたポーションの買い出しがスロット二つ分になることを前もって知ることができます。',
   'guide.gear.bagsTitle': 'バッグと収納容量',
@@ -20108,6 +20144,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': '管理者アカウントはキックできません。',
   'apiError.kick.reason_required': '理由の入力が必要です。',
   'apiError.kick.target_offline': 'そのプレイヤーはもうこのレルムにオンラインではありません。',
+  'apiError.world_quest_block.admin_target':
+    '管理者アカウントはワールドクエストから除外できません。',
+  'apiError.world_quest_block.reason_required': '理由の入力が必要です。',
+  'apiError.world_quest_block.already_blocked':
+    'そのアカウントはすでにワールドクエストから除外されています。',
+  'apiError.world_quest_block.not_blocked':
+    'そのアカウントはワールドクエストから除外されていません。',
   'entities.items.reins_goblin_rocket_sled.name': 'ゴブリンロケットそりの始動キー',
   'entities.items.reins_rallycart_rxt.name': 'ラリーカートRXTの始動キー',
   'guide.settingsPage.ifAuraBarBelowFrame':
@@ -21166,11 +21209,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.readyWeeks':
     '未受領の週：{count}。完了した最も古い週から受け取ってください。',
   'hudChrome.weeklyRewards.claimLastWeek': '先週の報酬を受け取る',
-  'hudChrome.weeklyRewards.previewClaimNotice':
-    '報酬が待っています。イーストブルックの宝物庫の番人を訪ね、宝物庫を開けて報酬を受け取ってください。',
   'hudChrome.weeklyRewards.readyTitle': '週間報酬の準備ができました',
   'hudChrome.weeklyRewards.readyDescription':
     '完了した週の報酬が待っています。獲得した宝物庫を開け、受け取る一品を選んでください。',
+  'hudChrome.weeklyRewards.previewClaimNotice':
+    '報酬が待っています。イーストブルックの宝物庫の番人を訪ね、宝物庫を開けて報酬を受け取ってください。',
   'hudChrome.weeklyRewards.notNow': '後で',
   'hudChrome.weeklyRewards.completedWeek': '{date}に終了した週',
   'hudChrome.weeklyRewards.currentWeek': '今週の進捗に戻る',
@@ -21466,7 +21509,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'あなたの継続回復効果の各ティックが10%の確率で胞子バーストに準備します。10秒に1回まで。',
   'entities.items.pvp_skull_bag.name': '頭蓋袋',
   'guide.worldPvpPage.hillBodyFlat':
-    '三時間ごとに、予測できないタイミングでレルム全体に告知が届きます。十五分後、無差別戦闘地帯のどこかに丘が出現し、その範囲となる円が開けた地面に示されます。丘は出現から四十五分間続いて消え、その間は五分ごとに場所と各グループの累計占領時間の順位が告知されます。円内に立つ人数が最も多いパーティーが丘を争い、人数優勢の状態を合計三十秒保つと占領できます。敵のパーティーが入っても、自分たちが再び優勢になるまで計時が一時停止するだけです。円内に味方の生存者が一人もいなくなったときだけ、計時が最初からになります。一人でも一人パーティーとして数えられ、占領中にパーティーを組んでも丘を失いませんが、レイドのメンバーは一切数えられません。占領しているパーティーの各メンバーは、円内に立っていると毎分同じ量の名誉を得られます。占領時間が長くなっても報酬は変わらず、満員のパーティーが妨害されずに最初から最後まで占領すれば、戦場で三勝するのとほぼ同じ名誉を得られます。丘が消えるとき、累計占領時間が最も長いグループが合計十分以上占領していれば、そのグループの占領中に円内で合計一分以上過ごし、終了時にも同じグループにいる全員に、週間宝物庫の PvP 枠への一勝が与えられます。戦場上部のバーに占領者、両陣営の人数、争奪の計時が表示され、チャットで /hill と入力すると丘の場所がわかります。',
+    '三時間ごとに、予測できないタイミングでレルム全体に告知が届きます。十五分後、北部の地帯のどこかに丘が出現し、その範囲となる円が開けた地面に示されます。丘は出現から四十五分間続いて消え、その間は五分ごとに場所と各グループの累計占領時間の順位が告知されます。円内に立つ人数が最も多いパーティーが丘を争い、人数優勢の状態を合計三十秒保つと占領できます。敵のパーティーが入っても、自分たちが再び優勢になるまで計時が一時停止するだけです。円内に味方の生存者が一人もいなくなったときだけ、計時が最初からになります。一人でも一人パーティーとして数えられ、占領中にパーティーを組んでも丘を失いませんが、レイドのメンバーは一切数えられません。占領しているパーティーの各メンバーは、円内に立っていると毎分同じ量の名誉を得られます。占領時間が長くなっても報酬は変わらず、満員のパーティーが妨害されずに最初から最後まで占領すれば、戦場で三勝するのとほぼ同じ名誉を得られます。丘が消えるとき、累計占領時間が最も長いグループが合計十分以上占領していれば、そのグループの占領中に円内で合計一分以上過ごし、終了時にも同じグループにいる全員に、週間宝物庫の PvP 枠への一勝が与えられます。戦場上部のバーに占領者、両陣営の人数、争奪の計時が表示され、チャットで /hill と入力すると丘の場所がわかります。',
   'hudChrome.graphicsRestore.note': '描画を復元中',
   'hudChrome.hill.contestOtherPaused': '相手の進行停止：{seconds}/{total}',
   'hudChrome.hill.contestYouPaused': '進行停止：{seconds}/{total}',
@@ -21510,7 +21553,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualTerms':
     '同じ料金で毎年更新されます。Stripeで法定通貨を使ってお支払いください。請求設定で解約できます。',
   'hudChrome.wocStore.subscription.annualMount':
-    '支払い後、購入したキャラクターで郵便から魂に縛られたナイトウィング・キマイラの手綱を受け取れます。メンバーシップが終了しても騎乗動物は所有できます。',
+    'アカウントの全キャラクターでナイトウィング・キマイラの騎乗動物が解放され、魂に縛られた手綱は購入したキャラクターに郵便で届きます。1アカウントにつき1体で、メンバーシップ終了後も所有できます。',
   'hudChrome.wocStore.subscription.trialTerms':
     '1アカウントにつき1回、{days}日間無料で体験できます。支払い方法の登録が必要です。解約しない場合、体験終了時に{price}が請求されます。',
   'hudChrome.wocStore.subscription.startTrial': '7日間の無料体験を開始',
@@ -21518,11 +21561,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualPending':
     '支払い後、購入したキャラクターに戻って騎乗動物を受け取ってください。支払い処理中や無料体験中の場合は、課金後に再試行してください。',
   'hudChrome.wocStore.subscription.annualDelivered': 'セットの騎乗動物の鍵が郵便で届きました。',
-  'hudChrome.wocStore.subscription.resumeCheckout': '購入手続きを再開',
   'entities.letters.membership_annual_reward.sender': 'レイヴンポスト',
   'entities.letters.membership_annual_reward.subject': '年間メンバーシップの騎乗動物',
   'entities.letters.membership_annual_reward.body':
-    '年間メンバーシップの支払いが完了しました。騎乗動物の手綱を同封しました。所有するには手綱をバッグか銀行に保管してください。メンバーシップが終了しても所有権は維持されます。騎乗スキルが必要です。',
+    '年間メンバーシップの支払いが完了しました。ナイトウィング・キマイラがアカウントの全キャラクターで解放され、手綱を同封しました。メンバーシップが終了しても所有できます。騎乗スキルが必要です。',
   'hudChrome.wocStore.subscription.checkoutClosed':
     'この購入手続きは終了しており、未受領の特典はありません。メンバーシッププランをもう一度選び、新しい購入手続きを開始してください。',
   'itemUi.tooltip.referralFullSet':
@@ -25393,4 +25435,31 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.firstPersonBody': '体を表示',
   'hudChrome.options.firstPersonNoBody': '体を非表示',
   'hudChrome.options.firstPersonOff': 'オフ',
+  'footer.guideBest': '最高のMMORPG',
+  'footer.guideFree': '無料MMORPG',
+  'footer.guideNew': '新作MMORPG',
+  'guide.footer.guideBest': '最高のMMORPG',
+  'guide.footer.guideFree': '無料MMORPG',
+  'guide.footer.guideNew': '新作MMORPG',
+  'entities.items.vanguard_band_of_might.name': 'ヴァンガードの力の指輪',
+  'entities.items.vanguard_band_of_precision.name': 'ヴァンガードの精密の指輪',
+  'entities.items.vanguard_band_of_focus.name': 'ヴァンガードの集中の指輪',
+  'entities.items.vanguard_band_of_mending.name': 'ヴァンガードの癒しの指輪',
+  'entities.items.vanguard_pendant_of_might.name': 'ヴァンガードの力のペンダント',
+  'entities.items.vanguard_pendant_of_precision.name': 'ヴァンガードの精密のペンダント',
+  'entities.items.vanguard_pendant_of_focus.name': 'ヴァンガードの集中のペンダント',
+  'entities.items.vanguard_pendant_of_mending.name': 'ヴァンガードの癒しのペンダント',
+  'footer.guidesLabel': 'プレイヤーガイド',
+  'footer.guideGamesLikeWow': 'WoWに似たゲーム',
+  'footer.guideBrowser': 'ブラウザMMORPG',
+  'footer.guideGamesLikeDiablo': 'ディアブロに似たゲーム',
+  'hudChrome.hill.pvpEntry': '開催中の円に入るとワールドPvPが有効になります。',
+  'hudChrome.hill.pvpBanner': 'PvP',
+  'hudChrome.hill.callout.killingSpree': '{name}：キリングスプリー！',
+  'hudChrome.hill.callout.rampage': '{name}：ランペイジ！',
+  'hudChrome.hill.callout.unstoppable': '{name}：アンストッパブル！',
+  'hudChrome.hill.callout.dominating': '{name}：ドミネイティング！',
+  'hudChrome.hill.callout.godlike': '{name}：ゴッドライク！',
+  'hudChrome.hill.callout.legendary': '{name}：レジェンダリー！',
+  'hudChrome.hill.callout.shutDown': '{killer}が{victim}をシャットダウン！',
 };

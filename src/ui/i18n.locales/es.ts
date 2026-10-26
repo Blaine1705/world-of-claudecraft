@@ -1287,16 +1287,14 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.confirmCancel': 'Cancelar',
   'hudChrome.worldPvp.disable': 'Desactivar el JcJ mundial',
   'hudChrome.worldPvp.disarmLine':
-    'Desactivarla tarda {minutes} minutos y espera a que termine el combate.',
+    'Desactivar la bandera tarda {minutes} minutos y espera hasta que salgas de la colina activa y termine el combate.',
   'hudChrome.worldPvp.enable': 'Activar el JcJ mundial',
   'hudChrome.worldPvp.greyLine':
     'Los jugadores con más de {levels} niveles por debajo del tuyo no pagan nada.',
   'hudChrome.worldPvp.groundContested':
     'En cualquier otro lugar, el terreno está disputado: solo pueden luchar dos jugadores marcados.',
   'hudChrome.worldPvp.groundFfa':
-    'Las Tierras del Dragón, el Velo de Escarcha y la Cascada de Ámbar son de todos contra todos: allí puede luchar cualquiera, tenga la bandera alzada o no.',
-  'hudChrome.worldPvp.groundSanctuary':
-    'La Costa de la Prueba y el Valle de Eastbrook son santuarios: allí no hay JcJ mundial de ningún tipo.',
+    'Las Tierras del Dragón, El Velo de Escarcha y La Cascada de Ámbar usan las banderas JcJ habituales. Entrar en el círculo activo del Rey de la Colina activa tu bandera.',
   'hudChrome.worldPvp.groupLine':
     'Los miembros de grupo y de banda nunca son hostiles entre sí. Los compañeros de hermandad que no estén en tu grupo sí pueden luchar.',
   'hudChrome.worldPvp.honorLine':
@@ -1304,9 +1302,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.keepUp': 'Mantener la bandera alzada',
   'hudChrome.worldPvp.levelReq': 'Requiere nivel {level}.',
   'hudChrome.worldPvp.markLine':
-    'Atacar allí a un jugador sin marcar alza tu propia bandera; atacar a uno marcado nunca lo hace.',
+    'Entrar en el círculo activo de una colina activa el JcJ mundial. Salir mantiene tu bandera activa.',
   'hudChrome.worldPvp.noStakeLine':
-    'Un jugador sin marcar que muere en terreno de todos contra todos no pierde oro.',
+    'Los jugadores sin bandera no pueden ser atacados en el mundo abierto.',
   'hudChrome.worldPvp.noTakeLine':
     'Un combatiente sin marcar tampoco se lleva oro: este solo se mueve entre dos jugadores marcados.',
   'hudChrome.worldPvp.pending': 'Esperando tu estado de JcJ del reino.',
@@ -1756,7 +1754,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_druid_feral.bonus2':
     'El tiempo de reutilización de Embestida de Bruin se reduce 3 s. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.vanguard_druid_feral.bonus4':
-    'Embestida de Bruin te otorga un escudo por el 6% de tu salud máxima durante 6 s.',
+    'Reduce el tiempo de reutilización de Carrera en 15 s.',
   'entities.items.vanguard_druid_restoration_chest.name': 'Chaleco Florcardo',
   'entities.items.vanguard_druid_restoration_gloves.name': 'Guantes Florcardo',
   'entities.items.vanguard_druid_restoration_helmet.name': 'Corona Florcardo',
@@ -2293,20 +2291,16 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.worldPvpPage.flagHeading': 'Levantar y bajar la bandera',
   'guide.worldPvpPage.heading': 'JcJ Mundial',
   'guide.worldPvpPage.hillBodyRamp':
-    'Una vez cada tres horas, en un momento que nadie puede predecir, se avisa a todo el reino de que una colina se alzará en una de las zonas de todos contra todos dentro de quince minutos, y el círculo donde se alzará queda marcado sobre terreno abierto. Al alzarse, permanece cuarenta y cinco minutos, y luego cae. El grupo con más jugadores dentro disputa la colina, y tras un minuto de mayoría ininterrumpida la colina es suya; un jugador solo cuenta como un grupo de uno, pero los miembros de banda no cuentan en absoluto. Mientras un grupo controla la colina, cada uno de sus miembros que esté dentro gana Honor cada minuto, y cuanto más tiempo la controle el mismo grupo, más paga cada minuto: un grupo completo que controle una colina sin disputa durante toda su duración gana aproximadamente lo mismo que tres victorias en Campos Espinosos. Cuando la colina cambia de manos, los nuevos controladores empiezan la cuenta desde el principio. Una barra sobre el campo muestra quién la controla, tus números frente a los suyos, y el reloj de la disputa; /hill en el chat indica dónde se encuentra.',
+    'Cada dos horas aparece una colina en Las Tierras del Dragón, El Velo de Escarcha o La Cascada de Ámbar. El reino recibe un aviso con quince minutos de antelación y el círculo queda marcado en terreno abierto. La colina permanece activa treinta minutos. Entrar en el círculo activo activa la bandera JcJ mundial según los requisitos de nivel habituales, también para los miembros de bandas. El grupo con más jugadores aptos dentro captura la colina tras un minuto de mayoría ininterrumpida; un jugador solo cuenta como grupo de uno, pero los miembros de bandas y los jugadores por debajo del nivel requerido para JcJ no pueden capturar ni ganar Honor de la colina. Cada defensor dentro gana Honor a un ritmo creciente. Los pagos y su aumento son más rápidos y conservan el Honor total del antiguo evento de cuarenta y cinco minutos. Al cambiar de dueño, el aumento empieza de nuevo. Salir mantiene tu bandera activa; /pvp off tarda los cinco minutos habituales y no puede completarse dentro de una colina activa ni durante el combate. La barra muestra el control, los efectivos y el progreso de captura; /hill indica la ubicación.',
   'guide.worldPvpPage.hillHeading': 'El Rey de la Colina',
-  'guide.worldPvpPage.introZones':
-    'El combate entre jugadores en el mundo abierto es voluntario, y el terreno donde te encuentras decide lo que eso significa. Levanta tu bandera de JcJ y todo jugador marcado que no esté en tu grupo o banda se convierte en enemigo en terreno disputado; bájala y, tras una breve demora, vuelves a ser un espectador. Dos zonas son santuarios donde no ocurre ningún combate mundial en absoluto, y las tres zonas más al norte son terreno de todos contra todos, donde cualquiera presente es blanco legítimo, con bandera o sin ella. Los compañeros de grupo y de banda nunca son enemigos tuyos en ningún sitio; los compañeros de hermandad fuera de tu grupo son blanco legítimo como cualquier otro.',
   'guide.worldPvpPage.limitsBodyRaids':
     'Derrotar al mismo jugador una y otra vez paga cada vez menos y pronto no paga nada, y tu cuenta contra ese jugador solo se reinicia alrededor de una hora después de la primera de esas muertes, así que acechar a una sola víctima nunca vale la espera. Un objetivo muy por debajo de tu nivel no paga absolutamente nada. Los Campos Espinosos y las Arenas siguen sus propias reglas mientras estás dentro, y pagan más Honor que el mundo abierto, así que el JcJ mundial es el camino más lento hacia el mismo vendedor. Las bandas no ganan nada con las muertes en el mundo: un miembro de banda no recibe Honor ni oro y no reduce la parte de nadie más, así que lucha en grupo para que te paguen.',
   'guide.worldPvpPage.limitsHeading': 'Reglas de juego limpio',
   'guide.worldPvpPage.stakesBodyFlagged':
-    'Cuando un jugador marcado es derrotado por otro jugador, el perdedor paga una pequeña parte del oro de su bolsa, con un tope modesto, y los ganadores obtienen Honor hacia el equipo de guerra. Un jugador que no estaba marcado no paga oro alguno, incluso si cae en una zona de todos contra todos. Todos los que ayudaron comparten ambas cosas: el golpe de gracia, cualquiera que dañara al objetivo poco antes, y los sanadores que mantuvieron en pie a esos luchadores. Un mano a mano limpio paga el bote entero; un grupo lo reparte.',
+    'Cuando un jugador marcado es derrotado por otro jugador, el perdedor paga una pequeña parte del oro de su bolsa, con un tope modesto, y los ganadores obtienen Honor hacia el equipo de guerra. Los jugadores sin bandera no pueden ser atacados en el mundo abierto. Todos los que ayudaron comparten ambas cosas: el golpe de gracia, cualquiera que dañara al objetivo poco antes, y los sanadores que mantuvieron en pie a esos luchadores. Un mano a mano limpio paga el bote entero; un grupo lo reparte.',
   'guide.worldPvpPage.stakesHeading': 'Cuánto vale una muerte',
   'guide.worldPvpPage.stakesUnflaggedTake':
     'Tampoco un luchador sin marcar recibe nada: el oro solo cambia de manos entre dos jugadores marcados, aunque todos los que ayudaron sí ganan el Honor.',
-  'guide.worldPvpPage.zonesBody':
-    'El mundo tiene tres tipos de terreno. La Costa de la Prueba y el Valle de Eastbrook son santuarios: allí no ocurre ningún JcJ mundial, con bandera o sin ella, así que un personaje nuevo jamás puede ser atacado antes de saber qué es la bandera. La mayor parte del mundo es terreno disputado, donde la regla de la bandera de arriba es toda la historia. Las Tierras del Dragón, El Velo de Escarcha y la Cascada de Ámbar, las tres zonas más al norte, son terreno de todos contra todos: todo el que se encuentra en ellas puede atacar a todos los demás que estén allí, con bandera o sin ella, y se te avisa tanto al entrar como al salir. Atacar a un jugador que no está marcado allí levanta tu propia bandera, así que un agresor siempre acaba cargando con el riesgo. Golpear a un jugador que ya está marcado nunca la levanta, lo que significa que defenderte a ti mismo, o defender a alguien que no está marcado, no te cuesta nada.',
   'guide.worldPvpPage.zonesHeading': 'Dónde ocurre el JcJ mundial',
   'guide.questsPage.cluesBody':
     'En las zonas lejanas, el tablón diario de misiones mundiales esconde una recompensa más para quien complete toda la lista: un Pergamino de Pistas, y la búsqueda del tesoro escrita en él.',
@@ -2334,8 +2328,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.vanguardBody':
     'El equipo de Vanguardia es la segunda temporada del equipo de Guerra, vendido por los mismos dos intendentes, por encima del nivel original, que sigue a la venta. Cada especialización tiene su propio conjunto de Vanguardia de cinco piezas, para la cabeza, los hombros, el pecho, las piernas y las manos, y la tienda solo lista los tres conjuntos que tu clase puede vestir, seguidos de las armas de Vanguardia que puedes empuñar. Una pieza de Vanguardia lleva las mismas características de Guerra que el nivel original a un nivel de objeto más alto, y cada conjunto tiene dos bonificaciones, a dos y cuatro piezas, que cambian una de las habilidades de tu especialización. A diferencia de los conjuntos originales, esas bonificaciones funcionan en todas partes, monstruos incluidos, pero están pensadas para luchar contra jugadores, así que un conjunto de banda sigue siendo la mejor opción dentro de una banda.',
   'guide.arenaPage.vanguardHeading': 'Equipo de Vanguardia: Guerra, temporada 2',
+  'guide.commandsPage.flair':
+    'Muestra u oculta tu rol de Discord a otros jugadores, es decir, tu nombre en color, tu etiqueta de rol y tu etiqueta de chat verificada: /flair on lo muestra, /flair off lo oculta y /flair a secas te dice cuál está activo. Requiere una cuenta de Discord vinculada.',
   'guide.commandsPage.pvpZones':
-    'Bandera de JcJ mundial: /pvp la alterna, /pvp on y /pvp off la fijan. Los jugadores marcados pueden luchar entre sí en terreno disputado, los santuarios no permiten ningún combate mundial en absoluto, y las zonas de todos contra todos lo permiten con o sin bandera; desactivarla tarda 5 minutos.',
+    'Bandera JcJ mundial: /pvp la alterna; /pvp on y /pvp off la activan y desactivan. Los jugadores marcados pueden luchar entre sí en zonas disputadas; los santuarios no permiten combates JcJ mundiales. Entrar en el círculo activo del Rey de la Colina activa tu bandera. Desactivarla tarda 5 minutos.',
   'guide.commandsPage.unstuckWindow':
     'La salida cuando el mundo te ha atrapado. Quédate quieto durante una breve cuenta atrás y te trasladan al cementerio más cercano, y te revive allí si ya habías caído. El primer uso en una hora es gratis. Si lo usas de nuevo dentro de la hora siguiente al último, te deja debilitado con el Mal de desatasco durante un tiempo después, así que es un rescate, no un atajo.',
   'guide.nav.factions': 'Facciones y Reputación',
@@ -6123,9 +6119,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cameraPrompt.title': 'Elige tu camara',
   'hudChrome.discord.link.joinServer': 'Unete al servidor de Discord',
   'hudChrome.discord.roleTag.contentcreator': 'Creador de contenido',
-  'hudChrome.discord.roleTag.juniormods': 'Moderador junior',
+  'hudChrome.discord.roleTag.juniormods': 'Observador',
   'hudChrome.discord.roleTag.legend': 'LEYENDA',
-  'hudChrome.discord.roleTag.seniormods': 'Moderador senior',
+  'hudChrome.discord.roleTag.seniormods': 'Centinela',
   'hudChrome.discord.roleTag.shill': 'PROMOTOR',
   'hudChrome.finder.accept': 'Aceptar',
   'hudChrome.finder.acceptApplicantAria': 'Aceptar a {name}',
@@ -7221,7 +7217,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.resurrectAtHealer': 'El Guardián Pálido (Tañido del Guardián)',
   'hudChrome.death.spiritHealerAlive':
     'El Guardián Pálido vela por los muertos. Tú aún estás entre los vivos.',
-  'hudChrome.discord.roleTag.admin': 'Administrador',
   'hudChrome.mailbox.arrivedBanner': 'El cuervo ha aterrizado: correo de {name}.',
   'hudChrome.mailbox.arrivedLog': 'Tienes correo nuevo de {name}.',
   'hudChrome.mailbox.attachmentsBadge': 'Paquete adjunto',
@@ -15009,7 +15004,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.rarity.legendary': 'Legendario',
   'hudChrome.wocStore.rarity.rare': 'Raro',
   'hudChrome.wocStore.rarity.uncommon': 'Poco común',
-  'hudChrome.wocStore.rewardsTab': 'Recompensas diarias',
   'hudChrome.wocStore.scene.day': 'Día',
   'hudChrome.wocStore.scene.dusk': 'Crepúsculo',
   'hudChrome.wocStore.scene.night': 'Noche',
@@ -15160,7 +15154,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Arco de acero plateado y hielo azul, con un núcleo congelado cian brillante en la empuñadura, una flecha de hielo macizo lista para disparar y vapor frío.',
   'hudChrome.wocStore.skins.winterbite.lore':
     'Un arco de acero plateado y hielo de Thornpeak, con la empuñadura iluminada por un núcleo cian frío que congela la flecha a la cuerda. Carga un astil de hielo glaciar macizo que vuelve a formarse con cada tensado; el arquero no lleva carcaj en el muro, solo el frío. Highwatch resistió un asedio en la Cresta del Acechador con uno como este: un solo arquero, según cuentan, y flechas para un invierno entero que parecían estar allí desde siempre.',
-  'hudChrome.wocStore.storeTab': 'Tienda',
+  'hudChrome.wocStore.storeTab': 'Tienda de cosméticos',
   'hudChrome.wocStore.tabsLabel': 'Secciones de la tienda WOC',
   'hudChrome.wocStore.title': 'Tienda WOC',
   'hudChrome.wocStore.tryOn': 'Probar',
@@ -18245,6 +18239,12 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': 'Las cuentas de los operadores no se pueden expulsar.',
   'apiError.kick.reason_required': 'Se requiere una razón.',
   'apiError.kick.target_offline': 'Ese jugador ya no está en línea en este reino.',
+  'apiError.world_quest_block.admin_target':
+    'Las cuentas de los operadores no se pueden bloquear para misiones de mundo.',
+  'apiError.world_quest_block.reason_required': 'Se requiere una razón.',
+  'apiError.world_quest_block.already_blocked':
+    'Esa cuenta ya está bloqueada para misiones de mundo.',
+  'apiError.world_quest_block.not_blocked': 'Esa cuenta no está bloqueada para misiones de mundo.',
   'entities.abilities.melting_acid.description':
     'Recubre tu arma durante 30 min. Cada uno de tus golpes cuerpo a cuerpo salpica al objetivo con ácido cáustico y reduce su armadura en un 5 % durante 12 s.',
   'entities.abilities.nightshade_coating.description':
@@ -18634,12 +18634,12 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.dreadCurseSummary':
     'Cada {every} s, Nythraxis golpea a su tanque actual con {hitNormal} de la salud máxima como daño de las Sombras y añade una acumulación de Maldición pavorosa. Durante {duration} s, cada acumulación aumenta el daño que ese tanque recibe de Nythraxis en {perStackNormal}, hasta {max} acumulaciones.',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionHeroicSummary':
-    'Cada {everyHeroic} s, manos esqueléticas marcan {countHeroic} círculos de {radius} yd bajo miembros de la banda. Tras {warning} s, cada círculo erupciona e inflige {burstHeroic} de la salud máxima como daño de las Sombras; luego arde como Llama sepulcral durante {flameHeroic} s e inflige {tickHeroic} de la salud máxima cada segundo a cualquiera que permanezca dentro.',
+    'Cada {everyHeroic} s, manos esqueléticas marcan {countHeroic} círculos de {radius} yd bajo miembros de la banda. Tras {warning} s, cada círculo erupciona e inflige {burstHeroic} de la salud máxima como daño de las Sombras; luego arde como Llama sepulcral durante {flameHeroic} s e inflige {tickHeroic} de la salud máxima cada segundo a cualquiera que permanezca dentro. Nunca ocurre mientras haya marcas de Desgarro de alma activas ni en los {gap} s posteriores a que desaparezcan.',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionName': 'Erupción sepulcral',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionResponse':
     'Sal de cada círculo de aviso antes de que erupcione y mantente fuera del suelo ardiente. Los tanques apartan a Nythraxis de las llamas para que los cuerpo a cuerpo tengan espacio.',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionSummary':
-    'Cada {everyNormal} s, manos esqueléticas marcan {countNormal} círculos de {radius} yd bajo miembros de la banda. Tras {warning} s, cada círculo erupciona e inflige {burstNormal} de la salud máxima como daño de las Sombras; luego arde como Llama sepulcral durante {flameNormal} s e inflige {tickNormal} de la salud máxima cada segundo a cualquiera que permanezca dentro.',
+    'Cada {everyNormal} s, manos esqueléticas marcan {countNormal} círculos de {radius} yd bajo miembros de la banda. Tras {warning} s, cada círculo erupciona e inflige {burstNormal} de la salud máxima como daño de las Sombras; luego arde como Llama sepulcral durante {flameNormal} s e inflige {tickNormal} de la salud máxima cada segundo a cualquiera que permanezca dentro. Nunca ocurre mientras haya marcas de Desgarro de alma activas ni en los {gap} s posteriores a que desaparezcan.',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerName': 'Quebrantatumbas',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerResponse':
     'Los tanques mantienen a Nythraxis mirando lejos de la banda. Todos los demás se quedan detrás o a su lado y nunca cruzan el cono.',
@@ -20341,7 +20341,7 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hudChrome.mapAtlas.resizeRailHint':
     'Arrastra para cambiar el tamaño de la barra lateral del mapa. Haz doble clic para restablecer.',
   'guide.worldPvpPage.hillBodyFlat':
-    'Una vez cada tres horas, en un momento impredecible, se anuncia a todo el reino que dentro de quince minutos aparecerá una colina en una de las zonas de combate libre, y se marca su círculo en terreno abierto. Permanece cuarenta y cinco minutos y luego desaparece. Mientras permanece, cada cinco minutos se anuncian su ubicación y los grupos que la han controlado durante más tiempo en total. El grupo con más jugadores dentro del círculo disputa la colina y la captura tras acumular treinta segundos de superioridad numérica. La entrada de un grupo rival solo pausa el contador hasta que el tuyo vuelva a liderar; solo se reinicia si no queda ningún miembro vivo de tu grupo dentro. Un jugador solo cuenta como un grupo de uno y conserva la colina al formar un grupo, pero los miembros de banda no cuentan. Cada integrante del grupo que controla la colina y está dentro recibe la misma cantidad de Honor por minuto, sin importar cuánto lleve controlándola. Un grupo completo que la controle sin oposición durante toda su duración gana aproximadamente lo mismo que por tres victorias en campos de batalla. Cuando desaparece, si el grupo con el mayor tiempo total de control acumuló al menos diez minutos, todos los que estuvieron dentro durante al menos un minuto mientras ese grupo la controlaba y siguen en él reciben una victoria para la fila de JcJ de la Bóveda Semanal. Una barra sobre el terreno muestra quién la controla, los jugadores de ambos bandos y el contador de captura; /hill en el chat indica dónde está.',
+    'Una vez cada tres horas, en un momento impredecible, se anuncia a todo el reino que dentro de quince minutos aparecerá una colina en una de las zonas del norte, y se marca su círculo en terreno abierto. Permanece cuarenta y cinco minutos y luego desaparece. Mientras permanece, cada cinco minutos se anuncian su ubicación y los grupos que la han controlado durante más tiempo en total. El grupo con más jugadores dentro del círculo disputa la colina y la captura tras acumular treinta segundos de superioridad numérica. La entrada de un grupo rival solo pausa el contador hasta que el tuyo vuelva a liderar; solo se reinicia si no queda ningún miembro vivo de tu grupo dentro. Un jugador solo cuenta como un grupo de uno y conserva la colina al formar un grupo, pero los miembros de banda no cuentan. Cada integrante del grupo que controla la colina y está dentro recibe la misma cantidad de Honor por minuto, sin importar cuánto lleve controlándola. Un grupo completo que la controle sin oposición durante toda su duración gana aproximadamente lo mismo que por tres victorias en campos de batalla. Cuando desaparece, si el grupo con el mayor tiempo total de control acumuló al menos diez minutos, todos los que estuvieron dentro durante al menos un minuto mientras ese grupo la controlaba y siguen en él reciben una victoria para la fila de JcJ de la Bóveda Semanal. Una barra sobre el terreno muestra quién la controla, los jugadores de ambos bandos y el contador de captura; /hill en el chat indica dónde está.',
   'errors.noUpdateFound': 'No hay actualizaciones. Inténtalo de nuevo en breve.',
   'errors.searchUpdates': 'Buscar actualizaciones',
   'errors.updateSearchFailed': 'No se pudieron comprobar las actualizaciones. Inténtalo de nuevo.',
@@ -23313,7 +23313,6 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hudChrome.wocStore.subscription.manage': 'Gestionar suscripción',
   'hudChrome.wocStore.subscription.monthlyTitle': 'Membresía mensual',
   'hudChrome.wocStore.subscription.price': '{price} al mes',
-  'hudChrome.wocStore.subscription.resumeCheckout': 'Reanudar pago',
   'hudChrome.wocStore.subscription.startTrial': 'Iniciar prueba gratuita de 7 días',
   'hudChrome.wocStore.subscription.status.active': 'Activo',
   'hudChrome.wocStore.subscription.status.canceled': 'Cancelado',
@@ -24771,7 +24770,7 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hudChrome.wocStore.subscription.annualDelivered':
     'La llave de la montura de tu paquete se ha entregado por correo.',
   'hudChrome.wocStore.subscription.annualMount':
-    'Después del pago, recoge por correo las riendas ligadas al alma de la Quimera de Ala Nocturna con el personaje que compró este paquete. La montura sigue siendo tuya cuando caduca la membresía.',
+    'Desbloquea la montura Quimera de Ala Nocturna para todos los personajes de tu cuenta, y sus riendas ligadas al alma llegan por correo al personaje que la compra. Una por cuenta, y sigue siendo tuya cuando termina la membresía.',
   'hudChrome.wocStore.subscription.annualPending':
     'Vuelve al personaje comprador después del pago para recoger la montura del paquete. Si el pago se está procesando o la prueba está activa, inténtalo de nuevo después del cargo de pago.',
   'hudChrome.wocStore.subscription.annualPrice': '{price} por 12 meses, pagados por adelantado',
@@ -24901,7 +24900,7 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
     'Invoca un burro volador para transportar objetos entre tus bolsas y el banco más cercano. Cada viaje tarda hasta 15 segundos en llegar al banco y hasta 15 segundos en volver; vuela más rápido en las rutas largas. Elige hasta 24 pilas por viaje. Los objetos devueltos desbordan las bolsas llenas y luego el mensajero desaparece hasta que vuelvas a invocarlo. El viaje de vuelta se pausa mientras estás muerto o dentro de una instancia. Se requiere membresía para iniciar un viaje nuevo.',
   'entities.items.reins_lantern_hall_destrier.name': 'Riendas del Destrero del Salón del Farol',
   'entities.letters.membership_annual_reward.body':
-    'El pago de tu membresía anual se ha completado. Se adjuntan las riendas de tu montura. Conserva las riendas en tus bolsas o banco para ser dueño de esta montura. Sigue siendo tuya cuando caduca la membresía. Se requiere equitación.',
+    'El pago de tu membresía anual se ha completado. La Quimera de Ala Nocturna ya está desbloqueada para todos los personajes de tu cuenta, y se adjuntan sus riendas. Sigue siendo tuya cuando caduca la membresía. Se requiere equitación.',
   'entities.letters.membership_token_delivery.body':
     'Se adjunta la ficha que has comprado. Canjéala para añadir 30 días de membresía a tu cuenta o intercámbiala con otro aventurero.',
   'entities.npcs.cantor_laverock.greeting':
@@ -26105,4 +26104,75 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
     'Las monturas son apariencias cosméticas para tu montura entrenada. No otorgan armadura, daño ni estadísticas de combate. El entrenamiento de equitación aumenta la velocidad por tierra y los saltos montado alcanzan más altura. Todas las monturas permanecen en tierra y ninguna puede nadar.',
   'guide.progression.ridingBody':
     'Al nivel {level}, la caballeriza mayor Marla enseña equitación básica por oro y ofrece después un rango avanzado. El entrenamiento determina la velocidad al montar. Elige tu apariencia en Cosméticos; las apariencias coleccionables se comparten mientras sus riendas sigan en las bolsas o el banco de cualquier personaje.',
+  'footer.guideBest': 'Mejores MMORPGs',
+  'footer.guideBrowser': 'MMORPGs de navegador',
+  'footer.guideFree': 'MMORPGs gratuitos',
+  'footer.guideGamesLikeDiablo': 'Juegos como Diablo',
+  'footer.guideGamesLikeWow': 'Juegos como WoW',
+  'footer.guideNew': 'Nuevos MMORPGs',
+  'footer.guidesLabel': 'Guías de jugadores',
+  'guide.footer.guideBest': 'Mejores MMORPGs',
+  'guide.footer.guideBrowser': 'MMORPGs de navegador',
+  'guide.footer.guideFree': 'MMORPGs gratuitos',
+  'guide.footer.guideGamesLikeDiablo': 'Juegos como Diablo',
+  'guide.footer.guideGamesLikeWow': 'Juegos como WoW',
+  'guide.footer.guideNew': 'Nuevos MMORPGs',
+  'guide.footer.guidesLabel': 'Guías de jugadores',
+  'hudChrome.hill.callout.dominating': '¡{name} está Dominando!',
+  'hudChrome.hill.callout.godlike': '¡{name} es Divino!',
+  'hudChrome.hill.callout.killingSpree': '¡{name} está en Racha Letal!',
+  'hudChrome.hill.callout.legendary': '¡{name} es Legendario!',
+  'hudChrome.hill.callout.rampage': '¡{name} está Desenfrenado!',
+  'hudChrome.hill.callout.shutDown': '¡{killer} ha detenido a {victim}!',
+  'hudChrome.hill.callout.unstoppable': '¡{name} es Imparable!',
+  'hudChrome.social.presence.everyone': 'Todos',
+  'hudChrome.social.presence.friends': 'Solo amigos',
+  'hudChrome.social.presence.label': 'Mostrarme conectado a',
+  'hudChrome.social.presence.none': 'Nadie',
+  'hudChrome.social.presence.title':
+    'Quién te ve conectado en listas de amigos y el registro de hermandad, con tu zona y posición en el mapa. Tu grupo siempre te ve.',
+  'hudChrome.warfareShop.buyConfirmBodyGold':
+    '¿Comprar {item} por {price}? Esta compra no se puede reembolsar.',
+  'itemUi.tooltip.warfareMainHandOnly': 'La Pericia bélica se cuenta solo en la mano principal.',
+  'entities.items.vanguard_band_of_focus.name': 'Anillo de Vanguardia de Enfoque',
+  'entities.items.vanguard_band_of_mending.name': 'Anillo de Vanguardia de Curación',
+  'entities.items.vanguard_band_of_might.name': 'Anillo de Vanguardia de Poder',
+  'entities.items.vanguard_band_of_precision.name': 'Anillo de Vanguardia de Precisión',
+  'entities.items.vanguard_pendant_of_focus.name': 'Colgante de Vanguardia de Enfoque',
+  'entities.items.vanguard_pendant_of_mending.name': 'Colgante de Vanguardia de Curación',
+  'entities.items.vanguard_pendant_of_might.name': 'Colgante de Vanguardia de Poder',
+  'entities.items.vanguard_pendant_of_precision.name': 'Colgante de Vanguardia de Precisión',
+  'guide.arenaPage.vanguardStatsBody':
+    'A diferencia del nivel original, el equipo de Vanguardia también lleva índices de combate: cada pieza de armadura, arma y collar de Vanguardia tiene Índice de Golpe Crítico o Índice de Celeridad, y las piezas de lanzador de hechizos y sanador añaden Poder con Hechizos o Poder de Sanación. Los anillos y collares de Vanguardia se venden junto con las armas, y todas las clases pueden usarlos. Dos de los anillos cuerpo a cuerpo de Vanguardia dan exactamente el Índice de Impacto que elimina la posibilidad base de que tus ataques fallen contra un jugador de tu nivel, y dos anillos de lanzador de hechizos hacen lo mismo con que tus hechizos sean resistidos. Los ataques automáticos mientras luchas con dos armas conservan su posibilidad de fallo adicional. El anillo de sanador lleva Índice de Celeridad en su lugar.',
+  'guide.commandsPage.presence':
+    'Quién te ve conectado en listas de amigos, el registro de tu hermandad y /who: /presence everyone (el predeterminado), /presence friends (solo jugadores de tu lista de amigos), o /presence none. Oculto, no ven un punto conectado, zona o posición de mapa para ti, aunque los susurros e invitaciones aún te llegan; tu grupo siempre te ve. Un /presence a secas te dice cuál está establecido.',
+  'abilityUi.actionBar.moveHint': 'Mantén Mayús y arrastra para mover',
+  'entities.items.vanguard_feral_staff.name': 'Bastón feral de la Vanguardia',
+  'hudChrome.worldPvp.groundSanctuary':
+    'La Costa de la Prueba es el único santuario: allí no puedes activar el JcJ mundial ni luchar contra otros jugadores.',
+  'guide.worldPvpPage.introZones':
+    'El JcJ en el mundo abierto es voluntario y depende del terreno. Al activar tu bandera, los demás jugadores marcados que no estén en tu grupo o banda se vuelven enemigos en zonas disputadas. Al desactivarla, vuelves a ser espectador tras una breve demora. La Costa de la Prueba es el único santuario, sin combates JcJ mundiales. Las tres zonas más al norte siguen las mismas reglas de participación voluntaria que el resto del mundo. Entrar en el círculo activo del Rey de la Colina activa automáticamente tu bandera. Tus compañeros de grupo y banda nunca son enemigos; los miembros de tu hermandad fuera de tu grupo pueden ser atacados como cualquier otro jugador.',
+  'guide.worldPvpPage.zonesBody':
+    'La Costa de la Prueba es el único santuario: allí no hay JcJ mundial ni puedes activar la bandera. Una bandera ya activa se mantiene, pero el progreso de tiempo jugado para títulos se pausa hasta que salgas. En todos los demás lugares, incluidos Las Tierras del Dragón, El Velo de Escarcha y La Cascada de Ámbar, solo pueden luchar los jugadores marcados. Entrar en el círculo activo del Rey de la Colina activa automáticamente tu bandera si cumples el requisito de nivel habitual. El círculo de aviso no te marca. Salir del círculo activo no desactiva la bandera; usa /pvp off para iniciar la cuenta atrás habitual de cinco minutos, que no puede terminar mientras estés en una colina activa o en combate.',
+  'hudChrome.hill.pvpEntry': 'Entrar en el círculo activo activa el JcJ mundial.',
+  'hudChrome.hill.pvpBanner': 'JcJ',
+  'guide.worldPvpPage.hillBody':
+    'Cada dos horas aparece una colina en Las Tierras del Dragón, El Velo de Escarcha o La Cascada de Ámbar. El reino recibe un aviso con quince minutos de antelación y el círculo queda marcado en terreno abierto. La colina permanece activa treinta minutos. Entrar en el círculo activo activa la bandera JcJ mundial según los requisitos de nivel habituales, también para los miembros de bandas. El grupo con más jugadores aptos dentro captura la colina tras un minuto de mayoría ininterrumpida; un jugador solo cuenta como grupo de uno, pero los miembros de bandas y los jugadores por debajo del nivel requerido para JcJ no pueden capturar ni ganar Honor de la colina. Cada defensor dentro gana Honor a un ritmo creciente. Los pagos y su aumento son más rápidos y conservan el Honor total del antiguo evento de cuarenta y cinco minutos. Al cambiar de dueño, el aumento empieza de nuevo. Salir mantiene tu bandera activa; /pvp off tarda los cinco minutos habituales y no puede completarse dentro de una colina activa ni durante el combate. La barra muestra el control, los efectivos y el progreso de captura; /hill indica la ubicación.',
+  'hudChrome.nameplate.hillBountyTag': 'Recompensa {honor}',
+  'hudChrome.wocStore.membershipsTab': 'Membresías',
+  'hudChrome.wocStore.membershipsUnavailable':
+    'Las membresías no están disponibles ahora. Inténtalo de nuevo en breve.',
+  'hudChrome.wocStore.subscription.addMonth': 'Añadir 1 mes',
+  'hudChrome.wocStore.subscription.addYear': 'Añadir 12 meses',
+  'hudChrome.wocStore.subscription.billingBlocked':
+    'Actualiza tus datos de pago en Gestionar suscripción antes de añadir tiempo de membresía.',
+  'hudChrome.wocStore.subscription.endsOn': 'La membresía termina el {date}',
+  'hudChrome.wocStore.subscription.renewsOn': 'Se renueva el {date}',
+  'hudChrome.wocStore.subscription.stackCapped':
+    'Puedes acumular hasta 2 años de membresía a la vez. Inténtalo de nuevo cuando se acerque la fecha de renovación.',
+  'hudChrome.wocStore.subscription.stackTerms':
+    'Se paga ahora. El tiempo se añade al final de tu membresía actual y después se renueva con este plan.',
+  'hudChrome.wocStore.subscription.stackUnavailable':
+    'Ahora no se puede añadir tiempo de membresía. Inténtalo de nuevo en breve.',
+  'hudChrome.wocStore.subscription.tokenPrice': '{price} por 30 días',
 };

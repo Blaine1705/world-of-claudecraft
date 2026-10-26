@@ -1158,6 +1158,9 @@ describe('dungeons: heroic difficulty', () => {
     const meta = sim.players.get(pid);
     expect(meta).toBeTruthy();
     meta?.raidLockouts.set('hollow_crypt:heroic', Number.MAX_SAFE_INTEGER);
+    // Both the change's implicit reset and the explicit one honor the lockout.
+    sim.setDungeonDifficulty('heroic', pid);
+    expect(normalInst.difficulty).toBe('normal');
 
     sim.resetDungeonInstances(pid);
     expect(normalInst.partyKey).not.toBeNull();
@@ -1605,6 +1608,131 @@ describe('dungeons: heroic difficulty', () => {
     expect(sim.dungeonDifficulty(third)).toBe('normal');
     // The setter keeps their own preference.
     expect(sim.dungeonDifficulty(leader)).toBe('heroic');
+  });
+
+  describe('a difficulty change resets the empty old-difficulty claims (no party reform)', () => {
+    function partyAfterNormalRun(sim: AnySim) {
+      const leader = sim.addPlayer('warrior', 'Leader', { characterId: 301 });
+      const member = sim.addPlayer('mage', 'Member', { characterId: 302 });
+      sim.partyInvite(member, leader);
+      sim.partyAccept(member);
+      enterDungeon(sim.ctx, 'hollow_crypt', leader);
+      enterDungeon(sim.ctx, 'hollow_crypt', member);
+      const normalInst = claimedDungeon(sim, 'hollow_crypt', 'normal');
+      leaveDungeon(sim.ctx, leader);
+      leaveDungeon(sim.ctx, member);
+      sim.drainEvents();
+      return { leader, member, normalInst, partyId: sim.partyOf(leader)!.id };
+    }
+
+    it('the leader switches an entered party to Heroic and the whole group walks into Heroic', () => {
+      const sim = makeSim();
+      const { leader, member, normalInst, partyId } = partyAfterNormalRun(sim);
+      const normalClaimId = normalInst.exitId;
+
+      sim.setDungeonDifficulty('heroic', leader);
+
+      const events = sim.drainEvents() as any[];
+      expect(
+        events.some((e) => e.pid === leader && e.text === 'Dungeon difficulty set to Heroic.'),
+      ).toBe(true);
+      expect(claimedDungeon(sim, 'hollow_crypt', 'normal')).toBeUndefined();
+      expect(enterDungeon(sim.ctx, 'hollow_crypt', leader)).toBe(true);
+      expect(enterDungeon(sim.ctx, 'hollow_crypt', member)).toBe(true);
+      const heroicInst = claimedDungeon(sim, 'hollow_crypt', 'heroic');
+      expect(heroicInst).toBeTruthy();
+      expect(heroicInst.exitId).not.toBe(normalClaimId);
+      expect(heroicInst.partyKey).toBe(`party:${partyId}`);
+      expect(mobInInstance(sim, heroicInst, 'morthen').level).toBe(22);
+      // Same party throughout: nobody had to leave and re-invite.
+      expect(sim.partyOf(leader)!.id).toBe(partyId);
+      expect(sim.partyOf(member)!.id).toBe(partyId);
+      const members = [leader, member].map((pid) => sim.entities.get(pid) as AnyEntity);
+      for (const e of members) expect(sim.instanceSlotAt(e.pos)).toBe(heroicInst.slot);
+    });
+
+    it('re-selecting the current difficulty never resets the claim', () => {
+      const sim = makeSim();
+      const { leader, normalInst } = partyAfterNormalRun(sim);
+      const normalClaimId = normalInst.exitId;
+
+      sim.setDungeonDifficulty('normal', leader);
+
+      const events = sim.drainEvents() as any[];
+      expect(normalInst.exitId).toBe(normalClaimId);
+      expect(normalInst.difficulty).toBe('normal');
+      expect(events.some((e) => e.text === 'All instances have been reset.')).toBe(false);
+      expect(events.some((e) => /reset/i.test(e.text ?? ''))).toBe(false);
+    });
+
+    it('a non-leader selection changes nothing and resets nothing', () => {
+      const sim = makeSim();
+      const { leader, member, normalInst } = partyAfterNormalRun(sim);
+      const normalClaimId = normalInst.exitId;
+
+      sim.setDungeonDifficulty('heroic', member);
+
+      expect(sim.dungeonDifficulty(leader)).toBe('normal');
+      expect(normalInst.exitId).toBe(normalClaimId);
+      expect(normalInst.difficulty).toBe('normal');
+    });
+
+    it('keeps the live claim while a member is inside, and says why', () => {
+      const sim = makeSim();
+      const { leader, member, normalInst } = partyAfterNormalRun(sim);
+      const normalClaimId = normalInst.exitId;
+      enterDungeon(sim.ctx, 'hollow_crypt', member);
+      sim.drainEvents();
+
+      sim.setDungeonDifficulty('heroic', leader);
+
+      // The selection still changes; only the reset is refused.
+      expect(sim.dungeonDifficulty(leader)).toBe('heroic');
+      expect(normalInst.exitId).toBe(normalClaimId);
+      expect(normalInst.difficulty).toBe('normal');
+      expect(
+        (sim.drainEvents() as any[]).some(
+          (e) =>
+            e.type === 'error' &&
+            e.pid === leader &&
+            e.text === 'You cannot reset instances while someone is still inside.',
+        ),
+      ).toBe(true);
+    });
+
+    it('keeps the five-minute cooldown: switching straight back cannot respawn the old run', () => {
+      const sim = makeSim();
+      const { leader, normalInst } = partyAfterNormalRun(sim);
+      sim.setDungeonDifficulty('heroic', leader);
+      const heroicClaimId = normalInst.exitId;
+      expect(normalInst.difficulty).toBe('heroic');
+      sim.drainEvents();
+
+      sim.setDungeonDifficulty('normal', leader);
+
+      expect(normalInst.exitId).toBe(heroicClaimId);
+      expect(normalInst.difficulty).toBe('heroic');
+      expect(
+        (sim.drainEvents() as any[]).some(
+          (e) =>
+            e.type === 'error' &&
+            e.pid === leader &&
+            e.text === 'Instances can only be reset once every 5 minutes.',
+        ),
+      ).toBe(true);
+    });
+
+    it('a selection with no claims to reset is silent about resets', () => {
+      const sim = makeSim();
+      const pid = sim.addPlayer('warrior', 'Fresh', { characterId: 303 });
+      sim.drainEvents();
+
+      sim.setDungeonDifficulty('heroic', pid);
+
+      const texts = (sim.drainEvents() as any[]).map((e) => e.text);
+      expect(texts).toContain('Dungeon difficulty set to Heroic.');
+      expect(texts).not.toContain('You have no instances to reset.');
+    });
   });
 });
 
@@ -3215,8 +3343,11 @@ describe('dungeons: raid lockout gate', () => {
     enterDungeon(sim.ctx, 'nythraxis_boss_arena', leader);
     const claim = claimedDungeon(sim, 'nythraxis_boss_arena', 'normal');
     const claimId = claim.exitId;
-    teleport(sim, sim.entities.get(leader) as AnyEntity, 0, 0);
+    // Flipped from inside, so the change's implicit reset is refused and the
+    // explicit Reset All is what moves the claim once the raid is outside.
     sim.setDungeonDifficulty('heroic', leader);
+    expect(claim.exitId).toBe(claimId);
+    teleport(sim, sim.entities.get(leader) as AnyEntity, 0, 0);
 
     sim.resetDungeonInstances(leader);
 
@@ -3387,7 +3518,8 @@ describe('dungeons: raid lockout gate', () => {
     selectDifficultyWithoutSwitch(sim, 'normal', leader);
     sim.drainEvents();
 
-    sim.resetDungeonInstances(leader);
+    // The change itself runs the reset (no separate Reset All click needed).
+    sim.setDungeonDifficulty('normal', leader);
 
     expect(inst.difficulty).toBe('normal');
     expect(inst.partyKey).not.toBeNull();
@@ -3396,7 +3528,7 @@ describe('dungeons: raid lockout gate', () => {
         (event) =>
           event.type === 'error' &&
           event.pid === leader &&
-          event.text === 'All instances have been reset.',
+          event.text === 'Dungeon difficulty set to Normal.',
       ),
     ).toBe(true);
     // Every member walks straight into the fresh Normal claim.
@@ -3535,13 +3667,14 @@ describe('dungeons: raid lockout gate', () => {
     selectDifficultyWithoutSwitch(sim, 'normal', leader);
     sim.drainEvents();
 
-    sim.resetDungeonInstances(leader);
+    // The change itself runs the reset (no separate Reset All click needed).
+    sim.setDungeonDifficulty('normal', leader);
 
     expect(lift.difficulty).toBe('normal');
     expect(lift.partyKey).toBe(instanceKeyFor(sim.ctx, leader));
     expect(
       (sim.drainEvents() as any[]).some(
-        (event) => event.pid === leader && event.text === 'All instances have been reset.',
+        (event) => event.pid === leader && event.text === 'Dungeon difficulty set to Normal.',
       ),
     ).toBe(true);
     for (const m of members) expect(enterDungeon(sim.ctx, 'ignivar_forge_lift', m)).toBe(true);

@@ -17,8 +17,6 @@ import type { VaultRewardClaim } from './vault_rewards_db';
 export function addVaultRewardToCharacterState(
   state: CharacterState,
   claim: VaultRewardClaim,
-  attemptId: string,
-  owner: boolean,
   preparedItems?: readonly InvSlot[],
 ): CharacterState {
   assertHeroicMarksGrantsFit(state, claim.items);
@@ -43,9 +41,6 @@ export function addVaultRewardToCharacterState(
     state.copper = copper;
   }
   if (!state.worldQuests) state.worldQuests = { cycle: '', progress: [] };
-  if (owner && state.worldQuests.vaultAttempt?.id === attemptId) {
-    delete state.worldQuests.vaultAttempt;
-  }
   if (!capped) {
     state.worldQuests.clueCasketsOpened = (state.worldQuests.clueCasketsOpened ?? 0) + 1;
   }

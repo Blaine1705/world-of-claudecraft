@@ -786,7 +786,6 @@ export const tr_TR: EnTranslations = {
       "claimLastWeek": "Geçen haftanın ödülünü al",
       "readyTitle": "Haftalık ödülleriniz hazır",
       "readyDescription": "Tamamlanan bir haftalık ödüller bekliyor. Kazanılan kasalarınızı açın, sonra almak için bir öğe seçin.",
-      "previewClaimNotice": "Ödüller seni bekliyor. Açıp almak için Eastbrook’taki Hazine Sakçısını ziyaret et.",
       "notNow": "Şimdi değil",
       "completedWeek": "{date} tarihinde hafta bitti",
       "currentWeek": "Bu haftanın ilerlemesine geri dön",
@@ -837,7 +836,8 @@ export const tr_TR: EnTranslations = {
         "dungeon_heroic": "Kahramanca zindan hazinesi",
         "world": "Dünya görevi hazinesi",
         "pvp": "SAVAŞ donanımı"
-      }
+      },
+      "previewClaimNotice": "Ödüller seni bekliyor. Açıp almak için Eastbrook’taki Hazine Sakçısını ziyaret et."
     },
     "guildHall": {
       "title": "Fener Salonu",
@@ -1327,15 +1327,15 @@ export const tr_TR: EnTranslations = {
         "annualTitle": "12 aylık üyelik paketi",
         "annualPrice": "12 ay için {price}, peşin ödenir",
         "annualTerms": "Her yıl aynı fiyatla yenilenir. Stripe üzerinden normal para birimiyle öde. Faturalandırma ayarlarından iptal et.",
-        "annualMount": "Ödemeden sonra, bu paketi satın alan karakterde ruha bağlı Gece Kanadı Kimera dizginlerini postadan al. Üyelik sona erdikten sonra da binek senin kalır.",
+        "annualMount": "Hesabındaki tüm karakterler için Gece Kanadı Kimera bineğinin kilidini açar; ruha bağlı dizginleri satın alan karaktere postayla gönderilir. Hesap başına bir tane ve üyelik bittikten sonra da senin kalır.",
         "trialTerms": "Hesap başına bir kez, üyeliği {days} gün ücretsiz dene. Ödeme yöntemi gereklidir. İptal etmezsen deneme sona erdiğinde {price} ücret alınır.",
         "startTrial": "7 günlük ücretsiz denemeyi başlat",
-        "resumeCheckout": "Ödemeye devam et",
         "checkoutClosed": "Bu ödeme, bekleyen bir ödül olmadan kapandı. Yeni bir ödeme başlatmak için tekrar üyelik planı seç.",
         "annualClaim": "Paket bineğini al",
         "annualPending": "Paket bineğini almak için ödemeden sonra satın alımı yapan karaktere dön. Ödeme işleniyorsa veya deneme süresi etkinse ücret alındıktan sonra tekrar dene.",
         "annualDelivered": "Paket binek anahtarın postayla teslim edildi.",
         "tokenTitle": "Takas edilebilir üyelik jetonu",
+        "tokenPrice": "30 gün için {price}",
         "benefitsTitle": "Etkin üyelik avantajları",
         "benefitBank": "Herhangi bir bankacıdan diğer karakterlerinin bankalarına eriş.",
         "benefitSlots": "10 ek karakter yuvasının kilidini aç.",
@@ -1351,6 +1351,14 @@ export const tr_TR: EnTranslations = {
         "price": "Aylık {price}",
         "terms": "Her ay yenilenir. Stripe üzerinden normal para birimiyle öde. Faturalandırma ayarlarından iptal et.",
         "subscribe": "Abone ol",
+        "addMonth": "1 ay ekle",
+        "addYear": "12 ay ekle",
+        "stackTerms": "Ödeme şimdi alınır. Süre, mevcut üyeliğinin sonuna eklenir; ardından üyeliğin bu planla yenilenir.",
+        "stackCapped": "Bir seferde en fazla 2 yıllık üyelik süresi biriktirebilirsin. Yenileme tarihin yaklaştığında tekrar dene.",
+        "stackUnavailable": "Üyelik süresi ekleme şu anda kullanılamıyor. Kısa süre sonra tekrar dene.",
+        "billingBlocked": "Üyelik süresi eklemeden önce Aboneliği yönet bölümünden ödeme bilgilerini güncelle.",
+        "renewsOn": "Yenileme tarihi: {date}",
+        "endsOn": "Üyelik bitiş tarihi: {date}",
         "manage": "Aboneliği yönet",
         "ending": "Fatura döneminin sonunda iptal edilir",
         "error": "Faturalandırma açılamadı. Açılır pencerelere izin verip tekrar dene.",
@@ -1369,8 +1377,9 @@ export const tr_TR: EnTranslations = {
       "title": "WOC Mağazası",
       "close": "WOC Mağazasını Kapat",
       "tabsLabel": "WOC Mağaza bölümleri",
-      "storeTab": "Mağaza",
-      "rewardsTab": "Günlük Ödüller",
+      "storeTab": "Kozmetik Mağazası",
+      "membershipsTab": "Üyelikler",
+      "membershipsUnavailable": "Üyelikler şu anda kullanılamıyor. Kısa süre sonra tekrar dene.",
       "mountsEyebrow": "Hesap Bağlantıları",
       "mountsTitle": "Makine Stabil",
       "mountBuyAria": "{item}'yi satın alın",
@@ -3446,22 +3455,22 @@ export const tr_TR: EnTranslations = {
       "zoneContested": "Tartışılı zemin: sadece bayraklı oyuncular burada savaşır.",
       "zoneFfa": "Serbest oyun zemin: orada herkes oyun kurallarına tabi.",
       "realmDisabled": "Bu alemdeki Dünya PvP devre dışıdır.",
-      "groundSanctuary": "Proving Shore ve Eastbrook Vale kutsal bölgelerdir: hiç dünya PvP'si yoktur.",
+      "groundSanctuary": "Sınav Kıyısı tek sığınaktır: orada Dünya PvP’sini açamaz veya diğer oyuncularla savaşamazsın.",
       "groundContested": "Başka yerlerde tartışılı: sadece iki bayraklı oyuncu savaşabilir.",
-      "groundFfa": "Drakelands, Frostveil Reach ve Amberfall serbest oyun alanıdır: orada herkes savaşabilir, bayraklı olsun ya da olmasın.",
+      "groundFfa": "Ejder Toprakları, Kırağı Diyarı ve Kehribar Vadisi normal PvP bayraklarını kullanır. Tepe Derdine etkinliğinin aktif çemberine girmek bayrağını açar.",
       "groupLine": "Grup ve rezzalı arkadaşlar asla birbirlerine düşman değildir. Loncandaki diğer oyuncular savaşabilir.",
-      "markLine": "Orada bayraklı olmayan bir oyuncuya saldırmak senin bayrağını kaldırır; bayraklı birine saldırmak hiçbir zaman yapmaz.",
+      "markLine": "Aktif tepe çemberine girmek Dünya PvP'yi açar. Çemberden ayrılınca bayrağın açık kalır.",
       "aidLine": "Bayraklı bir oyuncuya iyileştirme, kalkan veya buff verme, dünya savaşında senin bayrağını kaldırır.",
       "stakeLine": "Kaybeden {cap} veya hazinesinin {percent}'i öder, hangisi daha az ise.",
       "spoilsLine": "İkinizin de PvP bayrağı açıkken öldürücü darbenin altını, kaybedenin kafatasıyla birlikte cesede düşer.",
       "skullName": "{name} adlı oyuncunun kafatası",
-      "noStakeLine": "Serbest oyun alanında öldürülen bayraklı olmayan oyuncu altın kaybetmez.",
+      "noStakeLine": "Bayraksız oyunculara açık dünyada saldırılamaz.",
       "noTakeLine": "Bayraklı olmayan savaşçı da altın kaybetmez: sadece iki bayraklı oyuncu arasında hareket eder.",
       "honorLine": "Öldürme başına {honor} Onur, yardımcılar arasında bölünür.",
       "splitLine": "Temiz bir 1v1 tüm hazineyi öder; yardımcılar ve onların iyileştiricileri bunu paylaşır.",
       "repeatLine": "Bir oyuncuyu tekrar öldürmek {second} ödeme yapar, sonra {third}, sonra hiçbir şey; sayı ilk öldürmeden sonra {reset} içinde sıfırlanır.",
       "greyLine": "Senden {levels} seviye daha düşük oyuncular hiçbir şey ödemez.",
-      "disarmLine": "Kapanması {minutes} dakika alır ve savaşın bitmesini bekler.",
+      "disarmLine": "Kapanması {minutes} dakika sürer ve aktif tepeden ayrılmanı ve savaşın bitmesini bekler.",
       "record": "Rekord: {kills} öldürme, {deaths} ölüm",
       "enable": "Dünya PvP'yi Etkinleştir",
       "disable": "Dünya PvP'yi Devre Dışı Bırak",
@@ -3491,6 +3500,17 @@ export const tr_TR: EnTranslations = {
       "distance": "Daire için {yards} yd",
       "rises": "{minutes} içinde yükseliyor",
       "falls": "{minutes} içinde düşüyor",
+      "pvpEntry": "Aktif çembere girmek Dünya PvP'yi açar.",
+      "pvpBanner": "PvP",
+      "callout": {
+        "killingSpree": "{name} Katliam Akışındadır!",
+        "rampage": "{name} Çılgın Öfkededir!",
+        "unstoppable": "{name} Durdurulamaz!",
+        "dominating": "{name} Hükmediyor!",
+        "godlike": "{name} Tanrısal!",
+        "legendary": "{name} Efsanevî!",
+        "shutDown": "{killer}, {victim} serisini bitirdi!"
+      },
       "standingRaid": "Akın üyeleri sayılmaz: yalnızca partiler tepeyi tutabilir"
     },
     "skullBag": {
@@ -3523,7 +3543,8 @@ export const tr_TR: EnTranslations = {
       "owned": "Sahip",
       "buyAria": "{honor} karşılığında {item} satın al",
       "buyOwnedAria": "{honor} karşılığında {item} satın al, zaten sahipsin",
-      "buyConfirmBody": "{honor} karşılığında {item} satın alınsın mı? Onur ile yapılan alımlar iade edilemez."
+      "buyConfirmBody": "{honor} karşılığında {item} satın alınsın mı? Onur ile yapılan alımlar iade edilemez.",
+      "buyConfirmBodyGold": "{item} için {price} karşılığında satın alınsın mı? Bu satın alma geri alınamaz."
     },
     "charSheet": {
       "offense": "Saldırı",
@@ -4606,8 +4627,8 @@ export const tr_TR: EnTranslations = {
         "boneSpikeHeroicSummary": "Her {everyHeroic} sn, Nythraxis mevcut hedefi dışındaki {victimsHeroic} akıncıyı Kemik Dikenlerine saplar. Saplanan akıncı hareket edemez ve dikeni yok edilene kadar her saniye azami canının {drainHeroic} kadarını kaybeder. Bir diken, kimden gelirse gelsin {hitsHeroic} vuruştan sonra parçalanır; verilen hasar fark etmez. Zaten şişlenmiş bir oyuncu {cooldown} saniye boyunca yeniden seçilemez, böylece dikenler tüm baskına yayılır.",
         "boneSpikeResponse": "En yakındaki kişi Kemik Dikeni'ne vurur: kimden gelirse gelsin birkaç vuruş onu parçalar, hasar fark etmez. Şifacılar dikenler yıkılana dek şişlenenleri hayatta tutar.",
         "graveEruptionName": "Mezar Patlaması",
-        "graveEruptionSummary": "Her {everyNormal} sn, iskelet eller akıncıların altında {radius} yd yarıçaplı {countNormal} çember işaretler. {warning} sn sonra her çember azami canın {burstNormal} kadarı kadar Gölge hasarıyla patlar, ardından {flameNormal} sn boyunca Mezar Alevi olarak yanar ve içinde duran herkese her saniye azami canın {tickNormal} kadarını verir.",
-        "graveEruptionHeroicSummary": "Her {everyHeroic} sn, iskelet eller akıncıların altında {radius} yd yarıçaplı {countHeroic} çember işaretler. {warning} sn sonra her çember azami canın {burstHeroic} kadarı kadar Gölge hasarıyla patlar, ardından {flameHeroic} sn boyunca Mezar Alevi olarak yanar ve içinde duran herkese her saniye azami canın {tickHeroic} kadarını verir.",
+        "graveEruptionSummary": "Her {everyNormal} sn, iskelet eller akıncıların altında {radius} yd yarıçaplı {countNormal} çember işaretler. {warning} sn sonra her çember azami canın {burstNormal} kadarı kadar Gölge hasarıyla patlar, ardından {flameNormal} sn boyunca Mezar Alevi olarak yanar ve içinde duran herkese her saniye azami canın {tickNormal} kadarını verir. Ruh Yırtma işaretleri etkinken veya kaybolduktan sonraki {gap} sn içinde asla gerçekleşmez.",
+        "graveEruptionHeroicSummary": "Her {everyHeroic} sn, iskelet eller akıncıların altında {radius} yd yarıçaplı {countHeroic} çember işaretler. {warning} sn sonra her çember azami canın {burstHeroic} kadarı kadar Gölge hasarıyla patlar, ardından {flameHeroic} sn boyunca Mezar Alevi olarak yanar ve içinde duran herkese her saniye azami canın {tickHeroic} kadarını verir. Ruh Yırtma işaretleri etkinken veya kaybolduktan sonraki {gap} sn içinde asla gerçekleşmez.",
         "graveEruptionResponse": "Her uyarı çemberi patlamadan önce dışına çıkın ve yanan zeminden uzak durun. Tanklar Nythraxis’i alevlerden uzaklaştırır, böylece yakın dövüşün çalışacak alanı kalır.",
         "bindingSigilName": "Bağlama Mührü",
         "bindingSigilSummary": "Her {everyNormal} sn, tahtın iki yanındaki iki platformdan birinde, Nythraxis’in çekiş anında durduğu yerin (baskın açısından) solunda ya da sağında {sideOffset} yd uzakta, her seferinde diğer tarafta, eski muhafazaların mührü parlar ve Nythraxis Ölümsüz Yükseliş’e başlar; her {ascensionEvery} sn {ascensionNormal} hasar ve saldırı hızı kazanır. {bindNormal} sn içinde mührün üzerinde durursa Bağlanır: Yükseliş arındırılır, {stunNormal} sn sersemletilir ve {boundNormal} sn boyunca {vulnerability} daha fazla hasar alır. Aksi halde her akıncı azami canın {unboundHitNormal} kadarı kadar Gölge hasarı alır ve Nythraxis sonraki bağlamaya kadar {unboundBonusNormal} daha fazla hasarı korur.",
@@ -5010,6 +5031,7 @@ export const tr_TR: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "UZAKTA",
+      "hillBountyTag": "Ödül {honor}",
       "pvpTag": "PvP",
       "bountyTag": "Baş ödülü",
       "cheaterTag": "< Hileci >",
@@ -5435,12 +5457,11 @@ export const tr_TR: EnTranslations = {
       "memberSinceDays": "Discord'da {days}g",
       "roleTag": {
         "levyst": "Levy St",
-        "admin": "Yönetici",
         "coredevs": "Çekirdek Geliştirici",
         "devs": "Geliştirici",
-        "seniormods": "Kıdemli Moderatör",
+        "seniormods": "Nöbetçi",
         "mods": "Moderatör",
-        "juniormods": "Yardımcı Moderatör",
+        "juniormods": "Gözlemci",
         "artists": "Sanatçı",
         "contentcreator": "İçerik Üreticisi",
         "legend": "EFSANE",
@@ -5985,6 +6006,13 @@ export const tr_TR: EnTranslations = {
       "offlineHeader": "Çevrimdışı ({n})",
       "hideOffline": "Çevrimdışıları gizle",
       "hideOfflineTitle": "Çevrimdışı lonca üyelerini gizle",
+      "presence": {
+        "label": "Beni çevrimiçi olarak göster",
+        "everyone": "Herkes",
+        "friends": "Sadece arkadaşlar",
+        "none": "Kimse",
+        "title": "Kimin seni arkadaş listelerinde ve lonca çizelgesinde çevrimiçi göreceği, bölgen ve harita konumunla. Partun seni her zaman görür."
+      },
       "billboard": {
         "label": "Lonca Panosu",
         "empty": "Panoda henüz bir şey yok.",
@@ -8077,6 +8105,12 @@ export const tr_TR: EnTranslations = {
       "admin_target": "Operatör hesapları atılamaz.",
       "target_offline": "Bu oyuncu artık bu alanda çevrimiçi değil."
     },
+    "world_quest_block": {
+      "admin_target": "Operatör hesapları dünya görevlerinden engellenemez.",
+      "reason_required": "Bir neden gereklidir.",
+      "already_blocked": "O hesap zaten dünya görevlerinden engellenmiş.",
+      "not_blocked": "O hesap dünya görevlerinden engellenmemiş."
+    },
     "woc_market": {
       "invalid_input": "Geçersiz girdi.",
       "disabled": "$WOC Borsası bu dünyada kullanılamıyor.",
@@ -9103,7 +9137,14 @@ export const tr_TR: EnTranslations = {
       "discord": "Discord'a Katıl",
       "communityWiki": "Topluluk Wiki'si",
       "rights": "World of ClaudeCraft",
-      "linksLabel": "Oyun ve topluluk bağlantıları"
+      "linksLabel": "Oyun ve topluluk bağlantıları",
+      "guidesLabel": "Oyuncu Rehberleri",
+      "guideFree": "Ücretsiz MMORPG'ler",
+      "guideGamesLikeWow": "WoW Gibi Oyunlar",
+      "guideBest": "En İyi MMORPG'ler",
+      "guideNew": "Yeni MMORPG'ler",
+      "guideBrowser": "Tarayıcı MMORPG'leri",
+      "guideGamesLikeDiablo": "Diablo Gibi Oyunlar"
     },
     "language": {
       "label": "Dil",
@@ -9619,7 +9660,9 @@ export const tr_TR: EnTranslations = {
       "session": "Giriş yaptığından beri yaptıkların: öldürmeler, ölümler, hasar ve deneyim.",
       "arena": "Kül Kolezyumu’ndaki her iki kademedeki durumun: puan, galibiyet, mağlubiyet ve 1v1 ile 2v2 için galibiyet oranı.",
       "pvp": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other anywhere; switching off takes 5 minutes.",
-      "pvpZones": "Dünya PvP Bayrağı: /pvp geçer, /pvp on ve /pvp off ayarlar. Bayraklı oyuncular tartışmalı araziyi birbirlerine dövüşebilir, kutsal alanlar hiç dünya dövüşüne izin vermez, ve serbest oyun alanları bayrak olsun veya olmasın buna izin verir; kapatmak 5 dakika gerektirir.",
+      "pvpZones": "Dünya PvP bayrağı: /pvp durumunu değiştirir, /pvp on açar ve /pvp off kapatır. Bayraklı oyuncular çekişmeli bölgelerde birbirleriyle savaşabilir, sığınaklarda dünya savaşlarına hiç izin verilmez ve Tepe Derdine etkinliğinin aktif çemberine girmek bayrağını açar; kapanması 5 dakika sürer.",
+      "presence": "Arkadaş listelerinde, lonca çizelgesinde ve /who'da seni çevrimiçi olarak kimin göreceği: /presence everyone (varsayılan), /presence friends (sadece arkadaş listendeki oyuncular) veya /presence none. Gizliyken, senin için hiç çevrimiçi nokta, bölge veya harita konumu görmezler, fakat fısıltılar ve davetiyeler sana ulaşmaya devam eder; grubun seni her zaman görür. Düz /presence sana hangisinin ayarlanmış olduğunu söyler.",
+      "flair": "Discord rolünü diğer oyunculara gösterir veya gizler; yani renkli adını, rol etiketini ve doğrulanmış sohbet etiketini: /flair on gösterir, /flair off gizler, yalnızca /flair ise hangisinin ayarlı olduğunu söyler. Bağlı bir Discord hesabı gerekir.",
       "listings": "Dünya Pazarı’ndaki kendi ilanların, istenen fiyat, her birinde kalan süre ve daha fazlası için ne kadar yerin olduğuyla birlikte.",
       "buyback": "Yakın zamanda bir satıcıya sattığın ve hâlâ geri alabileceğin şeyler.",
       "groupState": "Şu anda nasıl olduğun",
@@ -10384,7 +10427,8 @@ export const tr_TR: EnTranslations = {
       "warfareTradeBody": "Bu bilinçli bir değiş tokuştur. Harp teçhizatı oyuncularla dövüşmek için yapılmıştır, zindan kademelerini atlamanın bir kestirmesi değildir: bir Harp parçası aynı yuvadaki destansı bir zindan parçasının taşıdığı savaş puanlarını asla taşımaz, ve getirdiği her şey diğer oyunculara harcanır. Arenada kendini tutmak istiyorsan onu satın al. Kahramanca zindanları daha hızlı temizlemek istiyorsan teçhizatını zindanlarda kazan.",
       "warfareTradeBodyRatingSpent": "Bu, kasıtlı takastır. Harp teçhizatı zindan kademelerini atlamak için değil, oyuncularla savaşmak için yapılır: bir Harp parçası aynı yuvadaki zindan epik parçasının taşıdığı savaş derecelerini asla taşımaz; onun yerine taşıdığı Harp derecesi ve set bonusları tamamen diğer oyunculara harcanır. Arenada ayakta kalmak istiyorsan onu satın al. Kahramanca zindanları daha hızlı temizlemek istiyorsan teçhizatını zindanlardan kazan.",
       "vanguardHeading": "Vanguard Ekipmesi: Savaş Mevsimi 2",
-      "vanguardBody": "Vanguard ekipmesi, Savaş Ekipmanı'nın ikinci mevsimi olup, aynı iki çeyiz hakkanı tarafından orijinal seviyenin üstünde satılmakta ve orijinal kat satışa devam eder. Her özel dallanma kendi beş parçalık Vanguard setine sahip, baş, omuzlar, göğüs, bacaklar ve eller için ve mağaza sadece sınıfının giyebileceği üç seti listeler, bunu takip eden Vanguard silahlarını senin kullanabileceğin. Bir Vanguard parçası orijinal seviye olarak aynı Savaş Derecelendirmelerini daha yüksek bir ürün seviyesinde taşır, ve her set iki bonus, iki ve dört parçada, birini değiştirir. Orijinal setlerin aksine, bu bonuslar her yerde, canavarlar dahil çalışır, ancak oyuncu dövüşü için yerleştirilir, böylece raid seti raid içinde daha iyi seçim kalır."
+      "vanguardBody": "Vanguard ekipmesi, Savaş Ekipmanı'nın ikinci mevsimi olup, aynı iki çeyiz hakkanı tarafından orijinal seviyenin üstünde satılmakta ve orijinal kat satışa devam eder. Her özel dallanma kendi beş parçalık Vanguard setine sahip, baş, omuzlar, göğüs, bacaklar ve eller için ve mağaza sadece sınıfının giyebileceği üç seti listeler, bunu takip eden Vanguard silahlarını senin kullanabileceğin. Bir Vanguard parçası orijinal seviye olarak aynı Savaş Derecelendirmelerini daha yüksek bir ürün seviyesinde taşır, ve her set iki bonus, iki ve dört parçada, birini değiştirir. Orijinal setlerin aksine, bu bonuslar her yerde, canavarlar dahil çalışır, ancak oyuncu dövüşü için yerleştirilir, böylece raid seti raid içinde daha iyi seçim kalır.",
+      "vanguardStatsBody": "Orijinal seviyenin aksine, Öncü ekipmesi savaş puanlarını da taşır: her Öncü zırh parçası, silah ve kolyenin Kritik Puanı veya Hız Puanı vardır ve büyücü ile iyileştirici parçalar Büyü Gücü veya İyileştirme Gücü ekler. Öncü yüzükleri ve kolyeler silahların yanında satılır ve her sınıf onları giyebilir. Öncü yakın dövüş yüzüklerinden ikisi tam olarak senin sınıfının oyuncusu kadar seviyedeki saldırılarını vuracağı şansını ortadan kaldıran İsabetlilik Puanı verir ve iki büyü yüzüğü senin büyülerinin dirençli olması için aynı şeyi yapar. Çift silah tutarken otomatik saldırılar ekstra kaçırma şansını korur. İyileştirici yüzüğü bunun yerine Hız Puanı taşır."
     },
     "worldPvpPage": {
       "heading": "Dünya PvP",
@@ -10395,18 +10439,18 @@ export const tr_TR: EnTranslations = {
       "stakesBody": "When flagged players defeat a flagged player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
       "limitsHeading": "Adil Oyun Kuralları",
       "limitsBody": "Defeating the same player again and again pays less each time and soon nothing, and the counter resets with the daily reset. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
-      "introZones": "Açık-dünya oyuncu-versus-oyuncu tercih sağlayıcı ve durduğunuz toprak ne anlama geldiğine karar verir. PvP bayrağını kaldırın ve tarafınız ya da raid partisinde olmayan diğer bayraklı oyuncu rakip tartışmalı araziede olur; kapatın ve kısa gecikme sonrası, yeniden izleyicisiniz. İki bölge hiçbir dünya dövüşü olmuyor kutsal alanlar, ve üç en kuzey bölge herkes serbest oyun varsa bayrak olsun ya da olmasın adildir. Puan ve raid yoldaşları hiçbir yerde sizin düşman değildir; lonca üyeleri grubunuzun dışında adildir.",
+      "introZones": "Açık dünyada PvP isteğe bağlıdır ve bulunduğun bölgeye göre değişir. Çekişmeli bölgelerde PvP bayrağını açınca grup veya baskının dışındaki tüm bayraklı oyuncular düşman olur; kapatınca kısa bir gecikmenin ardından yeniden seyirci olursun. Sınav Kıyısı, dünya savaşlarının olmadığı tek sığınaktır ve en kuzeydeki üç bölge de dünyanın geri kalanıyla aynı isteğe bağlı bayrak kurallarını kullanır. Tepe Derdine etkinliğinin aktif çemberine girmek bayrağını otomatik olarak açar. Grup ve baskın arkadaşların hiçbir yerde düşmanın olmaz; grubun dışındaki lonca üyeleri diğer oyuncular gibi hedeftir.",
       "zonesHeading": "Dünya PvP'si Nerede Olur",
-      "zonesBody": "Dünya üç tür zemine sahiptir. İspat Kıyısı ve Doğudere Vadisi kutsal topraklardır: hiç dünya PvP'si orada olmaz, bayraklı ya da değil, bu yüzden yeni bir karakter bayrak nedir bilmeden asla saldırıya uğramaz. Dünyanın çoğu uyuşmazlık bölgesidir; yukarıdaki bayrak kuralı tüm hikayedir. Ejder Toprakları, Kırağı Diyarı ve Kehribar Vadisi, en kuzey üç bölge, serbest savaş alanıdır: içlerinde duran herkes içlerinde duran herkese saldırabilir, bayraklı ya da değil, ve girişte ve çıkışta sana bildirilir. Bayraklanmamış bir oyuncuya saldırmak senin bayraını kaldırır, bu yüzden saldırgan her zaman riski taşır. Zaten bayraklı bir oyuncuya vurmak asla kaldırmaz, bu da kendini savunmak ya da bayraklanmamış birini savunmak hiçbir şeye mal olmaz.",
+      "zonesBody": "Sınav Kıyısı tek sığınaktır: burada Dünya PvP savaşı olmaz ve bayrağını açamazsın. Açık olan bayrağın açık kalır, ancak oynama süresine bağlı unvan ilerlemen buradan ayrılana kadar duraklar. Ejder Toprakları, Kırağı Diyarı ve Kehribar Vadisi dahil diğer tüm yerlerde yalnızca bayraklı oyuncular savaşabilir. Normal seviye şartını karşılıyorsan Tepe Derdine etkinliğinin aktif çemberine girmek bayrağını otomatik olarak açar. Uyarı çemberi bayrağını açmaz. Aktif çemberden ayrılınca bayrağın açık kalır; normal beş dakikalık geri sayımı başlatmak için /pvp off kullan. Aktif tepenin içindeyken veya hâlâ savaştayken bu geri sayım tamamlanamaz.",
       "flagBodyAid": "Sohbete /pvp yazın ya da G'ye PvP penceresini açın ve Dünya PvP sekmesi kullanın, aynı zamanda kaydınızı ve riskleri gösterir. Bayrağı kaldırmak başlangıç seviyelerinden sonra anında. Kapatmak birkaç dakika sayacı başlatır, ve bayrağı hala dövüştüğünüz sürece düşmez, böylece kapatmak hiçbir zaman başlattığınız dövüşten kaçış değildir. Bir bayraklı oyuncu dövüştüğünde iyileştirme, kalkan ya da buff verme sizin bayrağınızı da yükseltirir, böylece kimse giymedikleri bayrağın arkasından bir dövüşçüyü sürdürmez; bayraklı olmayan oyuncu aidaysa hiçbir şey yükselmez.",
       "stakesUnflaggedTake": "Bayraklanmamış bir savaşçı da hiçbir şey almaz: altın yalnızca iki bayraklı oyuncu arasında değişir, ancak yardım eden herkes yine de Onur kazanır.",
-      "stakesBodyFlagged": "Bayraklı oyuncu başka bir oyuncu yenildiğinde, kaybeden cüzdanında altının küçük hissesini öder, ölçülü tutarla sınırlı, ve kazananlar Savaş Ekipmesi yönü Onur kazanırlar. Bayraklı olmayan oyuncu serbest oyun alanında bile düşüp hiçbir altın ödemez. Herkes yardımseverce hisse: öldürme darbesi, geçenlerde hedef hasar herkes ve bu dövüşçüleri ayakta tutulan iyileştiriciler. Temiz bire bir bütün potayı öder; bir grup bölünür.",
+      "stakesBodyFlagged": "Bayraklı bir oyuncu başka bir oyuncuya yenildiğinde, kaybeden kesesindeki altının küçük bir bölümünü, makul bir üst sınırı aşmayacak şekilde öder ve kazananlar Savaş ekipmanı için Onur kazanır. Bayraksız bir oyuncuya açık dünyada saldırılamaz. Yardım eden herkes hem altından hem Onurdan pay alır: son darbeyi vuran oyuncu, kısa süre önce hedefe hasar verenler ve bu savaşçıları ayakta tutan şifacılar. Tamamen bire bir geçen bir dövüşte ödülün tamamı kazanana gider; bir grup ise ödülü paylaşır.",
       "hillHeading": "Tepe Derdine",
-      "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "hillBody": "Her iki saatte bir Ejder Toprakları, Kırağı Diyarı veya Kehribar Vadisi'nde bir tepe belirir. Diyara on beş dakika önceden uyarı verilir ve çember açık arazide işaretlenir. Tepe otuz dakika aktif kalır. Aktif çembere girmek, baskın üyeleri dahil herkesin Dünya PvP bayrağını normal seviye kurallarına göre açar. İçeride en çok uygun oyuncusu bulunan grup, çoğunluğunu kesintisiz bir dakika koruduktan sonra tepeyi ele geçirir; tek başına oynayan biri tek kişilik grup sayılır, ancak baskın üyeleri ve PvP seviye şartının altındaki oyuncular tepeyi ele geçiremez veya tepeden Onur kazanamaz. İçeride duran her hâkim grup üyesi giderek artan hızda Onur kazanır. Ödemeler daha sık yapılır ve daha hızlı artar; böylece eski kırk beş dakikalık etkinliğin toplam Onur miktarı korunur. Tepe el değiştirdiğinde ödül artışı baştan başlar. Çemberden ayrılınca bayrağın açık kalır; /pvp off normal beş dakikalık gecikmeyi kullanır ve aktif tepenin içindeyken veya savaş sırasında tamamlanamaz. Tepe çubuğu kontrolü, oyuncu sayılarını ve ele geçirme ilerlemesini gösterir; /hill konumunu bildirir.",
       "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
-      "hillBodyRamp": "Üç saatte bir, hiç kimsenin tahmin edemediği bir anda, tüm krallığa bir tepe serbest oyun alanlarından birinde on beş dakika içinde yükselecek söylenir ve üzerinde durduğu daire açık arazide işaretlenir. Yükseldiğinde kırk beş dakika durur, sonra düşer. Çoğu oyuncu içinde duran taraf tepeyi yarışır, ve kırılmaz çoğunluk dakikası sonra tepe onlarındır; yalnız oyuncu kendisinin partisidir, ama raid üyeleri hiç saymaz. Bir taraf tepeyi tutarken, içinde duran üyeleri dakikada Her Zaman Onur kazanır, ve aynı taraf onu ne kadar uzun tutarsa, her dakika ne kadar çoğu ödediğini: tam taraf tutmuş çekişmeli olmayan bir tepesinin tümü kadar bir saat üç zafer ve oyun kazancı. Tepe el değiştirdiğinde, yeni sahipçiler baştan başlar. Sahası üzerinde bir çubuk onu tutar, sayılarınız onlarına karşı, ve yarış saati; sohbete /hill nerede durduğunu söyler.",
+      "hillBodyRamp": "Her iki saatte bir Ejder Toprakları, Kırağı Diyarı veya Kehribar Vadisi'nde bir tepe belirir. Diyara on beş dakika önceden uyarı verilir ve çember açık arazide işaretlenir. Tepe otuz dakika aktif kalır. Aktif çembere girmek, baskın üyeleri dahil herkesin Dünya PvP bayrağını normal seviye kurallarına göre açar. İçeride en çok uygun oyuncusu bulunan grup, çoğunluğunu kesintisiz bir dakika koruduktan sonra tepeyi ele geçirir; tek başına oynayan biri tek kişilik grup sayılır, ancak baskın üyeleri ve PvP seviye şartının altındaki oyuncular tepeyi ele geçiremez veya tepeden Onur kazanamaz. İçeride duran her hâkim grup üyesi giderek artan hızda Onur kazanır. Ödemeler daha sık yapılır ve daha hızlı artar; böylece eski kırk beş dakikalık etkinliğin toplam Onur miktarı korunur. Tepe el değiştirdiğinde ödül artışı baştan başlar. Çemberden ayrılınca bayrağın açık kalır; /pvp off normal beş dakikalık gecikmeyi kullanır ve aktif tepenin içindeyken veya savaş sırasında tamamlanamaz. Tepe çubuğu kontrolü, oyuncu sayılarını ve ele geçirme ilerlemesini gösterir; /hill konumunu bildirir.",
       "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
-      "hillBodyFlat": "Her üç saatte bir, öngörülemeyen bir anda tüm diyara on beş dakika sonra serbest savaş bölgelerinden birinde bir tepenin belireceği duyurulur ve tepenin çemberi açık arazide işaretlenir. Tepe kırk beş dakika kalır, sonra kaybolur. Bu sırada her beş dakikada bir konumu ve en uzun toplam tutma süresine sahip gruplar duyurulur. Çemberin içinde en çok oyuncusu olan grup tepeyi ele geçirmeye çalışır ve toplam otuz saniye boyunca sayıca üstünlük sağladığında tepeyi alır. Rakip bir grubun girmesi sayacı yalnızca grubunuz tekrar üstün gelene kadar duraklatır; sayaç ancak çemberde grubunuzdan hayatta kimse kalmadığında sıfırlanır. Tek başına bir oyuncu tek kişilik grup sayılır ve grup kurduğunda tuttuğu tepeyi korur, ancak baskın üyeleri hiç sayılmaz. Tepeyi tutan grubun çemberde duran her üyesi, tepeyi ne kadar süredir tuttuklarından bağımsız olarak her dakika aynı miktarda Onur kazanır. Tepeyi bütün süresi boyunca rakipsiz tutan tam bir grup, yaklaşık üç savaş alanı zaferi kadar kazanır. Tepe kaybolduğunda, en uzun toplam tutma süresine sahip grup en az on dakika tutmuşsa, o grubun tutma süresi boyunca çemberde en az bir dakika durmuş ve hâlâ aynı grupta olan herkes Haftalık Kasa'nın PvP sırası için bir zafer kazanır. Alanın üzerindeki çubuk tepeyi kimin tuttuğunu, iki tarafın oyuncu sayılarını ve ele geçirme sayacını gösterir; sohbette /hill komutu konumunu söyler.",
+      "hillBodyFlat": "Her üç saatte bir, öngörülemeyen bir anda tüm diyara on beş dakika sonra kuzey bölgelerinden birinde bir tepenin belireceği duyurulur ve tepenin çemberi açık arazide işaretlenir. Tepe kırk beş dakika kalır, sonra kaybolur. Bu sırada her beş dakikada bir konumu ve en uzun toplam tutma süresine sahip gruplar duyurulur. Çemberin içinde en çok oyuncusu olan grup tepeyi ele geçirmeye çalışır ve toplam otuz saniye boyunca sayıca üstünlük sağladığında tepeyi alır. Rakip bir grubun girmesi sayacı yalnızca grubunuz tekrar üstün gelene kadar duraklatır; sayaç ancak çemberde grubunuzdan hayatta kimse kalmadığında sıfırlanır. Tek başına bir oyuncu tek kişilik grup sayılır ve grup kurduğunda tuttuğu tepeyi korur, ancak baskın üyeleri hiç sayılmaz. Tepeyi tutan grubun çemberde duran her üyesi, tepeyi ne kadar süredir tuttuklarından bağımsız olarak her dakika aynı miktarda Onur kazanır. Tepeyi bütün süresi boyunca rakipsiz tutan tam bir grup, yaklaşık üç savaş alanı zaferi kadar kazanır. Tepe kaybolduğunda, en uzun toplam tutma süresine sahip grup en az on dakika tutmuşsa, o grubun tutma süresi boyunca çemberde en az bir dakika durmuş ve hâlâ aynı grupta olan herkes Haftalık Kasa'nın PvP sırası için bir zafer kazanır. Alanın üzerindeki çubuk tepeyi kimin tuttuğunu, iki tarafın oyuncu sayılarını ve ele geçirme sayacını gösterir; sohbette /hill komutu konumunu söyler.",
       "limitsBodyRaids": "Aynı oyuncu tekrar tekrar mağlup etmek daha az az çoğu zaman hiçbir şey öder, ve o oyuncu yönü sayarınız ilk öldürülerinden bir saat sonra baştan başlar, böylece bir kurban değerli bekleme beklemez. Seviyeniz çok aşağı bir hedef hiçbir şey öder. Dövüşlü Alanları ve Arenalar onlara içinde iken kendi kuralları yürütür, ve açık dünyaya daha fazla Onur ödedikleri, böylece dünya PvP aynı satıcıya yavaş yoldur. Raid dünya öldürüleridaten hiç almaz: bir raid üyesi Onur ya da altın almaz ve başkasının hissesini kabusmaz, böylece parti olarak dövüş almak için ödenir."
     },
     "thornhollowPage": {
@@ -13507,7 +13551,14 @@ export const tr_TR: EnTranslations = {
     "terms": "Hizmet Koşulları",
     "privacy": "Gizlilik Politikası",
     "discordLabel": "Discord'a Katıl",
-    "levyStreet": "Levy Street"
+    "levyStreet": "Levy Street",
+    "guidesLabel": "Oyuncu Rehberleri",
+    "guideFree": "Ücretsiz MMORPG'ler",
+    "guideGamesLikeWow": "WoW Gibi Oyunlar",
+    "guideBest": "En İyi MMORPG'ler",
+    "guideNew": "Yeni MMORPG'ler",
+    "guideBrowser": "Tarayıcı MMORPG'leri",
+    "guideGamesLikeDiablo": "Diablo Gibi Oyunlar"
   },
   "settings": {
     "languageLoading": "Dil yükleniyor...",
@@ -16156,6 +16207,7 @@ export const tr_TR: EnTranslations = {
       "cooldownMinutes": "{minutes}d",
       "attackTooltip": "Hedefine otomatik saldırıyı aç/kapat. Bir düşmana sağ tıklamak da saldırır.",
       "attackRemoveHint": "Çubuktan kaldırıp yuvayı serbest bırakmak için sağ tıkla.",
+      "moveHint": "Taşımak için Shift tuşunu basılı tutup sürükle",
       "emptySlot": "Boş yuva",
       "slotAria": "Eylem yuvası {slot}: {ability}",
       "emptySlotAria": "Eylem yuvası {slot}: boş",
@@ -16975,6 +17027,7 @@ export const tr_TR: EnTranslations = {
       "dps": "(saniyede {dps} hasar)",
       "armorStat": "{value} Zırh",
       "stat": "+{value} {stat}",
+      "warfareMainHandOnly": "Savaş sadece ana elde sayılır.",
       "useFood": "Kullanım: {seconds} saniyede {amount} can yeniler. Yerken oturur kalmalısın.",
       "useDrink": "Kullanım: {seconds} saniyede {amount} mana yeniler. İçerken oturur kalmalısın.",
       "useElixir": "Kullan: {stat} niteliğini {minutes} dakika boyunca {value} artırır. Aynı nitelikteki başka bir iksir veya parşömenin yerini alır. Savaşta kullanılabilir.",
@@ -24217,6 +24270,33 @@ export const tr_TR: EnTranslations = {
       "moonwrack_stave": {
         "name": "Ay Enkazı Asası"
       },
+      "vanguard_feral_staff": {
+        "name": "Öncünün Yaban Asası"
+      },
+      "vanguard_band_of_might": {
+        "name": "Öncü'nün Güç Halkası"
+      },
+      "vanguard_band_of_precision": {
+        "name": "Öncü'nün Kesinlik Halkası"
+      },
+      "vanguard_band_of_focus": {
+        "name": "Öncü'nün Odaklanma Halkası"
+      },
+      "vanguard_band_of_mending": {
+        "name": "Öncü'nün İyileştirme Halkası"
+      },
+      "vanguard_pendant_of_might": {
+        "name": "Öncü'nün Güç Kolyesi"
+      },
+      "vanguard_pendant_of_precision": {
+        "name": "Öncü'nün Kesinlik Kolyesi"
+      },
+      "vanguard_pendant_of_focus": {
+        "name": "Öncü'nün Odaklanma Kolyesi"
+      },
+      "vanguard_pendant_of_mending": {
+        "name": "Öncü'nün İyileştirme Kolyesi"
+      },
       "membership_staff": {
         "name": "Değişim Asası"
       },
@@ -30304,7 +30384,7 @@ export const tr_TR: EnTranslations = {
       "membership_annual_reward": {
         "sender": "Kuzgun Postası",
         "subject": "Yıllık üyelik bineğin",
-        "body": "Yıllık üyelik ödemen tamamlandı. Binek dizginlerin ektedir. Bu bineğe sahip olmak için dizginleri çantalarında veya bankada tut. Üyelik sona erdikten sonra da senin kalır. Binicilik becerisi gerekir."
+        "body": "Yıllık üyelik ödemen tamamlandı. Gece Kanadı Kimera artık hesabındaki tüm karakterler için açıldı ve dizginleri ektedir. Üyelik sona erdikten sonra da senin kalır. Binicilik becerisi gerekir."
       },
       "woc_market_return": {
         "sender": "Borsa Komisyoncusu",

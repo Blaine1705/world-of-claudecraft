@@ -249,29 +249,36 @@ describe('the drop', () => {
   });
 
   it('no flag, no drop: an unflagged victim or an unflagged blow on free-for-all ground drops nothing', () => {
-    const sim = world();
-    const a = fighter(sim, 'Aleph', 1001, 0);
-    const b = fighter(sim, 'Bet', 1002, 2);
-    place(sim, a, FFA, 0);
-    place(sim, b, FFA, 2);
-    expect(ZONES.some((z) => z.worldPvp === 'ffa')).toBe(true);
-    // Unflagged victim: the blow marks the attacker, but the victim stakes nothing.
-    metaOf(sim, b).copper = 20_000;
-    slay(sim, a, b);
-    expect(ent(sim, a).pvpFlag).toBe(true);
-    expect(ent(sim, b).lootable).toBe(false);
-    expect(sim.worldPvpBooks.spoils.size).toBe(0);
-    // Flagged victim, unflagged blow (hitting a flagged player never marks).
-    const c = fighter(sim, 'Gimel', 1003, 0);
-    const d = fighter(sim, 'Dalet', 1004, 2);
-    place(sim, c, FFA, 4);
-    place(sim, d, FFA, 6);
-    flag(sim, d);
-    metaOf(sim, d).copper = 20_000;
-    slay(sim, c, d);
-    expect(ent(sim, c).pvpFlag).toBeFalsy();
-    expect(ent(sim, d).lootable).toBe(false);
-    expect(skullsOf(sim, c)).toHaveLength(0);
+    const zone = ZONES.find((z) => z.id === 'drakelands')!;
+    const previous = zone.worldPvp;
+    zone.worldPvp = 'ffa';
+    try {
+      const sim = world();
+      const a = fighter(sim, 'Aleph', 1001, 0);
+      const b = fighter(sim, 'Bet', 1002, 2);
+      place(sim, a, FFA, 0);
+      place(sim, b, FFA, 2);
+      expect(ZONES.some((z) => z.worldPvp === 'ffa')).toBe(true);
+      // Unflagged victim: the blow marks the attacker, but the victim stakes nothing.
+      metaOf(sim, b).copper = 20_000;
+      slay(sim, a, b);
+      expect(ent(sim, a).pvpFlag).toBe(true);
+      expect(ent(sim, b).lootable).toBe(false);
+      expect(sim.worldPvpBooks.spoils.size).toBe(0);
+      // Flagged victim, unflagged blow (hitting a flagged player never marks).
+      const c = fighter(sim, 'Gimel', 1003, 0);
+      const d = fighter(sim, 'Dalet', 1004, 2);
+      place(sim, c, FFA, 4);
+      place(sim, d, FFA, 6);
+      flag(sim, d);
+      metaOf(sim, d).copper = 20_000;
+      slay(sim, c, d);
+      expect(ent(sim, c).pvpFlag).toBeFalsy();
+      expect(ent(sim, d).lootable).toBe(false);
+      expect(skullsOf(sim, c)).toHaveLength(0);
+    } finally {
+      zone.worldPvp = previous;
+    }
   });
 
   it('a grey kill and a fully decayed repeat kill drop nothing', () => {

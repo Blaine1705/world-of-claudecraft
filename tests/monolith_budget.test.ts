@@ -550,7 +550,9 @@ const MONOLITHS: MonolithRow[] = [
     // the tavern's rest badge read (rest_indicator.ts restStateOf) pays for the tavern's wiring.
     // wc -l on the merged tree. Exact count.
     // Combined guild extractions and integration changes, measured with wc -l.
-    ceiling: 17996,
+    // v0.45.2 recovery: reuse the Warfare confirmation formatter for gold,
+    // Honor and companions. Measured after recovery integration, zero slack.
+    ceiling: 17733,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1854,7 +1856,8 @@ const MONOLITHS: MonolithRow[] = [
     // RE-PINNED to 9690 at the sync with the courier full-bank change (PR 4598): its
     // wiring composes with the extractions above, still under the release 9751. wc -l.
     // 9694 with the difficulty menu fix (PR 4625) merged ahead of its landing. wc -l.
-    ceiling: 9694,
+    // Membership boot wiring lives with its service factory.
+    ceiling: 9693,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -2569,7 +2572,8 @@ const MONOLITHS: MonolithRow[] = [
     // src/ui/store_mount_purchase.ts (the spend controller), the store body's
     // button wiring moved to src/ui/store_body_actions.ts, and both grant-SKU
     // controllers now build over one seam object (store_spend_controllers.ts).
-    ceiling: 1262,
+    // Summary and countdown formatting live in daily_rewards_chrome_view.ts.
+    ceiling: 1249,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },
   {

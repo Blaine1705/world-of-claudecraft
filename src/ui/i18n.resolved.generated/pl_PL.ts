@@ -786,7 +786,6 @@ export const pl_PL: EnTranslations = {
       "claimLastWeek": "Odebrz nagrodę z ostatniego tygodnia",
       "readyTitle": "Twoje tygodniowe nagrody są gotowe",
       "readyDescription": "Czeka ukończony tydzień nagród. Otwórz zarobione skarbo, a następnie wybierz jeden przedmiot do odebrania.",
-      "previewClaimNotice": "Czekają na ciebie nagrody. Odwiedź Strażnika Skarbca w Eastbrook, aby je otworzyć i odebrać.",
       "notNow": "Nie teraz",
       "completedWeek": "Tydzień skończył się {date}",
       "currentWeek": "Wróć do tegorocznych postępów",
@@ -837,7 +836,8 @@ export const pl_PL: EnTranslations = {
         "dungeon_heroic": "Łup z heroicznych lochów",
         "world": "Łup z zadań światowych",
         "pvp": "Sprzęt WOJEN"
-      }
+      },
+      "previewClaimNotice": "Czekają na ciebie nagrody. Odwiedź Strażnika Skarbca w Eastbrook, aby je otworzyć i odebrać."
     },
     "guildHall": {
       "title": "Sala Latarni",
@@ -1327,15 +1327,15 @@ export const pl_PL: EnTranslations = {
         "annualTitle": "Pakiet członkostwa na 12 miesięcy",
         "annualPrice": "{price} za 12 miesięcy, płatne z góry",
         "annualTerms": "Odnawia się co roku w tej samej cenie. Zapłać zwykłą walutą przez Stripe. Anuluj w ustawieniach rozliczeń.",
-        "annualMount": "Po dokonaniu płatności odbierz pocztą związane z duszą wodze Chimery Nocnego Skrzydła na postaci, która kupiła ten pakiet. Wierzchowiec pozostaje twój po wygaśnięciu członkostwa.",
+        "annualMount": "Odblokowuje wierzchowca Chimerę Nocnego Skrzydła dla każdej postaci na twoim koncie, a związane z duszą wodze trafiają pocztą do postaci, która go kupi. Jeden na konto i pozostaje twój po zakończeniu członkostwa.",
         "trialTerms": "Wypróbuj członkostwo bezpłatnie przez {days} dni, raz na konto. Wymagana jest metoda płatności. Jeśli nie anulujesz, po zakończeniu okresu próbnego zostanie pobrana opłata {price}.",
         "startTrial": "Rozpocznij bezpłatny okres próbny na 7 dni",
-        "resumeCheckout": "Wznów płatność",
         "checkoutClosed": "Ta płatność została zamknięta bez nagrody oczekującej na odbiór. Wybierz ponownie plan członkostwa, aby rozpocząć nową płatność.",
         "annualClaim": "Odbierz wierzchowca z pakietu",
         "annualPending": "Po zapłacie wróć do postaci, która dokonała zakupu, aby odebrać wierzchowca z pakietu. Jeśli płatność jest przetwarzana lub trwa okres próbny, spróbuj ponownie po pobraniu opłaty.",
         "annualDelivered": "Klucz do wierzchowca z pakietu został dostarczony pocztą.",
         "tokenTitle": "Zbywalny żeton członkostwa",
+        "tokenPrice": "{price} za 30 dni",
         "benefitsTitle": "Korzyści aktywnego członkostwa",
         "benefitBank": "Korzystaj z banków pozostałych postaci u dowolnego bankiera.",
         "benefitSlots": "Odblokuj 10 dodatkowych miejsc na postacie.",
@@ -1351,6 +1351,14 @@ export const pl_PL: EnTranslations = {
         "price": "{price} miesięcznie",
         "terms": "Odnawia się co miesiąc. Zapłać zwykłą walutą przez Stripe. Anuluj w ustawieniach rozliczeń.",
         "subscribe": "Subskrybuj",
+        "addMonth": "Dodaj 1 miesiąc",
+        "addYear": "Dodaj 12 miesięcy",
+        "stackTerms": "Płatność następuje teraz. Czas zostanie dodany na koniec obecnego członkostwa, które następnie odnowi się zgodnie z tym planem.",
+        "stackCapped": "Możesz zgromadzić maksymalnie 2 lata członkostwa naraz. Spróbuj ponownie bliżej daty odnowienia.",
+        "stackUnavailable": "Dodawanie czasu członkostwa jest obecnie niedostępne. Spróbuj ponownie za chwilę.",
+        "billingBlocked": "Zaktualizuj dane płatności w sekcji Zarządzaj subskrypcją, zanim dodasz czas członkostwa.",
+        "renewsOn": "Odnowienie: {date}",
+        "endsOn": "Członkostwo kończy się {date}",
         "manage": "Zarządzaj subskrypcją",
         "ending": "Zostanie anulowane na koniec okresu rozliczeniowego",
         "error": "Nie udało się otworzyć rozliczeń. Zezwól na wyskakujące okna i spróbuj ponownie.",
@@ -1369,8 +1377,9 @@ export const pl_PL: EnTranslations = {
       "title": "Sklep WOK",
       "close": "Zamknij sklep WOC",
       "tabsLabel": "Sekcje sklepu WOC",
-      "storeTab": "Sklep",
-      "rewardsTab": "Codzienne nagrody",
+      "storeTab": "Sklep z kosmetykami",
+      "membershipsTab": "Członkostwa",
+      "membershipsUnavailable": "Członkostwa są obecnie niedostępne. Spróbuj ponownie za chwilę.",
       "mountsEyebrow": "Mocowania konta",
       "mountsTitle": "Maszyna stabilna",
       "mountBuyAria": "Kup {item}",
@@ -3446,22 +3455,22 @@ export const pl_PL: EnTranslations = {
       "zoneContested": "Sporne tereny: mogą walczyć tylko oznaczeni gracze.",
       "zoneFfa": "Wolna gra dla wszystkich: każdy tutaj jest fair game.",
       "realmDisabled": "PvP Świata jest wyłączony na tym królestwie.",
-      "groundSanctuary": "Proving Shore i Eastbrook Vale to sanktuaria: żaden PvP Świata w ogóle.",
+      "groundSanctuary": "Wybrzeże Prób jest jedynym sanktuarium: nie można tam włączyć światowego PvP ani walczyć z innymi graczami.",
       "groundContested": "Wszędzie indziej to tereny sporne: mogą walczyć tylko dwaj oznaczeni gracze.",
-      "groundFfa": "Drakelands, Frostveil Reach i Amberfall to wolna gra dla wszystkich: każdy tam może walczyć, niezależnie od flagi.",
+      "groundFfa": "Smocze Ziemie, Szronowa Kraina i Bursztynowa Dolina stosują zwykłe flagi PvP. Wejście do aktywnego kręgu Króla Wzgórza włącza twoją flagę.",
       "groupLine": "Członkowie drużyny i rajdu nigdy nie są sobie wrogami. Gildiomanie spoza twojej grupy mogą walczyć.",
-      "markLine": "Atakowanie nienaczynaczonego gracza tam podnosi twoją flagę; atakowanie oznaczonego tego nigdy nie robi.",
+      "markLine": "Wejście do aktywnego kręgu wzgórza włącza PvP w świecie. Po opuszczeniu kręgu flaga pozostaje włączona.",
       "aidLine": "Leczenie, osłanianie lub wzmacnianie oznaczonego gracza w walce na świecie podnosi twoją flagę.",
       "stakeLine": "Przegrany płaci {cap} lub {percent} swoich pieniędzy, w zależności od tego, co jest mniejsze.",
       "spoilsLine": "Gdy oboje macie włączone PvP, złoto za śmiertelny cios leży na zwłokach razem z czaszką pokonanego.",
       "skullName": "Czaszka gracza {name}",
-      "noStakeLine": "Nienaczynaczony gracz pokonany na wolnej grze dla wszystkich nie traci złota.",
+      "noStakeLine": "Nieoznaczonych graczy nie można zaatakować w otwartym świecie.",
       "noTakeLine": "Nienaczynaczony walczący też nie traci złota: złoto przesuwa się tylko między dwoma oznaczonymi graczami.",
       "honorLine": "{honor} Honoru za każde zabójstwo, podzielony między wszystkich, którzy pomogli.",
       "splitLine": "Czysty 1v1 płaci całą pulę; pomocnicy i ich uleczacze dzielą ją.",
       "repeatLine": "Powtórne zabójstwa tego samego gracza dają {second}, potem {third}, potem nic; licznik resetuje się {reset} po pierwszym zabójstwie.",
       "greyLine": "Gracze o więcej niż {levels} poziomów poniżej ciebie nic nie płacą.",
-      "disarmLine": "Wyłączenie trwa {minutes} minut i czeka na koniec walki.",
+      "disarmLine": "Wyłączenie trwa {minutes} minut i czeka, aż opuścisz aktywne wzgórze i zakończy się walka.",
       "record": "Zapis: {kills} zabójstw, {deaths} zgonów",
       "enable": "Włącz PvP Świata",
       "disable": "Wyłącz PvP Świata",
@@ -3491,6 +3500,17 @@ export const pl_PL: EnTranslations = {
       "distance": "{yards} j do okręgu",
       "rises": "Pojawia się za {minutes}",
       "falls": "Spada za {minutes}",
+      "pvpEntry": "Wejście do aktywnego kręgu włącza PvP w świecie.",
+      "pvpBanner": "PvP",
+      "callout": {
+        "killingSpree": "{name} ma serię zabójstw!",
+        "rampage": "{name} szaleje!",
+        "unstoppable": "{name} jest nie do zatrzymania!",
+        "dominating": "{name} dominuje!",
+        "godlike": "{name} jest boski!",
+        "legendary": "{name} jest legendarny!",
+        "shutDown": "{killer} zakończył(a) passę gracza {victim}!"
+      },
       "standingRaid": "Członkowie rajdu się nie liczą: tylko drużyny mogą trzymać wzgórze"
     },
     "skullBag": {
@@ -3523,7 +3543,8 @@ export const pl_PL: EnTranslations = {
       "owned": "Posiadane",
       "buyAria": "Kup {item} za {honor}",
       "buyOwnedAria": "Kup {item} za {honor}, już posiadane",
-      "buyConfirmBody": "Kupić {item} za {honor}? Zakupów za Honor nie można zwrócić."
+      "buyConfirmBody": "Kupić {item} za {honor}? Zakupów za Honor nie można zwrócić.",
+      "buyConfirmBodyGold": "Kupić {item} za {price}? Ten zakup nie może być zwrócony."
     },
     "charSheet": {
       "offense": "Atak",
@@ -4606,8 +4627,8 @@ export const pl_PL: EnTranslations = {
         "boneSpikeHeroicSummary": "Co {everyHeroic} sek. Nythraxis nadziewa {victimsHeroic} rajderów innych niż jego obecny cel na Kościane Kolce. Nadziany rajder nie może działać i traci {drainHeroic} maksymalnego zdrowia co sekundę, dopóki jego kolec nie zostanie zniszczony. Kolec rozpada się po {hitsHeroic} trafieniach od kogokolwiek, niezależnie od zadanych obrażeń. Gracz, który został już nabity, nie może zostać wybrany ponownie przez {cooldown} s, dzięki czemu kolce rozkładają się na całą grupę rajdową.",
         "boneSpikeResponse": "Kto jest najbliżej, uderza w Kościany kolec: kilka trafień od kogokolwiek go rozbija, niezależnie od obrażeń. Uzdrowiciele utrzymują nabitych przy życiu, dopóki kolce nie padną.",
         "graveEruptionName": "Grobowa Erupcja",
-        "graveEruptionSummary": "Co {everyNormal} sek. szkieletowe dłonie oznaczają pod rajderami {countNormal} kręgów o promieniu {radius} jardów. Po {warning} sek. każdy krąg wybucha za {burstNormal} maksymalnego zdrowia jako obrażenia Cienia, potem płonie jako Grobowy Płomień przez {flameNormal} sek., zadając {tickNormal} maksymalnego zdrowia co sekundę każdemu, kto w nim stoi.",
-        "graveEruptionHeroicSummary": "Co {everyHeroic} sek. szkieletowe dłonie oznaczają pod rajderami {countHeroic} kręgów o promieniu {radius} jardów. Po {warning} sek. każdy krąg wybucha za {burstHeroic} maksymalnego zdrowia jako obrażenia Cienia, potem płonie jako Grobowy Płomień przez {flameHeroic} sek., zadając {tickHeroic} maksymalnego zdrowia co sekundę każdemu, kto w nim stoi.",
+        "graveEruptionSummary": "Co {everyNormal} sek. szkieletowe dłonie oznaczają pod rajderami {countNormal} kręgów o promieniu {radius} jardów. Po {warning} sek. każdy krąg wybucha za {burstNormal} maksymalnego zdrowia jako obrażenia Cienia, potem płonie jako Grobowy Płomień przez {flameNormal} sek., zadając {tickNormal} maksymalnego zdrowia co sekundę każdemu, kto w nim stoi. Nigdy nie następuje, gdy aktywne są znaki Rozdarcia Duszy, ani w ciągu {gap} sek. po ich zniknięciu.",
+        "graveEruptionHeroicSummary": "Co {everyHeroic} sek. szkieletowe dłonie oznaczają pod rajderami {countHeroic} kręgów o promieniu {radius} jardów. Po {warning} sek. każdy krąg wybucha za {burstHeroic} maksymalnego zdrowia jako obrażenia Cienia, potem płonie jako Grobowy Płomień przez {flameHeroic} sek., zadając {tickHeroic} maksymalnego zdrowia co sekundę każdemu, kto w nim stoi. Nigdy nie następuje, gdy aktywne są znaki Rozdarcia Duszy, ani w ciągu {gap} sek. po ich zniknięciu.",
         "graveEruptionResponse": "Wyjdźcie z każdego kręgu ostrzegawczego, zanim wybuchnie, i trzymajcie się z dala od płonącej ziemi. Tankowie odciągają Nythraxis od płomieni, aby walczący wręcz mieli miejsce do pracy.",
         "bindingSigilName": "Pieczęć Wiążąca",
         "bindingSigilSummary": "Co {everyNormal} sek. na jednej z dwóch platform po bokach tronu, {sideOffset} jardów na lewo lub na prawo (z perspektywy rajdu) od miejsca, w którym Nythraxis stał na początku walki, rozbłyska pieczęć dawnych ochron (za każdym razem po drugiej stronie), a on rozpoczyna Nieśmiertelne Wniebowstąpienie, zyskując {ascensionNormal} obrażeń i szybkości ataku co {ascensionEvery} sek. Jeśli stanie na pieczęci w ciągu {bindNormal} sek., zostaje Spętany: Wniebowstąpienie zostaje oczyszczone, on jest ogłuszony na {stunNormal} sek. i otrzymuje o {vulnerability} więcej obrażeń przez {boundNormal} sek. W przeciwnym razie każdy rajder otrzymuje {unboundHitNormal} maksymalnego zdrowia jako obrażenia Cienia, a on zachowuje o {unboundBonusNormal} więcej obrażeń do następnego wiązania.",
@@ -5010,6 +5031,7 @@ export const pl_PL: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
+      "hillBountyTag": "Nagroda {honor}",
       "pvpTag": "PvP",
       "bountyTag": "Nagroda za głowę",
       "cheaterTag": "< Oszust >",
@@ -5435,12 +5457,11 @@ export const pl_PL: EnTranslations = {
       "memberSinceDays": "{days}d na Discordzie",
       "roleTag": {
         "levyst": "Levy St",
-        "admin": "Admin",
         "coredevs": "Główny deweloper",
         "devs": "Dev",
-        "seniormods": "Starszy Moderator",
+        "seniormods": "Strażnik",
         "mods": "Mod",
-        "juniormods": "Młodszy Moderator",
+        "juniormods": "Obserwator",
         "artists": "Grafik",
         "contentcreator": "Twórca Treści",
         "legend": "LEGENDA",
@@ -5985,6 +6006,13 @@ export const pl_PL: EnTranslations = {
       "offlineHeader": "Offline ({n})",
       "hideOffline": "Ukryj offline",
       "hideOfflineTitle": "Ukryj offline członków gildii",
+      "presence": {
+        "label": "Pokaż mnie jako online",
+        "everyone": "Wszyscy",
+        "friends": "Tylko przyjaciele",
+        "none": "Nikt",
+        "title": "Kto cię widzi jako online na listach przyjaciół i w rostrze gildii, twoją strefę i pozycję na mapie. Twoja drużyna cię zawsze widzi."
+      },
       "billboard": {
         "label": "Tablica ogłoszeń gildii",
         "empty": "Na tablicy ogłoszeń nic jeszcze nie ma.",
@@ -8077,6 +8105,12 @@ export const pl_PL: EnTranslations = {
       "admin_target": "Konta operatorów nie mogą zostać wyrzucone.",
       "target_offline": "Ten gracz nie jest już online na tym serwerze."
     },
+    "world_quest_block": {
+      "admin_target": "Kont operatorów nie można zablokować w zadaniach światowych.",
+      "reason_required": "Wymagany jest powód.",
+      "already_blocked": "To konto ma już zablokowane zadania światowe.",
+      "not_blocked": "To konto nie ma zablokowanych zadań światowych."
+    },
     "woc_market": {
       "invalid_input": "Nieprawidłowe dane wejściowe.",
       "disabled": "Giełda $WOC nie jest dostępna na tym realmie.",
@@ -9103,7 +9137,14 @@ export const pl_PL: EnTranslations = {
       "discord": "Dołącz do Discorda",
       "communityWiki": "Wiki społeczności",
       "rights": "World of ClaudeCraft",
-      "linksLabel": "Odnośniki do gry i społeczności"
+      "linksLabel": "Odnośniki do gry i społeczności",
+      "guidesLabel": "Przewodniki graczy",
+      "guideFree": "Darmowe MMORPG",
+      "guideGamesLikeWow": "Gry podobne do WoW",
+      "guideBest": "Najlepsze MMORPG",
+      "guideNew": "Nowe MMORPG",
+      "guideBrowser": "MMORPG w przeglądarce",
+      "guideGamesLikeDiablo": "Gry podobne do Diablo"
     },
     "language": {
       "label": "Język",
@@ -9619,7 +9660,9 @@ export const pl_PL: EnTranslations = {
       "session": "Co zrobiłeś od zalogowania: zabójstwa, śmierci, obrażenia i doświadczenie.",
       "arena": "Twoja pozycja w Popielnym Koloseum w obu przedziałach: ranking, zwycięstwa, porażki i wskaźnik zwycięstw dla 1 na 1 i 2 na 2.",
       "pvp": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other anywhere; switching off takes 5 minutes.",
-      "pvpZones": "Flaga PvP na świecie: /pvp przełącza ją, /pvp on i /pvp off ustawiają ją. Oflagowani gracze mogą walczyć ze sobą na terenie spornym, świętuary nie pozwalają na żadne światowe walki, a strefy wolny-dla-wszystkich pozwalają na to z flagą lub bez flagi; wyłączenie zajmuje 5 minut.",
+      "pvpZones": "Flaga PvP w świecie: /pvp ją przełącza, /pvp on włącza, a /pvp off wyłącza. Oznaczeni gracze mogą walczyć ze sobą na spornych terenach, sanktuaria nie pozwalają na żadne walki w świecie, a wejście do aktywnego kręgu Króla Wzgórza włącza twoją flagę; wyłączenie trwa 5 minut.",
+      "presence": "Kto cię widzi jako online na listach przyjaciół, w spisie członków gildii i /who: /presence everyone (domyślnie), /presence friends (tylko gracze na twojej liście przyjaciół), lub /presence none. Gdy jesteś ukryty, nie widzą żadnej kropki online, twojej strefy ani pozycji na mapie, chociaż szepty i zaproszenia do ciebie docierają; twoja drużyna zawsze cię widzi. Zwykłe /presence mówi ci, co jest ustawione.",
+      "flair": "Pokazuje lub ukrywa twoją rolę z Discorda przed innymi graczami, czyli kolorową nazwę, plakietkę roli i zweryfikowaną plakietkę na czacie: /flair on ją pokazuje, /flair off ją ukrywa, a samo /flair mówi, co jest ustawione. Wymaga połączonego konta Discord.",
       "listings": "Twoje własne oferty na Rynku Świata, wraz z ceną wywoławczą, pozostałym czasem każdej z nich i tym, ile masz jeszcze miejsca na kolejne.",
       "buyback": "Co ostatnio sprzedałeś sprzedawcy i wciąż możesz odkupić.",
       "groupState": "Twój obecny stan",
@@ -10384,7 +10427,8 @@ export const pl_PL: EnTranslations = {
       "warfareTradeBody": "To celowy kompromis. Ekwipunek działań wojennych jest stworzony do walki z graczami, a nie jako skrót omijający kolejne poziomy lochów: element działań wojennych nigdy nie niesie takich statystyk bojowych, jakie ma epicki przedmiot z lochu w tym samym slocie, a wszystko, co ze sobą przynosi, jest przeznaczone przeciwko innym graczom. Jeśli chcesz poradzić sobie na arenie, kup go. Jeśli chcesz szybciej przechodzić heroiczne lochy, zdobywaj ekwipunek w lochach.",
       "warfareTradeBodyRatingSpent": "To zamierzona wymiana. Sprzęt Wojny służy do walki z graczami, a nie do omijania poziomów lochów: część sprzętu Wojny nigdy nie ma ocen bojowych, które ma epicki przedmiot z lochu w tym samym miejscu, lecz zamiast tego całą swoją ocenę Wojny i premie zestawu przeznacza na innych graczy. Jeśli chcesz utrzymać się na arenie, kup go. Jeśli chcesz szybciej czyścić tryby heroiczne, zdobądź sprzęt w lochach.",
       "vanguardHeading": "Zbroja Awangardy: Sezon Wojenki 2",
-      "vanguardBody": "Zbroja Awangardy to drugi sezon zbroi wojennej, sprzedawanej przez tych samych dwóch kwatermistrzów powyżej oryginalnego poziomu, który pozostaje w sprzedaży. Każda specjalizacja ma swój własny zestaw Awangardy pięciu części, dla głowy, ramion, klatki piersiowej, nóg i rąk, a sklep wyświetla tylko trzy zestawy, które twoja klasa może nosić, a następnie broń Awangardy, którą możesz władać. Część Awangardy nosi te same oceny wojennej co oryginalny poziom na wyższym poziomie przedmiotu, a każdy zestaw ma dwa bonusy, przy dwóch i czterech częściach, które zmieniają jedną z umiejętności twojej specjalizacji. W przeciwieństwie do oryginalnych zestawów, te bonusy działają wszędzie, potwory wlączone, ale są zbudowane do walki z graczami, więc zestaw rajdu pozostaje lepszym wyborem wewnątrz rajdu."
+      "vanguardBody": "Zbroja Awangardy to drugi sezon zbroi wojennej, sprzedawanej przez tych samych dwóch kwatermistrzów powyżej oryginalnego poziomu, który pozostaje w sprzedaży. Każda specjalizacja ma swój własny zestaw Awangardy pięciu części, dla głowy, ramion, klatki piersiowej, nóg i rąk, a sklep wyświetla tylko trzy zestawy, które twoja klasa może nosić, a następnie broń Awangardy, którą możesz władać. Część Awangardy nosi te same oceny wojennej co oryginalny poziom na wyższym poziomie przedmiotu, a każdy zestaw ma dwa bonusy, przy dwóch i czterech częściach, które zmieniają jedną z umiejętności twojej specjalizacji. W przeciwieństwie do oryginalnych zestawów, te bonusy działają wszędzie, potwory wlączone, ale są zbudowane do walki z graczami, więc zestaw rajdu pozostaje lepszym wyborem wewnątrz rajdu.",
+      "vanguardStatsBody": "W przeciwieństwie do oryginalnego poziomu, zbroja Awangardy nosi też oceny bojowe: każdy kawałek zbroi Awangardy, broń i naszyjnik ma Ocenę Krytyczną lub Ocenę Pośpiechu, a części dla czarownika i uzdrowiciela dodają Moc Zaklęcia lub Moc Leczenia. Pierścienie i naszyjniki Awangardy są sprzedawane obok broni i każda klasa je może nosić. Dwa z pierścieni Awangardy do walki wręcz dają dokładnie Ocenę Trafienia, która eliminuje szansę, że twoje ataki trafią gracza twojego poziomu, a dwa pierścienie czarowania robią to samo dla twoich zaklęć, które są oporami. Ataki automatyczne podczas walki z dwiema bronią zachowują swoją dodatkową szansę chybienia. Pierścień uzdrowiciela nosi zamiast tego Ocenę Pośpiechu."
     },
     "worldPvpPage": {
       "heading": "PvP na Świecie",
@@ -10395,18 +10439,18 @@ export const pl_PL: EnTranslations = {
       "stakesBody": "When flagged players defeat a flagged player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
       "limitsHeading": "Zasady fair play",
       "limitsBody": "Defeating the same player again and again pays less each time and soon nothing, and the counter resets with the daily reset. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
-      "introZones": "PvP na otwartym świecie gracza versus gracza jest opcjonalne, a grunt, na którym stoisz, decyduje, co to oznacza. Podnieś swoją flagę PvP, a każdy inny oflagowany gracz, który nie znajduje się w twojej drużynie lub rajdzie, staje się wrogiem na terenie spornym; opuść ją i, po krótkim opóźnieniu, jesteś znowu przechodzą daleko. Dwie strefy to świętuary, gdzie żadne światowe walki nie odbywają się, a trzy północne strefy to grunt wolny-dla-wszystkich, gdzie każdy obecny jest sprawiedliwą grą, flaga lub nie. Towarzysze z drużyny i rajdu nigdy nie są twoimi wrogami gdziekolwiek; towarysze gildi poza twoją grupą są sprawiedliwą grą jak każdy inny.",
+      "introZones": "PvP w otwartym świecie jest dobrowolne i zależy od terenu. Na spornych terenach włączenie flagi PvP czyni wrogami wszystkich oznaczonych graczy spoza twojej grupy lub rajdu; po wyłączeniu i krótkiej zwłoce znów jesteś obserwatorem. Wybrzeże Prób to jedyne sanktuarium bez walk w świecie, a trzy najbardziej północne strefy stosują te same zasady dobrowolnej flagi co reszta świata. Wejście do aktywnego kręgu Króla Wzgórza automatycznie włącza twoją flagę. Członkowie grupy i rajdu nigdzie nie są twoimi wrogami; członkowie gildii poza twoją grupą są celami jak inni gracze.",
       "zonesHeading": "Gdzie walka PvP się odbywała",
-      "zonesBody": "Świat dzieli się na trzy rodzaje terenów. Wybrzeże Prób i Dolina Wschodniego Strumienia to sanktuaria: tam w ogóle nie ma walki PvP, czy jesteś zaflahowany, czy nie, więc nowa postać nigdy nie może być zaatakowana, zanim nauczy się, czym jest flaga. Większość świata to tereny sporne, gdzie reguła flagi powyżej to jedyne zasady. Smocze Ziemie, Szronowa Kraina i Bursztynowa Dolina, trzy północne strefy, to tereny pełnej walki: każdy stojący w nich może atakować każdego innego, flagę czy bez niej, i zostaniesz powiadomiony, gdy wejdziesz i znowu, gdy wyjdziesz. Zaatakowanie niezaflagowanego gracza tam podnosi twoją flagę, więc napastnik zawsze bierze na siebie ryzyko. Atak na już zaflagowanego gracza nigdy nie podnosi twojej flagi, co oznacza, że obrona siebie lub kogoś niezaflagowanego nic cię nie kosztuje.",
+      "zonesBody": "Wybrzeże Prób to jedyne sanktuarium: nie ma tam PvP w świecie i nie możesz włączyć flagi. Włączona flaga pozostaje aktywna, ale postęp w zdobywaniu tytułów za czas gry zostaje wstrzymany do opuszczenia tego miejsca. Wszędzie indziej, w tym na Smoczych Ziemiach, w Szronowej Krainie i Bursztynowej Dolinie, mogą walczyć tylko oznaczeni gracze. Wejście do aktywnego kręgu Króla Wzgórza automatycznie włącza twoją flagę, jeśli spełniasz zwykły wymóg poziomu. Krąg ostrzegawczy nie włącza flagi. Po opuszczeniu aktywnego kręgu flaga pozostaje włączona; użyj /pvp off, aby rozpocząć zwykłe pięciominutowe odliczanie, które nie może się zakończyć, gdy jesteś na aktywnym wzgórzu lub nadal walczysz.",
       "flagBodyAid": "Wpisz /pvp w czacie lub otwórz okno PvP na G i użyj karty Światowego PvP, która również pokazuje twój wynik i stawki. Podniesienie flagi jest natychmiastowe, gdy już przejdziesz poziomy początkowe. Opuszczenie jej rozpoczyna odliczanie kilka minut, a flaga nie spadnie, gdy wciąż walczysz, więc wyłączenie nigdy nie jest ucieczką od walki, którą rozpocząłeś. Uzdrawianie, osłanianie lub wspieranie buforem oflagowanego gracza, który jest w walce, podnosi twoją własną flagę, więc nikt nie utrzymuje walczącego z tyłu flagi, którą nie nosisz; wspieranie gracza, który nie jest oflagowany, nic nie podnosi.",
       "stakesUnflaggedTake": "Ani niezaflagowany walczący nic nie dostaje: złoto zmienia właściciela wyłącznie między dwoma zaflagowanymi graczami, choć wszyscy, którzy pomogli, nadal zarabiają Honor.",
-      "stakesBodyFlagged": "Kiedy oflagowany gracz zostaje pokonany przez innego gracza, przegrany płaci mały udział złota w swojej kieszonki, ograniczony do skromnej kwoty, a zwycięzcy zarabiają Honor na zbrój Wojenną. Gracz, który nie był oflagowany, wcale nie płaci złota, nawet gdy pada w strefie wolny-dla-wszystkich. Wszyscy, którzy pomogli, dzielą się obydwoma: zabójczym ciosem, każdy, kto skrzywdził cel niedługo wcześniej, i uzdrowiciele, którzy utrzymywali tych walczących. Czysta jeden na jeden płaci całą porcję; drużyna ją dzieli.",
+      "stakesBodyFlagged": "Gdy oznaczony gracz zostaje pokonany przez innego gracza, przegrany płaci niewielką część złota ze swojej sakiewki, z ograniczeniem do skromnej kwoty, a zwycięzcy zdobywają Honor na wyposażenie Wojenne. Nieoznaczonego gracza nie można zaatakować w otwartym świecie. Złoto i Honor dzielą między siebie wszyscy, którzy pomogli: gracz zadający śmiertelny cios, każdy, kto zranił cel krótko wcześniej, oraz uzdrowiciele, którzy utrzymali tych walczących przy życiu. W czystym pojedynku jeden na jednego zwycięzca otrzymuje całą pulę; grupa ją dzieli.",
       "hillHeading": "Król Wzgórza",
-      "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "hillBody": "Co dwie godziny wzgórze pojawia się na Smoczych Ziemiach, w Szronowej Krainie lub Bursztynowej Dolinie. Kraina otrzymuje ostrzeżenie piętnaście minut wcześniej, a krąg zostaje oznaczony na otwartym terenie. Wzgórze pozostaje aktywne przez trzydzieści minut. Wejście do aktywnego kręgu włącza flagę PvP w świecie zgodnie ze zwykłymi zasadami poziomu, także członkom rajdu. Grupa z największą liczbą uprawnionych graczy w kręgu przejmuje wzgórze po minucie nieprzerwanej przewagi; samotny gracz liczy się jako jednoosobowa grupa, ale członkowie rajdu i gracze poniżej wymaganego poziomu PvP nie mogą przejmować wzgórza ani zdobywać z niego Honoru. Każdy obrońca stojący wewnątrz zdobywa Honor w rosnącym tempie. Wypłaty są częstsze, a ich wartość rośnie szybciej, dzięki czemu łączna ilość Honoru pozostaje taka sama jak w dawnym wydarzeniu trwającym czterdzieści pięć minut. Zmiana właściciela rozpoczyna wzrost nagród od nowa. Po opuszczeniu kręgu flaga pozostaje włączona; /pvp off korzysta ze zwykłego pięciominutowego opóźnienia i nie może się zakończyć na aktywnym wzgórzu ani podczas walki. Pasek wzgórza pokazuje kontrolę, liczby graczy i postęp przejmowania; /hill podaje jego położenie.",
       "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
-      "hillBodyRamp": "Raz na trzy godziny, w momencie, którego nikt nie może przewidzieć, cała kraina jest poinformowana, że wzgórze wzniesie się w jednej ze stref wolny-dla-wszystkich w piętnaście minut, a okrąg, gdzie będzie stał, jest oznaczony na otwartym terenie. Kiedy się wznosi, stoi czterdzieści pięć minut, potem spada. Drużyna z większością graczy stojących w środku walczy o wzgórze, a po minucie nieprzerwanej większości wzgórze jest ich; samotny gracz liczy się jako drużyna jednego, ale członkowie rajdu nie liczą się wcale. Gdy drużyna trzyma wzgórze, każdy jej członek stojący w środku zdobywa Honor co minutę, a dłużej ta sama drużyna go trzyma, tym więcej każda minuta płaci: pełna drużyna trzymająca niezaprzestającane wzgórze na całą jego stojąć zarabia około tyle co trzy wygrane w polach bitwy. Gdy wzgórze zmienia ręce, nowi właściciele zaczynają rachunek od początku. Pasek nad polem pokazuje, kto to trzyma, twoje liczby przeciwko ich, i zegar konkurencji; /hill w czacie mówi, gdzie on stoi.",
+      "hillBodyRamp": "Co dwie godziny wzgórze pojawia się na Smoczych Ziemiach, w Szronowej Krainie lub Bursztynowej Dolinie. Kraina otrzymuje ostrzeżenie piętnaście minut wcześniej, a krąg zostaje oznaczony na otwartym terenie. Wzgórze pozostaje aktywne przez trzydzieści minut. Wejście do aktywnego kręgu włącza flagę PvP w świecie zgodnie ze zwykłymi zasadami poziomu, także członkom rajdu. Grupa z największą liczbą uprawnionych graczy w kręgu przejmuje wzgórze po minucie nieprzerwanej przewagi; samotny gracz liczy się jako jednoosobowa grupa, ale członkowie rajdu i gracze poniżej wymaganego poziomu PvP nie mogą przejmować wzgórza ani zdobywać z niego Honoru. Każdy obrońca stojący wewnątrz zdobywa Honor w rosnącym tempie. Wypłaty są częstsze, a ich wartość rośnie szybciej, dzięki czemu łączna ilość Honoru pozostaje taka sama jak w dawnym wydarzeniu trwającym czterdzieści pięć minut. Zmiana właściciela rozpoczyna wzrost nagród od nowa. Po opuszczeniu kręgu flaga pozostaje włączona; /pvp off korzysta ze zwykłego pięciominutowego opóźnienia i nie może się zakończyć na aktywnym wzgórzu ani podczas walki. Pasek wzgórza pokazuje kontrolę, liczby graczy i postęp przejmowania; /hill podaje jego położenie.",
       "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
-      "hillBodyFlat": "Raz na trzy godziny, w nieprzewidywalnej chwili, cała kraina otrzymuje zapowiedź, że za piętnaście minut w jednej ze stref swobodnej walki pojawi się wzgórze. Jego krąg zostaje oznaczony na otwartym terenie. Wzgórze pozostaje przez czterdzieści pięć minut, po czym znika. W tym czasie co pięć minut ogłaszane są jego położenie oraz grupy z najdłuższym łącznym czasem utrzymania. Grupa z największą liczbą graczy w kręgu walczy o wzgórze i zdobywa je po łącznie trzydziestu sekundach przewagi liczebnej. Wejście rywali tylko wstrzymuje licznik, dopóki twoja grupa znów nie uzyska przewagi; odliczanie zaczyna się od nowa tylko wtedy, gdy w kręgu nie pozostanie żaden żywy członek twojej grupy. Samotny gracz liczy się jako jednoosobowa grupa i zachowuje zajęte wzgórze po utworzeniu grupy, ale członkowie rajdu w ogóle się nie liczą. Każdy członek grupy utrzymującej wzgórze, który stoi w kręgu, otrzymuje co minutę tyle samo Honoru, niezależnie od długości utrzymania. Pełna grupa utrzymująca je bez przeszkód przez cały czas jego istnienia zarabia mniej więcej tyle, co za trzy zwycięstwa na polach bitew. Gdy wzgórze znika, jeśli grupa z najdłuższym łącznym utrzymaniem zgromadziła co najmniej dziesięć minut, każdy, kto stał w kręgu przez przynajmniej minutę podczas utrzymania przez tę grupę i nadal do niej należy, otrzymuje jedno zwycięstwo do rzędu PvP Tygodniowego Skarbca. Pasek nad polem pokazuje właściciela, liczebność obu stron i licznik przejmowania; /hill na czacie podaje położenie.",
+      "hillBodyFlat": "Raz na trzy godziny, w nieprzewidywalnej chwili, cała kraina otrzymuje zapowiedź, że za piętnaście minut w jednej z północnych stref pojawi się wzgórze. Jego krąg zostaje oznaczony na otwartym terenie. Wzgórze pozostaje przez czterdzieści pięć minut, po czym znika. W tym czasie co pięć minut ogłaszane są jego położenie oraz grupy z najdłuższym łącznym czasem utrzymania. Grupa z największą liczbą graczy w kręgu walczy o wzgórze i zdobywa je po łącznie trzydziestu sekundach przewagi liczebnej. Wejście rywali tylko wstrzymuje licznik, dopóki twoja grupa znów nie uzyska przewagi; odliczanie zaczyna się od nowa tylko wtedy, gdy w kręgu nie pozostanie żaden żywy członek twojej grupy. Samotny gracz liczy się jako jednoosobowa grupa i zachowuje zajęte wzgórze po utworzeniu grupy, ale członkowie rajdu w ogóle się nie liczą. Każdy członek grupy utrzymującej wzgórze, który stoi w kręgu, otrzymuje co minutę tyle samo Honoru, niezależnie od długości utrzymania. Pełna grupa utrzymująca je bez przeszkód przez cały czas jego istnienia zarabia mniej więcej tyle, co za trzy zwycięstwa na polach bitew. Gdy wzgórze znika, jeśli grupa z najdłuższym łącznym utrzymaniem zgromadziła co najmniej dziesięć minut, każdy, kto stał w kręgu przez przynajmniej minutę podczas utrzymania przez tę grupę i nadal do niej należy, otrzymuje jedno zwycięstwo do rzędu PvP Tygodniowego Skarbca. Pasek nad polem pokazuje właściciela, liczebność obu stron i licznik przejmowania; /hill na czacie podaje położenie.",
       "limitsBodyRaids": "Pokonanie tego samego gracza znowu i znowu płaci mniej za każdym razem i wkrótce nic, a twój rachunek przeciwko temu graczowi zaczyna się tylko od nowa około godzinę po pierwszym z tych zabójstw, więc campowanie jednej ofiary nigdy nie jest warte czekania. Cel znacznie poniżej twojego poziomu płaci wcale. Pola bitwy i Areny prowadzą swoje własne zasady, gdy jesteś w środku, i płacą więcej Honor niż otwarty świat, więc świat PvP jest powolniejszą drogą do tego samego dostawcy. Rajdy nie zarabiają nic ze światowych zabójstw: członek rajdu nie otrzymuje Honor lub złota i nie zmniejsza udziału nikogo innego, więc walcz jako drużyna, aby być opłaconą."
     },
     "thornhollowPage": {
@@ -13507,7 +13551,14 @@ export const pl_PL: EnTranslations = {
     "terms": "Warunki korzystania z usługi",
     "privacy": "Polityka prywatności",
     "discordLabel": "Dołącz do Discorda",
-    "levyStreet": "Levy Street"
+    "levyStreet": "Levy Street",
+    "guidesLabel": "Przewodniki graczy",
+    "guideFree": "Darmowe MMORPG",
+    "guideGamesLikeWow": "Gry podobne do WoW",
+    "guideBest": "Najlepsze MMORPG",
+    "guideNew": "Nowe MMORPG",
+    "guideBrowser": "MMORPG w przeglądarce",
+    "guideGamesLikeDiablo": "Gry podobne do Diablo"
   },
   "settings": {
     "languageLoading": "Wczytywanie języka...",
@@ -16156,6 +16207,7 @@ export const pl_PL: EnTranslations = {
       "cooldownMinutes": "{minutes}m",
       "attackTooltip": "Przełącza automatyczny atak na cel. Kliknięcie wroga prawym przyciskiem również go atakuje.",
       "attackRemoveHint": "Kliknij prawym przyciskiem, aby usunąć z paska i zwolnić miejsce.",
+      "moveHint": "Przytrzymaj Shift i przeciągnij, aby przenieść",
       "emptySlot": "Puste pole",
       "slotAria": "Pole akcji {slot}: {ability}",
       "emptySlotAria": "Pole akcji {slot}: puste",
@@ -16975,6 +17027,7 @@ export const pl_PL: EnTranslations = {
       "dps": "({dps} obrażeń na sekundę)",
       "armorStat": "{value} pancerza",
       "stat": "+{value} {stat}",
+      "warfareMainHandOnly": "Działania wojenne liczą się tylko w głównej ręce.",
       "useFood": "Użycie: Przywraca {amount} zdrowia w ciągu {seconds} s. Podczas jedzenia musisz pozostać w pozycji siedzącej.",
       "useDrink": "Użycie: Przywraca {amount} many w ciągu {seconds} s. Podczas picia musisz pozostać w pozycji siedzącej.",
       "useElixir": "Użycie: Zwiększa {stat} o {value} na {minutes} min. Zastępuje każdy inny eliksir lub zwój tej samej cechy. Można użyć w walce.",
@@ -24217,6 +24270,33 @@ export const pl_PL: EnTranslations = {
       "moonwrack_stave": {
         "name": "Kostur Księżycowego Wraku"
       },
+      "vanguard_feral_staff": {
+        "name": "Dziki kostur Awangardy"
+      },
+      "vanguard_band_of_might": {
+        "name": "Pierścień Awangardy Mocy"
+      },
+      "vanguard_band_of_precision": {
+        "name": "Pierścień Awangardy Precyzji"
+      },
+      "vanguard_band_of_focus": {
+        "name": "Pierścień Awangardy Skupienia"
+      },
+      "vanguard_band_of_mending": {
+        "name": "Pierścień Awangardy Gojenia"
+      },
+      "vanguard_pendant_of_might": {
+        "name": "Wisior Awangardy Mocy"
+      },
+      "vanguard_pendant_of_precision": {
+        "name": "Wisior Awangardy Precyzji"
+      },
+      "vanguard_pendant_of_focus": {
+        "name": "Wisior Awangardy Skupienia"
+      },
+      "vanguard_pendant_of_mending": {
+        "name": "Wisior Awangardy Gojenia"
+      },
       "membership_staff": {
         "name": "Kostur Przemiany"
       },
@@ -30304,7 +30384,7 @@ export const pl_PL: EnTranslations = {
       "membership_annual_reward": {
         "sender": "Krucza Poczta",
         "subject": "Twój wierzchowiec za roczne członkostwo",
-        "body": "Płatność za roczne członkostwo została zakończona. Wodze wierzchowca są w załączniku. Zachowaj wodze w torbach lub banku, aby posiadać tego wierzchowca. Pozostanie twój po wygaśnięciu członkostwa. Wymagana jest umiejętność jeździectwa."
+        "body": "Płatność za roczne członkostwo została zakończona. Chimera Nocnego Skrzydła jest teraz odblokowana dla każdej postaci na twoim koncie, a jej wodze są w załączniku. Pozostanie twoja po wygaśnięciu członkostwa. Wymagana jest umiejętność jeździectwa."
       },
       "woc_market_return": {
         "sender": "Makler Giełdy $WOC",
@@ -30559,7 +30639,7 @@ export const pl_PL: EnTranslations = {
       "vanguard_druid_feral": {
         "name": "Skóra Krwawej Grzywy",
         "bonus2": "Regeneracja umiejętności Szarży Bruina jest zmniejszona o 3 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
-        "bonus4": "Szarża Bruina chroni Ciebie tarczą na 6 procent maksymalnego zdrowia na 6 sek."
+        "bonus4": "Skraca czas odnowienia umiejętności Sus o 15 s."
       },
       "vanguard_druid_restoration": {
         "name": "Szata Ostów w Rozkwicie",

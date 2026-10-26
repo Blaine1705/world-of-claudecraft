@@ -67,7 +67,8 @@ describe('painted weapon inventory icons', () => {
     // and muster_shardpike. 149 with Balgath's caster spoil, craterglass_stave.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 163.
     // + the membership Staff of Changing (PR 4281): 164.
-    expect(baseWeapons).toHaveLength(164);
+    // The restored Season 2 feral staff is one additional authored weapon.
+    expect(baseWeapons).toHaveLength(165);
     expect([...WEAPON_IMAGE_IDS].sort()).toEqual(baseWeapons);
     expect(Object.keys(ITEM_WEAPON_VARIANTS).sort()).toEqual(baseWeapons);
     for (const id of baseWeapons) {
@@ -118,7 +119,8 @@ describe('painted weapon inventory icons', () => {
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 19.
     // + the membership weapon batch (membership-weapon-2026-10-14): 20.
     // Integration 45 replaces the former shared faction batch with three painted batches.
-    expect(weaponBatches).toHaveLength(24);
+    // The feral staff retains its original separate painting batch.
+    expect(weaponBatches).toHaveLength(25);
     const historicalBatch = weaponBatches.find(
       ({ batchId }) => batchId === 'placeholder-art-completion-weapons-2026-08-09',
     );
@@ -262,6 +264,10 @@ describe('painted weapon inventory icons', () => {
       'vanguard_verdict_greatsword',
       'vanguard_warstaff',
     ]);
+    const feralStaffBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'warfare-season2-feral-staff-2026-09-29',
+    );
+    expect(feralStaffBatch?.itemIds).toEqual(['vanguard_feral_staff']);
     // The Mirefen world boss's maul ships in its own batch
     // (balgath-boss-icons-2026-08-18): a batch that lands after the
     // historical one OWNS its ids, so the historical batch's frozen scope
@@ -358,6 +364,7 @@ describe('painted weapon inventory icons', () => {
           id !== 'riftwarden_voidblade' &&
           id !== 'dawnkeeper_consecrated_mace' &&
           !season2WeaponIds.includes(id) &&
+          id !== 'vanguard_feral_staff' &&
           !bossWeaponIds.includes(id) &&
           !shardpikeWeaponIds.includes(id) &&
           !musterWeaponIds.includes(id) &&
@@ -426,7 +433,8 @@ describe('painted weapon inventory icons', () => {
         !musterWeaponIds.includes(id) &&
         !lootWeaponIds.includes(id) &&
         !reworkWeaponIds.includes(id) &&
-        id !== 'membership_staff',
+        id !== 'membership_staff' &&
+        id !== 'vanguard_feral_staff',
     );
     expect(chunkA.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(0, 40));
     expect(chunkB.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(40, 80));

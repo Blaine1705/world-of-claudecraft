@@ -2,7 +2,7 @@
 // The online path never draws RNG here, so a retry cannot change its parcel.
 
 import { isAutoEquipGearKind, maybeAutoEquip } from '../auto_equip';
-import { type TreasureMapRarity, VAULT_GUEST_PAYOUTS_PER_CYCLE } from '../content/treasure_maps';
+import type { TreasureMapRarity } from '../content/treasure_maps';
 import { ITEMS } from '../data';
 import { grantEarnedHeroicMarks } from '../earned_heroic_marks';
 import { assertHeroicMarksGrantsFit, isCurrencyGrantId } from '../heroic_marks';
@@ -16,8 +16,6 @@ export function grantHoardReward(
   pid: number,
   rarity: TreasureMapRarity,
   reward: HoardReward,
-  owner: boolean,
-  guestCycle?: string,
   reservedAtClear = false,
   preparedItems?: readonly InvSlot[],
 ): boolean {
@@ -32,20 +30,6 @@ export function grantHoardReward(
   // already been earned, so overflow must enter authored mail instead of
   // refusing a chest click, zone-out or teardown after the boss died.
   assertHeroicMarksGrantsFit(reservedAtClear ? meta : { heroicMarks: 0 }, reward.items);
-  if (
-    !owner &&
-    !reservedAtClear &&
-    (guestCycle === undefined || guestCycle === meta.worldQuestCycle)
-  ) {
-    if (meta.vaultGuestCycle !== meta.worldQuestCycle) {
-      meta.vaultGuestCycle = meta.worldQuestCycle;
-      meta.vaultGuestPayouts = 0;
-    }
-    meta.vaultGuestPayouts = Math.min(
-      VAULT_GUEST_PAYOUTS_PER_CYCLE,
-      (meta.vaultGuestPayouts ?? 0) + 1,
-    );
-  }
   const grants = preparedItems ?? hoardRewardGrantItems(reward.items);
   for (const item of grants) {
     if (isCurrencyGrantId(item.itemId)) {

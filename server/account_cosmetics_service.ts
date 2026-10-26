@@ -6,6 +6,7 @@
 // consumer; the pure rules live in server/account_cosmetics_live.ts and the
 // persistence in server/account_cosmetics_db.ts (re-exported by ./db, which is
 // what keeps every test double on one import).
+import { MEMBERSHIP_ANNUAL_MOUNT } from '../src/membership_annual_contract';
 import { isStoreMountSkinId } from '../src/sim/content/mount_skins';
 import { mountDef } from '../src/sim/content/mounts';
 import { withWeaponSkinApplied } from '../src/sim/content/weapon_skin_rules';
@@ -223,6 +224,13 @@ export class AccountCosmeticsService {
       'mountSkinIds',
       grantAccountMountSkins,
     );
+  }
+
+  /** The annual membership mount (src/membership_annual_contract.ts): already persisted by
+   *  the reward delivery transaction, so this union is a no-op write that refreshes live
+   *  sessions. Ownership survives membership expiry and never depends on the reins. */
+  grantMembershipMount(accountId: number): void {
+    this.grantSkins(accountId, [MEMBERSHIP_ANNUAL_MOUNT], 'mountSkinIds', grantAccountMountSkins);
   }
 
   /** Coalesce concurrent reconciliations. Publish ownership only after the

@@ -228,6 +228,8 @@ const UI_PURE_CORES = [
   // A copy's own display name (the World PvP trophy skull's "<name>'s Skull").
   'src/ui/item_copy_name_core.ts',
   'src/ui/item_combat_tooltip_view.ts',
+  'src/ui/treasure_map_tooltip_view.ts',
+  'src/ui/hud/action_bar/slot_edit_hints_core.ts',
   'src/ui/trinket_tooltip_view.ts',
   // The trinket auras' tooltip descriptor and their item-icon art map.
   'src/ui/trinket_aura_effect.ts',
@@ -3072,6 +3074,7 @@ const UI_PAINTER_HELPERS = [
 // the English catalog, it is a maintainer fix during the release locale fill:
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
+  'src/ui/footer_shell.ts',
   'src/ui/hud/referral_cards/referral_reward_celebration_window.ts',
   'src/ui/hud/referral_cards/referral_cards_controller.ts',
   'src/ui/hud/referral_cards/referral_cards_hud_controller.ts',

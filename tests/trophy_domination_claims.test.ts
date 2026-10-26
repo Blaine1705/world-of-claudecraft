@@ -237,8 +237,9 @@ describe('the jewelcrafting exclusion, recomputed: the amended census', () => {
     // above 600 (4950, 11000, 15400) and none sits inside the band, same amendment.
     // 65 and 55 with the Mirefen world-boss branch's three jewels, all selling above
     // 600 and none inside the band.
-    expect(jewelry.length, 'uncrafted neck and ring pool').toBe(65);
-    expect(jewelry.filter((d) => d.sellValue === 0).length, 'honor pieces at 0').toBe(9);
+    // The eight restored Season 2 jewels have zero sell value: 73 total, 17 honor pieces.
+    expect(jewelry.length, 'uncrafted neck and ring pool').toBe(73);
+    expect(jewelry.filter((d) => d.sellValue === 0).length, 'honor pieces at 0').toBe(17);
     expect(jewelry.filter((d) => d.sellValue > 600).length, 'pieces above 600').toBe(55);
     // Exactly one row sits here, and the amended record names it.
     expect(

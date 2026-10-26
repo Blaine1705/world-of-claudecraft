@@ -220,7 +220,6 @@ describe('live vault direct claim capacity refusal', () => {
       {
         deferVaultRewardClaim: vi.fn(async () => true),
         wakeOldestVaultRewardClaim: vi.fn(async () => null),
-        guestPayoutsForCycle: vi.fn(async () => 0),
         commitVaultOutcome: vi.fn(),
         loadVaultOutcome: vi.fn(async () => ({
           attemptId: '7:1',

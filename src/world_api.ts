@@ -476,6 +476,7 @@ export type {
 export type { TradeInfo, TradeOffer } from './world_api/trade';
 export type { TransportFerryView } from './world_api/transport';
 export type {
+  HillCalloutInfo,
   HillInfo,
   HillPhaseInfo,
   HillSide,
@@ -483,6 +484,7 @@ export type {
   SkullBagAction,
   SkullBagInfo,
   WorldPvpInfo,
+  WorldPvpRewardPause,
   WorldPvpZone,
 } from './world_api/world_pvp';
 

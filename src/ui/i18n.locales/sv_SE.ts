@@ -1392,24 +1392,21 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.confirmCancel': 'Avbryt',
   'hudChrome.worldPvp.disable': 'Inaktivera världskamp',
   'hudChrome.worldPvp.disarmLine':
-    'Att slå av tar {minutes} minuter och väntar på att kampen slutar.',
+    'Det tar {minutes} minuter att stänga av flaggan, och det väntar tills du lämnar den aktiva kullen och striden är över.',
   'hudChrome.worldPvp.enable': 'Aktivera världskamp',
   'hudChrome.worldPvp.greyLine': 'Spelare mer än {levels} nivåer under dig betalar ingenting.',
   'hudChrome.worldPvp.groundContested':
     'Överallt annars är omstritt: endast två flaggade spelare kan slåss.',
   'hudChrome.worldPvp.groundFfa':
-    'Draklandet, Frostslöjans räckvidd och Glödskogen är free-for-all: alla där kan slåss, flaggade eller inte.',
-  'hudChrome.worldPvp.groundSanctuary':
-    'Provstranden och Östbrooks dal är helgedomar: ingen världskamp alls.',
+    'Drakländerna, Frostslöjans vidder och Bärnstensfallet använder vanliga PvP-flaggor. Din flagga aktiveras när du går in i en aktiv cirkel i Kullens kung.',
   'hudChrome.worldPvp.groupLine':
     'Grupp- och raidmedlemmar är aldrig fientliga mot varandra. Gildekamrater utanför din grupp kan slåss.',
   'hudChrome.worldPvp.honorLine': '{honor} Heder per seger, delad mellan alla som hjälpte.',
   'hudChrome.worldPvp.keepUp': 'Håll flaggan uppe',
   'hudChrome.worldPvp.levelReq': 'Kräver nivå {level}.',
   'hudChrome.worldPvp.markLine':
-    'Att attackera en ej flaggad spelare där höjer din egen flagga; att attackera en flaggad gör det aldrig.',
-  'hudChrome.worldPvp.noStakeLine':
-    'En ej flaggad spelare som dödas på free-for-all marken förlorar inget guld.',
+    'Världs-PvP aktiveras när du går in i en aktiv kullcirkel. Din flagga förblir aktiv när du lämnar cirkeln.',
+  'hudChrome.worldPvp.noStakeLine': 'Oflaggade spelare kan inte angripas i den öppna världen.',
   'hudChrome.worldPvp.noTakeLine':
     'En ej flaggad fighter tar inget guld heller: det flyttas bara mellan två flaggade spelare.',
   'hudChrome.worldPvp.pending': 'Väntar på din PvP-status från riket.',
@@ -2441,8 +2438,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.vanguardHeading': 'Vanguard-utrustning: Warfare säsong 2',
   'guide.combat.unstuckBodyWindow':
     'Om världen fångar dig någonstans du inte kan ta dig ut, skriv /unstuck. Du måste vara utanför strid och stå stille, inte hålld av en bedövning eller en rot, och inte i en tvekamp eller en arenomatch: en kort nedräkning körs, och att röra dig eller ta skada avbryter det. När det slutförs är du placerad vid närmaste kyrkogård. Det dödar aldrig dig och det lämnar ingen lik, och om du redan var nere höjer det upp dig där istället. Den första användningen på en timme kostar dig ingenting. Använd det igen inom en timme från senast och priset är Unstuck sjukdom, en tillfällig försvagning av allt du är som har slitit av innan du kunde använda kommandot igen, och som Vaktarens tull sparar helt nya karaktärer.',
+  'guide.commandsPage.flair':
+    'Visar eller döljer din Discord-roll för andra spelare, alltså ditt färgade namn, din rolltagg och din verifierade chattagg: /flair on visar den, /flair off döljer den och bara /flair berättar vad som är inställt. Kräver ett kopplat Discord-konto.',
   'guide.commandsPage.pvpZones':
-    'Världens PvP-flagga: /pvp växlar den, /pvp on och /pvp off ställer in den. Flaggade spelare kan slåss med varandra på omstridigt område, helgedomar tillåter ingen världsstrid alls, och fritt-för-allt-zonerna tillåter det med eller utan flagga; att stänga av tar 5 minuter.',
+    'Flagga för världs-PvP: /pvp växlar den, /pvp on slår på den och /pvp off stänger av den. Flaggade spelare kan slåss mot varandra på omstridd mark, fristäder tillåter inga världsstrider alls och din flagga aktiveras när du går in i en aktiv cirkel i Kullens kung; det tar 5 minuter att stänga av den.',
   'guide.commandsPage.unstuckWindow':
     'Vägen ut när världen har fångat dig. Stå stille genom en kort nedräkning och du flytas till närmaste kyrkogård, och höjd där om du redan hade fallit. Den första användningen på en timme är gratis. Använd det igen inom en timme från senast och det lämnar dig försvagad av Unstuck sjukdom ett tag efteråt, så det är en räddning snarare än en genväg.',
   'guide.factionsPage.automatonsBody':
@@ -2513,20 +2512,16 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.worldPvpPage.flagHeading': 'Att höja och sänka flaggan',
   'guide.worldPvpPage.heading': 'Världens PvP',
   'guide.worldPvpPage.hillBodyRamp':
-    'En gång var tredje timme, vid ett tillfälle ingen kan förutsäga, blir hela riket berättat att en kulle kommer att stiga i en av fritt-för-allt-zonerna om femton minuter, och cirkeln där det kommer att stå markeras på öppen mark. När den stiger står den i fyrtiofem minuter, sedan faller. Partiet med mest spelare som står innanför bestrid kullen, och efter en minut av obruten majoritet är kullen deras; en ensamspelare räknas som ett parti av en, men raid-medlemmar räknas inte alls. Medan ett parti håller kullen, tjänar var och en av dess medlemmar som står innanför Ära varje minut, och ju längre samma parti håller det, desto mer varje minut betalar: ett fullt parti som håller en omtvistet kulle för hela sin tid tjänar ungefär lika mycket som tre slagfält-segrar. När kullen byter händer startar de nya innehavarna räkningen från början. En stapel över fältet visar vem som håller det, dina nummer mot deras, och tävlingsklockan; /hill i chatten säger var den står.',
+    'Varannan timme dyker en kulle upp i Drakländerna, Frostslöjans vidder eller Bärnstensfallet. Riket får en varning femton minuter i förväg och cirkeln markeras på öppen mark. Kullen är aktiv i trettio minuter. När du går in i den aktiva cirkeln aktiveras din flagga för världs-PvP enligt de vanliga nivåreglerna, även för raidmedlemmar. Gruppen med flest behöriga spelare i cirkeln tar kullen efter en minut med obruten majoritet; en ensam spelare räknas som en grupp på en, men raidmedlemmar och spelare under nivåkravet för PvP kan varken inta kullen eller tjäna Ära från den. Varje innehavare som står i cirkeln tjänar Ära i ökande takt. Utbetalningarna sker oftare och ökar snabbare, så att den totala Äran från det tidigare evenemanget på fyrtiofem minuter bevaras. När kullen byter innehavare börjar ökningen om från början. Din flagga förblir aktiv när du lämnar cirkeln; /pvp off använder den vanliga fördröjningen på fem minuter och kan inte slutföras på en aktiv kulle eller under strid. Kullens stapel visar kontroll, spelarantal och erövringsförlopp; /hill anger dess plats.',
   'guide.worldPvpPage.hillHeading': 'Kullens kung',
-  'guide.worldPvpPage.introZones':
-    'Öppen världsspeler-mot-spelare är val-in, och marken du står på bestämmer vad det betyder. Höj din PvP-flagga och varje annan flaggad spelare som inte är i ditt parti eller raid blir en fiende på omstridigt område; sänk den och, efter en kort fördröjning, är du en åskådare igen. Två zoner är helgedomar där ingen världsstrid händer alls, och de tre nordligaste zonerna är fritt-för-allt-område där alla närvarande är rättvis spel, flagga eller ingen flagga. Parti- och raid-kamrater är aldrig dina fiender någonstans; skickekamrater utanför din grupp är rättvis spel som vilken som helst.',
   'guide.worldPvpPage.limitsBodyRaids':
     'Att besegra samma spelare igen och igen betalar mindre varje gång och snart ingenting, och din räkning mot den spelaren börjar bara igen ungefär en timme efter den första av dessa dödningar, så att läger en offer är aldrig värt väntan. Ett mål långt under din nivå betalar ingenting alls. Slagfält och Arenor kör sina egna regler medan du är inne i dem, och de betalar mer Ära än den öppna världen, så världens PvP är den långsammare vägen till samma leverantör. Raid tjänar ingenting från världsdödningar: en raid-medlem tar ingen Ära eller guld och krymper inte någon annans andel, så slå som ett parti för att bli betald.',
   'guide.worldPvpPage.limitsHeading': 'Fair play-regler',
   'guide.worldPvpPage.stakesBodyFlagged':
-    'När en flaggad spelare besegras av en annan spelare, betalar förloraren en liten andel av guldet i sin börs, begränsad till ett blygsamt belopp, och vinnarna tjänar Ära mot Kriget-utrustning. En spelare som inte var flaggad betalar inget guld alls, även när de faller i en fritt-för-allt-zon. Alla som hjälpte delar båda: slaggöringen, någon som skadade målet strax innan, och helarna som höll dessa brottare stående. En ren en-mot-en-betalar hela potten; en grupp delar det.',
+    'När en flaggad spelare besegras av en annan spelare betalar förloraren en liten del av guldet i sin börs, begränsad till ett blygsamt belopp, och vinnarna tjänar Ära till Kriget-utrustning. En oflaggad spelare kan inte angripas i den öppna världen. Alla som hjälpte till delar på både guld och Ära: spelaren som gav dödsstöten, alla som skadade målet strax före och helarna som höll dessa kämpar på benen. En ren en-mot-en-strid ger hela potten; en grupp delar på den.',
   'guide.worldPvpPage.stakesHeading': 'Vad en dödning är värd',
   'guide.worldPvpPage.stakesUnflaggedTake':
     'En oflaggrad kämpare får inte heller någon: guld byter endast ägare mellan två flaggade spelare, men alla som hjälpte tjänar fortfarande Heder.',
-  'guide.worldPvpPage.zonesBody':
-    'Världen är uppdelad i tre sorters mark. Prövostranden och Östbäcksdalen är fredade områden: ingen världs-PvP förekommer där överhuvudtaget, flaggad eller inte, så en ny karaktär kan aldrig anfallas innan de förstår vad flaggan betyder. Det mesta av världen är omstritt, där flaggreglerna ovan är hela berättelsen. Drakländerna, Frostslöjans vidder och Bärnstensfallet, de tre nordligaste zonerna, är fri-för-allmark: alla som står där kan anfalla alla andra som står där, med eller utan flagga, och du underrättas när du går in och igen när du går ut. Att anfalla en spelare som inte är flaggad där höjer din egen flagga, så en angripare slutar alltid med att bära risken. Att slå en spelare som redan är flaggad höjer aldrig den, vilket betyder att försvara dig själv eller försvara någon som inte är flaggad inte kostar dig något.',
   'guide.worldPvpPage.zonesHeading': 'Var världs-PvP förekommer',
   'landing.headline': 'Äventyr med vänner.',
   'landing.contribute': 'Bidra till spelet',
@@ -6112,9 +6107,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cameraPrompt.title': 'Välj din kamera',
   'hudChrome.discord.link.joinServer': 'Gå med i Discord-servern',
   'hudChrome.discord.roleTag.contentcreator': 'Innehållsskapare',
-  'hudChrome.discord.roleTag.juniormods': 'Junior-mod',
+  'hudChrome.discord.roleTag.juniormods': 'Observatör',
   'hudChrome.discord.roleTag.legend': 'LEGEND',
-  'hudChrome.discord.roleTag.seniormods': 'Senior-mod',
+  'hudChrome.discord.roleTag.seniormods': 'Väktare',
   'hudChrome.discord.roleTag.shill': 'MARKNADSFÖRARE',
   'hudChrome.finder.accept': 'Acceptera',
   'hudChrome.finder.acceptApplicantAria': 'Acceptera {name}',
@@ -7190,7 +7185,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.death.resurrectAtHealer': 'Den bleka väktaren (Väktartullen)',
   'hudChrome.death.spiritHealerAlive':
     'Den bleka väktaren vakar över de döda. Du är fortfarande bland de levande.',
-  'hudChrome.discord.roleTag.admin': 'Admin',
   'hudChrome.frameReset.label': 'Återställ ramarnas positioner',
   'hudChrome.mailbox.arrivedBanner': 'Korpen har landat: post från {name}.',
   'hudChrome.mailbox.arrivedLog': 'Du har ny post från {name}.',
@@ -14558,7 +14552,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.rarity.legendary': 'Legendarisk',
   'hudChrome.wocStore.rarity.rare': 'Sällsynt',
   'hudChrome.wocStore.rarity.uncommon': 'Ovanlig',
-  'hudChrome.wocStore.rewardsTab': 'Dagliga belöningar',
   'hudChrome.wocStore.scene.day': 'Dag',
   'hudChrome.wocStore.scene.dusk': 'Skymning',
   'hudChrome.wocStore.scene.night': 'Natt',
@@ -14708,7 +14701,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Försilvrat stål och blå-is båge, en glödande cyan frusen kärna i stigaren, en nockad pil av solid is, kall ånga.',
   'hudChrome.wocStore.skins.winterbite.lore':
     'En båge av försilvrat stål och Thornpeak-is, dess stigare upplyst av en kall cyan kärna som fryser pilen till snöret. Det knackar ett schakt av fast glaciär-is som reformerar varje dragning; bågskytten bär inget koger på väggen, bara kylan. Highwatch höll Smygjagaer Ridge genom en belägring med en liknande: en enda bågeskytt, säger de, och en vinter med pilar som alltid redan fanns där.',
-  'hudChrome.wocStore.storeTab': 'Butik',
+  'hudChrome.wocStore.storeTab': 'Kosmetikbutik',
   'hudChrome.wocStore.tabsLabel': 'Delar av WOC-butiken',
   'hudChrome.wocStore.title': 'WOC-butik',
   'hudChrome.wocStore.tryOn': 'Prova',
@@ -18035,6 +18028,11 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': 'Operatörskonton kan inte sparkas.',
   'apiError.kick.reason_required': 'En anledning krävs.',
   'apiError.kick.target_offline': 'Den spelaren är inte längre online i denna värld.',
+  'apiError.world_quest_block.admin_target':
+    'Operatörskonton kan inte blockeras från världsuppdrag.',
+  'apiError.world_quest_block.reason_required': 'En anledning krävs.',
+  'apiError.world_quest_block.already_blocked': 'Det kontot är redan blockerat från världsuppdrag.',
+  'apiError.world_quest_block.not_blocked': 'Det kontot är inte blockerat från världsuppdrag.',
   'entities.abilities.melting_acid.description':
     'Bestryker ditt vapen i 30 min. Vart och ett av dina närstridshugg stänker frätande syra på målet och minskar dess rustning med 5 % i 12 sekunder.',
   'entities.abilities.nightshade_coating.description':
@@ -18409,12 +18407,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.dreadCurseSummary':
     'Var {every} sek träffar Nythraxis sin nuvarande tank för {hitNormal} av maximal hälsa som Skuggskada och lägger till en stapel Skräckförbannelse. I {duration} sek ökar varje stapel skadan den tanken tar från Nythraxis med {perStackNormal}, upp till {max} staplar.',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionHeroicSummary':
-    'Var {everyHeroic} sek markerar skeletthänder {countHeroic} cirklar på {radius} yd under raiddeltagare. Efter {warning} sek bryter varje cirkel ut för {burstHeroic} av maximal hälsa som Skuggskada och brinner sedan som Gravflamma i {flameHeroic} sek, vilket orsakar {tickHeroic} av maximal hälsa varje sekund för alla som står i den.',
+    'Var {everyHeroic} sek markerar skeletthänder {countHeroic} cirklar på {radius} yd under raiddeltagare. Efter {warning} sek bryter varje cirkel ut för {burstHeroic} av maximal hälsa som Skuggskada och brinner sedan som Gravflamma i {flameHeroic} sek, vilket orsakar {tickHeroic} av maximal hälsa varje sekund för alla som står i den. Det sker aldrig medan Själsslitning-märken är aktiva, eller inom {gap} sek efter att de försvunnit.',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionName': 'Gravutbrott',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionResponse':
     'Kliv ut ur varje varningscirkel innan den bryter ut och håll er borta från brinnande mark. Tankar drar Nythraxis bort från lågorna så att närstrid har plats att arbeta.',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionSummary':
-    'Var {everyNormal} sek markerar skeletthänder {countNormal} cirklar på {radius} yd under raiddeltagare. Efter {warning} sek bryter varje cirkel ut för {burstNormal} av maximal hälsa som Skuggskada och brinner sedan som Gravflamma i {flameNormal} sek, vilket orsakar {tickNormal} av maximal hälsa varje sekund för alla som står i den.',
+    'Var {everyNormal} sek markerar skeletthänder {countNormal} cirklar på {radius} yd under raiddeltagare. Efter {warning} sek bryter varje cirkel ut för {burstNormal} av maximal hälsa som Skuggskada och brinner sedan som Gravflamma i {flameNormal} sek, vilket orsakar {tickNormal} av maximal hälsa varje sekund för alla som står i den. Det sker aldrig medan Själsslitning-märken är aktiva, eller inom {gap} sek efter att de försvunnit.',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerName': 'Gravbrytare',
   'hudChrome.raidBossGuide.nythraxis.gravebreakerResponse':
     'Tankar håller Nythraxis vänd bort från raiden. Alla andra står bakom eller bredvid honom och korsar aldrig konen.',
@@ -19925,7 +19923,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mapAtlas.resizeRailHint':
     'Dra för att ändra storlek på kartans sidopanel. Dubbelklicka för att återställa.',
   'guide.worldPvpPage.hillBodyFlat':
-    'En gång var tredje timme får hela riket vid en oförutsägbar tidpunkt veta att en kulle dyker upp i en zon med fri strid om femton minuter. Dess cirkel markeras på öppen mark. Kullen står kvar i fyrtiofem minuter och försvinner sedan. Under tiden meddelas dess plats och grupperna med längst sammanlagd innehavstid var femte minut. Gruppen med flest spelare i cirkeln utmanar om kullen och tar den efter sammanlagt trettio sekunders numerärt övertag. En rivaliserande grupp pausar bara räknaren tills din grupp leder igen; den börjar om först när ingen levande medlem av din grupp finns kvar där inne. En ensam spelare räknas som en grupp på en person och behåller sin kulle när en grupp bildas, men raidmedlemmar räknas inte alls. Varje medlem i gruppen som håller kullen och står i cirkeln får lika mycket Ära varje minut, oavsett hur länge gruppen hållit den. En full grupp som håller kullen ostört under hela dess tid tjänar ungefär lika mycket som för tre segrar på slagfält. När kullen försvinner får alla som stått i cirkeln minst en minut under den ledande gruppens innehav och fortfarande tillhör gruppen en seger till PvP-raden i det veckovisa valvet, om gruppen med längst sammanlagd innehavstid hållit den i minst tio minuter. En stapel över fältet visar vem som håller den, antalet spelare på båda sidor och erövringsräknaren; /hill i chatten visar platsen.',
+    'En gång var tredje timme får hela riket vid en oförutsägbar tidpunkt veta att en kulle dyker upp i en av de nordliga zonerna om femton minuter. Dess cirkel markeras på öppen mark. Kullen står kvar i fyrtiofem minuter och försvinner sedan. Under tiden meddelas dess plats och grupperna med längst sammanlagd innehavstid var femte minut. Gruppen med flest spelare i cirkeln utmanar om kullen och tar den efter sammanlagt trettio sekunders numerärt övertag. En rivaliserande grupp pausar bara räknaren tills din grupp leder igen; den börjar om först när ingen levande medlem av din grupp finns kvar där inne. En ensam spelare räknas som en grupp på en person och behåller sin kulle när en grupp bildas, men raidmedlemmar räknas inte alls. Varje medlem i gruppen som håller kullen och står i cirkeln får lika mycket Ära varje minut, oavsett hur länge gruppen hållit den. En full grupp som håller kullen ostört under hela dess tid tjänar ungefär lika mycket som för tre segrar på slagfält. När kullen försvinner får alla som stått i cirkeln minst en minut under den ledande gruppens innehav och fortfarande tillhör gruppen en seger till PvP-raden i det veckovisa valvet, om gruppen med längst sammanlagd innehavstid hållit den i minst tio minuter. En stapel över fältet visar vem som håller den, antalet spelare på båda sidor och erövringsräknaren; /hill i chatten visar platsen.',
   'questUi.dialog.attuneHearthstone': 'Bind min allierade hemsten här.',
   'questUi.dialog.attuneHearthstoneAria': 'Bind din allierade hemsten till {hub} hos {name}',
   'hudChrome.factionRewards.hearthstoneUnattuned':
@@ -21378,7 +21376,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualDelivered':
     'Nyckeln till ditt paketriddjur har levererats med posten.',
   'hudChrome.wocStore.subscription.annualMount':
-    'Hämta de själsbundna tyglarna till den nattvingade chimäran med posten efter betalning på den karaktär som köpte paketet. Riddjuret förblir ditt när medlemskapet går ut.',
+    'Låser upp riddjuret nattvingad chimär för alla karaktärer på ditt konto, och de själsbundna tyglarna skickas med posten till karaktären som köper den. En per konto, och den förblir din när medlemskapet tar slut.',
   'hudChrome.wocStore.subscription.annualPending':
     'Återvänd till den karaktär som gjorde köpet efter betalning för att hämta paketets riddjur. Om betalningen behandlas eller provperioden är aktiv, försök igen efter den betalda debiteringen.',
   'hudChrome.wocStore.subscription.annualPrice': '{price} för 12 månader, betalas i förskott',
@@ -21404,7 +21402,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.manage': 'Hantera prenumeration',
   'hudChrome.wocStore.subscription.monthlyTitle': 'Månadsmedlemskap',
   'hudChrome.wocStore.subscription.price': '{price} per månad',
-  'hudChrome.wocStore.subscription.resumeCheckout': 'Återuppta betalning',
   'hudChrome.wocStore.subscription.startTrial': 'Starta 7 dagars gratis provperiod',
   'hudChrome.wocStore.subscription.status.active': 'Aktiv',
   'hudChrome.wocStore.subscription.status.canceled': 'Avslutad',
@@ -24536,7 +24533,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Frammana en flygande åsna som bär föremål mellan dina väskor och närmaste bank. Varje resa tar upp till 15 sekunder till banken och upp till 15 sekunder tillbaka, med snabbare flygning på längre sträckor. Välj upp till 24 staplar per resa. Återlämnade föremål får plats även i fulla väskor, sedan försvinner kuriren tills den frammanas igen. Återresan pausas medan du är död eller inne i en instans. Medlemskap krävs för att påbörja en ny resa.',
   'entities.abilities.courier.name': 'Kurir',
   'entities.letters.membership_annual_reward.body':
-    'Din betalning för årsmedlemskapet är klar. Riddjurets tyglar är bifogade. Behåll tyglarna i dina väskor eller på banken för att äga detta riddjur. Det förblir ditt när medlemskapet går ut. Ridkunskap krävs.',
+    'Din betalning för årsmedlemskapet är klar. Den nattvingade chimären är nu upplåst för alla karaktärer på ditt konto, och dess tyglar är bifogade. Den förblir din när medlemskapet går ut. Ridkunskap krävs.',
   'entities.letters.membership_annual_reward.sender': 'Korpposten',
   'entities.letters.membership_annual_reward.subject': 'Ditt riddjur från årsmedlemskapet',
   'entities.letters.membership_token_delivery.body':
@@ -25584,4 +25581,75 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Riddjur är kosmetiska utseenden för din tränade ritt. De ger ingen rustning, skada eller stridsstatistik. Ridträning ökar färdhastigheten på marken och hopp till häst klarar högre hinder. Alla riddjur stannar på marken och inget kan simma.',
   'guide.progression.ridingBody':
     'På nivå {level} lär stallmästare Marla ut grundläggande ridning för guld och erbjuder sedan en avancerad rang. Träningen bestämmer hastigheten till häst. Välj ditt riddjursutseende i Kosmetik; insamlade utseenden delas så länge tyglarna finns i någon karaktärs väskor eller bank.',
+  'footer.guideBest': 'Bästa MMORPG:er',
+  'footer.guideBrowser': 'Webbläsar-MMORPG:er',
+  'footer.guideFree': 'Gratis MMORPG:er',
+  'footer.guideGamesLikeDiablo': 'Spel som Diablo',
+  'footer.guideGamesLikeWow': 'Spel som WoW',
+  'footer.guideNew': 'Nya MMORPG:er',
+  'footer.guidesLabel': 'Spelarguider',
+  'guide.footer.guideBest': 'Bästa MMORPG:er',
+  'guide.footer.guideBrowser': 'Webbläsar-MMORPG:er',
+  'guide.footer.guideFree': 'Gratis MMORPG:er',
+  'guide.footer.guideGamesLikeDiablo': 'Spel som Diablo',
+  'guide.footer.guideGamesLikeWow': 'Spel som WoW',
+  'guide.footer.guideNew': 'Nya MMORPG:er',
+  'guide.footer.guidesLabel': 'Spelarguider',
+  'hudChrome.hill.callout.dominating': '{name} dominerar!',
+  'hudChrome.hill.callout.godlike': '{name} är gudalik!',
+  'hudChrome.hill.callout.killingSpree': '{name} är på en mördarspree!',
+  'hudChrome.hill.callout.legendary': '{name} är legendarisk!',
+  'hudChrome.hill.callout.rampage': '{name} härjar!',
+  'hudChrome.hill.callout.shutDown': '{killer} har stoppat {victim}!',
+  'hudChrome.hill.callout.unstoppable': '{name} är omöjlig att stoppa!',
+  'hudChrome.social.presence.everyone': 'Alla',
+  'hudChrome.social.presence.friends': 'Endast vänner',
+  'hudChrome.social.presence.label': 'Visa mig online för',
+  'hudChrome.social.presence.none': 'Ingen',
+  'hudChrome.social.presence.title':
+    'Vem som ser dig online i vännernas listor och gildsamlandet, med din zon och kartposition. Ditt lag ser alltid dig.',
+  'hudChrome.warfareShop.buyConfirmBodyGold':
+    'Köp {item} för {price}? Detta köp kan inte återbetalas.',
+  'itemUi.tooltip.warfareMainHandOnly': 'Krigföring räknas endast i huvudhanden.',
+  'entities.items.vanguard_band_of_focus.name': 'Förtruppens ring av fokus',
+  'entities.items.vanguard_band_of_mending.name': 'Förtruppens ring av läkning',
+  'entities.items.vanguard_band_of_might.name': 'Förtruppens ring av kraft',
+  'entities.items.vanguard_band_of_precision.name': 'Förtruppens ring av precision',
+  'entities.items.vanguard_pendant_of_focus.name': 'Förtruppens hänge av fokus',
+  'entities.items.vanguard_pendant_of_mending.name': 'Förtruppens hänge av läkning',
+  'entities.items.vanguard_pendant_of_might.name': 'Förtruppens hänge av kraft',
+  'entities.items.vanguard_pendant_of_precision.name': 'Förtruppens hänge av precision',
+  'guide.arenaPage.vanguardStatsBody':
+    'Till skillnad från den ursprungliga nivån bär Förtruppsutrustning även stridsvärden: varje förtruppspans rustning, vapen och halsband har antingen Kritvärde eller Snabbhetsvärde, och spellcaster- och läkardelarna lägger till Besvärjelsekraft eller Läkningskraft. Förtruppens ringar och halsband säljs vid sidan av vapnen, och alla klasser kan bära dem. Två av Förtruppens närkampingsringar ger exakt det Träffvärde som tar bort baschansen för att dina attacker missar en spelare på din egen nivå, och två spellcaster-ringar gör samma för dina besvärjelser att bli motverkade. Autoattacker medan dual-wielding behåller sin extra misschans. Läkarringen bär Snabbhetsvärde istället.',
+  'guide.commandsPage.presence':
+    'Vem som ser dig online i vännernas listor, ditt gildsamlande och /who: /presence everyone (förval), /presence friends (endast spelare på din vännerlista) eller /presence none. Dold ser de ingen online-prick, zon eller kartposition för dig, dock når vissningar och inbjudningar dig ändå; ditt lag ser alltid dig. En enkel /presence talar om för dig vilken som är inställd.',
+  'abilityUi.actionBar.moveHint': 'Håll Skift och dra för att flytta',
+  'entities.items.vanguard_feral_staff.name': 'Förtruppens vilda stav',
+  'hudChrome.worldPvp.groundSanctuary':
+    'Prövostranden är den enda fristaden: där kan du inte aktivera världs-PvP eller slåss mot andra spelare.',
+  'guide.worldPvpPage.introZones':
+    'PvP i den öppna världen är frivilligt och beror på området. På omstridd mark gör din aktiva PvP-flagga alla flaggade spelare utanför din grupp eller raid till fiender; stänger du av den blir du åskådare igen efter en kort fördröjning. Prövostranden är den enda fristaden utan världsstrider, och de tre nordligaste områdena använder samma frivilliga flaggregler som resten av världen. Din flagga aktiveras automatiskt när du går in i en aktiv cirkel i Kullens kung. Grupp- och raidkamrater är aldrig dina fiender någonstans; guildmedlemmar utanför din grupp är mål som alla andra.',
+  'guide.worldPvpPage.zonesBody':
+    'Prövostranden är den enda fristaden: ingen världs-PvP sker där och du kan inte aktivera din flagga. En aktiv flagga förblir aktiv, men framsteg mot titlar baserade på speltid pausas tills du lämnar området. Överallt annars, även i Drakländerna, Frostslöjans vidder och Bärnstensfallet, kan bara flaggade spelare slåss. Din flagga aktiveras automatiskt när du går in i en aktiv cirkel i Kullens kung om du uppfyller det vanliga nivåkravet. Varningscirkeln aktiverar inte din flagga. Flaggan förblir aktiv när du lämnar den aktiva cirkeln; använd /pvp off för att starta den vanliga nedräkningen på fem minuter, som inte kan slutföras medan du är inne på en aktiv kulle eller fortfarande i strid.',
+  'guide.worldPvpPage.hillBody':
+    'Varannan timme dyker en kulle upp i Drakländerna, Frostslöjans vidder eller Bärnstensfallet. Riket får en varning femton minuter i förväg och cirkeln markeras på öppen mark. Kullen är aktiv i trettio minuter. När du går in i den aktiva cirkeln aktiveras din flagga för världs-PvP enligt de vanliga nivåreglerna, även för raidmedlemmar. Gruppen med flest behöriga spelare i cirkeln tar kullen efter en minut med obruten majoritet; en ensam spelare räknas som en grupp på en, men raidmedlemmar och spelare under nivåkravet för PvP kan varken inta kullen eller tjäna Ära från den. Varje innehavare som står i cirkeln tjänar Ära i ökande takt. Utbetalningarna sker oftare och ökar snabbare, så att den totala Äran från det tidigare evenemanget på fyrtiofem minuter bevaras. När kullen byter innehavare börjar ökningen om från början. Din flagga förblir aktiv när du lämnar cirkeln; /pvp off använder den vanliga fördröjningen på fem minuter och kan inte slutföras på en aktiv kulle eller under strid. Kullens stapel visar kontroll, spelarantal och erövringsförlopp; /hill anger dess plats.',
+  'hudChrome.hill.pvpEntry': 'Världs-PvP aktiveras när du går in i den aktiva cirkeln.',
+  'hudChrome.hill.pvpBanner': 'PvP',
+  'hudChrome.nameplate.hillBountyTag': 'Belöning {honor}',
+  'hudChrome.wocStore.membershipsTab': 'Medlemskap',
+  'hudChrome.wocStore.membershipsUnavailable':
+    'Medlemskap är inte tillgängliga just nu. Försök igen om en stund.',
+  'hudChrome.wocStore.subscription.addMonth': 'Lägg till 1 månad',
+  'hudChrome.wocStore.subscription.addYear': 'Lägg till 12 månader',
+  'hudChrome.wocStore.subscription.billingBlocked':
+    'Uppdatera dina betalningsuppgifter under Hantera prenumeration innan du lägger till medlemstid.',
+  'hudChrome.wocStore.subscription.endsOn': 'Medlemskapet upphör den {date}',
+  'hudChrome.wocStore.subscription.renewsOn': 'Förnyas den {date}',
+  'hudChrome.wocStore.subscription.stackCapped':
+    'Du kan samla upp till 2 års medlemskap åt gången. Försök igen närmare ditt förnyelsedatum.',
+  'hudChrome.wocStore.subscription.stackTerms':
+    'Betalningen sker nu. Tiden läggs till efter ditt nuvarande medlemskap, som sedan förnyas enligt denna plan.',
+  'hudChrome.wocStore.subscription.stackUnavailable':
+    'Det går inte att lägga till medlemstid just nu. Försök igen om en stund.',
+  'hudChrome.wocStore.subscription.tokenPrice': '{price} för 30 dagar',
 };

@@ -1,8 +1,11 @@
 import { DESKTOP_APP } from '../client_origin';
 import { MEMBERSHIP_TOKEN_OFF } from '../membership_token_contract';
+import { openStripeCheckout } from '../net/stripe_checkout';
 import {
   isGameSubscriptionPlan,
   SUBSCRIPTION_OFF,
+  type SubscriptionLink,
+  type SubscriptionSnapshot,
   type SubscriptionStoreHooks,
   subscriptionLink,
 } from '../subscription_contract';
@@ -10,13 +13,18 @@ import { esc } from './esc';
 import { focusKeyAttr } from './focus_restore';
 import { t } from './i18n';
 import { mintIntentKey } from './purchase_intent_key';
-import { subscriptionOffersHtml } from './store_subscription_offers';
+import {
+  membershipBadgeHtml,
+  membershipBenefits,
+  subscriptionOffersHtml,
+  subscriptionPurchase,
+} from './store_subscription_offers';
 import { SubscriptionCheckoutIntents } from './subscription_checkout_intents';
 import { usdText } from './usd_text';
 
 /** Cold store section. Status refreshes on user entry/refresh, never the store polling timer. */
 export class StoreSubscription {
-  private state = { ...SUBSCRIPTION_OFF };
+  private state: SubscriptionSnapshot = { ...SUBSCRIPTION_OFF };
   private tokenState = { ...MEMBERSHIP_TOKEN_OFF };
   private tokenKey = this.savedTokenKey();
   private savedTokenKey(): string {
@@ -36,7 +44,41 @@ export class StoreSubscription {
     mint: mintIntentKey,
   });
   private annualDelivered = false;
+  /** Repaints the store once an embedded checkout completes (webhooks settle shortly after). */
+  private checkoutCompleted: () => void = () => {};
   constructor(private readonly hooks: () => SubscriptionStoreHooks | undefined) {}
+
+  /** Embedded Checkout mounts in the game like a Claudium top-up, so no tab or popup is
+   *  needed. A hosted link (a service without embedding) still opens a tab. */
+  private async openCheckout(result: SubscriptionLink): Promise<void> {
+    if (result.stripe) {
+      await openStripeCheckout(
+        result.stripe,
+        {
+          title: t('hudChrome.claudium.checkoutTitle'),
+          close: t('hudChrome.claudium.checkoutClose'),
+          loading: t('hudChrome.claudium.checkoutLoading'),
+          failed: t('hudChrome.claudium.checkoutFailed'),
+        },
+        {
+          onComplete: () => {
+            this.checkoutCompleted();
+            window.setTimeout(this.checkoutCompleted, 4000);
+          },
+        },
+      );
+      return;
+    }
+    if (!result.url) throw new Error('checkout unavailable');
+    // Electron denies BrowserWindows and sends HTTPS links to the system browser.
+    if (DESKTOP_APP) {
+      window.open(result.url, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    const tab = window.open(result.url, '_blank');
+    if (!tab) throw new Error('popup blocked');
+    tab.opener = null;
+  }
 
   refresh(): Promise<void> {
     if (this.flight) return this.flight;
@@ -73,23 +115,23 @@ export class StoreSubscription {
   html(): string {
     if (this.owner !== this.hooks()) return '';
     if (!this.state.available)
-      return this.tokenState.available ? this.benefitsHtml() + this.tokenHtml() : '';
-    return (
-      subscriptionOffersHtml(
-        this.state,
-        this.busy,
-        this.intents.pending('game_annual'),
-        this.annualDelivered,
-        this.intents.pending('game_monthly'),
-        !!this.hooks()?.annualMountClaim &&
-          (this.state.canManage || this.state.plan === 'game_annual'),
-      ) +
-      this.benefitsHtml() +
-      this.tokenHtml()
+      return this.tokenState.available
+        ? `<div class="membership-badges">${this.tokenHtml()}</div>`
+        : '';
+    return subscriptionOffersHtml(
+      this.state,
+      this.busy,
+      this.intents.pending('game_annual'),
+      this.annualDelivered,
+      !!this.hooks()?.annualMountClaim &&
+        (this.state.canManage || this.state.plan === 'game_annual'),
+      this.tokenHtml(),
+      Math.floor(Date.now() / 1000),
     );
   }
 
-  bind(body: HTMLElement): void {
+  bind(body: HTMLElement, repaint: () => void = () => {}): void {
+    this.checkoutCompleted = repaint;
     this.bindToken(body);
     this.bindAnnual(body);
     for (const button of body.querySelectorAll<HTMLButtonElement>('[data-subscription-action]')) {
@@ -100,27 +142,30 @@ export class StoreSubscription {
         if (!hooks || hooks !== this.owner) return;
         this.busy = true;
         button.disabled = true;
-        // Reserve a tab during the gesture so async checkout creation is not popup-blocked.
-        const tab = DESKTOP_APP ? null : window.open('about:blank', '_blank');
+        // Checkout is embedded in the game. The portal is Stripe-hosted only, so reserve its
+        // tab during the gesture to keep async link creation from being popup-blocked.
+        const tab =
+          DESKTOP_APP || action === 'checkout' ? null : window.open('about:blank', '_blank');
         if (tab) tab.opener = null;
         try {
-          if (!DESKTOP_APP && !tab) throw new Error('popup blocked');
+          if (action === 'portal' && !DESKTOP_APP && !tab) throw new Error('popup blocked');
           const requested = button.dataset.subscriptionCheckoutPlan;
           const plan =
             action === 'checkout' && isGameSubscriptionPlan(requested)
               ? requested
               : (this.state.plan ?? 'game_monthly');
-          const resume =
-            ['none', 'incomplete'].includes(this.state.status) && this.intents.pending(plan);
+          const purchase = subscriptionPurchase(this.state, plan, Math.floor(Date.now() / 1000));
           if (
             action === 'checkout' &&
-            ((!this.state.canCheckout && !resume) ||
+            ((purchase !== 'new' && purchase !== 'stack') ||
               !(this.state.plans ?? [{ plan: 'game_monthly' }]).some(
                 (offer) => offer.plan === plan,
               ))
           )
             throw new Error('plan unavailable');
           const accountId = this.state.accountId;
+          // Every click is a new checkout: retire any earlier attempt's key first.
+          if (action === 'checkout') this.intents.complete(plan);
           const key = action === 'checkout' ? this.intents.start(plan) : mintIntentKey();
           const result = subscriptionLink(await hooks.link(action, key, plan), action);
           if (hooks !== this.hooks() || accountId !== this.state.accountId)
@@ -134,9 +179,11 @@ export class StoreSubscription {
               error.textContent = t('hudChrome.wocStore.subscription.checkoutClosed');
             return;
           }
-          if (!result.ok || !result.url) throw new Error('subscription unavailable');
+          if (!result.ok) throw new Error('subscription unavailable');
+          if (action === 'checkout') await this.openCheckout(result);
+          else if (!result.url) throw new Error('subscription unavailable');
           // Electron denies BrowserWindows and sends HTTPS links to the system browser.
-          if (DESKTOP_APP) window.open(result.url, '_blank', 'noopener,noreferrer');
+          else if (DESKTOP_APP) window.open(result.url, '_blank', 'noopener,noreferrer');
           else tab?.location.replace(result.url);
         } catch {
           tab?.close();
@@ -195,19 +242,20 @@ export class StoreSubscription {
       }
     };
   }
-  private benefitsHtml(): string {
-    return `<section class="ui-card" data-membership-benefits><div class="charter-body"><h2 class="ui-h">${esc(t('hudChrome.wocStore.subscription.benefitsTitle'))}</h2><ul>${(['benefitBank', 'benefitSlots', 'benefitArmour', 'benefitBag', 'benefitTax'] as const).map((key) => `<li>${esc(t(`hudChrome.wocStore.subscription.${key}`))}</li>`).join('')}</ul><p>${esc(t('hudChrome.wocStore.subscription.benefitExpiry'))}</p></div></section>`;
-  }
-
   private tokenHtml(): string {
     if (!this.tokenState.available) return '';
-    return (
-      `<section class="ui-card membership-token-card" data-membership-token-section><div class="charter-body"><h2 class="ui-h">${esc(t('hudChrome.wocStore.subscription.tokenTitle'))}</h2>` +
-      `<p>${esc(t('hudChrome.wocStore.subscription.tokenTerms', { price: usdText(this.tokenState.price.unitAmount) }))}</p>` +
-      `<button type="button" class="ui-btn ui-btn--lg" data-membership-purchase-action="buy"${focusKeyAttr('membership-token-buy')}${this.busy || !this.tokenState.canCheckout ? ' disabled' : ''}>${esc(t('hudChrome.wocStore.subscription.tokenBuy'))}</button> ` +
-      `<button type="button" class="ui-btn ui-btn--lg" data-membership-purchase-action="claim"${focusKeyAttr('membership-token-claim')}${this.busy ? ' disabled' : ''}>${esc(t('hudChrome.wocStore.subscription.tokenClaim'))}</button>` +
-      `<p data-membership-token-status role="status"></p></div></section>`
-    );
+    const price = usdText(this.tokenState.price.unitAmount);
+    return membershipBadgeHtml({
+      id: 'membership_token',
+      title: t('hudChrome.wocStore.subscription.tokenTitle'),
+      price: t('hudChrome.wocStore.subscription.tokenPrice', { price }),
+      lines: [t('hudChrome.wocStore.subscription.tokenTerms', { price })],
+      benefits: membershipBenefits(),
+      action:
+        `<button type="button" class="ui-btn ui-btn--lg" data-membership-purchase-action="buy"${focusKeyAttr('membership-token-buy')}${this.busy || !this.tokenState.canCheckout ? ' disabled' : ''}>${esc(t('hudChrome.wocStore.subscription.tokenBuy'))}</button> ` +
+        `<button type="button" class="ui-btn ui-btn--lg" data-membership-purchase-action="claim"${focusKeyAttr('membership-token-claim')}${this.busy ? ' disabled' : ''}>${esc(t('hudChrome.wocStore.subscription.tokenClaim'))}</button>` +
+        '<p data-membership-token-status role="status"></p>',
+    });
   }
 
   private bindToken(body: HTMLElement): void {
@@ -229,8 +277,6 @@ export class StoreSubscription {
               (control.dataset.membershipPurchaseAction === 'buy' && !this.tokenState.canCheckout);
         };
         disable(true);
-        const tab = buying && !DESKTOP_APP ? window.open('about:blank', '_blank') : null;
-        if (tab) tab.opener = null;
         let message:
           | 'hudChrome.wocStore.subscription.tokenPending'
           | 'hudChrome.wocStore.subscription.tokenDelivered'
@@ -238,17 +284,14 @@ export class StoreSubscription {
           'hudChrome.wocStore.subscription.tokenPending';
         try {
           if (buying) {
-            if (!DESKTOP_APP && !tab) throw new Error('popup blocked');
             try {
               localStorage.setItem('woc.membership-token.pending', this.tokenKey);
             } catch {
               /* Storage unavailable. */
             }
             const result = subscriptionLink(await hooks.tokenCheckout!(this.tokenKey), 'checkout');
-            if (hooks !== this.hooks() || !result.ok || !result.url)
-              throw new Error('token checkout unavailable');
-            if (DESKTOP_APP) window.open(result.url, '_blank', 'noopener,noreferrer');
-            else tab?.location.replace(result.url);
+            if (hooks !== this.hooks() || !result.ok) throw new Error('token checkout unavailable');
+            await this.openCheckout(result);
           } else if (
             (await hooks.tokenClaim?.(this.tokenKey))?.delivered &&
             hooks === this.hooks()
@@ -262,7 +305,6 @@ export class StoreSubscription {
             }
           }
         } catch {
-          tab?.close();
           message = 'hudChrome.wocStore.subscription.error';
         } finally {
           this.busy = false;

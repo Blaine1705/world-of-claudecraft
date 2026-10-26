@@ -44,6 +44,10 @@ export interface SubscriptionSnapshot {
   currentPeriodEnd: number | null;
   canCheckout: boolean;
   canManage: boolean;
+  /** Live member: a monthly or annual purchase adds its period onto currentPeriodEnd. */
+  canStack?: boolean;
+  /** Latest end (unix seconds, like currentPeriodEnd) a stacked purchase may reach; Stripe caps renewals at two years. */
+  stackLimit?: number | null;
 }
 export const SUBSCRIPTION_OFF: SubscriptionSnapshot = {
   available: false,
@@ -56,6 +60,8 @@ export const SUBSCRIPTION_OFF: SubscriptionSnapshot = {
 export interface SubscriptionLink {
   ok: boolean;
   url: string | null;
+  /** Embedded Checkout, mounted in the game like a Claudium top-up (no tab or popup). */
+  stripe?: { clientSecret: string; publishableKey: string };
   /** Exact owned checkout is definitively closed and has no reward left to claim. */
   retryWithNewKey?: true;
 }
@@ -96,6 +102,12 @@ export function subscriptionSnapshot(value: unknown): SubscriptionSnapshot {
     !(
       v.currentPeriodEnd === null ||
       (Number.isSafeInteger(v.currentPeriodEnd) && Number(v.currentPeriodEnd) > 0)
+    ) ||
+    (v.canStack !== undefined && typeof v.canStack !== 'boolean') ||
+    !(
+      v.stackLimit === undefined ||
+      v.stackLimit === null ||
+      (Number.isSafeInteger(v.stackLimit) && Number(v.stackLimit) > 0)
     )
   ) {
     return { ...SUBSCRIPTION_OFF };
@@ -144,6 +156,12 @@ export function subscriptionSnapshot(value: unknown): SubscriptionSnapshot {
     canCheckout:
       v.canCheckout && ['none', 'canceled', 'incomplete_expired'].includes(String(v.status)),
     canManage: v.canManage,
+    // A legacy service never advertises stacking; only a live membership can stack.
+    ...(v.canStack === true &&
+    typeof v.stackLimit === 'number' &&
+    ['active', 'trialing'].includes(String(v.status))
+      ? { canStack: true, stackLimit: v.stackLimit }
+      : {}),
   };
 }
 export function subscriptionLink(value: unknown, action: SubscriptionAction): SubscriptionLink {
@@ -151,6 +169,27 @@ export function subscriptionLink(value: unknown, action: SubscriptionAction): Su
   const v = value as Record<string, unknown>;
   if (action === 'checkout' && v.ok === false && v.url === null && v.retryWithNewKey === true)
     return { ok: false, url: null, retryWithNewKey: true };
+  if (action === 'checkout' && v.ok === true && v.url === null) {
+    const stripe = v.stripe as Record<string, unknown> | null | undefined;
+    if (
+      stripe &&
+      typeof stripe === 'object' &&
+      Object.keys(stripe).length === 2 &&
+      typeof stripe.clientSecret === 'string' &&
+      /^cs_(test|live)_[A-Za-z0-9_]{1,500}$/.test(stripe.clientSecret) &&
+      typeof stripe.publishableKey === 'string' &&
+      /^pk_(test|live)_[A-Za-z0-9]{1,255}$/.test(stripe.publishableKey)
+    )
+      return {
+        ok: true,
+        url: null,
+        stripe: {
+          clientSecret: stripe.clientSecret,
+          publishableKey: stripe.publishableKey,
+        },
+      };
+    return { ...SUBSCRIPTION_LINK_OFF };
+  }
   if (v.ok !== true || typeof v.url !== 'string') return { ...SUBSCRIPTION_LINK_OFF };
   try {
     const url = new URL(v.url);

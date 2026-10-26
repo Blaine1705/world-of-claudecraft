@@ -786,7 +786,6 @@ export const zh_CN: EnTranslations = {
       "claimLastWeek": "领取上周的奖励",
       "readyTitle": "你的每周奖励已就绪",
       "readyDescription": "有一周已完成的奖励正在等待。打开你获得的宝库，然后选择一件物品领取。",
-      "previewClaimNotice": "奖励已就绪。请前往东溪的宝库管理员处开启宝库并领取奖励。",
       "notNow": "稍后再说",
       "completedWeek": "周次结束于{date}",
       "currentWeek": "返回本周进度",
@@ -837,7 +836,8 @@ export const zh_CN: EnTranslations = {
         "dungeon_heroic": "英雄地下城战利品",
         "world": "世界任务战利品",
         "pvp": "战争装备"
-      }
+      },
+      "previewClaimNotice": "奖励已就绪。请前往东溪的宝库管理员处开启宝库并领取奖励。"
     },
     "guildHall": {
       "title": "灯火大厅",
@@ -1327,15 +1327,15 @@ export const zh_CN: EnTranslations = {
         "annualTitle": "12个月会员礼包",
         "annualPrice": "12个月共{price}，一次付清",
         "annualTerms": "每年以相同价格续订。通过Stripe使用法定货币付款。可在账单设置中取消。",
-        "annualMount": "付款后，请使用购买此礼包的角色通过邮件领取灵魂绑定的夜翼奇美拉缰绳。会员到期后，你仍将拥有这只坐骑。",
+        "annualMount": "为你账号下的所有角色解锁夜翼奇美拉坐骑，灵魂绑定的缰绳将通过邮件发送给购买的角色。每个账号限一只，会员到期后仍归你所有。",
         "trialTerms": "每个账户可免费试用一次，共{days}天。需要提供付款方式。除非取消，否则试用结束时将收取{price}。",
         "startTrial": "开始7天免费试用",
-        "resumeCheckout": "继续结账",
         "checkoutClosed": "此结账流程已结束，且没有待领取奖励。请重新选择会员方案，开始新的结账流程。",
         "annualClaim": "领取礼包坐骑",
         "annualPending": "付款后，请返回购买礼包的角色领取坐骑。如果付款正在处理或仍在试用期，请在付费成功后重试。",
         "annualDelivered": "礼包坐骑钥匙已通过邮件送达。",
         "tokenTitle": "可交易会员代币",
+        "tokenPrice": "30天{price}",
         "benefitsTitle": "有效会员权益",
         "benefitBank": "在任意银行员处访问您其他角色的银行。",
         "benefitSlots": "额外解锁10个角色栏位。",
@@ -1351,6 +1351,14 @@ export const zh_CN: EnTranslations = {
         "price": "每月 {price}",
         "terms": "每月自动续费。通过 Stripe 使用法定货币付款。可在账单设置中取消。",
         "subscribe": "订阅",
+        "addMonth": "增加1个月",
+        "addYear": "增加12个月",
+        "stackTerms": "立即付款。时长将追加到当前会员的结束时间之后，之后按此方案续订。",
+        "stackCapped": "会员时长最多可同时持有2年。请在临近续订日期时再试。",
+        "stackUnavailable": "目前无法增加会员时长。请稍后再试。",
+        "billingBlocked": "增加会员时长前，请先在“管理订阅”中更新付款信息。",
+        "renewsOn": "将于{date}续订",
+        "endsOn": "会员将于{date}结束",
         "manage": "管理订阅",
         "ending": "将在当前账单周期结束时取消",
         "error": "无法打开账单页面。请允许弹出窗口后重试。",
@@ -1369,8 +1377,9 @@ export const zh_CN: EnTranslations = {
       "title": "WOC 商店",
       "close": "关闭 WOC 商店",
       "tabsLabel": "WOC 商店分区",
-      "storeTab": "商店",
-      "rewardsTab": "每日奖励",
+      "storeTab": "外观商店",
+      "membershipsTab": "会员",
+      "membershipsUnavailable": "会员服务目前不可用。请稍后再试。",
       "mountsEyebrow": "账号坐骑",
       "mountsTitle": "机械马厩",
       "mountBuyAria": "购买{item}",
@@ -3446,22 +3455,22 @@ export const zh_CN: EnTranslations = {
       "zoneContested": "争夺地带：只有已开启旗帜的玩家才能在此交战。",
       "zoneFfa": "自由混战地带：这里的每个人都可能成为目标。",
       "realmDisabled": "世界 PvP 在此服务器已禁用。",
-      "groundSanctuary": "试炼之滨与东溪谷是圣域：完全不会发生世界 PvP。",
+      "groundSanctuary": "试炼之滨是唯一的圣域：在这里不能开启世界PvP，也不能与其他玩家战斗。",
       "groundContested": "其余地方均为争夺地带：只有双方都开启旗帜的玩家才能交战。",
-      "groundFfa": "龙裔荒原、霜幕之境与琥珀秋境是自由混战地带：无论是否开启旗帜，身处其中的每个人都可以战斗。",
+      "groundFfa": "龙裔荒原、霜幕之境和琥珀秋境采用常规 PvP 旗帜规则。进入正在进行的山丘之王活动圈会开启你的旗帜。",
       "groupLine": "小队和团队成员之间永远不会互相为敌。不在你队伍中的公会成员则可以战斗。",
-      "markLine": "在那里攻击未开启旗帜的玩家会升起你自己的旗帜；攻击已开启旗帜的玩家则永远不会。",
+      "markLine": "进入正在进行的山丘活动圈会开启世界 PvP。离开圈后旗帜仍会保留。",
       "aidLine": "在世界战斗中为一名已开启旗帜的玩家治疗、上护盾或增益，会升起你自己的旗帜。",
       "stakeLine": "败者支付 {cap} 或其钱袋 {percent} 中较少的一项。",
       "spoilsLine": "双方都开启 PvP 时，致命一击者的金币会与败者的头骨一同掉落在尸体上。",
       "skullName": "{name}的头骨",
-      "noStakeLine": "在自由混战地带被击杀的未开启旗帜玩家不会损失金币。",
+      "noStakeLine": "未开启旗帜的玩家在开放世界中无法被攻击。",
       "noTakeLine": "未开启旗帜的战斗者同样不会获得金币：金币只在两名已开启旗帜的玩家之间转移。",
       "honorLine": "每次击杀获得 {honor} 点荣誉，由所有出力者平分。",
       "splitLine": "干净的一对一可独得全部奖励；助战者和治疗者共同分享。",
       "repeatLine": "重复击杀同一名玩家，收益依次为 {second}、{third}，此后归零；计数会在首次击杀 {reset} 后清零。",
       "greyLine": "等级比你低 {levels} 级以上的玩家不会付出任何代价。",
-      "disarmLine": "关闭需要 {minutes} 分钟，并会等待战斗结束。",
+      "disarmLine": "关闭需要 {minutes} 分钟，并且必须等到你离开活动山丘且战斗结束。",
       "record": "战绩：{kills} 杀，{deaths} 死",
       "enable": "开启世界 PvP",
       "disable": "关闭世界 PvP",
@@ -3491,6 +3500,17 @@ export const zh_CN: EnTranslations = {
       "distance": "距离圆圈 {yards} 码",
       "rises": "{minutes} 后升起",
       "falls": "{minutes} 后消失",
+      "pvpEntry": "进入活动圈会开启世界 PvP。",
+      "pvpBanner": "PvP",
+      "callout": {
+        "killingSpree": "{name}正在大杀特杀！",
+        "rampage": "{name}已经杀人如麻！",
+        "unstoppable": "{name}已经无人能挡！",
+        "dominating": "{name}已经主宰比赛！",
+        "godlike": "{name}已经接近神了！",
+        "legendary": "{name}已经超越神了！",
+        "shutDown": "{killer}终结了{victim}！"
+      },
       "standingRaid": "团队成员不计入人数：只有队伍才能占据山丘"
     },
     "skullBag": {
@@ -3523,7 +3543,8 @@ export const zh_CN: EnTranslations = {
       "owned": "已拥有",
       "buyAria": "以 {honor} 购买 {item}",
       "buyOwnedAria": "以 {honor} 购买 {item}，已拥有",
-      "buyConfirmBody": "用 {honor} 购买 {item}？荣誉购买后无法退款。"
+      "buyConfirmBody": "用 {honor} 购买 {item}？荣誉购买后无法退款。",
+      "buyConfirmBodyGold": "用 {price} 购买 {item}？此次购买无法退款。"
     },
     "charSheet": {
       "offense": "攻击",
@@ -4606,8 +4627,8 @@ export const zh_CN: EnTranslations = {
         "boneSpikeHeroicSummary": "每 {everyHeroic} 秒，尼思拉克西斯会用骨刺穿刺除当前目标外的 {victimsHeroic} 名队员。被穿刺的队员无法行动，每秒损失 {drainHeroic} 最大生命值，直到骨刺被摧毁。任何人命中骨刺 {hitsHeroic} 次即可将其击碎，无论伤害多少。已被穿刺过的队员在 {cooldown} 秒内不会再次被选中，因此骨刺会分散到整个团队。",
         "boneSpikeResponse": "离得最近的人攻击骨刺：任何人命中几次即可击碎，无论伤害多少。治疗者在骨刺被击碎前保住被穿刺队员的性命。",
         "graveEruptionName": "坟场爆裂",
-        "graveEruptionSummary": "每 {everyNormal} 秒，森森白骨之手会在队员脚下标记 {countNormal} 个半径 {radius} 码的圆圈。{warning} 秒后，每个圆圈都会爆裂，造成 {burstNormal} 最大生命值的暗影伤害，随后化为坟场烈焰燃烧 {flameNormal} 秒，对站在其中的任何人每秒造成 {tickNormal} 最大生命值的伤害。",
-        "graveEruptionHeroicSummary": "每 {everyHeroic} 秒，森森白骨之手会在队员脚下标记 {countHeroic} 个半径 {radius} 码的圆圈。{warning} 秒后，每个圆圈都会爆裂，造成 {burstHeroic} 最大生命值的暗影伤害，随后化为坟场烈焰燃烧 {flameHeroic} 秒，对站在其中的任何人每秒造成 {tickHeroic} 最大生命值的伤害。",
+        "graveEruptionSummary": "每 {everyNormal} 秒，森森白骨之手会在队员脚下标记 {countNormal} 个半径 {radius} 码的圆圈。{warning} 秒后，每个圆圈都会爆裂，造成 {burstNormal} 最大生命值的暗影伤害，随后化为坟场烈焰燃烧 {flameNormal} 秒，对站在其中的任何人每秒造成 {tickNormal} 最大生命值的伤害。灵魂撕裂标记存在期间以及标记消失后 {gap} 秒内，此技能不会发动。",
+        "graveEruptionHeroicSummary": "每 {everyHeroic} 秒，森森白骨之手会在队员脚下标记 {countHeroic} 个半径 {radius} 码的圆圈。{warning} 秒后，每个圆圈都会爆裂，造成 {burstHeroic} 最大生命值的暗影伤害，随后化为坟场烈焰燃烧 {flameHeroic} 秒，对站在其中的任何人每秒造成 {tickHeroic} 最大生命值的伤害。灵魂撕裂标记存在期间以及标记消失后 {gap} 秒内，此技能不会发动。",
         "graveEruptionResponse": "在每个预警圆圈爆裂前离开，并远离燃烧地面。坦克应将尼思拉克西斯拉离火焰区域，为近战输出留出空间。",
         "bindingSigilName": "束缚法阵",
         "bindingSigilSummary": "每 {everyNormal} 秒，一座古老结界的法阵会在王座两侧的两座平台之一浮现（以团队视角，位于开战时尼思拉克西斯所站位置左侧或右侧 {sideOffset} 码处），每次施放交替换边，同时他开始不死飞升，每 {ascensionEvery} 秒获得 {ascensionNormal} 伤害与攻击速度加成。若他在 {bindNormal} 秒内站上法阵，便会受缚：不死飞升被清除，他被眩晕 {stunNormal} 秒，并在接下来的 {boundNormal} 秒内受到的伤害提高 {vulnerability}。否则每名队员都会受到 {unboundHitNormal} 最大生命值的暗影伤害，且他会一直保持 {unboundBonusNormal} 的伤害加成，直到下一次束缚。",
@@ -5010,6 +5031,7 @@ export const zh_CN: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "暂离",
+      "hillBountyTag": "悬赏 {honor}",
       "pvpTag": "PvP",
       "bountyTag": "悬赏",
       "cheaterTag": "< 作弊者 >",
@@ -5435,12 +5457,11 @@ export const zh_CN: EnTranslations = {
       "memberSinceDays": "已加入 Discord {days} 天",
       "roleTag": {
         "levyst": "Levy St",
-        "admin": "管理员",
         "coredevs": "核心开发者",
         "devs": "开发者",
-        "seniormods": "高级管理员",
+        "seniormods": "哨兵",
         "mods": "管理员",
-        "juniormods": "初级管理员",
+        "juniormods": "观察员",
         "artists": "画师",
         "contentcreator": "内容创作者",
         "legend": "传奇",
@@ -5985,6 +6006,13 @@ export const zh_CN: EnTranslations = {
       "offlineHeader": "离线 ({n})",
       "hideOffline": "隐藏离线",
       "hideOfflineTitle": "隐藏离线公会成员",
+      "presence": {
+        "label": "对谁显示在线",
+        "everyone": "所有人",
+        "friends": "仅好友",
+        "none": "无人",
+        "title": "谁能在好友列表和公会名单中看到你在线，以及你的区域和地图位置。队伍成员始终能看到你。"
+      },
       "billboard": {
         "label": "公会公告板",
         "empty": "公告板上还没有内容。",
@@ -8077,6 +8105,12 @@ export const zh_CN: EnTranslations = {
       "admin_target": "管理员账号无法被踢出。",
       "target_offline": "该玩家已不在此服务器在线。"
     },
+    "world_quest_block": {
+      "admin_target": "管理员账号无法被禁止参与世界任务。",
+      "reason_required": "必须填写原因。",
+      "already_blocked": "该账号已被禁止参与世界任务。",
+      "not_blocked": "该账号未被禁止参与世界任务。"
+    },
     "woc_market": {
       "invalid_input": "输入无效。",
       "disabled": "本服务器未开放 $WOC 交易所。",
@@ -9103,7 +9137,14 @@ export const zh_CN: EnTranslations = {
       "discord": "加入 Discord",
       "communityWiki": "社区维基",
       "rights": "World of ClaudeCraft",
-      "linksLabel": "游玩与社区链接"
+      "linksLabel": "游玩与社区链接",
+      "guidesLabel": "玩家指南",
+      "guideFree": "免费 MMORPG",
+      "guideGamesLikeWow": "类似 WoW 的游戏",
+      "guideBest": "最佳 MMORPG",
+      "guideNew": "新 MMORPG",
+      "guideBrowser": "浏览器 MMORPG",
+      "guideGamesLikeDiablo": "类似《暗黑破坏神》的游戏"
     },
     "language": {
       "label": "语言",
@@ -9619,7 +9660,9 @@ export const zh_CN: EnTranslations = {
       "session": "你登录以来做过的事：击杀、死亡、伤害与经验。",
       "arena": "你在灰烬角斗场两个组别中的战绩：1v1 与 2v2 各自的评分、胜场、负场与胜率。",
       "pvp": "世界 PvP 旗帜：/pvp 切换，/pvp on 与 /pvp off 直接设置。已开启旗帜的玩家可以在任何地方互相作战；关闭需要 5 分钟。",
-      "pvpZones": "世界 PvP 旗帜：/pvp 切换，/pvp on 与 /pvp off 直接设置。已开启旗帜的玩家可以在争夺地带互相作战，圣域完全不允许世界战斗，而自由混战地带无论是否开启旗帜都允许作战；关闭需要 5 分钟。",
+      "pvpZones": "世界 PvP 旗帜：/pvp 切换状态，/pvp on 和 /pvp off 分别开启和关闭。在争夺区域，已开启旗帜的玩家可以相互战斗；庇护区域禁止一切世界 PvP。进入正在进行的山丘之王活动圈会开启旗帜；关闭需要 5 分钟。",
+      "presence": "控制谁能在好友列表、公会名单和 /who 中看到你在线：/presence everyone（默认）、/presence friends（仅你好友列表中的玩家）或 /presence none。隐藏后，他们看不到你的在线标记、区域和地图位置，但密语和邀请仍能送达你；队伍成员始终能看到你。只输入 /presence 会告诉你当前设置。",
+      "flair": "对其他玩家显示或隐藏你的 Discord 身份组，即彩色名字、身份组标签和聊天认证标签：/flair on 显示，/flair off 隐藏，只输入 /flair 会告诉你当前设置。需要已关联的 Discord 账号。",
       "listings": "你自己在世界市场上的挂单，包括要价、每一件还剩多久，以及你还能再挂多少。",
       "buyback": "你最近卖给商人、目前仍能买回来的东西。",
       "groupState": "你此刻如何",
@@ -10384,7 +10427,8 @@ export const zh_CN: EnTranslations = {
       "warfareTradeBody": "这正是刻意为之的取舍。战争套装是为与玩家交战而生的，不是绕过地下城品级的捷径：在同一个部位上，一件战争装备永远不会带有同部位地下城史诗所拥有的战斗属性，而它所带来的一切都只花在其他玩家身上。想在竞技场里站得住脚，就去买它；想更快地打通英雄难度，就去地下城里挣你的装备。",
       "warfareTradeBodyRatingSpent": "这正是刻意为之的取舍。战争套装是为与玩家交战而生的，不是绕过地下城品级的捷径：在同一个部位上，一件战争装备永远不会带有同部位地下城史诗所拥有的战斗属性，而它转而带有的战争等级与套装效果，则全都花在其他玩家身上。想在竞技场里站得住脚，就去买它；想更快地打通英雄难度，就去地下城里挣你的装备。",
       "vanguardHeading": "先锋套装：战争第二赛季",
-      "vanguardBody": "先锋套装是战争套装的第二个赛季，由同样的两位军需官在原有品级之上出售，原品级仍照常在售。每个专精都有自己专属的五件先锋套装，涵盖头部、肩部、胸部、腿部与双手，商店只会列出你的职业能穿的三套装备，随后是你能使用的先锋武器。先锋装备带有与原有品级相同的战争等级，只是物品等级更高，并且每套装备都有两条套装效果，分别在凑齐两件与四件时触发，会改变你某个专精技能的效果。与原有套装不同，这些效果在任何场合都会生效，包括对怪物，但它们是为对抗玩家而设计的，因此在团队副本里，团队副本套装仍是更好的选择。"
+      "vanguardBody": "先锋套装是战争套装的第二个赛季，由同样的两位军需官在原有品级之上出售，原品级仍照常在售。每个专精都有自己专属的五件先锋套装，涵盖头部、肩部、胸部、腿部与双手，商店只会列出你的职业能穿的三套装备，随后是你能使用的先锋武器。先锋装备带有与原有品级相同的战争等级，只是物品等级更高，并且每套装备都有两条套装效果，分别在凑齐两件与四件时触发，会改变你某个专精技能的效果。与原有套装不同，这些效果在任何场合都会生效，包括对怪物，但它们是为对抗玩家而设计的，因此在团队副本里，团队副本套装仍是更好的选择。",
+      "vanguardStatsBody": "与原版装备不同，先锋装备还带有战斗等级：每件先锋护甲、武器和坠饰都带有暴击等级或急速等级，施法者和治疗者的装备还额外提供法术强度或治疗强度。先锋指环和坠饰与武器一同出售，所有职业都可以佩戴。佩戴两枚先锋近战指环，恰好提供足够的命中等级，消除你对同等级玩家攻击的基础未命中几率；佩戴两枚施法指环，则同样消除你的法术被抵抗的几率。双持时的自动攻击仍保留额外的未命中几率。治疗指环则改为提供急速等级。"
     },
     "worldPvpPage": {
       "heading": "世界 PvP",
@@ -10395,18 +10439,18 @@ export const zh_CN: EnTranslations = {
       "stakesBody": "当已开启旗帜的玩家击败另一名已开启旗帜的玩家时，败者会支付钱袋中一小部分金币（有一个不高的上限），而胜者获得用于兑换 PvP 装备的荣誉。所有出过力的人共同分享这两者：最后一击者、不久前对目标造成过伤害的人，以及让这些战士站稳脚跟的治疗者。干净的一对一可独得全部奖励；团队则平分。",
       "limitsHeading": "公平规则",
       "limitsBody": "反复击败同一名玩家，每次的收益都会减少并很快归零，计数会随每日重置而重置。远低于你等级的目标不会带来任何收益。在战场和竞技场内部适用它们自己的规则，而且它们提供的荣誉比开放世界更多，因此世界 PvP 是通往同一位商人的较慢道路。",
-      "introZones": "开放世界的玩家对战需要主动开启，而你脚下的土地决定了这意味着什么。升起你的 PvP 旗帜后，所有不在你的小队或团队中且同样开启了旗帜的玩家都会在争夺地带成为敌人；降下旗帜后，稍作等待你就会重新成为旁观者。有两座区域是完全不会发生世界战斗的圣域，而最北端的三座区域是自由混战地带，无论是否开启旗帜，身处其中的每个人都可以被攻击。小队和团队的伙伴在任何地方都不会成为你的敌人；队伍之外的公会成员与其他人一样可以被攻击。",
+      "introZones": "开放世界 PvP 由玩家自愿参与，所在区域决定具体规则。在争夺区域开启 PvP 旗帜后，不属于你的小队或团队的其他已开启旗帜玩家会成为敌人；关闭旗帜并等待片刻后，你将再次成为旁观者。试炼之滨是唯一的庇护区域，禁止一切世界 PvP。最北面的三个区域采用与世界其他地方相同的自愿开启旗帜规则。进入正在进行的山丘之王活动圈会自动开启旗帜。小队和团队成员在任何地方都不会成为敌人；不在你队伍中的公会成员与其他玩家一样可以交战。",
       "zonesHeading": "世界 PvP 发生在哪里",
-      "zonesBody": "世界上的土地分为三种。试炼之滨与东溪谷是圣域：无论是否开启旗帜，那里都完全不会发生世界 PvP，所以新角色绝不会在弄清旗帜是什么之前就被人挑战。世界的大部分是争夺地带，上面那条旗帜规则就是全部。龙裔荒原、霜幕之境与琥珀秋境是自由混战地带：站在其中的每个人都可以攻击站在其中的其他任何人，无论是否开启旗帜，而且你跨入时会收到提示，离开时同样会。在那里攻击未开启旗帜的玩家会升起你自己的旗帜，所以挑起战斗的一方始终承担风险。攻击已经开启旗帜的玩家则永远不会升起你的旗帜，这意味着自卫，或是保护未开启旗帜的人，都不会让你付出任何代价。",
+      "zonesBody": "试炼之滨是唯一的庇护区域：这里没有世界 PvP，也无法开启旗帜。已有旗帜会保留，但用于头衔的游戏时长进度会暂停，直到你离开。其他所有地方，包括龙裔荒原、霜幕之境和琥珀秋境，只有已开启旗帜的玩家才能交战。满足常规等级要求时，进入正在进行的山丘之王活动圈会自动开启旗帜。预告圈不会开启旗帜。离开活动圈后旗帜仍会保留；使用 /pvp off 开始常规的五分钟倒计时，在活动山丘内或战斗中时，倒计时无法完成。",
       "flagBodyAid": "在聊天中输入 /pvp，或按 G 打开 PvP 窗口并使用世界 PvP 标签页，那里还会显示你的战绩和赌注。度过起始等级后，升起旗帜是即时的。降下旗帜会开始几分钟的倒计时，而且在你仍在战斗时旗帜不会降下，所以关闭永远不是逃离你挑起的战斗的手段。为正在战斗的已开启旗帜的玩家治疗、护盾或增益，同样会升起你自己的旗帜，所以没有人能不挂旗帜就在背后支撑一名战斗者；而援助未开启旗帜的玩家不会升起任何旗帜。",
       "stakesUnflaggedTake": "未开启旗帜的战斗者同样拿不到金币：金币只在两名开启旗帜的玩家之间转移，但所有出过力的人仍能获得荣誉。",
-      "stakesBodyFlagged": "当一名已开启旗帜的玩家被另一名玩家击败时，败者会支付钱袋中一小部分金币（有一个不高的上限），而胜者获得用于兑换 PvP 装备的荣誉。未开启旗帜的玩家则完全不必支付金币，即便是在自由混战区域中倒下也一样。所有出过力的人共同分享这两者：最后一击者、不久前对目标造成过伤害的人，以及让这些战士站稳脚跟的治疗者。干净的一对一可独得全部奖励；团队则平分。",
+      "stakesBodyFlagged": "当一名已开启旗帜的玩家被另一名玩家击败时，败者会支付钱袋中一小部分金币（有一个不高的上限），而胜者获得用于兑换 PvP 装备的荣誉。 未开启旗帜的玩家在开放世界中无法被攻击。 所有出过力的人共同分享这两者：最后一击者、不久前对目标造成过伤害的人，以及让这些战士站稳脚跟的治疗者。干净的一对一可独得全部奖励；团队则平分。",
       "hillHeading": "山丘之王",
-      "hillBody": "每三小时，会在无法预料的时刻向全领域发出通告：十五分钟后，某个自由混战地带将升起一座山丘，它所在的圆圈会预先在开阔地上标出。山丘升起后会屹立四十五分钟，然后消失。圈内站着玩家最多的小队争夺这座山丘，连续保持人数优势一分钟后，山丘便归他们所有；单独一人算作一支一人小队，但团队成员完全不计入人数。一支小队占据山丘期间，站在圈内的每名成员每分钟都会获得少量荣誉，因此一支满员小队在山丘屹立的全程不受争夺地占据它，所获荣誉略少于一场战场胜利。场地上方的横条会显示谁在占据、你方与对方的人数以及争夺计时；在聊天中输入 /hill 可以得知它的位置。",
+      "hillBody": "每两小时，龙裔荒原、霜幕之境或琥珀秋境会出现一座活动山丘。全服会提前十五分钟收到预告，空地上会标出圆圈。山丘活动持续三十分钟。进入活动圈会按常规等级规则开启世界 PvP 旗帜，团队成员也不例外。圈内符合条件的玩家人数最多的小队，在连续保持人数优势一分钟后占领山丘；单人视为一人小队，但团队成员和未达到 PvP 等级要求的玩家不能占领或获得山丘荣誉。占领方每名站在圈内的成员都会以逐渐提高的速率获得荣誉。发奖频率和奖励递增速度均已加快，保留原四十五分钟活动的荣誉总量。占领方变更会重置奖励递增。离开圈后旗帜仍保留；/pvp off 使用常规的五分钟延迟，在活动山丘内或战斗中无法完成。山丘状态条显示控制方、人数和占领进度；/hill 显示位置。",
       "limitsBodyHour": "反复击败同一名玩家，每次的收益都会减少并很快归零，而你对那名玩家的计数要在首次击杀约一小时之后才会重新开始，所以蹲守同一个目标永远不值得等待。远低于你等级的目标不会带来任何收益。在战场和竞技场内部适用它们自己的规则，而且它们提供的荣誉比开放世界更多，因此世界 PvP 是通往同一位商人的较慢道路。",
       "hillBodyRamp": "每三小时，会在无法预料的时刻向全领域发出通告：十五分钟后，某个自由混战地带将升起一座山丘，它所在的圆圈会预先在开阔地上标出。山丘升起后会屹立四十五分钟，然后消失。圈内站着玩家最多的小队争夺这座山丘，连续保持人数优势一分钟后，山丘便归他们所有；单独一人算作一支一人小队，但团队成员完全不计入人数。一支小队占据山丘期间，站在圈内的每名成员每分钟都会获得荣誉，同一支小队占据得越久，每分钟获得的荣誉就越多。一支满员小队在山丘屹立的全程不受争夺地占据它，所获荣誉约相当于三场战场胜利。山丘易手时，新的占据者从头开始累积。场地上方的横条会显示谁在占据、你方与对方的人数以及争夺计时；在聊天中输入 /hill 可以得知它的位置。",
       "hillBodyPause": "每三小时，某个自由混战地带会出现一座山丘。山丘存在期间，每五分钟全领域都会收到它的位置以及各队伍占据时长的排名。山丘消失时，若占据总时长最长的队伍累计占据至少十分钟，该队伍成员会为每周宝库的 PvP 进度获得一场胜利，前提是该玩家在本队占据期间曾在圆圈内站满至少一分钟，并且结束时仍留在该队伍中。",
-      "hillBodyFlat": "每三小时，会在无法预料的时刻向全领域发出通告：十五分钟后，某个自由混战地带将升起一座山丘，它所在的圆圈会预先在开阔地上标出。山丘升起后会屹立四十五分钟，然后消失。期间每五分钟，全领域都会收到它的位置以及各队伍占据总时长的排名。圈内站着玩家最多的小队争夺山丘，累计保持人数优势三十秒后便能占据它。敌方小队进入只会暂停计时，直到你方再次领先；只有你方在圈内没有任何存活成员时，计时才会重置。单独一人算作一支一人小队，组建小队时仍能保有已占据的山丘，但团队成员完全不计入人数。一支小队占据山丘期间，站在圈内的每名成员每分钟都会获得同样数量的荣誉，无论已经占据了多久；满员小队在山丘屹立全程不受争夺地占据它，所获荣誉约相当于三场战场胜利。山丘消失时，若占据总时长最长的小队累计占据至少十分钟，该小队中在占据期间曾在圈内站满至少一分钟、且结束时仍留在小队的每名玩家，都会为每周宝库的 PvP 进度获得一场胜利。场地上方的横条会显示谁在占据、你方与对方的人数以及争夺计时；在聊天中输入 /hill 可以得知它的位置。",
+      "hillBodyFlat": "每三小时，会在无法预料的时刻向全领域发出通告：十五分钟后，某个北部地带将升起一座山丘，它所在的圆圈会预先在开阔地上标出。山丘升起后会屹立四十五分钟，然后消失。期间每五分钟，全领域都会收到它的位置以及各队伍占据总时长的排名。圈内站着玩家最多的小队争夺山丘，累计保持人数优势三十秒后便能占据它。敌方小队进入只会暂停计时，直到你方再次领先；只有你方在圈内没有任何存活成员时，计时才会重置。单独一人算作一支一人小队，组建小队时仍能保有已占据的山丘，但团队成员完全不计入人数。一支小队占据山丘期间，站在圈内的每名成员每分钟都会获得同样数量的荣誉，无论已经占据了多久；满员小队在山丘屹立全程不受争夺地占据它，所获荣誉约相当于三场战场胜利。山丘消失时，若占据总时长最长的小队累计占据至少十分钟，该小队中在占据期间曾在圈内站满至少一分钟、且结束时仍留在小队的每名玩家，都会为每周宝库的 PvP 进度获得一场胜利。场地上方的横条会显示谁在占据、你方与对方的人数以及争夺计时；在聊天中输入 /hill 可以得知它的位置。",
       "limitsBodyRaids": "反复击败同一名玩家，每次的收益都会减少并很快归零，而你对那名玩家的计数要在首次击杀约一小时之后才会重新开始，所以蹲守同一个目标永远不值得等待。远低于你等级的目标不会带来任何收益。在战场和竞技场内部适用它们自己的规则，而且它们提供的荣誉比开放世界更多，因此世界 PvP 是通往同一位商人的较慢道路。团队无法从世界击杀中获得任何收益：团队成员既得不到荣誉也得不到金币，也不会减少其他人的份额，所以想获得报酬就以小队身份作战。"
     },
     "thornhollowPage": {
@@ -13507,7 +13551,14 @@ export const zh_CN: EnTranslations = {
     "terms": "服务条款",
     "privacy": "隐私政策",
     "discordLabel": "加入Discord社区",
-    "levyStreet": "Levy Street"
+    "levyStreet": "Levy Street",
+    "guidesLabel": "玩家指南",
+    "guideFree": "免费 MMORPG",
+    "guideGamesLikeWow": "类似 WoW 的游戏",
+    "guideBest": "最佳 MMORPG",
+    "guideNew": "新 MMORPG",
+    "guideBrowser": "浏览器 MMORPG",
+    "guideGamesLikeDiablo": "类似《暗黑破坏神》的游戏"
   },
   "settings": {
     "languageLoading": "正在加载语言...",
@@ -16156,6 +16207,7 @@ export const zh_CN: EnTranslations = {
       "cooldownMinutes": "{minutes}分钟",
       "attackTooltip": "对目标开启或关闭自动攻击。右键点击敌人也会发起攻击。",
       "attackRemoveHint": "右键点击可将其从动作栏移除并空出栏位。",
+      "moveHint": "Shift-拖动以移动",
       "emptySlot": "空栏位",
       "slotAria": "动作栏位 {slot}：{ability}",
       "emptySlotAria": "动作栏位 {slot}：空",
@@ -16975,6 +17027,7 @@ export const zh_CN: EnTranslations = {
       "dps": "（每秒 {dps} 伤害）",
       "armorStat": "{value} 护甲",
       "stat": "+{value} {stat}",
+      "warfareMainHandOnly": "战争属性仅在主手时生效。",
       "useFood": "使用：在 {seconds} 秒内恢复 {amount} 点生命值。进食时必须保持坐下。",
       "useDrink": "使用：在 {seconds} 秒内恢复 {amount} 点法力值。饮水时必须保持坐下。",
       "useElixir": "使用：使你的{stat}提高 {value} 点，持续 {minutes} 分钟。会顶替其他任何同属性的药剂或卷轴。战斗中可用。",
@@ -24217,6 +24270,33 @@ export const zh_CN: EnTranslations = {
       "moonwrack_stave": {
         "name": "月殇法杖"
       },
+      "vanguard_feral_staff": {
+        "name": "先锋野性法杖"
+      },
+      "vanguard_band_of_might": {
+        "name": "先锋力量指环"
+      },
+      "vanguard_band_of_precision": {
+        "name": "先锋精准指环"
+      },
+      "vanguard_band_of_focus": {
+        "name": "先锋专注指环"
+      },
+      "vanguard_band_of_mending": {
+        "name": "先锋愈合指环"
+      },
+      "vanguard_pendant_of_might": {
+        "name": "先锋力量坠饰"
+      },
+      "vanguard_pendant_of_precision": {
+        "name": "先锋精准坠饰"
+      },
+      "vanguard_pendant_of_focus": {
+        "name": "先锋专注坠饰"
+      },
+      "vanguard_pendant_of_mending": {
+        "name": "先锋愈合坠饰"
+      },
       "membership_staff": {
         "name": "万变法杖"
       },
@@ -30304,7 +30384,7 @@ export const zh_CN: EnTranslations = {
       "membership_annual_reward": {
         "sender": "鸦羽邮局",
         "subject": "您的年度会员坐骑",
-        "body": "你的年度会员付款已完成。随信附上坐骑缰绳。将缰绳保存在背包或银行中即可拥有这只坐骑。会员到期后，它仍属于你。需要骑术。"
+        "body": "你的年度会员付款已完成。夜翼奇美拉现已为你账号下的所有角色解锁，随信附上它的缰绳。会员到期后，它仍属于你。需要骑术。"
       },
       "woc_market_return": {
         "sender": "交易所经纪人",

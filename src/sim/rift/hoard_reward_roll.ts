@@ -51,9 +51,6 @@ export function rollHoardReward(
   rng: Pick<Rng, 'int' | 'chance'>,
   input: HoardRewardInput,
 ): HoardReward {
-  if (!input.owner && input.guestCapped)
-    return Object.freeze({ items: Object.freeze([]), copper: 0, capped: true });
-
   const def = VAULT_PAYOUTS[input.rarity];
   const items: HoardRewardItem[] = [];
   const material = VAULT_MATERIAL_POOL[rng.int(0, VAULT_MATERIAL_POOL.length - 1)];

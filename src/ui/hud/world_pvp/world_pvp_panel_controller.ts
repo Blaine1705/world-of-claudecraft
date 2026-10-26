@@ -124,6 +124,7 @@ export function worldPvpBodyHtml(view: WorldPvpWindowView): string {
   return (
     `<div class="arena-layout"><section class="arena-overview">` +
     blurb +
+    `<div class="bg-note" data-pvp-reward-progress>${esc(rewardProgressText(view))}</div>` +
     status +
     // The action sits right under the status it acts on, and above the record,
     // so it is on screen without scrolling on a landscape phone.
@@ -227,13 +228,13 @@ function groundHtml(view: LiveView): string {
 
 function actionHtml(view: LiveView): string {
   const hint = `<div class="bg-note">${esc(t('hudChrome.worldPvp.commandHint'))}</div>`;
-  if (view.action === 'realmOff') {
+  if (view.action === 'realmOff' || view.action === 'sanctuary') {
     // The reason sits under the button, where the level requirement does, so a
     // dead control is never unexplained. No command hint: /pvp is refused on
     // this realm too, so pointing at it would only lead to an error line.
     return (
       `<div class="pvp-queue ui-card"><button class="btn ui-btn ui-btn--red${INERT_CLASS}" data-act="pvp-enable"${focusKeyAttr(WORLD_PVP_ACTION_FOCUS_KEY)}${INERT_ATTR}>${esc(t('hudChrome.worldPvp.enable'))}</button>` +
-      `<div class="bg-note bg-level-req">${esc(t('hudChrome.worldPvp.realmDisabled'))}</div></div>`
+      `<div class="bg-note bg-level-req">${esc(t(view.action === 'sanctuary' ? 'hudChrome.worldPvp.zoneSanctuary' : 'hudChrome.worldPvp.realmDisabled'))}</div></div>`
     );
   }
   if (view.action === 'locked') {

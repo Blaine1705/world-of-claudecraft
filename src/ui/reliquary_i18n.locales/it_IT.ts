@@ -146,7 +146,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_gallery: {
     name: 'Galleria di Guerra',
-    desc: "I cinque completi da battaglia di Guerra, ottenuti pezzo per pezzo con l'onore.",
+    desc: 'I cinque kit da battaglia di Guerra della prima stagione, ora venduti pezzo per pezzo per oro.',
   },
   conquerors_warfare_armory: {
     name: 'Armeria di Guerra',

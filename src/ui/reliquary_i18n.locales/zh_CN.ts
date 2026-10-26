@@ -168,7 +168,7 @@ export const table: ReliquaryLocaleTable = {
   // (wocStore.armoryTitle 兵器库).
   conquerors_warfare_gallery: {
     name: '战争展厅',
-    desc: '五套战争战斗装备，以荣誉一件件挣得。',
+    desc: '第一赛季的五套战争战斗装备，现以金币一件件出售。',
   },
   conquerors_warfare_armory: {
     name: '战争兵器库',

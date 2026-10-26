@@ -902,6 +902,9 @@ ALTER TABLE accounts ADD COLUMN IF NOT EXISTS chat_strikes INT NOT NULL DEFAULT 
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cheater_mark_seconds INT NOT NULL DEFAULT 0;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cheater_mark_reason TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cheater_mark_set_at TIMESTAMPTZ;
+-- The operator world quest block (src/sim/world_quest_block.ts): NULL = not blocked.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS world_quests_blocked_at TIMESTAMPTZ;
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS world_quests_block_reason TEXT;
 -- Admin-managed filter word lists. tier 'soft' = cosmetic (masked client-side
 -- when the player's filter is on); tier 'hard' = enforced (blocked + escalated).
 CREATE TABLE IF NOT EXISTS chat_filter_words (
@@ -2805,6 +2808,9 @@ export interface CharacterRow {
   // The authored modular-creator look (own JSONB column, hotbar_layout's
   // pattern). Normalized at write; NULL = pre-creator character (legacy rig).
   appearance?: Record<string, unknown> | null;
+  // Presence privacy (server/presence_privacy.ts; SOCIAL_SCHEMA column). Selected
+  // by the join path only, so the setting holds from the session's first tick.
+  presence_mode?: string | null;
   // One-shot redesign token spent (see the reroll endpoint). Selected by the
   // list path only.
   appearance_reroll_used?: boolean;
@@ -2885,7 +2891,7 @@ export async function getCharacter(
   characterId: number,
 ): Promise<CharacterRow | null> {
   const res = await pool.query(
-    'SELECT id, account_id, name, class, level, state, is_gm, force_rename, hotbar_layout, appearance, membership_slot FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
+    'SELECT id, account_id, name, class, level, state, is_gm, force_rename, hotbar_layout, appearance, membership_slot, presence_mode FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
     [characterId, accountId, REALM],
   );
   return res.rows[0] ?? null;

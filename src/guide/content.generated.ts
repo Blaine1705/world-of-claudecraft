@@ -9502,6 +9502,42 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Vanguard's Warstaff"
+      },
+      {
+        "kind": "item",
+        "name": "Vanguard's Feral Staff"
+      },
+      {
+        "kind": "item",
+        "name": "Vanguard's Band of Might"
+      },
+      {
+        "kind": "item",
+        "name": "Vanguard's Band of Precision"
+      },
+      {
+        "kind": "item",
+        "name": "Vanguard's Band of Focus"
+      },
+      {
+        "kind": "item",
+        "name": "Vanguard's Band of Mending"
+      },
+      {
+        "kind": "item",
+        "name": "Vanguard's Pendant of Might"
+      },
+      {
+        "kind": "item",
+        "name": "Vanguard's Pendant of Precision"
+      },
+      {
+        "kind": "item",
+        "name": "Vanguard's Pendant of Focus"
+      },
+      {
+        "kind": "item",
+        "name": "Vanguard's Pendant of Mending"
       }
     ]
   }

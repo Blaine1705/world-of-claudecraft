@@ -617,7 +617,7 @@ describe('DailyRewardsWindow store refresh behavior', () => {
     expect(writes).toBe(3);
   });
 
-  it('reads subscription status on foreground refreshes but never on background polls', async () => {
+  it('reads subscription status on Memberships entry but never on background polls', async () => {
     const snapshot = vi.fn(async () => ({
       available: false,
       status: 'none' as const,
@@ -640,12 +640,16 @@ describe('DailyRewardsWindow store refresh behavior', () => {
     });
     const runner = store as unknown as {
       renderStore(focus: null, opts?: { background: boolean }): Promise<void>;
+      renderMemberships(focus: null, opts?: { background: boolean }): Promise<void>;
     };
+    // The Cosmetic Store tab no longer carries the membership section.
     await runner.renderStore(null);
+    expect(snapshot).not.toHaveBeenCalled();
+    await runner.renderMemberships(null);
     expect(snapshot).toHaveBeenCalledTimes(1);
-    for (let i = 0; i < 4; i++) await runner.renderStore(null, { background: true });
+    for (let i = 0; i < 4; i++) await runner.renderMemberships(null, { background: true });
     expect(snapshot).toHaveBeenCalledTimes(1);
-    await runner.renderStore(null);
+    await runner.renderMemberships(null);
     expect(snapshot).toHaveBeenCalledTimes(2);
   });
 

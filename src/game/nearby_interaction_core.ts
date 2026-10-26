@@ -133,6 +133,7 @@ export function resolveNearbyInteractionCandidate(
   }
 
   for (const entity of world.entities.values()) {
+    if (!vaultPortalVisible(entity, playerId, world.partyInfo, world.characterId)) continue;
     // A disguised infiltrator or a shadow-mission guard the viewer cannot see is
     // no candidate, exactly as the renderer hides it.
     if (investigationDisguiseHidden(entity, world) || shadowGuardHidden(entity, world)) continue;

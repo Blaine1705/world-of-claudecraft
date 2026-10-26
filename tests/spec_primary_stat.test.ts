@@ -124,21 +124,11 @@ describe('every per-spec stat table leads with SPEC_PRIMARY_STAT', () => {
     });
   });
 
-  // Feral's Season 2 Strength fix (#4265) is on main and arrives with the next
-  // merge of main into this branch. The check below fails once it lands, so the
-  // exemption leaves with it.
-  const AWAITING_MAIN_MERGE: ReadonlySet<string> = new Set(['vanguard_druid_feral']);
-
   it('the Season 2 Vanguard sets', () => {
     expect(SEASON2_SETS).toHaveLength(27);
     for (const set of SEASON2_SETS) {
       const primary = SPEC_PRIMARY_STAT[set.cls as PlayerClass][set.spec];
       const leads = set.itemIds.map((id) => leading(ITEMS[id].stats));
-      if (AWAITING_MAIN_MERGE.has(set.setId)) {
-        const fixed = leads.every((stat) => stat === primary);
-        expect(fixed, `${set.setId} is fixed now: drop it from AWAITING_MAIN_MERGE`).toBe(false);
-        continue;
-      }
       for (const [index, id] of set.itemIds.entries()) expect(leads[index], id).toBe(primary);
     }
   });
