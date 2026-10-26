@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { KAYKIT_KNIGHT_WARRIOR, KAYKIT_PALADIN, VISUALS } from '../src/render/characters/manifest';
+import { SHARDPIKE_THROW_CLIP } from '../src/render/characters/shardpike_throw_clip';
 import {
   attackAbilityId,
   isSpinAttackAbility,
@@ -10,6 +11,7 @@ import {
 } from '../src/render/characters/weapon_attack_style_core';
 import { wocAnimsUrl, wocBaseUrl } from '../src/render/characters/woc_armor_core';
 import { wocKeyedAnimsUrl } from '../src/render/characters/woc_keyed_animations';
+import { Renderer } from '../src/render/renderer';
 import {
   isMobEngageCue,
   WARRIOR_SHOUT_COLORS,
@@ -31,29 +33,28 @@ describe('winning Warrior attack animation routing', () => {
     // library, the hand-keyed library keyed on the same bind pose, and the warrior
     // armor set): no KayKit donor clip is ever layered on.
     expect(VISUALS.player_warrior.clips.attackByHand).toEqual({
-      twohand: '2H_Chop',
+      twohand: 'Woc_Attack_2H_0',
       dualwield: 'Dual_Chop',
     });
     expect(VISUALS.player_warrior.clips.attackByAbility).toMatchObject({
-      mortal_strike: '2H_Chop',
-      execute: '2H_Chop',
-      slam: '2H_Chop',
-      red_harvest: '2H_Chop',
-      breachmaker: '2H_Chop',
-      // Shieldcrack braces behind the offhand SHIELD (the rig's guard beat;
-      // it ships no shield bash), never a sword chop.
-      shield_slam: 'Block',
-      raging_gale: 'Dual_Chop',
-      bloodthirst: 'Dual_Chop',
-      // The two frontal-arc AoE strikes reap sideways (the slash), never the
-      // top-to-bottom chop.
-      cleave: '1H_Slash',
-      revenge: '1H_Slash',
-      thunder_clap: '1H_Chop',
-      faultline: '1H_Chop',
-      heroic_strike: '1H_Slash',
-      overpower: '1H_Slash',
-      hamstring: '1H_Slash',
+      mortal_strike: 'Woc_Attack_2H_0',
+      execute: 'Woc_Attack_2H_0',
+      slam: 'Woc_Attack_2H_0',
+      red_harvest: 'Woc_Attack_2H_1',
+      breachmaker: 'Woc_Attack_2H_1',
+      // Shieldcrack drives the offhand shield forward (the keyed shield bash),
+      // never a sword chop.
+      shield_slam: 'Woc_Shield_Bash',
+      raging_gale: 'Woc_Attack_Dual',
+      bloodthirst: 'Woc_Attack_Dual',
+      // The frontal-arc AoE strikes reap sideways, never the top-to-bottom chop.
+      cleave: 'Woc_Special_1H',
+      revenge: 'Woc_Attack_1H_1',
+      thunder_clap: 'Woc_Special_1H',
+      faultline: 'Woc_Attack_2H_1',
+      heroic_strike: 'Woc_Attack_1H_0',
+      overpower: 'Woc_Attack_1H_1',
+      hamstring: 'Woc_Attack_1H_Stab',
     });
     // Instant casts carry no gesture entry on this body (owner call): with
     // none, the ability painter draws nothing and the generic cast arm goes
@@ -128,13 +129,15 @@ describe('winning Warrior attack animation routing', () => {
 
   it.each(['cleave', 'whirlwind', 'bladestorm', 'dawnfall'])(
     'forwards %s identity to the live spin selector',
-    async (abilityId) => {
-      const { Renderer } = await import('../src/render/renderer');
+    (abilityId) => {
       const visual = { playWhirl: vi.fn(), playAttack: vi.fn() };
       const renderer = Object.assign(Object.create(Renderer.prototype), {
         views: new Map([[7, {}]]),
         activeVisual: () => visual,
         attackTriggerCount: 0,
+        // a swing first looks up its wearer's weapon skin for a trail
+        // (weapon_skin_trail_core.ts); one not in the world wears none
+        sim: { entities: new Map() },
       });
 
       renderer.triggerAttack(7, abilityId, false, 'melee');
@@ -215,12 +218,12 @@ describe('winning Warrior cast VFX routing', () => {
     expect(pal.clips.run).toBe('Woc_Run');
     // Weapon strikes and interrupts swing; the timed holy bolt releases a cast.
     expect(pal.clips.attackByAbility).toEqual({
-      crusader_strike: '1H_Chop',
-      vowkeeper_strike: '1H_Slash',
-      final_edict: '2H_Chop',
-      hushbrand: '1H_Chop',
-      rebuke: '1H_Chop',
-      mercy_lance: 'Cast_Shoot',
+      crusader_strike: 'Woc_Attack_1H_0',
+      vowkeeper_strike: 'Woc_Attack_1H_1',
+      final_edict: 'Woc_Attack_2H_0',
+      hushbrand: 'Woc_Shield_Bash',
+      rebuke: 'Woc_Attack_1H_0',
+      mercy_lance: 'Woc_Cast_Shoot',
     });
     for (const silent of [
       'consecration',
@@ -242,7 +245,7 @@ describe('winning Warrior cast VFX routing', () => {
     expect(VISUALS.player_warrior.clips.swimSurface).toBe('Woc_Swim');
     expect(VISUALS.player_warrior.clips.swimIdle).toBe('Woc_Swim_Idle');
     expect(VISUALS.player_warrior.hideWeaponsWhileSwimming).toBe(true);
-    expect(VISUALS.player_warrior.swimRise?.stroke).toBeCloseTo(-0.65, 6);
+    expect(VISUALS.player_warrior.swimRise?.stroke).toBeCloseTo(-1.0, 6);
     expect(VISUALS.player_warrior.clips.emote?.flex?.clips[0]).toBe('Woc_Emote_Flex');
     expect(KAYKIT_KNIGHT_WARRIOR.clips.shoutEmote).toBeUndefined();
     const renderer = readFileSync('src/render/renderer.ts', 'utf8');
@@ -395,5 +398,17 @@ describe('Signature_ clip binding is keyed on the warrior rig, not the clip name
     const visual = await buildVisual('player_priest', 'qa_probe_ability');
     expect(VISUALS.player_priest.clips.attackByAbility?.qa_probe_ability).toBeUndefined();
     expect(visual.hasAttackClipOverride('qa_probe_ability')).toBe(false);
+  });
+
+  // The one exception: the Shardpike throw (f91bbc8b04e) is minted for EVERY
+  // player rig by prepareShardpikeThrowClip under the Signature_ name, so any
+  // class carrying the pike plays it; that name, and only that name, binds off
+  // the warrior rig.
+  it('binds the Shardpike throw on a non-warrior rig', async () => {
+    const visual = await buildVisual(
+      'player_priest',
+      SHARDPIKE_THROW_CLIP.slice('Signature_'.length),
+    );
+    expect(visual.hasAttackClipOverride('lance_thrust')).toBe(true);
   });
 });

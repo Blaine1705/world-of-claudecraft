@@ -44,9 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Cekungan Hati Liar',
+    desc: 'Senjata khas dari Penguasa Taring Sang Penguasa Binatang, Bunga Pelahap, dan Zulgar.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroik: Cekungan Hati Liar',
+    desc: 'Item epik dan pernak-pernik khusus Heroik dari Penguasa Taring Sang Penguasa Binatang, Bunga Pelahap, dan Zulgar, Suara Cekungan.',
   },
   conquerors_nythraxis: {
     name: 'Raid Nythraxis',
@@ -142,11 +144,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_gallery: {
     name: 'Galeri Peperangan',
-    desc: 'Kelima set tempur Peperangan, diraih sepotong demi sepotong dengan kehormatan.',
+    desc: 'Lima set tempur Peperangan musim pertama, kini dijual sepotong demi sepotong seharga emas.',
   },
   conquerors_warfare_armory: {
     name: 'Gudang Senjata Peperangan',
-    desc: 'Perhiasan dan senjata Peperangan yang dibeli dengan kehormatan hasil jerih payah.',
+    desc: 'Perhiasan, senjata, dan barang Peperangan yang dibeli dengan kehormatan hasil jerih payah.',
   },
   conquerors_vanguard_gallery: {
     name: 'Galeri Garda Depan',

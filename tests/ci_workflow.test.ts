@@ -300,6 +300,7 @@ function screenshotSparseBlocks(source: string): string[] {
 }
 
 describe('CI workflow parity', () => {
+  // Reads the whole tracked text corpus; disk contention is not a CI policy failure.
   it('sparse-checkout on the test jobs covers every referenced screenshot subtree', () => {
     // The five sparse test-job checkouts (pr-gate, both long-sims lanes,
     // release-gate, release-i18n) exclude docs/screenshots DIRECTORIES
@@ -324,26 +325,63 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/balgath-shardpike/',
       '            /docs/screenshots/bank-storage-charters/',
       '            /docs/screenshots/bank-vault-tab/',
+      '            /docs/screenshots/bastion-ghost-crew/',
       '            /docs/screenshots/buried-hoard-entrance/',
       '            /docs/screenshots/buried-hoard-valley/',
       '            /docs/screenshots/clue-character-panel/',
-      '            /docs/screenshots/cosmetics-window/',
+      '            /docs/screenshots/clue-icons-v045/',
       '            /docs/screenshots/confection-cascade/',
       '            /docs/screenshots/confection-cascade-v3/',
       '            /docs/screenshots/confection-cascade-v4/',
       '            /docs/screenshots/confection-cascade-v5/',
       '            /docs/screenshots/confection-cascade-v6/',
       '            /docs/screenshots/confection-cascade-v7/',
+      '            /docs/screenshots/cosmetics-window/',
+      '            /docs/screenshots/deed-adventures-icons-v045/',
+      '            /docs/screenshots/deed-bastion-icons-v045/',
       '            /docs/screenshots/deed-border-cartouche/',
+      '            /docs/screenshots/deed-crucible-icons-v045/',
+      '            /docs/screenshots/deed-crypt-icons-v045/',
+      '            /docs/screenshots/deed-factions-icons-v045/',
+      '            /docs/screenshots/deed-foundations-icons-v045/',
+      '            /docs/screenshots/deed-gravewyrm-icons-v045/',
+      '            /docs/screenshots/deed-temple-icons-v045/',
+      '            /docs/screenshots/deed-wildheart-icons-v045/',
+      '            /docs/screenshots/deed-worldquests-icons-v045/',
+      '            /docs/screenshots/dungeon-bastion-blues-icons-v045/',
+      '            /docs/screenshots/dungeon-bastion-icons-v045/',
+      '            /docs/screenshots/dungeon-crypt-blues-icons-v045/',
+      '            /docs/screenshots/dungeon-crypt-icons-v045/',
+      '            /docs/screenshots/dungeon-gravewyrm-icons-v045/',
+      '            /docs/screenshots/dungeon-temple-blues-icons-v045/',
+      '            /docs/screenshots/dungeon-temple-icons-v045/',
+      '            /docs/screenshots/dungeon-wildheart-icons-v045/',
+      '            /docs/screenshots/eastbrook-ferry/',
+      '            /docs/screenshots/dungeon-groups/',
       '            /docs/screenshots/eastbrook-grand-armoury/',
       '            /docs/screenshots/eastbrook-vale-rebuild/',
+      '            /docs/screenshots/faction-automaton-icons-v045/',
+      '            /docs/screenshots/faction-church-icons-v045/',
+      '            /docs/screenshots/faction-rift-icons-v045/',
       '            /docs/screenshots/far-foliage-impostors/',
       '            /docs/screenshots/fenbridge-rebuild/',
+      '            /docs/screenshots/first-person-view/',
       '            /docs/screenshots/guild-bank-history/',
       '            /docs/screenshots/guild-bank-tab/',
       '            /docs/screenshots/guild-pledge-board/',
       '            /docs/screenshots/guild-social-v1/',
+      '            /docs/screenshots/highwatch-guild/',
       '            /docs/screenshots/harvest-button-refresh/',
+      '            /docs/screenshots/hoard-arcane-icons-v045/',
+      '            /docs/screenshots/hoard-brute-icons-v045/',
+      '            /docs/screenshots/hoard-ember-icons-v045/',
+      '            /docs/screenshots/hoard-frost-icons-v045/',
+      '            /docs/screenshots/hoard-necro-icons-v045/',
+      '            /docs/screenshots/hoard-storm-icons-v045/',
+      '            /docs/screenshots/hoard-tide-icons-v045/',
+      '            /docs/screenshots/hoard-venom-icons-v045/',
+      '            /docs/screenshots/horse-whistle-v045/',
+      '            /docs/screenshots/icon-backlog-v045-surfaces/',
       '            /docs/screenshots/ignivar-raid/',
       '            /docs/screenshots/ignivar-raid-expansion/',
       '            /docs/screenshots/intentional-gathering-pr1/',
@@ -353,17 +391,32 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/ley-beam-v1/',
       '            /docs/screenshots/market-house-redesign/',
       '            /docs/screenshots/masterwrought-art-completion-2026-09-02/',
+      '            /docs/screenshots/membership/',
+      '            /docs/screenshots/membership-courier/',
+      '            /docs/screenshots/missing-skills-v045/',
       '            /docs/screenshots/placeholder-art-completion-2026-08-09/',
       '            /docs/screenshots/r35-admin-professions-inspector/',
+      '            /docs/screenshots/ravenrift-battleground/',
       '            /docs/screenshots/referral-armour/',
       '            /docs/screenshots/referral-cards/',
       '            /docs/screenshots/referral-portrait-render-2026-10-09/',
-      '            /docs/screenshots/ravenrift-battleground/',
+      '            /docs/screenshots/referral-rewards-v045/',
       '            /docs/screenshots/release-v036-skill-normalization-2026-08-10/',
       '            /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/',
+      '            /docs/screenshots/rewards-icons-v045/',
+      '            /docs/screenshots/scenery-windows-4070-2026-10-15/',
       '            /docs/screenshots/target-dots/',
       '            /docs/screenshots/touch-ui-rework/',
       '            /docs/screenshots/vault-fine-mark/',
+      '            /docs/screenshots/warfare-season2-druid-icons/',
+      '            /docs/screenshots/warfare-season2-hunter-icons/',
+      '            /docs/screenshots/warfare-season2-mage-icons/',
+      '            /docs/screenshots/warfare-season2-paladin-icons/',
+      '            /docs/screenshots/warfare-season2-priest-icons/',
+      '            /docs/screenshots/warfare-season2-rogue-icons/',
+      '            /docs/screenshots/warfare-season2-shaman-icons/',
+      '            /docs/screenshots/warfare-season2-warlock-icons/',
+      '            /docs/screenshots/warfare-season2-warrior-icons/',
       '            /docs/screenshots/wildheart/',
       '            /docs/screenshots/woc-market/',
       '            /docs/screenshots/world-quest-cannon/',
@@ -582,6 +635,7 @@ describe('CI workflow parity', () => {
       'charselect-zone',
       'dash-speed-stack',
       'nythraxis-dread-curse-swap',
+      'realm-motd',
     ]);
     for (const dir of workflowScopedFollowup) {
       expect(referenced.has(dir), `${dir} remains a real referenced screenshot subtree`).toBe(true);
@@ -590,7 +644,7 @@ describe('CI workflow parity', () => {
     expect([...referenced].filter((dir) => !workflowScopedFollowup.has(dir)).sort()).toEqual(
       [...coneDirs].sort(),
     );
-  });
+  }, 60_000);
 
   it('performs no hand-rolled directory reads (the corpus is the git index)', () => {
     expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
@@ -688,7 +742,19 @@ describe('CI workflow parity', () => {
     // auto-rerunnable setup class.
     expect(browserGate).toContain(PLAYWRIGHT_INSTALL_BLOCK);
     expect(browserGate).not.toContain('--with-deps');
-    expect(browserGate).toContain('run: npm run test:browser');
+    // Two halves in two fresh sessions (a long single session lost its server
+    // connection at the 48th file on the v0.45.0 integration). Pinned whole:
+    // both halves always run and either failing fails the step, so a half can
+    // never drop out or mask the other.
+    expect(browserGate).toContain(
+      [
+        '        run: |',
+        '          status=0',
+        '          npm run test:browser -- --shard=1/2 || status=1',
+        '          npm run test:browser -- --shard=2/2 || status=1',
+        '          exit "$status"',
+      ].join('\n'),
+    );
     const browser = gateSteps.find((s) => s.name === 'browser regressions');
     expect(browser?.cmd).toBe('npm');
     expect(browser?.args).toEqual(['run', 'test:browser']);
@@ -1362,24 +1428,22 @@ describe('CI workflow parity', () => {
     // in shape rather than lifted from the checkout-stall replay directly, so
     // every job in this file carries a conscious timeout-minutes value.
     const bounds = [
-      // pr-gate: 37 is the 2026-08-14 re-derivation from the worst healthy
-      // SELECTIVE shard wall (16.55 minutes, run 31765273776; selective and
-      // full mode share this one bound and selective is the expensive one,
-      // x 1.60 slow-runner ratio x 1.37 margin = 36.3). The 20-then-40
-      // history, the full-mode measurement trap (a ci.yml-touching PR
-      // always widens to full, so a bounds PR cannot observe selective
-      // walls), and the derivation live on the ci.yml bound.
-      ['pr-gate', 37],
+      // pr-gate: v0.45 SELECTIVE run 40134416344 shard 6 completed in
+      // 35m52s. The established 1.60 slow-runner ratio and 1.37 margin
+      // give 78.62 minutes, rounded up to 79. Cancelled legs are not the
+      // sizing base; a workflow-editing PR widens to FULL and cannot
+      // remeasure selective walls. Full evidence lives on the ci.yml bound.
+      ['pr-gate', 79],
       // release-gate is the one shard matrix that keeps its CI_LONG_SUITES
       // files in-shard (pr-gate hands them to the lanes), so a single shard
       // can draw four of them at once and the bound has to cover a slow
       // runner rather than the healthy median. 20 was sized from a 14.63
       // minute healthy worst case and was bound-killing shard 1 by 2026-08-11
-      // at b160a1ba18; 36 is the 2026-08-14 re-derivation from the measured
-      // post-split release-push worst (16.43 minutes, checkout-stall walls
-      // excluded) at the same 1.60 ratio and 1.37 margin; evidence on the
-      // ci.yml bound.
-      ['release-gate', 36],
+      // at b160a1ba18. The August 36-minute budget was overtaken by the
+      // v0.45 workload: run 40113294880 shard 5 completed in 35m29s with
+      // a healthy checkout. The same 1.60 ratio and 1.37 margin give
+      // 77.78 minutes, rounded up to 78; evidence on the ci.yml bound.
+      ['release-gate', 78],
       // The lanes: 28 is the 2026-08-14 re-derivation from post-rebalance
       // healthy walls (worst lane 12.5 minutes, same formula as pr-gate).
       // The 60-to-20-to-30 history, including the falsified under-10
@@ -1388,7 +1452,9 @@ describe('CI workflow parity', () => {
       // rebalance without re-sizing.
       ['pr-long-sims-a', 28],
       ['pr-long-sims-b', 28],
-      ['browser-gate', 10],
+      // 12 since the v0.45.0 integration: a 6.2 minute healthy wall (run
+      // 39354039920) plus the second browser session (rationale on ci.yml).
+      ['browser-gate', 12],
       // 8 is a measured decision like the rest (healthy worst 4.42 min, all
       // observed stalls over 8), so it is pinned exactly here beside the
       // single-digit shape check the classifier test keeps.

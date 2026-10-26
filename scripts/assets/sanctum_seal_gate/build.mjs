@@ -1,11 +1,14 @@
 // Ship the Blender-authored Seal Gate, the Gravewyrm Sanctum's world entrance
 // (docs/design/dungeon-rework/entrance/). Three GLBs share one origin, the
-// door at its terrain height: the gate itself (pylons, lintel, the rock-cut
-// tunnel, the chains), the plaza props (the chain heap, the cult's debris, the
-// cairn, the headstones, the ground blend) and the render-only ice tongue on
-// the ridge. Never flatten or join: the runtime (src/render/sanctum_seal_gate.ts)
-// keeps each Entrance_* node and splits it by material (KitStone lit,
-// KitGlow the unlit runes, KitIce the glacier ice and icicles).
+// door at its terrain height: the gate itself (the carved pylons, the lintel
+// and its crown, the rock spur and its tunnel, the chains), the plaza props
+// (the chain heap, the cult's debris, the cairn, the headstones, the rubble
+// and the drifts) and the render-only icefall in the ridge notch. The masses
+// are signed-distance sculpts (sanctum_gate_sculpt.py, on the Sanctum kit's
+// own sculpt library) meshed and decimated in Blender. Never flatten or join:
+// the runtime (src/render/sanctum_seal_gate.ts) keeps each Entrance_* node and
+// splits it by material (KitStone lit, KitGlow the unlit runes and the seal's
+// light, KitIce the glacier ice and icicles).
 //
 //   npx tsx docs/design/dungeon-rework/entrance/probe.mts sanctum 0 858 tmp/asset_src/sanctum_seal_gate/terrain 32 130
 //   "<blender>" -b --factory-startup --python docs/design/dungeon-rework/entrance/build_sanctum_entrance.py -- \
@@ -43,7 +46,7 @@ export const SANCTUM_SEAL_GATE_ASSETS = [
     target: 'public/models/props/sanctum_seal_gate_ice.glb',
     root: 'SanctumIceTongue_ROOT',
     pieces: ['Entrance_IceTongue'],
-    materials: ['KitIce', 'KitStone'],
+    materials: ['KitIce'],
   },
 ];
 
@@ -53,7 +56,10 @@ export function sourceFingerprint(root = ROOT) {
   // sources and the sim's own terrain), so the fingerprint covers the sources.
   for (const file of [
     'docs/design/dungeon-rework/kit/hckit.py',
+    'docs/design/dungeon-rework/kit/jaguar_head_sculpt.py',
+    'docs/design/dungeon-rework/kit/gravewyrm_sculpt.py',
     'docs/design/dungeon-rework/entrance/entrance_common.py',
+    'docs/design/dungeon-rework/entrance/sanctum_gate_sculpt.py',
     'docs/design/dungeon-rework/entrance/build_sanctum_entrance.py',
     'scripts/assets/sanctum_seal_gate/build.mjs',
   ]) {

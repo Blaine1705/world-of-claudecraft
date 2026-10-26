@@ -48,26 +48,40 @@ for (const [name, family] of Object.entries({
 }))
   add(`Woc_Emote_${name}`, family);
 for (const [name, options] of Object.entries({
-  Unarmed_0: { weapon: 'fist' },
-  Unarmed_1: { weapon: 'fist', side: 'l' },
-  Rifle: { weapon: 'rifle' },
+  Unarmed_0: { weapon: 'fist', autoattack: true },
+  Unarmed_1: { weapon: 'fist', side: 'l', autoattack: true },
+  Rifle: { weapon: 'rifle', autoattack: true },
   Thrown: { weapon: 'thrown' },
-  Bow: { weapon: 'bow' },
-  '1H_0': { weapon: 'blade' },
-  '1H_1': { weapon: 'blade' },
+  Bow: { weapon: 'bow', autoattack: true },
+  '1H_0': { weapon: 'blade', autoattack: true },
+  '1H_1': { weapon: 'blade', autoattack: true },
   Offhand: { weapon: 'blade', side: 'l' },
   Offhand_Stab: { weapon: 'pierce', side: 'l' },
   '1H_Stab': { weapon: 'pierce' },
-  '2H_0': { weapon: 'twohand' },
-  '2H_1': { weapon: 'twohand' },
+  '2H_0': { weapon: 'twohand', autoattack: true },
+  '2H_1': { weapon: 'twohand', autoattack: true },
   Polearm_0: { weapon: 'long' },
   Polearm_1: { weapon: 'long' },
   Polearm_2: { weapon: 'long' },
-  'Dual#main': { weapon: 'blade', dual: 'main' },
-  'Dual#off': { weapon: 'blade', side: 'l', dual: 'off' },
-  Dual: { weapon: 'blade', dual: 'pair' },
+  'Dual#main': { weapon: 'blade', dual: 'main', autoattack: true },
+  'Dual#off': { weapon: 'blade', side: 'l', dual: 'off', autoattack: true },
+  Dual: { weapon: 'blade', dual: 'pair', autoattack: true },
 }))
   add(`Woc_Attack_${name}`, 'attack', { side: 'r', ...options });
+
+add('Woc_Combat_Idle_1H', 'combat_idle', { loop: true });
+add('Woc_Combat_Idle_2H', 'combat_idle', { loop: true });
+add('Woc_Combat_Idle_Dual', 'combat_idle', { loop: true });
+add('Woc_Hit', 'hit');
+add('Woc_Shout', 'shout');
+add('Woc_Shield_Bash', 'attack', { weapon: 'shield', side: 'l' });
+add('Woc_Special_1H', 'attack', { weapon: 'blade', side: 'r' });
+add('Woc_Special_2H', 'attack', { weapon: 'twohand', side: 'r' });
+add('Woc_Cast_Directed', 'cast', { loop: true });
+add('Woc_Cast_Omni', 'cast', { loop: true });
+add('Woc_Cast_Shoot', 'cast');
+add('Woc_Cast_Omni_Release', 'cast');
+add('Woc_Channel_Directed', 'cast', { loop: true });
 
 export const CATALOG = Object.freeze(entries);
 
@@ -78,6 +92,7 @@ export const SHIPPED_CLIPS = Object.freeze([
   'Woc_Walk',
   'Woc_Walk_Back',
   'Woc_Run',
+  'Woc_Run_Back',
   'Woc_Jump',
   'Woc_Death',
   'Woc_Swim',
@@ -86,15 +101,39 @@ export const SHIPPED_CLIPS = Object.freeze([
   'Woc_Emote_Laugh',
   'Woc_Emote_Flex',
   'Woc_Emote_Bow',
+  'Woc_Emote_Nod',
+  'Woc_Emote_Shake_Head',
+  'Woc_Emote_Beckon',
+  'Woc_Emote_Point',
   'Woc_Attack_1H_0',
   'Woc_Attack_1H_1',
+  'Woc_Attack_1H_Stab',
+  'Woc_Attack_Offhand',
+  'Woc_Attack_Offhand_Stab',
   'Woc_Attack_2H_0',
   'Woc_Attack_2H_1',
+  'Woc_Attack_Polearm_0',
+  'Woc_Attack_Polearm_1',
+  'Woc_Attack_Polearm_2',
   'Woc_Attack_Unarmed_0',
   'Woc_Attack_Unarmed_1',
   'Woc_Attack_Rifle',
   'Woc_Attack_Bow',
+  'Woc_Attack_Thrown',
   'Woc_Attack_Dual',
   'Woc_Attack_Dual#main',
   'Woc_Attack_Dual#off',
+  'Woc_Combat_Idle_1H',
+  'Woc_Combat_Idle_2H',
+  'Woc_Combat_Idle_Dual',
+  'Woc_Hit',
+  'Woc_Shout',
+  'Woc_Shield_Bash',
+  'Woc_Special_1H',
+  'Woc_Special_2H',
+  'Woc_Cast_Directed',
+  'Woc_Cast_Omni',
+  'Woc_Cast_Shoot',
+  'Woc_Cast_Omni_Release',
+  'Woc_Channel_Directed',
 ]);

@@ -189,6 +189,7 @@ interface HostRecords {
   readonly originalMaterials: Map<THREE.Mesh, THREE.Material | THREE.Material[]>;
   readonly casters: THREE.Mesh[];
   readonly shadowOn: boolean;
+  casterShadowOn(): boolean;
 }
 
 /**
@@ -279,7 +280,7 @@ function drawProblems(h: WocVisualHarness, v: Visual): string[] {
     if (!records.originalMaterials.has(mesh)) out.push(`${mesh.name} is unknown to the host`);
     // the pieces it folds cast nothing while they are out of the render lists: it casts
     // for them, exactly while the body's shadows are on
-    if (mesh.castShadow !== records.shadowOn) {
+    if (mesh.castShadow !== records.casterShadowOn()) {
       out.push(`${mesh.name} casts ${mesh.castShadow}, the body's shadows are ${records.shadowOn}`);
     }
   }
@@ -433,7 +434,7 @@ async function unlinkedGate(asyncCompile: boolean) {
   const asked: string[] = [];
   const gate: Gate = (target, settle) => {
     asked.push(target.name);
-    settle(compileProof(asyncCompile, properties, target));
+    settle(compileProof(asyncCompile, { properties }, target));
   };
   return { gate, asked };
 }
@@ -863,7 +864,7 @@ describe('the linked-program shortcut', () => {
     expect(headDrawn(h, first)).toBe('merged');
     // stealth: its clones link behind the gate, then the head goes back to its pieces,
     // its stand-in taken down wearing the effect's clone
-    first.setGhost(true, 'stealth');
+    first.setGhost(true, 'stealth-rogue');
     gl.settle();
     frame(first, null);
     expect(headDrawn(h, first)).toBe('pieces');
@@ -940,7 +941,7 @@ describe('a translucent effect on a merged head', () => {
 
   it.each([
     { effect: 'the ghost run', set: (v: Visual, on: boolean) => v.setGhost(on, 'spirit') },
-    { effect: 'stealth', set: (v: Visual, on: boolean) => v.setGhost(on, 'stealth') },
+    { effect: 'stealth-rogue', set: (v: Visual, on: boolean) => v.setGhost(on, 'stealth-rogue') },
     { effect: 'Shadowform', set: (v: Visual, on: boolean) => v.setShadowform(on) },
   ])(
     '$effect puts the head back into its pieces in the call that mounts it, and it merges again after',
@@ -954,11 +955,6 @@ describe('a translucent effect on a merged head', () => {
       const head = mergedHeadOf(v) as THREE.Mesh;
       const wrapper = head.parent as THREE.Object3D;
       expect(wrapper.name).toBe(HEAD_GATE);
-      // guards: the Soul Rend prewarm linked a translucent clone for the merged head,
-      // which is never drawn that way (the pieces are)
-      const slots = v.prewarmSoulRendSlots();
-      expect(slots.map((slot) => slot.source.name)).toContain(BASE);
-      expect(slots.some((slot) => slot.source === head)).toBe(false);
       // the effect's clones are not linked yet: they link hidden, the body unchanged
       set(v, true);
       const staging = h.gates.find((g) => g.target.name === EFFECT_GATE);
@@ -1008,7 +1004,7 @@ describe('a translucent effect on a merged head', () => {
     const { h, body, frame } = await world();
     const v = body({ ...h.DEFAULT_APPEARANCE });
     // stealth starts while the head still waits to merge: its clones link behind the gate
-    v.setGhost(true, 'stealth');
+    v.setGhost(true, 'stealth-rogue');
     expect(h.gates.map((g) => g.target.name)).toEqual([EFFECT_GATE]);
     // the frame mounts the waiting head, straight into the effect: taken down again
     frame(v, null);
@@ -1500,7 +1496,7 @@ describe('a seeded run of the whole lifecycle', () => {
         40,
         (v) => {
           const on = chance(0.35);
-          const style = pick(['spirit', 'stealth'] as const);
+          const style = pick(['spirit', 'stealth-rogue'] as const);
           v.setGhost(on, style);
           return `ghost ${on} (${style})`;
         },

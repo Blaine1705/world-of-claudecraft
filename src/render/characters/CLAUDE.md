@@ -36,6 +36,21 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   weapons its build hangs, asked as demands), and the boot set itself rides the
   loader's BACKGROUND class, so none of it queues ahead of those
   (`tests/preview_direct_build_assets.test.ts`).
+  Which GLBs leave that gate is
+  `rift_body_stream_core.ts` `characterStreamPlan`: on the iOS memory profile
+  every creature body streams, the shared overworld ones right after first paint and
+  the Rift-only ones (derived from the Rift and Buried Hoard templates, never a
+  file name) in two paced lanes (`RiftBodyLanes`: the Rift lane a natural Rift
+  needs, the hoard lane only a Buried Hoard needs) that `RiftBodyStreamTrigger`
+  opens on a read treasure map, a reachable entrance, or the player inside;
+  dungeon-only actors wait for `prepareDungeonCharacterBodies`, awaited by
+  `prepareZoneAt` under the arrival cover and before static interior construction.
+  Its content-derived inventory includes encounter summons. Cosmetic buddies
+  load on demand through the existing visual build/retry path;
+  every other profile gates them all. The client loop polls it through
+  `pollRiftCharacterStream`. `tests/ios_rift_body_stream.test.ts` pins the class,
+  the lanes, the pacing, and the on-disk budget of the iOS post-entry creature
+  stream.
 - `armor_dye.ts`: the outfit-colorway dye shader layer (`attachArmorDye`, plus
   `reapplyArmorDyeToClone` for the clone path). Its own leaf module because
   `../material_clone_hooks.ts` must re-attach it on every program-preserving
@@ -44,19 +59,25 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   A sibling key on the same material, `userData.armorDyeFallbackHex`
   (`assets.ts` `recolored()`), carries a flat, multiply-safe approximation of
   the same colorway for the low tier, which has no shader stage to run the
-  spec in at all; `buildTintedClone`'s Lambert branch reads it instead.
+  spec in at all; `buildTintedClone`'s Lambert branch reads it instead. The
+  spirit veil's colour pass splices the same GLSL (`ARMOR_DYE_GLSL_PARS`,
+  `armorDyeRemapGlsl`) so a veil that keeps colours keeps the dye too.
 - `visual.ts`: `CharacterVisual`, the mixer + `BaseState` machine, LOD/shadow/
-  ghost plumbing, one-shot triggers, death/revive edge logic. A transparent
-  effect (ghost run, stealth, Shadowform, Moonkin) is a new program per rig
-  material, so its clones link hidden behind the same compile gate before the
-  swap commits (`stageEffectSwap`, twinning each source mesh's KIND because
-  three keys `skinning` on `isSkinnedMesh`); a swap still in flight when the
-  gate is replaced (`setFarBakeGate`, a pooled body handed out again) is
-  planned again behind the new gate, never dropped and forgotten; the Soul
-  Rend mark is exempt and commits at once, being actionable raid information
-  (`tests/character_effect_compile_gate.test.ts`). Shadowform (Gloamveil) alone
-  never waits to SHOW: it has a program-free stand-in set the visual mounts on
-  the frame of the shift and keeps while the body swims (next entry).
+  ghost plumbing, one-shot triggers, death/revive edge logic. Every translucent
+  look is the spirit veil (`ghost_veil.ts`): one unlit material per (palette,
+  source, shape) over a depth pre-pass sibling, all on the pinned program
+  family of `spirit_veil_family_core.ts` that `../spirit_veil_prewarm.ts` links
+  at boot, so the swap commits at once; a new part shape must join that family
+  (`tests/spirit_veil_census.test.ts`). The users and their palettes are
+  `spirit_veil_palette_core.ts` (a released spirit, the Pale Keeper and the
+  quest visions; Ghost Wolf; the Veilbound March; stealth by source; Moonkin;
+  Soul Rend), picked by `../ghost_style_core.ts` and the visual's own Moonkin
+  and Soul Rend flags; the palette's policy says whether the rig keeps its
+  shadow and weapon-skin VFX. Shadowform is no veil: Gloamveil uses the gated treatment described below. A veil tuple not linked yet stages
+  behind the effect gate with the body still drawing (`stageEffectSwap`)
+  and commits only on the gate's readiness proof, never on a bare settle;
+  Soul Rend, actionable raid information, is exempt and commits at once
+  (`tests/character_effect_compile_gate.test.ts`).
 - Gloamveil, the Shadow priest's form (`setShadowform`): a look on the body's
   own materials, no bone and no adornment. `gloam_climb_core.ts` is the pure
   half (the tongue tables, the cast surge and entry, the shader text and its
@@ -80,20 +101,14 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
     the transparent clone (solid, depth written): in the transparent pass the
     body draws after the sun-shaft overlay and its dark stays deep, which is
     the approved look. Its program is the transparent variant of each rig
-    material, the one the ghost run and stealth use, so the form adds no
-    program of its OWN; whether that variant is already linked depends on the
-    mesh. The boot twin (`character_effect_prewarm.ts`) stages skinned meshes
-    only, so it covers the body; a player's rigid bone-attached pieces (head,
-    hair, shoulders, weapon, halo) get their transparent variant on the first
-    shift, stealth or ghost run of the session, behind the effect-swap gate.
+    material. The effect-swap gate links this variant before mounting it.
     The stand-in is the same look on a clone that flips nothing, so it needs
     no link at all: `applyVisualMaterials` mounts it while the transparent set
     is behind its gate (that first link shows as the stand-ins for a moment,
     never as a late form), and for as long as the body swims (a body in the
     transparent pass would draw over the water it is in). A host with no
     compile gate (a preview, a test, a renderer that links synchronously)
-    mounts the settled set at once and pays its links on that draw, the same
-    baseline the ghost run and stealth have always had there.
+    mounts the settled set at once and pays its links on that draw, so that host must provide its own readiness policy.
   - **The form recolours every unlit clone, which today is the halo alone.**
     `dressGloamClone` repaints by material type, and the class halo is the one
     unlit piece a rig that can hold `form_shadow` carries (a priest's set, on
@@ -290,7 +305,11 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   its body at once WITHOUT the face decals, the stand-in, and
   `CharacterVisual.attachDeferredDecals` adds them through the compile gate
   once they land; never deferred under a cover or for the target: the producer
-  contract in `src/render/CLAUDE.md`), `hair_sway.ts` (long-hair motion
+  contract in `src/render/CLAUDE.md`), `decal_texture_size_core.ts` (the
+  decal map sides per memory profile: a halved stubble map on the iOS memory
+  profile, full size elsewhere, the makeup map full size everywhere; held per
+  page by `decalTextureSizes()` in `stubble.ts`, and a map's texture always
+  takes its side from the painted buffer), `hair_sway.ts` (long-hair motion
   via morph targets, not shaders, so the low-tier Lambert rebuild cannot drop
   it), `underhair.generated.ts` (regenerated by the Fit Studio server,
   `scripts/asset_pipeline/lib/fit_studio.mjs`; never hand-edit).
@@ -307,7 +326,7 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   `rig_fx.ts`. Moonwing is the only form that wears one: Gloamveil's face veil
   was sized for one head and is gone (see the Gloamveil entry above). Pieces
   ride the rig's `head`/`chest` bones, carry the
-  `weaponVfxMesh` marker so no overlay swap, prewarm twin or caster sweep
+  `weaponVfxMesh` marker so no overlay swap, spirit veil or caster sweep
   touches them, hide under a ghost or stealth body, and their shared kits are
   prewarmed through `ABILITY_MATERIAL_SOURCES`; a rig's first mount of a set
   still waits hidden behind the injected compile gate
@@ -315,8 +334,10 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
 - WOC split character files (the player bodies, 2026-09-28): one base and one
   animation library per body fit, plus the hand-keyed library over it
   (`woc_keyed_animations.ts`: `players/woc_keyed/woc_<fit>.glb`, keyed on the same bind
-  pose by `scripts/assets/woc_keyed_anims/`, for the idle, gaits, swim, jump take-off,
-  death, four emotes and the white swings), and per armor set and fit a low file, a medium
+  pose by `scripts/assets/woc_keyed_anims/`, for the idle and combat stances, gaits,
+  swim, jump take-off, death, hit flinch, emotes, the white swings, and the ability
+  strikes, casts and channels each class routes in `manifest.ts`), and per armor set and
+  fit a low file, a medium
   file and a TOP file (`woc_armor_core.ts`: file names, the tier a character
   draws, the stand-in tier, the idle rule and its ledger; pure). Since 2026-10-03 the
   medium file carries every map of the set's one full layout at half its size and
@@ -738,6 +759,9 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
     `tests/woc_far_equipment.test.ts`, `tests/woc_merge_visual.test.ts`.
 - Pure selection cores: `modular.ts` (composed bodies, below),
   `player_look_core.ts`, `form_visual_selection_core.ts`,
+  `form_visual_slots_core.ts` (the lazy form-rig slot list the renderer's
+  per-frame shadow/far/proxy/dispose passes walk: a new form rig is an entry
+  there plus its view field, never more per-slot lines in `renderer.ts`),
   `far_lod_reveal_core.ts` (the rig/far-mesh/shadow-proxy handoff rule: the
   baked far mesh stands in only once it exists AND its materials linked
   behind the renderer's far-bake compile gate, and a WOC body's shadow stand-in
@@ -760,7 +784,7 @@ paragraph). No mob draws on a retired KayKit player rig (pinned in
 `tests/npc_looks.test.ts`); NPCs to the WOC def of
 their authored class and body type (`npcLookFor`, the next paragraph), and only
 an NPC with no authored look to its stock rig in `NPC_KEYS`. Forms
-(`form_sheep`/`form_bear`/`form_cat`/`form_travel`) are passed explicitly by the renderer;
+(`form_sheep`/`form_bear`/`form_cat`/`form_travel`/`form_metamorph`/`form_sporemender`) are passed explicitly by the renderer;
 `characterFormAssetKey` (`form_visual_selection_core.ts`) then splits the shared cat slot at
 construction, so a shaman's `ghost_wolf` aura resolves to `form_ghost_wolf` (the tinted
 `wolf_basic.glb`) while the druid's `form_cat` loads its own `druid_cat_form.glb`. It
@@ -858,6 +882,15 @@ one), drawn by that pipeline from the class body; no frame shows those files.
   (crossfade only when the outgoing action still drives the rig, else snap to
   full weight); the per-frame `scanAnimRepair` watchdog (`anim_state.ts`) is the
   backstop that re-drives the base pose after 3 starved frames.
+- **Ambient clips (`VisualDef.ambientClips`)** loop for the visual's whole life
+  BESIDE the state clips, on their own clock (Wobbles the Slime's bubbles), so a
+  gait or jump change never restarts them. `CharacterVisual` starts them once at
+  construction and keeps them OUT of `actions`, so crossfades, `stop()` sweeps,
+  gait time-scaling and the `scanAnimRepair` weight scan never see them (an
+  ambient action at weight 1 must not hide a starved base pose); only dispose's
+  `stopAllAction()` ends them. Each must key only bones no state clip keys, or
+  the two blend. Pinned in `tests/character_ambient_clips.test.ts` and, per
+  manifest def, `tests/character_clipmaps.test.ts`.
 
 ## The visual reuse pool (`visual_pool.ts` + `visual_pool_policy.ts` + `pooled_visual_lifecycle.ts`)
 `renderer.ts` routes non-player character visuals through a bounded,
@@ -1021,7 +1054,15 @@ per part.
     population of a zone. It is refcounted (retained in `assembleModular`,
     released in `CharacterVisual.dispose`) and evicts idle entries over a cap;
     an entry a live character is drawn from is never dropped, because clones
-    share its geometry.
+    share its geometry. Which idle entries go is
+    `composed_variant_residency_core.ts`: the total cap everywhere (desktop and
+    Android decide exactly as before), plus, on the iOS memory profile, an IDLE
+    bound evicted least recently SEEN first (composed from, or released to idle),
+    so the looks a session walked past stop holding their merged buffers and
+    morph textures (`tests/composed_variant_residency_core.test.ts`, the wiring
+    in `tests/modular_variant_eviction.test.ts`). An eviction frees geometry
+    only, never a material, so a returning look re-composes with no link; the
+    compose is its own ledger kind, `view-part:variant-compose`.
 - Part names are the contract; `tests/modular_character.test.ts` gates the tables
   against the shipped GLB, because a renamed node fails SILENTLY (the body just
   loses a limb). The body's radius tables are SOLVED against the armour at

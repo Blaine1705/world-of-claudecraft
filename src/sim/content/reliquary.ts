@@ -19,7 +19,12 @@
 // would double-count completion.
 
 import { HOARD_BASE_ITEM_IDS } from './hoard_loot';
-import { FURY_STOCK, WARFARE_ITEMS, WARFARE_TRINKET_STOCK } from './pvp_honor';
+import {
+  FURY_STOCK,
+  WARFARE_ITEMS,
+  WARFARE_TRINKET_STOCK,
+  WORLD_PVP_GOODS_STOCK,
+} from './pvp_honor';
 import { SEASON2_STOCK } from './pvp_honor_season2';
 import {
   RIFT_EPIC_ITEM_IDS,
@@ -27,6 +32,7 @@ import {
   RIFT_LEGENDARY_ITEM_IDS,
   RIFT_RARE_ITEM_IDS,
 } from './rift/items';
+import { VAULT_MATERIAL_POOL } from './treasure_maps';
 
 /** Top-level shelf ids (Overview is virtual UI, not a catalog shelf row). */
 export type ReliquaryShelfId = 'conquerors' | 'professions' | 'horizons';
@@ -113,7 +119,13 @@ export const RELIQUARY_STORE_SOURCE_ID = 'woc_store' as const;
  * - buried_hoard: src/sim/treasure_vault.ts payOne rolls one piece off the fallen
  *   keeper's table (content/hoard_loot.ts rollHoardBossDrop) when an entrant
  *   opens the hoard's reward chest. The piece is never on the keeper's own mob
- *   loot, so a boss hint would name a door that does not hold it.
+ *   loot, so a boss hint would name a door that does not hold it. The same
+ *   chest always pays a stack of one corpse-harvest specimen (VAULT_MATERIAL_POOL,
+ *   content/treasure_maps.ts, rolled by src/sim/rift/hoard_reward_roll.ts).
+ * - weekly_vault_pvp: src/sim/weekly_rewards.ts weeklyLootPool('pvp') rolls Warfare
+ *   Season 2 (content/pvp_honor_season2.ts) and nothing else: a PvP-row choice in
+ *   the Weekly Vault rolls one piece on open and claimWeeklyReward grants it. It
+ *   is the second door to the Vanguard Gallery beside the honor quartermasters.
  */
 export const RELIQUARY_ACTIVITY_SOURCE_IDS = [
   'corpse_harvest',
@@ -122,6 +134,10 @@ export const RELIQUARY_ACTIVITY_SOURCE_IDS = [
   'buried_hoard',
   // src/sim/referral_rewards.ts grants the completed-card and inviter reins.
   'referral_cards',
+  // Lantern Hall's quartermaster (src/sim/guild_quartermaster.ts) sells the guild's horse and
+  // sword for Lantern Seals: a seal counter, not a vendorItems shop, so not a vendor hint.
+  'lantern_hall_quartermaster',
+  'weekly_vault_pvp',
 ] as const;
 export type ReliquaryActivitySourceId = (typeof RELIQUARY_ACTIVITY_SOURCE_IDS)[number];
 
@@ -276,8 +292,11 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   'thunderstrut_gobbler',
   'drakemaw_raptor',
   'avian_strider',
+  'lantern_hall_destrier',
   'lanternback_troll',
+  'wobbles_slime',
   'terrorspark_groundshaker',
+  'nightwing_chimera',
   'referral_raptor',
   'referral_tank',
   // Gourdlight Eve's Emberbristle Broom: Hester's, for five of Old Thatchgrin's daily
@@ -304,15 +323,16 @@ export const RELIQUARY_HORIZON_MOUNTS = [
 // table as an ungrouped 1% personal drop (content/zone2.ts), the "dedicated
 // world boss" the 2026-08-04 owner call held them back for.
 //
-// Dreadspark Groundshaker is the annual membership bundle's paid mount reward.
+// Nightwing Chimaera is the annual membership bundle's paid mount reward.
 //
 // The Viridian Valestrider is the Rift Watch quartermaster's Champion row
 // (content/faction_vendors.ts).
 //
-// Grumbol the Lanternback has no player acquisition path (DEVELOPER_MOUNTS,
-// content/mounts.ts): no live table awards its reins, so its absence here IS
-// the answer, and it stays hand-listed in SOURCE_PENDING_RULING. Paid mount
-// skins are deliberately absent here.
+// The Lantern Hall Destrier is Garrick Holt's 40-seal row (content/guild_contracts.ts), an
+// activity door because the guild's counter is not a vendorItems shop.
+//
+// The retired tank placeholders have no new acquisition path. Saved reins
+// remain usable. Paid mount skins are deliberately absent here.
 //
 // Keys are typed against the live mount ladder so a misspelled or renamed key
 // fails tsc at the authoring site instead of falling through to the pending
@@ -325,9 +345,10 @@ const MOUNT_SOURCES: Readonly<
   // never encodes meaning in the shape).
   valorsteed: fromVendor('stablemaster_marla'),
   avian_strider: fromVendor('npc_rift_watch_quartermaster'),
-  terrorspark_groundshaker: fromStore(),
+  lantern_hall_destrier: fromActivity('lantern_hall_quartermaster'),
+  nightwing_chimera: fromStore(),
   referral_raptor: fromActivity('referral_cards'),
-  referral_tank: fromActivity('referral_cards'),
+  wobbles_slime: fromActivity('referral_cards'),
   stormfeather_griffin: [
     fromBoss('morthen'),
     fromBoss('nythraxis_scourge_of_thornpeak'),
@@ -399,7 +420,29 @@ export const RELIQUARY_HORIZON_WEAPON_SKINS = [
   'emberwish_wand',
   'encore_bow',
   'meteorlatch_crossbow',
+  'lantern_hall_sword',
+  // The four elemental arms (hearthbrand_sword, squallcrest_sword, rimelight_staff,
+  // duskwick_staff) are reserved for a future raid and obtainable nowhere yet, so they get no
+  // Reliquary row until that raid ships them.
 ] as const;
+
+// The skins NOT sold by the store (WeaponSkinDef.earnedFrom), each naming where it is earned.
+// With them the page has two doors, so every row names its own (the store's rows the store),
+// never leaning on the page default for a door it does not have.
+const WEAPON_SKIN_SOURCES: Readonly<
+  Partial<Record<(typeof RELIQUARY_HORIZON_WEAPON_SKINS)[number], ReliquarySourceHints>>
+> = {
+  lantern_hall_sword: fromActivity('lantern_hall_quartermaster'),
+};
+
+function weaponSkinEntries(
+  ids: readonly (typeof RELIQUARY_HORIZON_WEAPON_SKINS)[number][],
+): RelicEntry[] {
+  return ids.map((id) => {
+    const earned = Object.hasOwn(WEAPON_SKIN_SOURCES, id) ? WEAPON_SKIN_SOURCES[id] : undefined;
+    return [id, earned ?? fromStore()] as const;
+  });
+}
 
 // Hidden deeds NEVER enter the Reliquary, not even as a masked or locked slot:
 // a hidden deed's existence is itself the secret, so a placeholder row would
@@ -484,6 +527,20 @@ export const RELIQUARY_HORIZON_TITLES = [
   'exp_clue_ten_caskets',
   // The Drowned Temple lore guide's The Last Verse: Witness of the Choir.
   'dgn_drowned_temple_cantor',
+  // Lantern Hall's quartermaster (guild_contracts.ts): the three titles bought with
+  // Lantern Seals from the guild's weekly dungeon contracts.
+  'feat_guild_writ_runner',
+  'feat_guild_hallsworn',
+  'feat_guild_of_lantern_hall',
+  // The sixth lifetime-XP rung (10,000,000 lifetime experience): Titan
+  // pages here per the locked titles-page rule.
+  'prog_titan',
+  // World PvP streak titles page here per the locked titles-page rule.
+  'pvp_flag_1h',
+  'pvp_flag_3h',
+  'pvp_flag_6h',
+  'pvp_flag_24h',
+  'pvp_flag_168h',
   // Gourdlight Eve's three title writs (Hester Gourdwick's stall): every non-hidden
   // title deed pages here per the locked titles-page rule.
   'feat_title_gourdlit',
@@ -636,13 +693,22 @@ function withProfessions(
   ids: readonly string[],
   professionById: Readonly<Record<string, string>>,
   fallback: ReliquarySourceHint,
-): RelicEntry[] {
+): (readonly [string, ReliquarySourceHint])[] {
   return ids.map((id) => {
     // Own-property read, same reasoning as setMembers below.
     const professionId = Object.hasOwn(professionById, id) ? professionById[id] : undefined;
     if (professionId) return [id, fromProfession(professionId)] as const;
     return [id, fallback] as const;
   });
+}
+
+/** Adds the Buried Hoard door to a specimen the hoard chest also pays. */
+function withHoardMaterialHint(
+  entry: readonly [string, ReliquarySourceHint],
+): readonly [string, ReliquarySourceHints] {
+  const [id, hint] = entry;
+  if (!VAULT_MATERIAL_POOL.includes(id)) return entry;
+  return [id, [hint, fromActivity('buried_hoard')]] as const;
 }
 
 // Epic set members, pinned to the same id lists as col_set_* deeds in
@@ -886,8 +952,8 @@ export const RELIQUARY_HEROIC_GEAR = {
     'scepter_of_the_deathless_court',
     'stormcallers_focus',
   ],
-  // Crucible of the Last Spring: the heroic-only weapon, shield and trinket
-  // appends.
+  // Crucible of the Last Spring: the heroic-only weapon, shield, offhand,
+  // quiver and trinket appends.
   // The sigil redemption tokens that share both bosses' heroic tables are
   // NOT catalogued (kind 'tool'): they are per-slot redemption currency the
   // Crucible Quartermaster consumes, not unique spoils, the same carve-out
@@ -912,6 +978,7 @@ export const RELIQUARY_HEROIC_GEAR = {
     'staff_of_the_last_spring',
     'orb_of_the_last_spring',
     'cinder_of_the_first_design',
+    'infernal_quiver',
     // The raid trinkets (content/trinkets.ts), heroic exclusives here and
     // Normal off-set drops too, so also on the Normal page.
     'forgefathers_temper',
@@ -1024,7 +1091,8 @@ const REALM_RARE_ZONES = [
 // Both quartermasters front the SAME canonical honor stock: FURY at the
 // Eastbrook arena (FURY_NPC in content/pvp_honor.ts) and Warmarshal Draven
 // Kole at the Highwatch hub (content/zone3.ts, spawned under a reserved id by
-// src/sim/pvp/warfare_quartermaster.ts), each with vendorItems = HONOR_QUARTERMASTER_STOCK.
+// src/sim/pvp/warfare_quartermaster.ts), each with vendorItems = HONOR_VENDOR_STOCK (the
+// HONOR_QUARTERMASTER_STOCK gear plus one cosmetic companion whistle no page counts).
 // Every slot therefore names both counters through one shared tuple. Honor
 // purchases flow through the ordinary buyItem discovery path
 // (markItemDiscovered + noteRelicObtain), so ownership needs no new state.
@@ -1039,16 +1107,20 @@ const WARFARE_VENDOR_HINTS = [fromVendor('fury'), fromVendor('warmarshal_draven_
 // the partition and both floors are pinned in tests/reliquary_content.test.ts.
 // The two honor trinkets (WARFARE_TRINKET_STOCK) are set-less honor purchases
 // from the same two counters, so they close the armory after the kit's
-// jewelry and weapons.
+// jewelry and weapons, followed by the World PvP goods (the Skull Bag).
 const WARFARE_GALLERY_ITEM_IDS = FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set !== undefined);
 const WARFARE_ARMORY_ITEM_IDS = [
   ...FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set === undefined),
   ...WARFARE_TRINKET_STOCK,
+  ...WORLD_PVP_GOODS_STOCK,
 ];
 // Warfare Season 2 ("Vanguard", content/pvp_honor_season2.ts) is sold by the same
 // two quartermasters: its 27 spec sets and four weapons fill one page, in stock
-// order (class, then spec, each helmet to gloves, then the weapons).
+// order (class, then spec, each helmet to gloves, then the weapons). The PvP
+// row of the Weekly Vault rolls the same stock, so every slot names both
+// counters and that activity.
 const VANGUARD_GALLERY_ITEM_IDS = [...SEASON2_STOCK];
+const VANGUARD_SOURCE_HINTS = [...WARFARE_VENDOR_HINTS, fromActivity('weekly_vault_pvp')] as const;
 
 /**
  * Freeze the whole page table at its one construction site: the top-level
@@ -1690,8 +1762,10 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     // SPECIMEN_PROFESSIONS). The five pristine specimens come from corpse
     // harvest, which no gathering profession owns, so they name the
     // corpse_harvest activity, the same answer gather_event:perfect_specimen
-    // gives (one write site, src/sim/interaction.ts, awards the mark and these
-    // five items together). The CRAFTED FISHING ROD LADDER closes the angler's
+    // gives (src/sim/interaction.ts awards the mark and these five items
+    // together). All five are also the Buried Hoard chest's material stack
+    // (VAULT_MATERIAL_POOL), so they name buried_hoard as a second door. The
+    // CRAFTED FISHING ROD LADDER closes the angler's
     // chase, and since masterwrought Phase 11i that ladder is three rungs, not
     // two. Engineering crafts all three at the toolworks (ROD_RECIPES in
     // content/recipes.ts), so every one of them names the craft. What differs
@@ -1718,7 +1792,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
         RELIQUARY_PROFESSION_SPECIMEN_ITEMS,
         SPECIMEN_PROFESSIONS,
         fromActivity('corpse_harvest'),
-      ),
+      ).map(withHoardMaterialHint),
       [
         'stormreel_fishing_rod',
         [fromProfession('engineering'), fromVendor('brother_halven_marsh')],
@@ -1773,9 +1847,10 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     // That is an account-level storefront rather than a boss, zone, profession,
     // deed, or in-world vendor NPC, and the 'store' kind now names it. One
     // storefront awards every skin on the page, which is exactly the condition
-    // a page default is for, so the default carries all 29 rows.
-    sourceDefault: fromStore(),
-    relics: weaponSkins(...RELIQUARY_HORIZON_WEAPON_SKINS),
+    // a page default was for. Lantern Hall's earned blade gave the page a second door, so every
+    // row now names its own (weaponSkinEntries): the store rows the store, the guild's blade the
+    // guild's quartermaster.
+    relics: weaponSkins(...weaponSkinEntries(RELIQUARY_HORIZON_WEAPON_SKINS)),
   },
   {
     id: 'horizons_titles',
@@ -1955,7 +2030,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     id: 'conquerors_warfare_gallery',
     shelf: 'conquerors',
     name: 'Warfare Gallery',
-    desc: 'The five Warfare battle kits, earned piece by piece with honor.',
+    desc: 'The five Warfare battle kits of the first season, now sold piece by piece for gold.',
     clearSource: { kind: 'none' },
     relics: items(...WARFARE_GALLERY_ITEM_IDS.map((id) => [id, WARFARE_VENDOR_HINTS] as const)),
   },
@@ -1963,7 +2038,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     id: 'conquerors_warfare_armory',
     shelf: 'conquerors',
     name: 'Warfare Armory',
-    desc: 'Warfare jewelry and weapons purchased with hard-won honor.',
+    desc: 'Warfare jewelry, weapons and goods purchased with hard-won honor.',
     clearSource: { kind: 'none' },
     relics: items(...WARFARE_ARMORY_ITEM_IDS.map((id) => [id, WARFARE_VENDOR_HINTS] as const)),
   },
@@ -2193,7 +2268,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     // completion pairs, the Riftbound precedent, so the Conquerors capstone never
     // needs a character of every class.
     excludeFromCompletion: 'personal',
-    relics: items(...VANGUARD_GALLERY_ITEM_IDS.map((id) => [id, WARFARE_VENDOR_HINTS] as const)),
+    relics: items(...VANGUARD_GALLERY_ITEM_IDS.map((id) => [id, VANGUARD_SOURCE_HINTS] as const)),
   },
 ]);
 

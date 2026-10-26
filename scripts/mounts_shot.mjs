@@ -76,6 +76,9 @@ await page.evaluate(() => {
     'reins_referral_tank',
     'reins_referral_raptor',
     'reins_lanternback_troll',
+    'reins_lantern_hall_destrier',
+    'reins_wobbles_slime',
+    'reins_nightwing_chimera',
     'reins_emberbristle_broom',
   ])
     sim.addItem(id, 1);
@@ -176,5 +179,6 @@ await swapTo('stormfeather_griffin', 'tmp/mounts_griffin.png');
 await swapTo('thunderstrut_gobbler', 'tmp/mounts_gobbler.png');
 await swapTo('aether_hover_cycle', 'tmp/mounts_hover_cycle.png');
 await swapTo('avian_strider', 'tmp/mounts_avian_strider.png');
+await swapTo('nightwing_chimera', 'tmp/mounts_nightwing_chimera.png');
 
 await browser.close();

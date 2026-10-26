@@ -7,8 +7,8 @@
     "Hit rating from authored gear vs a +3 target",
     "same shared-RNG draw count/order as the ungeared spell-resist path"
   ],
-  "draws": 688,
-  "drawDigest": "e80bb56c",
+  "draws": 687,
+  "drawDigest": "4fc15226",
   "frames": [
     {
       "tick": 0,
@@ -163,8 +163,8 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1013,
-      "state": "0a11726b",
-      "events": "dda6957b",
+      "state": "dee84307",
+      "events": "db350c58",
       "rng": {
         "draws": 3,
         "digest": "80e78b7c"
@@ -174,7 +174,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1013,
-      "state": "16774288",
+      "state": "0ab1a5a4",
       "events": "def3f5b8",
       "rng": {
         "draws": 3,
@@ -185,7 +185,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1013,
-      "state": "39a5d97f",
+      "state": "9c69c65b",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -196,7 +196,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1013,
-      "state": "a6737c88",
+      "state": "2e490fa4",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -207,7 +207,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1013,
-      "state": "5bf3b1f7",
+      "state": "67a971c3",
       "events": "ff1d9d1c",
       "rng": {
         "draws": 72,
@@ -218,7 +218,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1013,
-      "state": "db524eaf",
+      "state": "cc217f2b",
       "events": "741638a5",
       "rng": {
         "draws": 153,
@@ -229,7 +229,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 1013,
-      "state": "4ed3e0ea",
+      "state": "791734b2",
       "events": "741638a5",
       "rng": {
         "draws": 241,
@@ -240,7 +240,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1013,
-      "state": "0377ca6a",
+      "state": "f1b89232",
       "events": "34fe5d0d",
       "rng": {
         "draws": 329,
@@ -251,7 +251,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 1013,
-      "state": "b45dae9d",
+      "state": "b2377fe5",
       "events": "985878f9",
       "rng": {
         "draws": 414,
@@ -262,7 +262,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1013,
-      "state": "42e30c70",
+      "state": "c375e2dc",
       "events": "741638a5",
       "rng": {
         "draws": 507,
@@ -273,7 +273,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 1013,
-      "state": "1a04c66b",
+      "state": "95aaf707",
       "events": "741638a5",
       "rng": {
         "draws": 605,
@@ -284,22 +284,22 @@
       "tick": 120,
       "time": 6,
       "nextId": 1013,
-      "state": "c7ae79b4",
+      "state": "fbe62f40",
       "events": "741638a5",
       "rng": {
-        "draws": 688,
-        "digest": "e80bb56c"
+        "draws": 687,
+        "digest": "4fc15226"
       }
     },
     {
       "tick": 120,
       "time": 6,
       "nextId": 1013,
-      "state": "c7ae79b4",
+      "state": "fbe62f40",
       "events": "741638a5",
       "rng": {
-        "draws": 688,
-        "digest": "e80bb56c"
+        "draws": 687,
+        "digest": "4fc15226"
       },
       "label": "fireball-landed",
       "players": [
@@ -395,7 +395,44 @@
             "mainhand": "lunar_tide_greatstaff",
             "waist": "sash_of_the_sunken_court"
           },
-          "equipmentInstance": {},
+          "equipmentInstance": {
+            "gloves": {
+              "guid": "1f14f407-e764-83f1-8960-aa5b6440d4cd",
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
+            },
+            "legs": {
+              "guid": "1c96ee9e-9137-8acc-8461-bf8a25e5e0e0",
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
+            },
+            "mainhand": {
+              "guid": "a709a99f-0a87-8851-8c6a-4a2b5de61485",
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
+            },
+            "waist": {
+              "guid": "4396e72c-a673-8886-804a-2aa0de58cb72",
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
+            }
+          },
           "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},
@@ -590,11 +627,11 @@
       "tick": 120,
       "time": 6,
       "nextId": 1013,
-      "state": "c7ae79b4",
+      "state": "fbe62f40",
       "events": "741638a5",
       "rng": {
-        "draws": 688,
-        "digest": "e80bb56c"
+        "draws": 687,
+        "digest": "4fc15226"
       },
       "label": "final",
       "players": [
@@ -690,7 +727,44 @@
             "mainhand": "lunar_tide_greatstaff",
             "waist": "sash_of_the_sunken_court"
           },
-          "equipmentInstance": {},
+          "equipmentInstance": {
+            "gloves": {
+              "guid": "1f14f407-e764-83f1-8960-aa5b6440d4cd",
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
+            },
+            "legs": {
+              "guid": "1c96ee9e-9137-8acc-8461-bf8a25e5e0e0",
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
+            },
+            "mainhand": {
+              "guid": "a709a99f-0a87-8851-8c6a-4a2b5de61485",
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
+            },
+            "waist": {
+              "guid": "4396e72c-a673-8886-804a-2aa0de58cb72",
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
+            }
+          },
           "factionCurrencies": {},
           "factions": {},
           "gatheringProficiency": {},

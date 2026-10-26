@@ -151,14 +151,10 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // (cmb_balgath and cmb_balgath_ten at 10, cmb_point_taken at 5: +25), at the
     // release/v0.45.0 merge over the Buried Hoards Coinsack catch.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346, 3810.
-    // + Gourdlight Eve's zero-Renown Feat (feat_gourdlight_guise): 347, 3810.
-    // + Old Thatchgrin's zero-Renown Feat (feat_old_thatchgrin): 348, 3810.
-    // + Gourdlight Eve's three zero-Renown title-writ Feats (feat_title_*): 351, 3810.
-    // + the Haunted Pumpkin hunt's zero-Renown Feat (feat_pumpkin_hunter): 352.
-    // + Gourdlight Eve's whole-event checklist (round 12): three zero-Renown section Feats
-    //   and the zero-Renown meta (feat_gourdlight_eve_complete): 356, 3810.
-    expect(DEED_ORDER.length).toBe(356);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3810);
+    // + Lantern Hall (the Highwatch guild): three contract milestones (5, 10, 25) and the
+    // quartermaster's three zero-Renown title feats: 352, 3850.
+    expect(DEED_ORDER.length).toBe(369);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(4010);
   });
 
   it('ships the audited per-category counts', () => {
@@ -176,8 +172,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // release/v0.41.0 merge (the release's own chain read 58), then
       // +1 the Phase 13 promotion capstone prog_legendmaker, then
       // +7 the faction standing ladder (a Trusted and a Champion deed per
-      // allied faction plus the all-factions meta).
-      progression: 75,
+      // allied faction plus the all-factions meta), then
+      // +1 the sixth lifetime-XP rung (prog_titan).
+      progression: 76,
       // +1 the Buried Hoard goblin catch (cmb_coinsack_caught).
       // +2 the Mirefen world boss pair, +1 the muster's pike drill.
       combat: 14,
@@ -190,7 +187,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +1 the Drowned Temple lore guide's The Last Verse.
       // +3 the Hollow Crypt wing bosses' encounter deeds.
       // +1 Morthen's Every Candle Lit.
-      dungeon: 60,
+      // +3 Lantern Hall's contract milestones.
+      dungeon: 63,
       delve: 13,
       // +4 farming first-harvest chronicles (chr_*_first_harvest).
       chronicle: 53,
@@ -200,20 +198,16 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // release side added independently. UNION MERGE: base plus both deltas.
       collection: 41,
       // Release's Thornhollow battlegrounds plus the WARFARE honor ladder.
-      pvp: 35,
+      pvp: 40,
       // +2 bank socket ladder deeds (soc_strongbox_outfitter,
       // soc_four_bags_deep; Bank Storage phase 06).
       social: 20,
       // +2 the Clue Scroll casket pair (exp_clue_first_casket and
       // exp_clue_ten_caskets, both on the clueCasketsOpened meter).
       // +1 the release's ferry round trip (exp_harbor_to_harbor).
-      exploration: 22,
-      // +1 Gourdlight Eve's seasonal Feat (feat_gourdlight_guise).
-      // +1 its field boss's Feat (feat_old_thatchgrin).
-      // +3 its title writs (feat_title_gourdlit, _trickster, _hollow_grinned),
-      // +1 the Haunted Pumpkin hunt (feat_pumpkin_hunter).
-      // +4 the whole-event checklist (three sections and the meta, round 12).
-      feat: 13,
+      exploration: 23,
+      // +3 Lantern Hall's quartermaster titles (bought for Lantern Seals).
+      feat: 16,
       hidden: 10,
     });
   });
@@ -434,6 +428,13 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // release/v0.44.0 base merge.
       'exp_harbor_to_harbor',
       // The Mirefen world-boss branch, appended last over release/v0.44.0.
+      'prog_titan',
+      'pvp_flag_1h',
+      'pvp_flag_3h',
+      'pvp_flag_6h',
+      'pvp_flag_24h',
+      'pvp_flag_168h',
+      'exp_wisp_maze_hard',
       'cmb_balgath',
       'cmb_balgath_ten',
       'cmb_point_taken',
@@ -470,17 +471,24 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'dgn_ilvane_hush',
       // Morthen the Gravecaller's Rite (morthen.ts).
       'dgn_morthen_candlelight',
+      'dgn_guild_first_contract',
+      'dgn_guild_ten_contracts',
+      'dgn_guild_fifty_contracts',
+      'feat_guild_writ_runner',
+      'feat_guild_hallsworn',
+      'feat_guild_of_lantern_hall',
+      // The sixth lifetime-XP rung (10,000,000 lifetime XP, the Titan title).
       // Gourdlight Eve's seasonal Feat (content/gourdlight_eve.ts).
-      'feat_gourdlight_guise',
       // ...and its field boss's (content/gourdlight_eve_scarecrow.ts).
-      'feat_old_thatchgrin',
       // ...and the three title writs Hester sells (GOURDLIGHT_TITLE_WRITS).
+      // ...and the Haunted Pumpkin hunt's completion Feat.
+      // ...and the whole-event checklist (round 12): three sections, then the meta.
+      'feat_gourdlight_guise',
+      'feat_old_thatchgrin',
       'feat_title_gourdlit',
       'feat_title_trickster',
       'feat_title_hollow_grinned',
-      // ...and the Haunted Pumpkin hunt's completion Feat.
       'feat_pumpkin_hunter',
-      // ...and the whole-event checklist (round 12): three sections, then the meta.
       'feat_gourdlight_doorsteps',
       'feat_gourdlight_errands',
       'feat_gourdlight_frights',
@@ -882,15 +890,12 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // faction standing Champion titles (Riftwarden, Dawnkeeper, Forgemaster)
     // three more, and the Clue Scroll tenth-casket title (Treasure Hunter)
     // one more, and the Drowned Temple lore guide's Witness of the Choir
-    // (dgn_drowned_temple_cantor) one more, Gourdlight Eve's three title
-    // writs (the Gourdlit, Trickster, the Hollow-Grinned) three more, and the
-    // Haunted Pumpkin hunt (the Hollow) one more, and the whole-event meta (the
-    // Gourdsworn) one more.
-    expect(titles.length).toBe(57);
+    // (dgn_drowned_temple_cantor) one more, and Lantern Hall's quartermaster three more.
+    expect(titles.length).toBe(66);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(57);
+    expect(new Set(titleTexts).size).toBe(66);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -1128,18 +1133,12 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // down into PRE_APPEND_CATALOG_SHA256 the same auditable way. The rework's own
   // chain (765c2ea1... -> 299661d4... -> ... -> 4086f07c...) minted those deeds
   // without the Mirefen three ahead of them, so it does not apply on this branch.
-  // Re-baselined for Gourdlight Eve's one appended Feat (feat_gourdlight_guise), the
-  // auditable way: the 9e4d4f50... literal rotated down into PRE_APPEND_CATALOG_SHA256.
-  // Re-baselined for Old Thatchgrin's one appended Feat (feat_old_thatchgrin), the
-  // auditable way: the 4f56af60... literal rotated down into PRE_APPEND_CATALOG_SHA256.
-  // Re-baselined for Gourdlight Eve's three appended title-writ Feats (feat_title_*),
-  // the auditable way: the 7ce9116d... literal rotated down into PRE_APPEND_CATALOG_SHA256.
-  // Re-baselined for the Haunted Pumpkin hunt's appended Feat (feat_pumpkin_hunter) at its
-  // merge into the Halloween branch; it appends after the title writs.
-  // Re-baselined for Gourdlight Eve's whole-event checklist (round 12: three section
-  // Feats and the meta), the auditable way: the 74b4b307... literal rotated down into
-  // PRE_APPEND_CATALOG_SHA256.
-  const FROZEN_CATALOG_SHA256 = 'e9e749469181ac9a5c5465ec8bf4e93439a2f91bbb3e19cd2dac8cacf864cd41';
+  // Re-baselined for Lantern Hall (the Highwatch guild): its six appended deeds, re-minted
+  // the auditable way (the 9e4d4f50... literal rotated down into PRE_APPEND_CATALOG_SHA256).
+  // Release merge: retain the release catalogue first and append integration's
+  // 33 deeds. Stripping them reproduces the release's frozen digest below.
+  // Main's frozen catalog is preserved as the prefix; Halloween appends ten feats.
+  const FROZEN_CATALOG_SHA256 = '6209fd36c03fe4f3d6c8a4ba2966d04b4ba0ba2c21128b82db589c50e24697b2';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1214,25 +1213,21 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // On the v0.45.0 integration the five-dungeon rework's 24 deeds append after
   // cmb_point_taken; the previous mint is the Mirefen branch's 505e3754... literal
   // (rotated down here), and stripping the 24 must reproduce it exactly.
+  // Lantern Hall (the Highwatch guild) appends six deeds after dgn_morthen_candlelight; the
+  // previous mint is the v0.45.0 integration's 9e4d4f50... literal (rotated down here), and
+  // stripping the six must reproduce it exactly.
   //
-  // Gourdlight Eve (the autumn seasonal event) appends feat_gourdlight_guise after
-  // dgn_morthen_candlelight; the previous mint is the integration's 9e4d4f50...
-  // literal (rotated down here), and stripping the one id must reproduce it exactly.
-  //
-  // Its field boss (phase 2) appends feat_old_thatchgrin after the Guise; the previous
-  // mint is the Guise's 4f56af60... literal.
-  //
-  // Its three title writs (phase 3) append after the field boss's Feat, and the
-  // Haunted Pumpkin hunt's Feat after them (merged from its own branch, which minted
-  // it straight on the field boss's catalogue). The previous mint for both is the
-  // field boss's 7ce9116d... literal, so stripping all four must reproduce it exactly.
-  //
-  // Round 12's whole-event checklist (three section Feats, then the meta) appends after
-  // the Pumpkin Hunter; the previous mint is the hunt's 74b4b307... literal (rotated
-  // down here), and stripping the four must reproduce it exactly.
+  // The hard Wisp Maze deed now appends after the World PvP title ladder.
+  // Stripping it reproduces the previous 325-deed mint.
   const PRE_APPEND_CATALOG_SHA256 =
-    '74b4b307f276ae2e4b5ee7e1ca55a4f9263f7f5db4ab2bbaa673459395868b4e';
+    'f0b1e522f87715f2ffbf812095ea6fb172aa9116d57c706a9fe65f945b1b482d';
   const APPENDED_SINCE: readonly string[] = [
+    'feat_gourdlight_guise',
+    'feat_old_thatchgrin',
+    'feat_title_gourdlit',
+    'feat_title_trickster',
+    'feat_title_hollow_grinned',
+    'feat_pumpkin_hunter',
     'feat_gourdlight_doorsteps',
     'feat_gourdlight_errands',
     'feat_gourdlight_frights',
@@ -1248,8 +1243,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     // the ferry round trip. Pin the two predecessors too: an append into a known seat,
     // never a scattered insert or a retro-edit (the digest below proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'feat_title_hollow_grinned',
-      'feat_pumpkin_hunter',
+      'feat_guild_hallsworn',
+      'feat_guild_of_lantern_hall',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1478,19 +1473,14 @@ describe('table shape', () => {
     // then the world-quest block, then the faction standing ladder, then the
     // Clue Scroll casket pair, then the release's ferry round trip, then the
     // Mirefen world-boss branch's three combat deeds, then (v0.45.0 integration) the
-    // five-dungeon rework's 24, Morthen's Every Candle Lit last.
-    // Gourdlight Eve's Feat appends after Morthen's, then its field boss's Feat, then
-    // its three title writs, then the Haunted Pumpkin hunt's Feat, then (round 12) the
-    // whole-event checklist's three sections and its meta last.
-    expect(DEED_ORDER[DEED_ORDER.length - 38]).toBe('exp_harbor_to_harbor');
-    expect(DEED_ORDER[DEED_ORDER.length - 36]).toBe('cmb_balgath_ten');
-    expect(DEED_ORDER[DEED_ORDER.length - 35]).toBe('cmb_point_taken');
-    expect(DEED_ORDER[DEED_ORDER.length - 11]).toBe('dgn_morthen_candlelight');
-    expect(DEED_ORDER[DEED_ORDER.length - 10]).toBe('feat_gourdlight_guise');
-    expect(DEED_ORDER[DEED_ORDER.length - 9]).toBe('feat_old_thatchgrin');
-    expect(DEED_ORDER[DEED_ORDER.length - 6]).toBe('feat_title_hollow_grinned');
-    expect(DEED_ORDER[DEED_ORDER.length - 5]).toBe('feat_pumpkin_hunter');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('feat_gourdlight_eve_complete');
+    // five-dungeon rework's 24, Morthen's Every Candle Lit, then Lantern Hall's six, the
+    // quartermaster's third title last.
+    expect(DEED_ORDER[DEED_ORDER.length - 51]).toBe('exp_harbor_to_harbor');
+    expect(DEED_ORDER[DEED_ORDER.length - 42]).toBe('cmb_balgath_ten');
+    expect(DEED_ORDER[DEED_ORDER.length - 41]).toBe('cmb_point_taken');
+    expect(DEED_ORDER[DEED_ORDER.length - 17]).toBe('dgn_morthen_candlelight');
+    expect(DEED_ORDER[DEED_ORDER.length - 11]).toBe('feat_guild_of_lantern_hall');
+    expect(DEED_ORDER.at(-1)).toBe('feat_gourdlight_eve_complete');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
@@ -2301,6 +2291,31 @@ describe('milestone unification', () => {
     expect(DEEDS.prog_paragon.reward).toEqual({ kind: 'title', text: 'Paragon' });
     expect(DEEDS.prog_mythic.reward).toEqual({ kind: 'title', text: 'Mythic' });
     expect(DEEDS.prog_eternal.reward).toEqual({ kind: 'title', text: 'Eternal' });
+  });
+
+  it('the sixth rung (Titan) is a deed-only title at 10,000,000 lifetime XP', () => {
+    const deed = DEEDS.prog_titan;
+    expect(deed.category).toBe('progression');
+    expect(deed.renown).toBe(50);
+    expect(deed.trigger).toEqual({ kind: 'lifetimeXp', amount: 10_000_000 });
+    expect(deed.reward).toEqual({ kind: 'title', text: 'Titan' });
+    expect(deed.hidden).toBeFalsy();
+    expect(deed.feat).toBeFalsy();
+    // Deed-only: the frozen legacy milestone mirror does not grow.
+    expect(MILESTONE_DEED_TO_LEGACY.prog_titan).toBeUndefined();
+    expect(MILESTONES.some((m) => m.lifetimeXp === 10_000_000)).toBe(false);
+    // The ladder stays strictly ascending: the new rung sits above Eternal.
+    const ladder = ALL.filter((d) => d.trigger.kind === 'lifetimeXp').map((d) =>
+      d.trigger.kind === 'lifetimeXp' ? [d.id, d.trigger.amount] : [d.id, 0],
+    );
+    expect(ladder).toEqual([
+      ['prog_veteran', 250000],
+      ['prog_champion', 500000],
+      ['prog_paragon', 1000000],
+      ['prog_mythic', 2500000],
+      ['prog_eternal', 5000000],
+      ['prog_titan', 10000000],
+    ]);
   });
 });
 

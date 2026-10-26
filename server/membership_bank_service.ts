@@ -30,6 +30,8 @@ export interface MembershipBankCapture {
 export interface MembershipBankHost<S extends MembershipBankSession> {
   /** Alive, at a banker, still the same session, and not quarantined. */
   authorized(session: S): boolean;
+  /** Who may read the roster and a bank (defaults to `authorized`). */
+  authorizedRead?(session: S): boolean;
   membership(accountId: number): Promise<MembershipAuthorization>;
   /** Acquire shared inventory guard, flush conflicting books, enter the existing
    * save FIFO, and release only when job has settled. Abort unstarted jobs. */
@@ -66,25 +68,34 @@ export function createMembershipBankService<S extends MembershipBankSession>(
     views.set(session, info);
     host.publish(session, info);
   };
-  const fail = (session: S, error: string): void =>
+  // A refused move keeps the bank it was aimed at on screen (keep = that
+  // character); every other refusal clears the stale contents.
+  const fail = (session: S, error: string, keep?: number): void => {
+    const view = views.get(session) ?? empty();
     send(session, {
-      ...(views.get(session) ?? empty()),
-      bank: null,
+      ...view,
+      bank: keep !== undefined && view.selectedCharacterId === keep ? view.bank : null,
       error,
     });
+  };
   const membershipActive = (member: MembershipAuthorization): boolean =>
     member.active && Number(member.expiresAt) > now() && member.authorizedUntil > now();
 
+  const readable = (session: S): boolean =>
+    host.authorizedRead ? host.authorizedRead(session) : host.authorized(session);
   async function run(
     session: S,
     work: (membership: MembershipAuthorization) => Promise<void>,
+    keep?: number,
+    read = false,
   ): Promise<void> {
-    if (!host.authorized(session)) {
+    const authorized = read ? readable : host.authorized;
+    if (!authorized(session)) {
       fail(session, 'invalid');
       return;
     }
     if (pending.has(session.accountId) || pending.size >= MEMBERSHIP_BANK_MAX_IN_FLIGHT) {
-      fail(session, 'busy');
+      fail(session, 'busy', keep);
       return;
     }
     const time = now();
@@ -92,7 +103,7 @@ export function createMembershipBankService<S extends MembershipBankSession>(
     meter.tokens = Math.min(METER_BURST, meter.tokens + Math.max(0, time - meter.at) / 1000);
     meter.at = time;
     if (meter.tokens < 1) {
-      fail(session, 'rate_limited');
+      fail(session, 'rate_limited', keep);
       return;
     }
     meter.tokens--;
@@ -106,7 +117,7 @@ export function createMembershipBankService<S extends MembershipBankSession>(
         fail(session, 'membership_required');
         return;
       }
-      if (!host.authorized(session)) {
+      if (!authorized(session)) {
         fail(session, 'invalid');
         return;
       }
@@ -120,107 +131,122 @@ export function createMembershipBankService<S extends MembershipBankSession>(
   }
   return {
     list(session: S): Promise<void> {
-      return run(session, async (member) => {
-        const characters = await database.list(session.accountId);
-        if (!host.authorized(session) || !membershipActive(member)) {
-          fail(session, 'membership_required');
-          return;
-        }
-        send(session, {
-          characters: characters.filter((row) => row.characterId !== session.characterId),
-          selectedCharacterId: null,
-          bank: null,
-        });
-      });
+      return run(
+        session,
+        async (member) => {
+          const characters = await database.list(session.accountId);
+          if (!readable(session) || !membershipActive(member)) {
+            fail(session, 'membership_required');
+            return;
+          }
+          send(session, {
+            characters: characters.filter((row) => row.characterId !== session.characterId),
+            selectedCharacterId: null,
+            bank: null,
+          });
+        },
+        undefined,
+        true,
+      );
     },
     select(session: S, characterId: number): Promise<void> {
-      return run(session, async (member) => {
-        if (characterId === session.characterId) {
-          fail(session, 'invalid');
-          return;
-        }
-        const result = await database.load(session.accountId, characterId);
-        if (!host.authorized(session) || !membershipActive(member)) {
-          fail(session, 'membership_required');
-          return;
-        }
-        send(session, {
-          ...(views.get(session) ?? empty()),
-          selectedCharacterId: characterId,
-          bank: result.ok ? result.value : null,
-          error: result.ok ? undefined : result.error,
-        });
-      });
+      return run(
+        session,
+        async (member) => {
+          if (characterId === session.characterId) {
+            fail(session, 'invalid');
+            return;
+          }
+          const result = await database.load(session.accountId, characterId);
+          if (!readable(session) || !membershipActive(member)) {
+            fail(session, 'membership_required');
+            return;
+          }
+          send(session, {
+            ...(views.get(session) ?? empty()),
+            selectedCharacterId: characterId,
+            bank: result.ok ? result.value : null,
+            error: result.ok ? undefined : result.error,
+          });
+        },
+        undefined,
+        true,
+      );
     },
     transfer(
       session: S,
       characterId: number,
       request: MembershipBankTransferRequest,
     ): Promise<void> {
-      return run(session, async (member) => {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), MEMBERSHIP_BANK_QUEUE_WAIT_MS);
-        try {
-          const answer = await host.enqueueExclusive(
-            session,
-            async () => {
-              clearTimeout(timer);
-              if (
-                controller.signal.aborted ||
-                !host.authorized(session) ||
-                !membershipActive(member)
-              )
-                return false;
-              const capture = host.capture(session);
-              if (!capture || !session.leaseNonce) return false;
-              const result = await database.transfer({
-                accountId: session.accountId,
-                characterId: session.characterId,
-                targetCharacterId: characterId,
-                leaseNonce: session.leaseNonce,
-                state: capture.state,
-                membership: member,
-                storageEffects: capture.storageEffects,
-                ledgerEffects: capture.bankLedgerSnapshot
-                  ? bankLedgerSaveEffects(capture.bankLedgerSnapshot)
-                  : undefined,
-                request,
-                stillAuthorized: () => host.authorized(session) && membershipActive(member),
-              });
-              if (!result.ok) {
-                if (result.error === 'uncertain' || result.error === 'lease_lost')
-                  host.quarantine(session, result.error);
-                fail(session, result.error);
+      return run(
+        session,
+        async (member) => {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), MEMBERSHIP_BANK_QUEUE_WAIT_MS);
+          try {
+            const answer = await host.enqueueExclusive(
+              session,
+              async () => {
+                clearTimeout(timer);
+                if (
+                  controller.signal.aborted ||
+                  !host.authorized(session) ||
+                  !membershipActive(member)
+                )
+                  return false;
+                const capture = host.capture(session);
+                if (!capture || !session.leaseNonce) return false;
+                const result = await database.transfer({
+                  accountId: session.accountId,
+                  characterId: session.characterId,
+                  targetCharacterId: characterId,
+                  leaseNonce: session.leaseNonce,
+                  state: capture.state,
+                  membership: member,
+                  storageEffects: capture.storageEffects,
+                  ledgerEffects: capture.bankLedgerSnapshot
+                    ? bankLedgerSaveEffects(capture.bankLedgerSnapshot)
+                    : undefined,
+                  request,
+                  stillAuthorized: () => host.authorized(session) && membershipActive(member),
+                });
+                if (!result.ok) {
+                  if (result.error === 'uncertain' || result.error === 'lease_lost') {
+                    host.quarantine(session, result.error);
+                    fail(session, result.error);
+                  } else fail(session, result.error, characterId);
+                  return true;
+                }
+                // This section is synchronous: no economy command or passive grant
+                // can interleave the durable acknowledgement and exact-delta apply.
+                let applied = false;
+                try {
+                  applied = host.apply(session, result.value) && host.acknowledge(session, capture);
+                } catch (error) {
+                  host.onError(error);
+                }
+                if (!applied) {
+                  host.quarantine(session, 'changed');
+                  fail(session, 'uncertain');
+                  return true;
+                }
+                send(session, {
+                  ...(views.get(session) ?? empty()),
+                  selectedCharacterId: characterId,
+                  bank: result.value.bank,
+                  error: undefined,
+                });
                 return true;
-              }
-              // This section is synchronous: no economy command or passive grant
-              // can interleave the durable acknowledgement and exact-delta apply.
-              let applied = false;
-              try {
-                applied = host.apply(session, result.value) && host.acknowledge(session, capture);
-              } catch (error) {
-                host.onError(error);
-              }
-              if (!applied) {
-                host.quarantine(session, 'changed');
-                fail(session, 'uncertain');
-                return true;
-              }
-              send(session, {
-                ...(views.get(session) ?? empty()),
-                selectedCharacterId: characterId,
-                bank: result.value.bank,
-                error: undefined,
-              });
-              return true;
-            },
-            controller.signal,
-          );
-          if (!answer) fail(session, 'busy');
-        } finally {
-          clearTimeout(timer);
-        }
-      });
+              },
+              controller.signal,
+            );
+            if (!answer) fail(session, 'busy', characterId);
+          } finally {
+            clearTimeout(timer);
+          }
+        },
+        characterId,
+      );
     },
   };
 }

@@ -23,9 +23,9 @@
 
 import * as THREE from 'three';
 import {
-  BUILTIN_WORLD,
   getActiveWorldContent,
   isBuiltinWorldActive,
+  isBuiltinWorldContent,
   WORLD_MAX_X,
   WORLD_MAX_Z,
   WORLD_MIN_Z,
@@ -51,7 +51,20 @@ import {
 import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
 import { foliageShoreSkip } from './foliage_shore_gate_core';
 import { GFX, sharedUniforms } from './gfx';
+import {
+  createGrassEdgeTaperContext,
+  GRASS_HUB_INNER_RADIUS,
+  GRASS_ROAD_INNER_RADIUS,
+  grassEdgeCoverageScale,
+  grassEdgeHeightScale,
+  grassEdgeTaperAt,
+  grassEdgeWidthScale,
+} from './grass_edge_taper_core';
 import { getGrassGroundBake } from './grass_ground_bake';
+import {
+  attachGrassInteractionUniforms,
+  grassBladeInteractionGlsl,
+} from './grass_interaction_core';
 import {
   GRASS_PAINT_TRIM,
   MEADOW_BAND_BASE_RECOVER_Y,
@@ -147,12 +160,15 @@ export function buildBladeGrassBand(
     sh.uniforms.uPlayerPos = uPlayerPos;
     sh.uniforms.uBandFar = uBandFar;
     sh.uniforms.uBaseSink = uBaseSink;
+    attachGrassInteractionUniforms(sh.uniforms);
     sh.vertexShader = sh.vertexShader
       .replace(
         '#include <common>',
         `#include <common>
         uniform float uTime;
         uniform vec2 uPlayerPos;
+        uniform vec4 uGrassMove;
+        uniform vec4 uGrassWake;
         uniform float uBandFar;
         uniform vec3 uBaseSink;`,
       )
@@ -189,6 +205,7 @@ export function buildBladeGrassBand(
           // the carpet's sway, shared: one meadow, one wind; branched around
           // once the fade has collapsed the blade
           ${bladeSwayGlsl(classicSway)}
+          ${grassBladeInteractionGlsl()}
         #endif`,
       );
     sh.vertexShader = patchConstantUpNormalVertexShader(sh.vertexShader);
@@ -232,8 +249,14 @@ export function buildBladeGrassBand(
   const activeContent = getActiveWorldContent();
   const townExclusions = eastbrookGrassExclusions(
     activeContent.props.buildings,
-    activeContent === BUILTIN_WORLD,
+    isBuiltinWorldContent(activeContent),
     activeContent.services?.noticeboards ?? [],
+  );
+  const edgeTaperCtx = createGrassEdgeTaperContext(
+    activeContent.zones,
+    townExclusions,
+    activeContent.props.buildings,
+    activeContent.grassClear,
   );
 
   // The carpet's placeSlot, at the band's cell size: same coverage gate,
@@ -247,13 +270,15 @@ export function buildBladeGrassBand(
     if (ok) {
       const lush = groundLushnessAt(x, z, seed);
       const biomeDensity = GRASS_BIOME_DENSITY[zoneBiomeAt(x, z)] ?? 1;
-      ok = r1 < meadowCoverage(lush) * Math.min(biomeDensity, 1.2);
-      if (ok) ok = roadDistance(x, z) > 2.4;
+      const baseCoverage = meadowCoverage(lush) * Math.min(biomeDensity, 1.2);
+      const rd = roadDistance(x, z);
+      ok = r1 < baseCoverage;
+      if (ok) ok = rd > GRASS_ROAD_INNER_RADIUS;
       // The maker's painted no-grass discs, same as the near carpet: a city
       // floor has to be clear in BOTH bands or the meadow reappears the moment
       // the player steps back from it.
       if (ok) ok = !grassClearedAt(activeContent.grassClear, x, z);
-      if (ok) ok = !insideGrassHubExclusion(activeContent.zones, x, z);
+      if (ok) ok = !insideGrassHubExclusion(activeContent.zones, x, z, GRASS_HUB_INNER_RADIUS);
       if (ok) ok = !insidePavedGrassExclusion(x, z);
       if (ok) ok = !insideEastbrookGrassExclusion(townExclusions, x, z, 0.85);
       if (ok) ok = !insideAnyBuildingFootprint(activeContent.props.buildings, x, z, 0.85);
@@ -264,17 +289,23 @@ export function buildBladeGrassBand(
         if (ok) ok = !terrainCutAtHeight(x, z, h);
         if (ok) ok = Math.abs(terrainHeight(x + 0.9, z, seed) - h) < 0.55;
         if (ok) {
-          const s = meadowClusterScale(lush, hash(ci, cj, 3), hash(ci, cj, 4));
-          q.setFromAxisAngle(up, r1 * 12.9);
-          const rLean = hash(ci, cj, 5);
-          leanAxis.set(Math.sin(rLean * 41.3), 0, Math.cos(rLean * 41.3));
-          q.premultiply(qLean.setFromAxisAngle(leanAxis, rLean * 0.21));
-          const sy = meadowClusterHeight(s, lush, hash(ci, cj, 6));
-          m.compose(v.set(x, h - 0.02, z), q, sv.set(s, sy, s));
-          groundGrassColorAt(x, z, seed, c);
-          c.multiplyScalar(1.18);
-          sectorPool.place(slot, m, c);
-          return;
+          const edgeTaper = grassEdgeTaperAt(edgeTaperCtx, x, z, rd);
+          if (r1 < baseCoverage * grassEdgeCoverageScale(edgeTaper)) {
+            const baseScale = meadowClusterScale(lush, hash(ci, cj, 3), hash(ci, cj, 4));
+            const s = baseScale * grassEdgeWidthScale(edgeTaper);
+            q.setFromAxisAngle(up, r1 * 12.9);
+            const rLean = hash(ci, cj, 5);
+            leanAxis.set(Math.sin(rLean * 41.3), 0, Math.cos(rLean * 41.3));
+            q.premultiply(qLean.setFromAxisAngle(leanAxis, rLean * 0.21));
+            const sy =
+              meadowClusterHeight(baseScale, lush, hash(ci, cj, 6)) *
+              grassEdgeHeightScale(edgeTaper);
+            m.compose(v.set(x, h - 0.02, z), q, sv.set(s, sy, s));
+            groundGrassColorAt(x, z, seed, c);
+            c.multiplyScalar(1.18);
+            sectorPool.place(slot, m, c);
+            return;
+          }
         }
       }
     }

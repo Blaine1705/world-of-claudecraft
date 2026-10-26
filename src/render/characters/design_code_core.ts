@@ -291,12 +291,73 @@ export const DESIGN_FIELDS: readonly DesignField[] = [
   sizeField,
 ];
 
+const FIELD_BY_ID: ReadonlyMap<string, DesignField> = new Map(DESIGN_FIELDS.map((f) => [f.id, f]));
+
+/** The face code: the fields the WOC face builder edits, in the order its code
+ *  lists them (the body pick and size, the four colours, every head piece, the
+ *  face controls), and nothing the builder cannot show. It is the SAME wire
+ *  format with fewer fields (same header, ids and value spellings), so the one
+ *  decoder reads it and a full design code still imports into the builder.
+ *  tests/design_code.test.ts pins the list. */
+export const WOC_FACE_CODE_FIELDS: readonly string[] = [
+  'body',
+  'size',
+  'skin',
+  'eyecol',
+  'haircol',
+  'browcol',
+  'headhair',
+  'headbeard',
+  'headnose',
+  'headmouth',
+  'headbrows',
+  'headears',
+  'headeyes',
+  'headpiercing',
+  'headshape',
+];
+
+/** The face code's fields, resolved once: an id that is not a design code
+ *  field fails at load, never as a code missing a field. */
+const WOC_FACE_FIELDS: readonly DesignField[] = WOC_FACE_CODE_FIELDS.map((id) => {
+  const field = FIELD_BY_ID.get(id);
+  if (!field) throw new Error(`face code field "${id}" is not a design code field`);
+  return field;
+});
+
+function encodeFields(
+  appearance: Partial<ModularAppearance> | null,
+  fields: readonly DesignField[],
+): string {
+  const a = normalizeAppearance(appearance);
+  return `${DESIGN_CODE_HEADER}; ${fields.map((f) => `${f.id}=${f.encode(a)}`).join('; ')}`;
+}
+
 /** Serialize a look as a shareable one-line code. The input is normalized
  *  first, so the emitted values are always in range and re-importable
  *  verbatim. */
 export function encodeDesignCode(appearance: Partial<ModularAppearance> | null): string {
-  const a = normalizeAppearance(appearance);
-  return `${DESIGN_CODE_HEADER}; ${DESIGN_FIELDS.map((f) => `${f.id}=${f.encode(a)}`).join('; ')}`;
+  return encodeFields(appearance, DESIGN_FIELDS);
+}
+
+/** Serialize a look's FACE as a shareable one-line code (WOC_FACE_CODE_FIELDS):
+ *  what the WOC face builder's Share page shows and copies. */
+export function encodeWocFaceCode(appearance: Partial<ModularAppearance> | null): string {
+  return encodeFields(appearance, WOC_FACE_FIELDS);
+}
+
+/** Lift a code out of what a chat message wraps it in. A code shared on
+ *  Discord comes back with backticks or a code fence round it, in quotes, or
+ *  behind a label ("My ranger: WOC1; ..."): everything before the header token
+ *  goes, and so does a closing fence, backtick, quote mark (straight, or any
+ *  curly or angled quote, opening or closing type, since some languages close
+ *  on an opening-type mark) or full stop after the last field (no field value
+ *  can end in one). A paste with no header token at all comes back untouched,
+ *  so it still fails as 'header'. */
+function unwrapPastedCode(raw: string): string {
+  const m = /(^|[^a-z0-9_])woc\d+(?![a-z0-9_])/i.exec(raw);
+  if (!m) return raw;
+  return raw.slice(m.index + m[1].length).replace(/[\s`"'.\p{Pi}\p{Pf}]+$/u, '');
 }
 
 export type DesignCodeError = 'empty' | 'header' | 'version' | 'malformed';
@@ -320,14 +381,15 @@ export interface DesignCodeFailure {
 }
 
 /** Parse a pasted code. Tolerant where sharing mangles things (case, extra
- *  whitespace, line breaks between fields, a trailing separator); strict where
- *  damage means data loss (a token with no `=`, an unreadable value, a header
- *  from a future format). Missing fields take the default look's value, so a
- *  short code is a valid design, not an error. */
+ *  whitespace, line breaks between fields, a trailing separator, the backticks,
+ *  quotes or label a chat message wraps it in); strict where damage means data
+ *  loss (a token with no `=`, an unreadable value, a header from a future
+ *  format). Missing fields take the default look's value, so a short code is a
+ *  valid design, not an error. */
 export function decodeDesignCode(raw: string): DecodedDesignCode | DesignCodeFailure {
   if (typeof raw !== 'string') return { ok: false, reason: 'empty' };
   if (raw.length > DESIGN_CODE_MAX_LENGTH) return { ok: false, reason: 'malformed' };
-  const tokens = raw
+  const tokens = unwrapPastedCode(raw)
     .split(/[;\n\r]+/)
     .map((t) => t.trim())
     .filter((t) => t !== '');
@@ -337,7 +399,7 @@ export function decodeDesignCode(raw: string): DecodedDesignCode | DesignCodeFai
   if (!header) return { ok: false, reason: 'header' };
   if (Number(header[1]) !== 1) return { ok: false, reason: 'version' };
 
-  const byId = new Map(DESIGN_FIELDS.map((f) => [f.id, f]));
+  const byId = FIELD_BY_ID;
   const draft: Partial<ModularAppearance> = {};
   const applied: DesignField[] = [];
   const ignored: string[] = [];

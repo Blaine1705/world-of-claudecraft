@@ -838,11 +838,13 @@
 
   /* Footer donate link keeps the social-link shape but warms up on hover. */
   .footer-lang-row,
-  .footer-legal-row {
+  .footer-legal-row,
+  .footer-guides-row {
     display: flex;
     justify-content: center;
   }
-  .footer-legal-row {
+  .footer-legal-row,
+  .footer-guides-row {
     gap: 14px;
     flex-wrap: wrap;
   }
@@ -4720,6 +4722,27 @@
     font-family: var(--font-heading);
     font-size: 20px;
     text-shadow: 1px 1px 3px #000;
+    padding: 24px;
+    text-align: center;
+    overflow: auto;
+  }
+
+  .fatal-overlay-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .fatal-overlay-actions button {
+    margin: 0;
+    min-height: 40px;
+    max-width: 100%;
+  }
+
+  .fatal-overlay-status {
+    min-height: 1.5em;
+    font-size: 16px;
   }
 
   .char-list-message {
@@ -6918,6 +6941,33 @@
     );
     pointer-events: none;
   }
+  /* Gearscore (average worn item level), centered just under the stage's
+     class-colored floor line above, which sits 64px off the stage bottom. */
+  #inspect-window .inspect-gearscore {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 30px;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 8px;
+    pointer-events: none;
+    font-family: var(--title-font);
+    text-shadow: 0 1px 2px color-mix(in srgb, var(--color-keyline) 85%, transparent);
+  }
+  #inspect-window .inspect-gearscore-label {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-text-overlay) 72%, transparent);
+  }
+  #inspect-window .inspect-gearscore b {
+    font-size: 17px;
+    font-weight: normal;
+    color: var(--gold);
+  }
 
   @media (min-width: 900px) {
     /* Both screens share the same split so the right showcase panel is
@@ -8962,6 +9012,144 @@
       min-width: 40px;
     }
   }
+
+  /* ---------- first-login graphics prompt ---------- */
+  /* Pre-game modal over the start screen (src/ui/graphics_choice_prompt.ts). The dialog is a
+     .ui-panel and the confirm a .ui-btn--gold; this section only sets geometry and type. The
+     backdrop pads by the safe-area insets so a notched landscape phone keeps the dialog clear. */
+  .graphics-prompt-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+      max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    box-sizing: border-box;
+    background: var(--color-options-scrim);
+  }
+  .graphics-prompt-dialog {
+    width: min(460px, 100%);
+    max-height: 100%;
+    overflow-y: auto;
+    padding: 18px;
+    box-sizing: border-box;
+    animation: graphics-prompt-in 160ms ease-out;
+  }
+  @keyframes graphics-prompt-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .graphics-prompt-title {
+    margin: 0 0 6px;
+    font-family: var(--title-font);
+    font-size: 19px;
+    font-weight: normal;
+    color: var(--gold);
+  }
+  .graphics-prompt-desc,
+  .graphics-prompt-note {
+    margin: 0 0 14px;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .graphics-prompt-note {
+    margin: 0;
+    font-size: 12px;
+  }
+  .graphics-prompt-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .graphics-prompt-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    cursor: var(--cursor-point);
+  }
+  .graphics-prompt-option:has(.graphics-prompt-radio:checked) {
+    border-color: var(--gold);
+  }
+  .graphics-prompt-option:has(.graphics-prompt-radio:focus-visible) {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .graphics-prompt-radio {
+    flex: none;
+    margin-top: 2px;
+    accent-color: var(--gold);
+    width: 18px;
+    height: 18px;
+  }
+  .graphics-prompt-option-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .graphics-prompt-option-title {
+    color: var(--color-text-light);
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .graphics-prompt-option-desc {
+    color: var(--color-text-muted);
+    font-size: 12px;
+    line-height: 1.45;
+  }
+  /* The "change it later" note shares the confirm's row, so the prompt stays one row shorter. */
+  .graphics-prompt-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .graphics-prompt-confirm {
+    flex: none;
+    min-width: 120px;
+  }
+  /* Landscape phones: two option columns and tighter spacing so the whole prompt fits
+     without scrolling on a short viewport. */
+  @media (max-height: 520px) and (min-width: 560px) {
+    .graphics-prompt-dialog {
+      width: min(640px, 100%);
+      padding: 12px 14px;
+    }
+    .graphics-prompt-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+    .graphics-prompt-option {
+      padding: 7px 10px;
+    }
+    .graphics-prompt-desc {
+      margin-bottom: 8px;
+    }
+    .graphics-prompt-actions {
+      margin-top: 8px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .graphics-prompt-dialog {
+      animation: none;
+    }
+  }
+  body.reduce-motion .graphics-prompt-dialog {
+    animation: none;
+  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -9786,7 +9974,7 @@
 /* Character creation and the Redesign editor on a WOC body. Mounted by
    src/ui/woc_head_builder.ts into the same hosts as the modular customizer
    above. A AAA creator layout: a category menu on the left, the open
-   category's options in a panel beside it, a Randomize / Reset footer.
+   category's options in a panel beside it, a Randomize / Reset / Share footer.
    Tokens only, pinned at zero raw colour literals by
    tests/css_raw_color_ratchet.test.ts; swatch fills arrive as --whb-sw from
    the painter. Like the customizer rules, these live outside @layer shell so
@@ -9914,6 +10102,12 @@
   min-height: 0;
   padding: 10px 10px 8px;
   animation: whb-panel-in 180ms ease;
+}
+
+/* The tab panel and the Share region take turns in one grid cell: the class's
+   display would otherwise outrank the hidden attribute's. */
+.whb-panel[hidden] {
+  display: none;
 }
 
 @keyframes whb-panel-in {
@@ -10234,13 +10428,140 @@
   box-shadow: 0 0 12px var(--color-primary-glow);
 }
 
+/* The footer's Share button: gold (below, with Copy), with its glyph, on a row
+   of its own under Random and Reset, so the way to save and send a face reads
+   at a glance. Lit while the Share page is up. */
+.whb-foot-share {
+  grid-column: 1 / -1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.whb-foot-glyph {
+  flex: none;
+  width: 15px;
+  height: 15px;
+}
+
+/* The Share page: the face code in a monospace box that is also where a code
+   is pasted, Copy / Import under it, then a status line. Coarse pointers get
+   the 16px input floor from base.css, so nothing here sets a smaller font on
+   the box there. */
+.whb-share-hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+}
+
+.whb-share-code {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 104px;
+  padding: 8px 10px;
+  font-family: ui-monospace, Consolas, "Cascadia Mono", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-text-light);
+  background: var(--color-card-inset);
+  /* a text box's edge has to read against the panel (3:1), which the
+     showcase border colour does not on its own */
+  border: 1px solid color-mix(in srgb, var(--gold-dim) 60%, transparent);
+  border-radius: 6px;
+  resize: vertical;
+  /* the code is one long line of fields: wrap anywhere rather than scroll */
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  scrollbar-width: thin;
+}
+
+/* Copy and Import side by side while both labels fit, each on a row of its own
+   when they do not (a narrow panel, a long translation): a button is never
+   narrower than its label, and a row shares its spare width out. */
+.whb-share-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.whb-share-btn {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 4px 10px;
+  white-space: nowrap;
+  font-family: var(--title-font);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-light);
+  background: var(--color-card-inset);
+  border: 1px solid var(--color-border-showcase);
+  border-radius: 6px;
+  cursor: var(--cursor-point);
+  transition:
+    color 140ms ease,
+    background 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.whb-share-btn:hover {
+  border-color: color-mix(in srgb, var(--gold-dim) 70%, transparent);
+  background: color-mix(in srgb, var(--gold-dim) 12%, transparent);
+}
+
+/* Gold, the builder's call to action: the footer's Share button and Copy, the
+   Share page's main action. After both buttons' own rules, so it wins. */
+.whb-foot-share,
+.whb-share-copy {
+  color: var(--gold);
+  border-color: var(--gold-dim);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--gold-dim) 26%, transparent),
+    color-mix(in srgb, var(--gold-dim) 8%, transparent)
+  );
+}
+
+.whb-foot-share:hover,
+.whb-foot-share.sel {
+  border-color: var(--gold);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--gold) 30%, transparent),
+    0 0 14px var(--color-primary-glow);
+}
+
+.whb-share-copy:hover {
+  border-color: var(--gold);
+  box-shadow: 0 0 12px var(--color-primary-glow);
+}
+
+.whb-share-status {
+  min-height: 18px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--color-text-success);
+}
+
+.whb-share-status.err {
+  color: var(--color-text-error);
+}
+
 .whb-cat:focus-visible,
 .whb-opt:focus-visible,
 .whb-match:focus-visible,
 .whb-custom-input:focus-visible,
 .whb-sw:focus-visible,
 .whb-slider:focus-visible,
-.whb-foot-btn:focus-visible {
+.whb-foot-btn:focus-visible,
+.whb-share-code:focus-visible,
+.whb-share-btn:focus-visible {
   outline: 2px solid var(--color-border-focus);
   outline-offset: 2px;
 }
@@ -10255,7 +10576,8 @@
   .whb-match,
   .whb-custom,
   .whb-sw,
-  .whb-foot-btn {
+  .whb-foot-btn,
+  .whb-share-btn {
     transition: none;
   }
 }
@@ -10281,7 +10603,8 @@
   .whb-opt.sel,
   .whb-match.sel,
   .whb-custom.sel,
-  .whb-cat.sel {
+  .whb-cat.sel,
+  .whb-foot-share.sel {
     border-color: Highlight;
     outline: 2px solid Highlight;
     outline-offset: -2px;
@@ -10291,7 +10614,8 @@
   .whb-opt.sel:focus-visible,
   .whb-match.sel:focus-visible,
   .whb-cat.sel:focus-visible,
-  .whb-sw.sel:focus-visible {
+  .whb-sw.sel:focus-visible,
+  .whb-foot-share.sel:focus-visible {
     outline: 3px solid CanvasText;
     outline-offset: 2px;
   }
@@ -10311,7 +10635,8 @@
   .whb-opt,
   .whb-match,
   .whb-custom,
-  .whb-foot-btn {
+  .whb-foot-btn,
+  .whb-share-btn {
     min-height: 40px;
   }
   /* Touch: every swatch clears the 40px target floor, in even rows (the skin
@@ -10442,6 +10767,11 @@
   }
   .whb-opts {
     grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  }
+  /* the sheet's own cap above leaves a short landscape phone little room: the
+     code box scrolls inside itself so Copy and Import stay in view */
+  .whb-share-code {
+    max-height: 26dvh;
   }
 }
 

@@ -3,6 +3,7 @@ import { MUSTER_RACK_TEMPLATE_ID } from '../sim/content/mirefen_muster';
 import { FORGE_INTERACT_RANGE, FORGE_STATIONS } from '../sim/content/world_quest_forging';
 import { isInvestigationNpc } from '../sim/content/world_quest_investigation';
 import { isShadowNpc, SHADOW_NPC_ID } from '../sim/content/world_quest_shadow';
+import { isLootableBody } from '../sim/corpse_loot_state';
 import { ESCORTS } from '../sim/data';
 import { kitUsableNow } from '../sim/mob/trash_kit/encounter_use';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
@@ -12,6 +13,7 @@ import {
   EASTBROOK_NOTICEBOARD_TEMPLATE_ID,
   type Entity,
   INTERACT_RANGE,
+  type InvSlot,
   REALM_BUILDER_MONUMENT_INTERACT_RADIUS,
   REALM_BUILDER_MONUMENT_TEMPLATE_ID,
 } from '../sim/types';
@@ -23,6 +25,7 @@ import type { IWorld } from '../world_api';
 import { corpseLootAvailability, localPartyMemberIds } from './corpse_loot_availability';
 import type { HoverCursorKind } from './cursors';
 import { decideEscortPress, handleEscortPress, isEscorteeEntity } from './escort_interact';
+import { carriesFirebottle, isTorchableHut } from './hut_torch';
 import type { InteractionOutcome } from './interaction_autorun';
 
 export interface PickInteractionWorld {
@@ -154,14 +157,20 @@ export function isAttackableEntity(
   return e.kind === 'player' && activePvpOpponentSet.has(e.id);
 }
 
-/** Which game cursor to show when hovering an entity. */
+/** Which game cursor to show when hovering an entity. `carried` is the viewer's
+ *  bags, read only by the quest-item arm (a torchable mudfin hut). */
 export function hoverCursorKind(
   e: Entity | undefined,
   playerId: number,
   partyMemberIds: ReadonlySet<number>,
   activePvpOpponentSet: ReadonlySet<number> = new Set(),
+  carried?: readonly Pick<InvSlot, 'itemId' | 'count'>[],
 ): HoverCursorKind {
   if (!e) return 'default';
+  // A mudfin hut on "Back to the Shallows" wears the gear while the firebottle is in
+  // the bags: a click or the interact key throws it for you (hut_torch.ts), and the
+  // gear is the cue that says so before anyone reads the quest text.
+  if (isTorchableHut(e)) return carriesFirebottle(carried) ? 'gear' : 'default';
   if (isAttackableEntity(e, playerId, activePvpOpponentSet)) return 'attack';
   if (e.kind === 'npc') return 'friendly';
   // An escortee is a quest NPC that happens to be mob-kind; hovering it must
@@ -213,8 +222,7 @@ export function shouldApproachPickedEntity(
   const d = dist2d(player.pos, entity.pos);
   if (entity.dead) {
     return (
-      entity.kind === 'mob' &&
-      entity.lootable &&
+      isLootableBody(entity) &&
       d > INTERACT_RANGE + 1 &&
       corpseLootAvailability(entity, player.id, harvestStateReliable, partyMemberIds).canOpen
     );
@@ -284,7 +292,7 @@ export function handlePickedEntity(
         return true;
       }
       return world.pickUpObject(id);
-    } else if (e.kind === 'mob' && e.dead && e.lootable) {
+    } else if (isLootableBody(e)) {
       if (world.player.dead) {
         hud.showError(tSim('error.cantWhileDead'));
         return false;
@@ -390,7 +398,7 @@ export function handlePickedEntity(
         return true;
       }
       return world.pickUpObject(id);
-    } else if (e.kind === 'mob' && e.dead && e.lootable) {
+    } else if (isLootableBody(e)) {
       if (world.player.dead) {
         hud.showError(tSim('error.cantWhileDead'));
         return false;

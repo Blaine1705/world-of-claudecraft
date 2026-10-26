@@ -44,9 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Kotlina Dzikiego Serca',
+    desc: 'Charakterystyczna broń od Kłolorda, Pogromcy Bestii, Żarłokwiatu i Zulgara.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroiczna: Kotlina Dzikiego Serca',
+    desc: 'Epickie przedmioty i błyskotki dostępne tylko na heroicznym poziomie od Kłolorda, Pogromcy Bestii, Żarłokwiatu i Zulgara, Głosu Kotliny.',
   },
   conquerors_nythraxis: {
     name: 'Rajd Nythraxis',
@@ -142,11 +144,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_gallery: {
     name: 'Galeria Wojny',
-    desc: 'Pięć bojowych zestawów Wojny, zdobywanych sztuka po sztuce za honor.',
+    desc: 'Pięć bojowych zestawów Wojen pierwszego sezonu, teraz sprzedawanych kawałek po kawałku za złoto.',
   },
   conquerors_warfare_armory: {
     name: 'Zbrojownia Wojny',
-    desc: 'Biżuteria i bronie Wojny kupione za ciężko wywalczony honor.',
+    desc: 'Biżuteria, bronie i towary Wojny kupione za ciężko wywalczony honor.',
   },
   conquerors_vanguard_gallery: {
     name: 'Galeria Awangardy',

@@ -1,6 +1,7 @@
 import { resetBankerChestProfileCaches } from '../banker_chest';
 import { prepareCanopyDetailProfileAssets } from '../canopy_detail';
 import { prepareCharacterProfileAssets, resetCharacterProfileCaches } from '../characters/assets';
+import { resetSpiritVeilLedger } from '../characters/ghost_veil';
 import { prepareCityClutterProfileAssets, resetCityClutterProfileCaches } from '../city_clutter';
 import { prepareCliffScreeProfileAssets, resetCliffScreeProfileCaches } from '../cliff_scree';
 import { prepareStoneDetailProfileAssets } from '../detail_normals';
@@ -38,6 +39,7 @@ import { resetJailSceneProfileCaches } from '../jail_scene';
 import { prepareMailboxProfileAssets, resetMailboxProfileCaches } from '../mailbox';
 import { prepareMirefenTavernAssets, resetMirefenTavernCaches } from '../mirefen_tavern';
 import { prepareNoticeboardProfileAssets, resetNoticeboardProfileCaches } from '../noticeboard';
+import { preparePaintedTownProfileAssets, resetPaintedTownProfileCaches } from '../painted_towns';
 import { resetPaladinAscensionProfileCaches } from '../paladin_ascension_visual';
 import { preparePropProfileAssets, resetPropProfileCaches } from '../props';
 import { resetQuestObjectProfileCaches } from '../quest_objects';
@@ -79,6 +81,7 @@ const PREPARERS: readonly GraphicsProfileAssetPreparer[] = [
       prepareEastbrookTownProfileAssets(target),
       prepareFenbridgeTownProfileAssets(target),
       prepareHighwatchTownProfileAssets(target),
+      preparePaintedTownProfileAssets(target),
       prepareEastbrookGrandArmouryProfileAssets(),
       prepareMailboxProfileAssets(),
       prepareNoticeboardProfileAssets(),
@@ -98,11 +101,14 @@ const RESETTERS = [
   ['foliage', resetFoliageProfileCaches],
   ['props', resetPropProfileCaches],
   ['characters', resetCharacterProfileCaches],
+  // The veil's linked-tuple ledger belongs to the retiring renderer's programs.
+  ['spirit_veil', resetSpiritVeilLedger],
   ['stations', resetStationProfileCaches],
   ['eastbrook_surface_atlas', resetEastbrookSurfaceProfileCaches],
   ['eastbrook_town', resetEastbrookTownProfileCaches],
   ['fenbridge_town', resetFenbridgeTownProfileCaches],
   ['highwatch_town', resetHighwatchTownProfileCaches],
+  ['painted_towns', resetPaintedTownProfileCaches],
   ['banker_chest', resetBankerChestProfileCaches],
   ['mailbox', resetMailboxProfileCaches],
   ['noticeboard', resetNoticeboardProfileCaches],

@@ -4046,6 +4046,23 @@
       }
     ]
   },
+  "mount_neigh_lantern_hall_destrier": {
+    "ceilingDb": 4.6,
+    "tracks": [
+      {
+        "filename": "mount_neigh_lantern_hall_destrier_1.mp3",
+        "sha256": "2bcc861ba9d39bd262720fa3286dc78ebf02b781bbeb6c8351369f5c66978d99",
+        "size": 49572,
+        "peakDb": -5.6
+      },
+      {
+        "filename": "mount_neigh_lantern_hall_destrier_2.mp3",
+        "sha256": "4b39078de5971f70c4cc991a028d0c291dbc7bd5f40e4ff88f34c885fcefae70",
+        "size": 49572,
+        "peakDb": -6
+      }
+    ]
+  },
   "mount_run_aether_hover_cycle": {
     "ceilingDb": 5.2,
     "tracks": [

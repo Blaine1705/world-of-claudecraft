@@ -134,6 +134,8 @@ export const SFX = [
   // (foot_<surface>) through Sfx.mountRun's fallback branch. A mount is opted
   // into that fallback purely by the ABSENCE of its key here, so adding one
   // back is all it takes to give either of them a bespoke stride again.
+  // Wobbles the Slime (developer mount) borrows the footfall the same way
+  // until a bespoke squelch is generated for it.
   {
     key: 'mount_run_goblin_rocket_sled_start',
     custom: true,
@@ -239,6 +241,17 @@ export const SFX = [
   },
   {
     key: 'mount_run_terrorspark_groundshaker_stop',
+    custom: true,
+  },
+  {
+    // The Lantern Hall Destrier's whinny as it rears on its hind legs (a standing jump while
+    // mounted, src/render/mount_rear_core.ts): two takes generated with the ElevenLabs Sound
+    // Effects API (eleven_text_to_sound_v2, 2026-10-16) and picked by the maintainer, prompt
+    // "A powerful heavy war horse rearing up and letting out a loud, proud whinny neigh, with a
+    // short snort at the end, realistic recording, close, no music, no voices, about 2 seconds".
+    // Stored as custom masters so a paid regeneration never replaces the picked takes; the
+    // variant pool rotates them with a no-repeat bias.
+    key: 'mount_neigh_lantern_hall_destrier',
     custom: true,
   },
   {

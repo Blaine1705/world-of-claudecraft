@@ -1,3 +1,4 @@
+import { isLootableBody } from '../sim/corpse_loot_state';
 import { WORLD_QUESTS_BY_ID } from '../sim/data';
 import { kitUsableNow, kitUseOf } from '../sim/mob/trash_kit/encounter_use';
 import { isQuestGatedGroundObjectHidden } from '../sim/quest_gated_entity';
@@ -11,6 +12,7 @@ import {
   type QuestProgress,
   type WorldQuestProgress,
 } from '../sim/types';
+import { vaultPortalVisible } from '../sim/vault_portal_visibility';
 import { investigationDisguiseHidden } from '../sim/world_quest_investigation_visibility';
 import {
   isWorldQuestSalvageObject,
@@ -29,6 +31,7 @@ export interface NearbyInteractionScanWorld {
   player: Entity;
   playerId?: number;
   partyInfo?: { members: readonly { pid: number }[] } | null;
+  characterId?: number;
   entities: ReadonlyMap<number, Entity>;
   questLog: ReadonlyMap<string, QuestProgress>;
   farmPatches: readonly FarmPatchDef[];
@@ -130,6 +133,7 @@ export function resolveNearbyInteractionCandidate(
   }
 
   for (const entity of world.entities.values()) {
+    if (!vaultPortalVisible(entity, playerId, world.partyInfo, world.characterId)) continue;
     // A disguised infiltrator or a shadow-mission guard the viewer cannot see is
     // no candidate, exactly as the renderer hides it.
     if (investigationDisguiseHidden(entity, world) || shadowGuardHidden(entity, world)) continue;
@@ -150,9 +154,7 @@ export function resolveNearbyInteractionCandidate(
     // it cannot swallow an eligible interaction standing behind it.
     if (
       !player.dead &&
-      entity.kind === 'mob' &&
-      entity.dead &&
-      entity.lootable &&
+      isLootableBody(entity) &&
       corpseLootAvailability(entity, playerId, harvestStateReliable, partyIds).hasLoot &&
       distance < bestCorpseDistance
     ) {
@@ -168,6 +170,7 @@ export function resolveNearbyInteractionCandidate(
       !player.dead &&
       entity.kind === 'object' &&
       entity.lootable &&
+      vaultPortalVisible(entity, playerId, world.partyInfo, world.characterId) &&
       (salvageQuest && isWorldQuestSalvageObject(entity, salvageQuest)
         ? !isWorldQuestSalvageObjectHidden(
             entity,

@@ -93,7 +93,7 @@ describe('selectionRingScale', () => {
   });
 
   it('the rarity-tier buddies (3x scale) still shrink well below their raw scale', () => {
-    // cate_coin/alon/trollface/triple_t: scale 2.7, height <= 0.9 — the exact
+    // cate_coin/alon/trollface/triple_t: scale 2.7, height <= 0.9, the exact
     // case that read as a wildly oversized reticle before this fix.
     const s = selectionRingScale(2.7, 0.4);
     expect(s).toBeLessThan(1);

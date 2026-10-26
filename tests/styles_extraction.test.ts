@@ -114,6 +114,23 @@ describe('CSS extraction: barrel + seam wiring', () => {
     }
   });
 
+  it('self-hosts the same webfont set as the /wiki guide', () => {
+    // src/styles/fonts.css replaced the Google Fonts stylesheet on both game entries; the
+    // guide declares the identical set, so the two never drift apart.
+    const faces = (css: string) => css.match(/@font-face \{[\s\S]*?\n\}/g) ?? [];
+    const game = faces(read('src/styles/fonts.css'));
+    expect(game.length).toBeGreaterThanOrEqual(20);
+    expect(game).toEqual(faces(read('src/guide/styles.css')));
+    for (const entry of ['index.html', 'play.html']) {
+      expect(read(entry), entry).not.toContain('fonts.googleapis.com');
+      expect(read(entry), entry).toContain(
+        '<link rel="stylesheet" href="/src/styles/fonts.css" />',
+      );
+    }
+    // Linked per entry, not through the barrel (see the header of fonts.css).
+    expect(barrel).not.toContain('fonts.css');
+  });
+
   it('@imports in cascade order, with hud.css BEFORE components.css (same @layer components tie-break)', () => {
     // Import order roughly follows the @layer cascade. The one deliberate exception:
     // hud.css and components.css both target @layer components, so components.css is

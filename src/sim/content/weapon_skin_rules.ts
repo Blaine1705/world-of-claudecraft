@@ -16,6 +16,7 @@ import { WEAPON_SKINS } from './weapon_skins';
 export type ItemWeaponType = WeaponSkinType | 'polearm';
 
 export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
+  membership_staff: 'staff',
   // Swords
   thornpeak_wardblade: 'sword', // EPIC: Nythraxis gap-fill tank one-hander
   worn_sword: 'sword',
@@ -197,6 +198,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   fogbinders_rod: 'wand',
   merecleaver: 'axe',
   moonwrack_stave: 'staff',
+  vanguard_feral_staff: 'staff',
 };
 
 /**

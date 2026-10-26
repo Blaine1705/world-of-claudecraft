@@ -66,6 +66,10 @@ function openWindow(openReferralCards?: () => void): SocialWindow {
     showPrompt: noop,
     startWhisper: noop,
     openReferralCards,
+    openSelfMenu: noop,
+    openUnitMenu: noop,
+    openNameMenu: noop,
+    isMobileLayout: () => false,
   };
   const win = new SocialWindow(deps);
   win.toggle();

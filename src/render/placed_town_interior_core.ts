@@ -18,9 +18,9 @@
 //    in front of its back shelves, and the front door;
 //  - smithy: the forge room under its ceiling, the front door, and the side arch onto the
 //    forge shelter (an opening too: the shelter is open to the weather);
-//  - manor (the Highwatch manor, built in this repo): the great hall under its hood, the
-//    front door, the dais bay through its arch, and through their arches and doors the
-//    dining hall and the kitchen (west), the library and the chapel (east).
+//  - guild (the Highwatch adventurers' guild, built in this repo): the great hall clear of
+//    the guildmaster's hearth and the quartermaster's shelves, the front door, the arch
+//    and the trophy hall behind it, short of its hearth.
 // A model with no entry here (a sealed one: the cottages, the watch house, the vault) has no
 // air: the camera stays the open-world one. Every town that stands these models (Highwatch,
 // Eastbrook, Fenbridge) registers the air through placed_town_interiors.ts.
@@ -169,30 +169,21 @@ const MODEL_AIR: Readonly<Record<string, ModelAir>> = {
       { box: 2, axis: 0, side: 1 },
     ],
   },
-  manor: {
-    // scripts/assets/highwatch_manor/manor_plan.py: one storey, the floor at 0.6 everywhere
-    // but the dais (1.0)
+  guild: {
+    // scripts/assets/highwatch_guild/guild_plan.py: one storey, the floor at 0.6 everywhere
     boxes: [
-      // the great hall: inner walls x +-13, z +-10, under the copper hood (9.9) and the
-      // chandeliers; the open roof's trusses all stand above 11.6
-      [-12.75, 12.75, 0.6, 9.6, -9.6, 9.6],
-      // the front door through the front wall (z -10.9 to -10), its head at 5.8
-      [-1.6, 1.6, 0.6, 5.8, -11.0, -9.7],
-      // the round arch onto the dais, inside its curve, and the dais bay under its ceiling
-      [-3.6, 3.6, 1.0, 8.0, 9.5, 11.1],
-      [-5.75, 5.75, 1.0, 9.4, 10.9, 17.15],
-      // the arches through the gable walls into the wings (x +-13 to +-13.9)
-      [12.6, 14.3, 0.6, 5.8, -2.4, 2.4],
-      [-14.3, -12.6, 0.6, 5.8, -2.4, 2.4],
-      // the dining hall (west) under its tie beams, the door to the kitchen and the kitchen,
-      // short of its range's chimney breast
-      [14.15, 23.65, 0.6, 7.9, -6.95, 7.55],
-      [21.2, 23.2, 0.6, 5.4, 7.5, 8.9],
-      [15.85, 23.65, 0.6, 6.9, 8.85, 13.1],
-      // the library (east), clear of its shelves, the door to the chapel and the chapel
-      [-22.9, -14.15, 0.6, 7.9, -6.95, 3.9],
-      [-19.8, -17.8, 0.6, 5.4, 3.8, 5.9],
-      [-21.75, -15.85, 0.6, 7.8, 5.85, 12.15],
+      // the great hall: inner walls x +-14, z +-10, clear of the hearth's breast and the
+      // shelves on the right wall (x -12.7), under the chandeliers; the open roof's trusses
+      // all stand above 11.6. Its front face sits a hair past the quarter yard (-9.74) so a
+      // walk in at a free turn never lands on it exactly, where float rounding alone would
+      // decide whether the eye is in
+      [-12.45, 13.75, 0.6, 9.6, -9.74, 9.75],
+      // the front door through the front wall (z -10.9 to -10), its head at 6.2
+      [-1.6, 1.6, 0.6, 6.2, -11.0, -9.7],
+      // the round arch into the trophy hall, inside its curve, and the trophy hall under its
+      // tie beams, short of its hearth's breast
+      [-2.8, 2.8, 0.6, 7.4, 9.6, 11.2],
+      [-8.25, 8.25, 0.6, 9.1, 10.95, 18.55],
     ],
     openings: [{ box: 1, axis: 2, side: -1 }],
   },

@@ -9,13 +9,25 @@
 //
 // Data-as-code: plain exported records, no engine logic (content CLAUDE.md).
 
+import { NYTHRAXIS_BONE_STORM_ENABLED } from '../nythraxis_bone_storm';
 import { type DungeonDifficulty, NYTHRAXIS_ADDS_ENABLED, type PlayerClass } from '../types';
 import type { Role } from './talents';
 
 // Structured listing tags: the only "description" a premade listing carries.
 // Free-form listing text is deliberately unsupported (no moderation surface).
-export type FinderListingTag = 'first_run' | 'quest_run' | 'full_clear' | 'learning' | 'fast_run';
+// `guild_only` is not a purpose chip: it marks a Guild Party, whose every
+// member must share the leader's guild (enforced by the finder machine).
+export type FinderListingTag =
+  | 'first_run'
+  | 'quest_run'
+  | 'full_clear'
+  | 'learning'
+  | 'fast_run'
+  | 'guild_only';
 
+export const FINDER_GUILD_TAG: FinderListingTag = 'guild_only';
+
+// The purpose chips the create form offers (the Guild Party flag has its own toggle).
 export const FINDER_LISTING_TAGS: readonly FinderListingTag[] = [
   'first_run',
   'quest_run',
@@ -25,7 +37,7 @@ export const FINDER_LISTING_TAGS: readonly FinderListingTag[] = [
 ];
 
 export function isFinderListingTag(value: unknown): value is FinderListingTag {
-  return (FINDER_LISTING_TAGS as readonly unknown[]).includes(value);
+  return value === FINDER_GUILD_TAG || (FINDER_LISTING_TAGS as readonly unknown[]).includes(value);
 }
 
 // Stable slot order for deterministic role assignment and display.
@@ -35,11 +47,9 @@ export function isFinderRole(value: unknown): value is Role {
   return (FINDER_ROLE_ORDER as readonly unknown[]).includes(value);
 }
 
-// Below FIRST_TALENT_LEVEL there is no specialization, so finder roles come
-// from this fixed class-capability table. From the spec unlock (FIRST_TALENT_LEVEL) on, the selected role
-// must match the active specialization's role instead (see compatibleFinderRoles
-// in ../social/dungeon_finder.ts).
-export const FINDER_PRE_SPEC_ROLES: Record<Role, readonly PlayerClass[]> = {
+// Finder roles express the jobs a class can offer, at every level. Selecting
+// a role never changes or requires an active talent specialization.
+export const FINDER_CLASS_ROLES: Record<Role, readonly PlayerClass[]> = {
   tank: ['warrior', 'paladin', 'druid'],
   healer: ['paladin', 'priest', 'shaman', 'druid'],
   dps: ['warrior', 'paladin', 'hunter', 'rogue', 'priest', 'shaman', 'mage', 'warlock', 'druid'],
@@ -201,7 +211,7 @@ const SUNKEN_BASTION_ENCOUNTERS: readonly FinderEncounter[] = [
 const DROWNED_TEMPLE_ENCOUNTERS: readonly FinderEncounter[] = [
   // The rework's route (drowned_temple.md): the choir, the moon pool, the
   // prism, the altar.
-  { mobId: 'choirmother_selthe', mechanics: ['chorus_and_solo'] },
+  { mobId: 'choirmother_selthe', mechanics: ['chorus_and_solo', 'the_score'] },
   // The Mere Hydra (encounters/drowned_temple/mere_hydra.ts) stands between
   // Selthe's Court Stairs and the Prism Stair, which rises only once its three
   // heads are down (the prism_stair_rise gate). One boss, three bodies: the
@@ -292,7 +302,8 @@ const NYTHRAXIS_RAID_MECHANICS: readonly string[] = [
   'deathless_rage',
   'wardstones',
   'kings_wrath',
-  'bone_storm',
+  // Bone Storm is retired from play; the finder follows the same switch.
+  ...(NYTHRAXIS_BONE_STORM_ENABLED ? ['bone_storm'] : []),
   'crown_endures',
 ];
 

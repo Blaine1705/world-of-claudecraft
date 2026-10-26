@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { buildingRecordColliders } from '../src/sim/authored_town_buildings';
 import {
   bankerChestSpots,
@@ -21,7 +21,7 @@ import {
   ZONE2_ROADS,
   ZONE2_ZONE,
 } from '../src/sim/content/zone2';
-import { BUILTIN_WORLD, GATHER_NODES } from '../src/sim/data';
+import { BASE_WORLD, BUILTIN_WORLD, GATHER_NODES, setActiveWorldContent } from '../src/sim/data';
 import {
   distancePointToObb,
   FENBRIDGE_BUILDINGS_BY_ID,
@@ -41,6 +41,9 @@ import { waterLevelAt } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 const SEED = WORLD_SEED;
+
+beforeEach(() => setActiveWorldContent(BASE_WORLD));
+afterEach(() => setActiveWorldContent(null));
 
 function expectDeepFrozen(value: unknown): void {
   if (value === null || typeof value !== 'object') return;
@@ -293,9 +296,7 @@ describe('Fenbridge canonical pure layout', () => {
     // line: the only colliders there are the grand buildings' own walls (the
     // ones their records stand), which reach past it now.
     const ownWalls = FENBRIDGE_LAYOUT.buildings.flatMap((building) => {
-      const record = BUILTIN_WORLD.props.buildings.find(
-        (candidate) => candidate.id === building.id,
-      );
+      const record = BASE_WORLD.props.buildings.find((candidate) => candidate.id === building.id);
       if (!record) throw new Error(`no props record for ${building.id}`);
       return buildingRecordColliders(record, 0, () => 0, SEED);
     });
@@ -926,7 +927,7 @@ describe('Fenbridge content projection and preservation', () => {
 
 describe('Fenbridge runtime safety and traversal', () => {
   it('spawns every NPC at its exact authored transform and keeps Petra a live banker chest', () => {
-    const sim = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true, world: BASE_WORLD });
     for (const placement of FENBRIDGE_LAYOUT.services.npcs) {
       const entity = [...sim.entities.values()].find(
         (candidate) => candidate.kind === 'npc' && candidate.templateId === placement.id,

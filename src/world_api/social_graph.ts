@@ -114,6 +114,13 @@ export interface GuildInfo {
   nextRosterPrice?: number | null;
 }
 
+// Presence privacy (server/presence_privacy.ts): who sees this character online
+// through friends lists and the guild roster. 'friends' means the players on
+// THIS character's own friends list.
+export type PresenceMode = 'everyone' | 'friends' | 'none';
+
+export const PRESENCE_MODES: readonly PresenceMode[] = ['everyone', 'friends', 'none'];
+
 export interface SocialInfo {
   friends: FriendInfo[];
   friendsCursor?: number;
@@ -130,6 +137,9 @@ export interface SocialInfo {
   // The viewer's own standing pledge; null when none (and always null while
   // guilded: joining any guild clears the pledge server-side).
   myPledge: MyPledgeInfo | null;
+  // The viewer's own presence setting (the Social window's Friends footer).
+  // Absent from an older server's frame, where the control is not shown.
+  presenceMode?: PresenceMode;
 }
 
 // The realm's online roster as the Social window's Who tab mirrors it (the
@@ -166,7 +176,9 @@ export interface CharacterSearchResult {
 // This is the already-crawlable subset (the same one behind the public /c/:name
 // page), so it deliberately carries NO wallet balance, Discord/GitHub identity,
 // or equipped gear: those stay on the proximity-gated entity wire, visible only
-// when you are actually standing next to the player.
+// when you are actually standing next to the player. (One consented exception:
+// applying to a group listing shares worn gear with that listing's leader, via
+// DungeonFinderApplicantView.gear in the leader's own finder snapshot.)
 export interface CharacterProfile {
   name: string;
   cls: string;

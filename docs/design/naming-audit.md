@@ -769,6 +769,18 @@ caster kit and the Tideglass Colossus's floor mechanic (`src/sim/encounters/drow
 | Mere Surge | Selthe's wedge of water | KEEP. No match; plain English, "Mere" is the game's own Mere Hydra word. |
 | Tideglass Fracture | the Colossus's prism slices | KEEP. No match; "Tideglass" is this game's own coined token (Tideglass Colossus, Tideglass Dirk). |
 
+Selthe's Score (web-verified 2026-10-14; `src/sim/encounters/drowned_temple/selthe_score.ts`).
+Plain descriptive English by brief; exact-phrase searches against the major game wikis found no
+boss mechanic, aura or object of any of these names.
+
+| Name | Where | Verdict |
+|---|---|---|
+| The Score | Selthe's melody on the moon tiles (her bar and her ward) | KEEP. No match; the ordinary word for written music. |
+| Moon Tile | the five tiles round her pool | KEEP. No match in a game wiki (a mobile puzzle game uses "Moon-tile" for its goal tile, an unrelated generic compound). |
+| Broken Voice | her stun and damage window once the Score is answered | KEEP. No match; plain English. |
+| Discord | the court-wide hit when the verse runs out | KEEP. A common English word used across many unrelated properties (shared vocabulary); no boss mechanic of the name found. |
+| False Note | a tile stepped out of turn | KEEP. No match; a common English idiom. |
+
 The second round of the same pass (web-verified 2026-10-04): the Mere Hydra's Combined Breath
 (`hydra_combo.ts`), Ysolei calling the moon (`ysolei_moon.ts`) and the Pearlguard Sentinel's new
 manta body (display only; the id `pearlguard_sentinel` is frozen).
@@ -1004,13 +1016,56 @@ candidates collided and were replaced before shipping; the ids never shipped und
 
 ### The Highwatch manor's steward (web-checked 2026-10-15)
 
-The manor's resident (`src/sim/content/highwatch_manor.ts`). The manor itself carries no new
-proper noun ("Highwatch" is the existing town).
+The manor's resident (`src/sim/content/highwatch_manor.ts`, deleted with the manor). The manor
+itself carries no new proper noun ("Highwatch" is the existing town).
+
+**RETIRED 2026-10-19.** The manor came out of the game whole, its steward with it
+(`steward_ansel_hale` was cut outright: integration-branch only, never in a release), so
+neither name below ships anywhere. The verdicts are KEPT rather than deleted, because a
+retired audit row is what stops a later change re-coining the same name and re-doing the
+same search.
 
 | Name | Where | Verdict |
 |---|---|---|
-| Ansel Hale | the manor steward NPC | KEEP. No full-name hit on the web or any game wiki searched (warcraft.wiki.gg, Wowhead, Fallout and RuneScape wikis). "Ansel" alone is a real given name: RuneScape Dragonwilds has a knight called Ansel and WoW has a High Executor Anselm, neither a match. "Hale" is a common English surname (Fallout 76 has an Emerson Hale). Shared English, no coined token. "Odric" was considered and dropped: Sir Odric is a named Magic: The Gathering character. |
-| Steward of the Manor | his NPC title | KEEP. Plain English job title, no distinctive match. |
+| Ansel Hale | the manor steward NPC (retired) | KEEP. No full-name hit on the web or any game wiki searched (warcraft.wiki.gg, Wowhead, Fallout and RuneScape wikis). "Ansel" alone is a real given name: RuneScape Dragonwilds has a knight called Ansel and WoW has a High Executor Anselm, neither a match. "Hale" is a common English surname (Fallout 76 has an Emerson Hale). Shared English, no coined token. "Odric" was considered and dropped: Sir Odric is a named Magic: The Gathering character. |
+| Steward of the Manor | his NPC title (retired) | KEEP. Plain English job title, no distinctive match. |
+
+### The Highwatch adventurers' guild (web-checked 2026-10-16)
+
+The guild hall at the old stable yard (`src/sim/content/highwatch_guild.ts`, the contracts in
+`src/sim/content/guild_contracts.ts`). Exact-phrase web searches plus the major game wikis.
+
+| Name | Where | Verdict |
+|---|---|---|
+| Lantern Hall | the guild hall | KEEP. No game, guild or location of that name found; the hits were Guild Wars 2 guild-hall lantern decorations (items, not a hall) and a homebrew Exalted city "Lanterntown". Shared English. |
+| Lantern Seal | the guild's contract currency | KEEP. No game item of that name; the nearest hit is the puzzle game Lantern Push's "Ember Seals". "Guild Seal" was considered and dropped: it is Gems of War's guild-only currency, distinctive enough to avoid. |
+| Hesper Dunmore | the guildmaster | KEEP. No full-name hit; Dunmore is a Scottish place name and surname (the Earls of Dunmore, the novelist Helen Dunmore), Hesper a real given name. |
+| Tobias Wren | the contract clerk | KEEP. No full-name hit in any game or wiki; several unrelated single-name Tobiases (Redguard, Dying Light, Saints Row). Shared English. |
+| Garrick Holt | the guild quartermaster | KEEP. No full-name hit; a Garrick appears in the novel Fourth Wing under another surname. |
+| Mira Fairweather | the guild recruiter | KEEP. No full-name hit. "Lysa Fairweather" was considered and dropped: the given name too readily recalls Lysa Arryn of A Song of Ice and Fire. |
+| Contract Clerk, Guild Quartermaster, Guild Recruiter, Guildmaster of Lantern Hall | the residents' titles | KEEP. Plain English job titles. |
+| Writ-Runner, Hallsworn | the quartermaster's two bought titles | KEEP. No game title or term of either name found. |
+| of Lantern Hall | the quartermaster's third title | KEEP. Built on the hall's own name above. "Lantern-Bearer" was considered and dropped: Pathfinder's Lantern Bearers are a named order of resurrected adventurers. |
+| Lantern Hall Destrier | the guild's war horse (a mount) | KEEP. No game mount or creature of that name found; built on the hall's own name and the plain English "destrier" (a historical war horse; Warhammer's "Destrier" is a knight war machine, not this phrase). |
+| Reins of the Lantern Hall Destrier | the horse's reins item | KEEP. The repo's own reins pattern (Reins of the Viridian Valestrider) around the name above. |
+| Blade of Lantern Hall | the guild's sword appearance | KEEP. No game weapon of that name found. "Lantern Sword" was considered and dropped: it is a Guild Wars 2 weapon skin; "Lanternblade" and "Lanternguard" were checked and carry no hit, but the hall's own name reads plainer. |
+| Hearthbrand | the guild's fire sword appearance | KEEP. Exact-phrase searches (game wikis, wiki.gg, Wowhead, Fandom) found no game weapon, item or term of that name; the nearest hits are unrelated (Minecraft Dungeons' Hawkbrand, a Skyrim mod's Hjaltbrand). Plain English hearth plus brand (a sword). |
+| Squallcrest | the guild's sea-storm sword appearance | KEEP. No game weapon, place or term of that name found. Inspired only in feel by an ornate sea-themed sword from another game; no name, silhouette or texture of it is used. |
+| Rimelight Staff | the guild's frost staff appearance | KEEP. No game staff or item of that name found (Rimlight Studios is an unrelated developer name, Rimelands an unrelated game). |
+| Duskwick Staff | the guild's shadow staff appearance | KEEP. No game staff or item of that name found (only a community roleplay town). "Nightwick Staff" was considered and dropped: Nightwick Abbey is a published tabletop setting. |
+
+### The sixth lifetime-XP rung: Titan (web-verified 2026-10-01)
+
+Scope: `prog_titan`, the 10,000,000 lifetime-XP deed and its title reward,
+both displayed as "Titan". Method per the standing bar: quoted exact-phrase
+search for "Titan" as a title or achievement across WoW, RuneScape, GW2, FFXIV
+and ESO. No game ships "Titan" alone as a player title; the nearest hit is
+WoW's "Herald of the Titans", a different full name. Titan is shared Greek
+myth vocabulary used across many unrelated properties, and in this repo it
+only appears inside the Fury talent name "Titan's Grip", a different role.
+Verdict: GENERIC. Earlier candidates: "Immortal" and "Undying" were rejected
+as WoW's Naxxramas titles; "Timeless" (also GENERIC) was replaced by the
+owner's pick before shipping.
 
 ### Hester's Gourdlight Eve toys (web-checked 2026-10-19)
 
@@ -1593,6 +1648,7 @@ frozen).
 | Spellgnaw | CLEAR |  | mobMechanic:grubjaw.purgeOnHit |
 | Spirit of Aldren | CLEAR |  | mob:nythraxis_heroic_warrior_add |
 | Splitshot | KEEP | relabeled at QA: 'Split Shot' is a genre-wide ranged skill (FFXIV Machinist, Heroes of Hammerwatch); the fused token keeps it under bar rule 2 | ability:multi_shot choiceRow:hun_r14_multi_shot |
+| Sporemending | CLEAR | owner display rename of Wildbloom (2026-10-08, id unchanged); quoted exact-phrase and coined-token searches found no game use; nearest is Scars of Honor's druid talent effect 'Mending Spore', generic words in another order and role | ability:rejuvenation |
 | Springwell | CLEAR |  | ability:healing_stream choiceRow:sha_r11_healing_stream |
 | Staff of Velkhar | CLEAR |  | item:staff_of_velkhar item:heroic_staff_of_velkhar |
 | Stormcrag | CLEAR |  | poi:2.5 |
@@ -1651,7 +1707,6 @@ frozen).
 | Watcher of the Tanglemouth | CLEAR |  | npcTitle:strandwatcher_pell |
 | Waterbind | CLEAR |  | ability:conjure_water |
 | Wickharbor | CLEAR |  | poi:12.0 |
-| Wildbloom | CLEAR |  | ability:rejuvenation |
 | Wildbolt | CLEAR |  | ability:wrath |
 | Wildbond | CLEAR |  | ability:tame_beast |
 | Wildfang Rally | CLEAR |  | ability:aspect_of_the_wild choiceRow:hun_r20_aspect_of_the_wild |

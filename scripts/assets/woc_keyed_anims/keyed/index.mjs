@@ -15,6 +15,21 @@ import * as attack1h1 from './attack1h_1.mjs';
 import { twoHand } from './attack2h.mjs';
 import * as backpedal from './backpedal.mjs';
 import { resolveBladeKeys } from './blade.mjs';
+import {
+  castDirected,
+  castOmni,
+  castOmniRelease,
+  castShoot,
+  channelDirected,
+  combatIdle1h,
+  combatIdle2h,
+  combatIdleDual,
+  hitWound,
+  shieldBash,
+  shoutRoar,
+  special1h,
+  special2h,
+} from './combat_actions.mjs';
 import { crouchIdle, crouchWalk } from './crouch.mjs';
 import * as death from './death.mjs';
 import { dualOff, dualPair } from './dual.mjs';
@@ -75,6 +90,19 @@ export const KEYED = {
   Woc_Attack_Polearm_0: long0,
   Woc_Attack_Polearm_1: long1,
   Woc_Attack_Polearm_2: long2,
+  Woc_Combat_Idle_1H: combatIdle1h,
+  Woc_Combat_Idle_2H: combatIdle2h,
+  Woc_Combat_Idle_Dual: combatIdleDual,
+  Woc_Hit: hitWound,
+  Woc_Shout: shoutRoar,
+  Woc_Shield_Bash: shieldBash,
+  Woc_Special_1H: special1h,
+  Woc_Special_2H: special2h,
+  Woc_Cast_Directed: castDirected,
+  Woc_Cast_Omni: castOmni,
+  Woc_Cast_Shoot: castShoot,
+  Woc_Cast_Omni_Release: castOmniRelease,
+  Woc_Channel_Directed: channelDirected,
   Woc_Crouch_Idle: crouchIdle,
   Woc_Crouch_Forward: crouchWalk(0),
   Woc_Crouch_Back: crouchWalk(180),

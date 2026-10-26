@@ -27,7 +27,7 @@ function harness(sim: Sim): {
 }
 
 describe('membership armour tooltip matches live stats', () => {
-  it.each([5, 19, 20])(
+  it.each([5, 19, 20, 30])(
     'shows the live stats and tier at level %s even with item levels hidden',
     (level) => {
       const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
@@ -53,11 +53,11 @@ describe('membership armour tooltip matches live stats', () => {
           );
       }
       expect(html).toContain(
-        t('hudChrome.options.itemLevelLine', { level: itemNumber(level < 20 ? level : 25) }),
+        t('hudChrome.options.itemLevelLine', { level: itemNumber(level + 5) }),
       );
       expect(html).toContain('all 7 membership armor pieces');
       expect(html).toContain('20% more experience');
-      if (level === 20) expect(html).toContain('Perfected: item level 25');
+      expect(html).not.toContain('Perfected:');
     },
   );
 
@@ -103,7 +103,7 @@ describe('membership armour tooltip matches live stats', () => {
       );
     const active = tooltip();
     expect(active).toContain('Healing Power');
-    expect(active).toContain('Perfected: item level 25');
+    expect(active).toContain(t('hudChrome.options.itemLevelLine', { level: itemNumber(25) }));
     expect(active).not.toContain('Inactive:');
     expect(active).not.toContain('tt-armor-bad');
     wearer.membershipActive = false;
@@ -111,6 +111,26 @@ describe('membership armour tooltip matches live stats', () => {
     const dormant = tooltip();
     expect(dormant).toContain('Inactive:');
     expect(dormant).not.toContain('Healing Power');
+    expect(dormant).not.toContain('999');
+  });
+
+  it('shows the Staff of Changing damage and attributes from the combat projection', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'rogue', autoEquip: false });
+    const meta = sim.players.get(sim.player.id)!;
+    sim.setPlayerLevel(19);
+    sim.setMembership(sim.player.id, 1000);
+    sim.setSpec('assassination');
+    const item = MEMBERSHIP_ITEMS.membership_staff;
+    const effective = membershipTooltipItem(item, sim);
+    recalcPlayerStats(sim.player, 'rogue', { mainhand: item.id }, sim.playerMods(meta), {});
+    expect(sim.player.weapon).toEqual(effective.weapon);
+    const html = harness(sim).itemTooltip(item, false);
+    expect(html).toContain(t('hudChrome.options.itemLevelLine', { level: itemNumber(24) }));
+    expect(html).toContain(t('itemUi.tooltip.membershipWeaponAdaptive'));
+    expect(html).not.toContain('all 7 membership armor pieces');
+    sim.setMembership(sim.player.id, 0);
+    const dormant = harness(sim).itemTooltip(item, false, { rolled: { stats: { agi: 999 } } });
+    expect(dormant).toContain('Inactive: renew your membership');
     expect(dormant).not.toContain('999');
   });
 

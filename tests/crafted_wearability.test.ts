@@ -204,7 +204,8 @@ describe('crafted wearability: the level-20 shelf is unmoved (masterwrought R5 s
     // four level-20 drops plus Balgath's loot (five trinkets and the Craterglass
     // Stave), the same +10 its own branch measured (768 -> 778).
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 897.
-    expect(shelf.length).toBe(897);
+    // The restored Season 2 feral staff and eight jewels retain the level-20 gate.
+    expect(shelf.length).toBe(907);
     for (const def of shelf) {
       expect(requiredLevelFor(def), `${def.id} shelf gate`).toBe(20);
     }

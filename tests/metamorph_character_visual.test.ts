@@ -133,7 +133,15 @@ describe('Metamorphosis character integration', () => {
       readFileSync(new URL('../src/render/characters/form_rig_sync.ts', import.meta.url), 'utf8'),
     ).toContain("metamorph: { key: 'form_metamorph', slot: 'metamorphVisual', gate: false }");
     expect(source).toContain('this.createCharacterVisualWithRetry(e, formKey, formKey)');
-    expect(source).toContain('v.metamorphVisual?.setFar(v.isFar && active === v.metamorphVisual);');
+    // The far-LOD handoff walks every form slot (only the ACTIVE rig may go far)
+    // through the slot list in form_visual_slots_core.ts, the Lich slot included.
+    expect(source).toContain('setFormRigsFar(v, active, v.isFar);');
+    expect(
+      readFileSync(
+        new URL('../src/render/characters/form_visual_slots_core.ts', import.meta.url),
+        'utf8',
+      ),
+    ).toContain("'metamorphVisual',");
     // The player prewarm builder (metamorph-first, then per-class rigs) moved
     // to src/render/zone_prewarm_groups.ts at the Phase 16 extraction; the
     // form claim follows the code.
@@ -155,9 +163,7 @@ describe('Metamorphosis character integration', () => {
     );
     expect(core).toContain('rigs.metamorphVisual?.setActive(visibility.metamorph);');
     expect(source).toContain('characterFormShadowPlan(');
-    expect(source).toContain(
-      'v.metamorphVisual?.setProxyShadow(shadowPlan.formProxy && active === v.metamorphVisual)',
-    );
+    expect(source).toContain('setFormRigsProxyShadow(v, active, shadowPlan.formProxy);');
     // The entity's own scale, times only the per-body swells (the Bastion's
     // fed crawler and Old Thatchgrin's Swelling Gourd, 1 for every other body),
     // composed in scarecrow_fx.ts entityDisplayScale: no form scale.

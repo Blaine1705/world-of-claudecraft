@@ -1,6 +1,7 @@
 // The built-in towns that stand painted Tidehold buildings, in one list:
-// Eastbrook (sim/eastbrook_layout.ts), Fenbridge (sim/fenbridge_layout.ts) and
-// Highwatch (sim/highwatch_layout.ts). Every consumer that has to know which
+// Eastbrook (sim/eastbrook_layout.ts), Fenbridge (sim/fenbridge_layout.ts),
+// Highwatch (sim/highwatch_layout.ts) and every painted town after them
+// (sim/painted_towns/). Every consumer that has to know which
 // building records belong to a rebuilt town (their colliders and walk-in
 // floors, the inn's rest area, the custom-world strip, Studio's promotion)
 // reads this list instead of naming the towns one by one.
@@ -11,13 +12,15 @@
 // saved before Highwatch was rebuilt carries `authoredTowns` but none of
 // Highwatch's placements, and sharing the flag would stand its buildings down
 // with nothing to replace them (the same reason the Eastbrook vault has its
-// own family).
+// own family). The painted towns share `paintedTowns` for the same reason:
+// they arrived together, so a document carries all of them or none.
 import { EASTBROOK_LAYOUT } from './eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
 import { HIGHWATCH_LAYOUT } from './highwatch_layout';
+import { PAINTED_TOWNS, type PaintedTownId } from './painted_towns';
 import type { PromotedScenery } from './types';
 
-export type AuthoredTownFamily = 'authoredTowns' | 'highwatchTown';
+export type AuthoredTownFamily = 'authoredTowns' | 'highwatchTown' | 'paintedTowns';
 
 interface TownPoint {
   readonly x: number;
@@ -61,7 +64,7 @@ export interface AuthoredTownBuildingRecord {
 }
 
 export interface AuthoredTown {
-  readonly id: 'eastbrook' | 'fenbridge' | 'highwatch';
+  readonly id: 'eastbrook' | 'fenbridge' | 'highwatch' | PaintedTownId;
   readonly promotedBy: AuthoredTownFamily;
   readonly buildings: readonly AuthoredTownBuildingRecord[];
 }
@@ -70,6 +73,13 @@ export const AUTHORED_TOWNS: readonly AuthoredTown[] = Object.freeze([
   { id: 'eastbrook', promotedBy: 'authoredTowns', buildings: EASTBROOK_LAYOUT.buildings },
   { id: 'fenbridge', promotedBy: 'authoredTowns', buildings: FENBRIDGE_LAYOUT.buildings },
   { id: 'highwatch', promotedBy: 'highwatchTown', buildings: HIGHWATCH_LAYOUT.buildings },
+  ...PAINTED_TOWNS.map(
+    (town): AuthoredTown => ({
+      id: town.id,
+      promotedBy: 'paintedTowns',
+      buildings: town.buildings,
+    }),
+  ),
 ]);
 
 /** Every rebuilt town's building records, Eastbrook first. */

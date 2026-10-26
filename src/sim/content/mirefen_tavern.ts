@@ -13,21 +13,22 @@
 // One storey for players, open to the roof: an L with a round tower in its inner corner.
 //  - the common room (the hall), 30.4 wide and 26.4 deep inside, open to its hammerbeam
 //    roof (no timber crosses the room under TAVERN_HALL.truss): the front door in the
-//    middle of its gable, a round hearth one step down in the middle of the floor, a
-//    window booth either side of the door, a booth and the long table down the left wall
-//    and the dice table by the door, the bard's stage in the back left corner, the wall
-//    fireplace and its settle on the right, the bar on a raised platform in the back right
-//    corner wrapped round a stone pillar, barrel racks behind it either side of the
-//    kitchen's serving hatch;
+//    middle of its long front under a cross gable, a round hearth one step down in the
+//    middle of the floor, a window booth either side of the door, a booth and the long
+//    table down the left wall and the dice table by the door, the bard's stage in the back
+//    left corner, the wall fireplace and its settle on the right, the bar on a raised
+//    platform in the back right corner wrapped round a stone pillar, barrel racks behind
+//    it either side of the kitchen's serving hatch;
 //  - the round tower behind the hall's back wall, open to the room through a wide arch: a
 //    flagged nook with a bench round its wall and two small tables, open up into its cone;
 //  - the wing behind the hall's right half, the kitchen and the cellar, closed: only the
 //    serving hatch looks into it. The rooms the innkeeper lets upstairs are never walked.
 //
 // Scale: the player stands 2.6 yd to the crown on a 0.5 yd body radius. The door clears
-// 4.6 by 5.2, the side walls stand 10 to the eaves under a ridge at 20, the lowest roof
-// timber across the room is at 10.2, table tops stand at 1.45, plain wooden seats (chairs,
-// stools, the long table's and the porch's benches) at 0.9 and cushioned ones at 0.85.
+// 4.6 by 5.2, the front and the back walls stand 10 to the eaves under a ridge at 21.6
+// running along the hall, the lowest roof timber across the room is at 10.2, table tops
+// stand at 1.45, plain wooden seats (chairs, stools, the long table's and the porch's
+// benches) at 0.9 and cushioned ones at 0.85.
 
 import type { NpcDef } from '../types';
 import { TAVERN_GROUNDS_PROPS } from './mirefen_tavern_grounds';
@@ -51,21 +52,22 @@ export const TAVERN_HALL = {
   z0: -14,
   z1: 14,
   wall: 0.8,
-  /** The wall plate along both side walls (the eaves' line). */
+  /** The eaves' line along the front and the back walls (the roof runs along the road: its
+   *  eaves over the jettied front and the back wall, its gables on the side walls). */
   eave: 10.0,
-  /** The ridge over the middle, running front to back (the front is a gable). */
-  ridge: 20.0,
-  /** The hammer beams' undersides and the beam the bar's pillar carries: no timber crosses
-   *  the room under it (only the short braces under the hammer beams, hugging the side walls,
-   *  dip a yard below; the camera's air stops under them all,
-   *  render/mirefen_tavern_interior_core.ts). */
+  /** The ridge, running along the hall (local x) midway between the jettied front's face and
+   *  the back wall; a cross gable climbs over the front door into it. */
+  ridge: 21.6,
+  /** The level no timber crosses the room under, and the beam the bar's pillar carries (only
+   *  the hammer beams and their short braces, hugging the front and the back walls, dip a yard
+   *  below; the camera's air stops under them all, render/mirefen_tavern_interior_core.ts). */
   truss: 10.2,
-  /** The hammerbeam trusses' positions along the hall (local z). */
-  trusses: [-10.0, -4.6, 0.0, 5.0, 10.0],
-  /** The roof overhangs the side walls at the eaves and the gables at the verges: deep eaves,
-   *  and at the front a verge that reaches on over the jettied upper storey (TAVERN_JETTY). */
+  /** The hammerbeam trusses' positions along the hall (local x), each spanning front to back. */
+  trusses: [-11.0, -5.6, 5.6, 11.0],
+  /** The roof overhangs the front and the back walls at the eaves and the side walls at the
+   *  verges (the front's eaves reach on past the jettied upper storey, TAVERN_JETTY). */
   eaveOut: 1.6,
-  vergeOut: 2.0,
+  vergeOut: 1.8,
 } as const;
 
 /** The front's jettied upper storey: from `y` over the ground floor up to the gable the front
@@ -74,7 +76,7 @@ export const TAVERN_HALL = {
  *  is no upper floor, and nothing of it stands where a body walks (well over any head). */
 export const TAVERN_JETTY = { y: 5.9, out: 1.0 } as const;
 
-/** The front doorway in the middle of the front gable. */
+/** The front doorway in the middle of the long front, under the cross gable. */
 export const TAVERN_DOOR = { x: 0, width: 4.6, height: 5.2 } as const;
 
 /** The stone porch before the door and the steps down from it to the road. */
@@ -104,7 +106,8 @@ export const TAVERN_WING = {
   eave: 9.4,
   /** The keeper's floor over the kitchen (the band on its walls, outside). */
   floor: 6.0,
-  /** The wing's ridge runs front to back over its middle, under the hall's back gable. */
+  /** The wing's ridge runs front to back over its middle, on up over the hall roof's back slope
+   *  until it dies into it. */
   ridge: 13.3,
   eaveOut: 0.9,
   vergeOut: 0.6,
@@ -173,7 +176,6 @@ export type TavernPropKind =
   | 'chest'
   | 'barrels'
   | 'cask'
-  | 'planter'
   | 'terraceTable'
   | 'terraceBench'
   | 'post'
@@ -182,7 +184,8 @@ export type TavernPropKind =
   | 'hay'
   | 'cart'
   | 'woodpile'
-  | 'dog';
+  | 'dog'
+  | 'dressing';
 export type TavernLevel = 'ground' | 'pit' | 'platform' | 'stage';
 
 export interface TavernProp {
@@ -196,15 +199,19 @@ export interface TavernProp {
   hd?: number;
   height: number;
   level: TavernLevel;
-  /** For a piece outside on the terrain (the flower tubs at the foot of the porch steps and
-   *  everything on the grounds, ./mirefen_tavern_grounds.ts): the ground's height under its
-   *  middle, over the ground floor, in place of its level's floor. Everything else stands on
-   *  its level. */
+  /** For a piece outside on the terrain (everything on the grounds,
+   *  ./mirefen_tavern_grounds.ts): the ground's height under its middle, over the ground floor,
+   *  in place of its level's floor. Everything else stands on its level. */
   baseY?: number;
   /** Furniture can be stood on (the harbor house idiom); the hearth, the wall fireplace,
    *  the barrel racks and the bar's pillar block at full height. A `cask` is one barrel
-   *  standing on its end (the porch's), a `planter` a stone flower tub, both round. */
+   *  standing on its end (the porch's), round. */
   standable?: boolean;
+  /** A `dressing` piece is one of the room's painted models (the props' atlas,
+   *  scripts/assets/mirefen_tavern/props/props.json), named here, standing on its floor in its
+   *  footprint: the dresser, the stacked barrels, the crates, the sacks, the firewood. The model
+   *  draws it; the record is its collider. */
+  model?: string;
 }
 
 const DEG = Math.PI / 180;
@@ -580,6 +587,76 @@ export const TAVERN_PROPS: readonly TavernProp[] = [
     height: 3.6,
     level: 'platform',
   },
+  // the room's dressing (`model`: the props' painted models), each in its own footprint: the
+  // dresser of plates and jugs against the right gable wall in the front corner, clear of the
+  // square table's chairs and the low window over them
+  {
+    kind: 'dressing',
+    model: 'dresser',
+    x: 14.75,
+    z: 11.5,
+    rot: 4.7124,
+    hw: 0.93,
+    hd: 0.43,
+    height: 3.0,
+    level: 'ground',
+  },
+  // barrels stacked three high on their cradle behind the bar against the right gable wall,
+  // their heads to the room, under the low window there (its inner sill at 2.5) and clear of
+  // the barrel rack in the corner
+  {
+    kind: 'dressing',
+    model: 'barrel_stack',
+    x: 14.33,
+    z: -10.3,
+    rot: 4.7124,
+    hw: 1.03,
+    hd: 0.85,
+    height: 1.7,
+    level: 'platform',
+  },
+  // crates of straw and apples stacked against the right gable wall on the bar's platform by
+  // the long counter's open end, under the low window there
+  {
+    kind: 'dressing',
+    model: 'crate_stack',
+    x: 14.6,
+    z: -5.6,
+    rot: 4.7124,
+    hw: 0.87,
+    hd: 0.57,
+    height: 1.5,
+    level: 'platform',
+    standable: true,
+  },
+  // sacks of meal and malt slumped against the right gable wall in front of the bar's
+  // platform, under the fisherman's net
+  {
+    kind: 'dressing',
+    model: 'grain_sacks',
+    x: 14.58,
+    z: -2.9,
+    rot: 4.7124,
+    hw: 0.78,
+    hd: 0.6,
+    height: 0.9,
+    level: 'ground',
+    standable: true,
+  },
+  // a wicker basket heaped with split logs and the hatchet that split them, on the floor by
+  // the wall fire's right cheek, between the hearth and the square table's chair
+  {
+    kind: 'dressing',
+    model: 'firewood_basket',
+    x: 14.5,
+    z: 5.45,
+    rot: 4.7124,
+    hw: 0.63,
+    hd: 0.58,
+    height: 1.2,
+    level: 'ground',
+    standable: true,
+  },
   // the tower's nook
   ...nook(),
   // outside on the porch, clear of the doorway (x -2.3 to 2.3) and its posts: the porch
@@ -628,30 +705,6 @@ export const TAVERN_PROPS: readonly TavernProp[] = [
     r: 0.3,
     height: 0.8,
     level: 'ground',
-    standable: true,
-  },
-  // the flower tub left of the foot of the porch steps, on the terrain beside the last step
-  {
-    kind: 'planter',
-    x: -4.45,
-    z: 20.75,
-    rot: 0,
-    r: 0.5,
-    height: 0.95,
-    level: 'ground',
-    baseY: -2.69,
-    standable: true,
-  },
-  // the flower tub right of the foot of the porch steps
-  {
-    kind: 'planter',
-    x: 4.45,
-    z: 20.75,
-    rot: 0.4,
-    r: 0.5,
-    height: 0.95,
-    level: 'ground',
-    baseY: -2.24,
     standable: true,
   },
   // the grounds outside: the terrace, the stable's trough, hay and cart, the woodpile, the

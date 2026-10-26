@@ -4,6 +4,7 @@ import type { ReferralRewardState } from './referral_reward_state';
 // gameplay module. New fields remain optional unless every historical save can
 // supply them.
 
+import type { SavedAura } from './aura_persist';
 import type { SavedBankState } from './bank';
 import type { SavedBuddyCollection } from './buddies';
 import type { SavedLoadout, TalentAllocation } from './content/talents';
@@ -13,6 +14,7 @@ import type { SavedDeedStats } from './deeds';
 import type { PlayerEquipment } from './entity';
 import type { JailState } from './jail';
 import type { LocalGathererIdentity } from './material_gatherer';
+import type { MaterialComposition } from './material_sources';
 import type { SavedMaterialsVaultState } from './materials_vault';
 import type { ArchetypeState } from './professions/archetype';
 import type { PersistedFarmPlot } from './professions/farm_persist';
@@ -39,6 +41,7 @@ import type { WeeklyRewardState } from './weekly_rewards';
 // are optional so characters saved before the Ashen Coliseum existed load
 // cleanly (addPlayer falls back to the unranked defaults).
 export interface CharacterState extends ReferralRewardState {
+  queueRewards?: import('./social/queue_rewards').QueueRewardsState;
   // Production content migration revision. Revision 1 is the v0.26 all-class
   // Talents V2 migration; revision 2 is the v0.29 Hunter redesign repick.
   // Absent means a pre-v0.26 character JSONB save.
@@ -56,6 +59,9 @@ export interface CharacterState extends ReferralRewardState {
   // countdown stored as remaining seconds, and the career kill/death tally.
   // Absent for every character who never raised the flag.
   worldPvp?: WorldPvpSavedState;
+  // The Skull Bag's stored trophy skulls (src/sim/pvp/skull_bag.ts): one
+  // material-source bucket per victim. Absent when the bag holds nothing.
+  skullBag?: MaterialComposition;
   prestigeRank?: number;
   unlockedMilestones?: string[];
   // Rested XP pool. Optional so pre-rested-XP saves load cleanly (defaults to 0).
@@ -96,6 +102,8 @@ export interface CharacterState extends ReferralRewardState {
   // Equipped bag sockets. Optional so pre-bag saves load cleanly (defaults to
   // 4 empty sockets; an over-capacity legacy inventory is tolerated).
   bags?: (string | null)[];
+  /** Equipped member bag, retained without capacity while membership is inactive. */
+  membershipBag?: string;
   // Per-character bank (JSONB; optional so pre-bank saves load cleanly, defaulting
   // to an empty bank with no purchased/bonus slots). sanitizeBankState is the one
   // load path (never destroys items; tolerates an over-capacity inventory). The
@@ -132,10 +140,22 @@ export interface CharacterState extends ReferralRewardState {
     clueCasketsOpened?: number;
     // Treasure maps (src/sim/treasure_vault.ts), written only when set.
     treasureMap?: { rarity: string; siteId: string; seed: number };
-    vaultAttempt?: { id: string; rarity: string; siteId: string; seed: number };
+    vaultAttempt?: {
+      id: string;
+      rarity: string;
+      siteId: string;
+      seed: number;
+      expiresAtMs?: number;
+      bossKilledAtMs?: number;
+    };
     vaultAttemptSeq?: number;
     vaultGuestCycle?: string;
     vaultGuestPayouts?: number;
+    // Lantern Hall's weekly contracts (src/sim/guild_contracts.ts), written only once the
+    // character has done one: the week last read, its done list, and the lifetime count.
+    guildContracts?: { week: string; done: string[]; lifetime: number };
+    // The Allied Hearthstone's bound hub (a FactionId), written only when bound.
+    alliedHearthstone?: string;
   };
   // Faction standing (JSONB; optional so pre-reputation saves load cleanly).
   factions?: Partial<Record<string, number>>;
@@ -192,6 +212,12 @@ export interface CharacterState extends ReferralRewardState {
   // saves load cleanly with no cooldowns). Persisted so logging out and back in no
   // longer wipes cooldowns and lets a player bypass them by relogging.
   cooldowns?: SavedCooldowns;
+  // Buffs (food, elixirs, flasks, and the class maintenance buffs) as
+  // remaining-time records (JSONB; optional so pre-fix saves load with no buffs,
+  // and absent while none is worn). Persisted so a logout no longer strips them;
+  // timers freeze while offline, the classic behavior. The allowlist, caster
+  // re-anchoring, and load re-validation live in aura_persist.ts.
+  auras?: SavedAura[];
   // Per-player gather-node respawn timers as remaining-time deltas (D6; JSONB,
   // nodeId -> remaining seconds, the cooldowns scheme above applied to node
   // readiness). Optional with zero-default omission: absent for pre-D6 saves
@@ -266,6 +292,7 @@ export interface CharacterState extends ReferralRewardState {
   mountTrainingFeePaid?: boolean;
   // Riding skill purchased from Marla (80g). Optional and absent until bought.
   ridingTrained?: boolean;
+  ridingTier?: 1 | 2;
   // PBE boost kit version applied (server/pbe_boost.ts); absent outside PBE.
   pbeBoostKit?: number;
   delveMarks?: number;
@@ -274,6 +301,10 @@ export interface CharacterState extends ReferralRewardState {
   delveLoreUnlocked?: string[];
   delveDaily?: { date: string; firstClearXp: string[]; markClears: number };
   heroicDaily?: { date: string; marked: string[] };
+  // The Heroic Marks currency balance (src/sim/heroic_marks.ts). Optional and
+  // absent at zero; a pre-currency save loads its `heroic_mark` bag and bank
+  // stacks into it instead.
+  heroicMarks?: number;
   // Masterwrought materials (phase 04): both optional so pre-materials saves
   // load with the fields at their fresh defaults, and both omitted from
   // serialization while at those defaults so untouched rows stay byte-equal.
@@ -398,6 +429,8 @@ export interface CharacterState extends ReferralRewardState {
 export interface PetState {
   templateId: string;
   name: string;
+  /** Non-template cosmetic size of a tamed beast. Older saves omit it. */
+  scale?: number;
   level: number;
   hp: number;
   dead: boolean;

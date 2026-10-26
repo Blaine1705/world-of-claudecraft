@@ -20,6 +20,7 @@ const mocks = vi.hoisted(() => {
     town: prepare(),
     fenbridgeTown: prepare(),
     highwatchTown: prepare(),
+    paintedTowns: prepare(),
     armoury: prepare(),
     mailbox: prepare(),
     noticeboard: prepare(),
@@ -65,6 +66,9 @@ vi.mock('../src/render/characters/assets', () => ({
   prepareCharacterProfileAssets: mocks.characters,
   resetCharacterProfileCaches: mocks.reset,
 }));
+vi.mock('../src/render/characters/ghost_veil', () => ({
+  resetSpiritVeilLedger: mocks.reset,
+}));
 vi.mock('../src/render/sky', () => ({
   ensureSkyAssetsAt: mocks.sky,
 }));
@@ -87,6 +91,10 @@ vi.mock('../src/render/fenbridge_town', () => ({
 vi.mock('../src/render/highwatch_town', () => ({
   prepareHighwatchTownProfileAssets: mocks.highwatchTown,
   resetHighwatchTownProfileCaches: mocks.reset,
+}));
+vi.mock('../src/render/painted_towns', () => ({
+  preparePaintedTownProfileAssets: mocks.paintedTowns,
+  resetPaintedTownProfileCaches: mocks.reset,
 }));
 vi.mock('../src/render/transport_ship', () => ({
   prepareTransportShipAssets: mocks.ship,
@@ -229,6 +237,7 @@ describe('graphics profile asset preparation', () => {
     expect(mocks.town).toHaveBeenCalledWith(target);
     expect(mocks.fenbridgeTown).toHaveBeenCalledWith(target);
     expect(mocks.highwatchTown).toHaveBeenCalledWith(target);
+    expect(mocks.paintedTowns).toHaveBeenCalledWith(target);
     // ...and so does the painted Mirefen tavern (its .half / .quarter texture-tier files)
     expect(mocks.mirefenTavern).toHaveBeenCalledWith(target);
     for (const prepare of [
@@ -273,11 +282,13 @@ describe('graphics profile derived-cache reset', () => {
       'foliage',
       'props',
       'characters',
+      'spirit_veil',
       'stations',
       'eastbrook_surface_atlas',
       'eastbrook_town',
       'fenbridge_town',
       'highwatch_town',
+      'painted_towns',
       'banker_chest',
       'mailbox',
       'noticeboard',

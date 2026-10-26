@@ -380,6 +380,10 @@ function cityDecor(
   const town = lamps
     .map((lamp, index) => ({ lamp, index }))
     .filter(({ lamp }) => inTown(lamp.x, lamp.z) && chapelAt(lamp.x, lamp.z) === null);
+  // A re-plan may leave only a few posts: keep straw on a strict minority
+  // even when the hash happens to select several of that smaller set.
+  const strawLampLimit = Math.max(0, Math.floor((town.length - 1) / 2));
+  let strawLamps = 0;
   for (const { lamp, index } of town) {
     const anchor = `lamp:${index}`;
     // The post's road side: roadYaw points from the post at the road. The
@@ -407,7 +411,8 @@ function cityDecor(
     // corn shock behind the cluster, so a street of lamps is never one stamp
     // repeated. Kept sparse (owner note 2026-10-18: the straw read as litter):
     // the lamps' own dressing is gourds and pumpkins, the straw an accent.
-    const bale = anchorHash(anchor, 4) < LAMP_BALE_SHARE;
+    const allowStraw = strawLamps < strawLampLimit;
+    const bale = allowStraw && anchorHash(anchor, 4) < LAMP_BALE_SHARE;
     // [slot, kind, yards back from the road, yards along it, size]
     const slots: [string, SeasonalGroundKind, number, number, number][] = [
       ['b', 'gourd', 1.4, 4.2 * flip, 0.9],
@@ -415,11 +420,12 @@ function cityDecor(
         ? ['c', 'hay_bale', 1.8, -4.6 * flip, 0.9]
         : ['c', 'pumpkin_small', 1.5, -4.4 * flip, 0.85],
     ];
-    if (anchorHash(anchor, 5) < LAMP_SHOCK_SHARE)
+    if (allowStraw && anchorHash(anchor, 5) < LAMP_SHOCK_SHARE)
       slots.push(['d', 'corn_shock', 3.9, 1.2 * flip, 1]);
     const along = lamp.roadYaw + Math.PI / 2;
+    let seatedStraw = false;
     for (const [slot, kind, out, run, size] of slots) {
-      seat(
+      const seated = seat(
         probe,
         layout.ground,
         kind,
@@ -431,7 +437,9 @@ function cityDecor(
         // the tall shock stands out behind the post: it must never close a walkway
         kind === 'corn_shock',
       );
+      if (seated && decorFamily(kind) === 'straw') seatedStraw = true;
     }
+    if (seatedStraw) strawLamps++;
   }
   // Garlands: each post strung to its nearest neighbour ON ITS OWN SIDE of the
   // road (once per pair), when the run is short, never hangs over the road and

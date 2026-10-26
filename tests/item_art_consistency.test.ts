@@ -24,6 +24,56 @@ const FIELD_KIT_BATCH_ID = 'intentional-gathering-field-kit-2026-09-06';
 const CRUCIBLE_BATCH_ID = 'crucible-professions-2026-09-05';
 const LICENSE = 'World of ClaudeCraft project-generated art, project asset, rights reserved';
 
+// Integration45 current owners, also pinned by per-batch accepted-art tests.
+const BACKLOG_BATCH_IDS = [
+  'warfare-season2-warrior-icons-2026-10-22',
+  'warfare-season2-paladin-icons-2026-10-22',
+  'warfare-season2-hunter-icons-2026-10-22',
+  'warfare-season2-rogue-icons-2026-10-22',
+  'warfare-season2-priest-icons-2026-10-22',
+  'warfare-season2-shaman-icons-2026-10-22',
+  'warfare-season2-mage-icons-2026-10-22',
+  'warfare-season2-warlock-icons-2026-10-22',
+  'warfare-season2-druid-icons-2026-10-22',
+  'horse-whistle-icon-v045-2026-10-22',
+  'referral-reward-icons-v045-2026-10-22',
+  'hoard-arcane-painted-icons-v045-2026-10-22',
+  'hoard-frost-painted-icons-v045-2026-10-22',
+  'hoard-ember-painted-icons-v045-2026-10-22',
+  'hoard-storm-painted-icons-v045-2026-10-22',
+  'hoard-brute-painted-icons-v045-2026-10-22',
+  'hoard-venom-painted-icons-v045-2026-10-22',
+  'hoard-necro-painted-icons-v045-2026-10-22',
+  'hoard-tide-painted-icons-v045-2026-10-22',
+  'faction-rift-painted-icons-v045-2026-10-22',
+  'faction-church-painted-icons-v045-2026-10-22',
+  'faction-automaton-painted-icons-v045-2026-10-22',
+  'clue-painted-icons-v045-2026-10-22',
+  'rewards-painted-icons-v045-2026-10-22',
+  'dungeon-bastion-painted-icons-v045-2026-10-22',
+  'dungeon-temple-painted-icons-v045-2026-10-22',
+  'dungeon-wildheart-painted-icons-v045-2026-10-22',
+  'dungeon-gravewyrm-painted-icons-v045-2026-10-22',
+  'dungeon-crypt-painted-icons-v045-2026-10-22',
+  'dungeon-bastion-blues-painted-icons-v045-2026-10-22',
+  'dungeon-temple-blues-painted-icons-v045-2026-10-22',
+  'dungeon-crypt-blues-painted-icons-v045-2026-10-22',
+];
+
+// Preserve historical membership through explicit supersession records.
+function replacedBatchItemIds(mapping: ItemMapping, oldBatchId: string): string[] {
+  return mapping.generatedBatches
+    .filter(({ batchId }) => BACKLOG_BATCH_IDS.includes(batchId ?? ''))
+    .flatMap(({ provenanceRecord }) => {
+      const manifest = readJson<{
+        assets: Array<{ id: string; superseded?: { batchId: string } }>;
+      }>(String(provenanceRecord));
+      return manifest.assets
+        .filter((asset) => asset.superseded?.batchId === oldBatchId)
+        .map(({ id }) => id);
+    });
+}
+
 type ReportPin = {
   chunk: string;
   path: string;
@@ -590,24 +640,13 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(
       verdict.auditScope.heroicDefinitionsWithOwnWebp + verdict.auditScope.heroicWeaponArtAliases,
     ).toBe(verdict.auditScope.generatedHeroicDefinitions);
-    const shippingIds = new Set(
-      readdirSync(path.join(repoRoot, 'public/ui/items'))
-        .filter((name) => name.endsWith('.webp'))
-        .map((name) => name.slice(0, -'.webp'.length)),
-    );
-    // The art-pending ledger (ITEM_ART_PENDING) stages a wave's generated
-    // heroic variants outside the audited catalog until their paintings land,
-    // exactly as the audit CLI accounts them (scripts/lib/item_art_audit.mjs).
-    const generatedHeroics = Object.entries(ITEMS).filter(
-      ([id, item]) =>
-        'heroicOf' in item && typeof item.heroicOf === 'string' && !ITEM_ART_PENDING.has(id),
-    );
-    const heroicWithOwnWebp = generatedHeroics.filter(([id]) => shippingIds.has(id));
-    const heroicArtAliases = generatedHeroics.filter(([id]) => !shippingIds.has(id));
-    expect(generatedHeroics).toHaveLength(verdict.auditScope.generatedHeroicDefinitions);
-    expect(heroicWithOwnWebp).toHaveLength(verdict.auditScope.heroicDefinitionsWithOwnWebp);
-    expect(heroicArtAliases).toHaveLength(verdict.auditScope.heroicWeaponArtAliases);
-    expect(heroicArtAliases.every(([, item]) => item.kind === 'weapon')).toBe(true);
+    // The sealed verdict's heroic scope is the 2026-08-10 historical record, so it
+    // is pinned as that record. The LIVE heroic census grew past it (the
+    // five-dungeon rework's Heroic variants on the v0.45.0 integration) and is
+    // pinned, with every later wave named, in the current-owner case below.
+    expect(verdict.auditScope.generatedHeroicDefinitions).toBe(78);
+    expect(verdict.auditScope.heroicDefinitionsWithOwnWebp).toBe(59);
+    expect(verdict.auditScope.heroicWeaponArtAliases).toBe(19);
     expect(verdict.reviewContract.everyShippingFileReviewedInModes).toEqual([
       '128-color',
       '40-color',
@@ -857,12 +896,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // Plus the Mirefen world-boss branch (15 items) on the v0.45.0 integration: 2043.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2169.
     // The restored legacy whistle and charm definitions add 36 item ids.
-    // Five referral rewards reuse existing art while their own paintings are pending.
-    // + Gourdlight Eve's four event items: 2214; + Old Thatchgrin's two spoils: 2216.
-    // + the Gourdlight Eve shop's costume draughts (3), title writs (3) and candies (5), the
-    // broom and its Emberwoven Sheaf (2), the dailies' errand items (3) and Hester's five
-    // toys: 2237.
-    expect(Object.keys(ITEMS)).toHaveLength(2237);
+    // All five referral rewards now own paintings; only the retired Phoenix remains pending.
+    // Wobbles the Slime's reins (reins_wobbles_slime, a render of the shipped mount): 2,213.
+    // + the sprite buddy's whistle (whistle_sprites): 2,214.
+    expect(Object.keys(ITEMS)).toHaveLength(2221);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -947,14 +984,20 @@ describe('item-art consistency accepted-art provenance', () => {
     // The lower dungeons' normal blues add 30 more, named by their batch the
     // same way: its 25 own-art Heroic armour clones plus the generated Heroic
     // copies of its five weapons, which alias their base painting.
-    const bluesBatch = mapping.generatedBatches.find(
-      ({ batchId }) => batchId === 'lower-dungeon-blues-icons-2026-10-08',
+    const bluesBatchIds = [
+      'dungeon-bastion-blues-painted-icons-v045-2026-10-22',
+      'dungeon-temple-blues-painted-icons-v045-2026-10-22',
+      'dungeon-crypt-blues-painted-icons-v045-2026-10-22',
+    ];
+    const bluesBatches = mapping.generatedBatches.filter(({ batchId }) =>
+      bluesBatchIds.includes(batchId ?? ''),
     );
+    expect(bluesBatches).toHaveLength(3);
+    const bluesItemIds = bluesBatches.flatMap(({ itemIds }) => itemIds);
+    expect(bluesItemIds).toHaveLength(55);
     const blueHeroicIds = [
-      ...(bluesBatch?.itemIds.filter((id) => id.startsWith('heroic_')) ?? []),
-      ...(bluesBatch?.itemIds
-        .filter((id) => ITEMS[id]?.kind === 'weapon')
-        .map((id) => heroicVariantId(id)) ?? []),
+      ...bluesItemIds.filter((id) => id.startsWith('heroic_')),
+      ...bluesItemIds.filter((id) => ITEMS[id]?.kind === 'weapon').map(heroicVariantId),
     ];
     expect(blueHeroicIds).toHaveLength(30);
     for (const id of blueHeroicIds) {
@@ -1088,19 +1131,15 @@ describe('item-art consistency accepted-art provenance', () => {
     // integration: 1,890 owners over 2,043 items.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005, 2169.
     // Buddy provenance contributes 34 additional owners.
-    // + Gourdlight Eve's four painted event items: 2043.
-    // + Old Thatchgrin's two spoils: 2045.
-    // + the rest of Gourdlight Eve's painted items (the shop rows, the broom and its sheaf,
-    // the dailies' errand items and Hester's toys): 2066.
-    expect(new Set(currentOwnerIds).size).toBe(2066);
-    expect(shippingIds).toHaveLength(2066);
+    // Icon backlog adds 135 Season 2 armour icons, five referral icons, the Horse Whistle, and Nightwing Chimaera.
+    // Wobbles the Slime's reins (reins_wobbles_slime, a render of the shipped mount): 2,183.
+    // + the sprite buddy's whistle: 2,184 owners / 2,214 items.
+    expect(new Set(currentOwnerIds).size).toBe(2191);
+    expect(shippingIds).toHaveLength(2191);
     // The restored legacy whistle and charm definitions add 36 item ids.
-    // Five referral rewards reuse existing art while their own paintings are pending.
-    // + Gourdlight Eve's four event items: 2214; + Old Thatchgrin's two spoils: 2216.
-    // + the Gourdlight Eve shop's costume draughts (3), title writs (3) and candies (5), the
-    // broom and its Emberwoven Sheaf (2), the dailies' errand items (3) and Hester's five
-    // toys: 2237.
-    expect(Object.keys(ITEMS)).toHaveLength(2237);
+    // All five referral rewards now own paintings; only the retired Phoenix remains pending.
+    // Wobbles the Slime's reins (reins_wobbles_slime, a render of the shipped mount): 2,213.
+    expect(Object.keys(ITEMS)).toHaveLength(2221);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1125,7 +1164,8 @@ describe('item-art consistency accepted-art provenance', () => {
           ].includes(batchId),
       )
       .flatMap(({ itemIds }) => itemIds);
-    expect(releaseBatchIds).toHaveLength(59);
+    // 60 with the sprite buddy's whistle render in the whistle batch.
+    expect(releaseBatchIds).toHaveLength(25);
     // The world-quest branch's two batches are additive beyond the dated chain
     // as well (release/v0.43.0 merge into feature/world-quests).
     const worldQuestBatchIds = mapping.generatedBatches
@@ -1146,9 +1186,7 @@ describe('item-art consistency accepted-art provenance', () => {
     ]);
     // The wq-reputation merge's faction quartermaster stock, one SVG batch
     // (faction-vendor-icons-2026-09-16), additive beyond the chain the same way.
-    const factionVendorBatchIds = mapping.generatedBatches
-      .filter(({ batchId }) => batchId === 'faction-vendor-icons-2026-09-16')
-      .flatMap(({ itemIds }) => itemIds);
+    const factionVendorBatchIds = replacedBatchItemIds(mapping, 'faction-vendor-icons-2026-09-16');
     expect(sorted(factionVendorBatchIds)).toEqual([
       'artificers_welding_cowl',
       'automaton_cog_ring',
@@ -1168,9 +1206,7 @@ describe('item-art consistency accepted-art provenance', () => {
     ]);
     // The faction ladder rework's periphery rows and formulas, one SVG batch
     // (faction-ladder-icons-2026-09-23), additive beyond the chain the same way.
-    const factionLadderBatchIds = mapping.generatedBatches
-      .filter(({ batchId }) => batchId === 'faction-ladder-icons-2026-09-23')
-      .flatMap(({ itemIds }) => itemIds);
+    const factionLadderBatchIds = replacedBatchItemIds(mapping, 'faction-ladder-icons-2026-09-23');
     expect(sorted(factionLadderBatchIds)).toEqual([
       'acolytes_signet',
       'champions_dawn_loop',
@@ -1192,15 +1228,11 @@ describe('item-art consistency accepted-art provenance', () => {
     ]);
     // The Clue Scroll items, one SVG batch (clue-scroll-icons-2026-09-17),
     // additive beyond the chain the same way.
-    const clueScrollBatchIds = mapping.generatedBatches
-      .filter(({ batchId }) => batchId === 'clue-scroll-icons-2026-09-17')
-      .flatMap(({ itemIds }) => itemIds);
+    const clueScrollBatchIds = replacedBatchItemIds(mapping, 'clue-scroll-icons-2026-09-17');
     expect(sorted(clueScrollBatchIds)).toEqual(['clue_scroll', 'treasure_casket']);
     // The faction reward items, one SVG batch (faction-rewards-icons-2026-09-17),
     // additive beyond the chain the same way.
-    const factionRewardBatchIds = mapping.generatedBatches
-      .filter(({ batchId }) => batchId === 'faction-rewards-icons-2026-09-17')
-      .flatMap(({ itemIds }) => itemIds);
+    const factionRewardBatchIds = replacedBatchItemIds(mapping, 'faction-rewards-icons-2026-09-17');
     expect(sorted(factionRewardBatchIds)).toEqual([
       'allied_hearthstone',
       'allied_vanguard_duffel',
@@ -1235,9 +1267,7 @@ describe('item-art consistency accepted-art provenance', () => {
     // The Buried Hoard boss loot (hoard-boss-loot-icons-2026-09-20): one icon per
     // generated item id, 32 pieces at three tiers, pinned against the live table
     // rather than as 96 literals.
-    const hoardLootBatchIds = mapping.generatedBatches
-      .filter(({ batchId }) => batchId === 'hoard-boss-loot-icons-2026-09-20')
-      .flatMap(({ itemIds }) => itemIds);
+    const hoardLootBatchIds = replacedBatchItemIds(mapping, 'hoard-boss-loot-icons-2026-09-20');
     expect(hoardLootBatchIds).toHaveLength(96);
     expect(sorted(hoardLootBatchIds)).toEqual(sorted(Object.keys(HOARD_ITEMS)));
     // The choose-one leveling quest armor (quest-leveling-gear-icons-2026-10-06)
@@ -1323,6 +1353,13 @@ describe('item-art consistency accepted-art provenance', () => {
         // The weekly emissary's cache chest, additive the same way.
         'emissary_cache',
         'reins_avian_strider',
+        'reins_nightwing_chimera',
+        // Wobbles the Slime's reins (a render of the shipped mount model).
+        'reins_wobbles_slime',
+        // The World PvP trophy skull (pvp_trophy_skull), additive the same way.
+        'pvp_trophy_skull',
+        // The World PvP Skull Bag (pvp_skull_bag), additive the same way.
+        'pvp_skull_bag',
         // Warfare Season 2's painted weapons (warfare-season2-weapons-2026-09-25).
         'vanguard_verdict_greatsword',
         'vanguard_oath_blade',
@@ -1345,17 +1382,37 @@ describe('item-art consistency accepted-art provenance', () => {
         'barrowstone_heart',
         'muster_grapnel',
         'craterglass_stave',
-        // The dungeon reworks' loot batches (Sunken Bastion, Drowned Temple,
-        // Wildheart Basin, Gravewyrm Sanctum, Hollow Crypt).
+        // The membership Staff of Changing (membership-weapon-2026-10-14, PR 4281).
+        'membership_staff',
+        // Dungeon replacements plus 141 new files: Season 2, referral and horse.
         ...mapping.generatedBatches
           .filter(({ batchId }) =>
             [
-              'sunken-bastion-icons-2026-09-29',
-              'drowned-temple-icons-2026-09-30',
-              'wildheart-basin-icons-2026-10-02',
-              'gravewyrm-sanctum-icons-2026-10-03',
-              'hollow-crypt-icons-2026-10-03',
-              'lower-dungeon-blues-icons-2026-10-08',
+              'warfare-season2-warrior-icons-2026-10-22',
+              'warfare-season2-paladin-icons-2026-10-22',
+              'warfare-season2-hunter-icons-2026-10-22',
+              'warfare-season2-rogue-icons-2026-10-22',
+              'warfare-season2-priest-icons-2026-10-22',
+              'warfare-season2-shaman-icons-2026-10-22',
+              'warfare-season2-mage-icons-2026-10-22',
+              'warfare-season2-warlock-icons-2026-10-22',
+              'warfare-season2-druid-icons-2026-10-22',
+              'horse-whistle-icon-v045-2026-10-22',
+              'referral-reward-icons-v045-2026-10-22',
+              'dungeon-bastion-painted-icons-v045-2026-10-22',
+              'dungeon-temple-painted-icons-v045-2026-10-22',
+              'dungeon-wildheart-painted-icons-v045-2026-10-22',
+              'dungeon-gravewyrm-painted-icons-v045-2026-10-22',
+              'dungeon-crypt-painted-icons-v045-2026-10-22',
+              'dungeon-bastion-blues-painted-icons-v045-2026-10-22',
+              'dungeon-temple-blues-painted-icons-v045-2026-10-22',
+              'dungeon-crypt-blues-painted-icons-v045-2026-10-22',
+              // Lantern Hall's guild currency (the Blender-rendered seal) and its war horse's
+              // reins (the Blender-rendered portrait).
+              'warfare-season2-feral-staff-2026-09-29',
+              'vanguard-jewelry-icons-2026-10-03',
+              'lantern-hall-seal-2026-10-16',
+              'lantern-hall-destrier-reins-2026-10-16',
               // Gourdlight Eve's four event items (Blender renders)
               'gourdlight-eve-icons-2026-10-16',
               'gourdlight-eve-thatchgrin-icons-2026-10-17',
@@ -1369,6 +1426,9 @@ describe('item-art consistency accepted-art provenance', () => {
             ].includes(batchId ?? ''),
           )
           .flatMap(({ itemIds }) => itemIds),
+        'lychgate_buckler',
+        'bastion_kite_shield',
+        'barrowfield_tower_shield',
       ]),
     ).toEqual(sorted(currentOwnerIds));
 
@@ -1521,8 +1581,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // The completion wave consolidates 68 interim per-entry/SVG owners into
     // one generated batch. The surviving ordinary-art cohort stays explicit.
     // 43 -> 44 at the weekly emissary: the Emissary's Cache chest; 45 with
-    // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge).
-    expect(mapping.entries).toHaveLength(45);
+    // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge);
+    // 46 with the Nightwing Chimaera's reins (reins_nightwing_chimera); 47 with
+    // Wobbles the Slime's reins.
+    expect(mapping.entries).toHaveLength(49);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
     // 24 base + this branch's 3 Masterwrought-completion batches (fine
     // materials, apex-flask, professions coverage) + the release's 2
@@ -1544,11 +1606,11 @@ describe('item-art consistency accepted-art provenance', () => {
     // (balgath-boss, shardpike-mechanic, foremans-wage, muster-shardpike, balgath-loot)
     // bring it to 51 on the v0.45.0 integration.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 57.
-    // Buddy whistle and charm provenance add two batches; Gourdlight Eve's icons one more.
-    // Old Thatchgrin's spoils one more: 61.
-    // Gourdlight Eve's later icon batches (the shop, the broom and sheaf, the candies, the
-    // dailies, Hester's toys): 66.
-    expect(mapping.generatedBatches).toHaveLength(66);
+    // Buddy whistle and charm provenance add two batches.
+    // The membership weapon batch (membership-weapon-2026-10-14, PR 4281): 60.
+    // Backlog replacements consolidate old owners into a net 21 additional batches; Lantern
+    // Hall's seal and its horse's reins add two: 83.
+    expect(mapping.generatedBatches).toHaveLength(90);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1623,19 +1685,21 @@ describe('item-art consistency accepted-art provenance', () => {
     // role fill (quest-role-fill-icons-2026-10-07) adds 75: 1330. Membership adds 8
     // and referral armour 7: 1345. The Mirefen world-boss branch's 15 batch ids: 1360.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 1475.
-    // Buddy batches add 34 owner ids to the integration inventory.
-    // Gourdlight Eve's icon batch adds 4: 1513.
-    // Old Thatchgrin's batch adds 2: 1515. Gourdlight Eve's later batches add 21: 1536.
-    expect(priorGeneratedIds).toHaveLength(1536);
+    // Buddy batches add 34 owner ids to the integration inventory. The membership
+    // Staff of Changing batch (PR 4281) adds one: 1510.
+    // Backlog adds 141 files; replacements preserve the remaining owner count.
+    // + the sprite buddy's whistle render (buddy-whistle-icons batch): 1,652.
+    expect(priorGeneratedIds).toHaveLength(1657);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
     // Plus the Mirefen world-boss branch (15 items) on the v0.45.0 integration: 1890.
-    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
-    // + the rest of Gourdlight Eve's painted items: 2066.
-    expect(allCurrentOwnerIds).toHaveLength(2066);
-    expect(new Set(allCurrentOwnerIds).size).toBe(2066);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005 + Nightwing Chimaera mount: 2182.
+    // Wobbles the Slime's reins (reins_wobbles_slime, a render of the shipped mount) adds one ordinary entry: 2,183.
+    // + the sprite buddy's whistle render: 2,184.
+    expect(allCurrentOwnerIds).toHaveLength(2191);
+    expect(new Set(allCurrentOwnerIds).size).toBe(2191);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1643,8 +1707,9 @@ describe('item-art consistency accepted-art provenance', () => {
       masterwroughtCompletion: completionBatch?.itemIds.length,
       crucibleProfessions: crucibleBatch?.itemIds.length,
     }).toEqual({
-      // 45 entries (the release's mapping entries; the hoard batches own no entries).
-      entries: 45,
+      // 46 entries (the release's mapping entries + Nightwing Chimaera; the hoard batches own no entries),
+      // 47 with Wobbles the Slime's reins.
+      entries: 49,
       // + the 2 Clue Scroll ids = 776 + the 17 faction ladder ids = 793.
       // + the 18 trinkets (trinket-slot-icons-2026-09-23) = 811.
       // + the 4 Warfare Season 2 weapons = 815.
@@ -1655,8 +1720,9 @@ describe('item-art consistency accepted-art provenance', () => {
       // + 8 membership paintings + 7 referral paintings = 1345.
       // + the Mirefen world-boss branch's 15 = 1360.
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 1475.
-      // Plus 34 restored buddy provenance owners.
-      priorGenerated: 1536,
+      // Plus 34 restored buddy provenance owners, and the membership staff: 1510.
+      // Restored feral staff and eight Season 2 jewelry paintings.
+      priorGenerated: 1657,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1710,7 +1776,8 @@ describe('item-art consistency accepted-art provenance', () => {
           ['buddy-whistle-icons-2026-08-28', 'buddy-charm-icons-2026-09-09'].includes(batchId),
       )
       .flatMap(({ itemIds }) => itemIds);
-    expect(buddyBatchIdsForCatalog).toHaveLength(34);
+    // 35 with the sprite buddy's whistle render in the whistle batch.
+    expect(buddyBatchIdsForCatalog).toHaveLength(0);
     expect(
       sorted([
         ...historicalVerdict.visualVerdict.passIds.filter(
@@ -1739,32 +1806,22 @@ describe('item-art consistency accepted-art provenance', () => {
               [
                 'world-quest-puzzle-activators-2026-09-01',
                 'world-quest-freight-icons-2026-09-01',
-                // The faction quartermaster stock (wq-reputation merge).
-                'faction-vendor-icons-2026-09-16',
-                // The faction ladder rework's periphery rows and formulas.
-                'faction-ladder-icons-2026-09-23',
-                // The Clue Scroll items.
-                'clue-scroll-icons-2026-09-17',
-                'faction-rewards-icons-2026-09-17',
                 'buried-hoard-treasure-maps-2026-09-19',
-                'hoard-boss-loot-icons-2026-09-20',
                 'quest-leveling-gear-icons-2026-10-06',
                 'quest-blue-rewards-icons-2026-10-07',
                 'membership-items-2026-10-05',
+                'membership-weapon-2026-10-14',
                 'referral-items-2026-10-07',
                 'quest-role-fill-icons-2026-10-07',
-                // The Sunken Bastion rework's loot.
-                'sunken-bastion-icons-2026-09-29',
-                // The Drowned Temple rework's loot.
-                'drowned-temple-icons-2026-09-30',
-                // The Wildheart Basin rework's loot.
-                'wildheart-basin-icons-2026-10-02',
-                // The Gravewyrm Sanctum rework's loot.
-                'gravewyrm-sanctum-icons-2026-10-03',
-                // The Hollow Crypt rework's loot.
-                'hollow-crypt-icons-2026-10-03',
-                // The lower dungeons' normal blues.
-                'lower-dungeon-blues-icons-2026-10-08',
+                // Current replacements for factions, hoards and dungeons, plus new art.
+                ...BACKLOG_BATCH_IDS,
+                // Lantern Hall's guild currency (the Blender-rendered seal) and its war
+                // horse's reins.
+                'lantern-hall-seal-2026-10-16',
+                'lantern-hall-destrier-reins-2026-10-16',
+                'quest-shield-icons-2026-10-23',
+                'warfare-season2-feral-staff-2026-09-29',
+                'vanguard-jewelry-icons-2026-10-03',
                 'gourdlight-eve-icons-2026-10-16',
                 'gourdlight-eve-thatchgrin-icons-2026-10-17',
                 // Gourdlight Eve's later rounds (shop and broom, candies, sheaf, dailies, toys)
@@ -1785,6 +1842,13 @@ describe('item-art consistency accepted-art provenance', () => {
         // beyond the historical chain like the Field Kit.
         'emissary_cache',
         'reins_avian_strider',
+        'reins_nightwing_chimera',
+        // Wobbles the Slime's reins (a render of the shipped mount model).
+        'reins_wobbles_slime',
+        // The World PvP trophy skull (pvp_trophy_skull), additive the same way.
+        'pvp_trophy_skull',
+        // The World PvP Skull Bag (pvp_skull_bag), additive the same way.
+        'pvp_skull_bag',
         // Warfare Season 2's painted weapons (warfare-season2-weapons-2026-09-25).
         'vanguard_verdict_greatsword',
         'vanguard_oath_blade',
@@ -1944,12 +2008,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345. Plus the Buried Hoard paintings (release/v0.44.0 merge into feature/buried-hoards (2026-09-28)) = 1464. Plus the 245 choose-one leveling quest armor paintings (quest-leveling-gear-icons-2026-10-06) = 1709. Plus the 76 quest blue reward rares (quest-blue-rewards-icons-2026-10-07) = 1785. Plus the 75 quest role-fill paintings (quest-role-fill-icons-2026-10-07) = 1860. Plus the 8 membership paintings and the 7 referral paintings = 1875.
     // Plus the Mirefen world-boss branch and Balgath's loot (15 items) = 1890.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 2005.
-    // + Old Thatchgrin's two spoils: 2045.
-    // + the rest of Gourdlight Eve's painted items (the shop rows, the broom and its sheaf,
-    // the dailies' errand items and Hester's toys): 2066.
-    if (ownerIds.length !== 2066)
-      violations.push(`mapping owner count: ${ownerIds.length} != 2066`);
-    if (fileIds.length !== 2066) violations.push(`shipping WebP count: ${fileIds.length} != 2066`);
+    // Wobbles the Slime's reins: 2,183.
+    if (ownerIds.length !== 2191)
+      violations.push(`mapping owner count: ${ownerIds.length} != 2191`);
+    if (fileIds.length !== 2191) violations.push(`shipping WebP count: ${fileIds.length} != 2191`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

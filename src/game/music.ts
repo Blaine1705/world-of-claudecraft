@@ -1,6 +1,5 @@
 // The adventure soundtrack, in two halves. The composition half is unchanged:
-// every theme is still authored as note data (per-place leitmotifs, layered
-// ostinati, multi-section forms) played by the MusicSynth voices, and that
+// themes remain note data (leitmotifs, ostinati, forms) played by MusicSynth; that
 // machinery keeps powering the music editor (music_editor.html) and the
 // offline render pipeline (scripts/render_music.mjs). The runtime half no
 // longer synthesizes: the shipped game streams the remastered mp3 renders of
@@ -11,6 +10,7 @@
 
 import { resumeWhenAllowed } from './audio_unlock';
 import { BossLoopTrack, DEFAULT_BOSS_TRACK_URL } from './boss_music_loop';
+import { bossPcmPrefetchAllowed } from './boss_music_residency';
 import { CRUCIBLE_STREAM_URLS, type CrucibleFloor } from './crucible_music';
 import { dungeonMusicZoneForDungeon } from './dungeon_music_zones';
 import { minigameLayerFor } from './minigame_music_layer';
@@ -4351,7 +4351,7 @@ export class MusicDirector {
       return;
     }
     this.bossActive = on;
-    if (on) this.ensureBossBuffer();
+    if (on && bossPcmPrefetchAllowed()) this.ensureBossBuffer();
     if (!on) this.stopBossSource();
     this.applyBossPlayback();
     if (this.ctx && this.master)

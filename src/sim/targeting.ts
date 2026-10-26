@@ -27,6 +27,7 @@
 
 import { corpseInteractionAvailability } from './corpse_interaction';
 import { deadTargetSelectable } from './dead_target';
+import { gmHiddenFrom } from './gm_presence';
 import { isBuddyMob } from './pet/buddy_ai';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -77,6 +78,8 @@ export class Targeting {
     }
     const e = this.ctx.entities.get(id);
     if (!e || (e.dead && !this.deadEntitySelectableFor(e, p.id))) return;
+    // A hidden GM never reached this client's snapshot; refuse a forged id too.
+    if (gmHiddenFrom(this.ctx.entities, p, e)) return;
     if (this.stopsAutoAttackOnSwitch(r.meta, p, id)) p.autoAttack = false;
     p.targetId = id;
     if (!this.ctx.isHostileTo(p, e) || e.dead) p.autoAttack = false;

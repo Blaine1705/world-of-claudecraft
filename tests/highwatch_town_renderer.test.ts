@@ -15,8 +15,8 @@ import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
 import type { WorldContent } from '../src/sim/types';
 
 // Highwatch's view is the shared placed-town view (render/placed_town_buildings.ts)
-// over HIGHWATCH_LAYOUT: five painted buildings and the manor, each its own fade
-// target and reveal root, gated like the other towns' buildings.
+// over HIGHWATCH_LAYOUT: five painted buildings and the adventurers' guild, each its
+// own fade target and reveal root, gated like the other towns' buildings.
 
 const KIT = highwatchTownInternalsForTest.kit;
 const REVEAL_KEY = 'highwatch-town-static';
@@ -62,7 +62,7 @@ function buildingGroup(root: THREE.Object3D, id: string): THREE.Object3D {
 }
 
 describe('the Highwatch town view', () => {
-  it('stands the painted buildings and the manor as individual fade targets and reveal roots', () => {
+  it('stands the five painted buildings and the guild as individual fade targets and reveal roots', () => {
     gfxInternalsForTest.overrideSettings({ standardMaterials: false, dynamicShadows: false });
     const view = KIT.buildFromSources(fixtureSources(), () => 9, true);
     expect(view.group.name).toBe(HIGHWATCH_TOWN_ROOT_NAME);

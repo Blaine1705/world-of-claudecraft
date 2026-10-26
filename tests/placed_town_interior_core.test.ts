@@ -33,7 +33,7 @@ import { type Collider, rotY } from '../src/sim/collider_shapes';
 import { emitPlacementBoxes } from '../src/sim/colliders_authored/placement_colliders';
 import { BUILTIN_WORLD, getActiveWorldContent, setActiveWorldContent } from '../src/sim/data';
 import { EASTBROOK_LAYOUT } from '../src/sim/eastbrook_layout';
-import { FENBRIDGE_LAYOUT } from '../src/sim/fenbridge_layout';
+import { activeFenbridgeLayout } from '../src/sim/fenbridge_touchup';
 import { HIGHWATCH_LAYOUT } from '../src/sim/highwatch_layout';
 import { distancePointToObb, localToWorld } from '../src/sim/placed_town_kit';
 import { placementRampFloorAt } from '../src/sim/placement_ramps';
@@ -44,11 +44,11 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 // The air of the walk-in painted buildings (src/render/placed_town_interior_core.ts),
 // registered with the indoor camera (src/render/interior_camera.ts) by every town view that
 // stands them (src/render/placed_town_interiors.ts), so walking into an inn, a chapel, a bank,
-// a shop, a smithy or the Highwatch manor the camera follows in through the door and then
+// a shop, a smithy or the Highwatch guild the camera follows in through the door and then
 // keeps to the rooms, the way it does in the Mirefen tavern. The first blocks pin grand
 // Highwatch; the next two pin every painted model at any scale and turn, and every walk-in
 // building of Eastbrook, Fenbridge and Highwatch at the scale and spot its layout gives it
-// today; the last pins the manor's many rooms against its own baked collision.
+// today; the last pins the guild's rooms against its own baked collision.
 
 const BUILDINGS = HIGHWATCH_LAYOUT.buildings;
 type Building = (typeof BUILDINGS)[number];
@@ -63,7 +63,7 @@ interface TownBuilding extends PlacedTownInteriorBuilding {
 /** The built-in towns that stand painted buildings, with their records. */
 const TOWN_BUILDINGS: readonly (readonly [string, readonly TownBuilding[]])[] = [
   ['Eastbrook', EASTBROOK_LAYOUT.buildings],
-  ['Fenbridge', FENBRIDGE_LAYOUT.buildings],
+  ['Fenbridge', activeFenbridgeLayout().buildings],
   ['Highwatch', HIGHWATCH_LAYOUT.buildings],
 ];
 
@@ -92,7 +92,7 @@ describe('the air of a walk-in placed building', () => {
       'hall',
       'shop_a',
       'smithy',
-      'manor',
+      'guild',
     ]);
     for (const name of WALK_IN.map((building) => placedTownModelName(building.assetId))) {
       expect(placedTownInteriorModels()).toContain(name);
@@ -394,7 +394,7 @@ describe('the authored air against each model baked collision', () => {
     shop_a: 16.2797,
     shop_b: 18.7,
     smithy: 19.797,
-    manor: 51.248,
+    guild: 47.75,
   };
   // the sizes the towns stand the models at (authored size, and the grand towns' 1.2 to 1.5),
   // at every quarter turn (air in the world's axes) and at two of the free turns Eastbrook
@@ -479,9 +479,9 @@ describe('the authored air against each model baked collision', () => {
 
   function eachStanding(check: (name: string, scale: number, turn: number, at: string) => void) {
     for (const name of placedTownInteriorModels()) {
-      // the manor (its own model under tidehold/highwatch, many rooms off one hall) is pinned
-      // by its own block at the end of this file
-      if (name === 'manor') continue;
+      // the guild (its own model under tidehold/highwatch, several rooms off one hall) is
+      // pinned by its own block at the end of this file
+      if (name === 'guild') continue;
       for (const scale of SCALES) {
         for (const turn of TURNS) check(name, scale, turn, `${name} at ${scale}, turned ${turn}`);
       }
@@ -732,8 +732,8 @@ describe('a walk-in painted building at any turn', () => {
       {
         id: `turned_${name}`,
         assetId:
-          name === 'manor'
-            ? '/models/tidehold/highwatch/manor.glb'
+          name === 'guild'
+            ? '/models/tidehold/highwatch/guild.glb'
             : `/models/tidehold/${name}.glb`,
         walkIn: true,
         placement: { x: ANCHOR.x, z: ANCHOR.z, rotation, scale: SCALE, lift: -(SCALE + 0.05) },
@@ -886,7 +886,7 @@ describe('a walk-in painted building at any turn', () => {
   });
 });
 
-describe("the Highwatch manor's air against its baked collision", () => {
+describe("the Highwatch guild's air against its baked collision", () => {
   interface Row {
     x: number;
     y: number;
@@ -901,95 +901,103 @@ describe("the Highwatch manor's air against its baked collision", () => {
   const BAKED = JSON.parse(
     readFileSync(path.join(__dirname, '..', 'data/asset_collision_overrides.json'), 'utf8'),
   ) as Record<string, { boxes: Row[]; ramps?: Row[] }>;
-  // the manor's largest dimension at authored size (the placed-asset unit)
-  const MANOR_SIZE = 51.248;
-  /** The manor's air at authored size in its own axes: stood at the origin, unturned, its
+  // the largest dimension of each own-path model at authored size (the placed-asset unit)
+  const SIZE: Record<string, number> = { guild: 47.75 };
+  /** A model's air at authored size in its own axes: stood at the origin, unturned, its
    *  ground line on y 0. */
-  function manorAir() {
+  function modelAir(name: string) {
     const air = placedTownCameraInterior(
       {
-        id: 'probe_manor',
-        assetId: '/models/tidehold/highwatch/manor.glb',
+        id: `probe_${name}`,
+        assetId: `/models/tidehold/highwatch/${name}.glb`,
         walkIn: true,
         placement: { x: 0, z: 0, rotation: 0, scale: 1, lift: -1 },
       },
       0,
     );
-    if (!air) throw new Error('no manor air');
+    if (!air) throw new Error(`no ${name} air`);
     return air;
   }
 
-  it('stands its front door under its lintel and its hall on its floor deck', () => {
-    const air = manorAir();
-    const unit = MANOR_SIZE / 2.2;
-    const rows = BAKED['tidehold/highwatch/manor'];
-    const boxes = rows.boxes.map((b) => {
-      const c = Math.abs(Math.cos(b.ry ?? 0));
-      const s = Math.abs(Math.sin(b.ry ?? 0));
-      const ex = (b.hx * c + b.hz * s) * unit;
-      const ez = (b.hx * s + b.hz * c) * unit;
-      return {
-        x0: b.x * unit - ex,
-        x1: b.x * unit + ex,
-        z0: b.z * unit - ez,
-        z1: b.z * unit + ez,
-        y0: (b.y - b.hy) * unit - 1,
-      };
-    });
-    const decks = (rows.ramps ?? []).map((r) => Math.max(r.y0 ?? 0, r.y1 ?? 0) * unit - 1);
-    const [room, door] = [air.boxes[0], air.boxes[air.openings[0].box]];
-    // the hall's floor is one of the model's decks
-    expect(Math.min(...decks.map((d) => Math.abs(d - room[2])))).toBeLessThan(0.02);
-    // the door's head is the lowest baked box over the door's middle, in the wall
-    const mx = (door[0] + door[1]) / 2;
-    const mz = door[4] + 0.3; // inside the wall, a hand in from its outside face
-    const over = boxes.filter(
-      (b) => b.x0 <= mx && b.x1 >= mx && b.z0 <= mz && b.z1 >= mz && b.y0 > door[2] + 1,
-    );
-    expect(Math.min(...over.map((b) => b.y0))).toBeCloseTo(door[3], 1);
-  });
+  it.each(['guild'])(
+    'stands the %s front door under its lintel and its hall on its floor deck',
+    (name) => {
+      const air = modelAir(name);
+      const unit = SIZE[name] / 2.2;
+      const rows = BAKED[`tidehold/highwatch/${name}`];
+      const boxes = rows.boxes.map((b) => {
+        const c = Math.abs(Math.cos(b.ry ?? 0));
+        const s = Math.abs(Math.sin(b.ry ?? 0));
+        const ex = (b.hx * c + b.hz * s) * unit;
+        const ez = (b.hx * s + b.hz * c) * unit;
+        return {
+          x0: b.x * unit - ex,
+          x1: b.x * unit + ex,
+          z0: b.z * unit - ez,
+          z1: b.z * unit + ez,
+          y0: (b.y - b.hy) * unit - 1,
+        };
+      });
+      const decks = (rows.ramps ?? []).map((r) => Math.max(r.y0 ?? 0, r.y1 ?? 0) * unit - 1);
+      const [room, door] = [air.boxes[0], air.boxes[air.openings[0].box]];
+      // the hall's floor is one of the model's decks
+      expect(Math.min(...decks.map((d) => Math.abs(d - room[2])))).toBeLessThan(0.02);
+      // the door's head is the lowest baked box over the door's middle, in the wall
+      const mx = (door[0] + door[1]) / 2;
+      const mz = door[4] + 0.3; // inside the wall, a hand in from its outside face
+      const over = boxes.filter(
+        (b) => b.x0 <= mx && b.x1 >= mx && b.z0 <= mz && b.z1 >= mz && b.y0 > door[2] + 1,
+      );
+      expect(Math.min(...over.map((b) => b.y0))).toBeCloseTo(door[3], 1);
+    },
+  );
 
-  it("keeps every piece of the manor's air on a floor deck and clear of its walls", () => {
-    // the manor has many rooms: each piece stands on the deck under its middle, and no wall
-    // (a baked box five yards tall or more) cuts into any of them, so the camera can never be
-    // walked into masonry the model would draw through
-    const air = manorAir();
-    const unit = MANOR_SIZE / 2.2;
-    const rows = BAKED['tidehold/highwatch/manor'];
-    const walls = rows.boxes
-      .map((b) => ({
-        x0: (b.x - b.hx) * unit,
-        x1: (b.x + b.hx) * unit,
-        z0: (b.z - b.hz) * unit,
-        z1: (b.z + b.hz) * unit,
-        y0: (b.y - b.hy) * unit - 1,
-        y1: (b.y + b.hy) * unit - 1,
-      }))
-      .filter((b) => b.y1 - b.y0 >= 5);
-    expect(walls.length).toBeGreaterThan(20);
-    const decks = (rows.ramps ?? []).map((r) => ({
-      x0: (r.x - (r.ry ? r.hz : r.hx)) * unit,
-      x1: (r.x + (r.ry ? r.hz : r.hx)) * unit,
-      z0: (r.z - (r.ry ? r.hx : r.hz)) * unit,
-      z1: (r.z + (r.ry ? r.hx : r.hz)) * unit,
-      y: Math.max(r.y0 ?? 0, r.y1 ?? 0) * unit - 1,
-    }));
-    for (const [i, [x0, x1, y0, y1, z0, z1]] of air.boxes.entries()) {
-      const mx = (x0 + x1) / 2;
-      const mz = (z0 + z1) / 2;
-      // the highest deck under its middle is its floor
-      const under = decks.filter((d) => d.x0 <= mx && d.x1 >= mx && d.z0 <= mz && d.z1 >= mz);
-      expect(under.length, `piece ${i}`).toBeGreaterThan(0);
-      expect(Math.max(...under.map((d) => d.y)), `piece ${i} floor`).toBeCloseTo(y0, 1);
-      for (const w of walls) {
-        const overlap =
-          Math.min(x1, w.x1) - Math.max(x0, w.x0) > 0.05 &&
-          Math.min(z1, w.z1) - Math.max(z0, w.z0) > 0.05 &&
-          Math.min(y1, w.y1) - Math.max(y0, w.y0) > 0.05;
-        expect(overlap, `piece ${i} against a wall at ${w.x0.toFixed(1)}, ${w.z0.toFixed(1)}`).toBe(
-          false,
-        );
+  it.each(['guild'])(
+    "keeps every piece of the %s's air on a floor deck and clear of its walls",
+    (name) => {
+      // the guild has several rooms: each piece stands on the deck under its middle, and no
+      // wall (a baked box five yards tall or more: a hearth's breast and a run of tall shelves
+      // count) cuts into any of them, so the camera can never be walked into masonry the model
+      // would draw through
+      const air = modelAir(name);
+      const unit = SIZE[name] / 2.2;
+      const rows = BAKED[`tidehold/highwatch/${name}`];
+      const walls = rows.boxes
+        .map((b) => ({
+          x0: (b.x - b.hx) * unit,
+          x1: (b.x + b.hx) * unit,
+          z0: (b.z - b.hz) * unit,
+          z1: (b.z + b.hz) * unit,
+          y0: (b.y - b.hy) * unit - 1,
+          y1: (b.y + b.hy) * unit - 1,
+        }))
+        .filter((b) => b.y1 - b.y0 >= 5);
+      expect(walls.length).toBeGreaterThan(20);
+      const decks = (rows.ramps ?? []).map((r) => ({
+        x0: (r.x - (r.ry ? r.hz : r.hx)) * unit,
+        x1: (r.x + (r.ry ? r.hz : r.hx)) * unit,
+        z0: (r.z - (r.ry ? r.hx : r.hz)) * unit,
+        z1: (r.z + (r.ry ? r.hx : r.hz)) * unit,
+        y: Math.max(r.y0 ?? 0, r.y1 ?? 0) * unit - 1,
+      }));
+      for (const [i, [x0, x1, y0, y1, z0, z1]] of air.boxes.entries()) {
+        const mx = (x0 + x1) / 2;
+        const mz = (z0 + z1) / 2;
+        // the highest deck under its middle is its floor
+        const under = decks.filter((d) => d.x0 <= mx && d.x1 >= mx && d.z0 <= mz && d.z1 >= mz);
+        expect(under.length, `piece ${i}`).toBeGreaterThan(0);
+        expect(Math.max(...under.map((d) => d.y)), `piece ${i} floor`).toBeCloseTo(y0, 1);
+        for (const w of walls) {
+          const overlap =
+            Math.min(x1, w.x1) - Math.max(x0, w.x0) > 0.05 &&
+            Math.min(z1, w.z1) - Math.max(z0, w.z0) > 0.05 &&
+            Math.min(y1, w.y1) - Math.max(y0, w.y0) > 0.05;
+          expect(
+            overlap,
+            `piece ${i} against a wall at ${w.x0.toFixed(1)}, ${w.z0.toFixed(1)}`,
+          ).toBe(false);
+        }
       }
-    }
-  });
+    },
+  );
 });

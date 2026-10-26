@@ -10,6 +10,7 @@ import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from '
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { isFoliageFieldCopyCatalogId } from './assets/foliage_bark_decimation.mjs';
+import { isSceneryLodCopyCatalogId } from './assets/scenery_lod_build.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const modelsDir = join(root, 'public', 'models');
@@ -134,11 +135,14 @@ function prefabPieceEntries() {
 
 // The world foliage field's decimated-bark copies
 // (scripts/assets/decimate_foliage_bark.mjs) are not placeable: an authored
-// map places the full-detail original, at any scale.
+// map places the full-detail original, at any scale. Nor are the distant
+// scenery `<model>_lod` copies (scripts/assets/build_scenery_lod.mjs), which
+// only the zone features draw.
 const entries = [
   ...walk(modelsDir)
     .map(toEntry)
-    .filter((e) => !isFoliageFieldCopyCatalogId(e.id)),
+    .filter((e) => !isFoliageFieldCopyCatalogId(e.id))
+    .filter((e) => !isSceneryLodCopyCatalogId(e.id)),
   ...prefabPieceEntries(),
 ].sort((a, b) => a.id.localeCompare(b.id));
 

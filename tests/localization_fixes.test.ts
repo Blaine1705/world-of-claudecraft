@@ -22,6 +22,12 @@ import {
   worldPvpDefeatLine,
   worldPvpKillLine,
 } from '../src/sim/pvp/world_pvp';
+import {
+  WORLD_PVP_BOUNTY_EARNED_LINE,
+  WORLD_PVP_BOUNTY_LAPSED_LINE,
+  worldPvpBountyCollectedLine,
+  worldPvpBountyPlacedLine,
+} from '../src/sim/pvp/world_pvp_bounty';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 import { auraDisplayNameForHud } from '../src/ui/aura_display_name';
@@ -660,6 +666,12 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
       HILL_TAKEN_LINE,
       HILL_LOST_LINE,
       HILL_READOUT_NONE_LINE,
+      // World PvP bounties (src/sim/pvp/world_pvp_bounty.ts): the holder's
+      // notices and the two realm announcements, same constant-and-builder shape.
+      WORLD_PVP_BOUNTY_EARNED_LINE,
+      WORLD_PVP_BOUNTY_LAPSED_LINE,
+      worldPvpBountyPlacedLine('Aki'),
+      worldPvpBountyCollectedLine('Bet', 'Aki'),
     ];
     for (const lang of supportedLanguages) {
       setLanguage(lang);
@@ -1579,6 +1591,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     'server/character_blob_size.ts',
     'server/character_save_statement.ts',
     'server/admin_market_metrics.ts',
+    'server/realm_motd.ts',
   ]
     .map((file) => fs.readFileSync(path.resolve(process.cwd(), file), 'utf8'))
     .join('\n');
@@ -1785,14 +1798,23 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
       'chat.ts',
       'chat_readouts.ts',
       'duel.ts',
+      'duel_zone.ts',
       'dungeon_finder.ts',
+      'dungeon_finder_dev.ts',
+      'expedition_social.ts',
       'fiesta.ts',
       'fiesta_bots.ts',
+      'finder_advert.ts',
+      'finder_applications.ts',
+      'finder_guild.ts',
+      'finder_listing_edit.ts',
+      'finder_recruitment.ts',
       'map_objective_bots.ts',
       'map_objectives_hooks.ts',
       'map_objectives_run.ts',
       'party.ts',
       'pull_timer.ts',
+      'queue_rewards.ts',
       'ready_check.ts',
       'trade.ts',
       'trade_offer_sources.ts',
@@ -2312,6 +2334,18 @@ describe('vendor sell log line localizes the item name for both a single item an
         const out = harness().localizeLootText('Sold Copper Ore for 4c.');
         expect(out, lang).toBe(expected);
       }
+    } finally {
+      setLanguage('en');
+    }
+  });
+
+  it('localizes both current and legacy royal-door denial punctuation', () => {
+    try {
+      setLanguage('es');
+      const current = 'Nythraxis is engaged - the royal door has sealed shut.';
+      const legacy = 'Nythraxis is engaged \u2014 the royal door has sealed shut.';
+      expect(localizeSimText(current)).not.toBe(current);
+      expect(localizeSimText(current)).toBe(localizeSimText(legacy));
     } finally {
       setLanguage('en');
     }

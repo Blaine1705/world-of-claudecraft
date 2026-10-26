@@ -10,6 +10,8 @@ export interface GrassClearCircle {
   x: number;
   z: number;
   r: number;
+  /** A Studio map's permanent id (see HeightStamp.id); the game ignores it. */
+  id?: string;
 }
 
 const BUCKET = 32; // yards per spatial-index cell

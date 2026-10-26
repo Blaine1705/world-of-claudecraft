@@ -433,6 +433,7 @@ describe('muster camps: the weapon rack entity', () => {
     expect([...PICK_ONLY_OBJECT_TEMPLATE_IDS].sort()).toEqual([
       // round 10: Hester's Gurglegreen Cauldron, drawn by the toys' layer
       'ground_gurglegreen_cauldron',
+      'ground_murloc_hut',
       'muster_weapon_rack',
       'realm_builder_monument',
     ]);

@@ -2,6 +2,9 @@ import { MEMBERSHIP_ITEMS } from './content/membership';
 import { REFERRAL_ITEMS } from './content/referral';
 import { INVESTIGATION_MOB, INVESTIGATION_NPCS } from './content/world_quest_investigation';
 import { SHADOW_GUARDS, SHADOW_NPC_DEF } from './content/world_quest_shadow';
+import { bindFenbridgeActiveWorldGetter } from './fenbridge_touchup';
+import { applyWorldTouchup } from './world_touchup';
+import { WORLD_TOUCHUP } from './world_touchup.generated';
 // Content merge layer. Actual game content lives in sim/content/* — one
 // module per zone plus classes (abilities), shared items, and dungeons —
 // so content can grow without everything colliding in one file. This module
@@ -103,6 +106,7 @@ import {
   EVERGARDEN_ZONE,
 } from './content/evergarden';
 import { FACTION_VENDOR_ITEMS, FACTION_VENDOR_NPCS } from './content/faction_vendors';
+import { FARM_PATCHES, type FarmPatchDef } from './content/farm_patches';
 import {
   FARSHORE_CAMPS,
   FARSHORE_ESCORTS,
@@ -363,6 +367,7 @@ import { EASTBROOK_LAYOUT } from './eastbrook_layout';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
 import { HIGHWATCH_LAYOUT } from './highwatch_layout';
 import { JAIL_BLOCKERS, JAIL_TERRAIN_EDITS } from './jail';
+import { PAINTED_TOWNS } from './painted_towns';
 import { setStudioOverlay, studioOverlayInstalled } from './studio_content';
 
 export type { DelveShopEntry, DelveShopGate, DelveShopOffer } from './content/delves';
@@ -381,10 +386,11 @@ import { APEX_PATTERN_ITEMS } from './content/apex_patterns';
 import { CRUCIBLE_PROFESSION_ITEMS } from './content/crucible_professions';
 import { DELVE_ITEMS } from './content/delves/items';
 import { FARM_PATTERN_ITEMS } from './content/farm_patterns';
+import { GUILD_CONTRACT_ITEMS } from './content/guild_contracts';
 import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from './content/heroic_loot';
 import { buildHeroicVariants } from './content/heroic_variants';
 import { HEROIC_VENDOR_ITEMS } from './content/heroic_vendor';
-import { HIGHWATCH_MANOR_NPCS } from './content/highwatch_manor';
+import { HIGHWATCH_GUILD_NPCS } from './content/highwatch_guild';
 import { IGNIVAR_DROP_ITEMS } from './content/ignivar_drops';
 import { IGNIVAR_LOOT_ITEMS, IGNIVAR_VENDOR_NPCS } from './content/ignivar_loot';
 import { MIREFEN_TAVERN_NPCS } from './content/mirefen_tavern';
@@ -392,11 +398,12 @@ import { MIREFEN_TAVERN_PATRON_NPCS } from './content/mirefen_tavern_patrons';
 import { PROFESSION_ITEMS } from './content/profession_items';
 import { FURY_NPC, WARFARE_ITEMS } from './content/pvp_honor';
 import { SEASON2_ITEMS } from './content/pvp_honor_season2';
+import { QUEST_SHIELD_ITEMS } from './content/quest_shields';
 import { REFERRAL_STAMP_ITEMS } from './content/referral_rewards';
 import { TRINKET_ITEMS } from './content/trinkets';
 import { WYRMWATCH_HARBOR_NPCS } from './content/wyrmwatch_harbor_house';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId, delveModuleSpan } from './delve_layout';
-import { dungeonDoorPos, freezeObjectMoves, gatherNodesFor } from './moved_objects';
+import { dungeonDoorPos, farmPatchesFor, freezeObjectMoves, gatherNodesFor } from './moved_objects';
 
 function mergeItems(...parts: Record<string, ItemDef>[]): Record<string, ItemDef> {
   const merged = Object.assign({}, ...parts);
@@ -476,6 +483,8 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   FACTION_VENDOR_ITEMS,
   HOARD_ITEMS,
   QUEST_LEVELING_GEAR_ITEMS,
+  GUILD_CONTRACT_ITEMS,
+  QUEST_SHIELD_ITEMS,
   GOURDLIGHT_EVE_ITEMS,
   GOURDLIGHT_SCARECROW_ITEMS,
   GOURDLIGHT_DAILY_ITEMS,
@@ -583,7 +592,8 @@ export const NPCS: Record<string, NpcDef> = {
   // (content/wyrmwatch_harbor_house.ts), appended last so every NPC placed
   // before her keeps its entity id.
   ...WYRMWATCH_HARBOR_NPCS,
-  ...HIGHWATCH_MANOR_NPCS,
+  // ...and the Highwatch guild's four residents (content/highwatch_guild.ts), dynamic too
+  ...HIGHWATCH_GUILD_NPCS,
   // The Drowned Temple's lore guide (content/drowned_temple_cantor.ts):
   // dynamic, spawned per Temple claim, appended last so no placed NPC moves.
   ...CANTOR_NPCS,
@@ -793,6 +803,16 @@ export function activeGatherNodes(): GatherNodeDef[] {
  */
 export function gatherNodesInActiveWorld(): GatherNodeDef[] {
   return gatherNodesFor(getActiveWorldContent().objectMoves, GATHER_NODES);
+}
+
+/**
+ * The garden beds as the active world places them: any bed a Studio map moved
+ * (moved_objects.ts) at its new spot, the shipped table itself otherwise. The
+ * online client's IWorld.farmPatches, so its crops sit on the same beds the
+ * server's Sim plants and harvests at (the Sim reads its own world the same way).
+ */
+export function farmPatchesInActiveWorld(): readonly FarmPatchDef[] {
+  return farmPatchesFor(getActiveWorldContent().objectMoves, FARM_PATCHES);
 }
 
 /** One node of gatherNodesInActiveWorld by id (a click pick), or undefined. */
@@ -1068,7 +1088,7 @@ export const PLAYER_START = { ...EASTBROOK_LAYOUT.services.playerStart.position 
 // the Sim+renderer; the default game never touches it.
 // ---------------------------------------------------------------------------
 
-export const BUILTIN_WORLD: WorldContent = {
+export const BASE_WORLD: WorldContent = {
   zones: ZONES,
   camps: CAMPS,
   npcs: NPCS,
@@ -1108,8 +1128,13 @@ export const BUILTIN_WORLD: WorldContent = {
     // from the finished ground, so heights move a little further out too.
     // Copied: the layout's records are frozen, and edit lists are plain data.
     ...HIGHWATCH_LAYOUT.pads.map((pad) => ({ ...pad })),
+    // ...and every painted town after it (sim/painted_towns/), town by town in
+    // the list's order, each on its own ground far from every other stamp.
+    ...PAINTED_TOWNS.flatMap((town) => town.pads.map((pad) => ({ ...pad }))),
   ],
 };
+
+export const BUILTIN_WORLD = applyWorldTouchup(BASE_WORLD, WORLD_TOUCHUP);
 
 let activeWorld: WorldContent = BUILTIN_WORLD;
 // Bumped on every content swap so content-derived caches (the terrain
@@ -1121,6 +1146,8 @@ let contentGeneration = 0;
 export function getActiveWorldContent(): WorldContent {
   return activeWorld;
 }
+
+bindFenbridgeActiveWorldGetter(getActiveWorldContent);
 
 export function getContentGeneration(): number {
   return contentGeneration;
@@ -1137,7 +1164,11 @@ export function overworldTerrainPadsActive(): boolean {
 // in-thread paths for a custom world: a worker samples its own module copy of
 // the content, which is always the built-in one.
 export function isBuiltinWorldActive(): boolean {
-  return activeWorld === BUILTIN_WORLD;
+  return isBuiltinWorldContent(activeWorld);
+}
+
+export function isBuiltinWorldContent(world: WorldContent): boolean {
+  return world === BUILTIN_WORLD || world === BASE_WORLD || world.liveWorldPreview === true;
 }
 
 // Swap in a custom world (editor play-test) or restore the built-in (pass nothing).
@@ -1161,7 +1192,7 @@ export function setActiveWorldContent(world: WorldContent | null): void {
 // studio_content.ts) from the active content. The built-in world keeps the
 // release tables exactly.
 function refreshAuthoredMapGate(): void {
-  authoredMapWorld = activeWorld !== BUILTIN_WORLD && isAuthoredMapContent(activeWorld);
+  authoredMapWorld = !isBuiltinWorldActive() && isAuthoredMapContent(activeWorld);
   setStudioOverlay(
     {
       items: ITEMS,
@@ -1201,7 +1232,7 @@ export function authoredMapActive(): boolean {
 function isAuthoredMapContent(world: WorldContent): boolean {
   return (
     world.presentationMode !== undefined ||
-    world.placements !== undefined ||
+    (world.placements !== undefined && world.placements !== BUILTIN_WORLD.placements) ||
     (world.colliderVolumes?.length ?? 0) > 0 ||
     (world.caves?.length ?? 0) > 0 ||
     (world.holes?.length ?? 0) > 0
@@ -1402,7 +1433,14 @@ function computeWorldXBounds(z: number): Readonly<{ min: number; max: number }> 
       max = Math.max(max, zone.xMax ?? STRIP_MAX_X);
     }
   }
-  return Object.freeze({ min, max });
+  // Seed double-valued fields before freezing: integer rows and the infinite
+  // fallback otherwise share a changing numeric representation that can make
+  // V8 repeatedly deoptimize terrainHeightUnpadded at its bounds.max read.
+  // Assign the original results unchanged (including non-finite values).
+  const bounds = { min: Number.NaN, max: Number.NaN };
+  bounds.min = min;
+  bounds.max = max;
+  return Object.freeze(bounds);
 }
 
 interface WorldXBoundsIndex {

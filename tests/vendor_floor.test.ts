@@ -837,9 +837,10 @@ describe('stock rows: the phase 11n pulls', () => {
       // The two honor trinkets (WARFARE_TRINKET_STOCK) joined both honor
       // counters: 47 to 49 each.
       // Plus the 139 Warfare Season 2 rows (second release/v0.44.0 base merge): 188.
-      // Both honor vendors also carry the Tug companion whistle.
-      warmarshal_draven_kole: 189,
-      fury: 189,
+      // The PvP Skull Bag adds one item. Tug is a separate collection service.
+      // Restored feral staff and eight Season 2 jewelry rows at both counters.
+      warmarshal_draven_kole: 198,
+      fury: 198,
       stablemaster_marla: 2,
       wardsmith_orun: 3,
       // The three faction quartermasters (faction_vendors.ts): the standing

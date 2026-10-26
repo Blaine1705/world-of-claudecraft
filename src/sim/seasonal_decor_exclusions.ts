@@ -6,7 +6,7 @@
 // registry), never by a coordinate, so a town rework that moves or rebuilds it moves the
 // exclusion with it. The zone is the model's whole reach box (the hall, its bell tower,
 // its notice board) grown by CHAPEL_DECOR_CLEARANCE on every side.
-import { AUTHORED_TOWN_BUILDINGS } from './authored_town_registry';
+import { SEASONAL_EVENT_TOWNS } from './seasonal_towns';
 
 /** How far past a chapel's reach box the dressing keeps away (yards). */
 export const CHAPEL_DECOR_CLEARANCE = 8;
@@ -21,17 +21,17 @@ interface ChapelBox {
   halfDepth: number;
 }
 
-const CHAPELS: readonly ChapelBox[] = AUTHORED_TOWN_BUILDINGS.filter(
-  (b) => b.kind === 'chapel',
-).map((b) => ({
-  id: b.id,
-  cx: b.reach.center.x,
-  cz: b.reach.center.z,
-  cos: Math.cos(b.reach.rotation),
-  sin: Math.sin(b.reach.rotation),
-  halfWidth: b.reach.halfWidth,
-  halfDepth: b.reach.halfDepth,
-}));
+const CHAPELS: readonly ChapelBox[] = SEASONAL_EVENT_TOWNS.flatMap((town) => town.buildings)
+  .filter((b) => b.kind === 'chapel')
+  .map((b) => ({
+    id: b.id,
+    cx: b.reach.center.x,
+    cz: b.reach.center.z,
+    cos: Math.cos(b.reach.rotation),
+    sin: Math.sin(b.reach.rotation),
+    halfWidth: b.reach.halfWidth,
+    halfDepth: b.reach.halfDepth,
+  }));
 
 /** The ids of the event cities' chapels (exported for the pin). */
 export const SEASONAL_CHAPEL_IDS: readonly string[] = CHAPELS.map((c) => c.id);

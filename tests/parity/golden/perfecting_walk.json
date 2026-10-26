@@ -182,8 +182,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "110e4baf",
-      "events": "8c88bb71",
+      "state": "5caa55b5",
+      "events": "bee6bee9",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -262,10 +262,28 @@
             },
             {
               "count": 1,
+              "instance": {
+                "guid": "bbb35d0e-c2ec-8224-8330-c10afbd04238",
+                "provenance": {
+                  "at": 0,
+                  "by": "Adventurer",
+                  "source": "world",
+                  "zone": "eastbrook_vale"
+                }
+              },
               "itemId": "wyrmfall_pendant"
             },
             {
               "count": 1,
+              "instance": {
+                "guid": "be484953-1907-8a85-889c-dc4ff2a41619",
+                "provenance": {
+                  "at": 0,
+                  "by": "Adventurer",
+                  "source": "world",
+                  "zone": "eastbrook_vale"
+                }
+              },
               "itemId": "warhewn_signet"
             },
             {
@@ -378,7 +396,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "110e4baf",
+      "state": "5caa55b5",
       "events": "8886a5fa",
       "rng": {
         "draws": 0,
@@ -458,10 +476,28 @@
             },
             {
               "count": 1,
+              "instance": {
+                "guid": "bbb35d0e-c2ec-8224-8330-c10afbd04238",
+                "provenance": {
+                  "at": 0,
+                  "by": "Adventurer",
+                  "source": "world",
+                  "zone": "eastbrook_vale"
+                }
+              },
               "itemId": "wyrmfall_pendant"
             },
             {
               "count": 1,
+              "instance": {
+                "guid": "be484953-1907-8a85-889c-dc4ff2a41619",
+                "provenance": {
+                  "at": 0,
+                  "by": "Adventurer",
+                  "source": "world",
+                  "zone": "eastbrook_vale"
+                }
+              },
               "itemId": "warhewn_signet"
             },
             {
@@ -574,8 +610,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "6191d42c",
-      "events": "4ac06e05",
+      "state": "1a63f0f3",
+      "events": "bcb01177",
       "rng": {
         "draws": 6,
         "digest": "1272a77a"
@@ -656,7 +692,14 @@
               "count": 1,
               "instance": {
                 "boundTo": 1004,
+                "guid": "bbb35d0e-c2ec-8224-8330-c10afbd04238",
                 "perfected": true,
+                "provenance": {
+                  "at": 0,
+                  "by": "Adventurer",
+                  "source": "world",
+                  "zone": "eastbrook_vale"
+                },
                 "rolled": {
                   "stats": {
                     "int": 1
@@ -667,6 +710,15 @@
             },
             {
               "count": 1,
+              "instance": {
+                "guid": "be484953-1907-8a85-889c-dc4ff2a41619",
+                "provenance": {
+                  "at": 0,
+                  "by": "Adventurer",
+                  "source": "world",
+                  "zone": "eastbrook_vale"
+                }
+              },
               "itemId": "warhewn_signet"
             },
             {
@@ -779,7 +831,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "6191d42c",
+      "state": "1a63f0f3",
       "events": "53e31299",
       "rng": {
         "draws": 6,
@@ -861,7 +913,14 @@
               "count": 1,
               "instance": {
                 "boundTo": 1004,
+                "guid": "bbb35d0e-c2ec-8224-8330-c10afbd04238",
                 "perfected": true,
+                "provenance": {
+                  "at": 0,
+                  "by": "Adventurer",
+                  "source": "world",
+                  "zone": "eastbrook_vale"
+                },
                 "rolled": {
                   "stats": {
                     "int": 1
@@ -872,6 +931,15 @@
             },
             {
               "count": 1,
+              "instance": {
+                "guid": "be484953-1907-8a85-889c-dc4ff2a41619",
+                "provenance": {
+                  "at": 0,
+                  "by": "Adventurer",
+                  "source": "world",
+                  "zone": "eastbrook_vale"
+                }
+              },
               "itemId": "warhewn_signet"
             },
             {
@@ -984,8 +1052,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "a1679fa8",
-      "events": "c9480ba7",
+      "state": "da298d98",
+      "events": "2c74deb8",
       "rng": {
         "draws": 8,
         "digest": "3c3c49a7"
@@ -1052,7 +1120,14 @@
           "equipmentInstance": {
             "ring1": {
               "boundTo": 1004,
-              "perfecting": 1
+              "guid": "be484953-1907-8a85-889c-dc4ff2a41619",
+              "perfecting": 1,
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
             }
           },
           "factionCurrencies": {},
@@ -1072,7 +1147,14 @@
               "count": 1,
               "instance": {
                 "boundTo": 1004,
+                "guid": "bbb35d0e-c2ec-8224-8330-c10afbd04238",
                 "perfected": true,
+                "provenance": {
+                  "at": 0,
+                  "by": "Adventurer",
+                  "source": "world",
+                  "zone": "eastbrook_vale"
+                },
                 "rolled": {
                   "stats": {
                     "int": 1
@@ -1193,7 +1275,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "2ec01bec",
+      "state": "17cd8c1c",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -1261,7 +1343,14 @@
           "equipmentInstance": {
             "ring1": {
               "boundTo": 1004,
-              "perfecting": 1
+              "guid": "be484953-1907-8a85-889c-dc4ff2a41619",
+              "perfecting": 1,
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
             }
           },
           "factionCurrencies": {},
@@ -1281,7 +1370,14 @@
               "count": 1,
               "instance": {
                 "boundTo": 1004,
+                "guid": "bbb35d0e-c2ec-8224-8330-c10afbd04238",
                 "perfected": true,
+                "provenance": {
+                  "at": 0,
+                  "by": "Adventurer",
+                  "source": "world",
+                  "zone": "eastbrook_vale"
+                },
                 "rolled": {
                   "stats": {
                     "int": 1
@@ -1398,7 +1494,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "2ec01bec",
+      "state": "17cd8c1c",
       "events": "3882eb79",
       "rng": {
         "draws": 8,
@@ -1466,7 +1562,14 @@
           "equipmentInstance": {
             "ring1": {
               "boundTo": 1004,
-              "perfecting": 1
+              "guid": "be484953-1907-8a85-889c-dc4ff2a41619",
+              "perfecting": 1,
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
             }
           },
           "factionCurrencies": {},
@@ -1486,7 +1589,14 @@
               "count": 1,
               "instance": {
                 "boundTo": 1004,
+                "guid": "bbb35d0e-c2ec-8224-8330-c10afbd04238",
                 "perfected": true,
+                "provenance": {
+                  "at": 0,
+                  "by": "Adventurer",
+                  "source": "world",
+                  "zone": "eastbrook_vale"
+                },
                 "rolled": {
                   "stats": {
                     "int": 1
@@ -1603,7 +1713,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "2ec01bec",
+      "state": "17cd8c1c",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -1671,7 +1781,14 @@
           "equipmentInstance": {
             "ring1": {
               "boundTo": 1004,
-              "perfecting": 1
+              "guid": "be484953-1907-8a85-889c-dc4ff2a41619",
+              "perfecting": 1,
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
             }
           },
           "factionCurrencies": {},
@@ -1691,7 +1808,14 @@
               "count": 1,
               "instance": {
                 "boundTo": 1004,
+                "guid": "bbb35d0e-c2ec-8224-8330-c10afbd04238",
                 "perfected": true,
+                "provenance": {
+                  "at": 0,
+                  "by": "Adventurer",
+                  "source": "world",
+                  "zone": "eastbrook_vale"
+                },
                 "rolled": {
                   "stats": {
                     "int": 1
@@ -1808,7 +1932,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "2ec01bec",
+      "state": "17cd8c1c",
       "events": "d35a2997",
       "rng": {
         "draws": 8,
@@ -1876,7 +2000,14 @@
           "equipmentInstance": {
             "ring1": {
               "boundTo": 1004,
-              "perfecting": 1
+              "guid": "be484953-1907-8a85-889c-dc4ff2a41619",
+              "perfecting": 1,
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
             }
           },
           "factionCurrencies": {},
@@ -1896,7 +2027,14 @@
               "count": 1,
               "instance": {
                 "boundTo": 1004,
+                "guid": "bbb35d0e-c2ec-8224-8330-c10afbd04238",
                 "perfected": true,
+                "provenance": {
+                  "at": 0,
+                  "by": "Adventurer",
+                  "source": "world",
+                  "zone": "eastbrook_vale"
+                },
                 "rolled": {
                   "stats": {
                     "int": 1
@@ -2013,7 +2151,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "2ec01bec",
+      "state": "17cd8c1c",
       "events": "e2d61bdb",
       "rng": {
         "draws": 8,
@@ -2081,7 +2219,14 @@
           "equipmentInstance": {
             "ring1": {
               "boundTo": 1004,
-              "perfecting": 1
+              "guid": "be484953-1907-8a85-889c-dc4ff2a41619",
+              "perfecting": 1,
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
             }
           },
           "factionCurrencies": {},
@@ -2101,7 +2246,14 @@
               "count": 1,
               "instance": {
                 "boundTo": 1004,
+                "guid": "bbb35d0e-c2ec-8224-8330-c10afbd04238",
                 "perfected": true,
+                "provenance": {
+                  "at": 0,
+                  "by": "Adventurer",
+                  "source": "world",
+                  "zone": "eastbrook_vale"
+                },
                 "rolled": {
                   "stats": {
                     "int": 1
@@ -2218,7 +2370,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "74becd0c",
+      "state": "ae9e897d",
       "events": "e19b9d05",
       "rng": {
         "draws": 8,
@@ -2286,7 +2438,14 @@
           "equipmentInstance": {
             "ring1": {
               "boundTo": 1004,
-              "perfecting": 1
+              "guid": "be484953-1907-8a85-889c-dc4ff2a41619",
+              "perfecting": 1,
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
             }
           },
           "factionCurrencies": {},
@@ -2306,7 +2465,14 @@
               "count": 1,
               "instance": {
                 "boundTo": 1004,
+                "guid": "bbb35d0e-c2ec-8224-8330-c10afbd04238",
                 "perfected": true,
+                "provenance": {
+                  "at": 0,
+                  "by": "Adventurer",
+                  "source": "world",
+                  "zone": "eastbrook_vale"
+                },
                 "rolled": {
                   "stats": {
                     "int": 1
@@ -2320,7 +2486,8 @@
               "instance": {
                 "locked": true
               },
-              "itemId": "sundered_essence"
+              "itemId": "sundered_essence",
+              "slot": 2
             },
             {
               "count": 6,
@@ -2333,14 +2500,16 @@
                   "count": 6,
                   "source": {}
                 }
-              ]
+              ],
+              "slot": 3
             },
             {
               "count": 1,
               "instance": {
                 "locked": true
               },
-              "itemId": "makers_ember"
+              "itemId": "makers_ember",
+              "slot": 4
             }
           ],
           "lifetimeXp": 167200,
@@ -2436,7 +2605,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "74becd0c",
+      "state": "ae9e897d",
       "events": "32e75385",
       "rng": {
         "draws": 8,
@@ -2504,7 +2673,14 @@
           "equipmentInstance": {
             "ring1": {
               "boundTo": 1004,
-              "perfecting": 1
+              "guid": "be484953-1907-8a85-889c-dc4ff2a41619",
+              "perfecting": 1,
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
             }
           },
           "factionCurrencies": {},
@@ -2524,7 +2700,14 @@
               "count": 1,
               "instance": {
                 "boundTo": 1004,
+                "guid": "bbb35d0e-c2ec-8224-8330-c10afbd04238",
                 "perfected": true,
+                "provenance": {
+                  "at": 0,
+                  "by": "Adventurer",
+                  "source": "world",
+                  "zone": "eastbrook_vale"
+                },
                 "rolled": {
                   "stats": {
                     "int": 1
@@ -2538,7 +2721,8 @@
               "instance": {
                 "locked": true
               },
-              "itemId": "sundered_essence"
+              "itemId": "sundered_essence",
+              "slot": 2
             },
             {
               "count": 6,
@@ -2551,14 +2735,16 @@
                   "count": 6,
                   "source": {}
                 }
-              ]
+              ],
+              "slot": 3
             },
             {
               "count": 1,
               "instance": {
                 "locked": true
               },
-              "itemId": "makers_ember"
+              "itemId": "makers_ember",
+              "slot": 4
             }
           ],
           "lifetimeXp": 167200,
@@ -2654,7 +2840,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "74becd0c",
+      "state": "ae9e897d",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -2722,7 +2908,14 @@
           "equipmentInstance": {
             "ring1": {
               "boundTo": 1004,
-              "perfecting": 1
+              "guid": "be484953-1907-8a85-889c-dc4ff2a41619",
+              "perfecting": 1,
+              "provenance": {
+                "at": 0,
+                "by": "Adventurer",
+                "source": "world",
+                "zone": "eastbrook_vale"
+              }
             }
           },
           "factionCurrencies": {},
@@ -2742,7 +2935,14 @@
               "count": 1,
               "instance": {
                 "boundTo": 1004,
+                "guid": "bbb35d0e-c2ec-8224-8330-c10afbd04238",
                 "perfected": true,
+                "provenance": {
+                  "at": 0,
+                  "by": "Adventurer",
+                  "source": "world",
+                  "zone": "eastbrook_vale"
+                },
                 "rolled": {
                   "stats": {
                     "int": 1
@@ -2756,7 +2956,8 @@
               "instance": {
                 "locked": true
               },
-              "itemId": "sundered_essence"
+              "itemId": "sundered_essence",
+              "slot": 2
             },
             {
               "count": 6,
@@ -2769,14 +2970,16 @@
                   "count": 6,
                   "source": {}
                 }
-              ]
+              ],
+              "slot": 3
             },
             {
               "count": 1,
               "instance": {
                 "locked": true
               },
-              "itemId": "makers_ember"
+              "itemId": "makers_ember",
+              "slot": 4
             }
           ],
           "lifetimeXp": 167200,

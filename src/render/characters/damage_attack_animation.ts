@@ -49,6 +49,8 @@ export function isPlayerDamageContinuation(
   const id = attackAbilityId(label);
   return (
     SECONDARY_PHYSICAL_LABELS.has(label) ||
+    // Volley is now an instant zone; its label-only pulses follow the cast gesture.
+    id === 'volley' ||
     isBleedContinuation(id) ||
     !!(id && ABILITIES[id]?.effects.some((effect) => effect.type === 'dot'))
   );

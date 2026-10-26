@@ -44,9 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'La Cuenca del Corazón Salvaje',
+    desc: 'Armas emblemáticas del Maestro de Bestias Señor de los Colmillos, la Flor Devoradora y Zulgar.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroico: La Cuenca del Corazón Salvaje',
+    desc: 'Épicos y abalorios exclusivos del modo heroico del Maestro de Bestias Señor de los Colmillos, la Flor Devoradora y Zulgar, Voz de la Cuenca.',
   },
   conquerors_nythraxis: {
     name: 'Incursión de Nythraxis',
@@ -142,11 +144,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_gallery: {
     name: 'Galería de Guerra',
-    desc: 'Los cinco equipos de batalla de Guerra, conseguidos pieza a pieza con honor.',
+    desc: 'Los cinco equipos de batalla de Guerra de la primera temporada, ahora vendidos pieza a pieza por oro.',
   },
   conquerors_warfare_armory: {
     name: 'Armería de Guerra',
-    desc: 'Joyería y armas de Guerra compradas con honor ganado a pulso.',
+    desc: 'Joyería, armas y bienes de Guerra comprados con honor ganado a pulso.',
   },
   conquerors_vanguard_gallery: {
     name: 'Galería de Vanguardia',

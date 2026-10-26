@@ -12,123 +12,123 @@ import type { EnTranslations } from '../i18n.catalog';
 
 export const es: EnTranslations = {
   "referralCards": {
-    "title": "Refer a Friend",
-    "subtitle": "Adventure together. Earn your stamps.",
-    "close": "Close Refer a Friend",
-    "launcher": "Stamp cards",
-    "pages": "Stamp card pages",
-    "firstPage": "First page",
-    "nextPage": "More cards",
-    "trailmateTitle": "Trailmate",
-    "friendshipAura": "Friendship",
-    "protectiveCharm": "Protective Charm",
-    "bankBonus": "Completed stamp cards",
-    "bankBonusHelp": "Help two bound friends complete their stamp cards to unlock 20 permanent bank slots.",
-    "friendshipUse": "Increase your Strength, Agility, Stamina, Intellect, and Spirit by {stats} for {duration} seconds.",
-    "readyCount": "Stamp cards: {count} rewards ready to collect",
-    "loading": "Connecting to your referral cards...",
-    "empty": "Invite a new player to begin your first stamp card together.",
-    "inviteTitle": "Invite a friend",
-    "inviteHelp": "Share this link with a friend before they create their account. Only new accounts created through your link become bound friends.",
-    "inviteLabel": "Your invitation link",
-    "inviteUnavailable": "Your invitation link is not available yet.",
-    "membership": "When your bound friend buys their first membership, you receive a membership bond.",
-    "cardBetween": "{you} and {friend}",
-    "yourCard": "{name}'s stamp card",
-    "unassigned": "Character not selected",
-    "start": "Start a card",
-    "startPrompt": "Start stamp cards with {friend}? Both of you must accept. Each character must be below level 5 and must not have completed the final Tutorial Island quest.",
-    "accept": "Accept",
-    "decline": "Decline",
-    "declinePrompt": "Are you sure you want to decline? You can start later from the stamp card menu while both characters still meet the requirements.",
-    "declineConfirmed": "The card was not started. You can start from the stamp card menu while both characters still meet the requirements.",
-    "waiting": "Waiting for your bound friend to accept.",
-    "cancel": "Cancel",
-    "okay": "OK",
-    "understand": "Yes, I understand",
-    "confirmLock": "Yes, lock this card",
-    "lockFirst": "Redeeming The Fogbinder stamp reward permanently locks this card to {name}. You will no longer be able to move this card or its rewards to another character. Do you understand?",
-    "lockSecond": "Are you sure? Redeem The Fogbinder reward and permanently lock this card to {name}.",
-    "locked": "This card is locked to {name}. It can no longer be moved.",
-    "unlocked": "This card can move to another eligible character until you redeem The Fogbinder stamp reward. Redeeming that reward permanently locks it to this character.",
-    "move": "Move card to this character",
-    "movePrompt": "Move your card from {oldName} to {newName}? Your progress and all rewards earned from this card will move. Those rewards will be removed from {oldName}.",
-    "confirmMove": "Yes, move my card",
-    "summon": "Summon bound friend",
-    "summonPrompt": "{friend} wants to summon you to their location. Accept the summon?",
-    "summonHelp": "Bring your bound friend to your location. You can summon once every 30 minutes.",
-    "summonCooldown": "Summon ready in {minutes} min {seconds} sec",
-    "reward": "Reward: {reward}",
-    "earned": "Earned",
-    "redeemed": "Redeemed",
-    "emptyStamp": "Not yet earned",
-    "stamping": "Stamping your card...",
-    "redeem": "Redeem reward",
-    "previous": "Redeem earlier stamps first.",
-    "playTogether": "Complete milestones in a party with the characters on this card.",
-    "fallback": "Already completed a milestone quest alone? Rejoin your friend in a party for the Tutorial Island stamp. For later quest stamps, clear the matching dungeon together.",
-    "questGroup": "Stamp card quests",
-    "questWithFriend": "{quest} with {friend}",
-    "browseCards": "Browse all stamp card pages",
-    "nextQuest": "Stamp card: {quest}",
-    "questIndicator": "This quest advances your next stamp card reward.",
-    "completion": "Congratulations! {friend} completed their stamp card with your help.",
-    "openInvites": "Open Refer a Friend",
-    "referrerTitle": "Friends you helped",
-    "referrerCount": "{count} friends completed",
-    "friendTier": "Friends helped: {count}",
-    "awarded": "Awarded",
-    "pending": "Not yet awarded",
+    "title": "Invita a un amigo",
+    "subtitle": "Vivid aventuras juntos. Ganaos vuestros sellos.",
+    "close": "Cerrar Invita a un amigo",
+    "launcher": "Tarjetas de sellos",
+    "pages": "Páginas de tarjetas de sellos",
+    "firstPage": "Primera página",
+    "nextPage": "Más tarjetas",
+    "trailmateTitle": "Compañero de Camino",
+    "friendshipAura": "Amistad",
+    "protectiveCharm": "Amuleto protector",
+    "bankBonus": "Tarjetas de sellos completadas",
+    "bankBonusHelp": "Ayuda a dos amigos vinculados a completar sus tarjetas de sellos para desbloquear 20 espacios de banco permanentes.",
+    "friendshipUse": "Aumenta tu Fuerza, Agilidad, Aguante, Intelecto y Espíritu en {stats} durante {duration} segundos.",
+    "readyCount": "Tarjetas de sellos: {count} recompensas listas para recoger",
+    "loading": "Conectando con tus tarjetas de invitación...",
+    "empty": "Invita a un jugador nuevo para empezar juntos vuestra primera tarjeta de sellos.",
+    "inviteTitle": "Invitar a un amigo",
+    "inviteHelp": "Comparte este enlace con un amigo antes de que cree su cuenta. Solo las cuentas nuevas creadas mediante tu enlace se convierten en amigos vinculados.",
+    "inviteLabel": "Tu enlace de invitación",
+    "inviteUnavailable": "Tu enlace de invitación aún no está disponible.",
+    "membership": "Cuando tu amigo vinculado compra su primera membresía, recibes un bono de membresía.",
+    "cardBetween": "{you} y {friend}",
+    "yourCard": "Tarjeta de sellos de {name}",
+    "unassigned": "Personaje sin seleccionar",
+    "start": "Iniciar una tarjeta",
+    "startPrompt": "¿Iniciar tarjetas de sellos con {friend}? Ambos debéis aceptar. Cada personaje debe estar por debajo del nivel 5 y no haber completado la misión final de la Isla Tutorial.",
+    "accept": "Aceptar",
+    "decline": "Rechazar",
+    "declinePrompt": "¿Seguro que quieres rechazarla? Puedes iniciarla más tarde desde el menú de tarjetas de sellos mientras ambos personajes sigan cumpliendo los requisitos.",
+    "declineConfirmed": "La tarjeta no se ha iniciado. Puedes iniciarla desde el menú de tarjetas de sellos mientras ambos personajes sigan cumpliendo los requisitos.",
+    "waiting": "Esperando a que tu amigo vinculado acepte.",
+    "cancel": "Cancelar",
+    "okay": "Aceptar",
+    "understand": "Sí, lo entiendo",
+    "confirmLock": "Sí, bloquear esta tarjeta",
+    "lockFirst": "Canjear la recompensa del sello El Fogbinder bloquea permanentemente esta tarjeta a {name}. Ya no podrás mover esta tarjeta ni sus recompensas a otro personaje. ¿Lo entiendes?",
+    "lockSecond": "¿Seguro? Canjea la recompensa de El Fogbinder y bloquea permanentemente esta tarjeta a {name}.",
+    "locked": "Esta tarjeta está bloqueada a {name}. Ya no se puede mover.",
+    "unlocked": "Esta tarjeta puede moverse a otro personaje apto hasta que canjees la recompensa del sello El Fogbinder. Canjear esa recompensa la bloquea permanentemente a este personaje.",
+    "move": "Mover tarjeta a este personaje",
+    "movePrompt": "¿Mover tu tarjeta de {oldName} a {newName}? Se moverán tu progreso y todas las recompensas obtenidas con esta tarjeta. Esas recompensas se quitarán de {oldName}.",
+    "confirmMove": "Sí, mover mi tarjeta",
+    "summon": "Invocar amigo vinculado",
+    "summonPrompt": "{friend} quiere invocarte a su ubicación. ¿Aceptas la invocación?",
+    "summonHelp": "Trae a tu amigo vinculado hasta tu ubicación. Puedes invocarlo una vez cada 30 minutos.",
+    "summonCooldown": "Invocación lista en {minutes} min y {seconds} s",
+    "reward": "Recompensa: {reward}",
+    "earned": "Conseguidas",
+    "redeemed": "Canjeado",
+    "emptyStamp": "Aún sin conseguir",
+    "stamping": "Sellando tu tarjeta...",
+    "redeem": "Canjear recompensa",
+    "previous": "Canjea primero los sellos anteriores.",
+    "playTogether": "Completa hitos en un grupo con los personajes de esta tarjeta.",
+    "fallback": "¿Ya has completado una misión de hito en solitario? Vuelve a unirte a tu amigo en un grupo para el sello de la Isla Tutorial. Para los sellos de misiones posteriores, completad juntos la mazmorra correspondiente.",
+    "questGroup": "Misiones de tarjetas de sellos",
+    "questWithFriend": "{quest} con {friend}",
+    "browseCards": "Explorar todas las páginas de tarjetas de sellos",
+    "nextQuest": "Tarjeta de sellos: {quest}",
+    "questIndicator": "Esta misión hace avanzar tu próxima recompensa de tarjeta de sellos.",
+    "completion": "¡Enhorabuena! {friend} ha completado su tarjeta de sellos con tu ayuda.",
+    "openInvites": "Abrir Invita a un amigo",
+    "referrerTitle": "Amigos a los que has ayudado",
+    "referrerCount": "{count} amigos han completado",
+    "friendTier": "Amigos ayudados: {count}",
+    "awarded": "Otorgado",
+    "pending": "Aún sin otorgar",
     "celebration": {
-      "earned": "Adventure rewarded",
-      "title": "Reward claimed!",
-      "titleReward": "Title unlocked: {title}",
-      "together": "Earned together with {friend}.",
-      "continue": "Keep adventuring"
+      "earned": "Aventura recompensada",
+      "title": "¡Recompensa reclamada!",
+      "titleReward": "Título desbloqueado: {title}",
+      "together": "Conseguido junto a {friend}.",
+      "continue": "Sigue viviendo aventuras"
     },
     "milestones": {
-      "tutorial": "Tutorial Island final quest",
-      "hollow": "Into the Hollow",
-      "fogbinder": "The Fogbinder",
-      "gravewyrm": "Korzul the Gravewyrm",
-      "raid": "Defeat your first raid boss"
+      "tutorial": "Misión final de la Isla Tutorial",
+      "hollow": "Dentro del Hueco",
+      "fogbinder": "El Fogbinder",
+      "gravewyrm": "Korzul el Gravewyrm",
+      "raid": "Derrota a tu primer jefe de banda"
     },
     "rewards": {
-      "tutorial": "A unique title and a maximum-tier bag, bound to your character.",
-      "hollow": "A trinket that grants Stamina and a passive shield when your health is low.",
-      "fogbinder": "Your trinket evolves, gaining more Stamina and an active effect: +5 to all stats for 15 seconds, with a 2 minute cooldown.",
-      "gravewyrm": "Free mount training.",
-      "raid": "The exclusive Friendship Tank mount."
+      "tutorial": "Un título único y una bolsa del grado máximo, ligados a tu personaje.",
+      "hollow": "Un abalorio que otorga Aguante y un escudo pasivo cuando tienes poca salud.",
+      "fogbinder": "Tu abalorio evoluciona y obtiene más Aguante y un efecto activo: +5 a todas las estadísticas durante 15 segundos, con 2 minutos de tiempo de reutilización.",
+      "gravewyrm": "Entrenamiento de montura gratuito.",
+      "raid": "Montura de Tembleques el Moco."
     },
     "referrerRewards": {
-      "1": "The exclusive Friendship Raptor mount.",
-      "2": "20 bank slots and 5 character slots.",
-      "3": "1,000 Claudium.",
-      "4": "1,000 Claudium.",
-      "5": "A Sapling buddy companion."
+      "1": "La montura exclusiva Raptor de la Amistad.",
+      "2": "20 espacios de banco y 5 espacios de personaje.",
+      "3": "1000 de Claudium.",
+      "4": "1000 de Claudium.",
+      "5": "Los compañeros Parpadeo y Destello."
     },
     "reasons": {
-      "notParticipant": "This account is not part of this bound-friend link.",
-      "staleRevision": "Your card changed. Check its latest progress and try again.",
-      "invalidCharacters": "The party characters do not belong to this bound-friend link.",
-      "notTogether": "Both bound friends must be in the same party.",
-      "levelTooHigh": "New card characters must be below level 5.",
-      "tutorialCompleted": "A character has already completed the final Tutorial Island quest.",
-      "alreadyStarted": "This link already has a card. Each bound-friend link can have only one active card.",
-      "notPending": "There is no card invitation waiting for a response.",
-      "declinePending": "Your bound friend is deciding whether to decline the card.",
-      "declineNotConfirmed": "Confirm the decline before ending this invitation.",
-      "notActive": "Start a card together before collecting rewards.",
-      "wrongCharacter": "Use the characters named on the card, or move an unlocked card to an eligible character.",
-      "locked": "This card is locked to its character and cannot be moved.",
-      "sameCharacter": "This card is already on this character.",
-      "invalidMilestone": "That stamp does not belong to this card.",
-      "notEarned": "Complete this milestone together before redeeming it.",
-      "alreadyRedeemed": "This reward has already been redeemed.",
-      "previousRewardRequired": "Redeem the earlier stamp rewards first.",
-      "confirmationRequired": "Review the card lock warning before redeeming The Fogbinder reward.",
-      "newAccountsOnly": "Accounts can become bound friends only when a new account is created through a referral link. Existing accounts cannot be bound.",
-      "unavailable": "This action is not available right now. Please try again later."
+      "notParticipant": "Esta cuenta no forma parte de este vínculo de amigos.",
+      "staleRevision": "Tu tarjeta ha cambiado. Comprueba su progreso más reciente e inténtalo de nuevo.",
+      "invalidCharacters": "Los personajes del grupo no pertenecen a este vínculo de amigos.",
+      "notTogether": "Ambos amigos vinculados deben estar en el mismo grupo.",
+      "levelTooHigh": "Los personajes de una tarjeta nueva deben estar por debajo del nivel 5.",
+      "tutorialCompleted": "Un personaje ya ha completado la misión final de la Isla Tutorial.",
+      "alreadyStarted": "Este vínculo ya tiene una tarjeta. Cada vínculo de amigos solo puede tener una tarjeta activa.",
+      "notPending": "No hay ninguna invitación de tarjeta pendiente de respuesta.",
+      "declinePending": "Tu amigo vinculado está decidiendo si rechaza la tarjeta.",
+      "declineNotConfirmed": "Confirma el rechazo antes de dar por terminada esta invitación.",
+      "notActive": "Iniciad una tarjeta juntos antes de recoger recompensas.",
+      "wrongCharacter": "Usa los personajes indicados en la tarjeta o mueve una tarjeta desbloqueada a un personaje apto.",
+      "locked": "Esta tarjeta está bloqueada a su personaje y no se puede mover.",
+      "sameCharacter": "Esta tarjeta ya está en este personaje.",
+      "invalidMilestone": "Ese sello no pertenece a esta tarjeta.",
+      "notEarned": "Completad este hito juntos antes de canjearlo.",
+      "alreadyRedeemed": "Esta recompensa ya se ha canjeado.",
+      "previousRewardRequired": "Canjea primero las recompensas de los sellos anteriores.",
+      "confirmationRequired": "Revisa el aviso de bloqueo de la tarjeta antes de canjear la recompensa de El Fogbinder.",
+      "newAccountsOnly": "Las cuentas solo pueden convertirse en amigos vinculados cuando se crea una cuenta nueva mediante un enlace de invitación. No se pueden vincular cuentas existentes.",
+      "unavailable": "Esta acción no está disponible ahora. Vuelve a intentarlo más tarde."
     }
   },
   "meta": {
@@ -468,24 +468,205 @@ export const es: EnTranslations = {
   },
   "hudChrome": {
     "courier": {
-      "title": "Courier",
-      "close": "Close courier",
-      "ready": "Ready for a delivery",
-      "outbound": "Flying to the bank",
-      "returning": "Bringing your items back",
-      "waiting": "Waiting to return your items",
-      "bags": "Send to bank",
-      "bank": "Bring from bank",
-      "cargo": "Courier inventory",
-      "empty": "No items",
-      "send": "Send courier",
-      "selected": "{count} / {limit} stacks selected",
-      "select": "Select {item}, {count}",
-      "selectedItem": "Deselect {item}, {count}",
-      "instructions": "Select whole stacks. Your courier deposits them first, then collects your requested items. Quest items cannot be sent.",
-      "membership": "Renew your membership to start another trip.",
-      "cargoSafe": "Carried items stay with the courier until there is room in your bags.",
-      "unavailable": "Summon your courier to plan a delivery."
+      "title": "Mensajero",
+      "close": "Cerrar mensajero",
+      "ready": "Listo para una entrega",
+      "outbound": "Volando hacia el banco",
+      "returning": "Trayendo tus objetos de vuelta",
+      "waiting": "Esperando para devolverte tus objetos",
+      "bags": "Enviar al banco",
+      "bagsVault": "Enviar materiales a la bóveda",
+      "bank": "Traer del banco",
+      "vault": "Traer de la bóveda. Cada selección trae toda la fila.",
+      "inventory": "Inventario",
+      "bankTitle": "Banco",
+      "vaultTitle": "Bóveda de Materiales",
+      "storeTabs": "Almacenamiento del mensajero",
+      "vaultCap": "Almacena {cap} de cada material",
+      "vaultEmpty": "Tu bóveda está vacía.",
+      "vaultLocked": "Desbloquea la Bóveda de Materiales con un banquero para usarla con tu mensajero.",
+      "boundBank": "De camino al banco",
+      "boundVault": "De camino a la Bóveda de Materiales",
+      "boundAccount": "De camino al banco de otro personaje",
+      "accountTitle": "Otros personajes",
+      "accountBank": "Traer de este banco. Ese personaje debe estar desconectado cuando llegue el mensajero.",
+      "bagsAccount": "Enviar al banco de {name}",
+      "bagsAccountNone": "Elige un personaje al que enviar objetos.",
+      "accountPlanned": "Previsto para {name}: {count} pilas. Elegir para otro personaje las sustituye.",
+      "capacity": "{used} / {capacity} espacios",
+      "cargo": "Inventario del mensajero",
+      "empty": "Sin objetos",
+      "send": "Enviar mensajero",
+      "selected": "{count} / {limit} pilas seleccionadas",
+      "select": "Seleccionar {item}, {count}",
+      "selectedItem": "Deseleccionar {item}, {count}",
+      "instructions": "Selecciona pilas completas para tu banco, la Bóveda de Materiales u otro personaje. Tu mensajero las deposita primero y después recoge los objetos solicitados. No se pueden enviar objetos de misión.",
+      "membership": "Renueva tu membresía para iniciar otro viaje.",
+      "cargoSafe": "Los objetos devueltos desbordan las bolsas llenas. El mensajero desaparece tras la entrega hasta que vuelvas a invocarlo.",
+      "unavailable": "Invoca a tu mensajero para planificar una entrega."
+    },
+    "adventureGuide": {
+      "title": "Guía de aventuras",
+      "eyebrow": "El registro de expediciones",
+      "intro": "Descubre el mundo. Conoce a tu enemigo. Elige tu próxima aventura.",
+      "dungeons": "Mazmorras",
+      "raids": "Bandas",
+      "delves": "Expediciones",
+      "search": "Buscar aventuras",
+      "eligible": "Mi nivel",
+      "catalogueCount": "{count} adventures",
+      "catalogueCountPlural": {
+        "one": "{count} aventura",
+        "other": "{count} aventuras"
+      },
+      "empty": "Ninguna aventura coincide con estos filtros.",
+      "reset": "Borrar filtros",
+      "delve": "Expedición",
+      "delveTravel": "Entra por la entrada de la expedición. Elige tu grado en el tablón local; no hay emparejamiento automático.",
+      "dungeonTravel": "Explora los encuentros de abajo y luego elige un grupo o viaja a la entrada.",
+      "raidTravel": "Reúne tu banda, revisa los encuentros y comprueba tu bloqueo antes de entrar.",
+      "soloTravel": "Una aventura en solitario. Viaja a la entrada para empezar.",
+      "browseOnly": "Viajar a la entrada",
+      "findGroup": "Buscar grupo",
+      "inspectLoot": "Vista previa del botín",
+      "lootClass": "Clase",
+      "lootSpec": "Especialización",
+      "allSpecs": "Todas las especializaciones",
+      "lootHint": "Equipo utilizable con afinidad de estadísticas para la especialización seleccionada. Las recompensas generales siguen visibles. Las probabilidades de botín usan la tabla completa.",
+      "lootEmpty": "Ningún equipo coincide con esta clase y especialización.",
+      "fullTableRoll": "Un objeto de la tabla de botín completa",
+      "encountersCount": "{count} encuentros",
+      "tiers": "Grados disponibles: {tiers}"
+    },
+    "expeditions": {
+      "bell": "Open Groups: {count} notifications",
+      "bellCount": {
+        "one": "Grupos abiertos: {count} notificación",
+        "other": "Grupos abiertos: {count} notificaciones"
+      },
+      "alerts": "Avisos",
+      "groups": "Grupos",
+      "rewards": "Recompensas",
+      "sections": "Expedition sections",
+      "noAlerts": "No expedition alerts need your attention.",
+      "findGroup": "Buscar grupo",
+      "recruitPlayers": "Recruit Players",
+      "recruitIntro": "Choose your dungeon and group goal. Review your listing, then publish it.",
+      "recruitDungeon": "Dungeon",
+      "recruitDifficulty": "Difficulty",
+      "recruitPreview": "Listing preview",
+      "recruitPublish": "Publish Group",
+      "recruitPublishing": "Publishing your group...",
+      "recruitBeforeEntry": "You can recruit before entering the dungeon. Publishing does not teleport your group.",
+      "recruitUnconfirmed": "Your listing has not been confirmed. Check your connection or chat messages, then try again.",
+      "recruitLoading": "Loading your recruitment options...",
+      "recruitAlreadyOpen": "Your recruitment is already open. Manage your group instead.",
+      "recruitExistingRun": "You already have an expedition. Manage its recruitment from Your Group.",
+      "recruitLeaveQueue": "Leave the matchmaking queue before publishing your own group.",
+      "recruitFinishProposal": "Respond to your matchmaking invitation before publishing a group.",
+      "recruitCancelRequests": "Withdraw your pending join requests before publishing your own group.",
+      "recruitNoActivities": "No dungeons have room for your group at its current levels.",
+      "recruitNoRoles": "No compatible roles are available for your character.",
+      "recruitInvalidNote": "Use up to 120 characters without control characters in your note.",
+      "manageRecruitment": "Manage Recruitment",
+      "formingGroup": "Forming Group",
+      "groupGathering": "Your group is forming. Gather at the dungeon entrance when ready.",
+      "groupChooseDungeon": "Choose a dungeon for your group, then recruit any missing players.",
+      "waitForLeader": "Your group leader can choose a dungeon and open recruitment.",
+      "recruitmentNext": "Recruitment is open. Gather your group at the dungeon entrance when ready.",
+      "findGroupNext": "You are not in a group. Find one to start an expedition.",
+      "awaitingReply": "Waiting for replies from {count} groups.",
+      "requestSent": "Request sent. Waiting for the group leader to respond.",
+      "readyToTravel": "Your group is ready. Travel to the dungeon when you are ready.",
+      "groupRecruiting": "Your expedition is in progress. Recruitment is open.",
+      "groupInProgress": "Your expedition is in progress.",
+      "title": "Expediciones abiertas",
+      "entryTitle": "Run solo or open your group?",
+      "entryBody": "Start now. You can open your group later at any time.",
+      "solo": "Jugar en solitario",
+      "open": "Grupo abierto",
+      "closeRecruitment": "Cerrar reclutamiento",
+      "travel": "Viajar al grupo",
+      "request": "{name} quiere unirse como {role}.",
+      "level": "Nivel {level}",
+      "accept": "Aceptar",
+      "decline": "Rechazar",
+      "acceptPlayer": "Accept Player",
+      "declinePlayer": "Decline Player",
+      "chooseRole": "Your role",
+      "send": "Enviar solicitud",
+      "confirmRequest": "Confirm Request",
+      "chooseRoleAction": "Choose Role",
+      "cancel": "Cancelar",
+      "pending": "Solicitud pendiente",
+      "join": "Solicitar unirse",
+      "leader": "Dirigido por {name}",
+      "members": "{current}/{total} jugadores",
+      "progress": "{defeated}/{total} jefes derrotados",
+      "needed": "Funciones sugeridas: {roles}",
+      "close": "Cerrar",
+      "empty": "No hay expediciones abiertas en este momento.",
+      "finder": "Abrir buscador de mazmorras",
+      "groupsCount": "Open groups: {count}",
+      "requestsCount": "Join requests: {count}",
+      "yourGroup": "Tu grupo",
+      "otherGroups": "Otros grupos",
+      "manageGroup": "Your expedition and join requests",
+      "browseGroups": "Choose a group to help",
+      "noCurrentGroup": "You are not in an expedition.",
+      "noCurrentGroupHint": "Enter a dungeon or request to join a group.",
+      "recruitmentOpen": "Reclutamiento abierto",
+      "recruitmentClosed": "Reclutamiento cerrado",
+      "groupRoster": "Miembros del grupo",
+      "noRequests": "No pending join requests.",
+      "requestsCombat": "Requests are waiting. Review them after combat.",
+      "expires": "Expires in {time}",
+      "waiting": "Esperando la respuesta de {name}.",
+      "outcomeAccepted": "{name} ha aceptado tu solicitud. Usa Viajar al grupo cuando estés listo.",
+      "outcomeDeclined": "{name} ha rechazado tu solicitud.",
+      "outcomeExpired": "Tu solicitud ha caducado. Puedes enviar una nueva.",
+      "outcomeCancelled": "Has cancelado tu solicitud.",
+      "outcomeClosed": "Ese grupo ya no acepta tu solicitud.",
+      "editDetails": "Editar detalles del grupo",
+      "purpose": "Objetivo del grupo",
+      "purposeFirstTime": "Primera vez",
+      "purposeRelaxed": "Partida tranquila",
+      "purposeClear": "Completar la mazmorra",
+      "purposeNeedsHelp": "Necesito ayuda",
+      "note": "Nota breve (opcional, hasta 120 caracteres)",
+      "saveDetails": "Guardar detalles",
+      "available": "Disponible para ayudar",
+      "stopHelping": "Stop Helper Alerts",
+      "helperRoles": "Roles you offer",
+      "helperOn": "Helper alerts are on. You still choose which group to join.",
+      "helperPaused": "Los avisos para ayudar se pausan mientras estás en un grupo, en cola o tienes una solicitud pendiente.",
+      "helperFound": "{count} compatible groups are looking for help.",
+      "viewGroups": "View Groups",
+      "sound": "Reproducir un sonido para nuevos grupos y solicitudes",
+      "shop": "Tienda de puntos de cola",
+      "backToGroups": "Back to Groups",
+      "shopIntro": "A reward for every helping hand",
+      "shopDescription": "Spend the points you earn helping other players complete their expeditions.",
+      "shopCollection": "Bell Collection",
+      "shopOwned": "In your collection",
+      "shopLocked": "Available to unlock",
+      "shopRules": "How to earn points",
+      "pendingRequests": "Your pending requests: {count}/5",
+      "multiApplyHint": "Request up to five groups. Joining one withdraws your other requests.",
+      "multiApplyLimit": "You already have five pending requests. Cancel one to request another group.",
+      "points": "Puntos de cola: {count}",
+      "dailyPoints": "Earned today: {earned}/{cap}",
+      "rewardRules": "Helpers earn 5 points per qualifying boss and 10 for completion, paid when they complete the dungeon. Deal, heal or take effective damage worth at least 1% of each boss health to qualify. Each boss and completion pays once per dungeon difficulty per day, up to 60 points per day. Joining or waiting at the entrance gives no points.",
+      "rewardScope": "Bell finishes are permanent cosmetics for this character. They do not change gameplay.",
+      "bronze": "Bronze bell",
+      "silver": "Silver bell",
+      "gold": "Campana dorada",
+      "price": "{count} puntos de cola",
+      "buy": "Comprar y equipar",
+      "equip": "Equipar",
+      "equipped": "Equipado",
+      "defaultBell": "Use Default Bell",
+      "dismiss": "Despedir"
     },
     "framePresets": {
       "apply": "Aplicar",
@@ -558,6 +739,13 @@ export const es: EnTranslations = {
       "heroicClears": "{count} Heroico",
       "normalClears": "{count} Normal",
       "viewPossibleLoot": "Ver el botín posible",
+      "lootFocus": "Preferencia de botín",
+      "allClassGear": "Equipo de todas las clases",
+      "specRole": "{name} ({role})",
+      "mixedRole": "{first} / {second}",
+      "lootFocusHelp": "Solo se aplica a bóvedas sin abrir.",
+      "noFocusedLoot": "No hay botín válido. Elige otra preferencia.",
+      "rolledFocus": "Sorteado para: {focus}",
       "chooseTable": "Elegir en qué tabla tirar",
       "selectAllTables": "Seleccionar todo",
       "selectedTables": "{count} tablas seleccionadas",
@@ -578,7 +766,9 @@ export const es: EnTranslations = {
         "worldOne": "{count} misión de mundo completada",
         "worldMany": "{count} misiones de mundo completadas",
         "pvpOne": "{count} combate clasificatorio ganado",
-        "pvpMany": "{count} combates clasificatorios ganados"
+        "pvpMany": "{count} combates clasificatorios ganados",
+        "pvpWinOne": "{count} victoria JcJ",
+        "pvpWinMany": "{count} victorias JcJ"
       },
       "requiredTask": {
         "raidOne": "Supera {count} encuentro de banda",
@@ -588,7 +778,9 @@ export const es: EnTranslations = {
         "worldOne": "Completa {count} misión de mundo",
         "worldMany": "Completa {count} misiones de mundo",
         "pvpOne": "Gana {count} combate clasificatorio",
-        "pvpMany": "Gana {count} combates clasificatorios"
+        "pvpMany": "Gana {count} combates clasificatorios",
+        "pvpWinOne": "Consigue {count} victoria JcJ",
+        "pvpWinMany": "Consigue {count} victorias JcJ"
       },
       "readyWeeks": "Semanas sin reclamar: {count}. Reclama primero la semana completada más antigua.",
       "claimLastWeek": "Reclamar la recompensa de la semana pasada",
@@ -620,6 +812,7 @@ export const es: EnTranslations = {
       "worldPoolRule": "Equipo Normal de Nythraxis. No requiere haber superado la banda.",
       "poolRule": "Todos los objetos listados tienen la misma probabilidad. Los objetos respetan las restricciones de tu clase. Las bandas derrotadas desbloquean su botín en esa dificultad. Los objetos legendarios quedan excluidos.",
       "selectionPoolRule": "Para bandas y mazmorras, selecciona una o más tablas antes de abrir. Las tablas de mazmorra combinan los jefes que has superado en esa dificultad. Las tiradas excluyen duplicados, objetos legendarios y equipo que exija más de {maxLevelOffset} niveles por encima del tuyo.",
+      "previewPoolRule": "Todas las tablas de las que pueden salir recompensas de estas cámaras. Derrotar a un jefe desbloquea permanentemente su botín para futuras cámaras. Una tabla de mazmorra solo contiene a los jefes que hayas derrotado; una victoria heroica también desbloquea normal. Las tiradas excluyen los objetos que ya hayan salido. No se muestra el equipo que requiere más de {maxLevelOffset} niveles por encima de tu nivel.",
       "rare": "Raro",
       "epic": "Épico",
       "unavailable": "Todavía no disponible",
@@ -643,6 +836,103 @@ export const es: EnTranslations = {
         "dungeon_heroic": "Botín de mazmorra Heroica",
         "world": "Botín de misión de mundo",
         "pvp": "Equipo de guerra"
+      },
+      "previewClaimNotice": "Tienes recompensas pendientes. Visita al Guardián de la Bóveda en Eastbrook para abrirlas y recogerlas."
+    },
+    "guildHall": {
+      "title": "Salón del Farol",
+      "signSubtitle": "Hermandad de Aventureros",
+      "close": "Cerrar ventana de hermandad",
+      "tabsLabel": "Secciones del Salón del Farol",
+      "tabs": {
+        "contracts": "Contratos",
+        "quartermaster": "Intendente"
+      },
+      "seals": "Sellos del farol: {count}",
+      "resetIn": "Nuevos contratos en {time}",
+      "resetSoon": "Nuevos contratos en el próximo reinicio semanal",
+      "contractsIntro": "Tres contratos por semana, los mismos para todos los aventureros del reino. No hace falta firmar: completa uno y sus sellos irán directamente a tus bolsas, una vez por semana.",
+      "kinds": {
+        "boss": "Recompensa por captura",
+        "heroic": "Completar en heroico",
+        "task": "Ejecución"
+      },
+      "goals": {
+        "boss": "Derrota a {boss} en {dungeon}, en cualquiera de las dos dificultades.",
+        "heroic": "Completa {dungeon} en heroico: derrota a {boss} en dificultad heroica.",
+        "task": "{task} (en {dungeon})"
+      },
+      "contractLabel": "{kind}: «{dungeon}»",
+      "reward": {
+        "one": "{count} sello del farol",
+        "few": "{count} sellos del farol",
+        "many": "{count} sellos del farol",
+        "other": "{count} sellos del farol"
+      },
+      "done": "Completado esta semana",
+      "open": "Abrir",
+      "lifetime": "Contratos completados: {count}",
+      "emptyBoard": "Están reescribiendo el tablón. Vuelve después del reinicio semanal.",
+      "quartermasterIntro": "Garrick cambia sellos del farol solo por honores: títulos para mostrar en el Libro de Gestas, la apariencia de espada de la hermandad y su caballo de guerra. Nada de aquí te hace más fuerte en combate.",
+      "titleOffer": "Título: {title}",
+      "titlePreview": "Se muestra como {preview}",
+      "mountOffer": "Montura: {mount}",
+      "mountPreview": "Apariencia de montura para todos los personajes de tu cuenta. Tu entrenamiento de equitación determina la velocidad.",
+      "skinOffer": "Apariencia de espada: {skin}",
+      "skinPreview": "Cambia el aspecto de tu espada equipada en todos los personajes de tu cuenta. Solo apariencia: sin estadísticas.",
+      "buy": "Comprar",
+      "owned": "En propiedad",
+      "needSeals": "Faltan {count} más",
+      "bought": "Has comprado el título {title}. Elígelo en el Libro de Gestas.",
+      "boughtMount": "Has comprado {mount}. Sus riendas están en tus bolsas.",
+      "boughtSkin": "Has comprado la apariencia {skin}. Aplícala desde la ventana de Cosméticos.",
+      "refused": {
+        "owned": "Ya tienes eso.",
+        "seals": "No tienes suficientes sellos del farol.",
+        "range": "Acércate al intendente para comerciar.",
+        "riding": "Aprende a montar antes de comprar una montura.",
+        "bags": "Tus bolsas están llenas."
+      },
+      "board": {
+        "noticesLabel": "Contratos de esta semana",
+        "weekProgress": "Esta semana: {done} de {total} contratos completados",
+        "weekProgressAria": "Contratos completados esta semana",
+        "cardProgress": "{done}/{total} esta semana",
+        "rewardLine": "Recompensa: {reward}",
+        "stamp": "Sellado",
+        "sealsTip": "Los sellos del farol se obtienen por los contratos semanales del Salón del Farol y solo se gastan con Garrick Holt, el intendente. Están ligados a ti."
+      },
+      "shop": {
+        "stockLabel": "Mercancía de Garrick Holt",
+        "kindTitle": "Título",
+        "kindMount": "Montura",
+        "kindSword": "Apariencia de espada",
+        "plateHeading": "Tu placa de nombre",
+        "mountHeading": "Tú, sobre la montura",
+        "skinHeading": "En tu mano",
+        "stageLabel": "Vista previa 3D de {name}",
+        "stageUnavailable": "Vista previa 3D no disponible en este dispositivo.",
+        "mountHowTo": "Después de comprarla, sus riendas van a tus bolsas. Úsalas para montar; el caballo es tuyo mientras las conserves.",
+        "mountOwned": "Ya tienes esta montura. Sus riendas están en tus bolsas.",
+        "skinHowTo": "Después de comprarla, aplícala desde la ventana de Cosméticos. Funciona en todos los personajes de tu cuenta.",
+        "skinOwned": "Ya tienes esta apariencia. Aplícala desde la ventana de Cosméticos.",
+        "howTo": "Después de comprarlo, elígelo en el Libro de Gestas para mostrarlo con tu nombre.",
+        "cosmetic": "Solo cosmético: no cambia ninguna estadística.",
+        "price": "Precio: {price}",
+        "have": "Tienes {count}",
+        "ownedLong": "Ya tienes este título. Elígelo en el Libro de Gestas.",
+        "short": {
+          "one": "Necesitas {count} sello del farol más.",
+          "few": "Necesitas {count} sellos del farol más.",
+          "many": "Necesitas {count} sellos del farol más.",
+          "other": "Necesitas {count} sellos del farol más."
+        }
+      },
+      "contractDone": {
+        "one": "Contrato completado: {contract}. Recibes {count} sello del farol.",
+        "few": "Contrato completado: {contract}. Recibes {count} sellos del farol.",
+        "many": "Contrato completado: {contract}. Recibes {count} sellos del farol.",
+        "other": "Contrato completado: {contract}. Recibes {count} sellos del farol."
       }
     },
     "ferry": {
@@ -650,50 +940,56 @@ export const es: EnTranslations = {
       "departsIn": "El transbordador a {dest} sale en {time}",
       "castingOff": "El transbordador a {dest} está zarpando",
       "boardHint": "Súbete a su cubierta cuando zarpe. La travesía es gratis.",
-      "sailing": "Navegando hacia {dest}"
+      "sailing": "Navegando hacia {dest}",
+      "portLabel": "Transbordador de {port} a {dest}",
+      "portTitle": "Puerto de transbordadores de {port}",
+      "destination": "Destino: {dest}",
+      "boardNow": "Embarcar ahora",
+      "arrivesIn": "El transbordador llega en {time}",
+      "scheduleUnavailable": "Horario del transbordador no disponible."
     },
     "materialStackSelectionUnavailable": "Esa selección de materiales ya no está disponible.",
     "shardpike": {
-      "braceLabel": "Couch the Shardpike",
-      "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
-      "thrustLabel": "Barrowglass Thrust",
-      "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
-      "braceTooltipLean": "Plant the butt and hold the point up. Lean with your strafe or turn keys, or hold the two keys above the beam: each pushes the marker toward its side. The beam drifts on its own, and every slam he lands kicks it. Keep it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
-      "releaseLabel": "Ground the Shardpike",
-      "releaseTooltip": "Lower the pike and step out of the brace, the same as jumping. You lose the set but pay no penalty: you can couch it again right away. Only a thrust, a fumble, a broken stance or a missed window rests the pike, for {rest} seconds.",
-      "whyResting": "The pike is being re-set after a thrust, a fumble, a broken stance or a missed window. Wait out the timer on the icon.",
-      "whyAlreadyCouched": "The pike is already couched. Ground it before you re-set.",
-      "whyNotSet": "The pike is not set. Couch it and hold it steady first.",
-      "whyNothingCouched": "Nothing to ground: the pike is not couched.",
-      "beamLabel": "Shardpike balance",
-      "beamStatus": "Pike balance {balance}, set {set} percent.",
-      "beamDanger": "Pike balance {balance}, about to fumble.",
-      "promptStrike": "STRIKE THE EYE now, {seconds}s",
-      "promptHoldSteady": "Hold the pike steady with your strafe keys",
-      "promptCatchIt": "Catch it, the pike is going over",
-      "promptEyeOut": "The eye is out, {seconds}s: hit him with everything",
-      "promptSealed": "His eye is shut. It opens again in {seconds}s",
-      "promptResetting": "Re-setting the pike, {seconds}s",
-      "promptCloser": "Get within reach of the Foreman, {yards} yards out",
-      "promptBrace": "Couch the Shardpike, then hold it steady",
-      "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
-      "promptFindBossMuster": "The muster's Shardpike: put out the Foreman's eye with it",
-      "promptTakePike": "Press {key} or click the rack to take a Shardpike",
-      "promptTakePikeClick": "Click the rack to take a Shardpike",
-      "promptTakePikeTap": "Tap the rack to take a Shardpike",
-      "promptPikeLevelCap": "The muster lends its pikes only to level {level} or lower",
-      "promptHoldSteadyLean": "Hold the pike steady: lean with {left} and {right}",
-      "leanLeft": "Lean left",
-      "leanRight": "Lean right",
-      "leanLeftKey": "Lean left ({key})",
-      "leanRightKey": "Lean right ({key})",
-      "promptTally": "{count} put out",
-      "promptLabel": "Shardpike instruction",
-      "blindBanner": "BARROWHIDE BROKEN",
-      "effigyBanner": "BLINDED! NOW THE WHOLE RAID HITS HARD",
-      "promptStrikeLantern": "STRIKE THE LANTERN now, {seconds}s",
-      "promptLanternOut": "The lantern is out, {seconds}s: hit it with your own weapon",
-      "promptCloserEffigy": "Get within reach of the Straw Foreman, {yards} yards out"
+      "braceLabel": "Afirma la Pica de Fragmentos",
+      "braceTooltip": "Planta el extremo y mantén la punta alzada. Tus teclas de desplazamiento lateral controlan el equilibrio: la barra deriva por sí sola y cada golpe que acierta la sacude. Mantenla lejos de los bordes durante {set} segundos para preparar la pica. Necesitas suelo firme y no puedes hacerlo desde la montura.",
+      "thrustLabel": "Estocada al Cristal del Túmulo",
+      "thrustTooltip": "Atraviesa el ojo con la pica preparada para infligir {damage} de daño. Nada aumenta este daño: ni tu nivel, ni tu poder de ataque, ni la pica. Ciega al Capataz y elimina Piel del Túmulo para que todas las demás armas de la ciénaga por fin hagan daño. Solo una pica preparada puede hacerlo, a menos de {reach} yardas, y la oportunidad dura {seconds} segundos.",
+      "braceTooltipLean": "Planta el extremo y mantén la punta alzada. Inclínate con las teclas de desplazamiento lateral o giro, o mantén pulsadas las dos teclas sobre la barra: cada una empuja el marcador hacia su lado. La barra deriva por sí sola y cada golpe que acierta la sacude. Mantenla lejos de los bordes durante {set} segundos para preparar la pica. Necesitas suelo firme y no puedes hacerlo desde la montura.",
+      "releaseLabel": "Apoya la Pica de Fragmentos en el suelo",
+      "releaseTooltip": "Baja la pica y abandona la postura, igual que al saltar. Pierdes la preparación, pero no hay penalización: puedes afirmarla de nuevo al instante. Solo una estocada, que se te escape, una postura rota o perder la oportunidad dejan la pica en reposo durante {rest} segundos.",
+      "whyResting": "La pica se está preparando de nuevo tras una estocada, escaparse, romperse la postura o perder la oportunidad. Espera a que termine el temporizador del icono.",
+      "whyAlreadyCouched": "La pica ya está afirmada. Apóyala en el suelo antes de volver a prepararla.",
+      "whyNotSet": "La pica no está preparada. Primero afírmala y mantenla estable.",
+      "whyNothingCouched": "No hay nada que apoyar: la pica no está afirmada.",
+      "beamLabel": "Equilibrio de la Pica de Fragmentos",
+      "beamStatus": "Equilibrio de la pica {balance}, preparada al {set} por ciento.",
+      "beamDanger": "Equilibrio de la pica {balance}, a punto de escaparse.",
+      "promptStrike": "GOLPEA EL OJO ahora, {seconds} s",
+      "promptHoldSteady": "Mantén estable la pica con tus teclas de desplazamiento lateral",
+      "promptCatchIt": "Sujétala, la pica se está cayendo",
+      "promptEyeOut": "El ojo está apagado, {seconds} s: atácalo con todo",
+      "promptSealed": "Su ojo está cerrado. Vuelve a abrirse en {seconds} s",
+      "promptResetting": "Preparando de nuevo la pica, {seconds} s",
+      "promptCloser": "Ponte al alcance del Capataz, estás a {yards} yardas",
+      "promptBrace": "Afirma la Pica de Fragmentos y luego mantenla estable",
+      "promptFindBoss": "Pica de Fragmentos de Skerrit: apaga con ella el ojo del Capataz",
+      "promptFindBossMuster": "Pica de Fragmentos de la leva: apaga con ella el ojo del Capataz",
+      "promptTakePike": "Pulsa {key} o haz clic en el armero para tomar una Pica de Fragmentos",
+      "promptTakePikeClick": "Haz clic en el armero para tomar una Pica de Fragmentos",
+      "promptTakePikeTap": "Toca el armero para tomar una Pica de Fragmentos",
+      "promptPikeLevelCap": "La leva solo presta sus picas a personajes de nivel {level} o inferior",
+      "promptHoldSteadyLean": "Mantén estable la pica: inclínate con {left} y {right}",
+      "leanLeft": "Inclínate a la izquierda",
+      "leanRight": "Inclínate a la derecha",
+      "leanLeftKey": "Inclínate a la izquierda ({key})",
+      "leanRightKey": "Inclínate a la derecha ({key})",
+      "promptTally": "{count} apagados",
+      "promptLabel": "Instrucción de la Pica de Fragmentos",
+      "blindBanner": "PIEL DEL TÚMULO ROTA",
+      "effigyBanner": "¡CEGADO! AHORA TODA LA BANDA GOLPEA CON FUERZA",
+      "promptStrikeLantern": "GOLPEA EL FAROL ahora, {seconds} s",
+      "promptLanternOut": "El farol está apagado, {seconds} s: golpéalo con tu propia arma",
+      "promptCloserEffigy": "Ponte al alcance del Capataz de Paja, estás a {yards} yardas"
     },
     "vehicle": {
       "title": "El cañón de La Guardia del Norte",
@@ -752,6 +1048,15 @@ export const es: EnTranslations = {
     "spectate": {
       "banner": "Observando a {name}"
     },
+    "realmMotd": {
+      "line": "Mensaje del día: {text}",
+      "updated": "Mensaje del día actualizado.",
+      "cleared": "Mensaje del día eliminado.",
+      "none": "No hay mensaje del día.",
+      "usage": "Uso: /motd \"<mensaje>\" para establecerlo, /motd clear para eliminarlo.",
+      "tooLong": "El mensaje del día admite un máximo de {max} caracteres.",
+      "saveFailed": "No se pudo guardar el mensaje del día y se perderá al reiniciar."
+    },
     "readyCheck": {
       "title": "Listo cheque",
       "close": "Cerca",
@@ -775,6 +1080,11 @@ export const es: EnTranslations = {
     },
     "death": {
       "resurrectAtCorpse": "Resucitar en el cadáver",
+      "pvpResurrect": "Resurrección JcJ",
+      "pvpResurrectTitle": "Revive en el cementerio más cercano con toda la salud y sin una nueva Carga del Guardián.",
+      "pvpResurrectWaitButton": "Resurrección JcJ ({seconds})",
+      "pvpResurrectWaitNote": "Podrás resucitar en JcJ en {seconds}: revivirás en el cementerio más cercano.",
+      "pvpResurrectReadyNote": "La resurrección JcJ está lista: revivirás en el cementerio más cercano.",
       "resurrectAtHealer": "El Guardián Pálido (Tañido del Guardián)",
       "ghostHint": "Corre hasta el lugar de tu muerte o habla con el Guardián Pálido para revivir",
       "spiritHealerAlive": "El Guardián Pálido vela por los muertos. Tú aún estás entre los vivos.",
@@ -790,6 +1100,9 @@ export const es: EnTranslations = {
       "keeperConfirmSparedBody": "¿Estás seguro? El Guardián Pálido te revivirá aquí. Estás por debajo del nivel 10, así que el Tañido del Guardián no te debilitará esta vez.",
       "healerConfirmAccept": "Revívame",
       "healerConfirmCancel": "Cancelar"
+    },
+    "graphicsRestore": {
+      "note": "Restaurando gráficos"
     },
     "wiki": {
       "confirmTitle": "¿Abrir la Wiki?",
@@ -851,10 +1164,10 @@ export const es: EnTranslations = {
     },
     "emoteWheel": {
       "edit": "Editar",
-      "label": "Emotes"
+      "label": "Gestos"
     },
     "emoteEditor": {
-      "title": "Emotes",
+      "title": "Gestos",
       "done": "Listo",
       "close": "Cerrar emotes"
     },
@@ -1009,54 +1322,64 @@ export const es: EnTranslations = {
     },
     "wocStore": {
       "subscription": {
-        "title": "Game subscription",
-        "monthlyTitle": "Monthly membership",
-        "annualTitle": "12-month membership bundle",
-        "annualPrice": "{price} for 12 months, paid upfront",
-        "annualTerms": "Renews yearly at the same price. Pay with fiat through Stripe. Cancel in billing settings.",
-        "annualMount": "After payment, collect a soulbound tank mount key by mail on the character that purchased this bundle. The tank is a placeholder for the bundle mount.",
-        "trialTerms": "Try membership free for {days} days, once per account. A payment method is required. You will be charged {price} when the trial ends unless you cancel.",
-        "startTrial": "Start 7-day free trial",
-        "resumeCheckout": "Resume checkout",
-        "checkoutClosed": "This checkout has closed without an outstanding reward. Choose a membership plan again to start a new checkout.",
-        "annualClaim": "Collect bundle mount",
-        "annualPending": "Return to the purchasing character after payment to collect the bundle mount. If payment is processing or the trial is active, try again after the paid charge.",
-        "annualDelivered": "Your bundle mount key has been delivered by mail.",
-        "tokenTitle": "Tradable membership token",
-        "benefitsTitle": "Active membership benefits",
-        "benefitBank": "Access your other characters' banks at any banker.",
-        "benefitSlots": "Unlock 10 additional character slots.",
-        "benefitArmour": "Claim soulbound armour with stats for your class and specialisation. It scales with your level and reaches item level 25 at level 20. Wear the full set for 20% more XP.",
-        "benefitTax": "Pay half the normal auction house tax.",
-        "benefitExpiry": "When membership ends, characters in the additional slots and armour bonuses are locked until renewal. Your base character slots remain playable.",
-        "tokenTerms": "{price} once for 30 days. Delivered by mail to this character. Redeem it to add membership time, or sell it at the auction house.",
-        "tokenBuy": "Buy membership token",
-        "tokenClaim": "Collect purchased token",
-        "tokenPending": "After payment, return to this character and collect your token. If payment is still processing, try again shortly.",
-        "tokenDelivered": "Your token has been delivered by mail.",
-        "price": "{price} per month",
-        "terms": "Renews monthly. Pay with fiat through Stripe. Cancel in billing settings.",
-        "subscribe": "Subscribe",
-        "manage": "Manage subscription",
-        "ending": "Cancels at the end of the billing period",
-        "error": "Could not open billing. Allow popups and try again.",
+        "title": "Suscripción al juego",
+        "monthlyTitle": "Membresía mensual",
+        "annualTitle": "Paquete de membresía de 12 meses",
+        "annualPrice": "{price} por 12 meses, pagados por adelantado",
+        "annualTerms": "Se renueva cada año al mismo precio. Paga con moneda fiduciaria mediante Stripe. Cancela en los ajustes de facturación.",
+        "annualMount": "Desbloquea la montura Quimera de Ala Nocturna para todos los personajes de tu cuenta, y sus riendas ligadas al alma llegan por correo al personaje que la compra. Una por cuenta, y sigue siendo tuya cuando termina la membresía.",
+        "trialTerms": "Prueba la membresía gratis durante {days} días, una vez por cuenta. Se requiere un método de pago. Se te cobrará {price} al terminar la prueba salvo que canceles.",
+        "startTrial": "Iniciar prueba gratuita de 7 días",
+        "checkoutClosed": "Este proceso de pago se ha cerrado sin una recompensa pendiente. Elige de nuevo un plan de membresía para iniciar otro proceso de pago.",
+        "annualClaim": "Recoger montura del paquete",
+        "annualPending": "Vuelve al personaje comprador después del pago para recoger la montura del paquete. Si el pago se está procesando o la prueba está activa, inténtalo de nuevo después del cargo de pago.",
+        "annualDelivered": "La llave de la montura de tu paquete se ha entregado por correo.",
+        "tokenTitle": "Ficha de membresía intercambiable",
+        "tokenPrice": "{price} por 30 días",
+        "benefitsTitle": "Ventajas de membresía activas",
+        "benefitBank": "Accede a los bancos de tus otros personajes desde cualquier banquero.",
+        "benefitSlots": "Desbloquea 10 espacios adicionales de personaje.",
+        "benefitArmour": "Reclama armadura rara ligada al alma y el Bastón del cambio. Sus estadísticas se adaptan a tu clase y especialización, siempre 5 niveles de objeto por encima del nivel de tu personaje. Equipa las 7 piezas de armadura para obtener un 20% más de experiencia.",
+        "benefitBag": "Equipa una bolsa adicional en tu espacio de bolsa de membresía.",
+        "benefitTax": "Paga la mitad del impuesto normal de la casa de subastas.",
+        "benefitExpiry": "Cuando termina la membresía, los espacios adicionales de personaje, las ventajas de equipo y el espacio de bolsa adicional se bloquean hasta renovar. Tu bolsa y sus objetos se conservan a salvo, y los objetos de más quedan como excedente. Tus espacios básicos de personaje siguen siendo jugables.",
+        "tokenTerms": "{price} una vez por 30 días. Se entrega por correo a este personaje. Canjéala para añadir tiempo de membresía o véndela en la casa de subastas.",
+        "tokenBuy": "Comprar ficha de membresía",
+        "tokenClaim": "Recoger ficha comprada",
+        "tokenPending": "Después del pago, vuelve a este personaje y recoge tu ficha. Si el pago aún se está procesando, inténtalo de nuevo en breve.",
+        "tokenDelivered": "Tu ficha se ha entregado por correo.",
+        "price": "{price} al mes",
+        "terms": "Se renueva cada mes. Paga con moneda fiduciaria mediante Stripe. Cancela en los ajustes de facturación.",
+        "subscribe": "Suscribirse",
+        "addMonth": "Añadir 1 mes",
+        "addYear": "Añadir 12 meses",
+        "stackTerms": "Se paga ahora. El tiempo se añade al final de tu membresía actual y después se renueva con este plan.",
+        "stackCapped": "Puedes acumular hasta 2 años de membresía a la vez. Inténtalo de nuevo cuando se acerque la fecha de renovación.",
+        "stackUnavailable": "Ahora no se puede añadir tiempo de membresía. Inténtalo de nuevo en breve.",
+        "billingBlocked": "Actualiza tus datos de pago en Gestionar suscripción antes de añadir tiempo de membresía.",
+        "renewsOn": "Se renueva el {date}",
+        "endsOn": "La membresía termina el {date}",
+        "manage": "Gestionar suscripción",
+        "ending": "Se cancela al final del periodo de facturación",
+        "error": "No se pudo abrir la facturación. Permite las ventanas emergentes e inténtalo de nuevo.",
         "status": {
-          "none": "Not subscribed",
-          "incomplete": "Payment incomplete",
-          "incomplete_expired": "Checkout expired",
-          "trialing": "Trial",
-          "active": "Active",
-          "past_due": "Payment overdue",
-          "canceled": "Canceled",
-          "unpaid": "Unpaid",
-          "paused": "Paused"
+          "none": "Sin suscripción",
+          "incomplete": "Pago incompleto",
+          "incomplete_expired": "Proceso de pago caducado",
+          "trialing": "Prueba",
+          "active": "Activo",
+          "past_due": "Pago vencido",
+          "canceled": "Cancelado",
+          "unpaid": "Sin pagar",
+          "paused": "En pausa"
         }
       },
       "title": "Tienda WOC",
       "close": "Cerrar la tienda WOC",
       "tabsLabel": "Secciones de la tienda WOC",
-      "storeTab": "Tienda",
-      "rewardsTab": "Recompensas diarias",
+      "storeTab": "Tienda de cosméticos",
+      "membershipsTab": "Membresías",
+      "membershipsUnavailable": "Las membresías no están disponibles ahora. Inténtalo de nuevo en breve.",
       "mountsEyebrow": "Montajes de cuenta",
       "mountsTitle": "Estable de la máquina",
       "mountBuyAria": "Comprar {item}",
@@ -1098,9 +1421,35 @@ export const es: EnTranslations = {
         "guildmark": "Sello gremial",
         "emberwrought": "Forja de ascuas",
         "hoarfrost": "Escarcha",
-        "fallen_star": "Estrella caída"
+        "fallen_star": "Estrella caída",
+        "lantern_hall": "Salón del Farol"
       },
       "skins": {
+        "lantern_hall_sword": {
+          "name": "Hoja del Salón del Farol",
+          "look": "Hoja ancha de acero con una acanaladura de fuego de farol amortiguado, caras doradas, un farol enjaulado que arde en la cruceta y empuñadura de cuero azul.",
+          "lore": "Garrick Holt no vende esta hoja a desconocidos. Se entrega a miembros que han cumplido los contratos del Salón del Farol semana tras semana, y siempre la entrega con las mismas palabras: el farol de la guarda se enciende en el propio hogar del salón, así que adondequiera que la lleves, el salón va contigo. El fuego de la acanaladura es solo apariencia. Lo que importa es la promesa."
+        },
+        "hearthbrand_sword": {
+          "name": "Marca del Hogar",
+          "look": "Hoja flamígera de acero ennegrecido con filos ardientes de forja, una veta fundida que se ramifica por ambas caras, una guarda de llamas de bronce alrededor de una piedra ardiente y empuñadura rojo sangre de buey.",
+          "lore": "El Salón del Farol conserva un hogar que no se ha apagado desde que se levantó el salón, y Garrick Holt jura que esta hoja se templó en sus brasas. Los miembros que la llevan dicen que la empuñadura sigue caliente durante la guardia más fría. El fuego de sus filos es solo apariencia."
+        },
+        "squallcrest_sword": {
+          "name": "Cresta de Borrasca",
+          "look": "Hoja larga azul marino con filos brillantes como la espuma al romper, un canal de tormenta que contiene un rayo bifurcado, una ola dorada sobre el recazo, una aleta a lo largo de un filo y una guarda de rompientes doradas alrededor de una perla de tormenta.",
+          "lore": "Una capitana que navegaba para la hermandad trajo esta hoja de una borrasca que le arrebató el mástil y dejó su barco resonando como una campana. Garrick solo la vende por sellos y avisa a cada comprador de que zumba antes de una tormenta. El relámpago y la luz del mar son solo apariencia."
+        },
+        "rimelight_staff": {
+          "name": "Bastón de Luz de Escarcha",
+          "look": "Vara pálida ceñida en plata y envuelta en escarcha luminosa, coronada por una garra de plata que sostiene un gran cristal de luz fría dentro de una corona de hielo astillado, con carámbanos que cuelgan de su collar.",
+          "lore": "La guardia invernal del Salón del Farol llevaba bastones como este por el camino alto, con sus coronas encendidas para los viajeros perdidos en la nieve. Garrick conserva uno en el armero para los miembros con sellos de sobra. La escarcha y su luz fría son solo apariencia."
+        },
+        "duskwick_staff": {
+          "name": "Bastón de Mecha Crepuscular",
+          "look": "Dos hebras retorcidas de madera negra atadas con hierro, coronadas por un farol de hierro abierto donde arde una llama crepuscular violeta entre dos cuernos curvos, con cadenas que cuelgan de su base.",
+          "lore": "Todos los faroles del salón arden con fuerza salvo uno. La llama crepuscular se encendió para custodiar el salón de noche y desprende sombras donde los demás dan luz; Garrick recorta su mecha en persona. El humo y el brillo violeta son solo apariencia."
+        },
         "guildmark_arming_sword": {
           "name": "Espada de Armar con Sello Gremial",
           "look": "Hoja de acero azulado, cruz de bronce en cola de pez, empuñadura de cuero teñido de verde azulado y pequeño sello gremial estampado.",
@@ -1248,6 +1597,18 @@ export const es: EnTranslations = {
         }
       },
       "seasonOne": "Temporada 1",
+      "membershipPromo": {
+        "open": "Membresía en la tienda WOC",
+        "close": "Cerrar promoción de membresía",
+        "eyebrow": "Ventajas de cuenta",
+        "title": "Membresía",
+        "cta": "Únete ahora"
+      },
+      "referralPromo": {
+        "close": "Cerrar promoción de Invita a un amigo",
+        "eyebrow": "Vivid aventuras juntos",
+        "cta": "Invitar amigos"
+      },
       "rarity": {
         "uncommon": "Poco común",
         "rare": "Raro",
@@ -1432,7 +1793,7 @@ export const es: EnTranslations = {
     },
     "rest": {
       "resting": "Descansando",
-      "restArea": "Resting: you are in a rest area and gain rested experience here."
+      "restArea": "Descansando: estás en una zona de descanso y aquí acumulas experiencia de descanso."
     },
     "paladin": {
       "devotion": "Devoción",
@@ -1890,8 +2251,8 @@ export const es: EnTranslations = {
       "replayTarget": "Seleccionarlo de nuevo"
     },
     "dungeonTracker": {
-      "heroicTitle": "{name} ({difficulty})",
-      "complete": "Complete"
+      "heroicTitle": "{name} (dificultad {difficulty})",
+      "complete": "Completado"
     },
     "riftTracker": {
       "title": "Brecha",
@@ -2054,7 +2415,7 @@ export const es: EnTranslations = {
       "presetMinimalName": "Minimalista Puro",
       "presetMinimalDesc": "Fondo casi transparente, barras compactas de 16px sin espaciado, texto directo sin porcentajes.",
       "presetMinimalBadge": "Limpio",
-      "presetRaidName": "Raid Focus",
+      "presetRaidName": "Enfoque de banda",
       "presetRaidDesc": "Diseñado para bandas: densidad compacta de 18px, limite de 10 barras, total de grupo visible y fijado personal.",
       "presetRaidBadge": "Banda",
       "presetProGradientName": "Degradado Pro",
@@ -2084,6 +2445,8 @@ export const es: EnTranslations = {
       "reportSent": "Reporte copiado y enviado al chat",
       "reportNoData": "Sin datos registrados.",
       "noDetailedData": "Sin datos detallados",
+      "detailHealSubtitle": "Efectivo: {effective} | Sobrecuración: {overheal} ({overhealPercent}) | Golpes: {hits} ({critPercent} crítico)",
+      "detailHitSubtitle": "Golpes: {hits} | Críticos: {crits} ({critPercent}) | Promedio: {average} | Mín./máx.: {min} / {max}",
       "noDeathEvents": "Sin eventos registrados antes de la muerte",
       "killedBy": "Asesinado por {killer} ({ability})",
       "lethalHit": "Golpe Letal",
@@ -2092,7 +2455,7 @@ export const es: EnTranslations = {
       "comparisonNeedTwo": "Se necesitan al menos 2 combates para comparar",
       "backTimeline": "Cronologia",
       "timelineCombatEvents": "Eventos del combate: {count}",
-      "backDev": "Balance / Dev",
+      "backDev": "Equilibrio / Desarrollo",
       "balanceAbilitiesCount": "Habilidades registradas: {count}",
       "targetSubtitle": "Objetivo: {target}",
       "noTargetData": "Sin datos de jugadores para este objetivo"
@@ -2199,7 +2562,7 @@ export const es: EnTranslations = {
       "riding": "Montada",
       "mount": "Montar",
       "dismount": "Desmontar",
-      "useToRide": "Usar para invocar esta montura.",
+      "useToRide": "Úsalo para elegir esta apariencia e invocar tu montura. Conserva este objeto en las bolsas o el banco de cualquier personaje para compartir la apariencia con toda la cuenta. El entrenamiento de equitación determina la velocidad.",
       "emptyTitle": "Ninguna montura obtenida",
       "emptyStableHint": "Alcanza el nivel 20 y toma clases de monta con la Caballeriza mayor Marla en los establos al oeste de Highwatch.",
       "emptyDropHint": "Las monturas más raras las sueltan los jefes de mazmorras y bandas.",
@@ -2218,18 +2581,21 @@ export const es: EnTranslations = {
       "name_goblin_rocket_sled": "Trineo cohete goblin",
       "name_rallycart_rxt": "Rallycart RXT",
       "name_terrorspark_groundshaker": "Sacudetierra Chispa de Terror",
-      "name_referral_tank": "Friendship Tank",
-      "name_referral_raptor": "Friendship Raptor",
+      "name_referral_tank": "Tanque de la Amistad",
+      "name_referral_raptor": "Raptor de la Amistad",
       "name_drakemaw_raptor": "Raptor de Drakemaw",
       "name_avian_strider": "Zancudo Viridiano del Valle",
       "name_mech_bird": "Cluckwork Pájaro mecánico",
       "name_lanternback_troll": "Grumbol el lomo de linterna",
+      "name_lantern_hall_destrier": "Destrero del Salón del Farol",
       "name_chimeglass_tortoise": "Tolliver el timbre de cristal",
       "name_rickshaw_mount": "Rickshaw Atahuesos",
       "name_emberbristle_broom": "Emberbristle Broom",
-      "desc_valorsteed": "Un corcel resistente y de paso firme que aumenta la velocidad de viaje.",
-      "desc_grag_bear": "Un oso resistente y de paso firme que aumenta la velocidad de viaje.",
-      "desc_stalkglider_snail": "Un caracol recio y de combustión lenta que aumenta la velocidad de viaje.",
+      "name_wobbles_slime": "Tembleques el Moco",
+      "name_nightwing_chimera": "Quimera de Ala Nocturna",
+      "desc_valorsteed": "Un corcel resistente y de paso seguro con una silla de cuero.",
+      "desc_grag_bear": "Un oso resistente y de paso seguro con una silla pesada.",
+      "desc_stalkglider_snail": "Un caracol robusto y de ritmo tranquilo con un caparazón musgoso.",
       "desc_aether_hover_cycle": "Una potente moto magitecnológica diseñada para desplazamientos de combate veloces a baja altura.",
       "desc_shadowjump_toad": "Un sapo gigante, macizo y de paso firme, adiestrado en saltos sombríos relámpago que cubren cualquier terreno.",
       "desc_stormfeather_griffin": "Un grifo de tormenta majestuoso que acecha por tierra sobre garras rúnicas, con las alas plegadas.",
@@ -2237,20 +2603,23 @@ export const es: EnTranslations = {
       "desc_goblin_rocket_sled": "Un trineo goblin peligrosamente sobredimensionado, propulsado por dos cohetes y un excelente mal juicio.",
       "desc_rallycart_rxt": "Una máquina de rally en miniatura que proporciona mayor velocidad de viaje.",
       "desc_rallycart_skin": "Un pequeño coche de carreras con un rugido enorme.",
+      "desc_wobbles_slime": "Un gran moco azul domado para llevar silla. Salta en lugar de caminar, se tambalea bajo su jinete y lleva burbujas que ascienden por su gelatina.",
       "desc_terrorspark_groundshaker": "Una máquina blindada y compacta con orugas pesadas, un cañón de gran calibre y una silla hecha para pilotos intrépidos.",
-      "desc_referral_tank": "Earned by completing a referral stamp card.",
-      "desc_referral_raptor": "Earned by helping your first bound friend complete a stamp card.",
+      "desc_referral_tank": "Antigua recompensa de tarjeta de sellos por invitación.",
+      "desc_referral_raptor": "Se consigue ayudando a tu primer amigo vinculado a completar una tarjeta de sellos.",
       "desc_drakemaw_raptor": "Un raptor de cría domado para la silla, procedente de la Caldera de Drakemaw, puro tendón y arranque, que aún huele ligeramente a ceniza.",
       "desc_avian_strider": "Un ave de monta imponente cuyas pesadas garras y alas plegadas convierten cada viaje en una carrera atronadora.",
       "desc_mech_bird": "Un pollo de guerra mecánico hecho a mano que corre con servos chasqueantes y la llave de cuerda sigue girando.",
       "desc_lanternback_troll": "Un troll de las colinas sometido al yugo de los faroleros, que lleva un trono de hierro sobre los hombros y una linterna de tormenta encendida en cada brazo.",
+      "desc_lantern_hall_destrier": "El caballo de guerra del Salón del Farol, protegido con roble y hierro bajo el azul de la hermandad, con dos faroles de tormenta que cuelgan de su silla para iluminar el camino a casa.",
+      "desc_nightwing_chimera": "Un dracoleón crepuscular bicéfalo de las ramas antiguas, que descansa sobre sus patas traseras con garras y roza el suelo con alas grabadas de runas arcanas.",
       "desc_chimeglass_tortoise": "Una tortuga salada que ha dejado atrás a tres generaciones de caravanas. Los caldereros le quitaron las gafas de cristal de tormenta y le colgaron una campana de bronce en el cuello, de modo que la carretera le oye mucho antes de verlo.",
       "desc_rickshaw_mount": "Un carromato de huesos traqueteante, con un soldado esquelético enganchado a las varas, que te arrastra a toda carrera.",
       "desc_emberbristle_broom": "A harvest broom bound with orange ribbon that hovers a hand above the ground, shedding embers from its bristles. It crumbles back to straw when Gourdlight Eve ends."
     },
     "mountTraining": {
       "mountPrompt": "Pulsa {key} para montar el Corcel del Valor de entrenamiento.",
-      "ownedMountPrompt": "Tus riendas están en tus bolsas. Úsalas para montar.",
+      "ownedMountPrompt": "Elige tu montura en Cosméticos. Usa Montar / Desmontar para cabalgar.",
       "ridePrompt": "Sigue el marcador brillante hasta la línea de salida, y luego pulsa Iniciar Carrera.",
       "begin": "Comenzar Lección",
       "success": "Has domado al Corcel del Valor.",
@@ -2317,10 +2686,10 @@ export const es: EnTranslations = {
       "flagTakenLog": "¡{name} ha tomado la bandera {team}!",
       "flagDroppedLog": "Se soltó la bandera {team}.",
       "flagReturnedLog": "La bandera {team} fue devuelta.",
-      "flagDroppedByLog": "{name} dropped the {team} flag.",
-      "flagReturnedByLog": "{name} returned the {team} flag.",
-      "flagNameCrimson": "Crimson Flag",
-      "flagNameAzure": "Azure Flag",
+      "flagDroppedByLog": "{name} ha soltado la bandera del equipo {team}.",
+      "flagReturnedByLog": "{name} ha devuelto la bandera del equipo {team}.",
+      "flagNameCrimson": "Bandera carmesí",
+      "flagNameAzure": "Bandera azur",
       "dropFlagConfirmTitle": "¿Soltar la bandera?",
       "dropFlagConfirmBody": "Llevas la bandera enemiga. Si la sueltas, quedará en el suelo, donde cualquiera de los dos equipos puede alcanzarla.",
       "dropFlagConfirmAccept": "Soltar la bandera",
@@ -2360,6 +2729,7 @@ export const es: EnTranslations = {
       }
     },
     "options": {
+      "spellTooltipOnHover": "Descripciones de hechizos al pasar el cursor",
       "clickMoveLeft": "Clic izquierdo",
       "clickMoveRight": "Clic derecho",
       "version": "v{version} ({build})",
@@ -2405,11 +2775,14 @@ export const es: EnTranslations = {
       "interfaceModeDesktop": "Escritorio",
       "interfaceModeTouch": "Táctil",
       "interfaceModeNote": "Auto elige los controles Desktop o Touch según tu dispositivo. Elige Desktop para forzar teclado y ratón (útil en una tableta con teclado), o Touch para los controles en pantalla.",
+      "ambienceVolume": "Volumen de ambiente",
       "footstepSounds": "Sonidos de pasos",
       "interfaceSounds": "Sonidos de interfaz y respuesta",
       "clickFeedback": "Marcador de clic",
       "lockCursorOnRotate": "Bloquear cursor al rotar",
       "keybindHelpLockCursorOnRotate": "Mantiene el cursor del ratón dentro de la ventana mientras arrastras para rotar la cámara, para que no llegue al borde de la pantalla ni pase a otro monitor. Desactívalo si prefieres un cursor libre.",
+      "rawMouseInput": "Entrada directa del ratón",
+      "keybindHelpRawMouseInput": "Lee el movimiento directamente del ratón mientras arrastras para girar la cámara, sin aplicar la velocidad ni la aceleración del puntero del sistema, para que el giro sea más estable. Desactívalo para usar los ajustes del ratón del sistema. Solo funciona con Bloquear cursor al rotar activado y no es compatible con todos los navegadores o sistemas.",
       "showWalletOnCharacterScreen": "Mostrar cartera en la pantalla de personajes",
       "showWalletOnPlayerCard": "Mostrar cartera en la tarjeta de jugador",
       "showPlaytime": "Mostrar tiempo jugado en la pantalla de personajes",
@@ -2449,7 +2822,7 @@ export const es: EnTranslations = {
       "showDevBadges": "Mostrar insignias de desarrollador",
       "showOwnNameplate": "Mostrar mi placa de nombre",
       "showPlayerNameplates": "Mostrar placas de nombre de jugador",
-      "showPetNames": "Show Pet Names",
+      "showPetNames": "Mostrar nombres de mascotas",
       "uiScale": "Escala de la interfaz",
       "playerFrameScale": "Escala del marco del jugador",
       "targetFrameScale": "Escala del marco del objetivo",
@@ -2467,14 +2840,15 @@ export const es: EnTranslations = {
       "groundReticle": "Retícula de objetivo terrestre",
       "mouseoverCast": "Lanzar al pasar el cursor sobre los marcos de grupo",
       "stickyTarget": "Mantener objetivo al hacer clic en el suelo",
-      "showDungeonHints": "Dungeon mechanic hints",
-      "showDungeonHintsNote": "Shows the tip panel that explains a dungeon mechanic and what to do about it. Turning this off hides only those tips: ground warnings, cast bars and debuffs stay. Prompts you act on always show: a cage to break out of, a chain to break, an object to use.",
+      "showDungeonHints": "Consejos de mecánicas de mazmorra",
+      "showDungeonHintsNote": "Muestra el panel de consejos que explica una mecánica de mazmorra y cómo responder. Desactivarlo oculta solo esos consejos: se conservan los avisos del suelo, las barras de lanzamiento y los perjuicios. Los avisos que requieren una acción siempre se muestran: una jaula de la que escapar, una cadena que romper o un objeto que usar.",
       "showItemLevel": "Mostrar nivel de objeto",
       "showReliquaryTracker": "Mostrar rastreador de relicarios",
       "confirmVendorSell": "Confirmar antes de vender",
       "confirmVendorSellNote": "Si lo desactivas, los objetos se venden con un solo clic y sin confirmación, así que un espacio de bolsa desplazado podría vender el objeto equivocado.",
       "confirmVendorSellMinQuality": "Confirmar ventas de calidad",
       "confirmVendorSellMinQualityNote": "Los artículos por debajo de esta calidad se venden con un solo clic; un artículo mal vendido aún se puede volver a comprar al vendedor.",
+      "confirmVendorSellMinQualityNoteGray": "Los objetos de calidad inferior se venden con un clic. Puedes recomprar un objeto vendido por error, salvo los objetos grises sin firma.",
       "itemLevelLine": "Nivel de objeto {level}",
       "itemScoreLine": "Puntuación {score}",
       "showSecondaryActionBar": "Mostrar barra de acción secundaria",
@@ -2484,9 +2858,22 @@ export const es: EnTranslations = {
       "lockActionBars": "Bloquear barras de acción",
       "showTargetOfTarget": "Mostrar el objetivo del objetivo",
       "showTargetSwingTimer": "Mostrar temporizador de golpe del objetivo",
+      "enemyHighlightStyle": "Estilo de resaltado de enemigos",
+      "enemyHighlightEdgeArrow": "Flecha en el borde si está fuera de cámara",
+      "enemyHighlightNameplate": "Placa de objetivo grande con marco",
+      "enemyHighlightOverhead": "Marcador flotante sobre la cabeza",
+      "enemyHighlightReticle": "Retícula hostil más gruesa",
+      "enemyHighlightDistance": "{yards} yardas",
       "showPetFrame": "Mostrar tu mascota",
+      "playerFrameResourceDetached": "Separar barra de recursos",
+      "playerFrameResourceWidth": "Anchura de la barra de recursos",
+      "playerFrameResourceHeight": "Altura de la barra de recursos",
+      "hillBarOpacity": "Opacidad del fondo de El Rey de la Colina",
+      "pixelsValue": "{value} px",
       "showNameplateDots": "Mostrar mis puntos en las placas de identificación",
       "nameplateDotScale": "Tamaño del punto de la placa de identificación",
+      "showNameplateCooldowns": "Seguimiento ofensivo/defensivo",
+      "nameplateCooldownScale": "Tamaño del seguimiento ofensivo/defensivo",
       "showTargetDots": "Mostrar puntos de destino",
       "showDefensivesTrack": "Mostrar enfriamientos defensivos",
       "showSelfBuffTrack": "Mostrar mis beneficios",
@@ -2495,12 +2882,18 @@ export const es: EnTranslations = {
       "showUtilityModes": "Incluir modos de sigilo y viaje",
       "showFriendlyTrack": "Mostrar mis beneficios sobre aliados",
       "showShieldTrack": "Mostrar mis escudos",
+      "classicCombatText": "Texto de combate clásico",
       "waterRipples": "Ondas en el agua (estelas)",
+      "spellEffects": "Efectos de hechizos",
       "actionCam": "Cámara de acción",
       "actionCamShoulder": "Hombro de la cámara de acción",
       "actionCamShoulderLeft": "Izquierda {pct}",
       "actionCamShoulderRight": "Derecha {pct}",
       "actionCamShoulderCenter": "Centro",
+      "firstPersonMode": "Primera persona (acercamiento máximo)",
+      "firstPersonOff": "Desactivado",
+      "firstPersonBody": "Mostrar cuerpo",
+      "firstPersonNoBody": "Sin cuerpo",
       "showAttackButton": "Mostrar boton de ataque",
       "showDailyRewardsChest": "Mostrar cofre de recompensas diarias",
       "mobileCameraJoystick": "Palanca de mando de la cámara",
@@ -2526,6 +2919,11 @@ export const es: EnTranslations = {
       "complexityMedium": "Media",
       "complexityHigh": "Alta",
       "exampleAbilities": "Habilidades de ejemplo",
+      "specBonus": "Bonificación de especialización",
+      "healing": "sanación",
+      "absorption": "absorción de daño",
+      "physicalAbilityDamage": "daño de habilidades cuerpo a cuerpo y a distancia",
+      "primaryHealingBonus": "Aumenta la sanación principal un {pct} después de las demás bonificaciones de sanación.",
       "viewTalents": "Ver talentos",
       "selectSpec": "Seleccionar especialización",
       "specUnlockBanner": "¡Especialización Desbloqueada!",
@@ -2849,11 +3247,15 @@ export const es: EnTranslations = {
       "iconSize": "Tamaño del icono",
       "iconPadding": "Espaciado del icono",
       "opacity": "Opacidad",
-      "visibility": "Visibilidad",
-      "visAlways": "Siempre visible",
       "visCombat": "En combate",
-      "visHidden": "Oculto",
       "visHiddenHint": "Un grupo oculto sigue reproduciendo sus sonidos e iluminando tu barra de acción.",
+      "showWhile": "Mostrar durante",
+      "showOutOfCombat": "Fuera de combate",
+      "showIn": "Mostrar en",
+      "showInWorld": "Mundo abierto",
+      "showInInstances": "Zonas instanciadas",
+      "placeHint": "Las instancias incluyen mazmorras, bandas, expediciones, brechas, campos de batalla, la arena y cualquier otra zona instanciada. Fuera de los lugares que marques, el grupo queda oculto y en silencio.",
+      "groupOffHint": "Si no marcas ningún lugar, este grupo nunca se muestra ni reproduce sonidos.",
       "showTimer": "Mostrar temporizador",
       "positionX": "Posición horizontal",
       "positionY": "Posición vertical",
@@ -2871,7 +3273,6 @@ export const es: EnTranslations = {
       "aurasTitle": "Activaciones, motores y beneficios",
       "aurasHint": "Recursos de motor y sus acumulaciones, activaciones, y los beneficios que tus hechizos te otorgan. Cualquier otra cosa que hayas tenido también aparece aquí.",
       "auraFallback": "Aura",
-      "onlyWhileActive": "Mostrar solo mientras esté activo",
       "alertStacks": "Avisar en acumulaciones",
       "alertStacksAny": "Al obtenerla",
       "alertStacksHint": "El botón se ilumina, pulsa y suena en cuanto el aura alcanza esta cantidad de acumulaciones. Al obtenerla significa en cuanto aparece.",
@@ -2888,7 +3289,18 @@ export const es: EnTranslations = {
       "glowWhenReadyHint": "Aclara y resalta el borde del botón mientras el hechizo se puede lanzar.",
       "hotbarGlow": "Brillo en la barra de acción",
       "hotbarGlowHint": "También ilumina este hechizo en tu barra de acción mientras esté listo.",
-      "onlyWhenReady": "Mostrar solo cuando esté listo",
+      "showButtonWhen": "Mostrar botón cuando esté",
+      "showReady": "Disponible",
+      "showNotReady": "No disponible",
+      "notReadyHint": "No disponible significa que está en reutilización o que no se puede usar ahora.",
+      "auraShowWhen": "Mostrar botón cuando el aura esté",
+      "auraActive": "Activa",
+      "auraMissing": "Ausente",
+      "neverShownHint": "Si no marcas ninguna de las dos opciones, el botón nunca se muestra, pero su sonido sigue reproduciéndose.",
+      "reminderHint": "Recordatorio de beneficio: el botón se ilumina mientras falte esta aura y se oculta cuando la tienes.",
+      "glowWhileMissing": "Iluminar cuando falte",
+      "reminderGlowHint": "Ilumina, perfila y hace pulsar el botón mientras falte el aura.",
+      "reminderSoundHint": "Se reproduce cuando desaparece el aura.",
       "sound": "Sonido de listo",
       "soundHint": "Suena cuando el hechizo queda listo, o cuando su botón cambia a otro hechizo mientras está listo."
     },
@@ -3018,7 +3430,8 @@ export const es: EnTranslations = {
         "battlegroundAssist": "golpe de gracia asistido",
         "worldKill": "muerte en el mundo abierto",
         "worldAssist": "muerte en el mundo abierto asistida",
-        "hillHold": "manteniendo la colina"
+        "hillHold": "manteniendo la colina",
+        "worldQuest": "misión del mundo"
       },
       "floatReasons": {
         "kill": "Baja",
@@ -3028,6 +3441,11 @@ export const es: EnTranslations = {
       }
     },
     "worldPvp": {
+      "rewardTitles": "Gana títulos permanentes tras {thresholds} de juego con JcJ del mundo activado en el mundo abierto o en instancias JcJ. Desconectarte, morir, las instancias JcE y los santuarios pausan el contador. Desactivarlo lo reinicia.",
+      "rewardPaused": "Racha JcJ actual: {time} de juego (en pausa en un santuario)",
+      "rewardPausedDead": "Racha JcJ actual: {time} de juego (en pausa mientras estás muerto)",
+      "rewardPausedInstance": "Racha JcJ actual: {time} de juego (en pausa en instancias JcE)",
+      "rewardProgress": "Racha JcJ actual: {time} de juego",
       "tab": "JcJ mundial",
       "title": "JcJ mundial",
       "blurb": "Alza tu bandera para luchar contra otros jugadores marcados en cualquier lugar del mundo abierto. Derrota a uno y llévate parte de su bolsa, más Honor hacia el equipo de guerra. Los campos de batalla y las arenas siguen pagando más.",
@@ -3039,20 +3457,22 @@ export const es: EnTranslations = {
       "zoneContested": "Terreno disputado: aquí solo luchan los jugadores marcados.",
       "zoneFfa": "Terreno de todos contra todos: aquí cualquiera es blanco legítimo.",
       "realmDisabled": "El JcJ mundial está desactivado en este reino.",
-      "groundSanctuary": "La Costa de la Prueba y el Valle de Eastbrook son santuarios: allí no hay JcJ mundial de ningún tipo.",
+      "groundSanctuary": "La Costa de la Prueba es el único santuario: allí no puedes activar el JcJ mundial ni luchar contra otros jugadores.",
       "groundContested": "En cualquier otro lugar, el terreno está disputado: solo pueden luchar dos jugadores marcados.",
-      "groundFfa": "Las Tierras del Dragón, el Velo de Escarcha y la Cascada de Ámbar son de todos contra todos: allí puede luchar cualquiera, tenga la bandera alzada o no.",
+      "groundFfa": "Las Tierras del Dragón, El Velo de Escarcha y La Cascada de Ámbar usan las banderas JcJ habituales. Entrar en el círculo activo del Rey de la Colina activa tu bandera.",
       "groupLine": "Los miembros de grupo y de banda nunca son hostiles entre sí. Los compañeros de hermandad que no estén en tu grupo sí pueden luchar.",
-      "markLine": "Atacar allí a un jugador sin marcar alza tu propia bandera; atacar a uno marcado nunca lo hace.",
+      "markLine": "Entrar en el círculo activo de una colina activa el JcJ mundial. Salir mantiene tu bandera activa.",
       "aidLine": "Curar, proteger con un escudo o mejorar a un jugador marcado en un combate mundial alza tu bandera.",
       "stakeLine": "El perdedor paga {cap} o el {percent} de su bolsa, lo que sea menor.",
-      "noStakeLine": "Un jugador sin marcar que muere en terreno de todos contra todos no pierde oro.",
+      "spoilsLine": "Si ambos están marcados, el oro del golpe mortal cae en el cadáver junto al cráneo del perdedor.",
+      "skullName": "Cráneo de {name}",
+      "noStakeLine": "Los jugadores sin bandera no pueden ser atacados en el mundo abierto.",
       "noTakeLine": "Un combatiente sin marcar tampoco se lleva oro: este solo se mueve entre dos jugadores marcados.",
       "honorLine": "{honor} de Honor por baja, repartido entre todos los que ayudaron.",
       "splitLine": "Un 1c1 limpio paga el bote entero; quienes ayudan y sus sanadores lo reparten.",
       "repeatLine": "Las bajas repetidas sobre un mismo jugador pagan {second}, luego {third}, y después nada; el contador se reinicia {reset} después de la primera baja.",
       "greyLine": "Los jugadores con más de {levels} niveles por debajo del tuyo no pagan nada.",
-      "disarmLine": "Desactivarla tarda {minutes} minutos y espera a que termine el combate.",
+      "disarmLine": "Desactivar la bandera tarda {minutes} minutos y espera hasta que salgas de la colina activa y termine el combate.",
       "record": "Historial: {kills} bajas, {deaths} muertes",
       "enable": "Activar el JcJ mundial",
       "disable": "Desactivar el JcJ mundial",
@@ -3075,33 +3495,65 @@ export const es: EnTranslations = {
       "countsHolding": "Dentro: tú {yours}, rival {theirs}",
       "contestYou": "Tomando la colina: {seconds} de {total}",
       "contestOther": "Perdiendo la colina: {seconds} de {total}",
+      "contestYouPaused": "En pausa: {seconds} de {total}",
+      "contestOtherPaused": "Rival en pausa: {seconds} de {total}",
       "contestNone": "Mantén la mayoría dentro durante {total} para tomarla",
       "inside": "Estás dentro del círculo",
       "distance": "{yards} yd hasta el círculo",
       "rises": "Se alza en {minutes}",
       "falls": "Cae en {minutes}",
+      "pvpEntry": "Entrar en el círculo activo activa el JcJ mundial.",
+      "pvpBanner": "JcJ",
+      "callout": {
+        "killingSpree": "¡{name} está en Racha Letal!",
+        "rampage": "¡{name} está Desenfrenado!",
+        "unstoppable": "¡{name} es Imparable!",
+        "dominating": "¡{name} está Dominando!",
+        "godlike": "¡{name} es Divino!",
+        "legendary": "¡{name} es Legendario!",
+        "shutDown": "¡{killer} ha detenido a {victim}!"
+      },
       "standingRaid": "Los miembros de banda no cuentan: solo los grupos pueden controlar la colina"
+    },
+    "skullBag": {
+      "title": "Bolsa de Cráneos",
+      "total": "Cráneos: {count}",
+      "close": "Cerrar la Bolsa de Cráneos",
+      "clickOpen": "Haz clic para abrir",
+      "notCarried": "Lleva la Bolsa de Cráneos en el inventario para guardar o sacar cráneos.",
+      "empty": "Vacía. Mientras lleves la bolsa, los cráneos que despojes entran directamente en ella.",
+      "unrecorded": "Cráneo Trofeo",
+      "store": "Guardar los cráneos que llevas ({count})",
+      "storeNone": "No hay cráneos para guardar",
+      "takeOne": "Sacar 1",
+      "takeAll": "Sacar todos",
+      "takeOneAria": "Sacar 1: {item}",
+      "takeAllAria": "Sacar todos: {item}",
+      "tooltip": "Guarda cualquier cantidad de Cráneos Trofeo sin ocupar espacio de las bolsas. Mientras la lleves en el inventario, los cráneos que despojes entran directamente en ella. Haz clic en ella para guardar o sacar cráneos."
     },
     "warfareShop": {
       "gossipOption": "Explorar conjuntos de guerra",
       "gossipOptionAria": "Explorar la tienda de conjuntos de guerra de {name}",
       "jewelry": "Joyería",
       "weapons": "Armas",
+      "goods": "Mercancías",
       "groupSeason2": "Temporada de Guerra 2: Vanguardia",
       "groupEntry": "Temporada de Guerra 1",
-      "companions": "Companions",
-      "companionPurchase": "Permanently unlocks this buddy and summons it immediately. No item is added to your bags.",
-      "companionOwnedAria": "{item}, already collected or awaiting reveal",
+      "companions": "Compañeros",
+      "companionPurchase": "Desbloquea este compañero de forma permanente y lo invoca al instante. No se añade ningún objeto a tus bolsas.",
+      "companionOwnedAria": "{item}, ya conseguido o pendiente de revelar",
       "owned": "Adquirido",
       "buyAria": "Comprar {item} por {honor}",
       "buyOwnedAria": "Comprar {item} por {honor}, ya adquirido",
-      "buyConfirmBody": "¿Comprar {item} por {honor}? Las compras con Honor no se pueden reembolsar."
+      "buyConfirmBody": "¿Comprar {item} por {honor}? Las compras con Honor no se pueden reembolsar.",
+      "buyConfirmBodyGold": "¿Comprar {item} por {price}? Esta compra no se puede reembolsar."
     },
     "charSheet": {
       "offense": "Ofensiva",
       "spell": "Hechizo",
       "defense": "Defensa",
       "ratings": "Índices",
+      "gearScore": "Puntuación de equipo",
       "playtimeLabel": "Tiempo jugado",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Menos de un minuto",
@@ -3130,6 +3582,12 @@ export const es: EnTranslations = {
       "hint": "Encuentra el terreno que muestra este mapa, colócate sobre la X y usa el mapa otra vez para cavar. Se abrirá un tesoro enterrado para ti y tu grupo.",
       "upgradeNote": "Redibujarlo como mapa {rarity} cuesta {inks} de Tinta de cartógrafo (tienes {held}). La venden los intendentes de las facciones.",
       "upgradeMaxed": "Ningún cartógrafo podría mejorar este mapa.",
+      "inkPickerTitle": "¿En qué mapa quieres usar la Tinta de Cartógrafo?",
+      "inkPickerHeld": "Tienes {held} de Tinta de Cartógrafo.",
+      "inkPickerRead": "En seguimiento: su X está en {zone}. La X no se mueve.",
+      "inkPickerUnread": "Sin leer ({count} en tu poder)",
+      "inkPickerCost": "Redibujar a {rarity}: {inks} de tinta",
+      "inkPickerCancel": "Cancelar",
       "rarity": {
         "common": "Común",
         "rare": "Raro",
@@ -3143,9 +3601,9 @@ export const es: EnTranslations = {
       "factions": "Facciones",
       "honor": "Honor",
       "delveMark": "Marca de expedición",
-      "wocToken": "WoC Token",
+      "wocToken": "Ficha WoC",
       "heroicMarkNote": "Mazmorras heroicas . gástala con el intendente heroico",
-      "honorNote": "Campos de batalla y la arena",
+      "honorNote": "Campos de batalla, la arena y misiones de mundo",
       "delveMarkNote": "Expediciones completadas",
       "wocTokenNote": "Saldo de la cartera vinculada",
       "walletNotLinked": "Ninguna cartera vinculada",
@@ -3360,9 +3818,9 @@ export const es: EnTranslations = {
         "heat": "Tus golpes de arma cuerpo a cuerpo y a distancia añaden una acumulación de calor cada uno, hasta {max}. El calor dura {duration} s y se renueva cada vez que ganas una acumulación.",
         "ignite": "Tus golpes críticos de arma cuerpo a cuerpo y a distancia prenden fuego al objetivo, infligiendo {tick} de daño de fuego cada {every} s durante {duration} s. Un nuevo golpe crítico lo renueva. El daño aumenta con el poder de ataque o el poder de ataque a distancia, el que sea mayor.",
         "guardHeat": "Cada ataque que paras, esquivas o bloqueas añade una acumulación de calor, hasta {max}. El calor dura {duration} s y se renueva cada vez que ganas una acumulación.",
-        "stoneHeart": "When a hit would kill you, you turn to stone for {statue} sec instead: you take no damage and cannot move or act, then return with {restore} health ({restorePct}% of your maximum health). Can occur once every {icd}. Never in duels or arena matches, which end at the killing blow."
+        "stoneHeart": "Cuando un golpe fuera a matarte, te conviertes en piedra durante {statue} s: no recibes daño ni puedes moverte o actuar; luego vuelves con {restore} de salud ({restorePct}% de tu salud máxima). Puede ocurrir una vez cada {icd}. Nunca en duelos ni combates de arena, que terminan con el golpe mortal."
       },
-      "range": "{min} to {max}",
+      "range": "{min} a {max}",
       "use": {
         "retaliate": "Durante {duration} s, un enemigo que te golpee directamente recibe daño físico igual al {pct}% de la salud que te quitó ese golpe. El daño periódico no lo activa.",
         "anchor": "Durante {duration} s, recibes un {reduction}% menos de daño pero te mueves al {speed}% de velocidad. Elimina los aturdimientos, enraizamientos, ralentizaciones, miedos, polimorfias, silencios, cegueras, maleficios, desarmes y efectos incapacitantes que tengas, e ignoras los nuevos y los derribos mientras dura.",
@@ -3381,17 +3839,17 @@ export const es: EnTranslations = {
         "kindlingOrb": "Invoca un orbe de brasas a tu lado durante {duration} s. Cada hechizo que lanzas a un enemigo le hace disparar un proyectil a ese enemigo que inflige {damage} de daño de fuego. El daño aumenta con el poder con hechizos.",
         "pierce": "Durante {duration} s, tus ataques automáticos, disparos y habilidades físicas (no sangrados) también golpean al enemigo más cercano a tu objetivo a {reach} m o menos por el {share}% del daño infligido.",
         "lantern": "Coloca un farol a tus pies durante {duration} s. Una sanación directa de cualquiera sobre ti o un miembro del grupo a {radius} m o menos de él también sana al otro miembro del grupo más herido bajo su luz por el {share}% de la sanación.",
-        "shackle": "Chain your target within {range} yd in place for {duration} sec. A creature immune to control, such as a boss, is slowed by {slow}% instead, unless it is also immune to slows.",
-        "spiritPack": "Call a spirit jaguar to fight beside you for {duration} sec. It runs to your target and bites it for {min} to {max} Physical damage every {every} sec, switching to any other enemy you target. With no enemy targeted it attacks the enemy nearest you within {range} yd. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, fixed when it is called. Requires an enemy target within {range} yd.",
-        "seedburst": "Plant a seed on your target within {range} yd. After {delay} sec it bursts where the target stands, or where it died, dealing {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if the target died first. Damage increases with Spell Power, fixed when it is planted. The seed withers if you die before it bursts.",
-        "tether": "Chain yourself to a friendly player within {range} yd for {duration} sec. {share}% of the damage that would reach their health is dealt to you instead. Ends early if you die. Requires a friendly player target other than you.",
-        "harvest": "For {duration} sec, each hostile creature that dies within {radius} yd of you restores {pct}% of your maximum health ({health}) and {pct}% of your maximum mana.",
-        "quench": "Your next {hits} melee or ranged weapon hits within {duration} sec deal {damage} extra Frost damage. The last of them also quenches the target, slowing its attacks by {slow}% for {slowDuration} sec. Unused hits are lost when it ends. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.",
+        "shackle": "Encadena a tu objetivo a menos de {range} yardas en su sitio durante {duration} s. Una criatura inmune al control, como un jefe, queda ralentizada un {slow}% en su lugar, salvo que también sea inmune a las ralentizaciones.",
+        "spiritPack": "Invoca a un jaguar espiritual para que luche a tu lado durante {duration} s. Corre hacia tu objetivo y lo muerde por de {min} a {max} de daño Físico cada {every} s; cambia a cualquier otro enemigo que selecciones. Sin enemigo seleccionado, ataca al enemigo más cercano a ti a menos de {range} yardas. El daño aumenta con el poder de ataque o el poder de ataque a distancia, el mayor de los dos, fijado al invocarlo. Requiere un objetivo enemigo a menos de {range} yardas.",
+        "seedburst": "Planta una semilla en tu objetivo a menos de {range} yardas. Tras {delay} s, estalla donde esté el objetivo o donde murió e inflige {damage} de daño de Naturaleza a cada enemigo a menos de {radius} yardas, o un {bonus}% más ({empowered}) si el objetivo murió antes. El daño aumenta con el poder con hechizos, fijado al plantarla. La semilla se marchita si mueres antes de que estalle.",
+        "tether": "Encadénate a un jugador amistoso a menos de {range} yardas durante {duration} s. El {share}% del daño que alcanzaría su salud se te inflige a ti en su lugar. Termina antes si mueres. Requiere seleccionar a un jugador amistoso que no seas tú.",
+        "harvest": "Durante {duration} s, cada criatura hostil que muere a menos de {radius} yardas de ti restaura el {pct}% de tu salud máxima ({health}) y el {pct}% de tu maná máximo.",
+        "quench": "Tus siguientes {hits} golpes de arma cuerpo a cuerpo o a distancia en {duration} s infligen {damage} de daño de Escarcha adicional. El último también templa al objetivo y ralentiza sus ataques un {slow}% durante {slowDuration} s. Los golpes sin usar se pierden al terminar. El daño aumenta con el poder de ataque o el poder de ataque a distancia, el mayor de los dos.",
         "heartNova": "Gasta todas las acumulaciones de calor en una nova de fuego que inflige {perHeat} de daño de fuego por acumulación ({max} con {maxHeat} acumulaciones) a cada enemigo a {radius} m o menos y provoca a cada criatura que alcanza. El daño aumenta con el poder de ataque. Requiere una acumulación de calor.",
-        "foremanShape": "Take the Shape of the Foreman for {duration} sec: you become the one-eyed cyclops and fight with your fists, keeping every ability and its damage. You gain {armorPct}% armor and cannot be knocked back. Dismounts you.",
-        "musterStandard": "Plant a Muster Standard at your feet. For {duration} sec, {soldiers} muster soldiers march at your side and fight your target in melee, each hitting every {every} sec for {damage} Physical damage. They attack only your target, and only once it is already in combat. Each has {hpPct}% of your maximum health. Left more than {leash} yd behind, they rejoin you at once. They leave when the standard falls or when you die. Damage increases with Attack Power or Ranged Attack Power, whichever is higher, set when you plant it.",
-        "gutteredGlare": "Channel for {duration} sec: a beam {length} yd long bursts from you the way you face and deals {tick} Arcane damage every {every} sec to up to {max} enemies in its path ({total} to each over the full channel). Turn to sweep it; moving or casting ends it. Damage increases with Spell Power.",
-        "grapnel": "Hook a party or raid member within {range} yd that you can see and haul them through the air to your side, healing them for {heal} when they land. It cannot pull enemies, or allies in a vehicle, on a ship, turned to stone or held by an effect that cannot be broken. Healing increases with Healing Power."
+        "foremanShape": "Adopta Forma del capataz durante {duration} s: te conviertes en el cíclope tuerto y luchas con los puños, conservando todas tus habilidades y su daño. Obtienes un {armorPct}% de armadura y no pueden empujarte. Te desmonta.",
+        "musterStandard": "Planta un Estandarte de la leva a tus pies. Durante {duration} s, {soldiers} soldados de la leva marchan a tu lado y luchan cuerpo a cuerpo contra tu objetivo; cada uno golpea cada {every} s por {damage} de daño Físico. Solo atacan a tu objetivo y únicamente cuando ya está en combate. Cada uno tiene el {hpPct}% de tu salud máxima. Si quedan a más de {leash} yardas, vuelven junto a ti al instante. Se marchan cuando cae el estandarte o cuando mueres. El daño aumenta con el poder de ataque o el poder de ataque a distancia, el mayor de los dos, fijado al plantar el estandarte.",
+        "gutteredGlare": "Canaliza durante {duration} s: de ti sale un haz de {length} yardas en la dirección en la que miras e inflige {tick} de daño Arcano cada {every} s a un máximo de {max} enemigos en su trayectoria ({total} a cada uno durante toda la canalización). Gira para barrer con él; moverte o lanzar un hechizo lo termina. El daño aumenta con el poder con hechizos.",
+        "grapnel": "Engancha a un miembro del grupo o banda que puedas ver a menos de {range} yardas y arrástralo por el aire hasta tu lado; le restaura {heal} de salud al aterrizar. No puede atraer enemigos ni aliados en un vehículo, a bordo de un barco, convertidos en piedra o sujetos por un efecto que no se pueda romper. La sanación aumenta con el poder de sanación."
       }
     },
     "questShare": {
@@ -3410,6 +3868,12 @@ export const es: EnTranslations = {
       "linkHint": "Mayús+clic para enlazar este objeto en el chat."
     },
     "plurals": {
+      "itemHistoryEarlierHidden": {
+        "one": "No se muestra {count} transferencia anterior.",
+        "few": "No se muestran {count} transferencias anteriores.",
+        "many": "No se muestran {count} transferencias anteriores.",
+        "other": "No se muestran {count} transferencias anteriores."
+      },
       "guildBoardShown": {
         "one": "{count} hermandad mostrada",
         "few": "{count} hermandades mostradas",
@@ -3841,12 +4305,12 @@ export const es: EnTranslations = {
       "streamerBadgeTitle": "Streamer verificado"
     },
     "buddyMenu": {
-      "rename": "Rename Buddy",
-      "nameLabel": "Buddy name",
-      "autolootEnable": "Enable Autoloot",
-      "autolootDisable": "Disable Autoloot",
-      "autolootHint": "Your buddy fetches loot from your own corpses within 30 yards.",
-      "cancel": "Cancel"
+      "rename": "Renombrar compañero",
+      "nameLabel": "Nombre del compañero",
+      "autolootEnable": "Activar botín automático",
+      "autolootDisable": "Desactivar botín automático",
+      "autolootHint": "Tu compañero recoge el botín de los cadáveres que te corresponden a menos de 30 yardas.",
+      "cancel": "Cancelar"
     },
     "lootSettings": {
       "title": "Ajustes de botín",
@@ -3862,26 +4326,35 @@ export const es: EnTranslations = {
     "dungeonDifficulty": {
       "setHeroic": "Fijar dificultad de mazmorra: Heroica",
       "setNormal": "Fijar dificultad de mazmorra: Normal",
+      "unappliedNormal": "Heroico seleccionado. Las estancias actuales siguen en Normal.",
+      "unappliedHeroic": "Normal seleccionado. Las estancias actuales siguen en Heroico.",
       "resetAll": "Restablecer todas las instancias",
       "resetDone": "Se han restablecido todas las instancias.",
       "resetNone": "No tienes instancias que restablecer.",
       "resetOccupied": "No puedes restablecer instancias mientras alguien siga dentro.",
+      "queuedOccupied": "Cambio de dificultad en espera porque aún queda alguien o su cadáver dentro. Se aplicará cuando las instancias estén vacías.",
+      "queuedCancelled": "Cambio de dificultad pendiente cancelado porque cambió el grupo o su líder.",
       "resetSameDifficulty": "Cambia la dificultad de la mazmorra antes de restablecer estas instancias. Las instancias vacías se restablecen solas después de 5 minutos.",
       "resetLoot": "No puedes restablecer instancias mientras quede botín dentro.",
       "resetConfirmTitle": "¿Restablecer todas las instancias?",
-      "resetConfirmBody": "Esto abandona las instancias vacías de la dificultad seleccionada anteriormente. El botín sin reclamar impedirá el restablecimiento.",
+      "resetConfirmBody": "Esto abandona tus instancias vacías para que la siguiente partida empiece de nuevo en la dificultad elegida. Los bloqueos no cambian. Cualquier jugador que siga dentro o botín sin recoger impide el restablecimiento.",
       "resetConfirm": "Restablecer instancias",
       "resetCooldown": "Las instancias solo se pueden restablecer una vez cada 5 minutos.",
-      "resetUsage": "Usa /dungeon reset para abandonar tus instancias vacías después de cambiar la dificultad.",
+      "resetAlreadyFresh": "Tus instancias ya están como nuevas. Nadie ha entrado en ellas desde el último reinicio.",
+      "resetUsage": "Usa /dungeon reset para abandonar tus instancias vacías y empezarlas de nuevo.",
       "entryMismatchNormal": "Esta instancia está configurada en dificultad Normal. Usa Restablecer todas las instancias para iniciar una nueva partida Heroica.",
       "entryMismatchHeroic": "Esta instancia está configurada en dificultad Heroica. Usa Restablecer todas las instancias para iniciar una nueva partida Normal."
     },
     "bags": {
+      "membershipSlot": "Espacio de bolsa de membresía",
+      "membershipSlotLocked": "Desbloquea este espacio de bolsa con una membresía.",
+      "membershipSlotHint": "Equipa una bolsa adicional mientras tu membresía esté activa. Tu bolsa y sus objetos se conservan a salvo cuando caduca.",
       "cannotDestroy": "Este elemento no se puede destruir.",
       "rightClickDestroy": "Clic derecho para destruir",
       "dragEquipHint": "Arrastra sobre tu personaje para equipar",
       "dragDestroyHint": "Arrastra fuera del inventario para destruir",
       "reorderNeedsRecent": "Limpia el filtro y ordena por Reciente para reorganizar tus bolsas",
+      "reorderLocked": "Los objetos bloqueados conservan su hueco en la bolsa. Desbloquéalos para moverlos.",
       "itemAriaInstanced": "{item}, cantidad {count}, copia marcada por el creador",
       "itemAriaEnchanted": "{item}, cantidad {count}, copia encantada",
       "itemAriaBound": "{item}, cantidad {count}, copia vinculada",
@@ -4000,6 +4473,24 @@ export const es: EnTranslations = {
       "collapseAbility": "Contraer {ability}",
       "abilityControlLabel": "{action}. {details}",
       "tooltipMeta": "{phase} | {difficulty}",
+      "dungeonButton": "Guía de jefes: {dungeon}",
+      "dungeonBossesLabel": "Jefes de mazmorra",
+      "dungeonSubtitle": "{dungeon} | Jefe: {boss} | {difficulty}",
+      "rankMiniboss": "Minijefe",
+      "rankFinal": "Jefe final",
+      "defeated": "Derrotado",
+      "browseBossDefeated": "Ver {boss} (derrotado)",
+      "heroicHeading": "Qué cambia en heroico",
+      "tipsHeading": "Consejos por función",
+      "choicesHeading": "Decisiones clave",
+      "choiceGain": "Qué ganas",
+      "choiceRisk": "Qué arriesgas",
+      "markHeroicOnly": "Solo en heroico",
+      "markHeroicChanged": "Modificado en heroico",
+      "damageCompare": "Normal {normal} | Heroico {heroic}",
+      "damageRange": "{min} a {max}",
+      "finderOpen": "Guía de jefes",
+      "finderOpenLabel": "Abrir la guía de jefe de {boss}",
       "ignivar": {
         "overview": "Varkhul forjó a Ignivar como heraldo, sello viviente y llave de el Crisol Interior. El encuentro pone a prueba el control de los conductos de agua, el movimiento preciso y el daño prioritario rápido.",
         "phaseOpeningName": "El Heraldo Despierta",
@@ -4125,7 +4616,7 @@ export const es: EnTranslations = {
         "phaseWardstonesName": "Las piedras de resguardo",
         "phaseWardstonesSummary": "Al {health} de salud, Pisotón estremecedor inmoviliza a la banda mientras el hermano Aldric llega y enciende las piedras de resguardo. Todas las púas se rompen y el suelo deja de arder; luego Desgarro de alma y Rabia inmortal se suman a las mecánicas del Trono.",
         "phaseKingsWrathName": "La Ira del rey",
-        "phaseKingsWrathSummary": "At {health} health, Nythraxis roars in The King's Wrath and gains {bonusNormal} damage on Normal or {bonusHeroic} on Heroic for the rest of the fight. Grave Eruption tightens to every {eruptionEveryNormal} sec ({eruptionEveryHeroic} on Heroic). Every other mechanic keeps its cadence.",
+        "phaseKingsWrathSummary": "Al llegar a {health} de salud, Nythraxis ruge con Ira del rey y obtiene {bonusNormal} de daño en normal o {bonusHeroic} en heroico durante el resto del combate. Erupción sepulcral pasa a ocurrir cada {eruptionEveryNormal} s ({eruptionEveryHeroic} en heroico). Todas las demás mecánicas conservan su frecuencia.",
         "gravebreakerName": "Quebrantatumbas",
         "gravebreakerSummary": "Cada {seconds} s, Nythraxis carga su siguiente golpe que conecte. Su objetivo solo recibe el golpe, pero todos los demás dentro de {range} yd en el cono frontal de {arc} grados reciben {splash} de ese golpe como daño físico, reducido por su propia armadura.",
         "gravebreakerResponse": "Los tanques mantienen a Nythraxis mirando lejos de la banda. Todos los demás se quedan detrás o a su lado y nunca cruzan el cono.",
@@ -4134,16 +4625,16 @@ export const es: EnTranslations = {
         "dreadCurseHeroicSummary": "Cada {every} s, Nythraxis golpea a su tanque actual con {hitHeroic} de la salud máxima como daño de las Sombras y añade una acumulación de Maldición pavorosa. Durante {duration} s, cada acumulación aumenta el daño que ese tanque recibe de Nythraxis en {perStackHeroic}, hasta {max} acumulaciones.",
         "dreadCurseResponse": "Los tanques cambian a {stacks} acumulaciones: el otro tanque provoca y el tanque maldito permanece fuera del cono de Quebrantatumbas mientras se desvanecen las acumulaciones. Los sanadores preparan al tanque entrante antes del cambio.",
         "boneSpikeName": "Púa ósea",
-        "boneSpikeSummary": "Every {everyNormal} sec, Nythraxis impales {victimsNormal} raiders other than his current target on Bone Spikes. An impaled raider cannot act and loses {drainNormal} of maximum health every second until their spike is shattered. A spike shatters after {hitsNormal} hits from anyone, whatever the hits deal. A raider who has been impaled cannot be chosen again for {cooldown} sec, so the spikes spread across the raid.",
-        "boneSpikeHeroicSummary": "Every {everyHeroic} sec, Nythraxis impales {victimsHeroic} raiders other than his current target on Bone Spikes. An impaled raider cannot act and loses {drainHeroic} of maximum health every second until their spike is shattered. A spike shatters after {hitsHeroic} hits from anyone, whatever the hits deal. A raider who has been impaled cannot be chosen again for {cooldown} sec, so the spikes spread across the raid.",
+        "boneSpikeSummary": "Cada {everyNormal} s, Nythraxis empala a {victimsNormal} miembros de la banda que no sean su objetivo actual en Púas óseas. Un miembro empalado no puede actuar y pierde {drainNormal} de su salud máxima cada segundo hasta que se rompe su púa. Una púa se rompe tras {hitsNormal} golpes de cualquiera, sin importar su daño. Un miembro que haya sido empalado no puede volver a ser elegido durante {cooldown} s, por lo que las púas se reparten entre la banda.",
+        "boneSpikeHeroicSummary": "Cada {everyHeroic} s, Nythraxis empala a {victimsHeroic} miembros de la banda que no sean su objetivo actual en Púas óseas. Un miembro empalado no puede actuar y pierde {drainHeroic} de su salud máxima cada segundo hasta que se rompe su púa. Una púa se rompe tras {hitsHeroic} golpes de cualquiera, sin importar su daño. Un miembro que haya sido empalado no puede volver a ser elegido durante {cooldown} s, por lo que las púas se reparten entre la banda.",
         "boneSpikeResponse": "Los combatientes de daño cambian a las Púas óseas de inmediato y las destruyen para liberar a los empalados. Los sanadores mantienen vivos a los empalados mientras caen las púas.",
         "graveEruptionName": "Erupción sepulcral",
-        "graveEruptionSummary": "Cada {everyNormal} s, manos esqueléticas marcan {countNormal} círculos de {radius} yd bajo miembros de la banda. Tras {warning} s, cada círculo erupciona e inflige {burstNormal} de la salud máxima como daño de las Sombras; luego arde como Llama sepulcral durante {flameNormal} s e inflige {tickNormal} de la salud máxima cada segundo a cualquiera que permanezca dentro.",
-        "graveEruptionHeroicSummary": "Cada {everyHeroic} s, manos esqueléticas marcan {countHeroic} círculos de {radius} yd bajo miembros de la banda. Tras {warning} s, cada círculo erupciona e inflige {burstHeroic} de la salud máxima como daño de las Sombras; luego arde como Llama sepulcral durante {flameHeroic} s e inflige {tickHeroic} de la salud máxima cada segundo a cualquiera que permanezca dentro.",
+        "graveEruptionSummary": "Cada {everyNormal} s, manos esqueléticas marcan {countNormal} círculos de {radius} yd bajo miembros de la banda. Tras {warning} s, cada círculo erupciona e inflige {burstNormal} de la salud máxima como daño de las Sombras; luego arde como Llama sepulcral durante {flameNormal} s e inflige {tickNormal} de la salud máxima cada segundo a cualquiera que permanezca dentro. Nunca ocurre mientras haya marcas de Desgarro de alma activas ni en los {gap} s posteriores a que desaparezcan.",
+        "graveEruptionHeroicSummary": "Cada {everyHeroic} s, manos esqueléticas marcan {countHeroic} círculos de {radius} yd bajo miembros de la banda. Tras {warning} s, cada círculo erupciona e inflige {burstHeroic} de la salud máxima como daño de las Sombras; luego arde como Llama sepulcral durante {flameHeroic} s e inflige {tickHeroic} de la salud máxima cada segundo a cualquiera que permanezca dentro. Nunca ocurre mientras haya marcas de Desgarro de alma activas ni en los {gap} s posteriores a que desaparezcan.",
         "graveEruptionResponse": "Sal de cada círculo de aviso antes de que erupcione y mantente fuera del suelo ardiente. Los tanques apartan a Nythraxis de las llamas para que los cuerpo a cuerpo tengan espacio.",
         "bindingSigilName": "Sigilo vinculante",
-        "bindingSigilSummary": "Every {everyNormal} sec, a sigil of the old wards flares on one of the two platforms flanking the throne, {sideOffset} yd to the raid's left or right of where Nythraxis stood at the pull, switching sides every cast, and he begins Deathless Ascension, gaining {ascensionNormal} damage and attack speed every {ascensionEvery} sec. If he stands on the sigil within {bindNormal} sec he is Bound: the Ascension is purged, he is stunned for {stunNormal} sec, and he takes {vulnerability} more damage for {boundNormal} sec. Otherwise every raider takes {unboundHitNormal} of maximum health as Shadow damage and he keeps {unboundBonusNormal} more damage until the next binding.",
-        "bindingSigilHeroicSummary": "Every {everyHeroic} sec, a sigil of the old wards flares on one of the two platforms flanking the throne, {sideOffset} yd to the raid's left or right of where Nythraxis stood at the pull, switching sides every cast, and he begins Deathless Ascension, gaining {ascensionHeroic} damage and attack speed every {ascensionEvery} sec. If he stands on the sigil within {bindHeroic} sec he is Bound: the Ascension is purged, he is stunned for {stunHeroic} sec, and he takes {vulnerability} more damage for {boundHeroic} sec. Otherwise every raider takes {unboundHitHeroic} of maximum health as Shadow damage and he keeps {unboundBonusHeroic} more damage until the next binding.",
+        "bindingSigilSummary": "Cada {everyNormal} s, un sigilo de los antiguos resguardos fulgura en una de las dos plataformas que flanquean el trono, a {sideOffset} yardas a la izquierda o derecha de la banda respecto al lugar donde estaba Nythraxis al iniciar el combate, alternando de lado en cada lanzamiento. Comienza Ascensión inmortal y obtiene {ascensionNormal} de daño y velocidad de ataque cada {ascensionEvery} s. Si se coloca sobre el sigilo en {bindNormal} s, queda Vinculado: se elimina la Ascensión, queda aturdido durante {stunNormal} s y recibe {vulnerability} más de daño durante {boundNormal} s. Si no, cada miembro de la banda recibe {unboundHitNormal} de su salud máxima como daño de Sombras y él conserva {unboundBonusNormal} más de daño hasta la siguiente vinculación.",
+        "bindingSigilHeroicSummary": "Cada {everyHeroic} s, un sigilo de los antiguos resguardos fulgura en una de las dos plataformas que flanquean el trono, a {sideOffset} yardas a la izquierda o derecha de la banda respecto al lugar donde estaba Nythraxis al iniciar el combate, alternando de lado en cada lanzamiento. Comienza Ascensión inmortal y obtiene {ascensionHeroic} de daño y velocidad de ataque cada {ascensionEvery} s. Si se coloca sobre el sigilo en {bindHeroic} s, queda Vinculado: se elimina la Ascensión, queda aturdido durante {stunHeroic} s y recibe {vulnerability} más de daño durante {boundHeroic} s. Si no, cada miembro de la banda recibe {unboundHitHeroic} de su salud máxima como daño de Sombras y él conserva {unboundBonusHeroic} más de daño hasta la siguiente vinculación.",
         "bindingSigilResponse": "El tanque arrastra a Nythraxis hasta el sigilo de inmediato, atravesando cualquier fuego que haya dejado la banda. Los cuerpo a cuerpo siguen el arrastre y los de distancia se mantienen fuera del nuevo cono de Quebrantatumbas. Todos lo queman mientras está Vinculado.",
         "raiseFallenName": "Alzar caídos",
         "raiseFallenSummary": "Cada {every} s durante el Trono, Nythraxis alza Guardias reales resucitados detrás de él. Corren hacia su objetivo actual y luchan hasta ser destruidos.",
@@ -4160,7 +4651,7 @@ export const es: EnTranslations = {
         "courtSummary": "En heroico, Nythraxis alza a su corte después de cada Rabia inmortal, interrumpida o no, una vez que haya caído la corte anterior. El Espíritu de Aldren hiende todo lo cercano a su objetivo con Hendidura real. El Espíritu de Malric canaliza Alivio de Malric, sanando cada vez más a Nythraxis con cada lanzamiento. El Espíritu de Voss ignora las provocaciones y caza a la banda.",
         "courtResponse": "Los tanques recogen a Aldren y giran su hendidura lejos de la banda. Aturde o silencia a Malric en cuanto empiece Alivio de Malric y mátalo primero; luego enraíza o aturde a Voss lejos de los sanadores, ya que no se le puede provocar, y acábalo después.",
         "kingsWrathName": "Ira del rey",
-        "kingsWrathSummary": "Nythraxis deals {bonusNormal} more damage on Normal or {bonusHeroic} on Heroic for the rest of the fight. Grave Eruption occurs every {eruptionEveryNormal} sec ({eruptionEveryHeroic} on Heroic).",
+        "kingsWrathSummary": "Nythraxis inflige {bonusNormal} más de daño en normal o {bonusHeroic} en heroico durante el resto del combate. Erupción sepulcral ocurre cada {eruptionEveryNormal} s ({eruptionEveryHeroic} en heroico).",
         "kingsWrathResponse": "Usa los tiempos de reutilización defensivos restantes para el daño inevitable. Mantén limpias todas las mecánicas anteriores mientras la banda termina el combate.",
         "boneStormName": "Tormenta ósea",
         "boneStormSummary": "Comenzando {first} seg en la Ira del Rey y cada {everyNormal} seg después, Nythraxis comienza Tormenta ósea por {duration} seg. Ignora la amenaza, se mueve a {speed} veces la velocidad normal e realiza {charges} cargas de {chargeSeconds} seg cada una. Su torbellino inflige {whirlNormal} de la salud máxima cada segundo dentro de {radius} yd. Cada carga termina en un Golpe óseo dentro del mismo radio por {slamNormal} de la salud máxima. Cualquier marca de Desgarro de alma activa se libera sin resolver en el instante en que comienza la tormenta, y una tormenta nunca comienza justo después de una detonación de Desgarro de alma. Quebrantatumbas se reactiva {rearm} seg después de que la tormenta termina.",
@@ -4177,62 +4668,72 @@ export const es: EnTranslations = {
         "thatchbound": "Old Thatchgrin pulls your strings. You cannot act: you are walked to your nearest ally and strike them every {every} sec for {min} to {max} damage (up to {mult} times as much against a level {level} ally). Ends early when you take damage equal to {pct}% of your maximum health, or when an ally dispels it (Magic)."
       },
       "wildheart": {
-        "packBond": "Takes {pct}% less damage while its partner stands close. Pull the Beastmaster and his jaguar apart to break it.",
-        "packBondFury": "Deals {pct}% more damage while its partner stands close.",
-        "stalked": "The Great Jaguar hunts you and ignores taunts. Each bite deals {min} to {max} physical damage ({heroicMin} to {heroicMax} on Heroic) and opens a bleed. Kite it away from its master.",
-        "waryStuns": "A stun has landed on it. Further stuns slide off until this ends.",
-        "waryRoots": "A root has landed on it. Further roots slide off until this ends.",
-        "warySlows": "A slow has landed on it. Further slows slide off until this ends.",
-        "pollinated": "Touching a Seedpod makes it sprout a Thorn Sprout at once. Stay off the seeds and let a clean player stomp them; an untouched pod sprouts after {seconds} sec (on Heroic it burrows after {heroic} sec and rises beside the nearest player).",
-        "prey": "Zulgar hunts you. Lead him across a lit sun glyph to slow him by {slow}%. If he catches you, you are Mauled for {damage} damage ({heroic} on Heroic) and knocked down for {stun} sec.",
-        "avatar": "Moves {pct}% faster and hunts its Prey. Slows and roots take hold, and stuns last half as long.",
-        "vanished": "Hidden and immune to damage. He is about to pounce on the farthest player."
+        "packBond": "Recibe un {pct}% menos de daño mientras su compañero permanece cerca. Separa al Maestro de Bestias de su jaguar para romperlo.",
+        "packBondFury": "Inflige un {pct}% más de daño mientras su compañero permanece cerca.",
+        "stalked": "El Gran Jaguar te persigue e ignora las provocaciones. Cada mordisco inflige de {min} a {max} de daño físico (de {heroicMin} a {heroicMax} en heroico) y abre una hemorragia. Atráelo lejos de su amo sin dejar que te alcance.",
+        "waryStuns": "Un aturdimiento le ha afectado. Los aturdimientos adicionales no surten efecto hasta que esto termine.",
+        "waryRoots": "Una raíz le ha afectado. Las raíces adicionales no surten efecto hasta que esto termine.",
+        "warySlows": "Una ralentización le ha afectado. Las ralentizaciones adicionales no surten efecto hasta que esto termine.",
+        "pollinated": "Tocar una vaina de semillas hace que brote un Brote Espinoso al instante. Evita las semillas y deja que las pise un jugador sin este efecto; una vaina intacta brota tras {seconds} s (en heroico se entierra tras {heroic} s y emerge junto al jugador más cercano).",
+        "prey": "Zulgar te persigue. Guíalo por un glifo solar encendido para ralentizarlo un {slow}%. Si te alcanza, te deja Magullado por {damage} de daño ({heroic} en heroico) y te derriba durante {stun} s.",
+        "avatar": "Se mueve un {pct}% más rápido y persigue a su Presa. Las ralentizaciones y raíces surten efecto, y los aturdimientos duran la mitad.",
+        "vanished": "Oculto e inmune al daño. Está a punto de abalanzarse sobre el jugador más lejano.",
+        "sunstruck": "Golpeado por un glifo solar encendido: se mueve un {pct}% más despacio.",
+        "sunstruckExposed": "Golpeado por un glifo solar encendido: recibe un {pct}% más de daño.",
+        "sunWary": "Ningún glifo solar puede golpearlo hasta que termine este efecto. Los glifos encendidos que cruce permanecen encendidos.",
+        "pinned": "Una Lanza de caza te inmoviliza. Sangras y recibes {bleed} de daño Físico ({heroicBleed} en Heroico) cada {every} s, y Pulso de Corazón Salvaje te golpea estés donde estés con un {pulse}% más de daño. Un compañero puede extraer la lanza en {pull} s. Si nadie más está libre, extráela tú en {wrench} s. Se suelta tras {seconds} s.",
+        "idolAwake": "El jaguar de piedra ha despertado. Cada {every} s exhala sobre una mitad de la terraza y luego sobre la otra, tras un aviso de {warning} s en el suelo: entre {min} y {max} de daño de Naturaleza ({heroicMin} a {heroicMax} en Heroico) a todos en esa mitad. Zulgar permanece como Avatar del Jaguar hasta morir y elige una Presa nueva cada {seconds} s ({heroicSeconds} s en Heroico)."
+      },
+      "temple": {
+        "scoreWard": "Canta la partitura: no recibe daño hasta que termine. Pisa las baldosas lunares en el orden en que sonaron antes de que termine el verso para quebrar su voz. Respetad los turnos: tras tocar una nota, espera a que otro jugador toque la siguiente nota correcta. El único superviviente puede terminar solo. Si el verso termina antes, Discordia inflige entre {min} y {max} de daño de Escarcha ({heroicMin} a {heroicMax} en Heroico) a todos en el patio.",
+        "brokenVoice": "Su voz está quebrada: recibe un {pct}% más de daño hasta que termine este efecto.",
+        "spentVoice": "No puedes hacer sonar otra baldosa lunar hasta que otro jugador toque la siguiente nota correcta. Pisar una baldosa durante este efecto no reinicia la respuesta ni te daña. No se puede disipar. Se elimina cuando eres el único jugador vivo de tu estancia o termina la partitura."
       },
       "bastion": {
-        "brineColumn": "Rooted in a column of sea water: you take {min} to {max} Nature damage every {tick} sec for up to {seconds} sec. Interrupt or stun the Tidebound Acolyte to break it.",
-        "halberdWall": "Takes {pct}% less damage while another Drowned Watchman stands within {radius} yd. Pull them apart.",
-        "fogShroud": "Takes {pct}% less damage while it stands in the Fog Bank. Drag it out of the fog.",
-        "carrionGlut": "Fed on the dead ({stacks} of {max}): each stack makes its Soul Release {radius} yd wider and {pct}% stronger.",
-        "snappedFetters": "Its chains are broken. It no longer fights, cannot be harmed, and soon leaves.",
-        "anchored": "Chained to the Drowned Anchor: you can move, but never farther from the winch, which reels you toward the Drowning Pit. Reach within {reach} yd of a lit mooring post at least {run} yd from where you were hooked to moor the chain (that post goes dark for {dark} sec), or have your group break it with {links} hits ({linksHeroic} on Heroic). The pit takes {pit}% of your maximum health ({pitHeroic}% on Heroic)."
+        "brineColumn": "Inmovilizado en una columna de agua marina: recibes de {min} a {max} de daño de Naturaleza cada {tick} s durante un máximo de {seconds} s. Interrumpe o aturde al Acólito de la Marea para romperla.",
+        "halberdWall": "Recibe un {pct}% menos de daño mientras haya otro Vigía Ahogado a menos de {radius} yardas. Sepáralos.",
+        "fogShroud": "Recibe un {pct}% menos de daño mientras está en Banco de niebla. Sácalo de la niebla.",
+        "carrionGlut": "Alimentado de los muertos ({stacks} de {max}): cada acumulación amplía Liberación de almas {radius} yardas y aumenta su potencia un {pct}%.",
+        "snappedFetters": "Sus cadenas están rotas. Ya no lucha, no puede recibir daño y pronto se marcha.",
+        "anchored": "Encadenado al Ancla ahogada: puedes moverte, pero nunca alejarte más del torno, que te arrastra hacia la Fosa de ahogamiento. Acércate a menos de {reach} yardas de un poste de amarre encendido situado al menos a {run} yardas del punto donde quedaste enganchado para amarrar la cadena (ese poste se apaga durante {dark} s), o haz que tu grupo la rompa con {links} golpes ({linksHeroic} en heroico). La fosa te quita el {pit}% de tu salud máxima ({pitHeroic}% en heroico)."
       },
       "crypt": {
-        "carrionEye": "Every crow in the fight hunts you for {seconds} sec. Run to your tank so the flock can be cut down together.",
-        "graniteSkin": "Takes {pct}% less damage, and the stone thickens every {every} sec, up to {max} layers. A stun shatters it and leaves it taking {cracked}% more damage for {seconds} sec.",
-        "measured": "When this ends, an Open Grave caves in where you stand: {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd. The grave stays for the rest of the fight, so carry the mark to the edge of the yard, away from the group.",
-        "graveDirt": "Standing in an Open Grave: movement speed reduced by {slow}% and {damage} Shadow damage every second ({heroic} on Heroic). On Heroic, lingering {linger} sec in a grave raises a Restless Bones. Step out of the grave.",
-        "dirtInEyes": "Reduces movement speed by {pct}%. Shovelful hits everyone in front of Sexton Marrow: stand behind him.",
-        "blow": "Increases damage taken by {pct}%: {per}% for each stack, {stacks} of {max} now. Each Gravedigger's Blow adds a stack and resets the duration to {seconds} sec.",
-        "graveVigor": "Attacks {pct}% faster while he stands in an Open Grave. Keep him out of the graves.",
-        "tolling": "Immune to damage while he strides to the bell rope and rings the Burial Bell. When the ringing ends, the Toll deals {min} to {max} Shadow damage ({heroicMin} to {heroicMax} on Heroic) to everyone, and every Open Grave gives up a Restless Bones.",
-        "embraced": "Held aloft in the Lady's arms: unable to act, taking {tick} Frost damage every second ({tickHeroic} on Heroic). If your group deals {share}% of her maximum health ({shareHeroic}% on Heroic) she sets you down gently; if she holds you {hold} sec at the top she drops you onto the ice for {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic).",
-        "lament": "When Bride's Lament ends, it deals {min} to {max} Frost damage ({heroicMin} to {heroicMax} on Heroic) to everyone not within {radius} yd of a lit grave lantern. A lantern shelters the {cap} players nearest it, then goes dark and misses the next Lament.",
-        "lingering": "Your next Bride's Lament deals {pct}% more damage: {per}% for each stack, up to {max} stacks. Take the next one in a lantern's light.",
-        "slippery": "On slick ice: your speed changes by at most {grip} yd/sec each second, so you are slow to get going, slide on when you stop, and swing wide when you turn. Step off the ice to get your footing back.",
-        "harmony": "Takes {pct}% less damage: {per}% for each of her living Choristers. Kill the Choristers first.",
-        "crescendo": "Sings faster: the Dirge of the Hollow takes {cast} sec instead of {castNormal} sec and comes every {every} sec instead of {everyNormal} sec, and the Bone Organ plays {waves} waves of notes instead of {wavesNormal}.",
-        "gorged": "Deals {pct}% more damage: {per}% for each Bound Soul that reached him, {stacks} of {max} now, for the rest of the fight. Each soul that reaches him also heals him for {heal}% of his maximum health. Step into a soul's path to take it instead.",
-        "unquietWard": "Immune to damage while he channels the Rite of the Unquiet at the altar: {lit} of {total} Remembrance Candles relit. Relighting one is a {channel} sec channel that drains {drain}% of the lighter's maximum health every second ({drainHeroic}% on Heroic); hits do not break it, a step or a stun does. The last candle shatters the ward. On Heroic, light them in the order the Ledger names: a wrong candle snuffs the last one lit and deals {wrongMin} to {wrongMax} Shadow damage to the lighter.",
-        "riteBroken": "Stunned: the shattered ward leaves him unable to act for {seconds} sec.",
-        "shatteredWard": "Takes {pct}% more damage for {seconds} sec: the relit candles broke his ward. Spend your strongest attacks now.",
-        "graveChill": "Takes {bite} Shadow damage every second ({biteHeroic} on Heroic) while the Rite of the Unquiet holds, rising by {step} ({stepHeroic} on Heroic) every {every} sec. Relight the Remembrance Candles to end it.",
-        "graspMark": "Hands erupt from the ring under you in {fuse} sec: everyone within {radius} yd of where it was laid is rooted for {root} sec and takes {min} to {max} Shadow damage. Step out of the ring.",
-        "graspRoot": "Held by the grave's hands: unable to move for {seconds} sec.",
-        "knellAirborne": "On the wing over the Rite Ring, out of reach. It marks half of the ring for {mark} sec, then pours ghost fire over that half: {min} to {max} Fire damage to everyone in it. It burns {breaths} halves each flight, then lands."
+        "carrionEye": "Todos los cuervos del combate te persiguen durante {seconds} s. Corre hacia tu tanque para que se pueda abatir a toda la bandada junta.",
+        "graniteSkin": "Recibe un {pct}% menos de daño y la piedra se engrosa cada {every} s, hasta {max} capas. Un aturdimiento la rompe y hace que reciba un {cracked}% más de daño durante {seconds} s.",
+        "measured": "Cuando termina, se abre una Tumba abierta donde estés: de {min} a {max} de daño (de {heroicMin} a {heroicMax} en heroico) a todos a menos de {radius} yardas. La tumba permanece durante el resto del combate, así que lleva la marca al borde del patio, lejos del grupo.",
+        "graveDirt": "Dentro de una Tumba abierta: velocidad de movimiento reducida un {slow}% y {damage} de daño de Sombras cada segundo ({heroic} en heroico). En heroico, permanecer {linger} s en una tumba alza unos Huesos Inquietos. Sal de la tumba.",
+        "dirtInEyes": "Reduce la velocidad de movimiento un {pct}%. Palada golpea a todos delante del Sacristán Marrow: colócate detrás de él.",
+        "blow": "Aumenta el daño recibido un {pct}%: {per}% por acumulación, ahora {stacks} de {max}. Cada Golpe del sepulturero añade una acumulación y reinicia la duración a {seconds} s.",
+        "graveVigor": "Ataca un {pct}% más rápido mientras está en una Tumba abierta. Mantenlo fuera de las tumbas.",
+        "tolling": "Inmune al daño mientras avanza hasta la cuerda de la campana y hace sonar la Campana Funeraria. Cuando termina el tañido, el Toque inflige de {min} a {max} de daño de Sombras (de {heroicMin} a {heroicMax} en heroico) a todos, y cada Tumba abierta libera unos Huesos Inquietos.",
+        "embraced": "Sostenido en alto en brazos de la Dama: no puedes actuar y recibes {tick} de daño de Escarcha cada segundo ({tickHeroic} en heroico). Si tu grupo le inflige un daño equivalente al {share}% de su salud máxima ({shareHeroic}% en heroico), te deja en el suelo suavemente; si te mantiene arriba {hold} s, te deja caer sobre el hielo y recibes de {min} a {max} de daño (de {heroicMin} a {heroicMax} en heroico).",
+        "lament": "Cuando termina Lamento de la novia, inflige de {min} a {max} de daño de Escarcha (de {heroicMin} a {heroicMax} en heroico) a todos los que no estén a menos de {radius} yardas de un farol sepulcral encendido. Cada farol protege a los {cap} jugadores más cercanos, luego se apaga y no sirve para el siguiente Lamento.",
+        "lingering": "Tu próximo Lamento de la novia te inflige un {pct}% más de daño: {per}% por acumulación, hasta {max} acumulaciones. Recibe el siguiente bajo la luz de un farol.",
+        "slippery": "Sobre hielo resbaladizo: tu velocidad cambia como máximo {grip} yardas/s cada segundo, así que tardas en arrancar, sigues deslizándote al parar y trazas curvas amplias al girar. Sal del hielo para recuperar el equilibrio.",
+        "harmony": "Recibe un {pct}% menos de daño: {per}% por cada uno de sus coristas vivos. Mata primero a los coristas.",
+        "crescendo": "Canta más rápido: Canto fúnebre de la oquedad tarda {cast} s en lugar de {castNormal} s y llega cada {every} s en lugar de cada {everyNormal} s; Órgano de hueso toca {waves} oleadas de notas en lugar de {wavesNormal}.",
+        "gorged": "Inflige un {pct}% más de daño: {per}% por cada Alma atada que le haya alcanzado, ahora {stacks} de {max}, durante el resto del combate. Cada alma que lo alcanza también le restaura el {heal}% de su salud máxima. Interponte en la trayectoria de un alma para recibirla tú.",
+        "unquietWard": "Inmune al daño mientras canaliza Rito de los inquietos en el altar: {lit} de {total} Velas del Recuerdo reencendidas. Reencender una requiere canalizar {channel} s y drena el {drain}% de la salud máxima de quien la enciende cada segundo ({drainHeroic}% en heroico); los golpes no interrumpen, pero moverse o un aturdimiento sí. La última vela rompe el resguardo. En heroico, enciéndelas en el orden que indica el Registro: una vela incorrecta apaga la última encendida e inflige de {wrongMin} a {wrongMax} de daño de Sombras a quien la enciende.",
+        "riteBroken": "Aturdido: el resguardo destrozado le impide actuar durante {seconds} s.",
+        "shatteredWard": "Recibe un {pct}% más de daño durante {seconds} s: las velas reencendidas han roto su resguardo. Usa ahora tus ataques más potentes.",
+        "graveChill": "Recibe {bite} de daño de Sombras cada segundo ({biteHeroic} en heroico) mientras dura Rito de los inquietos; aumenta en {step} ({stepHeroic} en heroico) cada {every} s. Vuelve a encender las Velas del Recuerdo para terminarlo.",
+        "graspMark": "En {fuse} s brotan manos del círculo bajo tus pies: todos a menos de {radius} yardas del lugar donde se colocó quedan inmovilizados durante {root} s y reciben de {min} a {max} de daño de Sombras. Sal del círculo.",
+        "graspRoot": "Sujeto por las manos de la tumba: no puedes moverte durante {seconds} s.",
+        "knellAirborne": "Vuela sobre el Círculo Ritual, fuera de alcance. Marca la mitad del círculo durante {mark} s y luego vierte fuego fantasmal sobre esa mitad: de {min} a {max} de daño de Fuego a todos los que estén dentro. Quema {breaths} mitades en cada vuelo y luego aterriza."
       },
       "sanctum": {
-        "lockbound": "Takes {pct}% less damage: {per}% for each of his chains that still holds. Break a Seal Shackle to drop its chain.",
-        "enrage": "Deals {pct}% more damage.",
-        "grasp": "Stands in meltwater and deals {pct}% more damage. If it dies in meltwater it sinks and rises again {seconds} sec later; kill it on cold ice to keep it down.",
-        "twiceWoken": "Rose again from the meltwater and deals {pct}% more damage.",
-        "doused": "His plate broke under him and the quench-water put out his Grave Inferno.",
-        "airborne": "In the air and cannot be attacked. He lands with Crashing Descent on the plate where the most players stand, dealing {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone within {radius} yd.",
-        "wyrmsEye": "When this ends, Korzul pours Plunging Fire over the whole plate you stand on: {min} to {max} damage ({heroicMin} to {heroicMax} on Heroic) to everyone on it, and the plate cracks, or breaks if it was already cracked. Stand on sound ice, away from the group.",
-        "quenchWater": "In open quench-water: slowed by {slow}% and burned for {damage} damage every second ({heroic} on Heroic). Swim to any plate or the shore.",
-        "shardFlare": "The heart-shard flares: Grave Breath every {breath} sec and Wing Gale every {gale} sec.",
-        "branded": "Deals {value} {school} damage every {interval} sec for {seconds} sec. Step into a meltwater pool to put it out at once.",
-        "creepingRime": "Reduces movement speed by {pct}%, {per}% for each stack. Each Rime Breath adds a stack and resets the duration to {seconds} sec. Reaching {max} stacks freezes you solid (Iced Over) for {freeze} sec and clears them.",
-        "icedOver": "Frozen solid by Creeping Rime: unable to move or act."
+        "lockbound": "Recibe un {pct}% menos de daño: {per}% por cada una de sus cadenas que sigue intacta. Rompe un Grillete del sello para soltar su cadena.",
+        "enrage": "Inflige un {pct}% más de daño.",
+        "grasp": "Está en agua de deshielo e inflige un {pct}% más de daño. Si muere en ella, se hunde y vuelve a alzarse {seconds} s después; mátalo sobre hielo frío para que no vuelva.",
+        "twiceWoken": "Se ha alzado de nuevo del agua de deshielo e inflige un {pct}% más de daño.",
+        "doused": "Su placa se ha roto bajo sus pies y el agua de temple ha apagado su Infierno sepulcral.",
+        "airborne": "Está en el aire y no puede recibir ataques. Aterriza con Descenso aplastante en la placa donde haya más jugadores e inflige de {min} a {max} de daño (de {heroicMin} a {heroicMax} en heroico) a todos a menos de {radius} yardas.",
+        "wyrmsEye": "Cuando termina, Korzul vierte Fuego descendente sobre toda la placa donde estés: de {min} a {max} de daño (de {heroicMin} a {heroicMax} en heroico) a todos los que estén en ella, y la placa se agrieta o se rompe si ya estaba agrietada. Colócate sobre hielo intacto, lejos del grupo.",
+        "quenchWater": "En agua de temple abierta: ralentizado un {slow}% y quemado por {damage} de daño cada segundo ({heroic} en heroico). Nada hacia cualquier placa o hacia la orilla.",
+        "shardFlare": "La esquirla del corazón fulgura: Aliento sepulcral cada {breath} s y Vendaval de alas cada {gale} s.",
+        "branded": "Inflige {value} de daño de {school} cada {interval} s durante {seconds} s. Entra en un charco de agua de deshielo para apagarlo de inmediato.",
+        "creepingRime": "Reduce la velocidad de movimiento un {pct}%, {per}% por acumulación. Cada Aliento de escarcha añade una acumulación y reinicia la duración a {seconds} s. Al alcanzar {max} acumulaciones, quedas completamente congelado (Cubierto de hielo) durante {freeze} s y se eliminan las acumulaciones.",
+        "icedOver": "Congelado por completo por Escarcha creciente: no puedes moverte ni actuar."
       },
       "sharedPyre": "Inflige un {total}% de la salud máxima de cada jugador, dividido entre el número de jugadores dentro del círculo (un {perPlayer}% cada uno con {players} jugadores).",
       "varkhulSharedPyre": "Inflige un {total}% de la salud máxima de cada jugador, repartido entre quienes estén dentro del círculo ({perPlayer}% por persona con {players} jugadores). Cada plaza ausente también inflige un {missingPenalty}% de la salud máxima a toda la banda, incluidos los jugadores dentro del círculo.",
@@ -4277,10 +4778,10 @@ export const es: EnTranslations = {
       "elementalConvergencePrimed": "Tu próximo hechizo de la otra escuela elemental otorga Convergencia Elemental",
       "hunterFerocity": "{stacks} de Ferocidad de Manada: tu mascota inflige un {pct}% más de daño",
       "cooldownCap": "Has usado {used} de {cap} s de reducción de reutilización en esta ventana",
-      "bruinRushWindow": "Forma de lobo no cuesta maná e Inmoviliza a tu objetivo de Embestida de Bruin, ralentizándolo un {pct}% durante {sec} s",
+      "bruinRushWindow": "Forma felina no cuesta maná e Inmoviliza a tu objetivo de Embestida de Bruin, ralentizándolo un {pct}% durante {sec} s",
       "funeralHarvestLock": "Cosecha funeraria aún no puede crear otro fragmento de alma",
-      "effigyPlankHide": "Turns away {pct}% of every blow, until a Shardpike thrust puts out the lantern in its eye",
-      "effigyLanternOut": "The Straw Foreman's lantern is out for you: your blows and your pet's ignore its Plank Hide and land in full",
+      "effigyPlankHide": "Rechaza el {pct}% de cada golpe hasta que una estocada de Pica de Fragmentos apaga el farol de su ojo",
+      "effigyLanternOut": "El farol del Capataz de Paja está apagado para ti: tus golpes y los de tu mascota ignoran su Coraza de tablones y causan todo su daño",
       "leadenHexLock": "Maleficio plomizo aún no puede volver a inmovilizar a este objetivo",
       "forbiddenReflectionReady": "Puedes volver a usar tu próxima facultad de brujo con reutilización que cumpla los requisitos",
       "forbiddenReflectionLock": "Reflejo prohibido aún no puede volver a prepararse",
@@ -4330,8 +4831,8 @@ export const es: EnTranslations = {
       "coldsightRead": "Tu siguiente Tiro largo inflige un {longDrawPct}% más de daño, o tu siguiente Tiro aciago inflige un {fellShotPct}% más",
       "duskEconomy": "Las habilidades cuestan un {pct}% menos de energía",
       "moontide": "Marea Lunar: fase {stacks} de {max}. Los lanzamientos de Descarga Silvestre, Caída Celeste y Semilla Lunar la llenan en Forma de lechúcico lunar; con {max}, Semilla Lunar se convierte en Oleada Lunar y Caída Celeste en Estela Solar, y cualquiera de las dos la gasta",
-      "oldBlood": "Sangre Antigua: fase {stacks} de {max}. Los golpes conectados de lobo y Bruin comparten este banco; con {max}, Mordisco Sangriento o Rompehuesos se transforma",
-      "verdance": "Verdor {stacks}/{max}. Cada Floración Silvestre o Segundo Florecer NUEVO que plantes añade 1. Con {max}, Alivio presto se convierte en Sobrefloración",
+      "oldBlood": "Sangre Antigua: fase {stacks} de {max}. Los golpes conectados de gato y Bruin comparten este banco; con {max}, Mordisco Sangriento o Rompehuesos se transforma",
+      "verdance": "Verdor {stacks}/{max}. Cada Remiendo de Esporas, Segundo Florecer o Cura Silvestre que lances añade 1, y cada punto acorta el lanzamiento de Cura Silvestre. Con {max}, Alivio presto se convierte en Sobrefloración",
       "freeExecute": "Tu próxima facultad de ejecución válida no cuesta recursos",
       "resourceSap": "Restaura {value} de tu recurso actual cada {interval} s",
       "nextAttackCrit": "Tu próximo ataque tiene golpe crítico garantizado",
@@ -4359,16 +4860,16 @@ export const es: EnTranslations = {
         "riftGuard": "Recibes un {pct}% menos de daño.",
         "sprint": "Velocidad de movimiento aumentada un {pct}%. No se acumula con otros aumentos de velocidad.",
         "brand": "La sanación recibida se reduce un {pct}%.",
-        "shackle": "Chained in place: cannot move.",
-        "shackleSlow": "Chained: movement speed reduced by {pct}%.",
-        "spiritPack": "A spirit jaguar fights beside you, biting your target for {min} to {max} Physical damage every {every} sec.",
-        "seedburst": "A Gorgebloom seed. When this expires it bursts for {damage} Nature damage to each enemy within {radius} yd, or {bonus}% more ({empowered}) if this enemy dies before then.",
-        "tether": "Chained by Foreman's Last Link: {pct}% of the damage that would reach your health is dealt to the one who chained you instead.",
-        "tetherLink": "You take {pct}% of the damage your chained ally would take.",
-        "harvest": "Each hostile creature that dies within {radius} yd of you restores {pct}% of your maximum health and mana.",
-        "quench": "Your next {stacks} weapon hits deal {damage} extra Frost damage. The last one slows the target's attacks by {slow}%.",
-        "quenchOther": "The next {stacks} weapon hits deal extra Frost damage. The last one slows the target's attacks by {slow}%.",
-        "quenched": "Attack speed slowed by {pct}%.",
+        "shackle": "Encadenado en el sitio: no puede moverse.",
+        "shackleSlow": "Encadenado: velocidad de movimiento reducida un {pct}%.",
+        "spiritPack": "Un jaguar espiritual lucha a tu lado y muerde a tu objetivo por de {min} a {max} de daño Físico cada {every} s.",
+        "seedburst": "Una semilla de Flor Devoradora. Al expirar, estalla e inflige {damage} de daño de Naturaleza a cada enemigo a menos de {radius} yardas, o un {bonus}% más ({empowered}) si este enemigo muere antes.",
+        "tether": "Encadenado por Último eslabón del capataz: el {pct}% del daño que alcanzaría tu salud se inflige en su lugar a quien te encadenó.",
+        "tetherLink": "Recibes el {pct}% del daño que recibiría tu aliado encadenado.",
+        "harvest": "Cada criatura hostil que muere a menos de {radius} yardas de ti restaura el {pct}% de tu salud y maná máximos.",
+        "quench": "Tus siguientes {stacks} golpes de arma infligen {damage} de daño de Escarcha adicional. El último ralentiza los ataques del objetivo un {slow}%.",
+        "quenchOther": "Los siguientes {stacks} golpes de arma infligen daño de Escarcha adicional. El último ralentiza los ataques del objetivo un {slow}%.",
+        "quenched": "Velocidad de ataque reducida un {pct}%.",
         "forgeHeat": "Calor: {stacks}/{max}. Usar el Temple del Padre de la Forja lo gasta todo, y su fuego de arma inflige un {pct}% más de daño.",
         "tempered": "Tus golpes de arma cuerpo a cuerpo y a distancia infligen {damage} de daño de fuego adicional (un {pct}% más por el calor gastado). Cada golpe de gracia añade {killExtend} s, hasta {maxDuration} s en total.",
         "temperedOther": "Los golpes de arma cuerpo a cuerpo y a distancia infligen daño de fuego adicional, un {pct}% más por el calor gastado. El daño aumenta con el poder de ataque o el poder de ataque a distancia, el que sea mayor.",
@@ -4377,10 +4878,10 @@ export const es: EnTranslations = {
         "moltenIgnite": "Inflige {damage} de daño de fuego cada {every} s. Otro golpe crítico de arma lo reinicia.",
         "pierce": "Tus ataques automáticos, disparos y habilidades físicas (no sangrados) también golpean al enemigo más cercano a tu objetivo a {reach} m o menos por el {pct}% del daño infligido.",
         "lantern": "Una sanación directa de cualquiera sobre ti o un miembro del grupo a {radius} m o menos del farol también sana al otro miembro del grupo más herido bajo su luz por el {pct}% de la sanación.",
-        "foremanShape": "You are the Foreman: {armorPct}% more armor and immune to knockbacks.",
-        "musterStandard": "Your Muster Standard is planted. Its soldiers march with you and fight your target.",
-        "gutteredGlare": "The beam deals {tick} Arcane damage every {every} sec to enemies in its path. Moving or casting ends it.",
-        "stoneStatue": "Turned to stone: immune to damage and unable to act. You return with {pct}% of your maximum health.",
+        "foremanShape": "Eres el Capataz: un {armorPct}% más de armadura e inmunidad a los empujones.",
+        "musterStandard": "Tu Estandarte de la leva está plantado. Sus soldados marchan contigo y luchan contra tu objetivo.",
+        "gutteredGlare": "El haz inflige {tick} de daño Arcano cada {every} s a los enemigos en su trayectoria. Moverse o lanzar un hechizo lo termina.",
+        "stoneStatue": "Convertido en piedra: inmune al daño y sin poder actuar. Vuelves con el {pct}% de tu salud máxima.",
         "crucibleHeat": "Calor: {stacks}/{max}. Usa el Corazón del Crisol para gastarlo todo en una nova de fuego que inflige {damage} de daño de fuego a cada enemigo a {radius} m o menos y provoca a cada criatura que alcanza.",
         "crucibleHeatOther": "Calor: {stacks}/{max}. El Corazón del Crisol lo gasta todo en una nova de fuego a {radius} m o menos que inflige más daño de fuego por cada acumulación y provoca a cada criatura que alcanza."
       },
@@ -4449,6 +4950,7 @@ export const es: EnTranslations = {
       "formTravel": "Forma Fleet: velocidad de movimiento aumentada un {pct}%",
       "formFireball": "Forma de Brasa: velocidad de movimiento aumentada un {pct}%; ataques y hechizos desactivados",
       "formMoonkin": "Forma de ala lunar: daño con hechizos aumentado un {pct}% y armadura aumentada un {armorPct}%",
+      "formSporemender": "Forma de Sanador de Esporas: sanación aumentada un {pct}%, armadura aumentada un {armorPct}% y velocidad de movimiento reducida un {slowPct}%",
       "formShadow": "Forma de velo umbrío: daño de las Sombras aumentado un {pct}%",
       "resourceCount": "{value} de {max}",
       "formLich": "Lanza de alma también golpea hasta a {targets} enemigos cercanos por un {pct}% de daño",
@@ -4537,7 +5039,9 @@ export const es: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
+      "hillBountyTag": "Recompensa {honor}",
       "pvpTag": "JcJ",
+      "bountyTag": "Recompensa por captura",
       "cheaterTag": "< Tramposo >",
       "pledgeTag": "Juramento a {guild}",
       "npcRoleTag": "<{role}>",
@@ -4562,7 +5066,7 @@ export const es: EnTranslations = {
         "potionVendor": "Vendedor de pociones",
         "stableMaster": "Maestro estable",
         "generalGoods": "Bienes Generales",
-        "innkeeper": "Innkeeper"
+        "innkeeper": "Tabernero"
       }
     },
     "mobTooltip": {
@@ -4642,11 +5146,12 @@ export const es: EnTranslations = {
         "menu": "Menú",
         "minimap": "Minimapa",
         "stanceBar": "Barra de actitud",
-        "shardpikeBar": "Shardpike Bar",
+        "shardpikeBar": "Barra de la Pica de Fragmentos",
         "xpBar": "Barra de experiencia",
         "chat": "Chat",
         "actionBarGroup": "Barras de acción",
         "playerFrame": "Jugador",
+        "playerResource": "Barra de recursos",
         "targetFrame": "Objetivo",
         "partyFrames": "Grupo",
         "swingBar": "Ataque automático",
@@ -4660,9 +5165,9 @@ export const es: EnTranslations = {
         "deedTracker": "Seguimiento de hazañas",
         "delveTracker": "Seguimiento de exploraciones",
         "riftTracker": "Seguimiento de fallas",
-        "dungeonTracker": "Dungeon Tracker",
+        "dungeonTracker": "Seguimiento de mazmorra",
         "swingBarOffhand": "Mano izquierda",
-        "unitTooltip": "Tooltip"
+        "unitTooltip": "Información emergente"
       },
       "framesMenu": "Ajustes de marcos",
       "framesMenuTitle": "Muestra u oculta marcos individuales. Un marco sin marcar permanece oculto hasta que vuelvas a marcarlo o restablezcas los valores predeterminados.",
@@ -4700,6 +5205,37 @@ export const es: EnTranslations = {
       "imported": "Configuración de atajos importada.",
       "wrongKind": "Ese código es una exportación de configuración, no una configuración de atajos."
     },
+    "keybindLayout": {
+      "title": "Distribución del teclado",
+      "open": "Convertir",
+      "from": "Atajos creados para",
+      "to": "Convertir a",
+      "keepMovement": "Mantener las teclas de movimiento en su sitio",
+      "keepMovementLocked": "Las teclas de movimiento se conservaron la última vez y volverán a conservarse. Restablece los valores predeterminados para empezar de nuevo.",
+      "help": "Cada atajo pasa a la tecla que escribe el mismo carácter en la nueva distribución. La fila numérica conserva su posición. Los nombres de esta lista son posiciones QWERTY; el esquema del teclado muestra tu distribución.",
+      "moves": "Atajos que cambiarán de posición: {count}",
+      "noChange": "Ningún atajo cambia entre estas distribuciones.",
+      "apply": "Convertir atajos",
+      "converted": "Atajos convertidos de {from} a {to}.",
+      "layouts": {
+        "qwertyUs": "QWERTY (Estados Unidos)",
+        "qwertyUk": "QWERTY (Reino Unido)",
+        "qwertzDe": "QWERTZ (alemán)",
+        "qwertzCh": "QWERTZ (suizo)",
+        "azertyFr": "AZERTY (francés)",
+        "azertyBe": "AZERTY (belga)",
+        "qwertyEs": "QWERTY (español)",
+        "qwertyIt": "QWERTY (italiano)",
+        "qwertyNordic": "QWERTY (sueco, finés)",
+        "qwertyDa": "QWERTY (danés)",
+        "qwertyNo": "QWERTY (noruego)",
+        "qwertyBr": "QWERTY (brasileño ABNT2)",
+        "qwertyPt": "QWERTY (portugués)",
+        "qwertyTr": "QWERTY (turco)",
+        "dvorak": "Distribución Dvorak",
+        "colemak": "Distribución Colemak"
+      }
+    },
     "keyboardMap": {
       "title": "Vista del teclado",
       "hint": "Las teclas en uso tienen color por categoría. Pasa el cursor o enfoca una tecla para ver todo lo asignado a ella.",
@@ -4722,7 +5258,7 @@ export const es: EnTranslations = {
       "legendLayout": "Tu distribución",
       "legendQwerty": "QWERTY",
       "layerNone": "Sin modificador",
-      "layerShift": "Shift",
+      "layerShift": "Mayús",
       "layerCtrl": "Ctrl",
       "layerAlt": "Alt",
       "keyDetail": "{key}: {bindings}",
@@ -4788,7 +5324,11 @@ export const es: EnTranslations = {
       "partyTradeWindow": "Puedes intercambiar este objeto con jugadores que compartieron su botín durante los próximos {time}. Equiparlo termina la ventana de intercambio.",
       "perfectedBadge": "Perfeccionado",
       "perfectingRank": "Perfeccionamiento: rango {rank} de {ranks}",
+      "lootedBy": "Despojado por {name} el {date}",
+      "questRewardTo": "Recompensa de misión para {name} el {date}",
+      "obtainedBy": "Obtenido por {name} el {date}",
       "materialSourceGatherer": "{count} × Recolectado por {name}",
+      "trophySkullSource": "{count} × Obtenido de {name}",
       "materialSourceGathererSigned": "{count} × Recolectado por {name}, firmado por {signer}",
       "materialSourceUnrecorded": "{count} × Sin recolector registrado",
       "materialSourceUnrecordedSigned": "{count} × Sin recolector registrado, firmado por {name}",
@@ -4925,12 +5465,11 @@ export const es: EnTranslations = {
       "memberSinceDays": "{days}d en el Discord",
       "roleTag": {
         "levyst": "Levy St",
-        "admin": "Admin",
         "coredevs": "Desarrollador principal",
         "devs": "Dev",
-        "seniormods": "Moderador senior",
+        "seniormods": "Centinela",
         "mods": "Mod",
-        "juniormods": "Moderador junior",
+        "juniormods": "Observador",
         "artists": "Artista",
         "contentcreator": "Creador de contenido",
         "legend": "LEYENDA",
@@ -5233,19 +5772,32 @@ export const es: EnTranslations = {
       "vaultCannotDeposit": "No puede ir en la bóveda",
       "tabsAria": "Pestañas del banco",
       "personalTab": "Privado",
-      "accountTab": "Other characters",
-      "accountArmour": "Claim membership armour",
-      "referralArmour": "Claim friendship armour",
-      "accountMembership": "An active membership lets you access your other characters' banks here.",
-      "accountCharacters": "Character banks",
-      "accountEmpty": "Create another character to use their bank here.",
-      "accountSelect": "Select a character to load their bank.",
-      "accountUnavailable": "This bank is unavailable. Select the character again to refresh.",
-      "accountDeposit": "Your bags: deposit into this bank",
-      "accountWithdraw": "Selected bank: withdraw into your bags",
-      "accountDepositHint": "Click to deposit this stack into the selected character bank.",
-      "accountWithdrawHint": "Click to withdraw this stack into your bags.",
-      "accountBound": "Soulbound, locked and quest items cannot move between characters.",
+      "accountTab": "Otros personajes",
+      "accountArmour": "Reclamar equipo de membresía",
+      "referralArmour": "Reclamar armadura de la amistad",
+      "accountMembership": "Una membresía activa te permite acceder aquí a los bancos de tus otros personajes.",
+      "accountCharacters": "Bancos de personajes",
+      "accountEmpty": "Crea otro personaje para usar su banco aquí.",
+      "accountSelect": "Selecciona un personaje para cargar su banco.",
+      "accountUnavailable": "Este banco no está disponible. Selecciona de nuevo el personaje para actualizar.",
+      "accountLoading": "Cargando tus personajes...",
+      "accountOpening": "Abriendo el banco de {name}...",
+      "accountOnline": "{name} tiene una sesión abierta. Cierra la sesión de ese personaje para abrir su banco aquí.",
+      "accountBusy": "El banco está ocupado. Vuelve a intentarlo en un momento.",
+      "accountNoFit": "No hay espacio para esa pila.",
+      "accountStale": "Esa pila cambió antes de que se pudiera mover. Inténtalo de nuevo.",
+      "accountTooLarge": "El banco de {name} es demasiado grande para abrirlo desde aquí. Inicia sesión como {name} para usarlo.",
+      "accountRetry": "Intentar de nuevo",
+      "accountBankTitle": "Banco de {name}",
+      "accountBagsTitle": "Tus bolsas",
+      "accountSlots": "{used} / {total} espacios",
+      "accountWithdrawLead": "Haz clic en un objeto para moverlo a tus bolsas.",
+      "accountDepositLead": "Haz clic en un objeto para enviarlo al banco de {name}.",
+      "accountBankEmpty": "Este banco está vacío.",
+      "accountBagsEmpty": "Tus bolsas están vacías.",
+      "accountDepositHint": "Haz clic para depositar esta pila en el banco del personaje seleccionado.",
+      "accountWithdrawHint": "Haz clic para retirar esta pila a tus bolsas.",
+      "accountBound": "Los objetos ligados al alma, bloqueados o de misión no pueden pasar entre personajes.",
       "guildTab": "Hermandad",
       "guildCapacityAria": "Espacios del banco de la hermandad usados: {used} de {total}",
       "guildEmpty": "El banco de la hermandad está vacío.",
@@ -5317,187 +5869,57 @@ export const es: EnTranslations = {
       "logAdminPurge": "Un administrador eliminó {count} {item}"
     },
     "collections": {
-      "title": "Hunting",
-      "close": "Close hunting",
-      "keybindLabel": "Hunting",
-      "launcherTitle": "Hunting: buddies, mounts and item sets",
       "tabs": {
-        "buddies": "Buddies",
-        "mounts": "Mounts",
-        "sets": "Item Sets"
+        "buddies": "Compañeros"
       },
       "state": {
-        "owned": "Collected",
-        "notOwned": "Not collected",
-        "unavailable": "Not obtainable yet",
-        "pending": "A presence follows you"
+        "owned": "Conseguido",
+        "notOwned": "Sin conseguir",
+        "unavailable": "Aún no se puede obtener",
+        "pending": "Una presencia te sigue"
       },
-      "presenceDefault": "You feel a presence watching you.",
-      "revealed": "{name} has decided to follow you.",
-      "cosmeticUnlocked": "New look for {name}: {look}.",
+      "presenceDefault": "Sientes una presencia que te observa.",
+      "revealed": "{name} ha decidido seguirte.",
       "presence": {
-        "ember_fox": "Something small and warm is padding along behind you.",
-        "moss_hare": "A rustle in the peat keeps pace with your steps.",
-        "frog": "A wet croak answers every step you take.",
-        "crimson_claw_crab": "Something clicks and scuttles just out of sight.",
-        "golden_sentinel": "A faint gilded glint watches from the grass.",
-        "nightfang": "Silent paws follow where you cannot see.",
-        "tuskhorn_boar": "A snort and a stamp: something stubborn is trailing you.",
-        "emerald_wolf": "Green eyes blink in the undergrowth, then follow.",
-        "tiger": "Stripes shift at the edge of your vision.",
-        "cate_coin": "You hear the faint ring of a coin that is not yours.",
-        "alon": "You feel watched, and quietly approved of.",
-        "trollface": "Somewhere behind you, something is grinning.",
-        "ansem": "A whisper of doors and darkness follows you.",
-        "triple_t": "Three footsteps fall where there should be one.",
-        "kekius": "A stifled laugh trails you down the road.",
-        "solbot": "A soft ticking keeps time with your stride.",
-        "frostfire": "Steam and frost swirl in your wake.",
-        "rocky": "Pebbles shift behind you with no wind to move them.",
-        "proud_grunt": "A boot stamps to attention somewhere behind you.",
-        "loot_goblin": "Something is counting your coins under its breath.",
-        "penny_goldspark": "Tiny tools clink in a pocket that is not yours.",
-        "stag": "A shadow with antlers falls across your path.",
-        "alpaca": "Something woolly and unhurried has decided to come along.",
-        "horse": "Hooves keep an easy, patient beat somewhere behind you.",
-        "sapling": "Little roots patter behind you, stirring the fallen leaves.",
-        "bull": "A low huff of breath stirs the dust behind you.",
-        "spider": "A thread of silk brushes your shoulder.",
-        "raptor": "Quick claws tick over stone at your heels.",
-        "skeleton": "Dry bones rattle in step with yours.",
-        "crystal_lich": "A cold hum rises from the wreckage, and it is watching you.",
-        "forgemaw": "The heat of the forge has not left you. Something walked out with it.",
-        "crystal_tide": "A drop of the sea refuses to fall from your line.",
-        "phantom": "The air behind you is a shade too still.",
-        "emberfall_phoenix": "A warmth like a banked fire settles at your back."
-      },
-      "cosmetic": {
-        "crystal_lich_frostbound": "Frostbound",
-        "crystal_lich_voltaic": "Voltaic",
-        "forgemaw_ashen": "Ashen",
-        "forgemaw_whitehot": "White-Hot",
-        "stag_acorn": "Acorn Crown",
-        "stag_gilded": "Gilded",
-        "moss_hare_verdant": "Verdant",
-        "proud_grunt_warlord": "Warlord",
-        "frog_sapphire": "Sapphire Frog"
+        "ember_fox": "Algo pequeño y cálido camina con paso suave detrás de ti.",
+        "moss_hare": "Un crujido en la turba sigue el ritmo de tus pasos.",
+        "frog": "Un croar húmedo responde a cada paso que das.",
+        "crimson_claw_crab": "Algo chasquea y corre justo fuera de tu vista.",
+        "golden_sentinel": "Un tenue brillo dorado observa desde la hierba.",
+        "nightfang": "Unas patas silenciosas te siguen donde no alcanzas a ver.",
+        "tuskhorn_boar": "Un bufido y un pisotón: algo testarudo te sigue.",
+        "emerald_wolf": "Unos ojos verdes parpadean entre la maleza y luego te siguen.",
+        "tiger": "Unas rayas se mueven en el límite de tu visión.",
+        "cate_coin": "Oyes el leve tintineo de una moneda que no es tuya.",
+        "alon": "Te sientes observado y aprobado en silencio.",
+        "trollface": "En algún lugar detrás de ti, algo sonríe.",
+        "ansem": "Te sigue un susurro de puertas y oscuridad.",
+        "triple_t": "Suenan tres pisadas donde debería sonar una.",
+        "kekius": "Una risa ahogada te sigue por el camino.",
+        "solbot": "Un tictac suave acompasa tu zancada.",
+        "frostfire": "Vapor y escarcha se arremolinan a tu paso.",
+        "rocky": "Unos guijarros se mueven detrás de ti sin viento que los empuje.",
+        "proud_grunt": "Una bota se cuadra en algún lugar detrás de ti.",
+        "loot_goblin": "Algo cuenta tus monedas entre dientes.",
+        "penny_goldspark": "Unas herramientas diminutas tintinean en un bolsillo que no es tuyo.",
+        "stag": "Una sombra con astas se cruza en tu camino.",
+        "alpaca": "Algo lanudo y sin prisas ha decidido acompañarte.",
+        "horse": "Unos cascos marcan un ritmo tranquilo y paciente en algún lugar detrás de ti.",
+        "sapling": "Unas raicillas corretean a tu espalda y remueven las hojas caídas.",
+        "bull": "Un resoplido grave remueve el polvo a tu espalda.",
+        "spider": "Un hilo de seda te roza el hombro.",
+        "raptor": "Unas garras rápidas repiquetean sobre la piedra a tus talones.",
+        "skeleton": "Unos huesos secos traquetean al compás de tus pasos.",
+        "crystal_lich": "Un zumbido frío surge de los restos y te está observando.",
+        "forgemaw": "El calor de la forja no te ha abandonado. Algo salió con él.",
+        "sprites": "Dos pequeñas llamas se te han prendido y no se apagan.",
+        "crystal_tide": "Una gota del mar se niega a caer de tu sedal.",
+        "phantom": "El aire a tu espalda está un poco demasiado quieto.",
+        "emberfall_phoenix": "Un calor como el de unas brasas cubiertas se asienta a tu espalda."
       },
       "actions": {
-        "summon": "Summon",
-        "dismiss": "Dismiss",
-        "wear": "Wear",
-        "remove": "Remove"
-      },
-      "looks": {
-        "title": "Looks",
-        "unlocked": "Unlocked",
-        "locked": "Locked",
-        "worn": "Worn",
-        "none": "No looks authored for this companion yet"
-      },
-      "source": {
-        "bossLabel": "Boss pet",
-        "bossDrop": "{mob} ({location}), {chance}% per player per kill",
-        "bossDropWithHeroic": "{mob} ({location}), {chance}% per player, {heroicChance}% on Heroic",
-        "bossDropHeroicOnly": "{mob} ({location}), Heroic only, {chance}% per player",
-        "rollNote": "Every player rolls separately; nobody loses a roll to a party member.",
-        "deedLabel": "Earned by",
-        "deed": "The deed {deed}",
-        "challengeLabel": "Challenge",
-        "challengeSpeed": "Defeat {mob} within {seconds} seconds of the pull",
-        "challengeDps": "Deal {dps} damage per second to {mob} across the fight",
-        "craftLabel": "Crafted",
-        "craft": "{item} ({profession} recipe)",
-        "grantLabel": "Awarded",
-        "grantOnly": "Seasonal award: the monthly ladder and top-parse rewards",
-        "tokenLabel": "Token",
-        "token": "{item}, used once to attach the companion"
-      },
-      "buddyLore": {
-        "ember_fox": "A vixen out of the Eastbrook Vale hedgerows, named for the coal-red coat that shows through winter scrub. The trappers there gave up on the kits generations ago and started leaving food out instead.",
-        "moss_hare": "The Willowfen hare, green-furred from a lifetime bedded down in wet peat. Fen herbalists count them lucky and will not have one chased off a doorstep.",
-        "frog": "Mirefen Marsh raises them fat and unbothered, singing all night from the reed beds. The marsh guides swear a boat carrying one never runs aground.",
-        "crimson_claw_crab": "A Farshore tidal crab whose claw stays red long after it leaves the water. Dock crews used to race them along the boards for coin.",
-        "golden_sentinel": "A watch-beetle of the Amberfall, gilded by the resin it grew up in. The name is older than the resin: sentinels of a kind kept those groves long before anyone thought to bottle the sap.",
-        "nightfang": "A young Nightbloom hunter, silent even by the standards of its kind. It follows for the company and hunts nothing larger than a moth.",
-        "tuskhorn_boar": "Thornpeak stock, bred short-legged by shepherds who wanted a boar that could not put a fence down. It kept the temper regardless.",
-        "emerald_wolf": "A Wraithwood pup, its coat green in the canopy light that never quite reaches the forest floor. The wardens raise whichever orphans the wood leaves behind.",
-        "tiger": "Palmreach stripes on an animal that has never seen the Palmreach: the line has been kept in captivity since the old menageries closed. It answers to a whistle and to nothing else.",
-        "cate_coin": "A cat that will not be parted from the coin it sits on, and that nobody has ever seen eat. Eastbrook merchants still argue over which of the two is the pet.",
-        "alon": "A traveller's mascot from a road no map will admit to, turning up wherever a plan is going badly. It watches, it approves, and it offers no help whatsoever.",
-        "trollface": "A grinning thing the Wraithwood put out and would not take back. Every attempt to describe it ends with the describer laughing and giving up.",
-        "ansem": "It speaks of doors and of darkness and will not be drawn further on either. The Nightbloom cultists claim it as theirs; it wanders off whenever they hold a rite.",
-        "triple_t": "Three of something, or one thing three times over. The accounts disagree, and the creature will not hold still long enough to be counted.",
-        "kekius": "A laughing companion of unclear origin, adopted by the Galecrest race yards as a charm. It has outlived four stables that swore by it.",
-        "solbot": "A small sun-fed automaton, dug half-buried out of the Drakelands ash and still ticking. Whatever workshop built it left no mark anywhere on the casing.",
-        "frostfire": "Born in the Frostveil Reach where a hot spring surfaces through the ice field, and it has never settled on which half it belongs to. It steams in cold air and shivers in warm.",
-        "rocky": "A stone-shelled crawler off the Thornpeak scree, slow and thoroughly unbothered. Miners keep them for the way they go still a moment before a collapse.",
-        "proud_grunt": "A veteran of the Warfare stores who kept the salute and lost the rank. Warmarshal Draven Kole hands one to any soldier with honor enough to know what that costs.",
-        "loot_goblin": "It follows anyone carrying Heroic Marks and has never once been caught stealing. Quartermaster Vex maintains that this proves nothing at all.",
-        "penny_goldspark": "A gnome tinker's apprentice who charges by the hour and is worth every copper of it. Armorer Hode took her on to settle a debt and now sells the arrangement to anyone holding a thousand gold.",
-        "stag": "Evergarden bloodline, bred down from the great stags the wardens once rode. It still lowers its head at a raised hand, from a habit older than the animal.",
-        "alpaca": "The Galecrest herds keep them for wool and for temper: nothing stays calmer in a storm. This one will spit at exactly one person per journey.",
-        "horse": "Vale pony stock, bred small for the orchard lanes and never told it is not a warhorse. It keeps pace at your shoulder and will follow anyone who once fed it an apple.",
-        "sapling": "A young tree with a smile in its bark and a curious purple gaze. Its roots carry it in a cheerful waddle wherever you wander.",
-        "bull": "A Vale bull the size of a dog, which is the only reason anyone agreed to keep one indoors. The temperament did not scale down with the rest.",
-        "spider": "A Wraithwood weaver, palm-sized, that redecorates any pack it is carried in. The webbing is stronger than the thread it replaces.",
-        "raptor": "Drakelands hatchling stock, sold on before it learns how fast it can run. Every new owner is told to keep it fed, and none of them need telling twice.",
-        "skeleton": "It came up out of the Wraithwood barrows, dusted itself off, and has followed people about ever since. Nobody has established whose bones these were.",
-        "crystal_lich": "A splinter of Nythraxis itself, still humming with the cold that shaped it. It answers to whoever pulled it from the wreck of the raid, and it has not forgiven them for it.",
-        "forgemaw": "Forged in the Crucible of the Last Spring and never quite finished, it walked out of Ignivar's foundry while the hammers were still falling. Only the heroic descent finds it: the molten thing keeps returning to the forge that made it, and follows home whoever survives the fire twice.",
-        "crystal_tide": "A tide sprite that rides its own drop of sea-glass, hooked out of still water by anglers from the Vale to Farshore who were fishing for supper. It keeps the water it came up in, and it will not be talked into going back.",
-        "phantom": "A palm-sized haunt out of the Wraithwood barrows, all sheet and no bones, which turns up in a pack that was closed and stays for the company. Nobody has worked out what it wants, and it has never once tried to frighten anyone.",
-        "emberfall_phoenix": "It burns down to an ember every autumn and comes back up out of its own ash by spring, which is the whole of what anyone can tell you about it. Nobody has ever found a nest, and nobody has ever caught one twice."
-      },
-      "petKind": {
-        "beast": "Beasts",
-        "elemental": "Elementals",
-        "humanoid": "Humanoids",
-        "undead": "Undead",
-        "celebrity": "Celebrities"
-      },
-      "armor": {
-        "cloth": "Cloth",
-        "mail": "Mail",
-        "leather": "Leather"
-      },
-      "stat": {
-        "intellect": "Intellect",
-        "agility": "Agility",
-        "strength": "Strength",
-        "mixed": "Hybrid"
-      },
-      "set": {
-        "owned": "{owned} of {total} pieces",
-        "itemLevel": "ilvl {level}",
-        "bonusLabel": "{pieces} pieces"
-      },
-      "detail": {
-        "dropLabel": "Drops from",
-        "vendorLabel": "Sold by",
-        "bindLabel": "Binding",
-        "sellLabel": "Vendor pays",
-        "marketLabel": "World Market",
-        "exchangeLabel": "$WOC Exchange",
-        "setLabel": "Collected",
-        "drop": "{mob} ({location}), {chance}% per kill",
-        "heroicDrop": "{mob} ({location}), Heroic only, {chance}% per kill",
-        "dropWithHeroic": "{mob} ({location}), {chance}% per kill, {heroicChance}% on Heroic",
-        "globalDrop": "Any enemy, {chance}% per kill, one of {count} at this rarity",
-        "fishingDrop": "Fishing anywhere, {chance}% per catch",
-        "vendor": "{npc} ({location}) for {price}",
-        "honorPrice": "{amount} Honor",
-        "marksPrice": "{amount} Heroic Marks",
-        "noSource": "No source in the game yet",
-        "noItem": "No item grants this yet",
-        "tradeable": "Tradeable",
-        "soulbound": "Soulbound",
-        "noSell": "Cannot be sold",
-        "marketAtMerchant": "Shown at the Merchant",
-        "marketChecking": "Checking...",
-        "marketNone": "No listings",
-        "exchangeNone": "No listings",
-        "exchangeUnavailable": "Not available on this client"
+        "summon": "Invocar",
+        "dismiss": "Despedir"
       }
     },
     "calendar": {
@@ -5592,6 +6014,13 @@ export const es: EnTranslations = {
       "offlineHeader": "Desconectados ({n})",
       "hideOffline": "Ocultar desconectados",
       "hideOfflineTitle": "Ocultar miembros desconectados de la hermandad",
+      "presence": {
+        "label": "Mostrarme conectado a",
+        "everyone": "Todos",
+        "friends": "Solo amigos",
+        "none": "Nadie",
+        "title": "Quién te ve conectado en listas de amigos y el registro de hermandad, con tu zona y posición en el mapa. Tu grupo siempre te ve."
+      },
       "billboard": {
         "label": "Tablón de la Hermandad",
         "empty": "Aún no hay nada publicado en el tablón.",
@@ -5889,22 +6318,26 @@ export const es: EnTranslations = {
       "enchant_weapon_piston_drive": "Grabado de arma: Impulso de pistón"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "Tus ataques cuerpo a cuerpo que impactan pueden otorgar 50 de Fuerza durante 15 s y curarte 200 de salud. Se aplican los modificadores de curación. Cada golpe tiene una probabilidad del 1 % por cada 0,6 s de velocidad base del arma atacante. No tiene enfriamiento interno. Cada mano tiene su propio beneficio; los activadores repetidos renuevan el de esa mano. Los ataques a distancia no activan este efecto. Forma de lobo usa en su lugar su velocidad de golpe base de 1 s.",
-      "enchant_weapon_riftwalkers_grace": "Tus ataques cuerpo a cuerpo que impactan pueden otorgar 60 de Agilidad y un 2% más de velocidad de ataque cuerpo a cuerpo durante 15 s. Cada golpe tiene una probabilidad del 1% por cada 0,6 s de velocidad base del arma atacante. No tiene enfriamiento interno. Ambas manos comparten un único beneficio; cualquier activación lo renueva, y nunca se acumula. Los ataques a distancia no activan este efecto. Forma de lobo usa en su lugar su velocidad de golpe base de 1 s.",
+      "enchant_weapon_lastflame_zeal": "Tus ataques cuerpo a cuerpo que acierten pueden otorgar 50 de Fuerza durante 15 s y sanarte 200 de salud. Se aplican los modificadores de sanación. Cada impacto tiene un 1% de probabilidad por cada 0,6 s de velocidad base del arma que golpea. Sin tiempo de reutilización interno. Ambas manos comparten un beneficio: cada activación lo renueva y nunca se acumula. Los ataques a distancia no lo activan. En Forma felina, los ataques automáticos usan la velocidad de las zarpas de 1 s. Los golpes y remates de Forma felina y Forma de Bruin usan la velocidad propia del arma; Zarpas Barredoras realiza una tirada por uso, no por objetivo.",
+      "enchant_weapon_riftwalkers_grace": "Tus ataques cuerpo a cuerpo que acierten pueden otorgar 60 de Agilidad y ataques cuerpo a cuerpo un 2% más rápidos durante 15 s. Cada impacto tiene un 1% de probabilidad por cada 0,6 s de velocidad base del arma que golpea. Sin tiempo de reutilización interno. Ambas manos comparten un beneficio: cada activación lo renueva y nunca se acumula. Los ataques a distancia no lo activan. En Forma felina, los ataques automáticos usan la velocidad de las zarpas de 1 s. Los golpes y remates de Forma felina y Forma de Bruin usan la velocidad propia del arma; Zarpas Barredoras realiza una tirada por uso, no por objetivo.",
       "enchant_weapon_dawnfire_etching": "Graba permanentemente un arma con 18 de poder con hechizos. El poder con hechizos también cuenta para el poder de curación. Es una bonificación fija; no escala.",
       "enchant_weapon_dawns_benediction": "Graba permanentemente un arma con 34 de poder de curación. El poder de curación solo aumenta las curaciones, nunca el daño de hechizos. Es una bonificación fija; no escala.",
       "enchant_weapon_piston_drive": "Graba permanentemente un arma a dos manos con 12 de Fuerza y 25 de índice de golpe crítico. No se puede aplicar a un arma a una mano. Es una bonificación fija; no escala."
     },
     "factionRewards": {
+      "hearthstoneUnattuned": "Tu piedra de hogar aliada no está vinculada. Habla con un intendente aliado o úsala en un centro aliado.",
+      "hearthstoneBound": "Tu piedra de hogar aliada está ahora vinculada a {hub}.",
+      "hearthstoneTransport": "La piedra de hogar te transporta a {hub}.",
+      "itemCooldown": "Ese objeto aún no está listo (quedan {minutes} min).",
       "alliedHearthstoneUse": "Uso: Te teletransporta al bastión de facción sintonizado. (10 s de lanzamiento, 15 min de reutilización)",
       "alliedHearthstoneAttuned": "Sintonizado con: {hub}",
       "hub_none": "Ninguno (Úsala cerca de un bastión de facción para sintonizarte)",
       "hub_rift_watch": "Refugio de la Brecha (La Guardia de la Brecha)",
       "hub_church_order": "Valle de Arroyo Este (La Orden de la Iglesia)",
-      "hub_automatons": "Confín Sur (La Fundición de Autómatas)",
+      "hub_automatons": "Wyrmwatch (Autómatas)",
       "riftGliderUse": "Uso: Despliega el planeador, ralentizando la caída durante 30 s. Aterrizar o recibir daño cancela el efecto. (2 min de reutilización)",
       "targetDummyUse": "Uso: Despliega un muñeco mecánico de entrenamiento en el mundo abierto durante 2 minutos para practicar combate. (5 min de reutilización)",
-      "battleStandardUse": "Uso: Clava el estandarte de batalla del Alba Consagrada durante 5 minutos, aumentando notablemente la regeneración de salud y maná fuera de combate de todos los aliados cercanos. Permanecer cerca durante 10 segundos otorga Bendición del Alba (+5% a todas las estadísticas durante 30 min). (5 min de reutilización)",
+      "battleStandardUse": "Uso: Clava el estandarte de batalla del Alba Consagrada durante 5 min. Los jugadores fuera de combate a 15 yardas o menos regeneran un 10% más de salud; quienes usan maná recuperan además maná equivalente al 5% de su Espíritu cada 2 s. Permanecer cerca durante 10 s otorga Bendición del Alba, que aumenta Fuerza, Agilidad, Aguante, Intelecto y Espíritu un 5% durante 30 min. (5 min de reutilización)",
       "shockBombUse": "Uso: Lanza una bomba de choque mecánica hasta a 30 m, infligiendo de 120 a 160 p. de daño de Naturaleza a los enemigos en un radio de 5 m. (1 min de reutilización)",
       "invisibilityUse": "Uso: Te envuelve en sigilo durante 6 s. (2 min de reutilización)",
       "armorKitUse": "Uso: Refuerza tu armadura de pecho, aumentando la armadura en 12 p. durante 1 hora.",
@@ -6171,7 +6604,15 @@ export const es: EnTranslations = {
       "viewSources": "Ver fuentes",
       "separateByGatherer": "Separar por recolector",
       "takeChosenQuantity": "Retirar la cantidad elegida",
-      "combine": "Combinar pilas de materiales"
+      "combine": "Combinar pilas de materiales",
+      "itemHistory": "Historial del objeto"
+    },
+    "itemHistory": {
+      "title": "{item}: historial",
+      "passedTo": "Entregado a {name} el {date}",
+      "noTransfers": "Este objeto nunca ha cambiado de manos.",
+      "close": "Cerrar",
+      "openAria": "Historial de {item}"
     },
     "enchanting": {
       "recipeNotLearned": "Aprende la fórmula antes de aplicar este encantamiento.",
@@ -6264,7 +6705,9 @@ export const es: EnTranslations = {
     },
     "pattern": {
       "teaches": "Uso: te enseña a fabricar {item}.",
-      "teachesEnchant": "Uso: te enseña a aplicar {enchant}."
+      "teachesEnchant": "Uso: te enseña a aplicar {enchant}.",
+      "reagents": "{label} {list}",
+      "reagent": "{name} ×{count}"
     },
     "unbind": {
       "title": "Desvinculación: {name}",
@@ -6417,6 +6860,12 @@ export const es: EnTranslations = {
       "acceptedWait": "Esperando a los demás..."
     },
     "finder": {
+      "groups": "Grupos",
+      "dungeonGuide": "Guía de mazmorras",
+      "backToGroups": "Volver a los grupos",
+      "createGroup": "Crear grupo",
+      "cancelCreate": "Cancelar",
+      "activeQueue": "Tu cola",
       "title": "Buscador de Mazmorras",
       "close": "Cerrar",
       "back": "Volver",
@@ -6458,6 +6907,9 @@ export const es: EnTranslations = {
       "blockedLevel": "Solo niveles {min} a {max}",
       "blockedSpec": "Requiere una especializacion",
       "yourRoles": "Tus roles",
+      "yourRole": "Tu función",
+      "createQueueLocked": "Sal del emparejamiento antes de publicar.",
+      "noCreateActivities": "No hay actividades aptas en esta categoría.",
       "needsSpec": "Elige una especializacion para usar el Buscador de Mazmorras.",
       "leaderNote": "Solo el lider del grupo puede poner al grupo completo en cola.",
       "chooseActivities": "Elige actividades",
@@ -6497,44 +6949,91 @@ export const es: EnTranslations = {
       "tagFullClear": "Limpieza completa",
       "tagLearning": "Aprendizaje bienvenido",
       "tagFastRun": "Rapido",
+      "tagGuildOnly": "Grupo de hermandad",
+      "guildPartyToggle": "Grupo de hermandad",
+      "guildPartyHint": "Solo los miembros de {guild} pueden solicitar unirse.",
+      "guildPartyNeedsGuild": "Únete a una hermandad para crear un grupo de hermandad.",
+      "guildPartyNote": "Los grupos de hermandad solo aceptan miembros de la hermandad del líder.",
+      "guildPartyBadge": "Solo {guild}",
+      "guildPartyLocked": "Solo miembros de la hermandad",
+      "filterContent": "Contenido",
+      "filterAll": "Todo el contenido",
+      "filterDungeons": "Mazmorras",
+      "filterRaids": "Bandas",
+      "filterEmpty": "Ningún anuncio coincide con este filtro.",
+      "postHeading": "Anunciar tu grupo",
+      "postGeneral": "Publicar en General",
+      "postDiscord": "Publicar en Discord",
+      "postReadyIn": "Listo en {minutes} min",
+      "postDiscordOffline": "Solo juego en línea",
+      "inspect": "Inspeccionar",
+      "inspectApplicantAria": "Inspeccionar {name}",
+      "partyHeading": "Llevando a tu grupo",
+      "partyNote": "Tu grupo se une a este grupo. Elige una función para cada miembro o deja que conserven la suya.",
+      "partyRolesHeading": "Funciones del grupo",
+      "partyRolesNote": "Elige una función para cada miembro o deja que conserven la suya.",
+      "partyRoleOwn": "Su elección",
+      "partyRoleAria": "Función de {name}",
+      "partyMemberMeta": "{cls} de nivel {level}",
+      "difficultyHeading": "Dificultad",
+      "showGuide": "Mostrar guía",
+      "hideGuide": "Ocultar guía",
+      "levelUnavailable": "Fuera de tu intervalo de niveles",
+      "guideUnavailable": "Aún no hay una estrategia detallada para este encuentro.",
+      "guide": {
+        "pulse": "Daña periódicamente a los jugadores cerca del jefe. Los jugadores a distancia y sanadores pueden reducir el daño recibido manteniendo la distancia. Los sanadores deben prepararse para restaurar la salud de quienes luchan cuerpo a cuerpo.",
+        "cleave": "Los golpes cuerpo a cuerpo también dañan a otros jugadores cerca del objetivo actual. Deja espacio alrededor del tanque; colocarse solo detrás del jefe no evita este daño de área.",
+        "adds": "Llegan refuerzos a medida que avanza el combate. El tanque debe atraerlos antes de que alcancen al sanador. Los personajes de daño deben ayudar a eliminarlos para que el grupo no se enfrente a varias oleadas a la vez.",
+        "enrage": "Con poca salud, el jefe ataca más rápido y causa más daño. Reserva las habilidades defensivas y de sanación con tiempo de reutilización para este tramo final y termina el combate sin descuidar las demás mecánicas.",
+        "stomp": "Un golpe periódico daña y aturde brevemente a los jugadores cercanos. Los sanadores y jugadores a distancia deben mantenerse alejados. Mantén al tanque con buena salud antes del golpe, ya que los aliados cercanos podrían no poder actuar durante el aturdimiento.",
+        "inferno": "El jefe deja de moverse y atacar para canalizar pulsos de fuego cada vez más potentes. Sal de la zona que lo rodea en cuanto empiece a canalizar y vuelve cuando termine. Separarse dentro del fuego no te protege.",
+        "mending": "Cura periódicamente a los aliados heridos cercanos, incluido el propio lanzador. Concentra el daño en el sanador y evita atraer enemigos adicionales a su alcance de sanación. Es un efecto instantáneo, no un lanzamiento que se pueda interrumpir.",
+        "manaBurn": "Los golpes cuerpo a cuerpo que aciertan pueden drenar maná de un objetivo que lo use. Mantén al jefe alejado del sanador y de otros lanzadores vulnerables. Quienes usan ira o energía no pierden recursos por este efecto.",
+        "mortalWound": "Los golpes cuerpo a cuerpo pueden reducir la sanación que recibe el objetivo. Usa habilidades defensivas mientras la herida esté activa; el sanador necesitará más sanación para restaurar la misma cantidad de salud.",
+        "bleed": "Los golpes cuerpo a cuerpo pueden dejar una hemorragia que sigue dañando a la víctima. Vigila al jugador herido aunque el enemigo cambie de objetivo y restáurale la salud mientras dure la hemorragia.",
+        "haste": "Aumenta periódicamente la velocidad de ataque de los aliados cercanos. Evita luchar contra grupos adicionales junto al Maestro de Bestias y prepara habilidades defensivas cuando varios enemigos reciban el efecto.",
+        "ward": "Otorga periódicamente un escudo de absorción a los aliados cercanos. Concentraos juntos en el mismo objetivo para romper su escudo y acabar con él antes del siguiente resguardo, en lugar de repartir el daño entre todo el grupo de enemigos.",
+        "knockback": "Los golpes cuerpo a cuerpo pueden empujar al objetivo. Deja espacio seguro detrás del tanque, evita situarte cerca de enemigos aún no atacados y prepárate para volver al alcance cuerpo a cuerpo después del empujón."
+      },
       "mech": {
         "shadow_pulse": "Pulso de Sombra (dano de area pulsante)",
-        "crypt_shovelful": "Shovelful (every 11 seconds he flings grave dirt over an 8 yard cone in front of him: one and a half times his swing and 50 percent slower movement for 6 seconds, so stand behind him)",
-        "crypt_measured_for_the_grave": "Measured for the Grave (every 15 seconds he marks a player other than the tank; 4 seconds later an Open Grave caves in under them, 42 to 52 damage within 3 yards on normal, and the pit stays for the fight: 9 damage a second and 40 percent slower movement inside, so lay the graves at the edge of the yard)",
-        "crypt_burial_toll": "Burial Toll (at 66 and 33 percent health he strides to the bell rope, immune to damage, and rings for 3 seconds: 30 to 38 shadow damage to everyone on normal, and every Open Grave raises a Restless Bones)",
-        "crypt_marrow_heroic": "Heroic: Gravedigger's Blow every 9 seconds on the tank (each stack makes them take 6 percent more damage for 20 seconds, up to 6 stacks), Grave Vigor (he swings 30 percent faster while he stands in a grave) and Unquiet Earth (anyone who stays 2 seconds in a grave raises a Restless Bones there)",
-        "crypt_brides_lament": "Bride's Lament (every 22 seconds a 3 second wail: 60 to 75 frost damage on normal to everyone outside the light of a lit grave lantern, half again for every Lingering Lament stack from the Laments you already took. A lantern shelters two players at most and goes dark for 28 seconds after it shelters anyone, so split up and take turns)",
-        "crypt_frozen_embrace": "Frozen Embrace (every 30 seconds she seizes a player other than the tank and rises 5 yards into the air with them, 6 frost damage a second: deal 6 percent of her health within 8 seconds and she sets them down, otherwise she drops them for 150 to 180 damage on normal)",
-        "crypt_rime_path": "Rime Path (she leaves slippery rime where she drifts for 25 seconds: on it you gather speed slowly and slide on when you stop or turn)",
-        "crypt_bridal_freeze": "Bridal Freeze (at half health the whole ravine floor freezes over: slippery ice for the rest of the fight)",
-        "crypt_lady_heroic": "Heroic: every lit lantern also burns out on its own after 30 seconds and stays dark for 10, and the Frozen Embrace takes two players and lets go at 4.4 percent of her health",
-        "crypt_dirge_of_the_hollow": "Dirge of the Hollow (every 16 seconds a 2.5 second song you can interrupt: if she finishes it, 105 to 125 shadow damage on normal and a 4 second silence to everyone within 45 yards who can see her, so interrupt it or hide behind a choir pillar)",
-        "crypt_harmony": "Harmony (each living Chorister makes her take 30 percent less damage: kill the Choristers first)",
-        "crypt_bone_organ": "Bone Organ (every 26 seconds she plays the Bone Organ: two waves of shadow notes burst down lanes of the loft, 100 to 115 damage on normal in a lane, the second wave filling the first one's gaps)",
-        "crypt_crescendo": "Crescendo (below 30 percent health her Dirge takes 1.8 seconds and comes every 11 seconds, and the organ plays a third wave)",
-        "crypt_ilvane_heroic": "Heroic: Encore (a Chorister that lies dead for 10 seconds while the other still stands rises again, so kill them together) and Unbroken Verse (every third Dirge cannot be interrupted: hide from it)",
-        "crypt_morthen_shadow_pulse": "Shadow Pulse (every 12 seconds a 2 second cast, then 24 to 30 shadow damage on normal to everyone within 12 yards of him, so step away; every 9 seconds in his Last Rites)",
-        "crypt_gravecall": "Gravecall (every 15 seconds a Bound Soul drifts from the next sarcophagus alcove toward him; when it reaches him he is Gorged on the Dead, 10 percent more damage for each soul up to 10 stacks, and heals 3 percent of his health. A player in its path takes it instead: 12 to 16 shadow damage on normal)",
-        "crypt_rite_of_the_unquiet": "Rite of the Unquiet (at 65 percent health he returns to the altar, immune inside the Unquiet Ward, while Grave Chill deals 3 shadow damage a second to everyone, rising by 1 every 5 seconds, and 2 Restless Bones climb out of the alcoves. Relight the 4 Remembrance Candles: each is a 4 second channel that drains 6 percent of the lighter's maximum health every second, which hits do not break but a step or a stun does. The last candle breaks the Rite: he is stunned for 8 seconds and takes 25 percent more damage)",
-        "crypt_reap_the_unquiet": "Reap the Unquiet (below 35 percent health the souls stop; every 14 seconds he sweeps his scythe after a 2 second cast: 55 to 65 shadow damage on normal to everyone in a 120 degree arc 14 yards in front of him. Shadow Pulse then comes every 9 seconds)",
-        "crypt_morthen_heroic": "Heroic: Name the Dead (the Ledger names the order of the candles: a wrong candle snuffs the last one lit and deals 252 to 288 shadow damage to the lighter, and each relight drains 8 percent a second), Grasp of the Grave (every 16 seconds 2 players get a 4 yard ring; 1.5 seconds later hands erupt in it: a 3 second root and 162 to 198 shadow damage) and the Knellwyrm's Burning Knell (it takes flight and marks half of the ring for 4.5 seconds, then pours ghost fire over that half for 1,000 to 1,120 fire damage, 3 halves each flight)",
+        "crypt_shovelful": "Palada (cada 11 segundos lanza tierra sepulcral en un cono de 8 yardas frente a él: una vez y media el daño de su golpe y movimiento un 50 por ciento más lento durante 6 segundos; colócate detrás de él)",
+        "crypt_measured_for_the_grave": "Medido para la tumba (cada 15 segundos marca a un jugador que no sea el tanque; 4 segundos después se abre una Tumba abierta bajo él, de 42 a 52 de daño a menos de 3 yardas en normal, y la fosa permanece durante el combate: 9 de daño por segundo y movimiento un 40 por ciento más lento dentro; coloca las tumbas en el borde del patio)",
+        "crypt_burial_toll": "Toque fúnebre (al 66 y 33 por ciento de salud avanza hasta la cuerda de la campana, inmune al daño, y toca durante 3 segundos: de 30 a 38 de daño de sombras a todos en normal, y cada Tumba abierta alza unos Huesos Inquietos)",
+        "crypt_marrow_heroic": "Heroico: Golpe del sepulturero cada 9 segundos al tanque (cada acumulación aumenta su daño recibido un 6 por ciento durante 20 segundos, hasta 6 acumulaciones), Vigor sepulcral (golpea un 30 por ciento más rápido mientras está en una tumba) y Tierra inquieta (quien permanezca 2 segundos en una tumba alza allí unos Huesos Inquietos)",
+        "crypt_brides_lament": "Lamento de la novia (cada 22 segundos, un lamento de 3 segundos: de 60 a 75 de daño de escarcha en normal a todos fuera de la luz de un farol sepulcral encendido, con un 50% adicional por cada acumulación de Lamento persistente de los Lamentos que ya hayas recibido. Un farol protege como máximo a dos jugadores y se apaga durante 28 segundos después de proteger a alguien, así que repartíos y alternad turnos)",
+        "crypt_frozen_embrace": "Abrazo helado (cada 30 segundos agarra a un jugador que no sea el tanque y sube con él 5 yardas en el aire, causando 6 de daño de escarcha por segundo: inflígele un daño equivalente al 6 por ciento de su salud en 8 segundos y lo dejará en el suelo; de lo contrario, lo suelta y recibe de 150 a 180 de daño en normal)",
+        "crypt_rime_path": "Senda de escarcha (deja escarcha resbaladiza donde se desplaza durante 25 segundos: sobre ella aceleras despacio y sigues deslizándote al detenerte o girar)",
+        "crypt_bridal_freeze": "Congelación nupcial (a mitad de salud se congela todo el suelo del barranco: hielo resbaladizo durante el resto del combate)",
+        "crypt_lady_heroic": "Heroico: cada farol encendido también se apaga solo tras 30 segundos y queda oscuro durante 10; Abrazo helado agarra a dos jugadores y los suelta al recibir un daño equivalente al 4,4 por ciento de su salud",
+        "crypt_dirge_of_the_hollow": "Canto fúnebre de la oquedad (cada 16 segundos, un canto de 2,5 segundos que puedes interrumpir: si lo termina, de 105 a 125 de daño de sombras en normal y un silencio de 4 segundos a todos a menos de 45 yardas que puedan verla; interrúmpelo o escóndete detrás de un pilar del coro)",
+        "crypt_harmony": "Armonía (cada corista vivo hace que reciba un 30 por ciento menos de daño: mata primero a los coristas)",
+        "crypt_bone_organ": "Órgano de hueso (cada 26 segundos toca el Órgano de hueso: dos oleadas de notas de sombras recorren franjas de la tribuna, de 100 a 115 de daño en normal dentro de una franja; la segunda oleada ocupa los huecos de la primera)",
+        "crypt_crescendo": "Crescendo musical (por debajo del 30 por ciento de salud, su Canto fúnebre tarda 1,8 segundos y llega cada 11 segundos, y el órgano toca una tercera oleada)",
+        "crypt_ilvane_heroic": "Heroico: Otra estrofa (un corista que lleva muerto 10 segundos mientras el otro sigue vivo se alza de nuevo; matadlos juntos) y Verso ininterrumpido (cada tercer Canto fúnebre no se puede interrumpir: escóndete)",
+        "crypt_morthen_shadow_pulse": "Pulso de sombras (cada 12 segundos, un lanzamiento de 2 segundos y luego de 24 a 30 de daño de sombras en normal a todos a menos de 12 yardas de él; aléjate. Cada 9 segundos durante sus Últimos ritos)",
+        "crypt_gravecall": "Llamada sepulcral (cada 15 segundos, un Alma atada avanza desde la siguiente hornacina de sarcófago hacia él; al alcanzarlo, queda Ahíto de muertos, con un 10 por ciento más de daño por alma hasta 10 acumulaciones, y recupera el 3 por ciento de su salud. Un jugador en su trayectoria la recibe en su lugar: de 12 a 16 de daño de sombras en normal)",
+        "crypt_rite_of_the_unquiet": "Rito de los inquietos (al 65 por ciento de salud vuelve al altar, inmune dentro del Resguardo inquieto, mientras Frío sepulcral inflige 3 de daño de sombras por segundo a todos, aumentando en 1 cada 5 segundos, y 2 Huesos Inquietos salen de las hornacinas. Reenciende las 4 Velas del Recuerdo: cada una requiere canalizar 4 segundos y drena el 6 por ciento de la salud máxima de quien la enciende cada segundo; los golpes no interrumpen, pero moverse o un aturdimiento sí. La última vela rompe el Rito: queda aturdido durante 8 segundos y recibe un 25 por ciento más de daño)",
+        "crypt_reap_the_unquiet": "Segar a los inquietos (por debajo del 35 por ciento de salud cesan las almas; cada 14 segundos barre con su guadaña tras un lanzamiento de 2 segundos: de 55 a 65 de daño de sombras en normal a todos en un arco de 120 grados y 14 yardas delante de él. Pulso de sombras pasa a llegar cada 9 segundos)",
+        "crypt_morthen_heroic": "Heroico: Nombrar a los muertos (el Registro indica el orden de las velas: una incorrecta apaga la última encendida e inflige de 252 a 288 de daño de sombras a quien la enciende, y cada reencendido drena un 8 por ciento por segundo), Agarre de la tumba (cada 16 segundos, 2 jugadores reciben un círculo de 4 yardas; 1,5 segundos después brotan manos: inmovilización de 3 segundos y de 162 a 198 de daño de sombras) y Doblar ardiente del Vermis del Doblar (alza el vuelo y marca la mitad del círculo durante 4,5 segundos; luego vierte fuego fantasmal sobre esa mitad por de 1000 a 1120 de daño de fuego, 3 mitades por vuelo)",
         "reaping_arc": "Arco Segador (tajo frontal)",
-        "hallowed_brine": "Hallowed Brine (a 9 yard pool of dark holy water, 10 on heroic: 18 damage a second to anyone in it, 26 on heroic, and he takes 40 percent less damage while he stands in it, so drag him out)",
-        "rebounding_bulwark": "Rebounding Bulwark (his shield rebounds to the nearest player within 10 yards of the last one hit, up to 3 players, 4 on heroic: spread out)",
-        "tide_sentence": "Sentence of the Tide (5 seconds after the mark, a column of light strikes everyone within 6 yards of the marked player, 8 on heroic: take it away from the group)",
-        "unbroken_oath": "Unbroken Oath (once, at half health, he kneels immune in a bubble for up to 60 seconds: kill his soldiers to break it, then he is stunned 4 seconds and takes 20 percent more damage for 10)",
-        "fog_veil": "Fog Veil (four figures, one real: the beacon's beam makes the real Vael's lantern flare)",
+        "hallowed_brine": "Salmuera consagrada (un charco de agua sagrada oscura de 9 yardas, 10 en heroico: 18 de daño por segundo a quien esté dentro, 26 en heroico; él recibe un 40 por ciento menos de daño mientras esté en él, así que sácalo)",
+        "rebounding_bulwark": "Baluarte de rebote (su escudo rebota al jugador más cercano a menos de 10 yardas del último golpeado, hasta 3 jugadores, 4 en heroico: separaos)",
+        "tide_sentence": "Sentencia de la marea (5 segundos después de la marca, una columna de luz golpea a todos a menos de 6 yardas del jugador marcado, 8 en heroico: aléjala del grupo)",
+        "unbroken_oath": "Juramento intacto (una vez, a mitad de salud, se arrodilla inmune en una burbuja durante un máximo de 60 segundos: mata a sus soldados para romperla; luego queda aturdido 4 segundos y recibe un 20 por ciento más de daño durante 10)",
+        "fog_veil": "Velo de niebla (cuatro figuras, una real: el haz de la baliza hace fulgurar el farol del Vael real)",
         "mist_surge": "Oleada de Niebla (dano de area pulsante)",
         "summons_adds": "Invoca refuerzos",
         "lunar_tide": "Marea Lunar (dano de area pulsante)",
-        "chorus_and_solo": "Chorus and Solo (stack on one mark, spread from the other)",
-        "tideglass_reflections": "Tideglass Reflections (kill each other's mirror images)",
-        "hydra_three_elements": "Three Elements (the left head breathes an 18 yard cone of frost that slows you by 70 percent for 4 seconds, the centre head spits venom under up to 3 players that bursts after 1.5 seconds and burns for 6 seconds where it lands, and the right head fires a torrent down a 26 yard lane that throws you back 8 yards: step out of each one. When a head falls, the heads still standing take over its attack)",
-        "hydra_tsunami": "Tsunami (the heads sink for 4.5 seconds, taking 75 percent less damage, and a wave rolls over one half of the pool, the other half the next time: 160 to 190 frost damage on normal and a 10 yard shove. Cross to the other half or stand behind a rim column; on heroic the wave rolls back over the other half 3.5 seconds later. The first Tsunami comes 24 seconds into the fight, each later one 40 seconds after the last has passed)",
-        "hydra_combined_breath": "Combined Breath (between Tsunamis the heads fuse two of their attacks, always in the same order: Frostlocked Torrent freezes everyone in its lane for 2 seconds and leaves an Ice Wall that can shelter you from the next wave, Venom Current slides the venom pools outward, and Toxic Rime freezes the pools into crystals that burst after 4 seconds. Once between Tsunamis on normal, twice on heroic)",
-        "hydra_regrowth": "Regrowth (a fallen head grows back after 20 seconds at half health while another head still lives, and each fallen head makes the others deal 15 percent more damage: bring all three down close together)",
-        "rising_tide": "Rising Tide (half the island floods, move to the dry half)",
-        "undertow": "Undertow (pulls everyone in, run out before the crash)",
+        "chorus_and_solo": "Coro y Solo (agrupaos en una marca y separaos de la otra)",
+        "the_score": "La partitura (canta una melodía dos veces en las baldosas lunares: písalas en el orden en que sonaron para quebrar su voz)",
+        "tideglass_reflections": "Reflejos de Cristal de Marea (matad las imágenes reflejadas de los demás)",
+        "hydra_three_elements": "Tres elementos (la cabeza izquierda exhala un cono de escarcha de 18 yardas que te ralentiza un 70 por ciento durante 4 segundos; la central escupe veneno bajo hasta 3 jugadores que estalla tras 1,5 segundos y quema durante 6 segundos donde cae; y la derecha lanza un torrente por una franja de 26 yardas que te empuja 8 yardas: sal de cada ataque. Cuando cae una cabeza, las que siguen en pie asumen su ataque)",
+        "hydra_tsunami": "Ola de tsunami (las cabezas se hunden durante 4,5 segundos y reciben un 75 por ciento menos de daño; una ola recorre una mitad de la poza y la otra mitad la vez siguiente: de 160 a 190 de daño de escarcha en normal y un empujón de 10 yardas. Cruza a la otra mitad o colócate detrás de una columna del borde; en heroico la ola vuelve por la otra mitad 3,5 segundos después. El primer tsunami llega a los 24 segundos de combate y los siguientes, 40 segundos después de pasar el anterior)",
+        "hydra_combined_breath": "Aliento combinado (entre tsunamis, las cabezas fusionan dos de sus ataques, siempre en el mismo orden: Torrente aprisionado en hielo congela a todos en su franja durante 2 segundos y deja un Muro de hielo que puede proteger de la siguiente ola; Corriente venenosa desplaza los charcos de veneno hacia fuera; y Escarcha tóxica congela los charcos en cristales que estallan tras 4 segundos. Una vez entre tsunamis en normal, dos en heroico)",
+        "hydra_regrowth": "Regeneración (una cabeza caída vuelve a crecer tras 20 segundos con la mitad de salud mientras siga viva otra cabeza, y cada cabeza caída aumenta el daño de las demás un 15 por ciento: derriba las tres con poca diferencia de tiempo)",
+        "rising_tide": "Marea creciente (se inunda la mitad de la isla; ve a la mitad seca)",
+        "undertow": "Resaca (atrae a todos hacia dentro; sal antes del impacto)",
         "enrage": "Entra en furia al tener poca salud",
         "shuddering_stomp": "Pisada Estremecedora (aturdimiento de area)",
         "grave_inferno": "Infierno Sepulcral (AoE de fuego canalizado, manteneos separados)",
@@ -6560,9 +7059,9 @@ export const es: EnTranslations = {
         "deathless_court": "La Corte inmortal (solo heroico, la corte real se alza tras Rabia inmortal)",
         "bloodmane_rend": "Bloodmane Rend (sangrado, atento a los cambios de objetivos)",
         "tusk_sweep": "Barrido de colmillo (hendidura frontal)",
-        "grave_breath": "Grave Breath (frontal fire cone, it cracks the ice it covers)",
-        "plate_floor": "Breaking Ice (his fire cracks and sinks the lake plates, stay out of the open water)",
-        "wyrm_flights": "Flights (at 70% and 40%: walk Wyrm's Eye onto sound ice, stack where he should land)",
+        "grave_breath": "Aliento sepulcral (cono frontal de fuego que agrieta el hielo que cubre)",
+        "plate_floor": "Rotura del hielo (su fuego agrieta y hunde las placas del lago; mantente fuera del agua abierta)",
+        "wyrm_flights": "Vuelos (al 70% y 40%: lleva Ojo del vermis a hielo intacto, agrupaos donde deba aterrizar)",
         "ancestral_sap": "Savia Ancestral (cura a sus aliados)",
         "call_of_the_hunt": "Call of the Hunt (acelera a los aliados cercanos)",
         "thickhide_ward": "Thickhide Ward (protege a los aliados cercanos)",
@@ -6587,171 +7086,209 @@ export const es: EnTranslations = {
         "shared_pyre": "Pira compartida (círculo de reunión, divide el daño)",
         "anvils_decree": "Decreto del Yunque (tres golpes de martillo en toda la banda, curación completa)",
         "masters_assembly": "La Asamblea del Maestro (bloquear las vigas de forja, rotar los bloqueadores)",
-        "iron_cage": "Iron Cage (mash your interact key to break out, allies can smash the bars)",
-        "drowned_anchor": "Drowned Anchor (its victim is reeled toward the pit: run within 3 yards of a lit mooring post to moor the chain, the post then goes dark for 30 seconds, or break the chain with 12 hits, 16 on heroic)",
-        "shackle_pair": "Shackle Pair (two chained players must stay close together)",
-        "reaper_behind": "Shadow Crossing (three times in a row he rises behind a player, a different one each time while enough stand: step out of the scythe's arc)",
-        "pack_bond": "Pack Bond (together they take half damage: drag them 15 yards apart)",
-        "stalk": "Stalk (the jaguar hunts a marked player, never the tank; alone, it hunts you: kite, slow, root and stun it)",
-        "shared_health": "Shared Health (one pool: hit whichever is safest)",
-        "heel_frenzied_bond": "Heel! and Frenzied Bond (the jaguar leaps home, the bond reaches 20 yards)",
-        "seed_rain": "Seed Rain (clean players stomp the seeds before they sprout)",
-        "pollinate": "Pollinate (golden players stay off the seeds, or they sprout at once)",
-        "vine_lash": "Vine Lash (step out of the thorny lane or be rooted)",
-        "gorge": "Gorge (a heavy bite and a poison on the tank)",
-        "burrowing_seeds": "Burrowing Seeds and Pollen Cloud (seeds rise by a player at 6 seconds, gold spreads)",
-        "spirit_of_the_hunt": "Spirit of the Hunt (the Prey kites the avatar through lit sun glyphs; a Mauled player gets a head start)",
-        "twin_prey_ambush": "Twin Prey and Ambush (two Prey, then a pounce on the farthest player)",
-        "seal_shackles": "Seal Shackles (each chain you break makes him take 20 percent more damage and frees one of his attacks)",
-        "chain_strain": "Strain (step away from every pillar whose chain still holds)",
-        "korgath_stomp": "Shuddering Stomp (step out of the ring round him)",
-        "rerivet_last_link": "Re-rivet and Last Link (kick the Goadsmith re-pinning a chain; one chain left means Strain every 10 seconds)",
-        "waking_thaw": "Waking Thaw (the dead climb out of the thaw pools)",
-        "unquenched_held": "Held or Unquenched (kill the dead on cold ice, never in meltwater)",
-        "soulfire_trench": "Soulfire Trench (a line of soulfire, then a strip of meltwater)",
-        "shadow_volley": "Shadow Volley (shadow damage to everyone)",
-        "warm_hands_twice_woken": "Warm Hands and Twice-Woken (heroic only, keep the dead moving; a risen one returns stronger)"
+        "iron_cage": "Jaula de hierro (pulsa repetidamente tu tecla de interacción para escapar; los aliados pueden romper los barrotes)",
+        "drowned_anchor": "Ancla ahogada (arrastra a su víctima hacia la fosa: acércate a menos de 3 yardas de un poste de amarre encendido para amarrar la cadena; el poste se apaga durante 30 segundos, o rompe la cadena con 12 golpes, 16 en heroico)",
+        "shackle_pair": "Grilletes emparejados (dos jugadores encadenados deben permanecer cerca)",
+        "reaper_behind": "Cruce de sombras (tres veces seguidas emerge detrás de un jugador, distinto cada vez mientras haya suficientes en pie: sal del arco de la guadaña)",
+        "pack_bond": "Vínculo de la manada (juntos reciben la mitad de daño: sepáralos 15 yardas)",
+        "stalk": "Acecho (el jaguar persigue a un jugador marcado, nunca al tanque; en solitario te persigue a ti: atráelo sin dejarte alcanzar, ralentízalo, inmovilízalo y atúrdelo)",
+        "shared_health": "Salud compartida (una sola reserva: golpea al que sea más seguro)",
+        "heel_frenzied_bond": "¡Junto! y Vínculo frenético (el jaguar salta de vuelta a su amo y el vínculo alcanza 20 yardas)",
+        "seed_rain": "Lluvia de semillas (los jugadores sin polen pisan las semillas antes de que broten)",
+        "pollinate": "Polinizar (los jugadores dorados evitan las semillas o brotarán al instante)",
+        "vine_lash": "Latigazo de lianas (sal de la franja espinosa o quedarás inmovilizado)",
+        "gorge": "Atracón (un mordisco potente y un veneno sobre el tanque)",
+        "burrowing_seeds": "Semillas enterradoras y Nube de polen (las semillas emergen junto a un jugador a los 6 segundos; el efecto dorado se propaga)",
+        "spirit_of_the_hunt": "Espíritu de la caza (la Presa atrae al avatar por glifos solares encendidos sin dejarse alcanzar; un jugador Magullado recibe ventaja inicial)",
+        "twin_prey_ambush": "Presas gemelas y Emboscada (dos Presas y luego un salto sobre el jugador más lejano)",
+        "seal_shackles": "Grilletes del sello (cada cadena que rompes hace que reciba un 20 por ciento más de daño y libera uno de sus ataques)",
+        "chain_strain": "Tensión (aléjate de cada pilar cuya cadena siga intacta)",
+        "korgath_stomp": "Pisotón estremecedor (sal del círculo que lo rodea)",
+        "rerivet_last_link": "Remachar de nuevo y Último eslabón (interrumpe al Herrero de Aguijadas que vuelve a fijar una cadena; con una sola cadena restante, hay Tensión cada 10 segundos)",
+        "waking_thaw": "Deshielo que despierta (los muertos salen de los charcos de deshielo)",
+        "unquenched_held": "Cautivo o Sin templar (mata a los muertos sobre hielo frío, nunca en agua de deshielo)",
+        "soulfire_trench": "Zanja de fuego de almas (una línea de fuego de almas y luego una franja de agua de deshielo)",
+        "shadow_volley": "Salva de sombras (daño de sombras a todos)",
+        "warm_hands_twice_woken": "Manos calientes y Despertado dos veces (solo en heroico, mantén a los muertos en movimiento; uno que se alza vuelve más fuerte)"
       }
     },
     "bastionCage": {
-      "title": "Locked in the Iron Cage!",
-      "promptKey": "Press {key} again and again to break free",
-      "promptNoKey": "Press your interact key again and again to break free",
-      "promptClick": "Click here again and again to break free",
-      "promptTap": "Tap here again and again to break free",
-      "buttonAria": "Break free from the Iron Cage",
-      "progressAria": "Escape progress: {pct}"
+      "title": "¡Encerrado en la Jaula de hierro!",
+      "promptKey": "Pulsa {key} repetidamente para liberarte",
+      "promptNoKey": "Pulsa repetidamente tu tecla de interacción para liberarte",
+      "promptClick": "Haz clic aquí repetidamente para liberarte",
+      "promptTap": "Toca aquí repetidamente para liberarte",
+      "buttonAria": "Libérate de la Jaula de hierro",
+      "progressAria": "Progreso de escape: {pct}"
     },
     "bastionChain": {
-      "anchoredTitle": "Chained to the Drowned Anchor!",
-      "anchoredLine": "Run to a lit mooring post to moor the chain, or have your group break it before the winch drags you into the pit",
-      "allyTitle": "Break the chain!",
-      "allyLine": "{name} is being dragged to the pit: hit the Drowned Anchor, or help them reach a lit post",
-      "shackledTitle": "Shackled to {name}",
-      "shackledLine": "Stay within {range} yards to avoid chain damage to both of you ({dist} yards apart)",
-      "strainedLine": "Move within {range} yards of your partner to stop chain damage to both of you",
-      "brokenAria": "Chain broken: {pct}",
-      "reachAria": "Chain reach used: {pct}",
-      "linksLeft": "Chain links left: {count} of {total}",
-      "linkRule": "Every hit on the anchor breaks one link, however hard it lands",
-      "linksTarget": "{count} of {total} links",
-      "linkBroken": "Link broken!"
+      "anchoredTitle": "¡Encadenado al Ancla ahogada!",
+      "anchoredLine": "Corre hacia un poste de amarre encendido para amarrar la cadena o haz que tu grupo la rompa antes de que el torno te arrastre a la fosa",
+      "allyTitle": "¡Rompe la cadena!",
+      "allyLine": "Están arrastrando a {name} hacia la fosa: golpea el Ancla ahogada o ayúdale a llegar a un poste encendido",
+      "shackledTitle": "Encadenado a {name}",
+      "shackledLine": "Mantente a menos de {range} yardas para evitar que ambos recibáis daño de la cadena (separación de {dist} yardas)",
+      "strainedLine": "Acércate a menos de {range} yardas de tu compañero para que la cadena deje de dañaros a ambos",
+      "brokenAria": "Cadena rota: {pct}",
+      "reachAria": "Alcance de cadena usado: {pct}",
+      "linksLeft": "Eslabones restantes: {count} de {total}",
+      "linkRule": "Cada golpe al ancla rompe un eslabón, sin importar cuánto daño cause",
+      "linksTarget": "{count} de {total} eslabones",
+      "linkBroken": "¡Eslabón roto!"
     },
     "bastionAlert": {
-      "sentencedTitle": "The Sentence falls on you!",
-      "sentencedLine": "A column of light strikes everyone near you: move away from the group",
-      "brineTitle": "In the Hallowed Brine!",
-      "brineLine": "It burns you every second: step out of the pool",
-      "reapedTitle": "Death rises behind you!",
-      "reapedLine": "Move forward or sideways to avoid the scythe swinging behind you",
-      "veilTitle": "The Fog Veil",
-      "veilLine": "Find the Vael whose lantern flares in the beacon beam, then attack to break the veil",
-      "realTitle": "The beam found him!",
-      "realLine": "This is the real Vael: strike him to break the veil",
-      "shadeTitle": "A hollow shade",
-      "shadeLine": "Leave this decoy. Attack the Vael whose lantern flares in the beam to break the veil",
-      "timeAria": "{seconds} seconds left"
+      "sentencedTitle": "¡La Sentencia cae sobre ti!",
+      "sentencedLine": "Una columna de luz golpea a todos cerca de ti: aléjate del grupo",
+      "brineTitle": "¡En la Salmuera consagrada!",
+      "brineLine": "Te quema cada segundo: sal del charco",
+      "reapedTitle": "¡La muerte se alza a tu espalda!",
+      "reapedLine": "Avanza o muévete de lado para evitar la guadaña que barre detrás de ti",
+      "veilTitle": "El Velo de Niebla",
+      "veilLine": "Encuentra al Vael cuyo farol fulgura en el haz de la baliza y ataca para romper el velo",
+      "realTitle": "¡El haz lo ha encontrado!",
+      "realLine": "Este es el Vael real: golpéalo para romper el velo",
+      "shadeTitle": "Una sombra hueca",
+      "shadeLine": "Deja este señuelo. Ataca al Vael cuyo farol fulgura en el haz para romper el velo",
+      "timeAria": "Quedan {seconds} segundos"
+    },
+    "templeAlert": {
+      "melodyTitle": "La partitura",
+      "melodyLine": "Observa cómo suenan las baldosas lunares una tras otra. Repite el orden por turnos con otro jugador",
+      "melodyDarkLine": "Recuerda el orden antes de que se apaguen las baldosas. Repítelo por turnos con otro jugador",
+      "answerTitle": "¡Responde a la partitura!",
+      "answerLine": "Respetad los turnos: pisa la baldosa lunar marcada con {place}. Notas: {done} de {total}",
+      "answerDarkLine": "Respetad los turnos y repetid el orden de memoria. Sal de la baldosa antes de volver a pisarla. Notas: {done} de {total}",
+      "spentTitle": "Debe responder otra voz",
+      "spentLine": "No puedes hacer sonar una baldosa hasta que otro jugador toque la siguiente nota correcta. Notas: {done} de {total}",
+      "stepOffTitle": "Sal y vuelve a entrar",
+      "stepOffLine": "Una baldosa lunar solo suena cuando alguien entra en ella. Sal de esta baldosa y vuelve a pisarla",
+      "falseTitle": "¡Nota falsa!",
+      "falseLine": "Esa baldosa no tocaba. La respuesta vuelve a empezar por la primera baldosa",
+      "brokenTitle": "¡La voz de Selthe está quebrada!",
+      "brokenLine": "Recibe un {pct}% más de daño hasta que termine: usa ahora tus ataques más potentes",
+      "timeAria": "Quedan {seconds} segundos"
     },
     "wildheartAlert": {
-      "preyTitle": "You are the Prey!",
-      "preyLine": "Lure Zulgar through lit sun glyphs to slow him before he catches and mauls you",
-      "preyWaitLine": "Keep away from Zulgar: he will switch from the other marked player to chase you",
-      "stalkedTitle": "Stalked!",
-      "stalkedLine": "Run from the jaguar to avoid its bites. Lead it away from the Beastmaster to break Pack Bond",
-      "pollinatedTitle": "Pollinated!",
-      "pollinatedLine": "Avoid seedpods: touching them while Pollinated creates enemies. Unmarked allies can stomp them",
-      "bondTitle": "Pack Bond",
-      "bondLine": "Separate the Beastmaster and jaguar to remove their damage reduction and damage bonus",
-      "timeAria": "{seconds} seconds left"
+      "preyTitle": "¡Eres la Presa!",
+      "preyLine": "Atrae a Zulgar por glifos solares encendidos para ralentizarlo antes de que te alcance y magulle",
+      "preyWaitLine": "Mantente lejos de Zulgar: dejará al otro jugador marcado para perseguirte",
+      "stalkedTitle": "¡Acechado!",
+      "stalkedLine": "Huye del jaguar para evitar sus mordiscos. Aléjalo del Maestro de Bestias para romper Vínculo de la manada",
+      "pollinatedTitle": "¡Polinizado!",
+      "pollinatedLine": "Evita las vainas de semillas: tocarlas con Polinizado crea enemigos. Los aliados sin marca pueden pisarlas",
+      "bondTitle": "Vínculo de la manada",
+      "bondLine": "Separa al Maestro de Bestias del jaguar para quitar su reducción de daño y bonificación de daño",
+      "timeAria": "Quedan {seconds} segundos",
+      "preyAloneLine": "Nadie más puede encender los glifos solares. Permanece en uno apagado {seconds} s para encenderlo y atrae a Zulgar para que lo cruce",
+      "pinnedTitle": "¡Ensartado!",
+      "pinnedLine": "Un compañero debe extraer la Lanza de caza. Pulso de Corazón Salvaje te hace más daño mientras estás ensartado",
+      "pinnedSelfLine": "Nadie está libre para ayudarte: extrae tú la Lanza de caza antes de que llegue Pulso de Corazón Salvaje",
+      "sunstruckTitle": "¡Zulgar sufre el estado Golpeado por el sol!",
+      "sunstruckLine": "Recibe un {pct}% más de daño hasta que termine: usa ahora tus ataques más potentes",
+      "spearTitle": "¡Un aliado está ensartado!",
+      "spearLine": "Corre hasta la Lanza de caza y extráela antes de que llegue Pulso de Corazón Salvaje",
+      "glyphTitle": "Enciende los glifos solares",
+      "glyphLine": "Permanece en un glifo solar apagado {seconds} s para encenderlo. Cuando Zulgar lo cruce, recibirá un {pct}% más de daño durante {duration} s",
+      "glyphLightingTitle": "Encendiendo el glifo solar",
+      "glyphLightingLine": "Permanece en el glifo hasta que se encienda. Salir reinicia el proceso",
+      "breathTitle": "¡Aliento del ídolo!",
+      "breathLine": "El jaguar de piedra está a punto de exhalar sobre esta mitad de la terraza. Cruza a la otra mitad"
     },
     "sanctumAlert": {
-      "quenchTitle": "In the quench-water!",
-      "quenchLine": "Swim onto ice or the shore to escape the water damage and slow",
-      "plungeTitle": "Plunging Fire!",
-      "plungeLine": "Leave this ice platform now: fire will hit everyone on it and damage the ice",
-      "descentTitle": "Crashing Descent!",
-      "descentLine": "Leave the landing shadow to avoid Korzul crashing down and knocking you back",
-      "eyeTitle": "Wyrm's Eye on you!",
-      "eyeLine": "Move onto uncracked ice away from allies: your mark calls fire onto that platform",
-      "eyeCrackedLine": "Move onto uncracked ice away from allies: your marked fire would break this cracked platform",
-      "flailTitle": "Chain Flail!",
-      "flailLine": "Step sideways out of the marked strip to avoid the chain strike",
-      "chargeTitle": "Threshold Charge!",
-      "chargeLine": "Step sideways out of the marked strip: Korgath charges through it and knocks you back",
-      "trenchTitle": "Soulfire Trench!",
-      "trenchLine": "Step sideways out of the marked strip to avoid the fire damage. The ice then becomes meltwater",
-      "strainTitle": "Strain!",
-      "strainLine": "Move away from pillars with intact chains to avoid the blast and knockback",
-      "infernoTitle": "Grave Inferno!",
-      "infernoLine": "Move away from Korzul: each nearby fire pulse deals more damage",
-      "stompTitle": "Shuddering Stomp!",
-      "stompLine": "Move away from Korgath before the cast ends to avoid the stomp damage",
-      "breathTitle": "Grave Breath!",
-      "breathLine": "Move sideways out of the marked cone to avoid Korzul's breath damage",
-      "maulTitle": "Maul Arc!",
-      "maulLine": "Move behind Korgath to avoid the weapon swing hitting everyone in front",
-      "tailTitle": "Tail Sweep!",
-      "tailLine": "Move to Korzul's side to avoid the tail damage and knockback behind him",
-      "meltwaterTitle": "Bonewalker in meltwater",
-      "meltwaterLine": "Lure the Bonewalker chasing you onto dry ice before killing it: dying in water revives it and heals Velkhar",
-      "meltwaterTargetLine": "Stop attacking until the Bonewalker leaves the water: killing it there revives it and heals Velkhar",
-      "crackedTitle": "Cracked ice",
-      "crackedLine": "Move onto uncracked ice before drawing fire here: another fire hit breaks this platform",
-      "flightTitle": "Korzul takes flight",
-      "flightLine": "Group on uncracked ice to lure Korzul's landing, then leave the shadow to avoid the crash",
-      "lockboundTitle": "Lockbound",
-      "lockboundLine": "Attack the Seal Shackles to remove Korgath's damage reduction: {chains} chains grant {pct}% less damage taken",
-      "timeAria": "{seconds} seconds left",
-      "brandedTitle": "Branded!",
-      "brandedLine": "Enter a meltwater pool to remove the brand and stop its damage",
-      "rimeTitle": "Creeping Rime!",
-      "rimeLine": "Leave the whelps' breath to avoid freezing solid at full stacks: Creeping Rime {stacks}/{max}",
-      "slabTitle": "Ice Slab",
-      "slabLine": "Put the ice slab between you and enemy casters to block their line of sight"
+      "quenchTitle": "¡En el agua de temple!",
+      "quenchLine": "Nada hasta el hielo o la orilla para escapar del daño y la ralentización del agua",
+      "plungeTitle": "¡Fuego descendente!",
+      "plungeLine": "Sal de esta plataforma de hielo ahora: el fuego golpeará a todos los que estén en ella y dañará el hielo",
+      "descentTitle": "¡Descenso aplastante!",
+      "descentLine": "Sal de la sombra de aterrizaje para evitar que Korzul caiga sobre ti y te empuje",
+      "eyeTitle": "¡Ojo del vermis sobre ti!",
+      "eyeLine": "Ve a hielo sin grietas lejos de los aliados: tu marca atrae fuego a esa plataforma",
+      "eyeCrackedLine": "Ve a hielo sin grietas lejos de los aliados: el fuego de tu marca rompería esta plataforma agrietada",
+      "flailTitle": "¡Mangual de cadenas!",
+      "flailLine": "Sal de lado de la franja marcada para evitar el golpe de cadena",
+      "chargeTitle": "¡Carga del umbral!",
+      "chargeLine": "Sal de lado de la franja marcada: Korgath carga a través de ella y te empuja",
+      "trenchTitle": "¡Zanja de fuego de almas!",
+      "trenchLine": "Sal de lado de la franja marcada para evitar el daño de fuego. Después, el hielo se convierte en agua de deshielo",
+      "strainTitle": "¡Tensión!",
+      "strainLine": "Aléjate de los pilares con cadenas intactas para evitar la explosión y el empujón",
+      "infernoTitle": "¡Infierno sepulcral!",
+      "infernoLine": "Aléjate de Korzul: cada pulso de fuego cercano causa más daño",
+      "stompTitle": "¡Pisotón estremecedor!",
+      "stompLine": "Aléjate de Korgath antes de que termine el lanzamiento para evitar el daño del pisotón",
+      "breathTitle": "¡Aliento sepulcral!",
+      "breathLine": "Muévete de lado para salir del cono marcado y evitar el daño del aliento de Korzul",
+      "maulTitle": "¡Arco de maza!",
+      "maulLine": "Colócate detrás de Korgath para evitar el barrido del arma que golpea a todos delante",
+      "tailTitle": "¡Barrido de la cola!",
+      "tailLine": "Ve al costado de Korzul para evitar el daño y el empujón de su cola detrás de él",
+      "meltwaterTitle": "Caminahuesos en agua de deshielo",
+      "meltwaterLine": "Atrae al Caminahuesos que te persigue hasta hielo seco antes de matarlo: morir en el agua lo revive y cura a Velkhar",
+      "meltwaterTargetLine": "Deja de atacar hasta que el Caminahuesos salga del agua: matarlo allí lo revive y cura a Velkhar",
+      "crackedTitle": "Hielo agrietado",
+      "crackedLine": "Ve a hielo sin grietas antes de atraer fuego aquí: otro impacto de fuego rompe esta plataforma",
+      "flightTitle": "Korzul alza el vuelo",
+      "flightLine": "Agrupaos sobre hielo sin grietas para atraer el aterrizaje de Korzul y luego salid de la sombra para evitar el impacto",
+      "lockboundTitle": "Atado al sello",
+      "lockboundLine": "Ataca los Grilletes del sello para quitar la reducción de daño de Korgath: {chains} cadenas otorgan un {pct}% menos de daño recibido",
+      "timeAria": "Quedan {seconds} segundos",
+      "brandedTitle": "¡Marcado a fuego!",
+      "brandedLine": "Entra en un charco de agua de deshielo para quitar la marca y detener su daño",
+      "rimeTitle": "¡Escarcha creciente!",
+      "rimeLine": "Sal del aliento de las crías para evitar congelarte por completo al máximo de acumulaciones: Escarcha creciente {stacks}/{max}",
+      "slabTitle": "Losa de hielo",
+      "slabLine": "Coloca la losa de hielo entre tú y los lanzadores enemigos para bloquear su línea de visión"
     },
     "cryptAlert": {
-      "measuredTitle": "Measured for the Grave!",
-      "measuredLine": "Move to the yard's edge before the mark ends to keep the damaging grave away from your group",
-      "embracedTitle": "Frozen Embrace!",
-      "embracedLine": "Your group must damage the Lady of the Bonechill to free you from her grip",
-      "lamentTitle": "Bride's Lament!",
-      "lamentShelteredLine": "Stay in this lit lantern's light to avoid the wail damage: you have a shelter spot",
-      "lamentOpenLine": "Move into a lit lantern's light to avoid the wail damage: only two players fit per lantern",
-      "graveTitle": "In an Open Grave!",
-      "graveLine": "The grave dirt burns and slows you: step out of it",
-      "tollTitle": "Burial Toll!",
-      "tollLine": "Prepare to fight the skeletons raised from open graves: Marrow is immune while ringing the bell",
-      "harmonyTitle": "Harmony",
-      "harmonyLine": "Kill the Choristers to remove Ilvane's {pct}% damage reduction",
-      "knellTitle": "Burning Knell!",
-      "knellLine": "Ghost fire pours over this half of the ring when the bar runs out: get to the other half",
-      "graspTitle": "Grasp of the Grave!",
-      "graspLine": "Leave the marked ring before the hands erupt to avoid damage and being rooted",
-      "reapTitle": "Reap the Unquiet!",
-      "reapLine": "Move behind Morthen to avoid the scythe striking everyone in front",
-      "riteTitle": "Rite of the Unquiet",
-      "riteLine": "Relight all Remembrance Candles to break Morthen's immunity: {lit} of {total} lit",
-      "riteNamedLine": "Relight candles in the Ledger's order to break Morthen's immunity: a wrong candle undoes progress ({lit}/{total})",
-      "soulTitle": "Bound Soul",
-      "soulLine": "Intercept the drifting soul to stop it healing Morthen and increasing his damage. Catching it hurts you",
-      "timeAria": "{seconds} seconds left"
+      "measuredTitle": "¡Medido para la tumba!",
+      "measuredLine": "Ve al borde del patio antes de que termine la marca para mantener la tumba dañina lejos de tu grupo",
+      "embracedTitle": "¡Abrazo helado!",
+      "embracedLine": "Tu grupo debe dañar a la Dama del Frío de Huesos para liberarte de su agarre",
+      "lamentTitle": "¡Lamento de la novia!",
+      "lamentShelteredLine": "Permanece en la luz de este farol encendido para evitar el daño del lamento: tienes una plaza de refugio",
+      "lamentOpenLine": "Entra en la luz de un farol encendido para evitar el daño del lamento: solo caben dos jugadores por farol",
+      "graveTitle": "¡En una Tumba abierta!",
+      "graveLine": "La tierra sepulcral te quema y ralentiza: sal de ella",
+      "tollTitle": "¡Toque fúnebre!",
+      "tollLine": "Prepárate para luchar contra los esqueletos alzados de las tumbas abiertas: Marrow es inmune mientras toca la campana",
+      "harmonyTitle": "Armonía",
+      "harmonyLine": "Mata a los coristas para eliminar la reducción de daño del {pct}% de Ilvane",
+      "knellTitle": "¡Doblar ardiente!",
+      "knellLine": "El fuego fantasmal cubre esta mitad del círculo cuando se agota la barra: ve a la otra mitad",
+      "graspTitle": "¡Agarre de la tumba!",
+      "graspLine": "Sal del círculo marcado antes de que broten las manos para evitar el daño y la inmovilización",
+      "reapTitle": "¡Segar a los inquietos!",
+      "reapLine": "Colócate detrás de Morthen para evitar la guadaña que golpea a todos los que están delante",
+      "riteTitle": "Rito de los inquietos",
+      "riteLine": "Vuelve a encender todas las Velas del Recuerdo para romper la inmunidad de Morthen: {lit} de {total} encendidas",
+      "riteNamedLine": "Vuelve a encender las velas en el orden del Registro para romper la inmunidad de Morthen: una vela incorrecta deshace el progreso ({lit}/{total})",
+      "soulTitle": "Alma atada",
+      "soulLine": "Intercepta el alma que avanza para impedir que cure a Morthen y aumente su daño. Recibirla te hace daño",
+      "timeAria": "Quedan {seconds} segundos"
     },
     "kitUse": {
-      "toppleLine": "Topple the brazier onto nearby enemies to burn them with the spill",
-      "toppleKey": "Topple the {name} onto them",
-      "toppleTap": "Tap here to topple the {name} onto them",
-      "toppleClick": "Click here to topple the {name} onto them",
-      "toppleFar": "Get within {range} yd to kick it over",
-      "toppleAria": "Topple the {name}",
-      "usingLine": "Hold still: a hit, a step or a stun breaks it",
-      "relightLine": "Relight the candles to break Morthen's immunity. Channeling drains your health; moving or a stun cancels it",
-      "relightKey": "Relight the {name}",
-      "relightTap": "Tap here to relight the {name}",
-      "relightClick": "Click here to relight the {name}",
-      "relightFar": "Get within {range} yd to relight it",
-      "relightAria": "Relight the {name}",
-      "relightUsingLine": "Keep channeling to light the candle: it drains health. Hits do not interrupt; moving or a stun does",
-      "timeAria": "{seconds} seconds left"
+      "toppleLine": "Vuelca el brasero sobre enemigos cercanos para quemarlos con lo derramado",
+      "toppleKey": "Vuelca {name} sobre ellos",
+      "toppleTap": "Toca aquí para volcar {name} sobre ellos",
+      "toppleClick": "Haz clic aquí para volcar {name} sobre ellos",
+      "toppleFar": "Acércate a menos de {range} yardas para volcarlo de una patada",
+      "toppleAria": "Vuelca: {name}",
+      "usingLine": "No te muevas: un golpe, un paso o un aturdimiento lo interrumpe",
+      "relightLine": "Vuelve a encender las velas para romper la inmunidad de Morthen. Canalizar drena tu salud; moverte o un aturdimiento lo cancela",
+      "relightKey": "Vuelve a encender: {name}",
+      "relightTap": "Toca aquí para volver a encender: {name}",
+      "relightClick": "Haz clic aquí para volver a encender: {name}",
+      "relightFar": "Acércate a menos de {range} yardas para volver a encenderlo",
+      "relightAria": "Vuelve a encender: {name}",
+      "relightUsingLine": "Sigue canalizando para encender la vela: drena salud. Los golpes no interrumpen; moverte o un aturdimiento sí",
+      "freeLine": "Extrae la lanza del suelo para liberar a quien inmoviliza. Recibir daño no te detiene; moverte o sufrir un aturdimiento sí",
+      "freeKey": "Extraer {name}",
+      "freeTap": "Toca aquí para extraer {name}",
+      "freeClick": "Haz clic aquí para extraer {name}",
+      "freeFar": "Acércate a {range} m para extraerla",
+      "freeAria": "Extraer {name}",
+      "freeUsingLine": "Quédate quieto para extraer la lanza: moverte o sufrir un aturdimiento te detiene",
+      "timeAria": "Quedan {seconds} segundos"
     },
     "cosmetics": {
       "title": "Cosméticos",
@@ -6760,8 +7297,8 @@ export const es: EnTranslations = {
       "tabMounts": "Monturas",
       "tabSkins": "Apariencias",
       "tabMech": "Mecano",
-      "buddyActive": "Summoned",
-      "buddyDrag": "Drag to action bar",
+      "buddyActive": "Invocado",
+      "buddyDrag": "Arrastrar a la barra de acción",
       "legend": "Cuenta: compartido por todos los personajes. Personaje: solo este personaje.",
       "scopeAccount": "Cuenta",
       "scopeCharacter": "Personaje",
@@ -6772,12 +7309,13 @@ export const es: EnTranslations = {
       "detach": "Separar",
       "applied": "Aplicado",
       "owned": "En propiedad",
+      "notCollected": "Sin coleccionar",
       "storeOnly": "Disponible en la Tienda de WOC",
       "preview": "Avance",
       "previewAria": "Vista previa {name}",
       "cardAria": "Objeto: {name}, {rarity}",
-      "mountsIntro": "Una apariencia de montura se dibuja sobre la montura que cabalgue este personaje. Nunca cambia la velocidad.",
-      "mountsNoMount": "Consigue primero una montura: una apariencia necesita algo que montar.",
+      "mountsIntro": "Elige aquí la apariencia de tu montura. El entrenamiento de equitación determina la velocidad. Conserva el objeto de montura en las bolsas o el banco de cualquier personaje para compartir su apariencia con toda la cuenta.",
+      "mountsNoMount": "Aprende equitación con la caballeriza mayor Marla para invocar una montura.",
       "skinsEmpty": "Aún no tienes apariencias de arma. Visita la Tienda de WOC.",
       "skinsApplyHint": "Equipa un {type} para aplicar esta apariencia.",
       "mechIntro": "El Mecano de combate reemplaza el cuerpo de este personaje. Solo se lleva un croma a la vez.",
@@ -6884,6 +7422,8 @@ export const es: EnTranslations = {
       "sourceActivityMasterworkCraft": "Se consigue creando una obra maestra",
       "sourceActivityRiftFirstClear": "Se otorga a todos los miembros del grupo que logra la primera conquista de una Brecha clasificada",
       "sourceActivityBuriedHoard": "Se encuentra en el cofre de recompensa de un tesoro enterrado, la cámara a la que lleva un mapa del tesoro",
+      "sourceActivityLanternHall": "Se compra con sellos del farol al intendente del Salón del Farol",
+      "sourceActivityWeeklyVaultPvp": "Elegido de la fila JcJ de la Bóveda Semanal",
       "cellMissingSourceAria": "{name}, aún sin encontrar, {source}",
       "cellOwnedClearsAria": "{name}, catalogada, encontrada por primera vez en la conquista {count}",
       "searchPlaceholder": "Buscar reliquias",
@@ -6982,14 +7522,14 @@ export const es: EnTranslations = {
       "bordersSection": "Bordes",
       "bordersNone": "Sin borde",
       "bordersEmpty": "Consigue una gesta que otorgue borde para desbloquear este estante.",
-      "buddiesSection": "Buddies",
-      "buddiesNone": "No Buddy",
-      "buddiesEmpty": "Collect a companion to summon it from this shelf.",
-      "buddyDragHint": "Drag onto your action bar",
-      "looksSection": "Buddy Looks",
-      "looksNone": "Own Look",
-      "looksNoBuddy": "Summon a companion to choose its look here.",
-      "looksEmpty": "This companion has no looks unlocked yet.",
+      "buddiesSection": "Compañeros",
+      "buddiesNone": "Sin compañero",
+      "buddiesEmpty": "Consigue un compañero para invocarlo desde este estante.",
+      "buddyDragHint": "Arrastra a tu barra de acción",
+      "looksSection": "Apariencias de compañero",
+      "looksNone": "Apariencia propia",
+      "looksNoBuddy": "Invoca a un compañero para elegir su apariencia aquí.",
+      "looksEmpty": "Este compañero aún no tiene apariencias desbloqueadas.",
       "unlockedBanner": "Gesta lograda: {name}",
       "unlockedTitleHint": "Nuevo título conseguido: {title}. Elígelo en el Libro de Gestas.",
       "unlockedBorderHint": "Nuevo borde conseguido: {name}. Lúcelo desde el Libro de Gestas.",
@@ -7075,7 +7615,9 @@ export const es: EnTranslations = {
         "passage": "Paso"
       },
       "collapseHint": "Contraer la barra lateral del mapa",
-      "expandHint": "Expandir la barra lateral del mapa"
+      "expandHint": "Expandir la barra lateral del mapa",
+      "resizeRailAria": "Ancho de la barra lateral del mapa",
+      "resizeRailHint": "Arrastra para cambiar el tamaño de la barra lateral del mapa. Haz doble clic para restablecer."
     },
     "arenaGate": {
       "minLevelNote": "Requiere nivel {level}"
@@ -7360,6 +7902,8 @@ export const es: EnTranslations = {
       "choose": "Elegir misión",
       "inProgress": "En curso ({count}/{required})",
       "completed": "Completado esta semana",
+      "completedLastWeek": "Completado la semana pasada",
+      "claimFirst": "Recoger primero",
       "lockedThisWeek": "Bloqueado esta semana",
       "footerPick": "Puedes llevar una carga semanal a la vez. Elige una carta para leer sus condiciones.",
       "footerHeld": "Tu carga de la semana ya está fijada. Las otras tres se desbloquean en el reinicio.",
@@ -7368,7 +7912,7 @@ export const es: EnTranslations = {
       "rewards": "Recompensas",
       "alsoReceive": "También recibirás:",
       "tally": "{count} / {required}",
-      "cacheDesc": "Se abre en una pieza de incursión Normal para tu clase (nunca una pieza de un conjunto de rango), más {count} x {item}.",
+      "cacheDesc": "Se abre en una pieza de incursión Normal para tu clase (nunca una pieza de un conjunto de rango de Ignivar), más {count} x {item}.",
       "dialogNote": "Solo puede haber una carga semanal activa. Se {reset}",
       "accept": "Aceptar",
       "decline": "Rechazar",
@@ -7400,6 +7944,7 @@ export const es: EnTranslations = {
       },
       "commendHeading": "Condecoración del emisario",
       "commendNote": "{amount} de reputación con la facción que elijas, una vez por semana.",
+      "commendCarriedNote": "{amount} de reputación de la semana pasada sin recoger. Recógela para elegir una nueva carga.",
       "commendClaimed": "La condecoración de esta semana fue para {faction}.",
       "commendRewardLine": "{amount} de reputación con la facción que elijas",
       "chosen": "Misión semanal aceptada: {category}",
@@ -7470,8 +8015,8 @@ export const es: EnTranslations = {
       "delete_confirm": "Escribe el nombre del personaje para confirmar la eliminación.",
       "storage_purchase_open": "Una compra de almacenamiento debe completarse o resolverse antes de poder eliminar este personaje.",
       "delete_busy": "El reino está ocupado. Intenta eliminar este personaje de nuevo dentro de un momento.",
-      "referral_transfer_pending": "Move all unlocked stamp cards to another character before deleting this character.",
-      "referral_bond_pending": "A referral membership bond is being delivered to this character. Try deleting the character again after delivery finishes.",
+      "referral_transfer_pending": "Transfiere todas las tarjetas de sellos desbloqueadas a otro personaje antes de eliminar este personaje.",
+      "referral_bond_pending": "Se está entregando un bono de membresía por invitación a este personaje. Vuelve a intentar eliminarlo cuando termine la entrega.",
       "already_in_world": "El personaje ya está en el mundo.",
       "taken_over": "Otra sesión tomó el control de tu personaje.",
       "rename_required": "Este personaje debe cambiar de nombre antes de entrar al mundo.",
@@ -7567,6 +8112,12 @@ export const es: EnTranslations = {
       "reason_required": "Se requiere una razón.",
       "admin_target": "Las cuentas de los operadores no se pueden expulsar.",
       "target_offline": "Ese jugador ya no está en línea en este reino."
+    },
+    "world_quest_block": {
+      "admin_target": "Las cuentas de los operadores no se pueden bloquear para misiones de mundo.",
+      "reason_required": "Se requiere una razón.",
+      "already_blocked": "Esa cuenta ya está bloqueada para misiones de mundo.",
+      "not_blocked": "Esa cuenta no está bloqueada para misiones de mundo."
     },
     "woc_market": {
       "invalid_input": "Entrada no válida.",
@@ -7814,90 +8365,805 @@ export const es: EnTranslations = {
   "dungeonGuide": {
     "drownedTemple": {
       "greet": {
-        "1": "I was the youngest voice of the Pale Choir. On the night of the rite I did not drink, and I ran. Every full moon since, I hear them singing under the water. I must see her before I die. Let me walk behind you. I will not fight, and I will not slow you.",
-        "2": "Every full moon I come to this gate, and every full moon my nerve fails me. Not tonight. The Choir is singing, and I am the one who ran. Take me down to her, and I will keep out of your way."
+        "1": "Fui la voz más joven del Coro Pálido. La noche del rito no bebí y huí. Desde entonces, cada luna llena los oigo cantar bajo el agua. Debo verla antes de morir. Déjame caminar detrás de ti. No lucharé y no te retrasaré.",
+        "2": "Cada luna llena vengo a esta puerta y cada luna llena me falla el valor. Esta noche no. El Coro canta y yo soy quien huyó. Llévame hasta ella y no estorbaré."
       },
       "row": {
-        "join": "Come with us.",
-        "decline": "We go alone."
+        "join": "Ven con nosotros.",
+        "decline": "Iremos solos."
       },
-      "joined": "Lead on. I am right behind you.",
-      "singing": "Let me sing. Go, and go gently.",
+      "joined": "Guía el camino. Te sigo de cerca.",
+      "singing": "Déjame cantar. Ve, y ve con calma.",
       "accept": {
-        "1": "Thank you. I will walk behind you, and keep out of your way.",
-        "2": "Then I go down at last. Walk on. I will keep up."
+        "1": "Gracias. Caminaré detrás de ti y no estorbaré.",
+        "2": "Entonces por fin bajaré. Sigue adelante. Te seguiré el paso."
       },
-      "decline": "I understand. I will listen from up here, as I always have.",
-      "heroicWater": "The water stands high tonight, higher than I have ever seen it. She is close to waking.",
+      "decline": "Lo entiendo. Escucharé desde aquí arriba, como siempre.",
+      "heroicWater": "El agua está alta esta noche, más de lo que la he visto jamás. Está a punto de despertar.",
       "memory": {
-        "votaries": "The drowned ones on the shore walked in after the gate closed. The moon never took them, only the water.",
-        "rubbing": "The Tidewatcher read my words on the shore-rock. 'It only sleeps.' I carved them the morning after."
+        "votaries": "Los ahogados de la orilla entraron después de cerrarse la puerta. No se los llevó la luna, solo el agua.",
+        "rubbing": "El Vigía de las Mareas leyó mis palabras en la roca de la orilla. «Solo duerme». Las grabé a la mañana siguiente."
       },
       "area": {
-        "steps": "The Pilgrim Steps. I ran up these that night, three at a time, and never looked back.",
+        "steps": "Los Peldaños del Peregrino. Aquella noche los subí corriendo de tres en tres y nunca miré atrás.",
         "causeway": {
-          "1": "On rite nights the moon lay on this causeway like a second road.",
-          "2": "Look at the water. It still remembers how to hold the moon."
+          "1": "Las noches de rito, la luna reposaba sobre esta calzada como un segundo camino.",
+          "2": "Mira el agua. Aún recuerda cómo sostener la luna."
         },
-        "colonnade": "The Colonnade of Tides. We walked it two by two, singing the rising verse.",
-        "veil": "Past that veil is the Choir Court. I have not stood there since I was a boy.",
-        "terraces": "The tidepools. The novices kept them clean and fed the small bright things living in them.",
-        "falls": "Behind the falls the water drowns every voice. I hid here when I skipped practice.",
-        "pool": "The moon pool. They knelt round it and drank from their shells. I could not lift mine.",
-        "prismStair": "The Prism Stair. We climbed it at moonrise to wake the great glass.",
+        "colonnade": "La Columnata de las Mareas. La recorríamos de dos en dos cantando el verso ascendente.",
+        "veil": "Más allá de ese velo está el Patio del Coro. No lo he pisado desde niño.",
+        "terraces": "Las pozas de marea. Los novicios las limpiaban y daban de comer a las pequeñas criaturas brillantes que vivían en ellas.",
+        "falls": "Detrás de las cascadas, el agua ahoga cualquier voz. Me escondía aquí cuando faltaba a los ensayos.",
+        "pool": "La poza lunar. Se arrodillaban a su alrededor y bebían de sus conchas. Yo no pude alzar la mía.",
+        "prismStair": "La Escalera del Prisma. La subíamos al salir la luna para despertar el gran cristal.",
         "moonbridge": {
-          "1": "A bridge of moonlight. The elders said only the faithful could cross it.",
-          "2": "I was never faithful. Well. We shall see if it holds me."
+          "1": "Un puente de luz lunar. Los ancianos decían que solo los fieles podían cruzarlo.",
+          "2": "Nunca fui fiel. Bueno. Ya veremos si me sostiene."
         },
-        "altarLanding": "This is where I stood. Right here. This is where I turned and ran."
+        "altarLanding": "Aquí fue donde estuve. Justo aquí. Aquí me di la vuelta y huí."
       },
       "sight": {
-        "pilgrim": "The pilgrims of the shore villages. They carried their shrine on their backs every spring. Now they carry it forever.",
-        "acolyte": "The novices. I learned my letters beside them. They sing in their sleep now, and never wake.",
-        "templeguard": "The stair guard. They swore to hold the temple until the moon set. It never set.",
-        "snapper": "We drank the moon-water from shells like those. Mine I dropped on the stair.",
-        "siren": "That voice. She sang beside me in the choir. She still comes in half a beat early.",
-        "lurker": "The children netted those in the shallows. They were small as a thumb, and they glowed.",
-        "tidewisp": "That is the moon-water itself, the draught we were meant to drink. Do not let it touch you.",
-        "sentinel": "The moon rays of the gate pools. As novices we fed them pearls at moonrise. Now they keep the doors, and wear our pearls as hearts.",
-        "eel": "The lagoon eels. The novices fed them bread at dusk. They grew fat on our hymns.",
-        "reflection": "It shows you what the water would make of you. Break it!",
-        "moonspawn": "Those were never my people. They are hers, made of nothing but moonlight."
+        "pilgrim": "Los peregrinos de las aldeas de la costa. Cada primavera llevaban su santuario a la espalda. Ahora lo llevan para siempre.",
+        "acolyte": "Los novicios. Aprendí las letras a su lado. Ahora cantan dormidos y nunca despiertan.",
+        "templeguard": "La guardia de la escalera. Juraron defender el templo hasta que se pusiera la luna. Nunca se puso.",
+        "snapper": "Bebíamos el agua lunar de conchas como esas. La mía la dejé caer en la escalera.",
+        "siren": "Esa voz. Cantaba a mi lado en el coro. Sigue entrando medio tiempo antes.",
+        "lurker": "Los niños las atrapaban con redes en los bajíos. Eran pequeñas como un pulgar y brillaban.",
+        "tidewisp": "Eso es la propia agua lunar, el trago que debíamos beber. No dejes que te toque.",
+        "sentinel": "Las rayas lunares de las pozas de la puerta. De novicios les dábamos perlas al salir la luna. Ahora custodian las puertas y llevan nuestras perlas como corazones.",
+        "eel": "Las anguilas de la laguna. Los novicios les daban pan al anochecer. Engordaron con nuestros himnos.",
+        "reflection": "Te muestra lo que el agua haría de ti. ¡Rómpelo!",
+        "moonspawn": "Esos nunca fueron de mi pueblo. Son de ella, hechos solo de luz lunar."
       },
       "selthe": {
         "pre": {
-          "1": "Mother Selthe. She taught me to breathe from the belly. She taught us all to drown without dying.",
-          "2": "Choirmother Selthe. Every note I know, she put in me. Forgive me, Mother."
+          "1": "Madre Selthe. Me enseñó a respirar desde el vientre. Nos enseñó a todos a ahogarnos sin morir.",
+          "2": "Madre del Coro Selthe. Cada nota que sé, ella me la inculcó. Perdóname, Madre."
         },
         "post": {
-          "1": "She is quiet. In all my years in the Choir, she was never once quiet.",
-          "2": "Rest now, Mother. You were right about me. I never could hold the long notes."
+          "1": "Está en silencio. En todos mis años en el Coro, nunca guardó silencio ni una vez.",
+          "2": "Descansa ya, Madre. Tenías razón sobre mí. Nunca se me dio bien mantener las notas largas."
         }
       },
       "hydra": {
-        "pre": "The pool serpent. When I was a boy it had one head, and it ate from our hands.",
-        "post": "Listen. Under the falls they are still singing. Closer now."
+        "pre": "La serpiente de la poza. Cuando yo era niño tenía una cabeza y comía de nuestras manos.",
+        "post": "Escucha. Bajo las cascadas siguen cantando. Ahora más cerca."
       },
       "colossus": {
-        "pre": "The great prism. We sang into it to catch the moon. I never knew it could stand.",
-        "post": "The glass is broken. Nothing is left to catch the moon now, but her."
+        "pre": "El gran prisma. Cantábamos hacia él para atrapar la luna. Nunca supe que podía ponerse en pie.",
+        "post": "El cristal está roto. Ya no queda nada que atrape la luna, salvo ella."
       },
       "ysolei": {
-        "pre": "There she is. All my life I have asked if she was a goddess or a monster. Show me.",
-        "preHeroic": "On a night like this the whole Choir sings with her. Hold fast, all of you."
+        "pre": "Ahí está. Toda mi vida me he preguntado si era una diosa o un monstruo. Muéstramelo.",
+        "preHeroic": "En una noche así, todo el Coro canta con ella. Resistid, todos vosotros."
       },
       "farewell": {
-        "answer": "She was neither. She was the moon in the water, and we were the ones who knelt.",
-        "verse": "The rite had a last verse, the one that lets the singers sleep. I never sang it.",
-        "stay": "They have waited long enough. I will stay, and sing it for them now.",
+        "answer": "No era ninguna de las dos cosas. Era la luna en el agua, y nosotros éramos quienes se arrodillaban.",
+        "verse": "El rito tenía un último verso, el que permite dormir a los cantores. Nunca lo canté.",
+        "stay": "Ya han esperado bastante. Me quedaré y ahora lo cantaré para ellos.",
         "goodbye": {
-          "1": "Go up into the night. If you hear singing at the full moon, it is only me.",
-          "2": "Thank you for bringing an old coward to the end of his song. Go now."
+          "1": "Sube hacia la noche. Si oyes cantar durante la luna llena, solo soy yo.",
+          "2": "Gracias por traer a un viejo cobarde hasta el final de su canción. Vete ya."
         },
-        "emote": "{name} lifts his voice over the altar, and the lagoon falls still."
+        "emote": "{name} alza la voz sobre el altar y la laguna queda inmóvil."
       },
-      "wipe": "Get up. Please. Do not leave me down here alone again.",
-      "catchUp": "My legs are old, but I know every one of these stairs. I am here."
+      "wipe": "Levántate. Por favor. No vuelvas a dejarme solo aquí abajo.",
+      "catchUp": "Mis piernas son viejas, pero conozco cada uno de estos escalones. Aquí estoy."
+    }
+  },
+  "bossJournal": {
+    "common": {
+      "enrageName": "Enfurecido",
+      "phaseEnrageSummary": "Por debajo de {health} de salud, el jefe se enfurece durante el resto del combate.",
+      "enrageSummary": "Por debajo de {health} de salud, sus ataques cuerpo a cuerpo causan {damage} más de daño y se suceden {haste} más rápido durante el resto del combate.",
+      "enrageResponse": "El tanque y el sanador reservan sus habilidades defensivas y de sanación con tiempo de reutilización para esta fase. Los demás concentran su daño para terminarla rápido.",
+      "heroicHarder": "Todas las habilidades de esta página causan {scale} veces el daño del modo normal."
+    },
+    "wildheart": {
+      "saurian": {
+        "overview": "Una bestia de guerra del tamaño de una casa con una plataforma a cuestas recorre en bucle el vado del río. No puedes evitarla: los puentes de lianas solo se abren cuando muere. Dos golpes anunciados, un jinete sanador a mitad de salud y un enfurecimiento al final.",
+        "phaseFordName": "El Vado del Río",
+        "phaseFordSummary": "Desde el inicio alterna un barrido de cola detrás y un pisotón a su alrededor. Solo ejecuta un golpe cada vez.",
+        "phaseHowdahName": "La plataforma se rompe",
+        "phaseHowdahSummary": "Al llegar a {health} de salud, la plataforma se astilla y un Invocador de Maleficios de la Plataforma salta al suelo para curar al Saurio.",
+        "phaseEnrageName": "Enfurecido",
+        "phaseEnrageSummary": "Por debajo de {health} de salud se enfurece durante el resto del combate.",
+        "tailSummary": "Cada {every} s, un lanzamiento de {cast} s y luego su cola barre un cono de {arc} grados detrás, hasta {range} yardas desde su centro: de {min} a {max} de daño y un empujón de {push} yardas.",
+        "tailResponse": "Nunca te coloques detrás. Ataca desde sus costados.",
+        "stompSummary": "Cada {every} s, un lanzamiento de {cast} s y luego todos a menos de {radius} yardas de su centro reciben de {min} a {max} de daño y quedan derribados durante {stun} s.",
+        "stompResponse": "Quien pueda sale del círculo antes de que termine el lanzamiento. El tanque lo recibe; los sanadores le llenan la salud después.",
+        "riderName": "Jinete de la Plataforma",
+        "riderSummary": "Una vez, al llegar a {health} de salud: un Invocador de Maleficios de la Plataforma salta junto al Saurio y lucha a su lado, curándolo con Savia ancestral.",
+        "riderResponse": "El tanque atrae al jinete. Los personajes de daño interrumpen su cura o lo matan primero.",
+        "sapSummary": "La cura del jinete: un lanzamiento de {cast} s cada {every} s que restaura {heal} de la salud máxima del Saurio.",
+        "sapResponse": "Interrúmpelo siempre o mata al jinete.",
+        "enrageSummary": "Por debajo de {health} de salud, todo lo que hace inflige {damage} más de daño: cuerpo a cuerpo, Barrido de cola y Pisotón sísmico.",
+        "tipTank": "Mantenlo mirando lejos del grupo para que nadie acabe detrás de su cola. Atrae al Invocador de Maleficios de la Plataforma en cuanto aterrice.",
+        "tipHealer": "Pisotón sísmico derriba a todos cerca, así que cura al tanque después de cada uno. Reserva una habilidad defensiva para el enfurecimiento.",
+        "tipDamage": "Mantente en sus costados, fuera del cono de la cola y el círculo del pisotón. A mitad de salud, interrumpe Savia ancestral o mata al jinete.",
+        "choiceName": "¿Primero el jinete o el saurio?",
+        "choiceGain": "Matar al jinete termina sus curas para siempre: cada Savia ancestral restaura {heal} del Saurio cada {every} s.",
+        "choiceRisk": "Mientras matas al jinete, el Saurio sigue barriendo y pisoteando. Si dejas vivo al jinete, alguien debe interrumpir cada cura."
+      },
+      "beast": {
+        "overview": "El Maestro de Bestias Señor de los Colmillos y su Gran Jaguar comparten una barra de salud y mueren juntos. Cerca el uno del otro son mucho más resistentes y golpean más fuerte, así que el tanque aleja al amo mientras el jaguar persigue a un jugador marcado.",
+        "phasePitsName": "Los Fosos de las Bestias",
+        "phasePitsSummary": "Un combate, dos cuerpos. Sus temporizadores funcionan todo el combate; no hay fases por salud.",
+        "bondName": "Vínculo de la manada",
+        "bondSummary": "Mientras el Maestro de Bestias y el jaguar estén a menos de {reach} yardas entre sí, ambos reciben {dr} menos de daño e infligen {damage} más.",
+        "bondHeroicSummary": "Vínculo frenético: mientras el Maestro de Bestias y el jaguar estén a menos de {reach} yardas entre sí, ambos reciben {dr} menos de daño e infligen {damage} más.",
+        "bondResponse": "El tanque arrastra al Maestro de Bestias a más de {reach} yardas del jaguar y lo mantiene allí.",
+        "sharedName": "Salud compartida",
+        "sharedSummary": "Los dos cuerpos comparten una reserva de salud: el daño a cualquiera cuenta igual y cuando uno muere, el otro también.",
+        "sharedResponse": "Golpea al cuerpo al que sea más seguro llegar. No se pierde nada al cambiar de objetivo.",
+        "stalkName": "Acecho",
+        "stalkSummary": "El jaguar marca a un jugador que no sea el tanque de su amo y lo persigue durante {seconds} s, ignorando provocaciones. Al alcance, muerde cada {biteEvery} s: de {min} a {max} de daño y luego una hemorragia de {bleed} cada {bleedEvery} s durante {bleedSeconds} s. Después elige otra presa.",
+        "stalkResponse": "Si tienes la marca, corre y aleja al jaguar del Maestro de Bestias. Los demás lo ralentizan, inmovilizan o aturden.",
+        "waryName": "Prevenido",
+        "warySummary": "Cada tipo de control (aturdimiento, raíz, ralentización) afecta al jaguar una vez y luego ese tipo falla durante {lockout} s. Las incapacitaciones, miedos y polimorfias cuentan como aturdimientos.",
+        "waryResponse": "Alterna: una raíz, luego una ralentización y luego un aturdimiento, en lugar de tres del mismo tipo.",
+        "quakeSummary": "Cada {every} s, un lanzamiento de {cast} s y luego todos a menos de {radius} yardas del Maestro de Bestias reciben de {min} a {max} de daño.",
+        "quakeResponse": "Todos salvo el tanque se alejan del Maestro de Bestias.",
+        "huntName": "Llamada de la caza",
+        "huntSummary": "Cada {every} s, ambas bestias atacan {haste} más rápido durante {seconds} s.",
+        "huntResponse": "El tanque y el sanador usan una habilidad defensiva o de sanación durante el efecto; el jaguar también muerde más rápido.",
+        "wardName": "Resguardo de piel gruesa",
+        "wardSummary": "Cada {every} s el jaguar obtiene un escudo que absorbe {amount} de daño durante {seconds} s.",
+        "wardResponse": "Golpea al Maestro de Bestias mientras el escudo esté activo: la reserva de salud es compartida.",
+        "heelSummary": "Cada {every} s, un lanzamiento de {cast} s sobre el jaguar y luego salta de vuelta al Maestro de Bestias y regresa el vínculo.",
+        "heelResponse": "Aturde, incapacita o transforma al jaguar durante el lanzamiento para cancelarlo. Solo funciona si no está ya Prevenido contra los aturdimientos.",
+        "tipTank": "Aleja al Maestro de Bestias más de {normal} yardas del jaguar de inmediato y mantenlo allí, mirando lejos del grupo.",
+        "tipTankHeroic": "Aleja al Maestro de Bestias más de {heroic} yardas del jaguar de inmediato y mantenlo allí. Después de cada ¡Junto!, vuelve a separarlo.",
+        "tipHealer": "Vigila al objetivo de Acecho: los mordiscos y hemorragias llegan rápido, aún más durante Llamada de la caza.",
+        "tipDamage": "Golpea al cuerpo que sea más seguro. Cuando te aceche, aleja al jaguar del amo corriendo; si no, alterna ralentizaciones, raíces y aturdimientos sobre él.",
+        "tipDamageHeroic": "Golpea al cuerpo que sea más seguro. Reserva un aturdimiento para cada lanzamiento de ¡Junto! y alterna ralentizaciones y raíces sobre el jaguar.",
+        "choiceName": "¿Controlar al jaguar ahora o reservar el control?",
+        "choiceGain": "Las ralentizaciones, raíces y aturdimientos mantienen al jaguar lejos de su presa y del Maestro de Bestias.",
+        "choiceRisk": "Cada tipo de control funciona una vez y luego falla durante {lockout} s, así que usar los tres a la vez deja sin opciones para la próxima cacería.",
+        "choiceRiskHeroic": "Cada tipo de control funciona una vez y luego falla durante {lockout} s. Si usas el aturdimiento pronto, nada podrá cancelar el siguiente ¡Junto!.",
+        "heroicBond": "Vínculo frenético: Vínculo de la manada alcanza {reach} yardas.",
+        "heroicHeel": "¡Junto!: el jaguar salta de vuelta al Maestro de Bestias salvo que reciba un aturdimiento durante el lanzamiento. Resguardo de piel gruesa absorbe {amount}."
+      },
+      "bloom": {
+        "overview": "Una flor carnívora arraigada hace llover vainas de semillas sobre los bancales de tierra fértil a su alrededor. Los jugadores sin polen aplastan las vainas antes de que broten; los polinizados deben evitarlas o brotarán al instante.",
+        "phaseTerraceName": "Las Cascadas del Llanto",
+        "phaseTerraceSummary": "Nunca se mueve. Sus temporizadores de lanzamiento se pausan mientras se lanza otro hechizo, así que los intervalos indicados son los mínimos.",
+        "seedSummary": "Cada {every} s, un lanzamiento de {cast} s y luego caen {count} vainas de semillas, una en cada bancal. Pisarlas sin tener Polinizado las aplasta. Una vaina abandonada genera un Brote Espinoso tras {sprout} s.",
+        "seedHeroicSummary": "Cada {every} s, un lanzamiento de {cast} s y luego caen {count} vainas de semillas, una en cada bancal. Pisarlas sin tener Polinizado las aplasta. Semillas enterradoras: una vaina abandonada se entierra tras {burrow} s y un Brote Espinoso emerge junto al jugador más cercano.",
+        "seedResponse": "Los jugadores sin Polinizado pasan rápidamente por encima de cada vaina. Los polinizados las evitan.",
+        "pollinateName": "Polinizar",
+        "pollinateSummary": "Cada {every} s, {count} jugadores reciben Polinizado durante {seconds} s. Un jugador polinizado que toca una vaina la hace brotar al instante.",
+        "pollinateHeroicSummary": "Cada {every} s, {count} jugadores reciben Polinizado durante {seconds} s. Un jugador polinizado que toca una vaina la hace brotar al instante. Nube de polen: permanecer a menos de {cloudRadius} yardas de un jugador polinizado durante {cloudSeconds} s también te poliniza.",
+        "pollinateResponse": "Polinizado: evita las vainas hasta que termine y, en heroico, aléjate de los aliados.",
+        "sproutName": "Brote Espinoso",
+        "sproutSummary": "Un enemigo de élite adicional que crece de una vaina germinada y ataca al jugador más cercano. Los brotes se marchitan cuando muere la Flor Devoradora.",
+        "sproutResponse": "El tanque atrae su atención y los personajes de daño lo matan.",
+        "lashSummary": "Cada {every} s, un lanzamiento de {cast} s dirige a un jugador (que no sea el tanque si es posible) una franja de {length} yardas de largo y {width} de ancho: de {min} a {max} de daño y una inmovilización de {root} s.",
+        "lashResponse": "Sal de lado de la franja antes de que termine el lanzamiento.",
+        "gorgeSummary": "Cada {every} s, un lanzamiento de {cast} s a su objetivo y luego un mordisco por {mult} veces el daño de su golpe cuerpo a cuerpo y Digiriendo: {perSecond} de daño por segundo durante {seconds} s. No se puede esquivar moviéndose.",
+        "gorgeResponse": "Tanque: usa una habilidad defensiva. Sanadores: cubrid el daño de Digiriendo.",
+        "spitName": "Escupitajo floral",
+        "spitSummary": "Si su objetivo permanece fuera de alcance durante {delay} s, escupe cada {every} s por de {min} a {max} de daño.",
+        "spitResponse": "El tanque permanece al alcance cuerpo a cuerpo.",
+        "tipTank": "Mantente cuerpo a cuerpo: alejarte provoca Escupitajo floral. Usa una habilidad defensiva para cada Atracón y atrae a cada Brote Espinoso.",
+        "tipHealer": "Atracón es el gran golpe al tanque, seguido de Digiriendo. Latigazo de lianas inmoviliza y daña a quien esté en su franja.",
+        "tipDamage": "Si no tienes Polinizado, aplasta vainas entre ataques. Sal de Latigazo de lianas y mata rápido a los Brotes Espinosos.",
+        "choiceName": "¿Quién pisa las semillas?",
+        "choiceGain": "Cada vaina aplastada es un Brote Espinoso de élite menos y permite centrar el combate en la flor.",
+        "choiceRisk": "Correr a los bancales cuesta daño y tiempo cuerpo a cuerpo; un jugador con Polinizado que toca una vaina la hace brotar al instante.",
+        "heroicBurrow": "Semillas enterradoras: una vaina intacta se entierra tras {burrow} s y su brote emerge junto al jugador más cercano.",
+        "heroicCloud": "Nube de polen: permanecer a menos de {cloudRadius} yardas de un jugador con Polinizado durante {cloudSeconds} s también te poliniza."
+      },
+      "zulgar": {
+        "pulseSummaryRework": "Cada {every} s, un lanzamiento de {cast} s golpea a todos en un radio de {radius} m e inflige entre {min} y {max} de daño. Los jugadores ensartados reciben {pinMult} veces ese daño a cualquier distancia.",
+        "spearSummary": "Un lanzamiento de {cast} s ensarta a un jugador que no sea el tanque, o al tanque si no queda nadie más. La inmovilización dura hasta {seconds} s e inflige {bleed} de daño cada {tick} s.",
+        "spearResponse": "Selecciona la lanza e interactúa a menos de {range} m para extraerla en {pull} s. El daño no interrumpe la extracción. Si nadie más está libre en la terraza, la víctima puede interactuar para escapar en {self} s.",
+        "glyphSummaryRework": "Los {count} glifos empiezan apagados. Durante la cacería, un jugador sin marcar enciende uno permaneciendo encima {kindle} s. Si no queda nadie sin marcar, la Presa puede encenderlo en {alone} s. Salir reinicia el progreso. Cruzar un glifo encendido lo ralentiza en {slow} y aumenta el daño que recibe en {vulnerability} durante {seconds} s. El glifo no se puede encender durante {dark} s; ningún otro glifo puede golpearlo durante {wary} s. Durante la cacería, los aturdimientos duran la mitad.",
+        "glyphResponseRework": "Los jugadores sin marcar encienden glifos por delante de la Presa. Haz que los cruce y ataca mientras sufre el estado Golpeado por el sol. Los glifos se apagan cuando termina la cacería.",
+        "idolSummary": "Con {health} de salud, permanece como espíritu de jaguar hasta ser derrotado. El tanque también puede ser Presa.",
+        "idolHuntSummary": "Elige una Presa nueva cada {every} s y se gira hacia ella durante {turn} s antes de perseguirla.",
+        "idolHuntHeroicSummary": "Marca a una pareja nueva cada {pair} s y alterna entre ambos cada {switch} s. Cada cambio da a la nueva Presa {turn} s antes de perseguirla.",
+        "breathSummary": "Cada {every} s, una mitad de la terraza queda marcada durante {warning} s; después, todos los que estén en ella reciben entre {min} y {max} de daño de Naturaleza. El aliento alterna entre mitades.",
+        "breathResponse": "Cruza a la mitad sin marcar antes de que termine el aviso. La línea central es segura. En Heroico, el aliento también apaga los glifos encendidos de su mitad; se pueden volver a encender inmediatamente.",
+        "overview": "El sumo sacerdote de la cuenca. Un combate estable con un círculo anunciado hasta que se transforma en un espíritu de jaguar y persigue a un jugador. El perseguido lo atrae corriendo por glifos solares encendidos, que lo ralentizan.",
+        "phaseShrineName": "El Santuario",
+        "phaseShrineSummary": "Lucha cuerpo a cuerpo y emite pulsos en un círculo a su alrededor.",
+        "phaseHuntName": "Espíritu de la caza",
+        "phaseHuntSummary": "Al llegar a {first} y {second} de salud se convierte en un espíritu de jaguar durante {seconds} s y persigue a un jugador marcado.",
+        "phaseEnrageName": "Enfurecido",
+        "pulseSummary": "Cada {every} s, un lanzamiento de {cast} s y luego un estallido sobre todos a menos de {radius} yardas de él: de {min} a {max} de daño.",
+        "pulseResponse": "Todos salvo el tanque salen del círculo antes de que termine el lanzamiento.",
+        "roarName": "Rugido de jaguar",
+        "roarSummary": "Cada golpe cuerpo a cuerpo tiene una probabilidad de {chance} de empujar {distance} yardas al jugador golpeado.",
+        "roarResponse": "El tanque mantiene terreno despejado a su espalda.",
+        "huntSummary": "Al llegar a {first} y {second} de salud: un lanzamiento de {cast} s y luego persigue a un jugador marcado durante {seconds} s (la Presa, nunca el tanque mientras queden otros en pie). Corre {speed} más rápido que un jugador, ignora provocaciones y no ataca. Si alcanza a la Presa: {maul} de daño y un aturdimiento de {stun} s; luego elige otra presa. Un jugador magullado está a salvo durante {respite} s.",
+        "huntHeroicSummary": "Al llegar a {first} y {second} de salud: un lanzamiento de {cast} s y luego persigue a la Presa durante {seconds} s. Presas gemelas: se marcan dos jugadores y alterna entre ellos cada {switchEvery} s. Corre {speed} más rápido que un jugador, ignora provocaciones y no ataca. Si alcanza a una Presa: {maul} de daño y un aturdimiento de {stun} s.",
+        "huntResponse": "Presa: corre por glifos solares encendidos para ralentizarlo. Los demás lo ralentizan, inmovilizan y aturden mientras caza.",
+        "glyphName": "Glifos solares",
+        "glyphSummary": "{count} glifos rodean el santuario. Cuando el espíritu de jaguar cruza uno encendido, queda ralentizado {slow} durante {seconds} s y ese glifo se apaga durante {dark} s. Durante la cacería, las ralentizaciones y raíces le afectan y los aturdimientos duran la mitad.",
+        "glyphResponse": "Reparte el uso de los glifos: no los gastes todos en la primera cacería.",
+        "ambushName": "Emboscada del cazador",
+        "ambushSummary": "Después de cada cacería desaparece durante {seconds} s. Un círculo de {radius} yardas marca al jugador más lejano y da un aviso de {warn} s; luego aterriza allí: de {min} a {max} de daño a todos dentro.",
+        "ambushResponse": "Sal del círculo.",
+        "tipTank": "Mantén terreno despejado a tu espalda para Rugido de jaguar. Al terminar la cacería, vuelve a ti: prepárate para atraer su atención.",
+        "tipHealer": "Pulso de Corazón Salvaje golpea a quien permanezca en el círculo. Magullar es un gran golpe individual: llena la salud de la Presa.",
+        "tipDamage": "Sal del círculo de pulsos. Durante la cacería, ralentízalo, inmovilízalo y atúrdelo para proteger a la Presa, y corre por glifos encendidos si eres la Presa.",
+        "tipDamageHeroic": "Sal del círculo de pulsos. Durante la cacería, ralentízalo, inmovilízalo y atúrdelo para proteger a ambas Presas. Después de cada cacería, sal del círculo de Emboscada.",
+        "choiceName": "¿Usar un glifo ahora o guardarlo?",
+        "choiceGain": "Cada glifo encendido por el que lo guías lo ralentiza mucho y da tiempo a la Presa.",
+        "choiceRisk": "Un glifo usado permanece oscuro durante {dark} s y cada cacería dura {seconds} s: si los gastas todos al principio, no quedará ninguno para el final.",
+        "heroicTwinPrey": "Presas gemelas: persigue a dos jugadores y cambia cada {switchEvery} s.",
+        "heroicAmbush": "Emboscada: después de cada cacería se abalanza sobre un círculo de {radius} yardas en el jugador más lejano."
+      }
+    },
+    "crypt": {
+      "drake": {
+        "overview": "Un draco esquelético vuela en círculos sobre la Procesión. Pasa por debajo y aterriza para luchar: aliento de fuego delante, latigazo de cola detrás y ráfaga de alas a su alrededor.",
+        "phaseName": "La procesión",
+        "phaseSummary": "Aterriza donde se inicia el combate y lucha en el suelo.",
+        "breathSummary": "Cada {every} s, un lanzamiento de {cast} s y luego fuego en un cono de {arc} grados y {range} yardas delante: de {min} a {max} de daño. Su orientación queda fijada durante el lanzamiento.",
+        "breathResponse": "Solo el tanque se coloca delante. Los demás permanecen a sus lados.",
+        "tailSummary": "Cada {every} s cuando alguien está detrás: un lanzamiento de {cast} s y luego un barrido de {arc} grados y {range} yardas detrás que inflige de {min} a {max} de daño.",
+        "tailResponse": "Nunca te coloques detrás.",
+        "gustSummary": "Cada {every} s cuando alguien está cerca: un lanzamiento de {cast} s y luego todos a menos de {radius} yardas reciben de {min} a {max} de daño y son empujados {push} yardas.",
+        "gustResponse": "Prepárate para el empujón; mantén la espalda lejos de los bordes.",
+        "embersName": "Ascuas del túmulo",
+        "embersSummary": "El suelo bajo cada aliento sigue ardiendo durante {seconds} s: de {min} a {max} de daño por segundo a quien esté encima.",
+        "embersResponse": "Saca al draco del suelo ardiente y sal de él.",
+        "tipTank": "Gíralo para dirigir el aliento lejos del grupo y sácalo de cualquier suelo ardiente en heroico.",
+        "tipHealer": "El aliento y la ráfaga de alas son los picos de daño. Colócate a su lado.",
+        "tipDamage": "Ataca desde los costados: nunca delante ni detrás.",
+        "heroicEmbers": "Ascuas del túmulo: cada aliento deja el suelo ardiendo durante {seconds} s."
+      },
+      "marrow": {
+        "overview": "Un sepulturero resucitado que toma medidas a los jugadores para sus tumbas. Cada tumba permanece abierta, ralentiza y quema a quien esté dentro, y alza unos Huesos Inquietos cuando toca la Campana Funeraria. Excava las tumbas en el borde del patio y mantén su número bajo.",
+        "phaseYardName": "El Patio de la Campana",
+        "phaseYardSummary": "Excava tumbas bajo jugadores marcados y golpea al tanque con su pala.",
+        "phaseTollName": "El Toque Fúnebre",
+        "phaseTollSummary": "Al llegar a {first} y {second} de salud camina hasta la cuerda de la campana y toca el Toque fúnebre.",
+        "shovelSummary": "Cada {every} s, un lanzamiento de {cast} s y luego un barrido de pala en un cono de {arc} grados y {range} yardas delante de él por {mult} veces el daño de su golpe cuerpo a cuerpo. Todos los alcanzados reciben Tierra en los ojos: {slow} más lentos durante {seconds} s.",
+        "shovelResponse": "Solo el tanque se coloca delante. Puede apartarse durante el lanzamiento.",
+        "measureSummary": "Cada {every} s, un lanzamiento de {cast} s marca a un jugador. {mark} s después, se abre una tumba donde esté: de {min} a {max} de daño a todos a menos de {radius} yardas. La tumba sigue abierta durante el combate: dentro te mueves {slow} más despacio y recibes {dirt} de daño por segundo. Máximo {cap} tumbas; una nueva rellena la más antigua.",
+        "measureResponse": "Si tienes la marca, ve al borde del patio antes de que se abra la tumba. Nunca permanezcas dentro de una tumba abierta.",
+        "blowSummary": "Cada {every} s, un lanzamiento de {cast} s contra el tanque: un golpe cuerpo a cuerpo que añade una acumulación de {vuln} más de daño recibido, hasta {stacks} acumulaciones ({max}) durante {seconds} s.",
+        "blowResponse": "Tanque: usa habilidades defensivas a medida que suben las acumulaciones. Sanadores: vigilad al tanque.",
+        "vigorName": "Vigor sepulcral",
+        "vigorSummary": "Mientras está dentro de una tumba abierta, ataca {haste} más rápido.",
+        "vigorResponse": "El tanque lo mantiene fuera de las tumbas.",
+        "unquietName": "Tierra inquieta",
+        "unquietSummary": "Un jugador que permanece {linger} s dentro de una tumba alza unos Huesos Inquietos de ella. Esa tumba descansa entonces durante {rest} s.",
+        "unquietResponse": "Sal de las tumbas de inmediato.",
+        "tollSummary": "Camina hasta la cuerda y toca la campana durante {ring} s, inmune al daño mientras camina y toca. Después, todos los jugadores reciben de {min} a {max} de daño y cada tumba abierta alza unos Huesos Inquietos.",
+        "tollResponse": "Los sanadores llenan la salud de todos antes del último tañido. El tanque atrae a los Huesos Inquietos y los personajes de daño los matan.",
+        "tipTank": "Mantenlo mirando lejos del grupo. Atrae la atención de todos los Huesos Inquietos después de cada Toque fúnebre.",
+        "tipTankHeroic": "Mantenlo mirando lejos del grupo y fuera de todas las tumbas. Golpe del sepulturero se acumula: usa habilidades defensivas cuando aumenten las acumulaciones.",
+        "tipHealer": "Toque fúnebre golpea a todo el grupo. Las tumbas ralentizan y queman a quien esté dentro, así que ayuda a quien quede atrapado en una.",
+        "tipDamage": "Cuando tengas la marca, lleva la tumba al borde del patio. Después de cada Toque, mata a los Huesos Inquietos y luego vuelve a Marrow.",
+        "choiceName": "¿Dónde se colocan las tumbas?",
+        "choiceGain": "Las tumbas excavadas en el borde del patio dejan el centro libre para luchar y esquivar.",
+        "choiceRisk": "Cada tumba abierta, esté donde esté, alza unos Huesos Inquietos con el siguiente Toque, hasta {cap} a la vez.",
+        "choiceRiskHeroic": "Cada tumba abierta, esté donde esté, alza unos Huesos Inquietos con el siguiente Toque, hasta {cap} a la vez. En heroico, una tumba cerca del tanque también acelera a Marrow.",
+        "heroicBlow": "Golpe del sepulturero: un golpe al tanque que acumula {vuln} más de daño recibido.",
+        "heroicVigor": "Vigor sepulcral: dentro de una tumba ataca {haste} más rápido.",
+        "heroicUnquiet": "Tierra inquieta: {linger} s en una tumba alzan unos Huesos Inquietos."
+      },
+      "lady": {
+        "overview": "Una novia fantasma cuyo lamento daña a todos los que no estén protegidos por un farol sepulcral. Cada farol solo protege a dos jugadores y luego se apaga, así que el grupo debe turnarse. También eleva a un jugador en el aire hasta que el grupo le inflige suficiente daño para que lo suelte.",
+        "phaseRavineName": "El Barranco de Escarcha",
+        "phaseRavineSummary": "Hay tres faroles sepulcrales alrededor del barranco. Su recorrido se convierte en hielo resbaladizo.",
+        "phaseFreezeName": "Congelación nupcial",
+        "phaseFreezeSummary": "Al llegar a {health} de salud se congela todo el suelo del barranco durante el resto del combate.",
+        "lamentSummary": "Cada {every} s, un lanzamiento de {cast} s y luego de {min} a {max} de daño a cada jugador que no esté protegido por un farol. Cada golpe añade una acumulación de Lamento persistente: {perStack} más de daño de Lamento por acumulación durante {seconds} s, hasta {stacks} acumulaciones.",
+        "lamentResponse": "Colócate bajo la luz de un farol encendido antes de que termine el lanzamiento.",
+        "lanternName": "Faroles sepulcrales",
+        "lanternSummary": "Un farol encendido protege del Lamento a un máximo de {cap} jugadores a menos de {radius} yardas. Un farol que haya protegido a alguien se apaga durante {dark} s, así que sigue oscuro en el siguiente Lamento.",
+        "lanternHeroicSummary": "Un farol encendido protege del Lamento a un máximo de {cap} jugadores a menos de {radius} yardas. Un farol que haya protegido a alguien se apaga durante {dark} s. En heroico también se apaga solo tras {lit} s encendido y queda oscuro durante {gutter} s.",
+        "lanternResponse": "Planificad quién usa cada farol y alternad hacia uno encendido en cada Lamento.",
+        "embraceSummary": "Cada {every} s agarra a un jugador que no sea el tanque, lo eleva en el aire y lo sujeta. Inflígele un daño equivalente a {share} de su salud en {hold} s para que lo deje suavemente en el suelo. De lo contrario, lo suelta: de {min} a {max} de daño.",
+        "embraceHeroicSummary": "Cada {every} s agarra a {victims} jugadores que no sean el tanque, los eleva en el aire y los sujeta. Inflígele un daño equivalente a {share} de su salud en {hold} s para que los deje suavemente en el suelo. De lo contrario, los suelta: de {min} a {max} de daño.",
+        "embraceResponse": "Todos concentran su daño en ella en cuanto agarra a alguien. Los sanadores llenan la salud del jugador sujeto.",
+        "rimeName": "Senda de escarcha",
+        "rimeSummary": "Deja hielo resbaladizo por donde se desplaza; cada tramo dura {seconds} s. Sobre el hielo te deslizas y giras despacio.",
+        "rimeResponse": "Evita su rastro cuando necesites moverte rápido.",
+        "freezeSummary": "Al llegar a {health} de salud, un lanzamiento de {cast} s y luego todo el suelo se convierte en hielo resbaladizo durante el resto del combate. Cancela un Lamento que ya se esté lanzando.",
+        "freezeResponse": "Muévete antes: sobre el hielo tardas más en llegar a un farol.",
+        "tipTank": "Mantenla cerca del centro para que todos los faroles queden al alcance del grupo.",
+        "tipHealer": "Los jugadores sin refugio reciben el Lamento y ganan acumulaciones. El jugador sujeto recibe daño mientras ella lo mantiene agarrado.",
+        "tipDamage": "Concentra el daño en ella en cuanto agarra a alguien. Alterna entre faroles encendidos para cada Lamento.",
+        "choiceName": "¿Quién recibe el Lamento?",
+        "choiceGain": "Usar los tres faroles protege hasta {cap} jugadores en cada uno, así que nadie recibe este Lamento.",
+        "choiceRisk": "Los faroles usados siguen oscuros en el siguiente Lamento, así que alguien lo recibe entonces, y cada acumulación de Lamento persistente añade {perStack} de daño.",
+        "heroicEmbrace": "Abrazo helado agarra a {victims} jugadores a la vez.",
+        "heroicLanterns": "Un farol encendido se apaga solo tras {lit} s y permanece oscuro {gutter} s."
+      },
+      "ilvane": {
+        "overview": "Una maestra del coro custodiada por dos Coristas Huecos que la protegen mientras viven. Su Canto fúnebre daña y silencia a todos los que puedan verla, así que interrúmpelo o escóndete detrás de un pilar. También toca el Órgano de hueso y envía franjas de notas por la tribuna.",
+        "phaseLoftName": "La Tribuna del Coro",
+        "phaseLoftSummary": "Canta desde la tribuna con dos Coristas Huecos a su lado.",
+        "phaseCrescendoName": "Crescendo musical",
+        "phaseCrescendoSummary": "Al llegar a {health} de salud, canta más rápido y el órgano toca una tercera oleada.",
+        "harmonyName": "Armonía",
+        "harmonySummary": "Cada corista vivo reduce el daño que recibe en {per}: {both} mientras ambos están en pie.",
+        "harmonyResponse": "Matad primero a los coristas.",
+        "dirgeSummary": "Cada {every} s, un lanzamiento de {cast} s. Si termina, todos los que puedan verla reciben de {min} a {max} de daño y quedan silenciados durante {silence} s. Tras una interrupción, no canta ningún Canto fúnebre durante {quiet} s.",
+        "dirgeResponse": "Interrúmpelo o rompe la línea de visión detrás de un pilar antes de que termine el lanzamiento.",
+        "organSummary": "Cada {every} s camina al órgano y toca {waves} oleadas de franjas de notas por la tribuna. Cada franja se muestra durante {gather} s y luego estalla: de {min} a {max} de daño.",
+        "organResponse": "Colócate entre las primeras franjas y luego entra en una que ya haya estallado.",
+        "encoreName": "Otra estrofa",
+        "encoreSummary": "Un corista que permanece muerto {seconds} s mientras su compañero sigue en pie vuelve a alzarse con toda la salud.",
+        "encoreResponse": "Mata a ambos coristas con una diferencia máxima de {seconds} s.",
+        "unbrokenSummary": "Uno de cada {nth} Cantos fúnebres es un Verso ininterrumpido: no se puede interrumpir.",
+        "unbrokenResponse": "Escóndete detrás de un pilar.",
+        "crescendoName": "Crescendo musical",
+        "crescendoSummary": "Por debajo de {health} de salud, el Canto fúnebre tarda {cast} s y llega cada {every} s, y el órgano toca {waves} oleadas. La tercera reutiliza las franjas de la primera.",
+        "crescendoResponse": "Interrumpe cada Canto fúnebre y vuelve a salir de las primeras franjas para la tercera oleada.",
+        "tipTank": "Mantén juntos a los coristas para matarlos rápido y luego atrae a Ilvane.",
+        "tipHealer": "Un Canto fúnebre completado también te silencia: escóndete detrás de un pilar si nadie puede interrumpirlo.",
+        "tipDamage": "Mata primero a los coristas, interrumpe el Canto fúnebre y esquiva las franjas del órgano.",
+        "tipDamageHeroic": "Mata a ambos coristas con una diferencia máxima de {seconds} s, interrumpe el Canto fúnebre y escóndete de cada Verso ininterrumpido.",
+        "choiceName": "¿Interrumpirlo u ocultarse?",
+        "choiceGain": "Una interrupción detiene el Canto fúnebre y la mantiene en silencio durante {quiet} s.",
+        "choiceRisk": "Esconderse detrás de un pilar reduce el tiempo de ataque. Fallar una interrupción silencia y daña a todos los que estén a la vista.",
+        "heroicEncore": "Otra estrofa: un corista muerto durante {seconds} s mientras su compañero vive vuelve a alzarse.",
+        "heroicUnbroken": "Verso ininterrumpido: uno de cada {nth} Cantos fúnebres no se puede interrumpir."
+      },
+      "morthen": {
+        "overview": "Un obispo liche que dirige un rito en tres actos. Primero invoca almas que lo potencian; al llegar a {rite} de salud, se oculta tras un resguardo hasta que el grupo reenciende cuatro velas a costa de salud; al llegar a {last} de salud, barre con una enorme guadaña.",
+        "phaseCallingName": "La llamada",
+        "phaseCallingSummary": "Emite pulsos de sombras a su alrededor e invoca almas para alimentarse.",
+        "phaseRiteName": "El Rito de los Inquietos",
+        "phaseRiteSummary": "Al llegar a {health} de salud, vuelve al altar y se hace inmune hasta que las cuatro velas arden de nuevo.",
+        "phaseLastName": "Últimos ritos",
+        "phaseLastSummary": "Al llegar a {health} de salud, toma su guadaña para el final del combate.",
+        "pulseSummary": "Cada {every} s ({everyLast} s durante Últimos ritos), un lanzamiento de {cast} s y luego de {min} a {max} de daño a todos a menos de {radius} yardas.",
+        "pulseResponse": "Todos, incluido el tanque, se alejan hasta {radius} yardas antes de que termine el lanzamiento.",
+        "gravecallName": "Llamada sepulcral",
+        "gravecallSummary": "Cada {every} s, un Alma atada avanza desde una hornacina hacia él. Si lo alcanza, obtiene {per} más de daño por acumulación (hasta {stacks}) y recupera {heal} de su salud. El primer jugador que toca la absorbe en su lugar: de {min} a {max} de daño.",
+        "gravecallResponse": "Un jugador disponible se interpone en la trayectoria de cada alma.",
+        "graspName": "Agarre de la tumba",
+        "graspSummary": "Cada {every} s aparece un círculo de {radius} yardas bajo {count} jugadores. {fuse} s después brotan manos: todos dentro quedan inmovilizados durante {root} s y reciben de {min} a {max} de daño.",
+        "graspResponse": "Sal del círculo de inmediato.",
+        "riteSummary": "Se hace inmune y las {candles} velas se apagan. Salen {bones} Huesos Inquietos. Frío sepulcral golpea a todos cada segundo: {base} de daño, que aumenta en {step} cada {chillEvery} s, sin límite.",
+        "riteResponse": "Reenciende las cuatro velas rápido: el frío nunca deja de aumentar.",
+        "relightName": "Reencender las velas",
+        "relightSummary": "Canaliza {channel} s en una vela (a menos de {range} yardas) para reencenderla. Cuesta a quien la enciende {drain} de su salud máxima. Cuando se enciende la cuarta, queda aturdido durante {stun} s y recibe {vuln} más de daño.",
+        "relightResponse": "Reparte las velas entre jugadores con salud de sobra y concentra el daño en él durante el aturdimiento.",
+        "nameDeadName": "Nombrar a los muertos",
+        "nameDeadSummary": "Las velas deben encenderse en el orden que muestra un haz dorado del registro. Una vela incorrecta apaga la última encendida y quema a quien la enciende por de {min} a {max}.",
+        "nameDeadResponse": "Enciende solo la vela a la que apunta el haz.",
+        "reapSummary": "Cada {every} s, un lanzamiento de {cast} s al tanque y luego un barrido de guadaña de {arc} grados y {range} yardas delante de él: de {min} a {max} de daño.",
+        "reapResponse": "Solo el tanque se coloca delante. Puede apartarse de lado durante el lanzamiento.",
+        "tipTank": "Mantenlo mirando lejos del grupo y sal del Pulso de sombras con todos los demás.",
+        "tipHealer": "Cada vela cuesta una gran parte de la salud de quien la enciende y Frío sepulcral sigue aumentando: cura primero a quienes las encienden.",
+        "tipDamage": "Intercepta con el cuerpo las Almas atadas, reenciende velas durante el Rito y luego concentra el daño en él mientras está aturdido.",
+        "tipDamageHeroic": "Intercepta con el cuerpo las Almas atadas y esquiva Agarre de la tumba. Durante el Rito, sigue el haz dorado hasta la vela correcta.",
+        "choiceCandleName": "¿Cuántos encienden las velas?",
+        "choiceCandleGain": "Varios jugadores reencendiendo a la vez terminan el Rito antes, antes de que aumente Frío sepulcral.",
+        "choiceCandleRisk": "Cada jugador que enciende pierde {normal} de su salud máxima por vela mientras el frío sigue aumentando.",
+        "choiceSoulName": "¿Bloquear las almas?",
+        "choiceSoulGain": "Un alma interceptada nunca lo alcanza: ni acumulación de daño ni sanación.",
+        "choiceSoulRisk": "Quien la intercepta recibe el daño del alma. Cada alma que pasa añade {per} de daño y lo cura {heal}.",
+        "heroicNameDead": "Nombrar a los muertos: las velas deben encenderse en el orden que muestra el registro.",
+        "heroicGrasp": "Agarre de la tumba: círculos que inmovilizan y dañan en cada acto.",
+        "heroicDrain": "Cada vela cuesta a quien la enciende {drain} de su salud máxima."
+      },
+      "wyrm": {
+        "overview": "El rito de Morthen al morir enciende una pira y un vermis de hueso aterriza en ella. Lucha como el Draco del Osario, además de lanzar pasadas de fuego por franjas y un rugido que empuja a los jugadores pero lo deja vulnerable al daño.",
+        "phaseName": "La Pira de Invocación del Vermis",
+        "phaseSummary": "Planea fuera de alcance y aterriza en el círculo con un estallido de fuego.",
+        "strafeSummary": "Cada {every} s marca durante {mark} s una franja de {width} yardas a través de un jugador; luego vuela por ella vertiendo fuego: de {min} a {max} de daño a todos dentro. La franja sigue ardiendo durante {seconds} s: {burn} de daño por segundo.",
+        "strafeResponse": "Sal de lado de la franja marcada y mantente fuera del suelo ardiente.",
+        "bellowSummary": "Cada {every} s, un lanzamiento de {cast} s y luego de {min} a {max} de daño y un empujón de {push} yardas a menos de {radius} yardas. Después recibe {vuln} más de daño durante {seconds} s.",
+        "bellowResponse": "Evita que te empujen a una franja ardiente. Usa tus habilidades potentes con tiempo de reutilización durante la oportunidad posterior.",
+        "knellSummary": "Cada {every} s, vuela fuera de alcance y exhala fuego sobre la mitad del círculo {breaths} veces. Cada mitad se marca {mark} s antes del fuego: de {min} a {max} de daño a todos los que estén dentro.",
+        "knellResponse": "Corre a la mitad sin marcar del círculo cada vez.",
+        "tipTank": "Mantenlo mirando lejos del grupo y gíralo para sacarlo de las franjas ardientes.",
+        "tipHealer": "Pasada de fuego de pira y Bramido de pavor son los picos de daño; cura a quien sea empujado a una franja ardiente.",
+        "tipDamage": "Sal de las franjas marcadas y usa habilidades potentes después de cada Bramido de pavor.",
+        "tipDamageHeroic": "Sal de las franjas marcadas y, durante Doblar ardiente, corre cada vez a la mitad segura.",
+        "heroicKnell": "Doblar ardiente: alza el vuelo y lanza su aliento sobre la mitad del círculo {breaths} veces."
+      }
+    },
+    "bastion": {
+      "captain": {
+        "overview": "Un capitán fantasma flotante patrulla el foso del Patio Inferior, y el puente levadizo permanece cerrado hasta que muere. Alterna tres ataques en franjas dirigidos a un jugador que no sea el tanque; cada uno se dibuja en el suelo antes de activarse.",
+        "phaseName": "El foso",
+        "phaseSummary": "Su primer movimiento llega {first} s después de iniciar el combate; luego alterna Andanada espectral, Ancla maldita y Abordaje fantasma, con {recovery} s entre ellos. Permanece inmóvil durante cada movimiento.",
+        "broadsideSummary": "Tras un aviso de {warn} s, se disparan a la vez {lanes} franjas paralelas de {length} yardas de largo: de {min} a {max} de daño a cualquiera que esté en una de ellas.",
+        "broadsideResponse": "Colócate en un hueco entre las franjas.",
+        "anchorSummary": "Tras un aviso de {warn} s, un ancla maldita es arrastrada {length} yardas hacia atrás por su franja durante {seconds} s y golpea a todos a su paso: de {min} a {max} de daño.",
+        "anchorResponse": "Sal de la franja antes de que se active.",
+        "boardingSummary": "Tras un aviso de {warn} s, todos los que estén en una franja de {length} yardas reciben de {min} a {max} de daño y él se lanza por ella.",
+        "boardingResponse": "Apártate de la franja.",
+        "sailorsName": "Marineros del Naufragio",
+        "sailorsSummary": "Al llegar a {first} y {second} de salud, se incorporan {count} Marineros del Naufragio al combate. Poco después de morir, cada marinero estalla con energía de almas.",
+        "sailorsResponse": "El tanque atrae su atención. Aléjate de los marineros que acaben de morir.",
+        "tipTank": "Mantenlo en su sitio y atrae la atención de los Marineros del Naufragio. Sus franjas apuntan a los demás jugadores, no a ti.",
+        "tipHealer": "Andanada espectral es el ataque que más daño causa: cura a quienes estuvieran en una franja.",
+        "tipDamage": "Vigila el suelo: cada movimiento se dibuja antes de activarse. Colócate en los huecos de la Andanada."
+      },
+      "olen": {
+        "overview": "Un caballero paladín caído. Sus charcos de salmuera lo protegen, así que el tanque lo saca de ellos; el grupo mantiene la separación para que su escudo de rebote y la columna de Sentencia solo golpeen a un jugador. A mitad de salud se arrodilla, inmune, hasta que mueran sus Sargentos Ahogados.",
+        "phaseBreachName": "El Bastión de la Brecha",
+        "phaseBreachSummary": "Lanza una habilidad cada vez; sus temporizadores se detienen durante los lanzamientos.",
+        "phaseOathName": "Juramento intacto",
+        "phaseOathSummary": "Al llegar a {health} de salud, se arrodilla, inmune, mientras los Sargentos Ahogados luchan por él.",
+        "brineSummary": "Cada {every} s, lanza durante {cast} s y luego crea bajo sus pies un charco de salmuera sagrada de {radius} yardas durante {seconds} s: causa {perSecond} de daño por segundo a quien esté dentro. Mientras permanezca en cualquier charco, recibe {shield} menos de daño.",
+        "brineResponse": "El tanque lo saca del charco. Los demás también salen de él.",
+        "bulwarkSummary": "Cada {every} s, lanza durante {cast} s contra un jugador que no sea el tanque. El escudo le inflige de {min} a {max} de daño y luego rebota al jugador más cercano que aún no haya golpeado a menos de {reach} yardas, hasta alcanzar a {hits} jugadores.",
+        "bulwarkResponse": "Mantén la separación: a más de {reach} yardas de todos los demás.",
+        "sentenceSummary": "Cada {every} s, un lanzamiento de {cast} s marca a un jugador que no sea el tanque. {seconds} s después, una columna cae sobre él dondequiera que esté: de {min} a {max} de daño a todos a menos de {radius} yardas.",
+        "sentenceResponse": "Si tienes la marca, aléjate del grupo antes de que caiga la columna.",
+        "arcName": "Arco segador",
+        "arcSummary": "Cada uno de sus golpes cuerpo a cuerpo también alcanza a todos los demás jugadores a menos de {radius} yardas del tanque e inflige {share} del daño del golpe.",
+        "arcResponse": "Nadie salvo el tanque debe estar a menos de {radius} yardas del tanque.",
+        "oathSummary": "Una vez, al llegar a {health} de salud: se arrodilla y canaliza hasta {max} s, inmune al daño, mientras se alzan {count} Sargentos Ahogados y atacan a jugadores que no sean el tanque. Al matarlos a todos, queda aturdido durante {stun} s y recibe {vuln} más de daño durante {vulnSeconds} s.",
+        "oathResponse": "El tanque reúne a los sargentos; todos los matan y luego concentran su daño en Olen mientras está aturdido.",
+        "tipTank": "Sácalo de cada charco de salmuera. Mantén al grupo fuera de las {radius} yardas a tu alrededor, donde sus golpes causan daño de área.",
+        "tipHealer": "Baluarte de rebote y Sentencia de la marea causan más daño cuando los jugadores están juntos. Los sargentos se enfurecen cuando les queda poca salud.",
+        "tipDamage": "Mantened más de {reach} yardas de separación y alejaos del tanque. Durante el Juramento, matad primero a los sargentos.",
+        "choiceName": "¿Agruparse o separarse?",
+        "choiceGain": "Si os separáis, Baluarte de rebote, Sentencia de la marea y Arco segador solo golpean a un jugador cada uno.",
+        "choiceRisk": "Quien esté a menos de {reach} yardas de un jugador golpeado recibe el rebote, y quien esté a menos de {radius} yardas del tanque recibe el daño de área.",
+        "heroicChanges": "Los charcos de salmuera miden {radius} yardas, el escudo rebota a {hits} jugadores, la columna de Sentencia mide {sentence} yardas y se alzan {count} sargentos."
+      },
+      "turnkey": {
+        "overview": "El guardián de la prisión encierra a jugadores en Jaulas de hierro. El prisionero se libera pulsando repetidamente la tecla de interacción, y sus compañeros aceleran el proceso golpeando la jaula.",
+        "phaseName": "La Reja de la Prisión",
+        "phaseSummary": "Enjaula jugadores a intervalos regulares y libera a los prisioneros al llegar a mitad de salud.",
+        "cageSummary": "Cada {every} s, lanza durante {cast} s y luego cae una jaula sobre un jugador que no sea el tanque y lo aturde. La jaula tiene {hits} puntos: cada pulsación de la tecla de interacción del prisionero rompe {press}, cada golpe de un aliado rompe {helper}, y se repara lentamente. Tras {max} s, la jaula aplasta al prisionero y le causa un daño equivalente a {crush} de su salud máxima.",
+        "cageHeroicSummary": "Cada {every} s, lanza durante {cast} s y luego caen jaulas sobre {cages} jugadores que no sean el tanque. Cada jaula tiene {hits} puntos: cada pulsación de la tecla de interacción del prisionero rompe {press}, y cada golpe de un aliado rompe {helper}. Dentro, la salmuera que sube drena salud cada segundo. Tras {max} s, la jaula aplasta y causa un daño equivalente a {crush} de la salud máxima.",
+        "cageResponse": "Si estás enjaulado, pulsa rápidamente la tecla de interacción. Los demás golpean la jaula para romperla.",
+        "cellsName": "Abrir las celdas",
+        "cellsSummary": "Al llegar a {health} de salud, libera a {count} Prisioneros Encadenados. Cuando les queda un cuarto de salud, sus cadenas se rompen y abandonan el combate.",
+        "cellsResponse": "Bajadlos a un cuarto de salud; no hace falta matarlos.",
+        "tipTank": "Mantén su atención y la de los prisioneros; las jaulas nunca te eligen como objetivo.",
+        "tipHealer": "Llena la salud de los jugadores enjaulados: el aplastamiento les quita una parte de su salud.",
+        "tipDamage": "Cambia de objetivo a cada jaula de inmediato y golpéala hasta romperla.",
+        "heroicCages": "Jaula de hierro encierra a {cages} jugadores a la vez.",
+        "heroicFlood": "Inundación de salmuera: el jugador enjaulado pierde salud cada segundo hasta ser liberado."
+      },
+      "ossick": {
+        "overview": "El carcelero engancha a un jugador con el ancla y lo arrastra hacia la fosa de ahogamiento. Este debe correr hacia un Poste de Amarre encendido o el grupo debe romper la cadena. Mientras tanto, otros dos jugadores quedan encadenados entre sí y deben permanecer cerca.",
+        "phaseName": "El Patio de Ahogamiento",
+        "phaseSummary": "Al llegar a {first} y {second} de salud, salen de las celdas {count} Prisioneros Encadenados cada vez.",
+        "anchorSummary": "Cada {every} s, lanza durante {cast} s y luego engancha a un jugador que no sea el tanque. Tras {settle} s, la cadena lo arrastra hacia la fosa. Para escapar: acercarse a menos de {reach} yardas de un Poste de Amarre encendido situado al menos a {run} yardas del punto donde fue enganchado (ese poste se apaga durante {dark} s), o que el grupo aseste {hits} golpes al ancla. Llegar a la fosa causa un daño equivalente a {pit} de la salud máxima y un aturdimiento de {stun} s.",
+        "anchorHeroicSummary": "Cada {every} s, lanza durante {cast} s y luego engancha a un jugador que no sea el tanque; al caer, el ancla inflige de {min} a {max} de daño a los demás a menos de {crashRadius} yardas. Tras {settle} s, la cadena lo arrastra hacia la fosa. Para escapar: un Poste de Amarre encendido a un mínimo de {run} yardas o {hits} golpes al ancla. Llegar a la fosa causa un daño equivalente a {pit} de la salud máxima y un aturdimiento de {stun} s.",
+        "anchorResponse": "Si estás enganchado, corre pronto hacia un poste encendido. Los demás golpean el ancla.",
+        "shackleSummary": "Cada {every} s, un lanzamiento de {cast} s encadena entre sí a dos jugadores durante {seconds} s. Cada segundo que estén separados por más de {range} yardas, ambos reciben de {min} a {max} de daño.",
+        "shackleResponse": "Si estás encadenado, mantente a menos de {range} yardas de tu compañero.",
+        "cudgelSummary": "Cada {every} s, un lanzamiento de {cast} s contra el tanque: {mult} veces el daño de su golpe cuerpo a cuerpo, ignorando la armadura, y una reducción de {slow} de la velocidad de movimiento durante {seconds} s.",
+        "cudgelResponse": "Tanque: usa una habilidad defensiva con tiempo de reutilización. Sanadores: preparaos para el golpe.",
+        "tipTank": "Mantenlo cerca del centro y atrae la atención de los prisioneros. Garrote del carcelero ignora tu armadura.",
+        "tipHealer": "Vigila a los jugadores enganchados y encadenados; la fosa les quita una gran parte de la salud.",
+        "tipDamage": "Golpea el ancla en cuanto alguien quede enganchado. Si estás encadenado, permanece cerca de tu compañero.",
+        "choiceName": "¿Correr a un poste o romper la cadena?",
+        "choiceGain": "Un poste encendido libera por sí solo al jugador enganchado, así que el grupo puede seguir atacando.",
+        "choiceRisk": "El poste debe estar al menos a {run} yardas y se apaga durante {dark} s. Cuando la cadena ya es corta, no hay postes al alcance y solo sirve romperla.",
+        "heroicCrash": "Impacto del ancla: el ancla golpea a todos a menos de {crashRadius} yardas del jugador enganchado.",
+        "heroicChanges": "El ancla necesita {hits} golpes y los jugadores encadenados deben mantenerse a menos de {range} yardas entre sí."
+      },
+      "vael": {
+        "overview": "Un segador encapuchado. Tres veces seguidas emerge de un charco de sombras detrás de un jugador y le barre la espalda con una guadaña. Al llegar a {first} y {second} de salud, se esconde entre copias idénticas mientras un himno daña a todos; el haz de la Baliza de Niebla revela cuál es la figura real.",
+        "phaseCrownName": "La Corona de la Baliza",
+        "phaseCrownSummary": "Se alza de la corona cuando un jugador pisa sobre ella. Al llegar a {first} y {second} de salud, se incorporan {count} Esclavos Ahogados al combate.",
+        "phaseVeilName": "Velo de niebla",
+        "phaseVeilSummary": "Al llegar a {first} y {second} de salud, se esconde entre copias idénticas.",
+        "surgeSummary": "Un lanzamiento de {cast} s y luego de {min} a {max} de daño a todos a menos de {radius} yardas de él. Cada {every} s de combate abierto; cada {lastEvery} s por debajo de {below} de salud.",
+        "surgeResponse": "Los jugadores a distancia deben mantenerse a más de {radius} yardas.",
+        "crossingSummary": "Cada {every} s, atraviesa las sombras hasta {chain} veces seguidas, cada vez detrás de un jugador distinto: se abre un charco {behind} yardas a su espalda, él emerge y barre hacia ese jugador un arco de {arc} grados y {range} yardas: de {min} a {max} de daño.",
+        "crossingResponse": "Marcado por la muerte: avanza para salir del barrido o colócate detrás del charco. Los demás nunca deben situarse delante del jugador marcado.",
+        "graveName": "Sombra sepulcral",
+        "graveSummary": "Cada charco de sombras permanece durante {seconds} s y quema a cualquiera a menos de {radius} yardas, causando {perSecond} de daño por segundo.",
+        "graveResponse": "Mantente fuera de los charcos anteriores.",
+        "veilSummary": "Se esconde y luego aparecen cuatro figuras alrededor de la corona: Vael y tres Sombras de Niebla. Las cuatro cantan Himno de ahogamiento durante {seconds} s y causan más daño a todos cada segundo. El haz de la Baliza de Niebla barre cada {beam} s: el Vael real se ilumina. Inflígele un daño equivalente a {share} de su salud para romper el velo: queda aturdido durante {stun} s y recibe {vuln} más de daño durante {vulnSeconds} s.",
+        "veilHeroicSummary": "Se esconde y luego aparecen cuatro figuras alrededor de la corona: Vael y tres Sombras de Niebla, que se desplazan una posición cada {drift} s. Las cuatro cantan Himno de ahogamiento durante {seconds} s. El haz de la Baliza de Niebla revela al Vael real. Inflígele un daño equivalente a {share} de su salud para romper el velo: un aturdimiento de {stun} s y {vuln} más de daño recibido durante {vulnSeconds} s.",
+        "veilResponse": "Vigilad el haz y luego golpead todos únicamente al Vael real.",
+        "fogburstName": "Estallido de niebla",
+        "fogburstSummary": "Cualquier golpe a una Sombra de Niebla la hace estallar: de {min} a {max} de daño y un aturdimiento de {stun} s a los jugadores a menos de {radius} yardas de ella.",
+        "fogburstHeroicSummary": "Cualquier golpe a una Sombra de Niebla la hace estallar: de {min} a {max} de daño y un aturdimiento de {stun} s a los jugadores a menos de {radius} yardas, y un Esclavo Ahogado se alza donde estaba.",
+        "fogburstResponse": "No golpees una copia: espera al haz.",
+        "tipTank": "Atrae la atención de los Esclavos Ahogados. Durante el velo, ayuda a encontrar al Vael real.",
+        "tipHealer": "El daño de Himno de ahogamiento aumenta sobre todos hasta que se rompe el velo. Oleada de bruma golpea a todos a menos de {radius} yardas de él.",
+        "tipDamage": "Cuando tengas Marcado por la muerte, avanza o colócate detrás del charco. Durante el velo, golpea solo a la figura que ilumina el haz.",
+        "tipDamageHeroic": "Cuando tengas Marcado por la muerte, avanza o colócate detrás del charco y evita los charcos anteriores. Durante el velo, golpea solo a la figura que ilumina el haz.",
+        "choiceName": "¿Esperar al haz o adivinar?",
+        "choiceGain": "Esperar al haz hace que todos los golpes alcancen al Vael real y rompe el velo antes.",
+        "choiceRisk": "Cada segundo que dura el velo, el himno causa más daño. Si adivinas mal, una copia estalla: causa daño y aturde a su alrededor.",
+        "choiceRiskHeroic": "Cada segundo que dura el velo, el himno causa más daño. Si adivinas mal, una copia estalla, aturde a los jugadores cercanos y deja un Esclavo Ahogado.",
+        "heroicGrave": "Sombra sepulcral: cada charco de sombras sigue quemando durante {seconds} s.",
+        "heroicVeil": "Durante el velo, las figuras se desplazan cada {drift} s, y una copia que estalle deja un Esclavo Ahogado."
+      }
+    },
+    "temple": {
+      "selthe": {
+        "overviewRework": "Selthe nunca se mueve ni ataca cuerpo a cuerpo. Agrupaos para Coro, sal del grupo para Solo, interrumpe Aria de ahogamiento y esquiva Oleada de la laguna. En dos umbrales de salud, repetid su melodía de baldosas lunares alternando cantantes.",
+        "phaseSummaryRework": "Sus otros ataques se detienen mientras el grupo responde a la partitura. Las descargas de agua lunar no tienen barra de lanzamiento y no se pueden interrumpir.",
+        "boltSummaryRework": "Entre otros lanzamientos, cae una descarga cada {every} s tras un aviso visual de {windup} s e inflige {mult} veces su daño de arma como daño de Escarcha. Interrumpir Aria de ahogamiento detiene las descargas y el aria durante {quiet} s.",
+        "boltResponseRework": "Mantén al tanque en su línea de visión. Reserva las interrupciones para Aria de ahogamiento.",
+        "tipHealerRework": "Vigila al objetivo del aria y a quienes queden solos durante Coro. Durante la partitura, ayuda a cantar la siguiente nota y cura los errores.",
+        "scoreSummary": "Al llegar a {first} y {second} de salud, se vuelve inmune y toca {notes} notas, y luego {finalNotes}. Repetidlas en {answer} s y luego en {finalAnswer} s. Una baldosa incorrecta inflige {falseNote} de daño de Escarcha y reinicia el progreso, pero no el tiempo. Si se agota el tiempo, todos reciben entre {min} y {max} de daño de Escarcha. Acertar la aturde durante {stun} s y aumenta el daño que recibe en {vulnerability} durante {bonusSeconds} s.",
+        "scoreResponse": "Observa la melodía y pisa las baldosas en orden. Alterna las notas correctas con otro jugador vivo; el único superviviente puede terminar solo. Los pasos bloqueados son inofensivos. Sal de una baldosa y vuelve a pisarla para hacerla sonar, incluso si ya estabas en ella antes de empezar la respuesta.",
+        "scoreHeroic": "Durante la respuesta, las baldosas se apagan. Recuerda la melodía y respetad los turnos.",
+        "overview": "La Madre del Coro canta desde su poza y nunca se mueve ni ataca cuerpo a cuerpo. Marca a jugadores para un Coro compartido y un Solo aislado, dirige un aria creciente hacia uno y envía una ola por el patio. Sus descargas y su aria se pueden interrumpir.",
+        "phaseName": "El Patio del Coro",
+        "phaseSummary": "Una fase con temporizadores. Una mecánica que toca durante un lanzamiento espera a que termine.",
+        "chorusName": "Coro",
+        "chorusSummary": "Cada {every} s se marca a un jugador que no sea el tanque durante {mark} s. Al terminar, {total} de daño se reparte por igual entre todos a menos de {radius} yardas de él.",
+        "chorusHeroicSummary": "Cada {every} s se marca a un jugador que no sea el tanque durante {mark} s. Al terminar, {total} de daño se reparte por igual entre todos a menos de {radius} yardas de él. Eco: {echo} s después, el mismo lugar vuelve a estallar e inflige {echoDamage} a cada jugador que siga allí, sin reparto.",
+        "chorusResponse": "Todos se agrupan sobre el jugador del Coro y luego abandonan el lugar antes del Eco.",
+        "soloName": "Solo musical",
+        "soloSummary": "{offset} s después de cada Coro, se marca a otro jugador durante {mark} s. Al terminar, el jugador marcado y todos a menos de {radius} yardas reciben {damage} de daño cada uno.",
+        "soloHeroicSummary": "Dúo: Solo llega junto con Coro sobre otro jugador. Al terminar, el jugador marcado y todos a menos de {radius} yardas reciben {damage} cada uno; {echo} s después, el lugar vuelve a estallar.",
+        "soloResponse": "Jugador de Solo: aléjate de todos y luego abandona el lugar.",
+        "songSummary": "Cada {every} s, un lanzamiento de {cast} s y luego de {min} a {max} de daño de escarcha a cada jugador del patio.",
+        "songResponse": "No se puede evitar: los sanadores mantienen a todos con la salud llena.",
+        "boltSummary": "Su ataque de relleno: un lanzamiento de {cast} s a su objetivo por {mult} veces el daño de su golpe cuerpo a cuerpo, como escarcha. Tras cualquier interrupción no lanza descargas ni arias durante {quiet} s.",
+        "boltResponse": "Interrumpe las descargas cuando no vaya a llegar el aria.",
+        "ariaSummary": "Cada {every} s canaliza un haz hacia un jugador que no sea el tanque durante {channel} s: {pulses} pulsos que aumentan de {min} a {max} sobre el mismo cuerpo. Un jugador que entra en el haz recibe el pulso en su lugar y el aumento empieza de nuevo.",
+        "ariaResponse": "Interrúmpela, rompe su línea de visión detrás de un pilar de lámpara o entra en el haz para compartirlo.",
+        "surgeSummary": "Cada {every} s, un lanzamiento de {cast} s dirigido a un jugador que no sea el tanque y luego una ola de {arc} grados y {range} yardas: de {min} a {max} de daño y un empujón de {push} yardas.",
+        "surgeResponse": "Muévete de lado para salir de la cuña.",
+        "tipTank": "Colócate donde pueda verte para que sus descargas vayan a ti; nada más necesita tanque aquí.",
+        "tipHealer": "Canto del mar golpea a todos cada {every} s. Vigila al objetivo del aria y a quien reciba un Coro a solas.",
+        "tipDamage": "Agrupaos para Coro, separaos de Solo, interrumpid el aria y salid de Oleada de la laguna.",
+        "tipDamageHeroic": "Agrupaos para Coro y separaos de Solo a la vez; luego abandonad ambos lugares antes del Eco. Interrumpid el aria.",
+        "choiceName": "¿Interrumpir el aria o absorberla?",
+        "choiceGain": "Una interrupción o un pilar termina el haz al instante. Entrar en el haz reinicia su aumento sobre ti.",
+        "choiceRisk": "Interrumpir el aria también silencia sus descargas un momento, pero si nadie actúa, todo el aumento cae sobre un jugador.",
+        "heroicDuet": "Dúo: Coro y Solo llegan a la vez a dos jugadores.",
+        "heroicEcho": "Eco: cada marca vuelve a estallar en el mismo lugar {echo} s después."
+      },
+      "hydra": {
+        "overview": "Tres cabezas con tres elementos comparten un combate: hielo, veneno y agua. Una cabeza que muere pasa su ataque a la siguiente y vuelve a crecer {regrow} s después mientras otra viva. Las olas recorren la mitad de la poza a intervalos y, entre olas, dos cabezas combinan sus alientos.",
+        "phaseName": "La Poza de la Hidra",
+        "phaseSummary": "La cabeza izquierda exhala hielo, la central escupe veneno y la derecha lanza agua.",
+        "phaseComboName": "Aliento combinado",
+        "phaseComboSummary": "{after} s después de cada ola, dos cabezas se combinan siempre en el orden Torrente aprisionado en hielo, Corriente venenosa y Escarcha tóxica.",
+        "phaseComboHeroicSummary": "{early} s y {after} s después de cada ola, dos cabezas se combinan en el orden Torrente aprisionado en hielo, Corriente venenosa y Escarcha tóxica.",
+        "headsName": "Tres cabezas",
+        "headsSummary": "Una cabeza muerta pasa su elemento a la siguiente y cada cabeza viva inflige {enrage} más de daño por cabeza muerta. Una cabeza muerta vuelve a crecer tras {regrow} s con {share} de salud mientras otra siga viva.",
+        "headsResponse": "Baja la salud de las tres cabezas a la vez y remátalas en {regrow} s.",
+        "breathSummary": "Cada {every} s, un lanzamiento de {cast} s a un jugador que no sea el tanque y luego un cono de hielo de {arc} grados y {range} yardas: de {min} a {max} de daño y {slow} más lento durante {seconds} s.",
+        "breathResponse": "Sal del cono.",
+        "spitName": "Escupitajo venenoso",
+        "spitSummary": "Cada {every} s, hasta {count} charcos de {radius} yardas bajo jugadores distintos estallan tras {warn} s: de {min} a {max} de daño; luego el veneno quema allí durante {seconds} s por {perSecond} por segundo.",
+        "spitResponse": "Separaos y luego salid de los charcos.",
+        "torrentSummary": "Cada {every} s, un lanzamiento de {cast} s dirige una franja de {length} yardas a un jugador que no sea el tanque: de {min} a {max} de daño y un empujón de {push} yardas.",
+        "torrentResponse": "Muévete de lado para salir de la franja.",
+        "tsunamiSummary": "Primero a los {first} s y luego {every} s después de que termine la ola anterior: un lanzamiento de {cast} s mientras las cabezas reciben {reduction} menos de daño y luego una ola golpea la mitad de la poza: de {min} a {max} de daño y un empujón de {push} yardas.",
+        "tsunamiHeroicSummary": "Primero a los {first} s y luego {every} s después de que termine la ola anterior: un lanzamiento de {cast} s mientras las cabezas reciben {reduction} menos de daño y luego una ola golpea la mitad de la poza: de {min} a {max} de daño y un empujón. Contracorriente: {backwash} s después recorre la otra mitad.",
+        "tsunamiResponse": "Ve a la otra mitad, detrás de una columna del borde o detrás de un Muro de hielo. No concentres ataques en las cabezas mientras están sumergidas.",
+        "frostlockSummary": "Una franja dirigida a un jugador: de {min} a {max} de daño y una congelación de {stun} s. Deja un Muro de hielo durante {wall} s: colocarse hasta {lee} yardas detrás protege de la siguiente ola, que lo rompe.",
+        "frostlockHeroicSummary": "Una franja dirigida a un jugador: de {min} a {max} de daño y una congelación de {stun} s. Deja un Muro de hielo: colocarse detrás protege de la siguiente ola. Al romperse, todos a menos de {reach} yardas del muro reciben de {shardMin} a {shardMax}.",
+        "frostlockResponse": "Esquiva la franja y luego usa el muro para protegerte de la Ola de tsunami.",
+        "currentSummary": "Los charcos de veneno crecen hasta {radius} yardas y se deslizan {slide} yardas hacia fuera desde el centro de la poza, quemando por {perSecond} por segundo.",
+        "currentResponse": "Apártate de la trayectoria del deslizamiento.",
+        "rimeSummary": "Los charcos de veneno se congelan en cristales que estallan tras {seconds} s: de {min} a {max} de daño a menos de {radius} yardas.",
+        "rimeResponse": "Aléjate de cada cristal antes de que estalle.",
+        "tipTank": "Mantén la atención de las cabezas que alcances; sus ataques apuntan a los demás.",
+        "tipHealer": "La Ola de tsunami y los alientos combinados son los picos de daño. Cada cabeza muerta hace que las demás golpeen más fuerte.",
+        "tipDamage": "Reparte el daño de forma uniforme para que las tres cabezas caigan con una diferencia máxima de {regrow} s. Detente durante cada Ola de tsunami.",
+        "choiceName": "¿Qué cabeza muere primero?",
+        "choiceGain": "Matar las tres a la vez termina el combate; cualquier orden sirve si mueren con poca diferencia de tiempo.",
+        "choiceRisk": "Cada cabeza muerta aumenta el daño de las demás en {enrage} y vuelve a crecer tras {regrow} s; la última cabeza restante reúne todos los elementos.",
+        "heroicChanges": "Una cabeza regenerada vuelve con {share} de salud y cada ola envía una contracorriente."
+      },
+      "colossus": {
+        "overview": "Un gigante de cristal andante. En tres umbrales de salud, cada jugador recibe una copia reflejada que lo persigue; no puedes dañar tu propia copia y cada copia viva protege al Coloso. Entre medias hay franjas, golpes y un suelo que se rompe sector por sector.",
+        "phaseName": "La Terraza del Prisma",
+        "phaseSummary": "Planta los pies en cada lanzamiento y nunca abandona la terraza.",
+        "phaseFlareName": "Fulgor del prisma",
+        "phaseFlareSummary": "Al llegar a {first}, {second} y {third} de salud, invoca Reflejos de Cristal de Marea.",
+        "lanceSummary": "Cada {every} s, un lanzamiento de {cast} s dirige una franja de {length} yardas a un jugador que no sea el tanque: de {min} a {max} de daño.",
+        "lanceResponse": "Muévete de lado para salir de la franja.",
+        "slamSummary": "Cada {every} s, un lanzamiento de {cast} s y luego de {min} a {max} de daño y un empujón de {push} yardas a menos de {radius} yardas.",
+        "slamResponse": "Los de cuerpo a cuerpo pueden apartarse; los sanadores cubren al tanque.",
+        "fractureSummary": "Primero a los {first} s y luego cada {every} s: el suelo se divide en {slices} sectores durante {rounds} rondas. En cada ronda, algunos sectores brillan rojos y explotan {warn} s después: de {min} a {max} de daño. El centro explota en cada ronda.",
+        "fractureResponse": "Muévete a un sector despejado en cada ronda y evita el centro.",
+        "flareSummary": "Una canalización de {cast} s y luego cada jugador recibe un Reflejo de Cristal de Marea con {share} de su salud que lo persigue. No puedes dañar tu propio reflejo.",
+        "flareResponse": "Mata los reflejos de los demás: nunca el tuyo.",
+        "wardName": "Resguardo del prisma",
+        "wardSummary": "Cada reflejo vivo reduce el daño que recibe el Coloso en {per}, hasta {cap}.",
+        "wardResponse": "Elimina los reflejos y luego vuelve al Coloso.",
+        "shatterName": "Cristal hecho añicos",
+        "shatterSummary": "Cuando se rompe un reflejo, todos a menos de {radius} yardas reciben {damage} de daño.",
+        "shatterResponse": "No te coloques junto a un reflejo que esté a punto de morir.",
+        "swapName": "Imágenes intercambiadas",
+        "swapSummary": "Cada {every} s, los reflejos cambian de dueño, por lo que cambia quién puede golpear cada copia.",
+        "swapResponse": "Vuelve a comprobar qué copia puedes golpear después de cada intercambio.",
+        "tipTank": "Recupera la atención del Coloso tras cada fulgor; avanza hacia su objetivo.",
+        "tipHealer": "Los reflejos golpean a sus dueños. Fractura de cristal de marea castiga a quien siga en un sector rojo.",
+        "tipDamage": "En cada fulgor, mata el reflejo de un compañero y luego avanza sector por sector durante la Fractura.",
+        "tipDamageHeroic": "En cada fulgor, mata el reflejo de un compañero; compruébalo de nuevo tras un intercambio. No te coloques junto a una copia moribunda.",
+        "choiceName": "¿Matar los reflejos o al coloso?",
+        "choiceGain": "Matar las copias elimina hasta {cap} de reducción de daño y detiene su persecución.",
+        "choiceRisk": "El tiempo dedicado a las copias no se dedica al Coloso y, en heroico, cada copia estalla al romperse.",
+        "heroicShatter": "Cristal hecho añicos: un reflejo que se rompe daña a todos a menos de {radius} yardas.",
+        "heroicSwap": "Imágenes intercambiadas: los reflejos cambian de dueño cada {every} s."
+      },
+      "ysolei": {
+        "overview": "El Avatar de la Luna Ahogada atrae a todos y golpea, inunda la mitad de su isla, invoca Engendros Lunares y hace rodar Lágrimas de luz lunar hacia sí misma. Al final, la luna cae si el grupo no rompe su resguardo a tiempo.",
+        "phaseAltarName": "El Altar de la Luna",
+        "phaseAltarSummary": "Nunca se mueve. Tiene mucho alcance: los de cuerpo a cuerpo se colocan lejos de su centro.",
+        "phaseTideName": "Marea creciente",
+        "phaseTideSummary": "Al llegar a {health} de salud se inunda la mitad de la isla y la inundación cambia de lado.",
+        "phaseMoonName": "La luna llena",
+        "phaseMoonSummary": "Al llegar a {health} de salud hace caer la luna.",
+        "lunarSummary": "Cada {every} s, un lanzamiento de {cast} s y luego de {min} a {max} de daño a todos a menos de {radius} yardas de su centro.",
+        "lunarResponse": "Los jugadores a distancia se mantienen fuera; los de cuerpo a cuerpo siempre están al alcance, así que los sanadores los cubren.",
+        "undertowSummary": "Cada {every} s canaliza durante {seconds} s y arrastra a todos hacia ella a {pull} yardas por segundo. Luego llega Impacto de marea: de {min} a {max} de daño a menos de {radius} yardas.",
+        "undertowHeroicSummary": "Cada {every} s canaliza durante {seconds} s y arrastra a todos hacia ella. Luego llega Impacto de marea: de {min} a {max} de daño a menos de {radius} yardas. Corriente de retorno: aparece un charco donde estaba cada jugador, que quema por {riptide} por segundo durante {pool} s.",
+        "undertowResponse": "Todos, incluidos los de cuerpo a cuerpo, corren hacia suelo seco durante la canalización; el agua de inundación ralentiza.",
+        "tearsSummary": "Al llegar a {first} y {second} de salud invoca {count} Lágrimas de luz lunar que ruedan hacia ella. Una lágrima que toca a un jugador se detiene: de {min} a {max} de daño más {bonus} por cada acumulación de Abrasión lunar, que dura {sear} s. Una lágrima que la alcanza le otorga {swell} más de daño durante el combate y la cura {heal}.",
+        "tearsHeroicSummary": "Al llegar a {first} y {second} de salud invoca {count} Lágrimas de luz lunar que ruedan hacia ella. Una lágrima que toca a un jugador se detiene: de {min} a {max} de daño más {bonus} por acumulación de Abrasión lunar, y deja Luz lunar derramada que quema por {glow} por segundo. Una lágrima que la alcanza le otorga {swell} más de daño y la cura {heal}.",
+        "tearsResponse": "Interceptad todas las lágrimas con el cuerpo, turnándoos para que nadie acumule Abrasión lunar.",
+        "tideName": "Marea creciente",
+        "tideSummary": "Al llegar a {health} de salud se inunda de golpe la mitad de la isla. Cada {every} s cambia de lado, precedida de un brillo de {warn} s. En el agua: {perSecond} de daño por segundo y {slow} más lento.",
+        "tideHeroicSummary": "Al llegar a {health} de salud se inunda de golpe la mitad de la isla. Cada {every} s cambia de lado. En el agua: {perSecond} de daño por segundo y {slow} más lento. Luna ahogada: cada {moonEvery} s sale un Engendro Lunar de la mitad inundada.",
+        "tideResponse": "Permanece en la mitad seca y muévete cuando la otra mitad brille.",
+        "callSummary": "Al llegar a {first} y {second} de salud invoca {count} Engendros Lunares.",
+        "callResponse": "El tanque atrae su atención y los personajes de daño los matan.",
+        "moonSummary": "Un lanzamiento de {cast} s detrás de un resguardo equivalente a {ward} de su salud. Rompe el resguardo a tiempo: queda aturdida durante {stun} s y recibe {vuln} más de daño. Si el resguardo resiste: de {min} a {max} de daño a todos en la isla y ella inflige {might} más de daño durante el resto del combate.",
+        "moonResponse": "Todos los personajes de daño golpean su resguardo; los sanadores se preparan para el impacto.",
+        "tipTank": "Atrae a todos los Engendros Lunares. Sal de Resaca corriendo con todos.",
+        "tipHealer": "Marea lunar golpea a los de cuerpo a cuerpo en cada lanzamiento. Las lágrimas añaden acumulaciones de Abrasión lunar: cura a quien haya interceptado una.",
+        "tipDamage": "Huye de cada Resaca, intercepta lágrimas por turnos, mata a los Engendros Lunares y concentra el daño en el resguardo de Luna descendente.",
+        "tipDamageHeroic": "Huye de cada Resaca y sus charcos de Corriente de retorno, intercepta lágrimas por turnos, mata a los Engendros Lunares y destruye rápido el resguardo de Luna descendente.",
+        "choiceName": "¿Interceptar las lágrimas o dejarlas pasar?",
+        "choiceGain": "Una lágrima interceptada nunca la alcanza: ni bonificación de daño de {swell} para ella ni sanación de {heal}.",
+        "choiceRisk": "Quien intercepta recibe el golpe y una acumulación de Abrasión lunar: la siguiente lágrima que reciba golpeará {bonus} más fuerte. Alternad turnos.",
+        "heroicRiptide": "Corriente de retorno: cada Resaca deja charcos ardientes donde estaban los jugadores.",
+        "heroicDrownedMoon": "Luna ahogada: sale un Engendro Lunar de la inundación cada {moonEvery} s.",
+        "heroicTears": "{count} lágrimas por oleada y el lanzamiento de Luna descendente dura {cast} s."
+      }
+    },
+    "sanctum": {
+      "tusker": {
+        "overview": "Un colmilludo del tamaño de una casa arrastra un trineo de braseros de almas ardientes por el Camino del Trineo. Recorre el camino en bucle y desengancha el trineo donde inicies el combate. A mitad de salud, el trineo vuelca y derrama fuego detrás de él.",
+        "phaseRoadName": "En el camino",
+        "phaseRoadSummary": "Dos ataques anunciados desde el principio: un barrido frontal y una carga por una franja dibujada.",
+        "phaseSpillName": "El trineo vuelca",
+        "phaseSpillSummary": "Al llegar a {health} de salud, el trineo vuelca y derrama fuego de almas detrás de él.",
+        "phaseEnrageName": "Enfurecido",
+        "phaseEnrageSummary": "Por debajo de {health} de salud se enfurece durante el resto del combate.",
+        "sweepSummary": "Cada {every} s, un lanzamiento de {cast} s y luego sus colmillos barren un cono de {arc} grados delante de él, {range} yardas más allá de su cuerpo: de {min} a {max} de daño y un empujón de {push} yardas.",
+        "sweepResponse": "El tanque lo mantiene mirando lejos del grupo. Los demás atacan desde los costados o por detrás.",
+        "trampleSummary": "Cada {every} s, un lanzamiento de {cast} s dibuja una franja de {length} yardas hacia el jugador más lejano; luego carga por ella: de {min} a {max} de daño y un derribo de {stun} s a todos dentro.",
+        "trampleResponse": "Sal de lado de la franja dibujada antes de que termine el lanzamiento. El objetivo es el jugador más lejano, así que los jugadores a distancia deben dejar espacio para apartarse.",
+        "spillName": "Braseros volcados",
+        "spillSummary": "Una vez, al llegar a {health} de salud: el trineo vuelca y {count} zonas de fuego de almas ({radius} yardas) arden detrás de él durante {seconds} s; de {min} a {max} de daño por segundo a quien esté dentro.",
+        "spillResponse": "Sal del fuego de inmediato y lucha lejos de las zonas ardientes.",
+        "enrageSummary": "Por debajo de {health} de salud inflige {damage} más de daño durante el resto del combate.",
+        "enrageResponse": "Reserva las habilidades de sanación y defensa con tiempo de reutilización para el tramo final y termínalo rápido.",
+        "tipTank": "Mantenlo mirando lejos del grupo y quieto, para que el cono del barrido nunca gire hacia los aliados. Prepárate para un empujón con cada Barrido de colmillos.",
+        "tipHealer": "Barrido de colmillos y Pisotear son los picos de daño. Colócate a su lado, no en el extremo lejano al que apunta Pisotear, y reserva una habilidad defensiva para su enfurecimiento por debajo de {health}.",
+        "tipDamage": "Ataca desde los costados o por detrás. Vigila la franja dibujada en el suelo y sal de ella. A mitad de salud, abandona el fuego que queda detrás de él."
+      },
+      "korgath": {
+        "overview": "El capataz del Herrero, encadenado a cuatro pilares de sello. Cada cadena que sigue sujeta reduce el daño que recibe en {perChain}, así que romperlas facilita matarlo. Pero cada cadena que rompes libera uno más de sus ataques durante el resto del combate.",
+        "phaseLockName": "El sello",
+        "phaseLockSummary": "Empieza sujeto por {chains} cadenas, una a cada pilar. Un Grillete del sello en cada pilar sostiene su cadena.",
+        "phaseFreedName": "Cadenas rotas",
+        "phaseFreedSummary": "Cada cadena rota libera un ataque durante el resto del combate, aunque después vuelvan a remacharla.",
+        "phaseEnrageName": "Enfurecido",
+        "lockboundName": "Atado al sello",
+        "lockboundSummary": "Cada cadena intacta reduce el daño recibido en {perChain}: {all} menos de daño mientras las cuatro sigan intactas.",
+        "lockboundResponse": "Rompe cadenas para acelerar la victoria. Decide primero cuántas: cada una también libera un ataque.",
+        "shacklesName": "Grilletes del sello",
+        "shacklesSummary": "Hay un Grillete del sello al pie de cada pilar. No se pueden atacar hasta iniciar el combate con Korgath. Matar uno rompe su cadena. Mientras la cadena del Yunque siga intacta, no puede alejarse más de {leash} yardas del centro de la terraza.",
+        "shacklesResponse": "Los personajes de daño matan los grilletes de las cadenas que habéis elegido romper. Mientras tanto, el tanque mantiene a Korgath en el centro.",
+        "strainSummary": "Mientras quede alguna cadena: cada {every} s, un lanzamiento de {cast} s y luego una explosión en un círculo de {radius} yardas alrededor de cada pilar cuya cadena siga intacta: de {min} a {max} de daño y un empujón. Se detiene cuando se rompen las cuatro cadenas.",
+        "strainResponse": "Aléjate de cada pilar con una cadena intacta antes de que termine el lanzamiento.",
+        "stompSummary": "Cada {every} s, un lanzamiento de {cast} s y luego un círculo que alcanza {radius} yardas más allá de su cuerpo: de {min} a {max} de daño a todos dentro.",
+        "stompResponse": "Los jugadores a distancia permanecen fuera del círculo. Los de cuerpo a cuerpo salen si pueden; los sanadores llenan la salud de quienes reciban el golpe.",
+        "rerivetSummary": "{delay} s después de romperse una cadena, un Herrero de Aguijadas Juramentado a la Prole trepa por el borde detrás de su pilar, camina al grillete y canaliza Remachar de nuevo durante {channel} s. Si termina, vuelven la cadena y un grillete nuevo con su reducción de daño de {perChain}, pero el ataque liberado se mantiene.",
+        "rerivetResponse": "Interrumpe, aturde o mata al Herrero de Aguijadas antes de que termine la canalización.",
+        "lastLinkName": "Último eslabón",
+        "lastLinkSummary": "Mientras quede exactamente una cadena, Tensión llega cada {every} s en lugar de cada {base} s.",
+        "lastLinkResponse": "Rompe la última cadena rápido o prepárate para alejarte de su pilar cada {every} s.",
+        "maulSummary": "Cadena del Martillo rota: cada {every} s, un lanzamiento de {cast} s y luego una hendidura de {arc} grados delante de él, {range} yardas más allá de su cuerpo, por {mult} veces el daño de su golpe cuerpo a cuerpo.",
+        "maulResponse": "Solo el tanque se coloca delante. Los demás se mueven detrás de él durante el lanzamiento.",
+        "flailSummary": "Cadena de las Tenazas rota: cada {every} s, un lanzamiento de {cast} s dibuja una franja de {length} yardas hacia el jugador más lejano que no sea el tanque; luego el látigo golpea a todos dentro: de {min} a {max} de daño.",
+        "flailResponse": "Sal de lado de la franja antes de que termine el lanzamiento.",
+        "chargeSummary": "Cadena del Yunque rota: puede abandonar el centro de la terraza. Cada {every} s, un lanzamiento de {cast} s dibuja una franja de {length} yardas hacia el jugador más lejano y luego carga por ella: de {min} a {max} de daño y un empujón.",
+        "chargeResponse": "Sal de la franja. Mientras la cadena del Yunque siga intacta, permanece a menos de {leash} yardas del centro y nunca carga.",
+        "bellowSummary": "Cadena del Fuelle rota: cada {every} s, un lanzamiento de {cast} s y luego de {min} a {max} de daño a todos y un empujón de {push} yardas que los aleja de él.",
+        "bellowResponse": "Golpea a todo el grupo y no se puede evitar: los sanadores llenan la salud de todos antes de que llegue.",
+        "tipTank": "Mantenlo en el centro, mirando lejos del grupo. Al romperse la cadena del Martillo, Arco de maza golpea a todo lo que tenga delante. Hasta romperse la del Yunque, no puede alejarse más de {leash} yardas del centro.",
+        "tipHealer": "Tensión, Pisotón estremecedor y cada ataque liberado golpean fuerte. Cada cadena intacta alarga el combate; cada cadena rota añade un ataque cuyo daño hay que sanar.",
+        "tipDamage": "Mata los grilletes para romper las cadenas elegidas y luego concentra el daño en Korgath. Sal de las franjas dibujadas y aléjate de los pilares que aún sostienen una cadena.",
+        "tipDamageHeroic": "Mata los grilletes para romper las cadenas elegidas y luego concentra el daño en Korgath. Detén a cada Herrero de Aguijadas antes de que termine Remachar de nuevo. Sal de las franjas dibujadas y aléjate de los pilares que aún sostienen una cadena.",
+        "choiceName": "¿Cuántas cadenas rompéis?",
+        "choiceGain": "Cada cadena rota elimina {perChain} de su reducción de daño: desde {all} con las cuatro cadenas hasta ninguna. El combate se acorta mucho.",
+        "choiceRisk": "Cada cadena rota libera un ataque durante el resto del combate. Martillo: Arco de maza. Tenazas: Mangual de cadenas. Yunque: Carga del umbral y puede abandonar el centro. Fuelle: Bramido del capataz.",
+        "choiceRiskHeroic": "Cada cadena rota libera un ataque durante el resto del combate. Martillo: Arco de maza. Tenazas: Mangual de cadenas. Yunque: Carga del umbral y puede abandonar el centro. Fuelle: Bramido del capataz. También llega un Herrero de Aguijadas para volver a remachar cada cadena rota.",
+        "heroicRerivet": "Remachar de nuevo: {delay} s después de romperse una cadena, un Herrero de Aguijadas intenta restaurarla. Interrúmpelo, atúrdelo o mátalo.",
+        "heroicLastLink": "Último eslabón: con una sola cadena restante, Tensión llega cada {every} s."
+      },
+      "velkhar": {
+        "overview": "Velkhar alza a los muertos descongelados de tres pozas de agua de deshielo. Solo el frío los mantiene muertos: un Caminahuesos muerto sobre hielo seco sigue muerto, pero uno muerto en agua de deshielo vuelve a alzarse y lo cura.",
+        "phaseVaultName": "La Cámara Ritual",
+        "phaseVaultSummary": "Los Caminahuesos siguen saliendo de las pozas. Al llegar a {wave1} y {wave2} de salud surge una oleada adicional, uno de cada poza.",
+        "thawName": "Deshielo que despierta",
+        "thawSummary": "Cada {every} s ruge la pira de una poza y {count} Caminahuesos Resucitados salen {warn} s después. Las pozas se turnan. Al llegar a {wave1} y {wave2} de salud, sale uno más de cada poza.",
+        "thawResponse": "El tanque los reúne y los arrastra a hielo seco. Los personajes de daño los matan allí.",
+        "heldName": "Cautivos y sin templar",
+        "heldSummary": "Un Caminahuesos muerto sobre hielo seco queda Cautivo: se congela como estatua y permanece muerto. Uno muerto en agua de deshielo se hunde y vuelve a alzarse {delay} s después con {share} de salud, y cura a Velkhar {heal} de su salud.",
+        "heldResponse": "Mata a los Caminahuesos solo sobre hielo seco: nunca en una poza ni en una franja de agua de deshielo.",
+        "graspName": "Agarre de los descongelados",
+        "graspSummary": "Un Caminahuesos en agua de deshielo inflige {bonus} más de daño.",
+        "graspResponse": "El tanque mantiene a los Caminahuesos fuera del agua.",
+        "trenchSummary": "Cada {every} s, un lanzamiento de {cast} s dibuja una franja de {width} yardas desde él hacia un jugador que no sea el tanque, hasta el borde de la cámara. Luego inflige de {min} a {max} de daño a todos dentro y la franja permanece como agua de deshielo durante {seconds} s.",
+        "trenchResponse": "Sal de la franja. No mates a los Caminahuesos sobre la franja de agua de deshielo que deja.",
+        "volleySummary": "Cada {every} s, un lanzamiento de {cast} s y luego de {min} a {max} de daño de sombras a todos.",
+        "volleyResponse": "No se puede evitar: los sanadores mantienen a todo el grupo con la salud llena.",
+        "warmHandsName": "Manos calientes",
+        "warmHandsSummary": "Un Caminahuesos que permanece quieto {still} s derrite bajo sus pies un charco de agua de deshielo de {radius} yardas durante {seconds} s.",
+        "warmHandsResponse": "Mantén a los Caminahuesos en movimiento y nunca remates a uno sobre un charco.",
+        "twiceWokenName": "Despertado dos veces",
+        "twiceWokenSummary": "Un Caminahuesos que vuelve a alzarse regresa con toda la salud e inflige {bonus} más de daño.",
+        "twiceWokenResponse": "No dejes que ninguno vuelva a alzarse: mátalos a todos sobre hielo seco.",
+        "tipTank": "Atrae a cada Caminahuesos y arrástralo a hielo seco, fuera de las pozas y franjas de agua de deshielo. En agua de deshielo golpean {bonus} más fuerte.",
+        "tipTankHeroic": "Atrae a cada Caminahuesos y arrástralo a hielo seco, fuera de las pozas y franjas de agua de deshielo. Mantenlos en movimiento: uno que se queda quieto derrite un charco bajo sus pies.",
+        "tipHealer": "Salva de sombras golpea a todos cada {every} s. Los Caminahuesos en agua de deshielo golpean {bonus} más fuerte, así que vigila al tanque cuando lleguen al agua.",
+        "tipDamage": "Mata a los Caminahuesos solo sobre hielo seco y luego vuelve a Velkhar. Sal de la franja de Zanja de fuego de almas.",
+        "choiceName": "¿Dónde caen los muertos?",
+        "choiceGain": "Un Caminahuesos muerto sobre hielo seco desaparece para siempre: menos enemigos adicionales y un combate más limpio.",
+        "choiceRisk": "Si muere en agua de deshielo, vuelve a alzarse y cura a Velkhar {heal} de su salud cada vez. Arrastrarlos a hielo seco lleva tiempo, así que planifica dónde matarlos antes de concentrar el daño.",
+        "heroicWarmHands": "Manos calientes: un Caminahuesos que permanece quieto {still} s derrite un charco de agua de deshielo.",
+        "heroicTwiceWoken": "Despertado dos veces: un Caminahuesos que vuelve a alzarse regresa con toda la salud e inflige {bonus} más de daño."
+      },
+      "korzul": {
+        "overview": "Un combate contra un dragón sobre un lago helado que su fuego no deja de romper. Cada aliento consume hielo y el grupo dirige su fuego, así que decide qué hielo perder. Un vermis sin hielo restante exhala sin pausa.",
+        "phaseLakeName": "El Lago Helado",
+        "phaseLakeSummary": "Sale del hielo y aterriza en el centro del lago. Su combate empieza al tocar el suelo.",
+        "phaseFlightName": "Vuelos",
+        "phaseFlightSummary": "Al llegar a {first} y {second} de salud, despega y lucha desde el aire hasta que vuelve a caer.",
+        "phaseLastName": "La última fase",
+        "phaseLastSummary": "Después del segundo vuelo: Aliento sepulcral cada {breath} s y Vendaval de alas cada {gale} s en el suelo.",
+        "iceName": "Rotura del hielo",
+        "iceSummary": "El lago está formado por placas de hielo. Su fuego agrieta una placa intacta y rompe una agrietada. Una placa agrietada se vuelve a congelar tras {refreeze} s. Una placa rota deja agua abierta.",
+        "iceHeroicSummary": "El lago está formado por placas de hielo. Su fuego agrieta una placa intacta y rompe una agrietada. Temple profundo: en heroico, una placa agrietada nunca se vuelve a congelar. Una placa rota deja agua abierta.",
+        "iceResponse": "Sacrifica hielo deliberadamente: dirige su fuego hacia placas que el grupo pueda permitirse perder.",
+        "waterName": "Aguas abiertas",
+        "waterSummary": "Estar en agua abierta te ralentiza {slow} e inflige {perSecond} de daño por segundo.",
+        "waterResponse": "Permanece sobre el hielo. Sal del agua de inmediato si un empujón te mete en ella.",
+        "breathSummary": "Cada {every} s, un lanzamiento de {cast} s en la dirección del tanque y luego un cono de fuego de {arc} grados y {range} yardas más allá de su cuerpo: de {min} a {max} de daño a todos dentro salvo el tanque. Arden hasta {plates} placas bajo el cono, primero las más cercanas.",
+        "breathResponse": "Solo el tanque se coloca delante. El tanque orienta el aliento hacia hielo que el grupo pueda sacrificar.",
+        "tailSummary": "Cada {every} s, un lanzamiento de {cast} s y luego su cola barre los {arc} grados a su espalda, {range} yardas más allá de su cuerpo: de {min} a {max} de daño y un empujón.",
+        "tailResponse": "Nunca te coloques detrás de él. Ataca desde sus costados.",
+        "infernoSummary": "Cada {every} s y una vez al llegar a {health} de salud, canaliza durante {duration} s: {pulses} pulsos de fuego a menos de {radius} yardas, cada uno más potente que el anterior (el último inflige de {min} a {max}). El pulso {crack} agrieta su placa y el pulso {brk} la rompe; al romperse, queda Sumergido y termina la canalización.",
+        "infernoResponse": "Aléjate {radius} yardas de él. Haz que empiece sobre una placa agrietada y la canalización terminará en el pulso {crack}.",
+        "galeSummary": "Un lanzamiento de {cast} s y luego todos son empujados {push} yardas lejos de él.",
+        "galeResponse": "Mantén despejada de agua abierta la zona a tu espalda para que el empujón te deje sobre hielo.",
+        "plungeSummary": "En el aire marca a un jugador que no sea el tanque con Ojo del vermis durante {eye} s. Al terminar, vierte Fuego descendente sobre toda su placa: un aviso de {warn} s y luego de {min} a {max} de daño a quien esté encima; la placa arde. {roundsFirst} rondas en el primer vuelo y {roundsSecond} en el segundo.",
+        "plungeHeroicSummary": "En el aire marca a dos jugadores que no sean el tanque con Ojo del vermis durante {eye} s (Ojos gemelos). Al terminar, vierte Fuego descendente sobre toda la placa de cada jugador marcado: un aviso de {warn} s y luego de {min} a {max} de daño a quien esté encima; la placa arde. {roundsFirst} rondas en el primer vuelo y {roundsSecond} en el segundo.",
+        "plungeResponse": "Si tienes la marca, ve a una placa sin grietas lejos del grupo. Los demás abandonan esa placa.",
+        "broodName": "Prole de las profundidades",
+        "broodSummary": "Al despegar, sale un Guardia de Escamas de cada placa rota, hasta {max}.",
+        "broodResponse": "El tanque atrae su atención y el grupo los mata mientras él está en el aire.",
+        "descentSummary": "Termina cada vuelo aterrizando en la placa intacta con más jugadores: una sombra de {warn} s y luego de {min} a {max} de daño a menos de {radius} yardas y un empujón; esa placa arde.",
+        "descentResponse": "Agrupaos en una placa que podáis permitiros agrietar y luego salid de la sombra antes de que aterrice.",
+        "flareName": "Fulgor de la esquirla",
+        "flareSummary": "Después del segundo vuelo, la esquirla fulgura: Aliento sepulcral cada {breath} s y Vendaval de alas cada {gale} s en el suelo.",
+        "flareResponse": "Los alientos llegan más rápido: planifica qué placas quedan para sacrificar.",
+        "noIceName": "No queda hielo",
+        "noIceSummary": "Si se rompen todas las placas, se mantiene sobre el agua abierta y exhala sin pausa.",
+        "noIceResponse": "Nunca agotes el hielo: el combate termina con la derrota de todo el grupo.",
+        "tipTank": "Orienta Aliento sepulcral hacia hielo que el grupo pueda sacrificar, nunca a través del grupo. Muévelo a una placa agrietada antes de Infierno sepulcral para acortarlo.",
+        "tipHealer": "Los pulsos de Infierno sepulcral aumentan rápido: asegúrate de que todos salgan. Fuego descendente, Descenso aplastante y cualquier empujón al agua golpean fuerte.",
+        "tipDamage": "Nunca te coloques delante ni detrás. Con Ojo del vermis, ve a una placa sin grietas lejos del grupo. Mata a los Guardias de Escamas durante los vuelos.",
+        "tipDamageHeroic": "Nunca te coloques delante ni detrás. Dos jugadores reciben Ojo del vermis a la vez: cada uno lo lleva a una placa distinta sin grietas lejos del grupo. Mata a los Guardias de Escamas durante los vuelos.",
+        "choiceIceName": "¿Qué hielo consumís?",
+        "choiceIceGain": "Dirige su aliento, Fuego descendente y aterrizaje hacia placas elegidas y el resto del lago seguirá siendo seguro.",
+        "choiceIceRisk": "Cada placa rota deja agua abierta y permite que salga un Guardia de Escamas en su siguiente vuelo (hasta {max}). Sin hielo restante, exhala sin pausa.",
+        "choiceDouseName": "¿Sofocar el Infierno?",
+        "choiceDouseGain": "Si está sobre una placa agrietada, el pulso {crack} la rompe, queda Sumergido e Infierno sepulcral termina antes de los pulsos más potentes.",
+        "choiceDouseRisk": "Esa placa se pierde para siempre. Sobre hielo sin grietas, la canalización llega al pulso {brk} y también rompe la placa.",
+        "heroicDeepQuench": "Temple profundo: una placa agrietada nunca se vuelve a congelar.",
+        "heroicTwinEyes": "Ojos gemelos: Ojo del vermis marca a dos jugadores a la vez."
+      }
     }
   },
   "guide": {
@@ -7980,7 +9246,14 @@ export const es: EnTranslations = {
       "discord": "Únete al Discord",
       "communityWiki": "Wiki de la comunidad",
       "rights": "World of ClaudeCraft",
-      "linksLabel": "Enlaces de juego y comunidad"
+      "linksLabel": "Enlaces de juego y comunidad",
+      "guidesLabel": "Guías de jugadores",
+      "guideFree": "MMORPGs gratuitos",
+      "guideGamesLikeWow": "Juegos como WoW",
+      "guideBest": "Mejores MMORPGs",
+      "guideNew": "Nuevos MMORPGs",
+      "guideBrowser": "MMORPGs de navegador",
+      "guideGamesLikeDiablo": "Juegos como Diablo"
     },
     "language": {
       "label": "Idioma",
@@ -8247,7 +9520,7 @@ export const es: EnTranslations = {
       "mobileBody": "En un móvil o una tableta el juego te arranca en Low. Todos los dispositivos táctiles aterrizan ahí en su primer arranque, a propósito, para que entres al mundo y juegues; súbelo tú mismo desde el panel de Gráficos cuando quieras. En un navegador Android tienes toda la escala abierta y tu elección se mantiene. En iPhone y iPad aún puedes escoger los ajustes más altos y toman efecto en cuanto pulsas Aplicar, pero el juego te devuelve a High la próxima vez que arranques, porque iOS puede cerrar la pestaña mientras se construye una escena tan grande. La aplicación descargada es aún más estricta: su lista de ajustes termina en High y los controles de sistema individuales quedan ocultos, porque la aplicación los gestiona ella misma.",
       "touchBody": "En una pantalla táctil el panel de Gráficos gana una tarjeta propia de Controles táctiles: tamaño y zona muerta del joystick, tamaño de los botones en pantalla, opacidad de los controles, un stick de cámara opcional, una disposición reflejada para zurdos y mirada táctil invertida, para que la pantalla se adapte a tus manos y no al revés.",
       "audioTitle": "Sonido e idioma",
-      "audioBody": "La ventana de opciones no es solo píxeles. Audio reúne tres controles de volumen, para efectos de sonido, música y voz, más un interruptor de música y cuatro interruptores para los sonidos que antes cansan: voces de PNJ, pasos, sonidos de interfaz y respuesta al clic. La pestaña General del panel de Interfaz lleva un selector de idioma que vuelve a localizar la interfaz entera al instante, sin necesidad de recargar, y un selector de tema para el aspecto de las ventanas.",
+      "audioBody": "Las opciones también incluyen sonido. Audio ofrece cuatro controles de volumen: efectos, ambiente, música y voces; además, un interruptor para la música y cuatro para los sonidos que suelen cansar: voces de PNJ, pasos, sonidos de interfaz y respuesta de clic. La pestaña General del panel Interfaz incluye un selector de idioma que traduce toda la interfaz al instante, sin recargar, y un selector de tema para las ventanas.",
       "autolootBody": "¿Prefieres no hacer clic en cada cadáver? El saqueo automático al pasar, en la pestaña Combate del panel de Interfaz y desactivado por defecto, recoge el botín de tus propias presas mientras caminas junto a ellas.",
       "panelsMoreBody": "Los dos paneles que esta página no detalla merecen igualmente un vistazo. Auras es donde das forma a las grandes alertas en pantalla que se activan cuando aparece uno de los procs de tu clase: cuáles se muestran, su tamaño, color, opacidad y dónde se sitúan en la pantalla. Superposición de rendimiento es la lectura que activas mientras ajustas esta página, y luego vuelves a ocultar.",
       "valueUltraOrInsane": "Ultra, o Insane si lo quieres con todos los detalles.",
@@ -8264,6 +9537,7 @@ export const es: EnTranslations = {
       "rowCameraSpeed": "Con qué rapidez gira la cámara cuando miras alrededor con el ratón.",
       "rowTouchLookSpeed": "Lo mismo pero para el deslizamiento de la vista, y solo aparece cuando estás en una pantalla táctil.",
       "rowFullscreen": "Llena toda la pantalla con el juego.",
+      "rowSpellEffects": "El brillo, las chispas, los proyectiles y los estallidos de impacto de los hechizos de jugadores y sus mascotas, incluidos los tuyos. Desactívalo para una pantalla más tranquila o ganar algunos fotogramas en grandes combates de grupo. Los hechizos enemigos siguen visibles, al igual que los círculos de zonas peligrosas, las marcas sobre objetivos aturdidos, asustados o inmovilizados y todas las barras de lanzamiento.",
       "rowWaterRipples": "Estelas y ondas que se extienden detrás de ti mientras nadas. Desactivadas de forma predeterminada, y el único efecto de agua que cuesta fotogramas de verdad; las salpicaduras y burbujas no se ven afectadas de ninguna manera.",
       "rowOverflowXp": "Al nivel máximo, si tu barra sigue llenándose con experiencia sobrante o muestra en su lugar el clásico texto estático de nivel máximo.",
       "rowInterfaceMode": "Si obtienes la interfaz de escritorio o los controles táctiles en pantalla. Auto lee tu dispositivo, y puedes forzar cualquiera de los dos: una tableta con teclado puede usar el diseño de escritorio, y un portátil con pantalla táctil puede usar los controles táctiles.",
@@ -8298,7 +9572,7 @@ export const es: EnTranslations = {
       "ifPartyShowAuras": "Si los beneficios y perjuicios se muestran en los marcos de grupo. Interruptores equivalentes cubren las barras de recursos, los escudos de absorción, las mascotas y si apareces en tu propia lista de grupo.",
       "ifAurasOnPlayerFrame": "Muestra tus beneficios y perjuicios en tu propio marco de unidad, además de en la barra de auras.",
       "ifAuraBarBelowFrame": "Mueve la fila de beneficios debajo de tu marco de unidad en vez de encima. Solo importa mientras los beneficios estén en el marco del jugador.",
-      "ifTargetAurasBelowFrame": "Cuelga la franja de beneficios y perjuicios del marco de objetivo debajo del marco en lugar de encima, el diseño clásico. Desactivado de forma predeterminada, ya que el marco de objetivo estándar se sitúa justo encima de la barra de acción; actívalo una vez que hayas movido el marco a un lugar con espacio debajo.",
+      "ifTargetAurasBelowFrame": "Coloca la fila de beneficios y perjuicios del objetivo debajo de su marco, bajo el nombre y la barra de salud, en vez de encima: la distribución clásica. En su posición original, el marco del objetivo, junto con tu barra de lanzamiento y los temporizadores de ataque, sube una fila para que la primera fila de efectos no invada la barra de acción. Un marco que hayas movido conserva su posición.",
       "ifAlwaysShowAllBuffs": "Muestra todos los beneficios activos incluso con el preajuste gráfico Bajo, ignorando su límite habitual de iconos de beneficios.",
       "ifShowAuraCaster": "Añade una línea de \"Lanzado por\" a la información de cada beneficio o perjuicio, indicando quién lo aplicó. Útil para distinguir a varios lanzadores del mismo beneficio, como los Juramentos de dos paladines.",
       "ifTargetOfTarget": "Muestra a quién tiene como objetivo tu objetivo, la forma clásica de saber si el tanque todavía lo controla.",
@@ -8316,6 +9590,7 @@ export const es: EnTranslations = {
       "ifMouseoverCast": "Permite que una curación o un hechizo amistoso caiga sobre el marco de grupo que sobrevuelas con el cursor, sin cambiar tu objetivo.",
       "ifStickyTarget": "Mantiene tu objetivo actual cuando haces clic en suelo vacío, en lugar de quitarlo.",
       "ifFctScale": "El tamaño de los números de daño y curación que flotan sobre tu objetivo.",
+      "ifClassicCombatText": "Recupera los números de daño sencillos, blancos y dorados pálidos, que suben en vertical. Déjalo desactivado (opción predeterminada) para ver números más llamativos que se abren hacia los lados y destellos en los golpes críticos o inusualmente grandes.",
       "ifExtraBars": "Revela una segunda fila de la barra de acción, y una tercera en cuanto la segunda está activada. Las ranuras siguen siendo accesibles mediante sus atajos de teclado aunque las filas estén ocultas.",
       "ifHideUnused": "Oculta las ranuras de acción vacías para que solo se dibujen los botones que realmente usas.",
       "ifLockBars": "Bloquea tus barras para que no puedas arrastrar una habilidad fuera de una ranura por accidente.",
@@ -8343,7 +9618,7 @@ export const es: EnTranslations = {
       "deathTitle": "Cuando caes",
       "deathBody": "Si tu salud llega a cero, caes donde estás y tu cuerpo se queda allí. Libera tu espíritu y te alzas como espíritu en el cementerio más cercano: más veloz que los vivos, fuera del alcance de tus enemigos, pero incapaz de luchar, saquear o hablar con nadie salvo con el Guardián Pálido que flota sobre las lápidas. Desde ahí eliges. Lleva tu espíritu de vuelta a tu cuerpo y revives en el sitio, con parte de tu salud y tu maná restaurados y sin penalización alguna. O acepta del Guardián Pálido un alzamiento instantáneo donde estás, al precio del Tañido del Guardián: un debilitamiento temporal de cuanto eres que dura más cuanto más veterano seas, y que perdona por completo a los personajes recién creados. Cae dentro de una mazmorra y tu espíritu aguarda en el cementerio de fuera; lleva tu espíritu de vuelta a través de la puerta y revives en la entrada. Las expediciones son la excepción: si caes allí, simplemente vuelves a ponerte en pie en la entrada de la expedición, aunque una segunda caída termina la incursión. Por cualquiera de los dos caminos, no pierdes experiencia, equipo ni dinero. Entre combates, siéntate a comer y beber para empezar el siguiente con toda tu fuerza.",
       "threatTitle": "A quién golpea el enemigo",
-      "threatBody": "Cada enemigo lleva su propia cuenta privada de quién le ha molestado más. El daño se suma a ella, y también la curación: sanar añade amenaza sobre los enemigos que ya luchan contra la persona curada, repartida entre ellos, así que la curación más segura es la que recae sobre alguien que el tanque ya tiene sujeto. Los tanques activan una actitud en guardia o una forma protectora que multiplica cuanto generan, mientras que la Forma de lobo del druida hace justo lo contrario y descarta amenaza, y una provocación eleva al lanzador directo a la cima de la lista y le fija al enemigo encima durante unos segundos. Los enemigos no cambian en el instante en que alguien supera al tanque: hace falta una ventaja clara para arrebatarle uno, y una ventaja mayor a distancia que cuerpo a cuerpo, así que un poco de paciencia al empezar a atraer a un grupo mantiene el combate donde debe estar.",
+      "threatBody": "Cada enemigo lleva su propia cuenta privada de quién le ha molestado más. El daño se suma a ella, y también la curación: sanar añade amenaza sobre los enemigos que ya luchan contra la persona curada, repartida entre ellos, así que la curación más segura es la que recae sobre alguien que el tanque ya tiene sujeto. Los tanques activan una actitud en guardia o una forma protectora que multiplica cuanto generan, mientras que la Forma felina del druida hace justo lo contrario y descarta amenaza, y una provocación eleva al lanzador directo a la cima de la lista y le fija al enemigo encima durante unos segundos. Los enemigos no cambian en el instante en que alguien supera al tanque: hace falta una ventaja clara para arrebatarle uno, y una ventaja mayor a distancia que cuerpo a cuerpo, así que un poco de paciencia al empezar a atraer a un grupo mantiene el combate donde debe estar.",
       "hazardsTitle": "El agua puede matarte",
       "breathBody": "El agua profunda se puede nadar, y puedes bucear bajo ella. Mientras tienes la cabeza sumergida, aparece una barra de Aliento azul cerca de la parte superior de la pantalla y se va vaciando; sal a la superficie y se rellena mucho más rápido de lo que se vació. Deja que se agote por completo mientras sigues sumergido y empiezas a ahogarte, perdiendo un buen trozo de salud cada segundo hasta que llegues al aire, así que vigila la barra en una inmersión larga. La muerte la restablece, de modo que una carrera del cadáver siempre empieza con los pulmones llenos.",
       "fatigueBody": "El mar no tiene muro. Los cruces que el mundo espera que nades, los estrechos y las lagunas entre un tramo de tierra y el siguiente, y los lagos del interior, son seguros de cruzar por mucho que tarden. Aventúrate más allá de la orilla, en aguas verdaderamente abiertas, y empieza a minar tus fuerzas: aparece un aviso, tienes una ventana real para dar la vuelta, y después de eso el mar inflige un daño cada vez mayor que nada puede evitar hasta que regreses hacia tierra. Ahógate o agótate tan lejos de la orilla y liberas tu espíritu como en cualquier otra muerte, así que trata el horizonte como paisaje, no como destino.",
@@ -8379,8 +9654,9 @@ export const es: EnTranslations = {
       "framesGovernedAuraTracks": "Editar marcos también libera las seis pistas de auras opcionales cuando las activas en la pestaña Combate de las mismas opciones de Interfaz: Mis beneficios, Enfriamientos defensivos, Mis escudos, Enfriamientos ofensivos, Movimiento y sigilo, y Mis beneficios sobre aliados. Todas están desactivadas de forma predeterminada y cada una muestra su propia etiqueta cuando está libre.",
       "frameGroups": "{trackers} puede combinar misiones, gestas, brechas, expediciones, objetivos de recolección y el seguimiento del Relicario. {auras} puede combinar los dots de objetivo y las seis franjas de auras. Activa cualquiera de los dos grupos en Configuración de marcos, o déjalo desactivado para mover cada marco por separado. {tot} incluye una barra de recurso. {focus} tiene tres objetivos que se mueven de forma independiente: Shift+F1 a Shift+F3 los asigna; Ctrl+F1 a Ctrl+F3 los selecciona. Arrastra el medidor de daño o de amenaza en cualquier punto fuera de sus botones para moverlo, y arrastra sus bordes para redimensionarlo, incluso con los marcos bloqueados. Mientras los marcos están desbloqueados, Mostrar u Ocultar Marcos tiene su propio menú agrupado. Haz clic derecho en un marco desbloqueado para Restablecer tamaño u Opciones de marco. Interfaz > Marcos también contiene Configuración de marcos y las Opciones de marco de grupo, que se pueden contraer. Vincular el objetivo de tu objetivo al objetivo mantiene esos marcos juntos. Desactívalo para mover el objetivo de tu objetivo por separado; volver a activarlo conserva esa posición aparte para más tarde. Los marcos de foco asignados ocultan sus controles de configuración; haz clic derecho y elige Quitar foco para restaurarlos. El lanzamiento al pasar el cursor también funciona en los marcos de foco.",
       "framesGovernedTalkingHead": "Editar fotogramas también afloja el panel de Diálogo, que lleva la línea hablada de un NPC mientras ese NPC está fuera de tu vista; lleva su chip con nombre mientras está suelto.",
-      "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
+      "framesGovernedShardpike": "Editar marcos también permite mover la barra de la Pica de Fragmentos, la fila breve de acciones de herramienta de misión que aparece junto a tus barras de acción solo mientras llevas la propia Pica de Fragmentos. Muestra su etiqueta de nombre mientras está desbloqueada para que puedas colocarla antes del combate en lugar de durante él.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
+      "framesGovernedResourceAndHill": "Activa Separar barra de recursos en la pestaña Marcos y Editar marcos también desbloqueará tu barra de recursos, para que puedas colocar el maná, la energía o la ira por separado en cualquier lugar; Anchura de la barra de recursos y Altura de la barra de recursos, en esa misma pestaña, ajustan su tamaño. Editar marcos también desbloquea la barra de El Rey de la Colina, y Opacidad del fondo de El Rey de la Colina, en esa pestaña, atenúa su panel sin reducir la claridad del texto.",
       "barsTitle": "Barras, temporizadores y texto de combate",
       "barsBody": "Tu barra de lanzamiento aparece en el centro de la pantalla, justo encima de tus barras de acción, cada vez que lanzas o canalizas, y muestra el nombre del hechizo y el tiempo restante. Tu objetivo tiene su propia barra de lanzamiento en su marco, para que puedas ver lo que viene y responder a ello.\n\nUna fina barra de golpe se sitúa bajo tu barra de lanzamiento y se llena entre los golpes de tu arma, para que un atacante cuerpo a cuerpo o a distancia pueda ver cuándo llega el próximo golpe automático.\n\nTu barra de experiencia ocupa el ancho completo bajo tus barras de acción, dividida en segmentos, con un tramo más claro que muestra la experiencia de descanso que tienes acumulada.\n\nNada bajo el agua y aparecerá una barra de aliento azul en la parte superior de la pantalla. Se vacía mientras tienes la cabeza sumergida, parpadea en rojo en cuanto se agota y empiezas a ahogarte, y se rellena rápido en cuanto sales a la superficie. Space te hace nadar hacia arriba, y la tecla Nadar hacia abajo, Ctrl de forma predeterminada, te lleva más profundo.\n\nEl daño y la sanación flotan hacia arriba sobre aquello que los recibió en forma de pequeños números, para que puedas leer un combate sin leer texto. La pestaña Combate de tu caja de chat conserva el registro escrito completo.",
       "aurasTitle": "Beneficios y perjuicios",
@@ -8394,7 +9670,7 @@ export const es: EnTranslations = {
       "mapBodyZoneFirst": "M abre el mapa del mundo en la zona donde estás, con tu propia flecha, los puntos de interés cercanos, los emisores de misiones con sus marcas y las áreas de tus objetivos, estaciones de fabricación, buzones, tablones y bancales, entradas de mazmorra y todos los nodos de recolección de la zona, apagados mientras reaparecen y marcados cuando tus herramientas no bastan. Tu grupo también aparece. Haz clic derecho en el mapa o pulsa su botón Mapa del mundo para alejarlo hasta el continente, con cada zona dibujada y nombrada; al hacer clic en una zona se abre su mapa. Entra en una Profundidad, mazmorra, Brecha o fortaleza y el mapa cambia al plano del lugar; el campo de batalla de Campos Espinosos tiene su propio mapa.\n\nA la derecha, bajo el minimapa, una pila de rastreadores mantiene a la vista tus asuntos actuales: misiones y objetivos seguidos, progreso de gestas, páginas del Relicario, la Profundidad actual y cualquier Brecha en la que participes. El rastreador de misiones se contrae cuando quieres recuperar espacio en pantalla.",
       "gatheringGoalTrackerBody": "Un rastreador de objetivos de recolección se une a la pila cuando sigues una receta en la ventana de fabricación o una comisión en el tablón: indica la receta o comisión, cuánto estás reuniendo y cuánto aportan tus materiales guardados y almacenados. Seguir reemplaza el objetivo actual y Borrar lo elimina explícitamente; ninguno cambia tu preferencia de cosecha.",
       "hubPracticeTrackerBody": "Cerca del centro de Eastbrook se une un rastreador de práctica cuando aceptas allí las lecciones guiadas: mantiene visibles tus mejores intentos contra los muñecos de práctica. Mientras una lección está activa, una franja de entrenamiento te guía por el paso actual, desde abrir los medidores de daño hasta comparar un segundo intento.",
-      "dungeonTrackerBody": "Inside a group dungeon, a dungeon tracker takes the top of the stack: a plate carrying the dungeon's name, marked Heroic on a heroic run, with a rail that fills as the run goes, and under it every boss of that dungeon in the order the route meets them, each counted 0 / 1 until it falls. A boss whose fight has a second act stays open until the whole fight is over, so the list reads complete only when the run is. The tracker leaves when you do, and Edit Frames loosens it like the other trackers, under its own name chip.",
+      "dungeonTrackerBody": "Dentro de una mazmorra de grupo, un seguimiento de mazmorra ocupa la parte superior de la pila: una placa con el nombre de la mazmorra, marcada como Heroica en dificultad heroica, con una barra que se llena a medida que avanza la partida. Debajo aparecen todos sus jefes en el orden del recorrido, cada uno contado como 0 / 1 hasta que cae. Un jefe cuyo combate tenga un segundo acto permanece pendiente hasta que termina todo el combate, así que la lista solo aparece completa cuando la partida también lo está. El seguimiento desaparece cuando sales, y Editar marcos permite moverlo como los demás seguimientos, bajo su propia etiqueta de nombre.",
       "chatTitle": "La caja de chat",
       "chatBody": "Abajo a la izquierda. Pulsa Intro para empezar a escribir y de nuevo Intro para enviar.\n\nDos pestañas están siempre presentes: Chat, el registro combinado de cuanto se dice a tu alrededor, y Combate, el registro escrito de tu combate. El botón más añade otras, una por canal: Decir, Gritar, Grupo, General, Mundo, BdG, Hermandad y Oficiales, además de una pestaña de Susurro que reúne en un solo lugar cada susurro que envías y recibes. Escribir en la pestaña de un canal envía el mensaje a ese canal sin que tengas que volver a escribir el comando.\n\nLa caja entera se puede arrastrar a otro lugar y redimensionar, y recuerda dónde la dejaste.",
       "keyWindowsTitle": "Ventanas que abres con una tecla",
@@ -8493,7 +9769,9 @@ export const es: EnTranslations = {
       "session": "Lo que has hecho desde que iniciaste sesión: bajas, muertes, daño y experiencia.",
       "arena": "Tu posición en el Coliseo Ceniciento en ambas categorías: índice, victorias, derrotas y porcentaje de victorias para 1c1 y para 2c2.",
       "pvp": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other anywhere; switching off takes 5 minutes.",
-      "pvpZones": "Bandera de JcJ mundial: /pvp la alterna, /pvp on y /pvp off la fijan. Los jugadores marcados pueden luchar entre sí en terreno disputado, los santuarios no permiten ningún combate mundial en absoluto, y las zonas de todos contra todos lo permiten con o sin bandera; desactivarla tarda 5 minutos.",
+      "pvpZones": "Bandera JcJ mundial: /pvp la alterna; /pvp on y /pvp off la activan y desactivan. Los jugadores marcados pueden luchar entre sí en zonas disputadas; los santuarios no permiten combates JcJ mundiales. Entrar en el círculo activo del Rey de la Colina activa tu bandera. Desactivarla tarda 5 minutos.",
+      "presence": "Quién te ve conectado en listas de amigos, el registro de tu hermandad y /who: /presence everyone (el predeterminado), /presence friends (solo jugadores de tu lista de amigos), o /presence none. Oculto, no ven un punto conectado, zona o posición de mapa para ti, aunque los susurros e invitaciones aún te llegan; tu grupo siempre te ve. Un /presence a secas te dice cuál está establecido.",
+      "flair": "Muestra u oculta tu rol de Discord a otros jugadores, es decir, tu nombre en color, tu etiqueta de rol y tu etiqueta de chat verificada: /flair on lo muestra, /flair off lo oculta y /flair a secas te dice cuál está activo. Requiere una cuenta de Discord vinculada.",
       "listings": "Tus propios anuncios en el Mercado Mundial, con el precio pedido, el tiempo que le queda a cada uno, y cuánto espacio te queda para publicar más.",
       "buyback": "Lo que has vendido recientemente a un vendedor y todavía puedes recomprar.",
       "groupState": "Cómo estás ahora mismo",
@@ -8528,7 +9806,7 @@ export const es: EnTranslations = {
       "graveyard": "Adónde volvería tu espíritu si cayeras aquí.",
       "dungeons": "Todas las mazmorras, con la zona en la que está su puerta y el tamaño de grupo para el que está pensada, además de la dificultad que tienes seleccionada ahora.",
       "dungeonMode": "Cambia tus mazmorras entre la dificultad normal y la heroica.",
-      "dungeonReset": "Abandona tus propias instancias vacías, que es lo que haces después de cambiar de dificultad.",
+      "dungeonReset": "Abandona tus instancias vacías para que la siguiente partida empiece de nuevo, con la misma dificultad o una nueva.",
       "groupRecovery": "Recuperación y presencia",
       "unstuck": "La salida cuando el mundo te ha atrapado. Quédate quieto durante una breve cuenta atrás y te trasladas al cementerio más cercano, revivido allí si ya habías caído. Después te deja debilitado con el Mal de desatasco durante un tiempo, así que es un último recurso y no un atajo.",
       "unstuckWindow": "La salida cuando el mundo te ha atrapado. Quédate quieto durante una breve cuenta atrás y te trasladan al cementerio más cercano, y te revive allí si ya habías caído. El primer uso en una hora es gratis. Si lo usas de nuevo dentro de la hora siguiente al último, te deja debilitado con el Mal de desatasco durante un tiempo después, así que es un rescate, no un atajo.",
@@ -8742,18 +10020,20 @@ export const es: EnTranslations = {
       "formsHeading": "Cambio de forma",
       "formsNote": "Un druida lucha cambiando de forma. La mayoría de las habilidades de druida pertenecen a una forma concreta, así que la forma en la que estás decide lo que puedes lanzar, y cambiar de forma cuesta un poco de maná. Puedes cambiar de forma dentro o fuera de combate, tantas veces como quieras.",
       "formsAutoUnshift": "Una sanación o un hechizo de daño lanzado en forma te saca de ella por ti. Salir de una forma así es gratis y no gasta tu tiempo de reutilización global, de modo que un hechizo instantáneo sale en el momento en que lo pulsas. Volver a la forma es una habilidad normal y sigue costando maná y tu tiempo de reutilización global.",
-      "formsMoonwing": "Un druida de Equilibrio gana una forma más, la Forma de lechúcico lunar, la forma de conjurador en la que lucha un druida de Equilibrio. Es la única forma animal que conserva tus hechizos, y tu varita solo funciona en ella o en tu forma de conjurador normal.",
-      "formsWolfEngage": "Un Gato abre el combate con Embestida de Bruin, se transforma directamente en Forma de lobo para inmovilizar al objetivo, cierra la distancia con Embestida felina cuando no está al acecho, y mantiene quieto a un enemigo con Takedown.",
+      "formsMoonwing": "Un druida de Equilibrio obtiene otra forma: Forma de lechúcico lunar, la forma de conjurador en la que combate esta especialización. Como la Forma de Sanador de Esporas de Restauración, conserva tus hechizos; la varita solo funciona en estas dos formas o en tu forma de conjurador normal.",
+      "formsWolfEngage": "Un Gato abre el combate con Embestida de Bruin, se transforma directamente en Forma felina para inmovilizar al objetivo, cierra la distancia con Embestida felina cuando no está al acecho, y mantiene quieto a un enemigo con Derribo.",
       "formLine": {
         "form_bear": "La forma de tanque: una piel gruesa, ira en lugar de maná, y amenaza extra para que los enemigos sigan golpeándote a ti.",
         "form_cat": "La forma de daño cuerpo a cuerpo: energía y puntos de combo, como un pícaro, y mucha menos amenaza.",
-        "form_travel": "La forma de viaje: mucho más rápida por tierra, pero sin otras habilidades hasta que cambies de forma."
+        "form_travel": "La forma de viaje: mucho más rápida por tierra, pero sin otras habilidades hasta que cambies de forma.",
+        "form_sporemender": "La forma sanadora de Restauración: piel más resistente y sanación más potente a cambio de caminar más despacio; conserva todos tus hechizos y tu maná."
       },
       "mageEleSummon": "Un hechizo de Escarcha que llama al elemental a tu lado y lo lanza contra tu objetivo.",
       "formName": {
         "form_bear": "Forma de Bruin",
-        "form_cat": "Forma de lobo",
-        "form_travel": "Forma Fleet"
+        "form_cat": "Forma felina",
+        "form_travel": "Forma Fleet",
+        "form_sporemender": "Forma de Sanador de Esporas"
       }
     },
     "classHook": {
@@ -8953,27 +10233,27 @@ export const es: EnTranslations = {
     },
     "mountsPage": {
       "heading": "Monturas y equitación",
-      "intro": "Una montura es una forma más rápida de cruzar el mundo, y no es más que eso. Aprendes a montar en los establos, compras tu primer par de riendas, y a partir de ahí cada camino se acorta.",
+      "intro": "Elige una apariencia de montura, aprende equitación en los establos y viaja más rápido por el mundo. Tu entrenamiento marca el ritmo; todas las apariencias de montura son cosméticas.",
       "whatHeading": "Qué es una montura",
-      "whatBody": "Una montura es una bestia que cabalgas, y lo que te da es velocidad. Sin armadura, sin daño, sin características: te lleva por el terreno más rápido y salta un poco más alto cuando tú saltas, y ahí se acaba el trato. Toda montura del juego es una montura terrestre, así que no hay monturas voladoras, y ninguna de ellas nada.",
+      "whatBody": "Las monturas son apariencias cosméticas para tu montura entrenada. No otorgan armadura, daño ni estadísticas de combate. El entrenamiento de equitación aumenta la velocidad por tierra y los saltos montado alcanzan más altura. Todas las monturas permanecen en tierra y ninguna puede nadar.",
       "learnHeading": "Aprender a montar",
-      "learnBody": "La Equitación es una habilidad que compras una sola vez, y se desbloquea en el nivel {level}. Marla Hitchen, la caballeriza mayor, regenta los Establos del Galecrest en los páramos, y vende el Entrenamiento de Monta por 80 de oro. Esa única compra es lo que te permite montar, sin más, y la conservas para siempre.\n\nEn cuanto la tengas, Marla te ofrece una misión: Lecciones de equitación. Acéptala, sigue el marcador hasta el cuadrado brillante detrás del arco de salida, y pulsa Iniciar Carrera. Ella te presta un Corcel del Valor de entrenamiento para la lección, así que la lección en sí no te cuesta nada. Recorre el circuito, termínalo, y vuelve con ella a por tus monedas y tu experiencia. El corcel prestado vuelve al establo después, así que la lección te enseña a manejarte en la silla, en lugar de regalarte un caballo.",
+      "learnBody": "La equitación se desbloquea al nivel {level}. La caballeriza mayor Marla Hitchen vende el Entrenamiento de Monta por 80 de oro en los Establos del Galecrest. El entrenamiento básico permite moverse un {basicSpeed}% más rápido al montar. Después, Marla también vende el Entrenamiento avanzado de Monta por {advancedFee} de oro, que aumenta la bonificación al {advancedSpeed}%. Cada rango pertenece al personaje que lo aprende.\n\nTras aprender equitación básica, acepta la misión Lecciones de equitación de Marla y sigue el marcador hasta el cuadrado luminoso tras el arco de salida. Pulsa Iniciar carrera para tomar prestado el Corcel del Valor de entrenamiento. Termina el recorrido y vuelve para recibir monedas y experiencia. El caballo prestado regresa al establo al terminar la lección.",
       "whereHeading": "Dónde encontrarla",
       "whereBody": "Los Establos del Galecrest están marcados en el mapa de La Cresta del Vendaval, en los páramos entre el Shear y los Wreckfields. Marla está junto al establo, mirando hacia el corral de carreras.",
       "firstHeading": "Tu primera montura",
-      "firstBody": "El Corcel del Valor es la única montura que se vende en cualquier parte del mundo. En cuanto hayas aprendido Equitación, Marla te venderá las Riendas del Corcel del Valor por 10 de oro, y esas riendas son tuyas para quedártelas. Cualquier otra montura se gana ahí fuera, en el mundo, así que el caballo es donde empieza casi cualquier jinete.",
+      "firstBody": "Marla vende las Riendas del Corcel del Valor por 10 de oro después de aprender equitación. Conservar las riendas desbloquea la apariencia del caballo en Cosméticos para todos los personajes de tu cuenta. El entrenamiento ya permite invocar una montura sin llevar riendas, así que elige el caballo u otra apariencia que poseas cuando quieras cambiar de aspecto.",
       "rideHeading": "Montar y desmontar",
-      "rideBody": "No hay ventana de monturas ni favorito que fijar, porque las riendas son la montura. Usa un par de riendas desde tus bolsas o desde una ranura de la barra de acción y montas esa montura. Invocarla lleva un instante, una llamada breve en vez de instantánea, así que no te salvará si atraes mal a un grupo de enemigos. Desmontar es instantáneo y nunca se bloquea.\n\nUsa las riendas que ya estás montando y guardas esa montura. Usa un par distinto mientras estás montado y cambias directamente a ella, sin nada que invocar por en medio. La tecla Montar / Desmontar, la tecla de acento grave (`) de forma predeterminada, solo sirve para bajarte: es el camino de bajada, no el de subida. La única excepción es la lección de equitación, donde esa misma tecla llama al corcel que te presta Marla, ya que un caballo prestado no tiene riendas que pulsar. En un teléfono o una tableta, el botón Monturas de la bandeja Más funciona en ambos sentidos, aunque llama al primer par de riendas que encuentre en tus bolsas en lugar de uno que elijas tú, así que toca las riendas mismas cuando quieras una montura concreta.",
+      "rideBody": "Abre Cosméticos y elige una apariencia en la pestaña Monturas. La tecla Montar / Desmontar, por defecto el acento grave, invoca tu montura entrenada con esa apariencia. El botón Montar del móvil hace lo mismo. Invocarla requiere una breve canalización; desmontar es instantáneo. Puedes cambiar de apariencia mientras montas sin cambiar tu velocidad.\n\nTambién puedes usar riendas desde las bolsas o una barra de acción para elegir esa apariencia e invocar la montura. Usar la apariencia que ya llevas al montar guarda la montura. Las riendas en el banco o en otro personaje desbloquean el mismo cosmético sin que el jinete deba llevarlas.",
       "breaksHeading": "Qué te hace desmontar",
       "breaksBody": "El agua siempre gana. Métete con la montura en cualquier lugar lo bastante profundo para nadar y caerás en el acto, porque ninguna montura terrestre nada, y morir te deja donde hayas caído. No puedes invocar una mientras estás en combate, mientras estás muerto o de vuelta como espíritu, o en cualquier momento durante una partida de Campos Espinosos, que se libra a pie desde la formación inicial hasta el desenlace final: si estabas montado mientras esperabas, que te sienten en la partida te hace desmontar también. Entrar en combate o meterte en el agua a mitad de una invocación también la cancela.\n\nLa mayoría de lo que haces también te desmonta. Atacar algo, empezar un lanzamiento, cosechar un nodo, pescar, fabricar, encantar, desguazar y recargar una herramienta de oficio te desmontan en cuanto empiezas, así que espera bajarte en cada veta. Invocar una montura también deshace cualquier transformación que mantengas activa: nunca estás transformado y montado a la vez.",
-      "speedHeading": "Velocidad y niveles",
-      "speedBody": "La velocidad es lo único que diferencia una montura de otra. El Corcel del Valor que le compras a Marla marca el ritmo base, y las monturas que consigues por el mundo lo superan: cuanto más raras son las riendas, más rápida es la montura, en unos pocos escalones claros en vez de una progresión suave. No hay una segunda categoría de Equitación que entrenar ni una mejora que comprar después. Pagas la Equitación una sola vez, y desde ese momento las riendas que uses deciden lo rápido que viajas.",
+      "speedHeading": "Velocidad y entrenamiento de equitación",
+      "speedBody": "El Entrenamiento de Monta básico permite moverse un {basicSpeed}% más rápido al montar. El Entrenamiento avanzado de Monta permite un {advancedSpeed}% más de velocidad y cuesta {advancedFee} de oro con Marla. Toda apariencia usa la misma velocidad según el rango de entrenamiento del personaje, independientemente de su rareza u origen. Los aspectos de la tienda también usan esa velocidad.",
       "collectHeading": "De dónde vienen las monturas más raras",
       "collectBody": "Más allá del mostrador de Marla, las riendas se encuentran, no se compran. Salen de los últimos jefes de las mazmorras de cinco jugadores y de la banda en heroico, y de brechas despejadas, donde cuanto más difícil sea la brecha que termines, más raras pueden ser las riendas que deje. Son hallazgos raros a propósito y ninguna partida promete una, así que la forma sensata de cazar una montura es llevar esa caza de fondo en las partidas que ibas a hacer de todos modos. Esta página no te dirá qué montura cuelga de qué jefe: esa parte te toca descubrirla a ti.",
       "raceHeading": "La carrera de los establos",
       "raceBody": "El circuito de salto en el corral de Marla está abierto para cualquiera, en cualquier momento, no solo durante la lección. Monta, ponte de pie sobre el cuadrado brillante detrás del arco, y pulsa Iniciar Carrera. Una cuenta atrás te mantiene inmóvil, y luego el cronómetro corre: supera los siete obstáculos y vuelve a cruzar el arco antes de que se acabe la arena.\n\nUn obstáculo solo cuenta si estás de verdad en el aire por encima de la barra, así que pasar por debajo sin saltar no despeja nada. Puedes tomarlos en cualquier orden y desde cualquiera de los dos lados, y fallar uno no es el fin del mundo: da la vuelta y vuelve a intentarlo. Morir, desmontar o salir del corral termina el intento, y lo mismo pasa si dejas que el cronómetro llegue a cero, lo que te baja de la silla justo donde estés; cancelarlo tú mismo solo detiene el cronómetro. Nada te impide empezar otro intento. No hay tarifa, ni tiempo de reutilización, ni más recompensa que el propio tiempo, y cualquier número de jinetes puede correr el circuito a la vez sin estorbarse entre sí.",
       "goodsHeading": "Las riendas son bienes ordinarios",
-      "goodsBody": "Una montura es un objeto, lo que la convierte en algo que la economía puede mover. Eres dueño de una montura mientras sus riendas estén en tus bolsas o en tu bóveda, aunque unas riendas guardadas en la bóveda mantienen la montura como tuya sin dejarte montarla: para invocar a la bestia tienes que llevar las riendas encima. Las riendas de jugador no llevan ningún vínculo, así que se intercambian, viajan por correo y se publican en el Mercado Mundial como cualquier otro hallazgo, salvo que el propio objeto diga lo contrario. Vale la pena saber dos cosas antes de desprenderte de una: ningún vendedor te recomprará jamás un par de riendas, así que una montura es una compra que conservas o regalas, no que conviertes en monedas, y si las riendas salen a la vez de tus bolsas y de tu bóveda mientras estás montado, ya sea porque las intercambias, las envías por correo o las vendes en el mercado, la montura se va con ellas y te deja de pie justo donde estés."
+      "goodsBody": "Las apariencias de montura coleccionables están disponibles para toda la cuenta mientras quede al menos un objeto de riendas correspondiente en las bolsas o el banco personal de cualquier personaje. Intercambiar, enviar por correo, poner a la venta, vender o retirar de cualquier otra forma el último objeto válido elimina la apariencia de Cosméticos. Quien la lleve vuelve a la apariencia del caballo predeterminado y sigue montado a la velocidad de su entrenamiento.\n\nLas riendas de los jugadores pueden intercambiarse, enviarse por correo y ponerse a la venta en el Mercado Mundial salvo que el objeto indique lo contrario. Las riendas del caballo también pueden venderse a un mercader por 10 de oro. Las demás riendas mantienen sus propias restricciones de venta. Los aspectos de montura de la tienda siguen siendo cosméticos de cuenta independientes de las riendas."
     },
     "worldPage": {
       "heading": "El mundo",
@@ -9148,7 +10428,7 @@ export const es: EnTranslations = {
       "heroicRewardsBody": "Los jefes heroicos sueltan el botín que ya conoces, mejorado y marcado como Heroico en la información, y el jefe final de cada incursión añade épicos que no se encuentran en ningún otro sitio. Esa última muerte también deja Marcas Heroicas a cada participante: una moneda que se gasta con el intendente Vex en Highwatch, cuyo mostrador es un estante de anillos y colgantes que nada salvo la prueba de las profundidades heroicas puede comprar.",
       "heroicLockoutBody": "Las mazmorras normales se pueden recorrer todo el día. El heroico pide paciencia: la muerte del jefe final limita a todos los de la incursión a un solo despeje heroico de esa mazmorra al día, y la banda mantiene un bloqueo diario para cada dificultad. En un reino en vivo todos los bloqueos diarios se liberan juntos a la hora del reinicio nocturno propio del reino, así que un despeje tomado justo antes de esa hora y otro tomado justo después caen en días distintos; juega en tu navegador sin conexión y un bloqueo simplemente expira un día después de tu propia muerte del jefe. Una incursión de cinco jugadores ya despejada sigue abierta a su propio grupo para carreras de cadáver y botín, así que nadie queda apartado de lo que ganó allí. La banda es más estricta: una vez que su muerte te bloquea, la puerta permanece cerrada hasta el reinicio, y la única forma de volver a cruzarla es una carrera de cadáver de alguien que cayó en la misma incursión que lo bloqueó, así que un incursor vivo que sale ha salido por ese día. Recoge tus despojos antes de dejar la arena. Cada uno de estos bloqueos pertenece al personaje que se lo ganó, así que un despeje en tu personaje principal deja libres a tus demás personajes.",
       "resetTitle": "Restablecer tus instancias",
-      "resetBody": "Si cambiáis de dificultad mientras vuestro grupo aún mantiene incursiones reclamadas, las reclamaciones antiguas permanecen un rato antes de liberarse solas. El líder del grupo puede soltarlas de golpe en su lugar: elegid Restablecer todas las instancias en el menú de su propio retrato, o escribid /dungeon reset. Un restablecimiento solo funciona después de haber cambiado realmente la dificultad, solo mientras no quede nadie dentro, vivo o caído, solo una vez que todos los cadáveres de ahí dentro hayan sido saqueados por completo, y un breve tiempo de reutilización separa un restablecimiento del siguiente. Si llegáis a la puerta con la dificultad equivocada, el juego os lo dice antes de que empiece la incursión. La banda nunca se restablece así; sus propias reglas de bloqueo se mantienen.",
+      "resetBody": "Las partidas reclamadas vacías tardan un tiempo en desaparecer solas. El líder del grupo puede abandonarlas de inmediato: elige Restablecer todas las instancias en el menú de su propio retrato o escribe /dungeon reset. La siguiente partida empezará de nuevo con tu dificultad actual. Cambiar la dificultad hace lo mismo con las partidas de la dificultad anterior. Solo se puede restablecer cuando no queda nadie dentro, vivo ni muerto, y se ha recogido todo el botín de los cadáveres. Nunca acorta un bloqueo: una mazmorra heroica o banda bloqueada sigue bloqueada hasta su reinicio. Hay un breve tiempo de espera entre restablecimientos. Si llegas a la puerta con la dificultad equivocada, el juego te lo indica antes de empezar. La banda se restablece igual y conserva sus reglas de bloqueo y regreso al cadáver. Al cambiar la dificultad de una banda no hay tiempo de espera: si el grupo eligió mal o no pudo con Heroico, puede volver de inmediato, pues su propio bloqueo limita las repeticiones.",
       "templeLoreTitle": "El Templo Ahogado, un poco más a fondo",
       "templeLoreBody": "El templo tiene su propia leyenda, más antigua que el culto que persigues en otros lugares. En la orilla del Glimmermere, un lago que bebe la luz de la luna y devuelve a los ahogados, un vigía solitario custodia una puerta de luz pálida. Bajo la superficie, una escalera de piedra fría desciende hasta él. Las gentes que se hundieron allí no se ahogaron por desventura: eran el Coro Pálido, que se sumergió en adoración y nunca dejó de cantar. Los viejos guardianes grabaron una sola advertencia en las rocas antes de que el agua se los llevara, una plegaria a algo que llamaban la Luna Ahogada, con una mano más firme añadiendo dos palabras debajo: solo duerme.",
       "cryptLeadTitle": "Una puerta que los muertos debían mantener cerrada",
@@ -9252,11 +10532,12 @@ export const es: EnTranslations = {
       "honorFinalNoteSoldBack": "Las compras de Honor son definitivas. La lista de recompra solo contiene lo que vendiste: una compra con monedas normalmente puede venderse por su precio de venta y recuperarse de la lista si vuelves a cambiar de idea, pero el equipo de Guerra se liga al alma en cuanto lo compras, así que nunca puede intercambiarse, enviarse por correo ni venderse, y nunca llega a esa lista. La tienda pide confirmación por eso: lee la pieza antes de pulsar.",
       "warfareHeading": "Equipo de guerra",
       "warfareBody": "Toda pieza de equipo de guerra lleva Índice de Ofensiva y de Defensa de Pericia Bélica, y esos dos índices no sirven de nada contra monstruos. Solo se aplican cuando luchas contra otro jugador, en un duelo, en la arena o en el campo de batalla, donde la Ofensiva se suma al daño que infliges y la Defensa reduce el daño que recibes, cada una hasta su propio tope. Cada familia de armadura es también un conjunto, y sus bonificaciones de conjunto son igualmente índice de Pericia Bélica o efectos que solo funcionan contra jugadores, así que un equipo de honor completo no vale nada contra un jefe de mazmorra.",
-      "warfareBodyStatsStay": "Cada pieza de Guerra lleva índice de Ofensiva de Guerra e índice de Defensa de Guerra, y esos índices no hacen nada contra monstruos. Solo se aplican al luchar contra otro jugador, en duelo, arena o campo de batalla: la Ofensiva aumenta el daño que infliges y la Defensa reduce el daño que recibes, cada una hasta su propio límite. Cada familia de armadura también es un conjunto, y sus bonificaciones son índices o efectos de Guerra que solo funcionan contra jugadores, así que las bonificaciones de un conjunto completo de Honor no sirven contra un jefe de mazmorra. Las piezas mantienen sus estadísticas normales, armadura y daño de arma, que sí funcionan en todas partes; contra monstruos solo se apagan los índices de Guerra y sus bonificaciones.",
+      "warfareBodyStatsStay": "Cada pieza de Guerra lleva índice de Ofensiva de Guerra e índice de Defensa de Guerra, y esos índices no hacen nada contra monstruos. Solo se aplican al luchar contra otro jugador, en duelo, arena o campo de batalla: la Ofensiva aumenta el daño que infliges y la Defensa reduce el daño que recibes, cada una hasta su propio límite. Cada familia de armadura también es un conjunto, y sus bonificaciones son índices o efectos de Guerra que solo funcionan contra jugadores, así que las bonificaciones de un conjunto completo de Honor no sirven contra un jefe de mazmorra. Las piezas mantienen sus estadísticas normales, armadura y daño de arma, que sí funcionan en todas partes; contra monstruos solo se apagan los índices de Guerra y sus bonificaciones. Hay una excepción que funciona en todas partes: dos piezas de cualquiera de estos conjuntos hacen además que el daño recibido ya no retrase tus hechizos.",
       "warfareTradeBody": "Ese es el intercambio deliberado. El equipo de guerra está pensado para luchar contra jugadores, no como atajo para saltarte los niveles de mazmorra: una pieza de guerra nunca lleva los índices de combate que sí lleva un objeto épico de mazmorra en el mismo hueco, y cuanto aporta se gasta en otros jugadores. Si quieres defenderte bien en la arena, cómpralo. Si quieres superar las heroicas más rápido, gánate tu equipo en las mazmorras.",
       "warfareTradeBodyRatingSpent": "Ese es el intercambio deliberado. El equipo de Guerra está hecho para combatir jugadores, no para saltarse los niveles de mazmorra: una pieza de Guerra nunca lleva los índices de combate que tendría un épico de mazmorra en el mismo hueco, y los índices y bonificaciones de Guerra que sí lleva se gastan por completo contra otros jugadores. Si quieres competir en arena, cómpralo. Si quieres limpiar heroicas más rápido, consigue tu equipo en las mazmorras.",
       "vanguardHeading": "Equipo de Vanguardia: Guerra, temporada 2",
-      "vanguardBody": "El equipo de Vanguardia es la segunda temporada del equipo de Guerra, vendido por los mismos dos intendentes, por encima del nivel original, que sigue a la venta. Cada especialización tiene su propio conjunto de Vanguardia de cinco piezas, para la cabeza, los hombros, el pecho, las piernas y las manos, y la tienda solo lista los tres conjuntos que tu clase puede vestir, seguidos de las armas de Vanguardia que puedes empuñar. Una pieza de Vanguardia lleva las mismas características de Guerra que el nivel original a un nivel de objeto más alto, y cada conjunto tiene dos bonificaciones, a dos y cuatro piezas, que cambian una de las habilidades de tu especialización. A diferencia de los conjuntos originales, esas bonificaciones funcionan en todas partes, monstruos incluidos, pero están pensadas para luchar contra jugadores, así que un conjunto de banda sigue siendo la mejor opción dentro de una banda."
+      "vanguardBody": "El equipo de Vanguardia es la segunda temporada del equipo de Guerra, vendido por los mismos dos intendentes, por encima del nivel original, que sigue a la venta. Cada especialización tiene su propio conjunto de Vanguardia de cinco piezas, para la cabeza, los hombros, el pecho, las piernas y las manos, y la tienda solo lista los tres conjuntos que tu clase puede vestir, seguidos de las armas de Vanguardia que puedes empuñar. Una pieza de Vanguardia lleva las mismas características de Guerra que el nivel original a un nivel de objeto más alto, y cada conjunto tiene dos bonificaciones, a dos y cuatro piezas, que cambian una de las habilidades de tu especialización. A diferencia de los conjuntos originales, esas bonificaciones funcionan en todas partes, monstruos incluidos, pero están pensadas para luchar contra jugadores, así que un conjunto de banda sigue siendo la mejor opción dentro de una banda.",
+      "vanguardStatsBody": "A diferencia del nivel original, el equipo de Vanguardia también lleva índices de combate: cada pieza de armadura, arma y collar de Vanguardia tiene Índice de Golpe Crítico o Índice de Celeridad, y las piezas de lanzador de hechizos y sanador añaden Poder con Hechizos o Poder de Sanación. Los anillos y collares de Vanguardia se venden junto con las armas, y todas las clases pueden usarlos. Dos de los anillos cuerpo a cuerpo de Vanguardia dan exactamente el Índice de Impacto que elimina la posibilidad base de que tus ataques fallen contra un jugador de tu nivel, y dos anillos de lanzador de hechizos hacen lo mismo con que tus hechizos sean resistidos. Los ataques automáticos mientras luchas con dos armas conservan su posibilidad de fallo adicional. El anillo de sanador lleva Índice de Celeridad en su lugar."
     },
     "worldPvpPage": {
       "heading": "JcJ Mundial",
@@ -9267,16 +10548,18 @@ export const es: EnTranslations = {
       "stakesBody": "When flagged players defeat a flagged player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
       "limitsHeading": "Reglas de juego limpio",
       "limitsBody": "Defeating the same player again and again pays less each time and soon nothing, and the counter resets with the daily reset. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
-      "introZones": "El combate entre jugadores en el mundo abierto es voluntario, y el terreno donde te encuentras decide lo que eso significa. Levanta tu bandera de JcJ y todo jugador marcado que no esté en tu grupo o banda se convierte en enemigo en terreno disputado; bájala y, tras una breve demora, vuelves a ser un espectador. Dos zonas son santuarios donde no ocurre ningún combate mundial en absoluto, y las tres zonas más al norte son terreno de todos contra todos, donde cualquiera presente es blanco legítimo, con bandera o sin ella. Los compañeros de grupo y de banda nunca son enemigos tuyos en ningún sitio; los compañeros de hermandad fuera de tu grupo son blanco legítimo como cualquier otro.",
+      "introZones": "El JcJ en el mundo abierto es voluntario y depende del terreno. Al activar tu bandera, los demás jugadores marcados que no estén en tu grupo o banda se vuelven enemigos en zonas disputadas. Al desactivarla, vuelves a ser espectador tras una breve demora. La Costa de la Prueba es el único santuario, sin combates JcJ mundiales. Las tres zonas más al norte siguen las mismas reglas de participación voluntaria que el resto del mundo. Entrar en el círculo activo del Rey de la Colina activa automáticamente tu bandera. Tus compañeros de grupo y banda nunca son enemigos; los miembros de tu hermandad fuera de tu grupo pueden ser atacados como cualquier otro jugador.",
       "zonesHeading": "Dónde ocurre el JcJ mundial",
-      "zonesBody": "El mundo tiene tres tipos de terreno. La Costa de la Prueba y el Valle de Eastbrook son santuarios: allí no ocurre ningún JcJ mundial, con bandera o sin ella, así que un personaje nuevo jamás puede ser atacado antes de saber qué es la bandera. La mayor parte del mundo es terreno disputado, donde la regla de la bandera de arriba es toda la historia. Las Tierras del Dragón, El Velo de Escarcha y la Cascada de Ámbar, las tres zonas más al norte, son terreno de todos contra todos: todo el que se encuentra en ellas puede atacar a todos los demás que estén allí, con bandera o sin ella, y se te avisa tanto al entrar como al salir. Atacar a un jugador que no está marcado allí levanta tu propia bandera, así que un agresor siempre acaba cargando con el riesgo. Golpear a un jugador que ya está marcado nunca la levanta, lo que significa que defenderte a ti mismo, o defender a alguien que no está marcado, no te cuesta nada.",
+      "zonesBody": "La Costa de la Prueba es el único santuario: allí no hay JcJ mundial ni puedes activar la bandera. Una bandera ya activa se mantiene, pero el progreso de tiempo jugado para títulos se pausa hasta que salgas. En todos los demás lugares, incluidos Las Tierras del Dragón, El Velo de Escarcha y La Cascada de Ámbar, solo pueden luchar los jugadores marcados. Entrar en el círculo activo del Rey de la Colina activa automáticamente tu bandera si cumples el requisito de nivel habitual. El círculo de aviso no te marca. Salir del círculo activo no desactiva la bandera; usa /pvp off para iniciar la cuenta atrás habitual de cinco minutos, que no puede terminar mientras estés en una colina activa o en combate.",
       "flagBodyAid": "Escribe /pvp en el chat, o abre la ventana de JcJ con G y usa la pestaña JcJ Mundial, que además muestra tu historial y lo que está en juego. Levantar la bandera es instantáneo una vez que superas los niveles iniciales. Bajarla inicia una cuenta atrás de unos minutos, y la bandera no caerá mientras sigas luchando, así que desactivarla nunca es una forma de escapar de una pelea que tú mismo empezaste. Sanar, proteger con un escudo o mejorar a un jugador marcado que está en combate también levanta tu propia bandera, así que nadie sostiene a un luchador desde detrás de una bandera que no lleva puesta; ayudar a un jugador que no está marcado no levanta nada.",
       "stakesUnflaggedTake": "Tampoco un luchador sin marcar recibe nada: el oro solo cambia de manos entre dos jugadores marcados, aunque todos los que ayudaron sí ganan el Honor.",
-      "stakesBodyFlagged": "Cuando un jugador marcado es derrotado por otro jugador, el perdedor paga una pequeña parte del oro de su bolsa, con un tope modesto, y los ganadores obtienen Honor hacia el equipo de guerra. Un jugador que no estaba marcado no paga oro alguno, incluso si cae en una zona de todos contra todos. Todos los que ayudaron comparten ambas cosas: el golpe de gracia, cualquiera que dañara al objetivo poco antes, y los sanadores que mantuvieron en pie a esos luchadores. Un mano a mano limpio paga el bote entero; un grupo lo reparte.",
+      "stakesBodyFlagged": "Cuando un jugador marcado es derrotado por otro jugador, el perdedor paga una pequeña parte del oro de su bolsa, con un tope modesto, y los ganadores obtienen Honor hacia el equipo de guerra. Los jugadores sin bandera no pueden ser atacados en el mundo abierto. Todos los que ayudaron comparten ambas cosas: el golpe de gracia, cualquiera que dañara al objetivo poco antes, y los sanadores que mantuvieron en pie a esos luchadores. Un mano a mano limpio paga el bote entero; un grupo lo reparte.",
       "hillHeading": "El Rey de la Colina",
-      "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "hillBody": "Cada dos horas aparece una colina en Las Tierras del Dragón, El Velo de Escarcha o La Cascada de Ámbar. El reino recibe un aviso con quince minutos de antelación y el círculo queda marcado en terreno abierto. La colina permanece activa treinta minutos. Entrar en el círculo activo activa la bandera JcJ mundial según los requisitos de nivel habituales, también para los miembros de bandas. El grupo con más jugadores aptos dentro captura la colina tras un minuto de mayoría ininterrumpida; un jugador solo cuenta como grupo de uno, pero los miembros de bandas y los jugadores por debajo del nivel requerido para JcJ no pueden capturar ni ganar Honor de la colina. Cada defensor dentro gana Honor a un ritmo creciente. Los pagos y su aumento son más rápidos y conservan el Honor total del antiguo evento de cuarenta y cinco minutos. Al cambiar de dueño, el aumento empieza de nuevo. Salir mantiene tu bandera activa; /pvp off tarda los cinco minutos habituales y no puede completarse dentro de una colina activa ni durante el combate. La barra muestra el control, los efectivos y el progreso de captura; /hill indica la ubicación.",
       "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
-      "hillBodyRamp": "Una vez cada tres horas, en un momento que nadie puede predecir, se avisa a todo el reino de que una colina se alzará en una de las zonas de todos contra todos dentro de quince minutos, y el círculo donde se alzará queda marcado sobre terreno abierto. Al alzarse, permanece cuarenta y cinco minutos, y luego cae. El grupo con más jugadores dentro disputa la colina, y tras un minuto de mayoría ininterrumpida la colina es suya; un jugador solo cuenta como un grupo de uno, pero los miembros de banda no cuentan en absoluto. Mientras un grupo controla la colina, cada uno de sus miembros que esté dentro gana Honor cada minuto, y cuanto más tiempo la controle el mismo grupo, más paga cada minuto: un grupo completo que controle una colina sin disputa durante toda su duración gana aproximadamente lo mismo que tres victorias en Campos Espinosos. Cuando la colina cambia de manos, los nuevos controladores empiezan la cuenta desde el principio. Una barra sobre el campo muestra quién la controla, tus números frente a los suyos, y el reloj de la disputa; /hill en el chat indica dónde se encuentra.",
+      "hillBodyRamp": "Cada dos horas aparece una colina en Las Tierras del Dragón, El Velo de Escarcha o La Cascada de Ámbar. El reino recibe un aviso con quince minutos de antelación y el círculo queda marcado en terreno abierto. La colina permanece activa treinta minutos. Entrar en el círculo activo activa la bandera JcJ mundial según los requisitos de nivel habituales, también para los miembros de bandas. El grupo con más jugadores aptos dentro captura la colina tras un minuto de mayoría ininterrumpida; un jugador solo cuenta como grupo de uno, pero los miembros de bandas y los jugadores por debajo del nivel requerido para JcJ no pueden capturar ni ganar Honor de la colina. Cada defensor dentro gana Honor a un ritmo creciente. Los pagos y su aumento son más rápidos y conservan el Honor total del antiguo evento de cuarenta y cinco minutos. Al cambiar de dueño, el aumento empieza de nuevo. Salir mantiene tu bandera activa; /pvp off tarda los cinco minutos habituales y no puede completarse dentro de una colina activa ni durante el combate. La barra muestra el control, los efectivos y el progreso de captura; /hill indica la ubicación.",
+      "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "hillBodyFlat": "Una vez cada tres horas, en un momento impredecible, se anuncia a todo el reino que dentro de quince minutos aparecerá una colina en una de las zonas del norte, y se marca su círculo en terreno abierto. Permanece cuarenta y cinco minutos y luego desaparece. Mientras permanece, cada cinco minutos se anuncian su ubicación y los grupos que la han controlado durante más tiempo en total. El grupo con más jugadores dentro del círculo disputa la colina y la captura tras acumular treinta segundos de superioridad numérica. La entrada de un grupo rival solo pausa el contador hasta que el tuyo vuelva a liderar; solo se reinicia si no queda ningún miembro vivo de tu grupo dentro. Un jugador solo cuenta como un grupo de uno y conserva la colina al formar un grupo, pero los miembros de banda no cuentan. Cada integrante del grupo que controla la colina y está dentro recibe la misma cantidad de Honor por minuto, sin importar cuánto lleve controlándola. Un grupo completo que la controle sin oposición durante toda su duración gana aproximadamente lo mismo que por tres victorias en campos de batalla. Cuando desaparece, si el grupo con el mayor tiempo total de control acumuló al menos diez minutos, todos los que estuvieron dentro durante al menos un minuto mientras ese grupo la controlaba y siguen en él reciben una victoria para la fila de JcJ de la Bóveda Semanal. Una barra sobre el terreno muestra quién la controla, los jugadores de ambos bandos y el contador de captura; /hill en el chat indica dónde está.",
       "limitsBodyRaids": "Derrotar al mismo jugador una y otra vez paga cada vez menos y pronto no paga nada, y tu cuenta contra ese jugador solo se reinicia alrededor de una hora después de la primera de esas muertes, así que acechar a una sola víctima nunca vale la espera. Un objetivo muy por debajo de tu nivel no paga absolutamente nada. Los Campos Espinosos y las Arenas siguen sus propias reglas mientras estás dentro, y pagan más Honor que el mundo abierto, así que el JcJ mundial es el camino más lento hacia el mismo vendedor. Las bandas no ganan nada con las muertes en el mundo: un miembro de banda no recibe Honor ni oro y no reduce la parte de nadie más, así que lucha en grupo para que te paguen."
     },
     "thornhollowPage": {
@@ -9452,8 +10735,9 @@ export const es: EnTranslations = {
       "groupClasses": "Clases",
       "groupForms": "Formas de druida",
       "formBear": "Forma de Bruin",
-      "formCat": "Forma de lobo",
+      "formCat": "Forma felina",
       "formTravel": "Forma Fleet",
+      "formSporemender": "Forma de Sanador de Esporas",
       "groupCreatures": "Criaturas",
       "groupPets": "Demonios de brujo",
       "pickerLabel": "Elige un modelo para ver",
@@ -9887,8 +11171,8 @@ export const es: EnTranslations = {
         "commissionsHeading": "Encargos y el Vínculo del Artesano",
         "commissionsBody": "Un encargo es una creación hecha para alguien. Al crear un arma, una pieza de armadura u objeto de mano izquierda (una poción no puede llevar un vínculo), el artesano puede marcar la creación como encargo: la pieza terminada se comporta normalmente en manos del creador, pero en el momento en que cambia de manos en un intercambio queda vinculada a quien la recibió. Ese es el Vínculo del Artesano: el comprador obtiene su pieza, y la pieza no puede pasarse ni revenderse.\n\nLos vínculos no son para siempre, solo son costosos. Cualquier maestro de estación puede desvincular una pieza vinculada mientras estás en su estación (una estación móvil nunca ofrece el servicio), por una tarifa fijada por la calidad del objeto: 25 de plata para poco común, 1 de oro para raro, 4 de oro para épico, con un legendario pagando la tarifa épica y una pieza común de encargo la poco común.\n\nLa tarifa compra un estado limpio, no una cura: la pieza sigue siendo un encargo, así que se vuelve a vincular a quien la reciba en el siguiente intercambio, y todo lo demás sobre ella, firma, obra maestra y encantamientos, permanece intacto.",
         "provenanceHeading": "Trabajo firmado",
-        "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
-        "provenanceBodyUndiscounted": "Algunos objetos llevan un nombre. Las líneas de origen de un material dicen quién recogió cada grupo de unidades, mientras que una marca independiente de firmante identifica al artesano premium cuando existe. Son datos independientes: el material recolectado normal registra al recolector sin ganar firma, y las existencias antiguas firmadas pueden nombrar a su firmante diciendo honestamente que no se registró recolector. Una pieza terminada dice quién la fabricó. Estos registros viajan con el objeto por intercambios, banco, correo, Mercado Mundial e incluso recompra de vendedor, y nunca desaparecen.\n\nLa recolección firma automáticamente su mejor trabajo: toda cosecha que resulte rara o superior llega firmada, y los hallazgos raros firman su ganancia completa de cinco unidades. Una tirada afortunada de cosecha de cadáver firma el rendimiento cuando esa familia no tiene espécimen que entregar; cuando sí lo tiene, mantiene el rendimiento normal y crea junto a él el espécimen prístino firmado. La fabricación firma del mismo modo: cada copia de una salida rara o superior crea una versión firmada, y una obra maestra siempre firma cualquiera que sea su calidad. Así, la versión más fina de cada pieza nombra siempre a su creador. La firma de un material normal viaja con las unidades y no se pierde solo porque una acumulación compatible ya contenga otro recolector o firmante. Un espécimen prístino es un objeto separado y necesita espacio; si no cabe, queda el rendimiento normal del cadáver pero se pierde el espécimen.\n\nLos objetos terminados conservan una identidad estricta: dos copias solo se fusionan cuando coinciden exactamente el objeto, el firmante, las estadísticas de obra maestra, el encantamiento y el vínculo. Los materiales compatibles comparten espacio entre recolectores y firmantes mientras conservan un recuento por origen. La ayuda emergente resume los orígenes; abre Orígenes para la lista completa. Separar por recolector mantiene esas acumulaciones aparte en las bolsas y la ordenación respeta la elección. El material transferido puede acumularse normalmente con el del receptor.\n\nLas firmas devuelven algo a los artesanos: si sostienes en el banco una copia firmada de un reactivo necesario, quien la firmó añade 2 puntos porcentuales a la probabilidad de obra maestra. Si el reactivo está firmado por ti, reduce en uno la cantidad exigida, nunca por debajo de uno, salvo cuando el reactivo sea indiscountable. Los núcleos de incursión conservan siempre su coste completo. Tu propia obra rara o superior firmada también puede seguir enseñándote, hoy solo mediante pociones fabricadas: beber un brebaje raro que preparaste y firmaste devuelve un pequeño goteo de habilidad al oficio que lo creó, si ese oficio es una de tus profesiones principales activas. Solo funciona con la rama de pociones: un elixir, un pergamino o un frasco cumbre no enseña nada aunque lleve una firma excelente.",
+        "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent, whoever signed it, in your bags or in your Materials Vault wherever crafts can draw on it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
+        "provenanceBodyUndiscounted": "Algunos objetos llevan un nombre. Las líneas de origen de un material dicen quién recogió cada grupo de unidades, mientras que una marca independiente de firmante identifica al artesano premium cuando existe. Son datos independientes: el material recolectado normal registra al recolector sin ganar firma, y las existencias antiguas firmadas pueden nombrar a su firmante diciendo honestamente que no se registró recolector. Una pieza terminada dice quién la fabricó. Estos registros viajan con el objeto por intercambios, banco, correo, Mercado Mundial e incluso recompra de vendedor, y nunca desaparecen.\n\nLa recolección firma automáticamente su mejor trabajo: toda cosecha que resulte rara o superior llega firmada, y los hallazgos raros firman su ganancia completa de cinco unidades. Una tirada afortunada de cosecha de cadáver firma el rendimiento cuando esa familia no tiene espécimen que entregar; cuando sí lo tiene, mantiene el rendimiento normal y crea junto a él el espécimen prístino firmado. La fabricación firma del mismo modo: cada copia de una salida rara o superior crea una versión firmada, y una obra maestra siempre firma cualquiera que sea su calidad. Así, la versión más fina de cada pieza nombra siempre a su creador. La firma de un material normal viaja con las unidades y no se pierde solo porque una acumulación compatible ya contenga otro recolector o firmante. Un espécimen prístino es un objeto separado y necesita espacio; si no cabe, queda el rendimiento normal del cadáver pero se pierde el espécimen.\n\nLos objetos terminados conservan una identidad estricta: dos copias solo se fusionan cuando coinciden exactamente el objeto, el firmante, las estadísticas de obra maestra, el encantamiento y el vínculo. Los materiales compatibles comparten espacio entre recolectores y firmantes mientras conservan un recuento por origen. La ayuda emergente resume los orígenes; abre Orígenes para la lista completa. Separar por recolector mantiene esas acumulaciones aparte en las bolsas y la ordenación respeta la elección. El material transferido puede acumularse normalmente con el del receptor.\n\nLas firmas devuelven algo a los artesanos: tener cualquier unidad firmada de un reactivo necesario, sin importar quién la firmó, en tus bolsas o en la Bóveda de Materiales, donde la fabricación pueda utilizarla, añade 2 puntos porcentuales a la probabilidad de obra maestra. Si el reactivo está firmado por ti, reduce en uno la cantidad exigida, nunca por debajo de uno, salvo cuando el reactivo esté marcado como no sujeto a descuento. Los núcleos de incursión conservan siempre su coste completo. Tu propia obra rara o superior firmada también puede seguir enseñándote, hoy solo mediante pociones fabricadas: beber un brebaje raro que preparaste y firmaste devuelve un pequeño goteo de habilidad al oficio que lo creó, si ese oficio es una de tus profesiones principales activas. Solo funciona con la rama de pociones: un elixir, un pergamino o un frasco cumbre no enseña nada aunque lleve una firma excelente.",
         "collectorsHeading": "Coleccionistas, trofeos y el precio de una historia",
         "collectorsBody": "Los vendedores son ciegos a la procedencia: un objeto firmado se vende a un PNJ exactamente por su precio base. La prima de una firma existe solo entre jugadores, que es precisamente lo que la hace interesante: una pila de mineral inesperado firmada por un recolector famoso, un Corte Primo de una cosecha afortunada, una hoja de obra maestra que nombra a un artesano que ya se retiró; todo vale lo que la memoria de alguien diga que vale.\n\nEl Libro de Gestas se inclina hacia el mismo instinto: Veta Prístina, Duramen Antiguo, Flor Iluminada por la Luna, Espécimen Perfecto y Destello de Esperanza son marcas de coleccionista con Renombre cero que existen únicamente para demostrar que un momento te sucedió a ti. Conserva el objeto que ganó la gesta y tienes el recibo. Nada de esto da poder; la procedencia no compra estadísticas ni gana combates, es el rastro en papel del juego de los buenos días.",
         "castPaceHeading": "El tiempo de lanzamiento y el drenaje de oro",
@@ -9937,7 +11221,7 @@ export const es: EnTranslations = {
         "q3": "¿Cuál es la diferencia entre saquear y recolectar un cadáver?",
         "a3": "Son dos acciones distintas sobre el mismo cadáver. Todo lo que un cadáver contiene, monedas y botín más cualquier componente recolectable, se abre en la misma ventana, pero la tecla de interacción y Tomar botín solo recogen el botín ordinario, que sigue las reglas normales de botín. La recolección es el lado de los oficios, extrayendo materiales del cadáver mismo, y solo ocurre cuando eliges Recolectar en esa ventana.\n\nLa recolección es de primero en llegar, de uso único: cada cadáver puede recolectarse exactamente una vez, por quien lo reclame primero, incluidos los que están en línea. Tu Enfoque del Pueblo determina lo que obtienes: mientras estés en un pueblo principal puedes distribuir 10 puntos de enfoque entre los tipos de componente que te interesan, y cada componente enfocado saca un nivel mejor (cada 5 puntos lo sube un escalón, como máximo dos escalones) y rinde más (10 por ciento por punto). Los componentes sin enfoque nunca empeoran.",
         "q4": "¿Por qué está firmado mi Tronco de Corteza de Hierro?",
-        "a4": "Te tocó un golpe de suerte. Aproximadamente 1 de cada 90 cosechas activa un evento de recolección raro (duramen antiguo en un árbol, una veta prístina en el mineral, una flor iluminada por la luna entre las hierbas): multiplica el rendimiento por cinco, firma cada unidad con tu nombre y anuncia el hallazgo a toda la zona. Una tirada de rareza rara o mejor en una cosecha corriente también firma el rendimiento.\n\nLos materiales firmados vale la pena guardarlos o venderlos caros: tener en el banco de trabajo cualquier copia firmada de un reactivo necesario añade 2 puntos porcentuales a la probabilidad de obra maestra. Solo recuerda que únicamente se apilan con copias firmadas de forma idéntica, así que ocupan su propia ranura de bolsa.",
+        "a4": "Has encontrado una veta excepcional. Aproximadamente 1 de cada 90 recolecciones activa un hallazgo raro: duramen ancestral en árboles, una veta prístina en menas o una flor iluminada por la luna en hierbas. Multiplica por cinco la cantidad, firma cada unidad con tu nombre y anuncia el hallazgo en toda la zona. Una recolección normal cuya calidad resulte rara o superior también firma su producción.\n\nConviene guardar los materiales firmados o venderlos caros: tener cualquier unidad firmada de un reactivo necesario en tus bolsas o en la Bóveda de Materiales, donde la fabricación pueda utilizarla, añade 2 puntos porcentuales a la probabilidad de obra maestra. Pueden compartir una pila compatible con material sin firmar o de otros recolectores y firmantes sin perder ninguna marca: cada origen y cantidad se conservan por separado.",
         "q5": "¿Cómo desvínculo una pieza de encargo y cuánto cuesta?",
         "a5": "Ve a cualquier estación de artesanía con la pieza en tus bolsas y paga al maestro. La tarifa sigue la calidad del objeto: 25 de plata para una pieza poco común, 1 de oro para una rara, 4 de oro para una épica; una legendaria paga la tarifa épica, y una pieza común de encargo paga la tarifa poco común. Debe ser una estación real: una estación móvil nunca ofrece el servicio.\n\nLa tarifa compra un estado limpio, no una cura: la pieza sigue siendo un encargo, así que se vuelve a vincular a quien la reciba en el siguiente intercambio. Si varias copias vinculadas comparten una pila, se separa una copia y se desvincula por pago.",
         "q6": "¿Dónde aprendo recetas y cuánto cuestan?",
@@ -9973,6 +11257,7 @@ export const es: EnTranslations = {
       "buyingBody": "Habla con un mercader y elige ver sus mercancías, y su tienda se abre con tres pestañas: Explorar, Vender y Recompra. Explorar contiene cuanto tiene en stock, tuyo si te lo puedes permitir. Vender enumera lo que de tus bolsas te pagará, y vender una pieza que lleva su propia calidad tirada te pide confirmar antes, para que un ejemplar preciado nunca se te escape por error. Si te desprendes de algo de lo que te arrepientes, la pestaña de Recompra guarda tus ventas recientes para que puedas recomprarlas por las monedas que te pagaron.",
       "junkTitle": "Despejar la chatarra",
       "junkBody": "Los objetos que recoges y no te sirven se pueden vender igualmente a cualquier vendedor, así que vacía las bolsas cada vez que pases por el pueblo en lugar de dejar que se llenen. La pestaña Vender del vendedor incluso guarda un botón de un solo clic que vende de golpe cada baratija de calidad Pobre. Las baratijas verdaderamente inútiles también se pueden descartar sin más para hacer sitio.",
+      "junkBodyFinal": "Puedes vender el botín que no necesites a cualquier mercader con tienda propia, así que vacía las bolsas cuando pases por la ciudad. Su ventana incluye un botón Vender chatarra que vende todos los objetos de calidad Pobre con un clic. También puedes destruir los trastos sin valor para hacer espacio. Los objetos grises sin firma vendidos así no aparecen en la lista de recompra: revisa antes si querías conservar alguno.",
       "tradeTitle": "Comerciar con otros jugadores",
       "tradeBody": "Puedes comerciar cara a cara con cualquiera que esté cerca de ti. Ambos ponéis objetos y monedas en una ventana compartida y el intercambio solo se produce cuando los dos lo confirmáis, así que ninguna de las partes puede ser engañada. Es la manera sencilla de pasarle un objeto a un amigo o cerrar un trato.",
       "mailTitle": "El Correo del Cuervo",
@@ -10124,7 +11409,7 @@ export const es: EnTranslations = {
       "prestigeBody": "La experiencia sigue contando incluso después del límite. Alimenta un nivel virtual cosmético, así que tu barra de experiencia sigue subiendo, y un rango de prestigio a largo plazo que puedes reclamar desde tu hoja de personaje una vez que llegas ahí. Superar grandes hitos de experiencia acumulada también consigue gestas en tu Libro de Gestas, con títulos cosméticos y bordes de placa de nombre que se muestran en tu hoja de personaje. Todas estas recompensas son puramente opcionales y nunca otorgan poder, solo una marca del camino que has recorrido.",
       "noRush": "No hay prisa. El mundo está ahí para disfrutarlo a tu propio ritmo, así que deambula, acepta las misiones que te llamen la atención y deja que tu héroe crezca por el camino.",
       "ridingTitle": "Aprender a montar",
-      "ridingBody": "La Equitación es una de las cosas que esperan al final del ascenso. En el nivel {level}, una caballeriza mayor te enseñará la habilidad por una buena suma de oro, y una lección en el circuito de entrenamiento te consigue tu primer par de riendas. Una montura no otorga ningún poder; sin más, hace que el mundo se sienta más pequeño, lo cual, después de una larga caminata hacia el norte, es una recompensa en sí misma."
+      "ridingBody": "Al nivel {level}, la caballeriza mayor Marla enseña equitación básica por oro y ofrece después un rango avanzado. El entrenamiento determina la velocidad al montar. Elige tu apariencia en Cosméticos; las apariencias coleccionables se comparten mientras sus riendas sigan en las bolsas o el banco de cualquier personaje."
     },
     "placeholder": {
       "note": "Esta parte de la guía está en camino."
@@ -10137,151 +11422,155 @@ export const es: EnTranslations = {
   },
   "editor": {
     "picking": {
-      "target": "Target: {name}",
-      "choose": "Choose overlapping asset ({count})",
-      "chooser": "Choose an asset under the pointer",
-      "front": "Frontmost",
-      "behind": "Behind another asset",
-      "close": "Close",
-      "keyboard": "Use Previous/Next or arrow keys to compare. Enter selects; Escape closes.",
-      "hint": "Click again to cycle overlapping items, or choose from this list.",
-      "asset": "Asset {number}",
-      "overlapAt": "Overlaps at {name}",
-      "previous": "Previous",
-      "next": "Next",
-      "position": "{current} of {count}",
-      "details": "Item {number} · Floor {level} · Height {height}",
-      "ungroupedDetails": "Item {number} · Height {height}",
-      "hideAbove": "Hide floors above selected level",
-      "allFloors": "All floors visible",
-      "filteredFloors": "Floors above level {level} are hidden"
+      "target": "Objetivo: {name}",
+      "choose": "Elegir recurso solapado ({count})",
+      "chooser": "Elegir un recurso bajo el puntero",
+      "front": "Delante de todo",
+      "behind": "Detrás de otro recurso",
+      "close": "Cerrar",
+      "keyboard": "Usa Anterior/Siguiente o las flechas para comparar. Intro selecciona; Esc cierra.",
+      "hint": "Vuelve a hacer clic para recorrer los elementos solapados o elige uno de esta lista.",
+      "asset": "Recurso {number}",
+      "overlapAt": "Solapamientos en {name}",
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "position": "{current} de {count}",
+      "details": "Elemento {number} · Planta {level} · Altura {height}",
+      "ungroupedDetails": "Elemento {number} · Altura {height}",
+      "hideAbove": "Ocultar plantas sobre el nivel seleccionado",
+      "allFloors": "Todas las plantas visibles",
+      "filteredFloors": "Las plantas por encima del nivel {level} están ocultas"
     },
     "quickActions": {
-      "title": "Selected asset",
-      "move": "Move",
-      "frame": "Frame",
-      "remove": "Remove",
-      "count": "{count} selected"
+      "title": "Recurso seleccionado",
+      "move": "Mover",
+      "frame": "Encuadrar",
+      "remove": "Quitar",
+      "count": "{count} seleccionados"
     },
     "buildMode": {
       "materialNames": {
-        "WardenStone": "Smooth Stone",
-        "Cliff001": "Red Cliff",
-        "Cliff002": "Mossy Crag",
-        "Cliff003": "Craggy Rock",
-        "Cliff004": "Weathered Bluff",
-        "Rock052": "Rugged Stone",
-        "Rock053": "Ironrock",
-        "Rock054": "Sandstone Face",
-        "Rock055": "Rust Rock",
-        "Rock029": "Weathered Rock",
-        "Rock035": "Layered Stone",
-        "Rock051": "Granite",
-        "Rock056": "Meadow Stones",
-        "Rock057": "Veined Darkstone",
-        "Cliff005": "Strata Cliff",
-        "Cliff006": "Sunbaked Cliff",
-        "Concrete034": "Cast Concrete",
-        "Marble012": "Veined Marble",
-        "Bricks076C": "Mossy Brick",
-        "Gravel024": "Gravel",
-        "PavingStones046": "Paving Stones",
-        "Cobblestone001": "Cobbled Road",
-        "Cobblestone002": "Old Cobblestone",
-        "Tiles001": "Lichen Flagstones",
-        "Tiles002": "Slate Pavers",
-        "PavingStones131": "Mossy Setts",
-        "Metal032": "Brushed Steel",
-        "Metal034": "Painted Steel",
-        "Rust004": "Rusted Iron",
-        "Roots001": "Tangled Roots",
-        "Roots002": "Living Roots",
-        "Wood001": "Oak Planks",
-        "Wood002": "Pine Planks",
-        "Wood003": "Weathered Bark",
-        "Wood004": "Mossy Bark",
-        "Plaster001": "Lime Plaster"
+        "WardenStone": "Piedra lisa",
+        "Cliff001": "Acantilado rojo",
+        "Cliff002": "Peñasco con musgo",
+        "Cliff003": "Roca escarpada",
+        "Cliff004": "Farallón erosionado",
+        "Rock052": "Piedra rugosa",
+        "Rock053": "Roca ferruginosa",
+        "Rock054": "Frente de arenisca",
+        "Rock055": "Roca oxidada",
+        "Rock029": "Roca erosionada",
+        "Rock035": "Piedra en capas",
+        "Rock051": "Granito",
+        "Rock056": "Piedras de pradera",
+        "Rock057": "Piedra oscura veteada",
+        "Cliff005": "Acantilado estratificado",
+        "Cliff006": "Acantilado abrasado por el sol",
+        "Concrete034": "Hormigón moldeado",
+        "Marble012": "Mármol veteado",
+        "Bricks076C": "Ladrillo con musgo",
+        "Gravel024": "Grava",
+        "PavingStones046": "Losas de pavimento",
+        "Cobblestone001": "Camino adoquinado",
+        "Cobblestone002": "Adoquines antiguos",
+        "Tiles001": "Losas con líquenes",
+        "Tiles002": "Adoquines de pizarra",
+        "PavingStones131": "Adoquines con musgo",
+        "Metal032": "Acero cepillado",
+        "Metal034": "Acero pintado",
+        "Rust004": "Hierro oxidado",
+        "Roots001": "Raíces enmarañadas",
+        "Roots002": "Raíces vivas",
+        "Wood001": "Tablones de roble",
+        "Wood002": "Tablones de pino",
+        "Wood003": "Corteza erosionada",
+        "Wood004": "Corteza con musgo",
+        "Plaster001": "Enlucido de cal"
       },
-      "title": "Build a building",
-      "modeWall": "Walls",
-      "modeRoom": "Rooms",
-      "modeFloor": "Floors",
-      "modeObject": "Objects",
-      "modeFinish": "Wall finishes",
-      "building": "Building",
-      "buildingNumber": "Building {number}",
-      "noBuilding": "New building",
-      "newBuilding": "New building",
-      "levels": "Building floors",
-      "groundFloor": "Ground floor",
-      "floorNumber": "Floor {number}",
-      "addLevel": "Add floor",
-      "hideAbove": "Hide higher floors",
-      "settings": "Grid and foundation",
-      "gridSize": "Grid spacing",
-      "gridOff": "Off",
-      "gridCell": "{size} yards",
-      "floorHeight": "Floor height (yards)",
-      "baseY": "Foundation height (yards)",
-      "autoBase": "Set by first placement",
-      "foundationLocked": "Foundation settings are fixed after building starts.",
-      "wallSource": "Wall type",
-      "bareWall": "Bare wall",
-      "chosenAsset": "Chosen asset",
-      "thickness": "Wall thickness (yards)",
-      "pickAsset": "Choose asset",
-      "selectedAsset": "Asset: {name}",
-      "noAsset": "Choose an asset from the browser.",
-      "selectExisting": "Select an existing piece",
-      "wallHint": "Drag to draw a straight wall.",
-      "diagonal": "Diagonal walls",
-      "diagonalHint": "Drag between grid points to draw a wall at any angle.",
-      "roomHint": "Drag a rectangle to create a room with walls and a floor.",
-      "floorHint": "Drag a rectangle to add a floor on this level.",
-      "objectHint": "Place objects on the selected floor.",
-      "finishHint": "Choose a finish, then click a wall to paint it.",
-      "finishTexture": "Wall texture",
-      "bareFinish": "Original surface",
-      "importTexture": "Import texture",
-      "importingTexture": "Importing texture...",
-      "finishTile": "Texture repeat (yards)",
-      "finishSide": "Paint side",
-      "sideClicked": "Clicked side",
-      "sideFront": "Front",
-      "sideBack": "Back",
-      "sideBoth": "Both sides",
-      "finishRun": "Apply to connected walls",
-      "rotateLeft": "Rotate left",
-      "rotateRight": "Rotate right",
-      "smaller": "Smaller",
-      "larger": "Larger",
-      "fineRotation": "Fine rotation (15°)",
-      "transformReadout": "Rotation: {degrees}° | Size: {scale}x",
-      "transformEmpty": "Choose an asset to rotate or resize.",
-      "transformShortcuts": "Rotate: , and . | Resize: [ and ]",
-      "undo": "Undo",
-      "redo": "Redo",
-      "transformControls": "Asset controls",
-      "chooseWall": "Choose a wall asset and wait for its preview, or select Bare wall.",
-      "chooseAsset": "Choose an asset first.",
-      "choosePaintWall": "Click a building wall or a wall asset.",
-      "capacity": "This build is too large. Draw a smaller section or remove unused pieces.",
-      "invalid": "This wall or room could not fit. Adjust the grid or choose another piece.",
-      "importFailed": "Texture import failed. Use a PNG, JPG or WebP under 8 MB, up to 8192 pixels per side.",
-      "bare": "Original surface",
-      "importedTexture": "Imported texture {number}"
+      "title": "Construir un edificio",
+      "modeWall": "Paredes",
+      "modeRoom": "Habitaciones",
+      "modeFloor": "Plantas",
+      "modeObject": "Objetos",
+      "modeFinish": "Acabados de pared",
+      "building": "Edificio",
+      "buildingNumber": "Edificio {number}",
+      "noBuilding": "Nuevo edificio",
+      "newBuilding": "Nuevo edificio",
+      "levels": "Plantas del edificio",
+      "groundFloor": "Planta baja",
+      "floorNumber": "Planta {number}",
+      "addLevel": "Añadir planta",
+      "hideAbove": "Ocultar plantas superiores",
+      "settings": "Cuadrícula y cimientos",
+      "gridSize": "Separación de cuadrícula",
+      "gridOff": "Desactivado",
+      "gridCell": "{size} yardas",
+      "floorHeight": "Altura de la planta (yardas)",
+      "baseY": "Altura de los cimientos (yardas)",
+      "autoBase": "Se fija al colocar la primera pieza",
+      "foundationLocked": "Los ajustes de cimientos quedan fijados cuando empieza la construcción.",
+      "wallSource": "Tipo de pared",
+      "bareWall": "Pared desnuda",
+      "chosenAsset": "Recurso elegido",
+      "thickness": "Grosor de pared (yardas)",
+      "pickAsset": "Elegir recurso",
+      "selectedAsset": "Recurso: {name}",
+      "noAsset": "Elige un recurso del explorador.",
+      "selectExisting": "Seleccionar una pieza existente",
+      "wallHint": "Arrastra para trazar una pared recta.",
+      "diagonal": "Paredes diagonales",
+      "diagonalHint": "Arrastra entre puntos de cuadrícula para trazar una pared en cualquier ángulo.",
+      "roomHint": "Arrastra un rectángulo para crear una habitación con paredes y suelo.",
+      "floorHint": "Arrastra un rectángulo para añadir un suelo en este nivel.",
+      "objectHint": "Coloca objetos en la planta seleccionada.",
+      "finishHint": "Elige un acabado y luego haz clic en una pared para pintarla.",
+      "finishTexture": "Textura de pared",
+      "bareFinish": "Superficie original",
+      "importTexture": "Importar textura",
+      "importingTexture": "Importando textura...",
+      "finishTile": "Repetición de textura (yardas)",
+      "finishSide": "Lado para pintar",
+      "sideClicked": "Lado pulsado",
+      "sideFront": "Parte delantera",
+      "sideBack": "Parte trasera",
+      "sideBoth": "Ambos lados",
+      "finishRun": "Aplicar a las paredes conectadas",
+      "rotateLeft": "Girar a la izquierda",
+      "rotateRight": "Girar a la derecha",
+      "smaller": "Más pequeño",
+      "larger": "Más grande",
+      "fineRotation": "Rotación fina (15°)",
+      "transformReadout": "Rotación: {degrees}° | Tamaño: {scale}x",
+      "transformEmpty": "Elige un recurso para girarlo o cambiar su tamaño.",
+      "transformShortcuts": "Girar: , y . | Cambiar tamaño: [ y ]",
+      "undo": "Deshacer",
+      "redo": "Rehacer",
+      "transformControls": "Controles del recurso",
+      "chooseWall": "Elige un recurso de pared y espera su vista previa, o selecciona Pared desnuda.",
+      "chooseAsset": "Elige primero un recurso.",
+      "choosePaintWall": "Haz clic en una pared de edificio o en un recurso de pared.",
+      "capacity": "Esta construcción es demasiado grande. Traza una sección más pequeña o quita piezas sin usar.",
+      "invalid": "Esta pared o habitación no cabe. Ajusta la cuadrícula o elige otra pieza.",
+      "importFailed": "No se pudo importar la textura. Usa un PNG, JPG o WebP de menos de 8 MB y hasta 8192 píxeles por lado.",
+      "bare": "Superficie original",
+      "importedTexture": "Textura importada {number}"
     },
     "appTitle": "Editor de Mapas",
     "docTitle": "Editor de Mapas - World of ClaudeCraft",
     "untitledMap": "Mapa sin título",
-    "flatMapName": "Flat World",
+    "liveWorld": {
+      "name": "Retoques del mundo en vivo",
+      "scope": "Mundo en vivo: edita la altura y pintura del terreno, los caminos, las posiciones de objetos de juego y el atrezo añadido. Los edificios existentes permanecen fijos. Usa Exportar para guardar los retoques para revisión."
+    },
+    "flatMapName": "Mundo plano",
     "playtestPlayerName": "Cartógrafo",
-    "playtestBack": "Back to Editor",
-    "playtestBackTitle": "Return to the map editor (your map was saved when the playtest launched)",
+    "playtestBack": "Volver al editor",
+    "playtestBackTitle": "Vuelve al editor de mapas (tu mapa se guardó al iniciar la prueba de juego)",
     "topbar": {
       "label": "Acciones del editor",
-      "dungeon": "Dungeon",
-      "dungeonTitle": "Edit an authored dungeon interior layout",
+      "dungeon": "Mazmorra",
+      "dungeonTitle": "Editar una distribución de interior de mazmorra creada a mano",
       "mapNameLabel": "Nombre del mapa",
       "dirty": "Cambios sin guardar",
       "dirtyDot": "Este mapa tiene cambios sin guardar",
@@ -10292,8 +11581,8 @@ export const es: EnTranslations = {
       "neverSaved": "Sin guardar aún",
       "new": "Nuevo",
       "newTitle": "Empezar un mapa nuevo a partir del mundo integrado",
-      "newFlat": "Blank Map",
-      "newFlatTitle": "Start a brand-new blank map with none of the base game content, at a size you choose",
+      "newFlat": "Mapa en blanco",
+      "newFlatTitle": "Inicia un mapa nuevo en blanco, sin contenido del juego base y con el tamaño que elijas",
       "open": "Abrir",
       "openTitle": "Abrir un mapa guardado (navegador o servidor)",
       "save": "Guardar",
@@ -10310,49 +11599,51 @@ export const es: EnTranslations = {
       "uploadAsset": "Subir Elemento",
       "uploadAssetTitle": "Subir un modelo GLB (hasta 8 MiB) para colocarlo en tus mapas",
       "uploadAssetDisabledTitle": "Inicia sesión desde el juego para subir elementos",
-      "importModel": "Import Model",
-      "importModelTitle": "Load a .glb or .gltf model from this computer and place it, fully offline (kept for this session)",
+      "importModel": "Importar modelo",
+      "importModelTitle": "Carga un modelo .glb o .gltf de este equipo y colócalo sin conexión (se conserva durante esta sesión)",
       "playtest": "Probar",
       "playtestTitle": "Inicia el juego en este mapa (sin conexión, con las ediciones actuales incluidas)",
       "viewLabel": "Modo de vista",
-      "workspace": "View",
-      "workspaceTitle": "View, map, preview, and workspace modes",
+      "workspace": "Vista",
+      "workspaceTitle": "Modos de vista, mapa, vista previa y espacio de trabajo",
       "view3d": "3D",
       "view3dTitle": "Editar en el mundo renderizado",
       "view2d": "2D",
       "view2dTitle": "Editar en el mapa cenital simbólico",
-      "projectionPerspective": "Perspective",
-      "projectionOrthographic": "Orthographic",
-      "projectionTitle": "Toggle perspective/orthographic projection (Numpad 5)",
-      "axisGimbal": "Camera gimbal",
-      "axisGimbalTitle": "Show or hide the camera orientation gimbal",
-      "minimap": "Minimap",
-      "minimapTitle": "Toggle the corner minimap (top-down view that follows the camera)",
-      "music": "Music",
-      "musicTitle": "Play the soundtrack for the area under the camera (the music area's track, else the map track, else the zone's own cue). Fly around and it follows you.",
-      "mapWindow": "Map",
-      "mapWindowTitle": "Open the map of the current zone (with a button for the full world)",
-      "preview": "Preview",
-      "previewTitle": "See the map as it looks in-game: hides editor-only overlays (collider boxes, music areas, markers, rings, gizmos)",
-      "hitboxes": "Hitboxes",
-      "hitboxesTitle": "Show the collision shapes the game actually blocks with (blue = authored in Collision Master, red = auto-baked boxes)",
-      "zoneIsolateOff": "Full Build",
-      "zoneIsolateOn": "Zone: {zone}",
-      "zoneIsolateTitle": "Full Build ⇄ Zone: isolate the camera’s zone, everything outside it unloads until you switch back. View only; the map itself never changes.",
-      "fullBuildPreview": "Full Build Preview",
-      "fullBuildPreviewTitle": "Stream every zone of this map into the viewport (may take a while)",
-      "fullBuildProgress": "Building zones: {done}/{total}",
-      "fullBuildDone": "All {total} zones resident.",
-      "publishMap": "Publish to Game",
-      "publishMapTitle": "Write this map into the local repo as real game content (data/maps + src/sim/maps); boot it with ?map=<slug>",
-      "unpublishMap": "Remove from Game",
-      "unpublishMapTitle": "Uninstall this map from the local game: deletes the files Publish wrote and restores the standard ClaudeCraft world",
+      "projectionPerspective": "Perspectiva",
+      "projectionOrthographic": "Ortográfica",
+      "projectionTitle": "Alterna la proyección en perspectiva u ortográfica (5 del teclado numérico)",
+      "axisGimbal": "Cardán de cámara",
+      "axisGimbalTitle": "Mostrar u ocultar el cardán de orientación de la cámara",
+      "minimap": "Minimapa",
+      "minimapTitle": "Activa o desactiva el minimapa de la esquina (vista cenital que sigue a la cámara)",
+      "music": "Música",
+      "musicTitle": "Reproduce la banda sonora de la zona situada bajo la cámara (la pista de la zona musical; en su defecto, la del mapa; y en su defecto, la de la propia zona). Vuela por el mundo y te seguirá.",
+      "mapWindow": "Mapa",
+      "mapWindowTitle": "Abre el mapa de la zona actual (con un botón para el mundo completo)",
+      "preview": "Avance",
+      "previewTitle": "Muestra el mapa como se ve en el juego: oculta las superposiciones exclusivas del editor (cajas de colisión, zonas musicales, marcadores, anillos y manipuladores)",
+      "hitboxes": "Cajas de colisión",
+      "hitboxesTitle": "Muestra las formas de colisión que realmente bloquean en el juego (azul = definidas en el Editor de colisiones; rojo = cajas precalculadas automáticamente)",
+      "zoneIsolateOff": "Construcción completa",
+      "zoneIsolateOn": "Zona: {zone}",
+      "zoneIsolateTitle": "Construcción completa ⇄ Zona: aísla la zona de la cámara y descarga todo lo exterior hasta que vuelvas a cambiar. Solo afecta a la vista; el mapa en sí nunca cambia.",
+      "fullBuildPreview": "Vista previa de construcción completa",
+      "fullBuildPreviewTitle": "Cargar progresivamente todas las zonas de este mapa en la vista (puede tardar)",
+      "fullBuildProgress": "Construyendo zonas: {done}/{total}",
+      "fullBuildDone": "Las {total} zonas están residentes.",
+      "publishMap": "Publicar en el juego",
+      "pushMapChanges": "Enviar cambios al mapa del repositorio",
+      "pushMapChangesTitle": "Aplica solo lo que has cambiado desde que abriste este mapa del repositorio al archivo actual del repositorio y conserva los envíos de los demás.",
+      "publishMapTitle": "Escribe este mapa en el repositorio local como contenido real del juego (data/maps + src/sim/maps); inícialo con ?map=<slug>",
+      "unpublishMap": "Quitar del juego",
+      "unpublishMapTitle": "Desinstala este mapa del juego local: elimina los archivos que escribió Publicar y restaura el mundo estándar de ClaudeCraft",
       "undoCount": "Deshacer: {count}",
       "undoCountTitle": "{count} pasos que se pueden deshacer (Ctrl+Z para deshacer, Ctrl+Y para rehacer)",
       "autosave": "Autoguardado",
       "autosaveTitle": "Guarda automáticamente el mapa mientras haya cambios sin guardar. Se desactiva solo si un guardado falla.",
-      "presetPrompt": "Ask about presets on Lock In",
-      "presetPromptTitle": "After a Collision Master Lock In, ask whether to also save the boxes as a hitbox preset on this device. Turn this back on if you ticked \"Don't ask again\".",
+      "presetPrompt": "Preguntar por preajustes al confirmar",
+      "presetPromptTitle": "Después de confirmar en el Editor de colisiones, pregunta si también se deben guardar las cajas como preajuste de colisión en este dispositivo. Reactívalo si marcaste «No volver a preguntar».",
       "undo": "Deshacer",
       "undoTitle": "Deshacer el último cambio (Ctrl+Z)",
       "redo": "Rehacer",
@@ -10363,543 +11654,592 @@ export const es: EnTranslations = {
       "signInTitle": "Abrir la pantalla de inicio de sesión del juego en una pestaña nueva",
       "help": "Ayuda",
       "helpTitle": "Guía del editor: herramientas, atajos y el tutorial",
-      "more": "More",
-      "moreTitle": "More actions: Save As, autosave, fork, import/export, upload",
-      "primaryTools": "Primary transform tools",
-      "settings": "Settings",
-      "settingsTitle": "Graphics and sound settings (shared with playtest)",
-      "worldLink": "Link to World",
-      "worldLinkTitle": "Place this map inside the base game world: drag its outline onto the world map, and playtest embeds it there with the base game running around it",
-      "generateTerrain": "Generate Terrain",
-      "generateTerrainTitle": "Generate this map’s terrain from a region of the base game world: drag the outline over the world map to pick which part of the old layout to use",
-      "evenBuildings": "Even Out Buildings",
-      "evenBuildingsTitle": "Fix buildings that were stretched sideways to fill their plot: each one keeps its height and its footprint area, but its width and depth are made equal so it stops looking squashed",
-      "evenBuildingsDone": "Evened out {count} buildings.",
-      "evenBuildingsNone": "No squashed buildings found."
+      "more": "Más",
+      "moreTitle": "Más acciones: Guardar como, guardado automático, crear copia independiente, importar/exportar y subir",
+      "primaryTools": "Herramientas principales de transformación",
+      "settings": "Ajustes",
+      "settingsTitle": "Ajustes de gráficos y sonido (compartidos con la prueba de juego)",
+      "worldLink": "Vincular al mundo",
+      "worldLinkTitle": "Coloca este mapa dentro del mundo del juego base: arrastra su contorno sobre el mapa del mundo y la prueba de juego lo integra allí con el juego base funcionando a su alrededor",
+      "generateTerrain": "Generar terreno",
+      "generateTerrainTitle": "Genera el terreno de este mapa a partir de una región del mundo del juego base: arrastra el contorno sobre el mapa del mundo para elegir qué parte de la distribución antigua usar",
+      "evenBuildings": "Uniformar edificios",
+      "evenBuildingsTitle": "Corrige los edificios estirados lateralmente para llenar su parcela: cada uno conserva su altura y superficie de base, pero su anchura y profundidad se igualan para que deje de parecer aplastado",
+      "evenBuildingsDone": "Se han uniformado {count} edificios.",
+      "evenBuildingsNone": "No se han encontrado edificios aplastados."
     },
     "genTerrain": {
-      "title": "Generate Terrain",
-      "hint": "Pick which part of the old world layout this map’s terrain generates from: drag the gold rectangle over the region you want. Its hills, lakes, and coastlines become your map’s base terrain, you can sculpt on top of it afterwards. Generating replaces your current sculpt edits, and your map stays its own separate space.",
-      "dragHint": "Drag the gold rectangle over the terrain to copy. The dot marks your spawn point.",
-      "status": "Sampling the world layout around ({x}, {z}).",
-      "save": "Generate",
-      "clear": "Flatten Map",
-      "generated": "Terrain generated from the world layout around ({x}, {z}).",
-      "cleared": "Terrain source cleared: the map is a flat slate again."
+      "title": "Generar terreno",
+      "hint": "Elige qué parte de la distribución del mundo antiguo genera el terreno de este mapa: arrastra el rectángulo dorado sobre la región que quieras. Sus colinas, lagos y costas se convierten en el terreno base de tu mapa, sobre el que luego puedes esculpir. Generar sustituye tus ediciones de escultura actuales, y tu mapa sigue siendo un espacio independiente.",
+      "dragHint": "Arrastra el rectángulo dorado sobre el terreno que quieras copiar. El punto marca tu lugar de aparición.",
+      "status": "Muestreando la distribución del mundo alrededor de ({x}, {z}).",
+      "save": "Generar",
+      "clear": "Aplanar mapa",
+      "generated": "Terreno generado a partir de la distribución del mundo alrededor de ({x}, {z}).",
+      "cleared": "Origen de terreno borrado: el mapa vuelve a ser una superficie plana."
     },
     "worldLink": {
-      "title": "Link to World",
-      "hint": "Drag your map’s outline to where it should sit in the base game world. Playtest stamps your map’s terrain, placements, and spawns right there, with the world’s own mobs, NPCs, and quests running around it. You can also place it in the open sea beyond the old world’s edges: your map rises there as new land. Your editing space stays exactly as it is; only playtest uses the link.",
-      "statusLinked": "Linked: your map’s origin sits at ({x}, {z}) in the world.",
-      "statusUnlinked": "Standalone: this map playtests as its own separate space.",
-      "dragHint": "Drag the gold rectangle to position your map. The dot marks your spawn point.",
-      "save": "Save Link",
-      "unlink": "Unlink",
-      "cancel": "Cancel",
-      "linked": "Map linked to the world at ({x}, {z}).",
-      "unlinked": "Map unlinked: it playtests standalone again.",
-      "standaloneOnly": "Only standalone authored maps can link to the world (open a Blank Map or import one first)."
+      "title": "Vincular al mundo",
+      "hint": "Arrastra el contorno de tu mapa al lugar que deba ocupar en el mundo del juego base. La prueba de juego coloca allí el terreno, los elementos y las apariciones de tu mapa, con las criaturas, PNJ y misiones del mundo funcionando alrededor. También puedes colocarlo en mar abierto, más allá de los bordes del mundo antiguo: tu mapa emerge allí como tierra nueva. Tu espacio de edición se mantiene exactamente igual; solo la prueba de juego usa el vínculo.",
+      "statusLinked": "Vinculado: el origen de tu mapa está en ({x}, {z}) dentro del mundo.",
+      "statusUnlinked": "Independiente: este mapa se prueba como un espacio separado propio.",
+      "dragHint": "Arrastra el rectángulo dorado para posicionar tu mapa. El punto marca tu lugar de aparición.",
+      "save": "Guardar vínculo",
+      "unlink": "Desvincular",
+      "cancel": "Cancelar",
+      "linked": "Mapa vinculado al mundo en ({x}, {z}).",
+      "unlinked": "Mapa desvinculado: vuelve a probarse como espacio independiente.",
+      "standaloneOnly": "Solo los mapas creados como espacios independientes se pueden vincular al mundo (abre primero un Mapa en blanco o importa uno)."
     },
     "settings": {
-      "title": "Settings",
-      "hint": "Graphics and sound for the editor and playtest. These are the same settings the game uses, saved in this browser.",
-      "graphicsTitle": "Graphics quality",
-      "graphicsLow": "Low",
-      "graphicsMedium": "Medium",
-      "graphicsHigh": "High",
-      "graphicsUltra": "Ultra",
-      "graphicsHint": "Applies to the next playtest, and to the editor after a reload.",
-      "applyGraphics": "Reload editor to apply",
-      "soundTitle": "Sound",
-      "sfxVolume": "Effects volume",
-      "musicVolume": "Music volume",
-      "music": "Play music",
-      "close": "Close"
+      "title": "Ajustes",
+      "hint": "Gráficos y sonido del editor y la prueba de juego. Son los mismos ajustes que usa el juego y se guardan en este navegador.",
+      "graphicsTitle": "Calidad gráfica",
+      "graphicsLow": "Baja",
+      "graphicsMedium": "Media",
+      "graphicsHigh": "Alta",
+      "graphicsUltra": "Máxima",
+      "graphicsHint": "Se aplica a la siguiente prueba de juego y al editor después de recargar.",
+      "applyGraphics": "Recarga el editor para aplicar",
+      "soundTitle": "Sonido",
+      "sfxVolume": "Volumen de efectos",
+      "musicVolume": "Volumen de música",
+      "music": "Reproducir música",
+      "close": "Cerrar"
     },
     "fluid": {
-      "title": "Fluid Pool",
-      "hint": "Pick a fluid and click the ground to place a pool. Use the transform tools to move it, stretch its footprint, and slide the surface down into a dip.",
-      "selHint": "The gizmo scales the pool footprint (X/Z) and the Y arrow slides the surface height. Damage ticks once per second on anyone in the fluid.",
+      "title": "Poza de fluido",
+      "hint": "Elige un fluido y haz clic en el suelo para colocar una poza. Usa las herramientas de transformación para moverla, estirar su superficie y bajar su nivel hasta una depresión.",
+      "selHint": "El manipulador escala la superficie de la poza (X/Z), y la flecha Y desplaza su altura. El daño se aplica una vez por segundo a quien esté en el fluido.",
       "kind": {
-        "lava": "Lava",
-        "acid": "Acid",
-        "spectral": "Spectral Fluid",
-        "water": "Still Water"
+        "lava": "Lava volcánica",
+        "acid": "Ácido",
+        "spectral": "Fluido espectral",
+        "water": "Agua quieta"
       },
-      "hue": "Hue",
-      "light": "Lightness",
-      "dps": "Damage per second",
-      "surfaceOffset": "Surface height",
-      "fxBubbles": "Bubbles",
-      "fxSmoke": "Smoke",
-      "fxHaze": "Haze",
-      "fxLight": "Glow light",
-      "resetPreset": "Reset to preset"
+      "hue": "Matiz",
+      "light": "Luminosidad",
+      "dps": "Daño por segundo",
+      "surfaceOffset": "Altura de superficie",
+      "fxBubbles": "Burbujas",
+      "fxSmoke": "Humo",
+      "fxHaze": "Neblina",
+      "fxLight": "Luz de resplandor",
+      "resetPreset": "Restablecer preajuste"
     },
     "tunnel": {
-      "needExit": "Entrance placed. Keep clicking to lay the path (the last point is the exit), then hit Generate.",
-      "generate": "Generate cave ({count} ready)",
-      "tooShort": "The rig points are too close together - spread them at least a few yards apart.",
-      "modeDig": "Dig cave",
-      "modeCarve": "Carve",
-      "modeHole": "Cut hole",
-      "modePatch": "Patch hole",
-      "modeRemesh": "Remesh",
-      "modeSculpt": "Dig brush",
-      "modeFill": "Fill brush",
-      "modeSmooth": "Smooth",
-      "smoothHint": "Drag along a dug edge to SMOOTH it: each pass raises the Blend of every cut and fill under the brush, so creases and lumps along a dig stroke melt into one rounded surface. One undo step per stroke.",
-      "ghostTitle": "Pending cut",
-      "ghostHint": "The blue ghost is the solid the cut will remove. Drag it into place (click or hold anywhere on the ground), tune its size, shape and depth below, then press \"Lock in cut\" (or Enter) to commit it - or Cancel / Escape to discard it. Nothing is removed until you commit.",
-      "ghostConfirm": "Lock in cut",
-      "ghostLockHint": "Enter locks the cut in, Escape discards it. Tools 2-4 move, turn and scale the ghost first.",
-      "ghostCancel": "Cancel",
-      "carveHint": "Click the ground to spawn a blue GHOST of the solid, drag it into place and tune it, then press \"Lock in cut\" (or Enter) to carve a REAL room or tunnel out of the rock: the solid has a walkable floor, rock walls and a ceiling, and it re-meshes the ground around it. A ball makes a chamber, a pitched capsule bored into a hillside a tunnel, a box a hall - and raise Blend so neighbouring carves melt together into one clean cave. Walk in through any face that breaks the surface.",
-      "carveList": "Carves",
-      "carveLabel": "Carve {n}",
-      "carveDelete": "Delete carve",
-      "cutDepth": "Depth",
-      "sculptHint": "Drag across a carve wall, floor or ceiling to DIG rock away, like a clay brush: each pass carves a blended channel at the stamp size (set by the brush radius). Drag on open ground to gouge into the surface. One undo step per stroke.",
-      "fillHint": "Click the ground to drop an ERASE BOX, size it with the sliders or the gizmo (any width, length and height), then press \"Erase caves\" (or Enter): every carve, hole and dug volume inside the box is removed, and a carve the box only partly covers is filled back to solid rock where it is covered. One undo step.",
-      "eraseTitle": "Erase box",
-      "eraseGhostHint": "The box stands where you clicked; click again to move it. Everything cave-like inside it goes when you confirm.",
-      "eraseHalf": "Half width (yd)",
-      "eraseConfirm": "Erase caves",
-      "eraseDone": "Erased {n} cave record(s) inside the box",
-      "eraseNothing": "No caves inside the box",
-      "remeshHint": "Click to paint a DETAIL region (brush radius wide): every carve it touches re-meshes at the chosen cell size - finer OR coarser than the default. Spend fine topology exactly where a cave needs to read clean; turn the cell up to thin out a carve that costs too much. Finer cells cost more triangles.",
-      "remeshCell": "Detail (cell yards)",
-      "remeshAllTitle": "Remesh all caves",
-      "remeshAllHint": "One cell size for every carve and dug volume on the map: larger cells mean far fewer triangles. Applies to the whole map at once and re-meshes it; the regions below can still refine or coarsen single spots on top of it.",
-      "remeshGlobal": "Cave mesh detail (cell yards)",
-      "remeshAll": "Remesh all caves",
-      "remeshRegionsTitle": "Detail regions (brush)",
-      "remeshList": "Detail regions",
-      "remeshLabel": "Region {n} ({r} yd, {cell} yd cells)",
-      "remeshDelete": "Delete region",
-      "holeHint": "Click the ground to spawn a blue GHOST of the cut, drag it into place, then press \"Cut into the ground\" to punch it straight through the terrain mesh. The ground stops existing there and the mesh grows a rock rim around the opening, so line a cave mouth up underneath and you can walk or drop in. Pick the shape first: a ball, an oriented box for a slot or a doorway, or a capsule for an arch. Resize or delete any committed cut below; undo removes the last one.",
-      "holeList": "Cuts",
-      "holeLabel": "Cut {n}",
-      "holeRadius": "Radius",
-      "holeDelete": "Delete cut",
-      "cutBrush": "Next cut",
+      "needExit": "Entrada colocada. Sigue haciendo clic para trazar el recorrido (el último punto es la salida) y pulsa Generar.",
+      "generate": "Generar cueva ({count} listas)",
+      "tooShort": "Los puntos de la estructura están demasiado cerca; sepáralos al menos unas yardas.",
+      "modeDig": "Excavar cueva",
+      "modeCarve": "Excavar",
+      "modeHole": "Abrir agujero",
+      "modePatch": "Tapar agujero",
+      "modeRemesh": "Regenerar malla",
+      "modeSculpt": "Pincel de excavación",
+      "modeFill": "Pincel de relleno",
+      "modeSmooth": "Suavizar",
+      "smoothHint": "Arrastra por un borde excavado para SUAVIZARLO: cada pasada aumenta la Mezcla de todos los cortes y rellenos bajo el pincel para que los pliegues y bultos de la excavación se fundan en una superficie redondeada. Un paso de deshacer por pincelada.",
+      "ghostTitle": "Corte pendiente",
+      "ghostHint": "La previsualización azul es el sólido que eliminará el corte. Arrástrala a su sitio (haz clic o mantén pulsado en cualquier lugar del suelo), ajusta su tamaño, forma y profundidad abajo y pulsa «Confirmar corte» (o Intro) para aplicarlo; usa Cancelar o Esc para descartarlo. No se elimina nada hasta confirmar.",
+      "ghostConfirm": "Confirmar corte",
+      "ghostLockHint": "Intro confirma el corte; Esc lo descarta. Las herramientas 2-4 permiten mover, girar y escalar primero la previsualización.",
+      "ghostCancel": "Cancelar",
+      "carveHint": "Haz clic en el suelo para crear una PREVISUALIZACIÓN azul del sólido, arrástrala a su sitio y ajústala; luego pulsa «Confirmar corte» (o Intro) para excavar una habitación o túnel REAL en la roca: el sólido tiene suelo transitable, paredes de roca y techo, y regenera la malla del terreno alrededor. Una bola crea una cámara, una cápsula inclinada perfora una ladera para crear un túnel y una caja forma una sala. Aumenta Mezcla para que las excavaciones vecinas se fundan en una única cueva limpia. Entra por cualquier cara que atraviese la superficie.",
+      "carveList": "Excavaciones",
+      "carveLabel": "Excavación {n}",
+      "carveDelete": "Eliminar excavación",
+      "cutDepth": "Profundidad",
+      "sculptHint": "Arrastra sobre una pared, suelo o techo excavado para QUITAR roca, como con un pincel de arcilla: cada pasada excava un canal suavizado del tamaño de la estampa (fijado por el radio del pincel). Arrastra sobre suelo abierto para surcar la superficie. Un paso de deshacer por pincelada.",
+      "fillHint": "Haz clic en el suelo para colocar una CAJA DE BORRADO, ajusta su tamaño con los controles deslizantes o el manipulador (cualquier anchura, longitud y altura) y pulsa «Borrar cuevas» (o Intro): se elimina toda excavación, agujero y volumen excavado dentro de la caja; una excavación cubierta solo en parte se rellena de roca sólida donde la caja la cubra. Un paso de deshacer.",
+      "eraseTitle": "Caja de borrado",
+      "eraseGhostHint": "La caja queda donde hiciste clic; vuelve a hacer clic para moverla. Todo lo relacionado con cuevas que haya dentro desaparece al confirmar.",
+      "eraseHalf": "Mitad de la anchura (yardas)",
+      "eraseConfirm": "Borrar cuevas",
+      "eraseDone": "Se han borrado {n} registros de cueva dentro de la caja",
+      "eraseNothing": "No hay cuevas dentro de la caja",
+      "remeshHint": "Haz clic para pintar una región de DETALLE (con la anchura del radio del pincel): cada excavación que toque regenera su malla con el tamaño de celda elegido, más fino O más grueso que el predeterminado. Usa topología fina justo donde la cueva necesite verse limpia; aumenta la celda para aligerar una excavación demasiado costosa. Las celdas más finas cuestan más triángulos.",
+      "remeshCell": "Detalle (yardas por celda)",
+      "remeshAllTitle": "Regenerar mallas de todas las cuevas",
+      "remeshAllHint": "Un único tamaño de celda para todas las excavaciones y volúmenes excavados del mapa: las celdas mayores implican muchos menos triángulos. Se aplica a todo el mapa a la vez y regenera su malla; las regiones inferiores aún pueden afinar o simplificar puntos individuales por encima de este ajuste.",
+      "remeshGlobal": "Detalle de malla de cueva (yardas por celda)",
+      "remeshAll": "Regenerar mallas de todas las cuevas",
+      "remeshRegionsTitle": "Regiones de detalle (pincel)",
+      "remeshList": "Regiones de detalle",
+      "remeshLabel": "Región {n} ({r} yardas, celdas de {cell} yardas)",
+      "remeshDelete": "Eliminar región",
+      "holeHint": "Haz clic en el suelo para crear una PREVISUALIZACIÓN azul del corte, arrástrala a su sitio y pulsa «Cortar el terreno» para atravesar directamente la malla del terreno. El suelo deja de existir ahí y la malla forma un borde rocoso alrededor de la abertura; alinea una entrada de cueva debajo y podrás entrar andando o dejándote caer. Elige primero la forma: una bola, una caja orientada para una ranura o puerta, o una cápsula para un arco. Cambia el tamaño o elimina cualquier corte confirmado abajo; deshacer quita el último.",
+      "holeList": "Cortes",
+      "holeLabel": "Corte {n}",
+      "holeRadius": "Radio",
+      "holeDelete": "Eliminar corte",
+      "cutBrush": "Siguiente corte",
       "cutShape": {
-        "sphere": "Ball",
-        "box": "Box",
-        "capsule": "Capsule",
-        "voxel": "Dug rock",
-        "tube": "Cave mouth (from the bore)"
+        "sphere": "Bola",
+        "box": "Caja",
+        "capsule": "Cápsula",
+        "voxel": "Roca excavada",
+        "tube": "Entrada de cueva (desde la perforación)"
       },
-      "cutLength": "Length",
-      "cutHeight": "Height",
-      "cutYaw": "Turn",
-      "cutPitch": "Tilt",
-      "cutBlend": "Blend",
-      "cutWarp": "Undulation",
-      "digAlphaLabel": "Brush alpha",
+      "cutLength": "Longitud",
+      "cutHeight": "Altura",
+      "cutYaw": "Giro",
+      "cutPitch": "Inclinación",
+      "cutBlend": "Mezcla",
+      "cutWarp": "Ondulación",
+      "digAlphaLabel": "Máscara alfa del pincel",
       "digAlpha": {
-        "round": "Round",
-        "halfmoon": "Half moon",
-        "ragged": "Ragged",
-        "crescent": "Crescent"
+        "round": "Redondas",
+        "halfmoon": "Media luna",
+        "ragged": "Irregular",
+        "crescent": "Creciente"
       },
-      "digNoise": "Edge noise",
-      "digCell": "Dig detail (cell yards)",
-      "digCellHint": "Strokes bake straight into the map as one rock volume at this cell size (finer costs more memory and triangles). The cell is fixed once the first stroke lands.",
-      "digClear": "Clear dug rock",
-      "digVolumeFull": "The dug rock volume is as large as a map can hold; clear it or dig closer to what is already dug.",
-      "digCellCoarsened": "Dig detail set to {cell} yd for this brush size (a finer cell would not fit the volume budget).",
-      "cutWarpScale": "Undulation size",
-      "cutTaper": "Taper",
-      "cutWobble": "Wobble",
-      "cutWobbleLen": "Wobble length",
-      "cutBend": "Bend",
-      "cutArch": "Arch",
-      "ghostGizmoHint": "Press 2, 3 or 4 (Move, Rotate, Scale) to drag the ghost with the gizmo, then come back to the Caves tool to cut.",
-      "autoMouth": "Carve its own mouth",
-      "autoMouthHint": "The tube cuts the ground wherever it breaches the surface, so you no longer line a hole up with the mouth by hand. Buried stretches cut nothing, and ground under a stretch standing above the surface is left alone.",
-      "mouthBlend": "Mouth blend",
-      "patchHint": "Click the ground to lay a patch (brush radius wide, same shapes as a cut) that FILLS the ground back in wherever cuts overlap it - use it to trim the blank parts around each cut. A patch always beats the cuts it touches. Resize or delete any patch below; undo removes the last one.",
-      "patchList": "Patches",
-      "patchLabel": "Patch {n}",
-      "patchDelete": "Delete patch",
-      "listTitle": "Caves",
-      "caveLabel": "Cave {n} ({nodes} points)",
-      "width": "Width",
-      "height": "Interior height",
-      "variance": "Variance",
-      "floorVariance": "Floor bumps",
-      "stalactites": "Stalactites",
-      "stalagmites": "Stalagmites",
-      "spikeSize": "Formation size",
-      "startOpen": "Entrance open",
-      "endOpen": "Exit open",
-      "selectCave": "Select whole cave",
-      "noRig": "This cave has no rig nodes to grab - lay a new cave instead.",
-      "reverse": "Swap entrance/exit",
-      "delete": "Delete cave",
-      "texture": "Interior texture",
-      "texDefault": "Granite (default)",
-      "guideHint": "Blue nodes joined by a dotted line are your cave model (visible in every tool). Move a node with the Move tool, raise or sink it with the Y arrow, and scale it to widen the cave there - the tube re-generates live and ALWAYS keeps exactly the size you set. Green ball = entrance, red arrow = exit.",
-      "hint": "Click the ground to drop the ENTRANCE node, keep clicking to lay blue waypoints (the last one is the exit), then press Generate. The cave is a standalone tube built only from your nodes - the surrounding terrain never squishes or reshapes it. Turn on \"Carve its own mouth\" and the tube opens the ground wherever it breaches the surface; otherwise use Cut hole mode and slide the tube into place with Select whole cave + the Move tool."
+      "digNoise": "Ruido del borde",
+      "digCell": "Detalle de excavación (yardas por celda)",
+      "digCellHint": "Las pinceladas se precalculan directamente en el mapa como un único volumen de roca con este tamaño de celda (más fino consume más memoria y triángulos). La celda queda fijada al aplicar la primera pincelada.",
+      "digClear": "Borrar roca excavada",
+      "digVolumeFull": "El volumen de roca excavada ha alcanzado el máximo que admite un mapa; bórralo o excava más cerca de lo ya excavado.",
+      "digCellCoarsened": "Detalle de excavación fijado en {cell} yardas para este tamaño de pincel (una celda más fina no cabría en el presupuesto de volumen).",
+      "cutWarpScale": "Tamaño de ondulación",
+      "cutTaper": "Estrechamiento",
+      "cutWobble": "Oscilación",
+      "cutWobbleLen": "Longitud de oscilación",
+      "cutBend": "Curvatura",
+      "cutArch": "Arco",
+      "ghostGizmoHint": "Pulsa 2, 3 o 4 (Mover, Girar, Escalar) para arrastrar la previsualización con el manipulador y luego vuelve a la herramienta Cuevas para cortar.",
+      "autoMouth": "Excavar su propia entrada",
+      "autoMouthHint": "El tubo corta el suelo donde atraviesa la superficie para que ya no tengas que alinear un agujero con la entrada a mano. Los tramos enterrados no cortan nada y el suelo bajo un tramo situado por encima de la superficie queda intacto.",
+      "mouthBlend": "Mezcla de la entrada",
+      "patchHint": "Haz clic en el suelo para colocar un parche (con la anchura del radio del pincel y las mismas formas que un corte) que RELLENA el suelo donde se solape con cortes; úsalo para recortar las partes vacías alrededor de cada corte. Un parche siempre tiene prioridad sobre los cortes que toca. Cambia el tamaño o elimina cualquier parche abajo; deshacer quita el último.",
+      "patchList": "Parches",
+      "patchLabel": "Parche {n}",
+      "patchDelete": "Eliminar parche",
+      "listTitle": "Cuevas",
+      "caveLabel": "Cueva {n} ({nodes} puntos)",
+      "width": "Anchura",
+      "height": "Altura interior",
+      "variance": "Variabilidad",
+      "floorVariance": "Relieve del suelo",
+      "stalactites": "Estalactitas",
+      "stalagmites": "Estalagmitas",
+      "spikeSize": "Tamaño de formación",
+      "startOpen": "Entrada abierta",
+      "endOpen": "Salida abierta",
+      "selectCave": "Seleccionar cueva completa",
+      "noRig": "Esta cueva no tiene nodos de estructura que puedas agarrar; traza una cueva nueva.",
+      "reverse": "Intercambiar entrada y salida",
+      "delete": "Eliminar cueva",
+      "texture": "Textura interior",
+      "texDefault": "Granito (predeterminado)",
+      "guideHint": "Los nodos azules unidos por una línea de puntos son tu modelo de cueva (visible con cualquier herramienta). Mueve un nodo con Mover, súbelo o húndelo con la flecha Y y escálalo para ensanchar la cueva allí; el tubo se regenera en vivo y SIEMPRE mantiene exactamente el tamaño fijado. Bola verde = entrada; flecha roja = salida.",
+      "hint": "Haz clic en el suelo para colocar el nodo de ENTRADA, sigue haciendo clic para trazar puntos de ruta azules (el último es la salida) y pulsa Generar. La cueva es un tubo independiente construido solo a partir de tus nodos; el terreno circundante nunca lo aplasta ni cambia su forma. Activa «Excavar su propia entrada» y el tubo abrirá el suelo donde atraviese la superficie; en caso contrario, usa el modo Abrir agujero y coloca el tubo con Seleccionar cueva completa y la herramienta Mover."
     },
     "foliage": {
-      "kind": "Plant",
+      "kind": "Plantar",
       "kinds": {
-        "tree": "Tree",
-        "bush": "Bush",
-        "grass": "Grass clump",
-        "fern": "Fern",
-        "vine": "Vine"
+        "tree": "Árbol",
+        "bush": "Arbusto",
+        "grass": "Mata de hierba",
+        "fern": "Helecho",
+        "vine": "Liana"
       },
-      "preset": "Starting point",
+      "preset": "Punto de partida",
       "presets": {
-        "bushRound": "Round bush",
-        "bushBerry": "Berry bush",
-        "bushDry": "Dry scrub",
-        "grassTuft": "Tuft",
-        "grassMeadow": "Meadow clump",
-        "fernForest": "Forest fern",
-        "vineHanging": "Hanging vine"
+        "bushRound": "Arbusto redondo",
+        "bushBerry": "Arbusto de bayas",
+        "bushDry": "Matorral seco",
+        "grassTuft": "Mechón",
+        "grassMeadow": "Mata de pradera",
+        "fernForest": "Helecho de bosque",
+        "vineHanging": "Liana colgante"
       },
-      "footprint": "Spread",
-      "plantHeight": "Height",
-      "splay": "Splay",
-      "clumps": "Blade clumps",
-      "strands": "Strands",
-      "hang": "Hang",
-      "bake": "Keep as an asset",
-      "bakeHint": "Writes the plant to public/models/generated as a GLB, so it stops being a recipe and becomes an ordinary catalogue asset: it batches with the others, takes a collision bake, and can be placed on any map. Its settings ride along inside the file, so you can re-open and re-bake it later. Needs the dev server.",
-      "bakePrompt": "Name this plant",
-      "baked": "Kept as {id}. Re-run the asset catalogue to see it in the browser.",
-      "bakeFailed": "Could not keep the plant: {reason}"
+      "footprint": "Extensión",
+      "plantHeight": "Altura",
+      "splay": "Apertura",
+      "clumps": "Grupos de briznas",
+      "strands": "Briznas",
+      "hang": "Caída",
+      "bake": "Conservar como recurso",
+      "bakeHint": "Escribe la planta en public/models/generated como GLB para que deje de ser una receta y pase a ser un recurso normal del catálogo: se agrupa con los demás, admite precálculo de colisiones y se puede colocar en cualquier mapa. Sus ajustes se incluyen en el archivo para reabrirlo y volver a precalcularlo más tarde. Necesita el servidor de desarrollo.",
+      "bakePrompt": "Pon nombre a esta planta",
+      "baked": "Conservado como {id}. Vuelve a ejecutar el catálogo de recursos para verlo en el explorador.",
+      "bakeFailed": "No se pudo conservar la planta: {reason}"
     },
     "tree": {
-      "title": "Tree Generator",
-      "hint": "Click the ground to grow a tree there. Everything below shapes the NEXT tree; select a placed tree with the Select tool to reshape it live.",
-      "preset": "Preset",
-      "presetHint": "A starting point for the biome. Every setting stays editable afterwards.",
-      "openStudio": "Edit in Tree Studio",
-      "openStudioHint": "Opens the tree on its own in an empty scene, so you can shape it without a village in the way. Keep it when you are done and it becomes the tool default.",
-      "studioMapName": "Tree Studio",
-      "studioBanner": "Tree Studio",
-      "studioHint": "Shape the tree here, then keep it as the tool default or discard it. The map you came from is waiting.",
-      "studioKeep": "Use this tree",
-      "studioDiscard": "Discard",
-      "studioKept": "Tree Studio settings are now the tool default.",
-      "randomize": "New seed",
-      "randomizeHint": "Rerolls the branch growth and leaf scatter without changing any setting.",
-      "copyToTool": "Use as tool default",
-      "trunkSection": "Trunk",
-      "trunk": "Foundation",
-      "girth": "Girth",
-      "heightScale": "Trunk height",
-      "bark": "Bark texture",
-      "barkTile": "Bark tile (yd)",
-      "branchSection": "Branches",
-      "branches": "Per limb",
-      "branchDepth": "Levels",
-      "branchLen": "Length",
-      "branchAngle": "Spread",
-      "branchDroop": "Droop",
-      "branchTwist": "Gnarl",
-      "branchTaper": "Taper",
-      "canopySection": "Canopy volumes",
-      "canopyHint": "The leaves only ever go inside these spheres. Pick a shape to lay them out, then tune the spread and size - or edit a single sphere below to sculpt the crown by hand.",
-      "shape": "Shape",
-      "volumeCount": "Spheres",
-      "volumeSpread": "Spread",
-      "volumeRise": "Height",
-      "volumeScale": "Sphere size",
-      "volumeJitter": "Jitter",
-      "showVolumes": "Show spheres",
-      "editVolumes": "Edit spheres",
-      "resetVolumes": "Back to preset shape",
-      "volumeLabel": "Sphere {n}",
+      "title": "Generador de árboles",
+      "hint": "Haz clic en el suelo para crear allí un árbol. Todo lo de abajo da forma al SIGUIENTE árbol; selecciona uno colocado con la herramienta Seleccionar para modificarlo en vivo.",
+      "preset": "Preajuste",
+      "presetHint": "Un punto de partida para el bioma. Todos los ajustes se pueden editar después.",
+      "openStudio": "Editar en el taller de árboles",
+      "openStudioHint": "Abre el árbol por separado en una escena vacía para darle forma sin que estorbe un pueblo. Consérvalo al terminar y se convertirá en el valor predeterminado de la herramienta.",
+      "studioMapName": "Taller de árboles",
+      "studioBanner": "Taller de árboles",
+      "studioHint": "Da forma al árbol aquí y luego consérvalo como valor predeterminado de la herramienta o descártalo. El mapa del que viniste sigue esperando.",
+      "studioKeep": "Usar este árbol",
+      "studioDiscard": "Descartar",
+      "studioKept": "Los ajustes del taller de árboles son ahora los predeterminados de la herramienta.",
+      "randomize": "Nueva semilla",
+      "randomizeHint": "Vuelve a generar aleatoriamente el crecimiento de ramas y la distribución de hojas sin cambiar ningún ajuste.",
+      "copyToTool": "Usar como valor predeterminado de la herramienta",
+      "trunkSection": "Tronco",
+      "trunk": "Cimientos",
+      "girth": "Grosor del tronco",
+      "heightScale": "Altura del tronco",
+      "bark": "Textura de corteza",
+      "barkTile": "Tesela de corteza (yardas)",
+      "branchSection": "Ramas",
+      "branches": "Por rama",
+      "branchDepth": "Niveles",
+      "branchLen": "Longitud",
+      "branchAngle": "Extensión",
+      "branchDroop": "Caída de ramas",
+      "branchTwist": "Retorcimiento",
+      "branchTaper": "Estrechamiento",
+      "canopySection": "Volúmenes de copa",
+      "canopyHint": "Las hojas siempre quedan dentro de estas esferas. Elige una forma para distribuirlas y luego ajusta la extensión y el tamaño, o edita una esfera individual abajo para esculpir la copa a mano.",
+      "shape": "Forma",
+      "volumeCount": "Esferas",
+      "volumeSpread": "Extensión",
+      "volumeRise": "Altura",
+      "volumeScale": "Tamaño de esfera",
+      "volumeJitter": "Fluctuación",
+      "showVolumes": "Mostrar esferas",
+      "editVolumes": "Editar esferas",
+      "resetVolumes": "Volver a la forma del preajuste",
+      "volumeLabel": "Esfera {n}",
       "volumeX": "X",
       "volumeY": "Y",
       "volumeZ": "Z",
-      "volumeR": "Radius",
-      "volumeSy": "Stretch",
-      "addVolume": "Add sphere",
-      "removeVolume": "Remove",
-      "leafSection": "Leaves",
-      "leafSet": "Leaf art",
-      "leaves": "Count",
-      "leafSize": "Size",
-      "leafSizeVar": "Size variation",
-      "leafOrient": "Orientation",
-      "leafFill": "Fill",
-      "leafFillHint": "0 hangs the leaves on the shell of each sphere; 1 fills it solid.",
-      "leafDroop": "Droop",
-      "leafJitter": "Rotation jitter",
-      "leafClump": "Clumping",
-      "leafBranchBias": "Pull to branches",
-      "leafTint": "Tint",
-      "leafTintVar": "Colour variation",
-      "leafGlow": "Glow",
-      "leafCross": "Crossed cards",
-      "leafCrossHint": "Two quads per leaf instead of one: twice the cost, a canopy with real depth.",
-      "windSection": "Wind and collision",
-      "sway": "Sway",
-      "collide": "Trunk hitbox",
-      "collideHint": "Radius of the trunk collider, as a multiple of its own girth. 0 lets players walk through.",
-      "stats": "{leaves} leaves, {branches} branches, {height} yd tall",
+      "volumeR": "Radio",
+      "volumeSy": "Estirar",
+      "addVolume": "Añadir esfera",
+      "removeVolume": "Quitar",
+      "leafSection": "Hojas",
+      "leafSet": "Imagen de hoja",
+      "leaves": "Cantidad",
+      "leafSize": "Tamaño",
+      "leafSizeVar": "Variación de tamaño",
+      "leafOrient": "Orientación",
+      "leafFill": "Rellenar",
+      "leafFillHint": "0 coloca las hojas sobre la superficie de cada esfera; 1 llena su interior por completo.",
+      "leafDroop": "Caída de ramas",
+      "leafJitter": "Variación aleatoria de rotación",
+      "leafClump": "Agrupación",
+      "leafBranchBias": "Acercar a las ramas",
+      "leafTint": "Tinte",
+      "leafTintVar": "Variación de color",
+      "leafGlow": "Resplandor",
+      "leafCross": "Planos cruzados",
+      "leafCrossHint": "Dos cuadriláteros por hoja en lugar de uno: el doble de coste, una copa con profundidad real.",
+      "windSection": "Viento y colisión",
+      "sway": "Balanceo",
+      "collide": "Caja de colisión del tronco",
+      "collideHint": "Radio de colisión del tronco como múltiplo de su propio grosor. 0 permite a los jugadores atravesarlo.",
+      "stats": "{leaves} hojas, {branches} ramas, {height} yardas de altura",
       "orient": {
-        "volume": "Follow canopy",
-        "up": "Upright",
-        "out": "Outward",
-        "droop": "Drooping",
-        "random": "Random",
-        "billboard": "Face camera"
+        "volume": "Seguir la copa",
+        "up": "Erguido",
+        "out": "Hacia fuera",
+        "droop": "Colgante",
+        "random": "Aleatorio",
+        "billboard": "Orientar a la cámara"
       },
       "shapeName": {
-        "sockets": "On the limbs",
-        "sphere": "Ball",
-        "dome": "Dome",
-        "cone": "Cone",
-        "umbrella": "Umbrella",
-        "column": "Column",
-        "weeping": "Weeping"
+        "sockets": "Sobre las ramas",
+        "sphere": "Bola",
+        "dome": "Cúpula",
+        "cone": "Cono",
+        "umbrella": "Sombrilla",
+        "column": "Columna",
+        "weeping": "Llorón"
       }
     },
     "rock": {
-      "title": "Rock Generator",
-      "hint": "Click the ground to grow a procedural boulder there. The sliders below shape the NEXT rock; select a placed rock with the Select tool to reshape it live. Use the gizmo to stretch rocks into slabs and cliff plates.",
-      "chainMode": "Bridge / ridge mode",
-      "chainHint": "Click to lay blue points; Generate lofts ONE merged solid body through them (spanning dips in a straight line) plus walkable tops, so the chain works as a bridge or ridge. The points stay after Generate: move or scale one with the gizmos and the body follows.",
-      "chainCount": "{count} points laid",
-      "generateChain": "Generate rock ridge",
-      "clearChain": "Clear points",
-      "chainTooShort": "Lay at least two points first.",
-      "size": "Size",
-      "noise": "Noise amount",
-      "detail": "Feature detail",
-      "sharp": "Sharpness",
-      "height": "Height",
-      "depth": "Embed depth",
-      "jag": "Jaggedness",
-      "texture": "Texture",
-      "baseTex": "Base texture",
-      "texStone": "Stone",
-      "texSandstone": "Sandstone",
-      "texBare": "Bare (tintable)",
-      "reroll": "Re-roll shape",
-      "selTitle": "Generated Rock",
-      "walkable": "Walkable top"
+      "title": "Generador de rocas",
+      "hint": "Haz clic en el suelo para crear allí un peñasco procedimental. Los controles deslizantes inferiores dan forma a la SIGUIENTE roca; selecciona una roca colocada con la herramienta Seleccionar para modificarla en vivo. Usa el manipulador para estirar las rocas y formar losas y placas de acantilado.",
+      "chainMode": "Modo de puente o cresta",
+      "chainHint": "Haz clic para trazar puntos azules; Generar crea UN único cuerpo sólido unido que pasa por ellos (cruzando las depresiones en línea recta), además de superficies transitables, de modo que la cadena funciona como puente o cresta. Los puntos permanecen tras generar: mueve o escala uno con los manipuladores y el cuerpo se adapta.",
+      "chainCount": "{count} puntos trazados",
+      "generateChain": "Generar cresta rocosa",
+      "clearChain": "Borrar puntos",
+      "chainTooShort": "Traza primero al menos dos puntos.",
+      "size": "Tamaño",
+      "noise": "Cantidad de ruido",
+      "detail": "Detalle del relieve",
+      "sharp": "Agudeza",
+      "height": "Altura",
+      "depth": "Profundidad de inserción",
+      "jag": "Irregularidad",
+      "texture": "Textura",
+      "baseTex": "Textura base",
+      "texStone": "Piedra",
+      "texSandstone": "Arenisca",
+      "texBare": "Desnudo (admite tinte)",
+      "reroll": "Generar otra forma",
+      "selTitle": "Roca generada",
+      "walkable": "Parte superior transitable"
     },
     "tool": {
-      "building": "Build mode",
+      "building": "Modo de construcción",
       "listLabel": "Herramientas del editor",
       "keyHint": "{name} ({key})",
       "select": "Seleccionar",
-      "move": "Move",
-      "rotate": "Rotate",
-      "scale": "Scale",
+      "move": "Mover",
+      "rotate": "Girar",
+      "scale": "Escala",
       "raise": "Elevar",
       "lower": "Rebajar",
       "smooth": "Suavizar",
       "flatten": "Aplanar",
-      "slope": "Slope",
-      "pond": "Pond",
-      "tunnel": "Caves",
-      "rock": "Rock Gen",
-      "build": "Build Model",
-      "fluid": "Fluid Pool",
+      "slope": "Pendiente",
+      "pond": "Estanque",
+      "tunnel": "Cuevas",
+      "rock": "Generador de rocas",
+      "build": "Construir modelo",
+      "fluid": "Poza de fluido",
       "paint": "Pintar Bioma",
-      "eyedropper": "Eyedropper",
-      "decal": "Decal",
+      "eyedropper": "Cuentagotas",
+      "decal": "Calcomanía",
       "water": "Agua",
       "place": "Colocar Elemento",
-      "foliage": "Paint Foliage",
-      "clutter": "Paint Clutter",
-      "meshFix": "Mesh Fix",
-      "tree": "Tree Generator",
-      "grassClear": "Remove Grass",
+      "foliage": "Pintar vegetación",
+      "clutter": "Pintar detalles dispersos",
+      "meshFix": "Corrección de malla",
+      "tree": "Generador de árboles",
+      "grassClear": "Quitar hierba",
       "blocker": "Muro de Bloqueo",
-      "collider": "Collider",
+      "collider": "Volumen de colisión",
       "camp": "Campamento",
-      "entity": "Move NPCs and Mobs",
+      "entity": "Mover PNJ y criaturas",
       "spawn": "Punto de Aparición",
-      "zone": "Zone",
-      "light": "Point Light",
-      "music": "Music",
-      "sound": "Point Sound",
+      "zone": "Zona",
+      "light": "Luz puntual",
+      "music": "Música",
+      "sound": "Sonido puntual",
       "region": "Región",
       "erase": "Borrar",
-      "city": "City Build"
+      "city": "Construcción de ciudades"
     },
     "toolGroup": {
-      "terrain": "Terrain",
-      "assets": "Assets",
-      "world": "World",
-      "effects": "Effects"
+      "terrain": "Terreno",
+      "assets": "Recursos",
+      "world": "Mundo",
+      "effects": "Efectos"
     },
     "eyedropperTool": {
-      "empty": "Nothing painted here, click a painted texture to pick it."
+      "empty": "Aquí no hay nada pintado; haz clic en una textura pintada para elegirla."
     },
     "build": {
-      "entered": "Editing model, add shapes, apply a texture, toggle collision, then Done.",
-      "newHint": "Click the map to start a new model, or select one to edit it.",
-      "banner": "Building Model",
-      "bannerHint": "Add shapes and edit vertices/edges/faces with the modeling bar.",
-      "done": "Done",
-      "editModel": "Edit Model",
-      "panelTitle": "Built Model",
-      "shapes": "{n} shapes",
-      "texture": "Surface texture",
-      "material": "Material",
-      "materialMany": "Material controls apply to all {n} selected built models.",
-      "materialHint": "Library materials are projected onto the shape in the shader (no stretching on stairs, slopes or curves) and tint with hue, saturation and light.",
-      "hue": "Hue",
-      "saturation": "Saturation",
-      "light": "Light",
-      "resetLook": "Reset material tint",
-      "bare": "Plain (no texture)",
-      "tileSize": "Texture scale",
-      "tileSizeUnit": "yd / tile",
-      "collision": "Use mesh as collision",
-      "collisionHint": "The player is blocked where the model is solid. Walkable shapes (green) become ramps.",
-      "walkableTip": "Tip: use the modeling bar’s Walkable toggle to make a shape a ramp."
+      "entered": "Editando modelo: añade formas, aplica una textura, activa o desactiva la colisión y pulsa Listo.",
+      "newHint": "Haz clic en el mapa para iniciar un modelo nuevo o selecciona uno para editarlo.",
+      "banner": "Modelo de edificio",
+      "bannerHint": "Añade formas y edita vértices, aristas y caras con la barra de modelado.",
+      "done": "Listo",
+      "editModel": "Editar modelo",
+      "panelTitle": "Modelo construido",
+      "shapes": "{n} formas",
+      "texture": "Textura de superficie",
+      "material": "Material de superficie",
+      "materialMany": "Los controles de material se aplican a los {n} modelos construidos seleccionados.",
+      "materialHint": "Los materiales de la biblioteca se proyectan sobre la forma en el sombreador (sin estirarse en escaleras, pendientes ni curvas) y se tiñen mediante matiz, saturación y luminosidad.",
+      "hue": "Matiz",
+      "saturation": "Saturación",
+      "light": "Luz",
+      "resetLook": "Restablecer tinte del material",
+      "bare": "Liso (sin textura)",
+      "tileSize": "Escala de textura",
+      "tileSizeUnit": "yardas por tesela",
+      "collision": "Usar malla para colisiones",
+      "collisionHint": "El modelo bloquea al jugador donde es sólido. Las formas transitables (verdes) se convierten en rampas.",
+      "walkableTip": "Consejo: usa el interruptor Transitable de la barra de modelado para convertir una forma en una rampa."
     },
     "city": {
-      "title": "City Build",
-      "tabKit": "Kit",
-      "tabWalls": "Walls",
-      "tabRoads": "Roads",
-      "tabPrefabs": "Prefabs",
-      "tabRoutes": "Routes",
-      "settings": "Build settings",
-      "gridSize": "Grid size",
-      "gridOff": "Off",
-      "rotSnap": "Rotation snap",
-      "snapHint": "Grid snapping applies to wall nodes, Kit placement, and prefab stamps.",
-      "kitPick": "Choose asset",
-      "kitChosen": "Placing: {name}",
-      "kitNone": "Pick an asset from the browser, then click the map to place it on the grid.",
-      "kitRotate": "Rotate (R)",
-      "kitScale": "Piece scale",
-      "kitTileSnap": "Connect tiles",
-      "kitTileHint": "Connect tiles snaps each piece to its own size and to the FIRST tile’s height, so floors join edge to edge and stay flat across bumpy ground. Esc or picking a new asset starts a fresh level; turn it off to use the world grid.",
-      "kitGhostBlocked": "Blocked: overlapping a placed asset.",
-      "wallStyle": "Wall style",
-      "wallDraw": "Draw wall",
-      "wallDrawing": "Click to add corners on the visible grid. Double-click a node or press Enter to finish. Backspace or Delete removes the last node; Esc cancels.",
-      "wallFinish": "Finish wall",
-      "wallCancel": "Cancel",
-      "wallUndoPoint": "Undo point",
-      "wallNodes": "{n} wall nodes placed.",
-      "wallPostEvery": "Post spacing",
-      "wallPostsOff": "No posts",
-      "wallScale": "Wall scale",
-      "wallHeight": "Height",
-      "wallThickness": "Thickness",
-      "wallClosed": "Close the loop",
-      "wallWalkTop": "Walkable top",
-      "wallStairs": "Stairs up",
-      "wallWalkHint": "Walkable top puts a patrol deck along the wall so players can walk it in playtest; Stairs up adds a staircase from the ground to the deck at each end (or beside a closed loop).",
-      "wallPlaced": "Wall run placed ({n} pieces).",
-      "wallBuildFailed": "The wall assets could not be generated. Your path is still available.",
-      "wallTooShort": "Draw at least two points to build a wall.",
-      "wallLiveEdit": "The controls above update your most recent wall live.",
-      "wallEditHint": "Select any wall piece to make that run active. Return to Walls to reshape it, or press Delete in Select to remove the whole run.",
-      "wallGateHint": "Gate segments are skipped so the wall leaves an opening.",
-      "styleStone": "Stone Wall",
-      "styleCastle": "Castle Wall",
-      "styleWoodFence": "Wood Fence",
-      "styleMetalFence": "Metal Fence",
-      "styleCastleFence": "Castle Fence",
-      "styleHexWall": "Hex Wall",
-      "roadType": "Road type",
-      "roadTypeRoad": "Road",
-      "roadTypePath": "Footpath",
-      "roadDraw": "Draw road",
-      "roadDrawing": "Click to add waypoints. Enter or double-click finishes, Esc cancels.",
-      "roadFinish": "Finish road",
-      "roadCancel": "Cancel",
-      "roadPlaced": "Road placed.",
-      "roadTooShort": "Draw at least two points to build a road.",
-      "roadLimit": "This map already has the maximum number of roads.",
-      "roadList": "Roads on this map",
-      "roadDelete": "Delete",
-      "roadLegacy": "Built-in road",
-      "roadAuthored": "Road {n}",
-      "roadHint": "Roads blend into the terrain like the built-in world roads and flatten bumps beneath them.",
-      "prefabSave": "Save selection as prefab",
-      "prefabName": "Prefab name",
-      "prefabSaved": "Prefab saved: {name}",
-      "prefabNone": "No prefabs yet. Select some placed assets and save them as a prefab.",
-      "prefabStamp": "Stamp",
-      "prefabDelete": "Delete",
-      "prefabStamped": "Prefab stamped ({n} pieces).",
-      "prefabNeedSelection": "Select one or more placed assets first (Shift+click or marquee).",
-      "prefabCount": "{n} pieces",
-      "routePick": "Click an NPC to edit its route.",
-      "routeEditing": "Route for {name}: click the map to add waypoints.",
-      "routeAddHint": "Each click adds a waypoint. Enter finishes, Esc stops editing.",
-      "routeMode": "Traversal",
-      "routeModeLoop": "Loop",
-      "routeModePingPong": "Ping-pong",
-      "routeSpeed": "Walk speed",
-      "routeWait": "Wait at waypoints",
-      "routeWaitUnit": "seconds",
-      "routeFinish": "Save route",
-      "routeClear": "Clear route",
-      "routeSaved": "Route saved ({n} waypoints).",
-      "routeCleared": "Route cleared.",
-      "routeNoNpc": "No NPC selected. Click an NPC in the viewport first.",
-      "routeCount": "{n} waypoints"
+      "title": "Construcción de ciudades",
+      "tabKit": "Conjunto de piezas",
+      "tabWalls": "Paredes",
+      "tabRoads": "Caminos",
+      "tabPrefabs": "Prefabricados",
+      "tabRoutes": "Rutas",
+      "settings": "Ajustes de construcción",
+      "gridSize": "Tamaño de cuadrícula",
+      "gridOff": "Desactivado",
+      "rotSnap": "Ajuste de rotación",
+      "snapHint": "El ajuste a cuadrícula se aplica a los nodos de muro, la colocación de piezas y las estampas de prefabricados.",
+      "kitPick": "Elegir recurso",
+      "kitChosen": "Colocando: {name}",
+      "kitNone": "Elige un recurso del explorador y luego haz clic en el mapa para colocarlo en la cuadrícula.",
+      "kitRotate": "Girar (R)",
+      "kitScale": "Escala de pieza",
+      "kitTileSnap": "Conectar teselas",
+      "kitTileHint": "Conectar teselas ajusta cada pieza a su propio tamaño y a la altura de la PRIMERA tesela, de modo que los suelos se unen borde con borde y permanecen planos sobre terreno irregular. Esc o elegir un recurso nuevo inicia un nivel nuevo; desactívalo para usar la cuadrícula del mundo.",
+      "kitGhostBlocked": "Bloqueado: se solapa con un recurso colocado.",
+      "wallStyle": "Estilo de muro",
+      "wallDraw": "Trazar muro",
+      "wallDrawing": "Haz clic para añadir esquinas en la cuadrícula visible. Haz doble clic en un nodo o pulsa Intro para terminar. Retroceso o Supr quita el último nodo; Esc cancela.",
+      "wallFinish": "Terminar muro",
+      "wallCancel": "Cancelar",
+      "wallUndoPoint": "Deshacer punto",
+      "wallNodes": "{n} nodos de muro colocados.",
+      "wallPostEvery": "Separación entre postes",
+      "wallPostsOff": "Sin postes",
+      "wallScale": "Escala del muro",
+      "wallHeight": "Altura",
+      "wallThickness": "Grosor",
+      "wallClosed": "Cerrar el bucle",
+      "wallWalkTop": "Parte superior transitable",
+      "wallStairs": "Escaleras de subida",
+      "wallWalkHint": "Parte superior transitable coloca una plataforma de patrulla a lo largo del muro para recorrerla en la prueba de juego; Escaleras de subida añade una escalera desde el suelo hasta la plataforma en cada extremo (o junto a un bucle cerrado).",
+      "wallPlaced": "Tramo de muro colocado ({n} piezas).",
+      "wallBuildFailed": "No se pudieron generar los recursos del muro. Tu trazado sigue disponible.",
+      "wallTooShort": "Traza al menos dos puntos para construir un muro.",
+      "wallLiveEdit": "Los controles superiores actualizan tu muro más reciente en vivo.",
+      "wallEditHint": "Selecciona cualquier pieza de muro para activar ese tramo. Vuelve a Paredes para cambiar su forma o pulsa Supr en Seleccionar para quitar todo el tramo.",
+      "wallGateHint": "Los segmentos de puerta se omiten para que el muro deje una abertura.",
+      "styleStone": "Muro de piedra",
+      "styleCastle": "Muralla de castillo",
+      "styleWoodFence": "Valla de madera",
+      "styleMetalFence": "Valla metálica",
+      "styleCastleFence": "Valla de castillo",
+      "styleHexWall": "Muro hexagonal",
+      "roadType": "Tipo de camino",
+      "roadTypeRoad": "Camino",
+      "roadTypePath": "Sendero",
+      "roadDraw": "Trazar camino",
+      "roadDrawing": "Haz clic para añadir puntos de ruta. Intro o doble clic termina; Esc cancela.",
+      "roadFinish": "Terminar camino",
+      "roadCancel": "Cancelar",
+      "roadPlaced": "Camino colocado.",
+      "roadTooShort": "Traza al menos dos puntos para construir un camino.",
+      "roadLimit": "Este mapa ya tiene el número máximo de caminos.",
+      "roadList": "Caminos de este mapa",
+      "roadDelete": "Eliminar",
+      "roadLegacy": "Camino integrado",
+      "roadAuthored": "Camino {n}",
+      "roadHint": "Los caminos se integran en el terreno como los caminos del mundo incluidos y aplanan los bultos que hay debajo.",
+      "roadMode": "Herramienta de caminos",
+      "roadModeDraw": "Trazar un camino nuevo",
+      "roadModeEdit": "Editar caminos",
+      "roadEditHint": "Haz clic en un camino para seleccionarlo. Arrastra un punto de ruta para moverlo, arrastra la línea del camino para añadir una curva y pulsa Supr para quitar el punto de ruta que tengas sujeto.",
+      "roadEditNone": "No hay ningún camino seleccionado. Haz clic en uno en la vista o elígelo de una de las listas inferiores.",
+      "roadEditing": "Editando: {name}",
+      "roadWaypoints": "Puntos de ruta: {n}",
+      "roadWaypointHeld": "Punto de ruta {n} seleccionado.",
+      "roadDeletePoint": "Eliminar punto de ruta",
+      "roadRemove": "Quitar camino",
+      "roadReset": "Restablecer valores predeterminados",
+      "roadRestore": "Restaurar",
+      "roadSelect": "Seleccionar",
+      "roadBuiltin": "Camino del mundo {n}",
+      "roadBuiltinEdited": "{name} (modificado)",
+      "roadBuiltinRemoved": "{name} (eliminado)",
+      "roadWorldList": "Caminos del mundo ({n})",
+      "roadBuiltinNote": "Los caminos del mundo son los propios caminos del juego. Los cambios solo se aplican a este mapa, y Restablecer devuelve el camino a su estado anterior.",
+      "roadPointTooShort": "Un camino necesita al menos dos puntos de ruta. Usa Quitar camino.",
+      "roadPointLimit": "Este camino ya tiene todos los puntos de ruta que admite.",
+      "roadRemoved": "Camino eliminado. Deshacer lo recupera.",
+      "prefabSave": "Guardar selección como prefabricado",
+      "prefabName": "Nombre del prefabricado",
+      "prefabSaved": "Prefabricado guardado: {name}",
+      "prefabNone": "Aún no hay prefabricados. Selecciona algunos recursos colocados y guárdalos como prefabricado.",
+      "prefabStamp": "Estampar",
+      "prefabDelete": "Eliminar",
+      "prefabStamped": "Prefabricado estampado ({n} piezas).",
+      "prefabNeedSelection": "Selecciona primero uno o varios recursos colocados (Mayús+clic o selección rectangular).",
+      "prefabCount": "{n} piezas",
+      "routePick": "Haz clic en un PNJ para editar su ruta.",
+      "routeEditing": "Ruta de {name}: haz clic en el mapa para añadir puntos de ruta.",
+      "routeAddHint": "Cada clic añade un punto de ruta. Intro termina; Esc deja de editar.",
+      "routeMode": "Recorrido",
+      "routeModeLoop": "Bucle",
+      "routeModePingPong": "Ida y vuelta",
+      "routeSpeed": "Velocidad al caminar",
+      "routeWait": "Esperar en los puntos de ruta",
+      "routeWaitUnit": "segundos",
+      "routeFinish": "Guardar ruta",
+      "routeClear": "Borrar ruta",
+      "routeSaved": "Ruta guardada ({n} puntos de ruta).",
+      "routeCleared": "Ruta borrada.",
+      "routeNoNpc": "No hay ningún PNJ seleccionado. Haz clic primero en un PNJ de la vista.",
+      "routeCount": "{n} puntos de ruta"
     },
     "inspector": {
       "label": "Opciones de herramienta",
-      "toolTab": "Tools",
-      "cameraTab": "Camera",
-      "lightingTab": "Lighting",
-      "sceneTab": "Scene"
+      "toolTab": "Herramientas",
+      "cameraTab": "Cámara",
+      "lightingTab": "Iluminación",
+      "sceneTab": "Escena"
     },
     "scene": {
-      "title": "Scene Collection",
-      "hint": "Every placed object. Click to select, double-click a name to rename.",
-      "none": "No objects placed yet.",
-      "count": "{n} objects",
-      "pinTitle": "Focus the camera on this object and select it",
-      "hideTitle": "Hide this object in the editor (it still exists in the map)",
-      "showTitle": "Show this object again",
-      "hiddenBadge": "hidden",
-      "renameLabel": "Object name",
-      "residentBadge": "resident",
-      "isolateTitle": "Isolate {zone}: unload everything outside this zone (view only)",
-      "zoneStream": "Stream the zones near the camera",
-      "zoneStreamHint": "Keep the {count} zones nearest the camera loaded, and swap the whole set when you fly clear of them.",
-      "zoneStreamAt": "Streaming {zone} ({count} zones). Fly clear of them to load the next set.",
-      "zoneStreamLocked": "Locked on {zone}. Unlock to follow the camera again.",
-      "zoneStreamOn": "Streaming {zone} — {count} zones resident, everything else unloaded.",
-      "streamGuide": "Show the resident perimeter",
-      "streamGuideHint": "Draws light red walls where the loaded zones end, so the edge of what is streamed is visible instead of guessed.",
-      "zoneLockTitle": "Lock this zone loaded: stay here until you unlock, whatever the camera does",
-      "zoneUnlockTitle": "Unlock: follow the camera into the next zone again"
+      "title": "Colección de la escena",
+      "hint": "Todos los objetos colocados. Haz clic para seleccionar y doble clic en un nombre para renombrarlo.",
+      "none": "Aún no se han colocado objetos.",
+      "count": "{n} objetos",
+      "pinTitle": "Centra la cámara en este objeto y selecciónalo",
+      "hideTitle": "Oculta este objeto en el editor (sigue existiendo en el mapa)",
+      "showTitle": "Volver a mostrar este objeto",
+      "hiddenBadge": "oculto",
+      "renameLabel": "Nombre del objeto",
+      "residentBadge": "residente",
+      "isolateTitle": "Aislar {zone}: descargar todo lo que esté fuera de esta zona (solo la vista)",
+      "zoneStream": "Cargar progresivamente zonas cercanas a la cámara",
+      "zoneStreamHint": "Mantén cargadas las {count} zonas más cercanas a la cámara y cambia todo el conjunto cuando vueles fuera de ellas.",
+      "zoneStreamAt": "Cargando progresivamente {zone} ({count} zonas). Vuela fuera de ellas para cargar el siguiente conjunto.",
+      "zoneStreamLocked": "Fijado en {zone}. Desbloquea para volver a seguir la cámara.",
+      "zoneStreamOn": "Carga progresiva de {zone}, {count} zonas residentes y todo lo demás descargado.",
+      "streamGuide": "Mostrar perímetro residente",
+      "streamGuideHint": "Dibuja muros de color rojo claro donde terminan las zonas cargadas para que el límite de la carga progresiva sea visible y no haya que adivinarlo.",
+      "zoneLockTitle": "Fija la carga de esta zona: permanece aquí hasta que la desbloquees, haga lo que haga la cámara",
+      "zoneUnlockTitle": "Desbloquear: volver a seguir la cámara a la siguiente zona"
+    },
+    "push": {
+      "notLinked": "Este mapa no se abrió desde un mapa del repositorio, así que no hay destino para enviar cambios. Abre primero uno desde Abrir, Mapas incluidos.",
+      "baseMissing": "La versión desde la que empezaste ya no está disponible. Vuelve a abrir el mapa del repositorio y repite tus cambios.",
+      "repoMissing": "El mapa del repositorio del que procedía esta copia ya no existe.",
+      "missingIds": "Algunos elementos del mapa del repositorio no tienen identificador o comparten uno, por lo que no se pueden asociar tus cambios con ellos.",
+      "nothing": "No hay nada que enviar: esta copia no tiene cambios desde que la abriste.",
+      "done": "Se han enviado {count} cambios a {slug}. El editor muestra ahora el mapa combinado.",
+      "withUpgrades": "Una de tus ediciones afectaba a un elemento que el editor añadió al abrir el mapa, así que también se guardaron sus mejoras.",
+      "overwriteTitle": "¿Sustituir cambios más recientes del repositorio?",
+      "overwriteBody": "Alguien envió cambios a este mapa del repositorio después de que lo abrieras. Publicar sustituye el archivo entero y los perdería. Usa Enviar cambios al mapa del repositorio para conservarlos.",
+      "conflictsTitle": "Envío rechazado: cambios en conflicto",
+      "conflictsBody": "{count} de tus cambios entran en conflicto con cambios enviados desde que abriste este mapa. No se ha escrito nada. Vuelve a abrir el mapa del repositorio desde Abrir y repite estos cambios:",
+      "conflictRow": "{kind}, {id}: {reason}",
+      "conflictsMore": "Y {count} más.",
+      "reasonBoth": "tú y otra persona lo habéis modificado",
+      "reasonDeleted": "uno lo ha eliminado y el otro lo ha modificado",
+      "reasonOverlap": "tu pincelada de terreno se solapa con una más reciente",
+      "kindPlacement": "Recurso",
+      "kindTerrain": "Pincelada de terreno",
+      "kindGrassClear": "Despeje de hierba",
+      "kindNpc": "PNJ",
+      "kindObjectMove": "Objeto de juego",
+      "kindPaint": "Celdas pintadas",
+      "kindField": "Ajuste del mapa",
+      "kindRoad": "Camino",
+      "kindRoadEdit": "Camino del mundo",
+      "close": "Cerrar"
     },
     "publish": {
-      "failed": "Publish blocked: {error}",
-      "noDevServer": "Publishing writes into the project, so it needs the local dev server (npm run dev).",
-      "rejected": "Publish rejected: {error}",
-      "done": "Published. Boot it at /index.html?map={slug}, commit the generated files to ship.",
-      "removeTitle": "Remove this map from the game?",
-      "removeConfirm": "Deletes the published files for \"{slug}\" (data/maps + src/sim/maps) and restores the standard ClaudeCraft world. Your map in the editor is not touched, and you can publish it again at any time.",
-      "removed": "Removed \"{slug}\" from the game. The standard ClaudeCraft world is back.",
-      "removedNothing": "Nothing to remove: \"{slug}\" was not published to this repo."
+      "failed": "Publicación bloqueada: {error}",
+      "noDevServer": "Publicar escribe en el proyecto, por lo que necesita el servidor de desarrollo local (npm run dev).",
+      "rejected": "Publicación rechazada: {error}",
+      "done": "Publicado. Inícialo en /index.html?map={slug}; para distribuirlo, incluye los archivos generados en un commit.",
+      "removeTitle": "¿Quitar este mapa del juego?",
+      "removeConfirm": "Elimina los archivos publicados de «{slug}» (data/maps + src/sim/maps) y restaura el mundo estándar de ClaudeCraft. Tu mapa del editor no se modifica y puedes publicarlo de nuevo cuando quieras.",
+      "removed": "Se ha quitado «{slug}» del juego. Ha vuelto el mundo estándar de ClaudeCraft.",
+      "removedNothing": "No hay nada que quitar: «{slug}» no estaba publicado en este repositorio."
     },
     "brush": {
       "title": "Pincel",
-      "shape": "Brush shape",
-      "circle": "Circle",
-      "square": "Square",
+      "shape": "Forma del pincel",
+      "circle": "Círculo",
+      "square": "Cuadrado",
       "size": "Tamaño del pincel",
       "strength": "Intensidad",
       "sizeHint": "Teclas: [ y ] cambian el tamaño del pincel; Mayús+[ y Mayús+] cambian la intensidad.",
       "editCount": "Ediciones de terreno: {count} / {max}",
-      "reapplyWater": "Re-apply water",
-      "reapplyWaterTitle": "Rebuild the water from the current terrain. Strokes already refresh the water they touch; use this for anything left over, like a basin dug where the map had no water at all."
+      "reapplyWater": "Volver a aplicar agua",
+      "reapplyWaterTitle": "Reconstruye el agua a partir del terreno actual. Las pinceladas ya actualizan el agua que tocan; usa esto para lo que quede pendiente, como una cuenca excavada donde el mapa no tenía agua."
     },
     "biome": {
       "title": "Bioma",
@@ -10913,330 +12253,330 @@ export const es: EnTranslations = {
       "cave": "Cueva",
       "erase": "Borrar pintura",
       "hint": "Las celdas pintadas anulan el bioma de la zona en la forma y el color del terreno.",
-      "hue": "Hue",
-      "light": "Light/Dark",
-      "saveSwatch": "Save tint as swatch",
-      "saveSwatchTitle": "Keep this hue/light version as its own swatch, so the tint can be reused after the sliders move on",
-      "swatchSaved": "Saved swatch \"{name}\".",
-      "removeSwatch": "Remove swatch",
-      "removeSwatchTitle": "Delete this custom swatch from the map. Terrain painted with it reverts to the base biome look.",
-      "swatchRemoved": "Removed swatch \"{name}\".",
-      "customHint": "Custom swatches color the ground only (terrain shape keeps the zone biome) and save with the map.",
-      "customFull": "Swatch limit reached ({max}).",
-      "textureSlotsFull": "Only {max} textured swatches render per map; extra ones show their flat color. Retire an unused texture to free a slot.",
-      "textureSlots": "Texture slots: {used} / {max} used · {free} free",
-      "textureSlotsTitle": "Each distinct texture on this map uses one of {max} slots. Snow textures ride the terrain snow layer and use none. Removing a texture swatch frees its slot.",
-      "textureSlotsOver": "Over the limit by {over}: the most recently added textures paint as flat color. Remove a texture swatch to free a slot.",
-      "importTexture": "Import texture swatch",
-      "importTextureTitle": "Pick an image file: painting with the new swatch tiles it over the ground (stored in this browser; other machines see its average color)",
-      "builtinGroup": "Texture library",
-      "builtinTitle": "Built-in ground textures that ship with the editor: picking one adds it to this map as a swatch (available on every machine)",
-      "tileSize": "Texture tile size (yd)",
-      "depth": "Surface depth",
-      "variation": "Variation",
-      "variationHint": "Breaks up the repeating grid by sampling the texture a second time through a rotated frame. 0% is the plain tiling and costs nothing; higher values cost one extra texture read wherever this swatch is painted. Surface depth shades the texture's own crevices from its ambient-occlusion map, which stops painted ground reading flat; it is priced the same way.",
-      "importTextureFailed": "Could not read that image.",
-      "autoRetexture": "Auto-Retexture Map",
-      "autoRetextureHint": "One click: repaints the whole map with fitting builtin textures by elevation, slope, water, zone and paths, sand in deserts and on beaches, cliffs on steep faces, varied grass and dirt, cobble in towns and on roads. Fully editable after: repaint anything with the brush.",
-      "autoRetextureDone": "Retextured {count} cells. Repaint any of it with the brush.",
+      "hue": "Matiz",
+      "light": "Claro/oscuro",
+      "saveSwatch": "Guardar tinte como muestra",
+      "saveSwatchTitle": "Conserva esta versión de matiz y luminosidad como una muestra propia para reutilizar el tinte después de mover los controles deslizantes",
+      "swatchSaved": "Se ha guardado la muestra «{name}».",
+      "removeSwatch": "Quitar muestra",
+      "removeSwatchTitle": "Elimina esta muestra personalizada del mapa. El terreno pintado con ella recupera el aspecto del bioma base.",
+      "swatchRemoved": "Se ha quitado la muestra «{name}».",
+      "customHint": "Las muestras personalizadas solo cambian el color del suelo (la forma del terreno conserva el bioma de la zona) y se guardan con el mapa.",
+      "customFull": "Se ha alcanzado el límite de muestras ({max}).",
+      "textureSlotsFull": "Solo se dibujan {max} muestras con textura por mapa; las adicionales muestran su color liso. Retira una textura sin usar para liberar un espacio.",
+      "textureSlots": "Espacios de textura: {used} / {max} usados · {free} libres",
+      "textureSlotsTitle": "Cada textura distinta de este mapa ocupa uno de los {max} espacios. Las texturas de nieve usan la capa de nieve del terreno y no ocupan ninguno. Quitar una muestra de textura libera su espacio.",
+      "textureSlotsOver": "Se supera el límite en {over}: las texturas añadidas más recientemente se pintan como colores lisos. Quita una muestra de textura para liberar un espacio.",
+      "importTexture": "Importar muestra de textura",
+      "importTextureTitle": "Elige un archivo de imagen: al pintar con la nueva muestra, esta se repite sobre el suelo (se guarda en este navegador; otros equipos ven su color medio)",
+      "builtinGroup": "Biblioteca de texturas",
+      "builtinTitle": "Texturas de suelo incluidas con el editor: al elegir una, se añade a este mapa como muestra (disponible en todos los equipos)",
+      "tileSize": "Tamaño de tesela de textura (yardas)",
+      "depth": "Profundidad de la superficie",
+      "variation": "Variación",
+      "variationHint": "Rompe la cuadrícula repetitiva tomando una segunda muestra de la textura con un marco girado. El 0% corresponde al teselado simple y no tiene coste; los valores superiores requieren una lectura de textura adicional donde se pinte esta muestra. La profundidad de superficie sombrea las propias grietas de la textura mediante su mapa de oclusión ambiental para que el suelo pintado no parezca plano; su coste se calcula del mismo modo.",
+      "importTextureFailed": "No se pudo leer esa imagen.",
+      "autoRetexture": "Retexturizar mapa automáticamente",
+      "autoRetextureHint": "Con un clic, repinta todo el mapa con texturas integradas adecuadas a la elevación, la pendiente, el agua, la zona y los caminos: arena en desiertos y playas, roca en laderas escarpadas, hierba y tierra variadas, y adoquines en pueblos y caminos. Después puedes editarlo todo: repinta cualquier zona con el pincel.",
+      "autoRetextureDone": "Se han retexturizado {count} celdas. Puedes repintarlas con el pincel.",
       "clear": "Borrar toda la pintura de bioma",
       "clearConfirm": "¿Quitar de este mapa cada celda de bioma pintada?",
-      "hardness": "Brush hardness",
-      "edgeSoftness": "Edge softness",
-      "edgeDetail": "Edge detail",
-      "edgeHint": "How the boundary between two painted textures looks, across the whole map. A soft brush stores its rim as scattered single cells (one cell can only hold one texture), and the paint grid is a quarter of a yard, so with both of these at 0 a boundary is a hard line with speckle along it, whatever the hardness slider says. Edge softness widens the blend so that scatter reads as the gradual fade it stands for; Edge detail wanders the boundary with fine noise so it interlocks like real ground instead of following the grid. Both are free, no extra texture reads, but a wide softness blurs painted detail narrower than itself.",
-      "bucket": "Fill (replace texture)",
-      "bucketTitle": "Arm the bucket, then click the ground: every cell painted with the clicked texture switches to the selected swatch",
-      "bucketArmedHint": "Bucket armed: click the ground to replace the clicked texture map-wide.",
-      "bucketDone": "Replaced {count} painted cells.",
-      "pickTexture": "Pick the texture to paint",
-      "galleryTitle": "Choose a ground texture",
-      "galleryHint": "Browse every texture, then Lock In the one you want to paint with.",
-      "galleryLockIn": "Lock In",
-      "galleryCurrent": "Current",
-      "groupBiomes": "Biomes",
-      "groupSwatches": "Your swatches",
-      "galleryCount": "{n} textures",
-      "alphaTitle": "Brush alpha",
-      "alphaNone": "None",
-      "alphaImport": "Import alpha",
-      "alphaImportTitle": "Load a grayscale image as a brush mask: white paints, black masks out (kept in this browser)",
-      "alphaImportFailed": "Could not read that image as a brush alpha.",
-      "alphaRemove": "Remove this imported alpha",
-      "autoTitle": "Auto textures",
-      "autoSlopeRock": "Rock on steep slopes",
-      "autoScree": "Rock rubble on cliffs (high graphics)",
-      "autoSnowCaps": "Snow-capped peaks",
-      "autoRim": "Mountains at the map edge",
-      "autoShoreSand": "Sand near the water",
-      "autoAllOff": "Paint only (turn all off)",
-      "autoAllOffTitle": "Switch every automatic rule off so nothing re-textures the ground by slope, height or shoreline. Your paint is then the only thing on it.",
-      "autoHint": "Automatic texturing rules, applied UNDER your paint: while one is on it keeps re-tinting the ground it owns, so a cliff you have painted goes back to rock. Uncheck one to remove it map-wide. New maps start with all of these off."
+      "hardness": "Dureza del pincel",
+      "edgeSoftness": "Suavidad de los bordes",
+      "edgeDetail": "Detalle de los bordes",
+      "edgeHint": "Aspecto del límite entre dos texturas pintadas en todo el mapa. Un pincel suave guarda su contorno como celdas individuales dispersas (cada celda solo admite una textura), y la cuadrícula de pintura mide un cuarto de yarda. Por eso, con ambos valores a 0, el límite será una línea dura con puntos dispersos, independientemente del ajuste de dureza. La suavidad de los bordes ensancha la mezcla para que esa dispersión se vea como el desvanecimiento gradual que representa; el detalle de los bordes desplaza el límite con ruido fino para que las texturas encajen como un suelo real en lugar de seguir la cuadrícula. Ambos ajustes no requieren lecturas adicionales de texturas, pero una suavidad amplia difumina los detalles pintados más estrechos que ella.",
+      "bucket": "Rellenar (sustituir textura)",
+      "bucketTitle": "Activa el cubo y haz clic en el suelo: todas las celdas pintadas con esa textura cambiarán a la muestra seleccionada",
+      "bucketArmedHint": "Cubo activado: haz clic en el suelo para sustituir esa textura en todo el mapa.",
+      "bucketDone": "Se han sustituido {count} celdas pintadas.",
+      "pickTexture": "Elige la textura para pintar",
+      "galleryTitle": "Elige una textura de suelo",
+      "galleryHint": "Explora todas las texturas y luego confirma la que quieras usar para pintar.",
+      "galleryLockIn": "Confirmar",
+      "galleryCurrent": "Actual",
+      "groupBiomes": "Biomas",
+      "groupSwatches": "Tus muestras",
+      "galleryCount": "{n} texturas",
+      "alphaTitle": "Máscara alfa del pincel",
+      "alphaNone": "Ninguna",
+      "alphaImport": "Importar máscara alfa",
+      "alphaImportTitle": "Carga una imagen en escala de grises como máscara del pincel: el blanco pinta y el negro excluye zonas (se guarda en este navegador)",
+      "alphaImportFailed": "No se pudo leer esa imagen como máscara alfa del pincel.",
+      "alphaRemove": "Quitar esta máscara alfa importada",
+      "autoTitle": "Texturas automáticas",
+      "autoSlopeRock": "Roca en pendientes pronunciadas",
+      "autoScree": "Escombros de roca en los acantilados (gráficos altos)",
+      "autoSnowCaps": "Cumbres nevadas",
+      "autoRim": "Montañas en el borde del mapa",
+      "autoShoreSand": "Arena cerca del agua",
+      "autoAllOff": "Solo pintura (desactivar todo)",
+      "autoAllOffTitle": "Desactiva todas las reglas automáticas para que nada vuelva a aplicar texturas al suelo según la pendiente, la altura o la orilla. Así solo quedará tu pintura.",
+      "autoHint": "Las reglas automáticas de texturizado se aplican DEBAJO de tu pintura: mientras una esté activa, seguirá tiñendo el suelo que controla, por lo que un acantilado que hayas pintado volverá a ser roca. Desmarca una regla para quitarla de todo el mapa. Los mapas nuevos empiezan con todas desactivadas."
     },
     "map": {
-      "zoneTitle": "Zone map",
-      "worldTitle": "World map",
-      "showWorld": "Show full world",
-      "showZone": "Show this zone",
-      "usePainted": "Use painted map",
-      "useLiveTerrain": "Use live terrain",
-      "pinHint": "Click the map to place a teleport pin.",
-      "teleportToPin": "Teleport to pin",
-      "close": "Close"
+      "zoneTitle": "Mapa de la zona",
+      "worldTitle": "Mapa del mundo",
+      "showWorld": "Mostrar el mundo completo",
+      "showZone": "Mostrar esta zona",
+      "usePainted": "Usar mapa pintado",
+      "useLiveTerrain": "Usar terreno en vivo",
+      "pinHint": "Haz clic en el mapa para colocar un marcador de teletransporte.",
+      "teleportToPin": "Teletransportarse al marcador",
+      "close": "Cerrar"
     },
     "zoneTool": {
-      "title": "Named Locations",
-      "hint": "Drag a box on the ground, then name it: standing inside shows that name as the location in playtest.",
-      "namePrompt": "Location name",
-      "none": "No named locations yet.",
-      "deleteTitle": "Remove this location",
-      "hideBoxes": "Hide area boxes"
+      "title": "Ubicaciones con nombre",
+      "hint": "Arrastra un rectángulo sobre el suelo y dale un nombre: al situarte dentro, ese nombre se muestra como ubicación en la prueba de juego.",
+      "namePrompt": "Nombre de la ubicación",
+      "none": "Aún no hay ubicaciones con nombre.",
+      "deleteTitle": "Quitar esta ubicación",
+      "hideBoxes": "Ocultar cajas de zonas"
     },
     "objectMove": {
-      "title": "Gameplay Object",
-      "kindFarmBed": "Farm bed",
-      "kindPracticeDummy": "Practice dummy",
-      "kindGatherNode": "Gather node",
-      "kindDungeonDoor": "Dungeon door",
-      "position": "Position: {x}, {z}",
-      "moved": "Moved on this map.",
-      "original": "At its original spot.",
-      "hint": "Drag it, or nudge it with the arrow keys. The move applies to this map only and the object keeps its identity, so saved progress still finds it.",
-      "reset": "Reset to original spot",
-      "edited": "Changed on this map.",
-      "rotation": "Rotation (degrees)",
-      "size": "Size",
-      "resetAll": "Reset to original",
-      "delete": "Delete from this map",
-      "deleteHint": "Deletes it from this map only. Restore it later from the deleted objects list.",
-      "doorDeleteHint": "Deleting a dungeon door removes its overworld entrance from this map.",
-      "dummyDeleteHint": "Hale's practice lessons use these dummies: deleting one leaves its lesson unfinishable on this map.",
-      "doorFixed": "Dungeon doors can be moved or deleted, but not turned or resized.",
-      "deletedTitle": "Deleted Gameplay Objects",
-      "deletedHint": "Deleted from this map. Restore one to bring it back where it stood.",
-      "deletedRow": "{kind}: {name}",
-      "restore": "Restore",
-      "restoredLater": "Restored. It appears in the view after the map reloads."
+      "title": "Objeto de juego",
+      "kindFarmBed": "Bancal de cultivo",
+      "kindPracticeDummy": "Muñeco de práctica",
+      "kindGatherNode": "Nodo de recolección",
+      "kindDungeonDoor": "Puerta de mazmorra",
+      "position": "Posición: {x}, {z}",
+      "moved": "Movido en este mapa.",
+      "original": "En su posición original.",
+      "hint": "Arrástralo o desplázalo ligeramente con las flechas. El movimiento solo se aplica a este mapa y el objeto conserva su identidad, por lo que el progreso guardado sigue encontrándolo.",
+      "reset": "Restablecer posición original",
+      "edited": "Modificado en este mapa.",
+      "rotation": "Rotación (grados)",
+      "size": "Tamaño",
+      "resetAll": "Restablecer original",
+      "delete": "Eliminar de este mapa",
+      "deleteHint": "Lo elimina solo de este mapa. Puedes restaurarlo después desde la lista de objetos eliminados.",
+      "doorDeleteHint": "Eliminar una puerta de mazmorra quita su entrada del mundo exterior de este mapa.",
+      "dummyDeleteHint": "Las lecciones de práctica de Hale usan estos muñecos: eliminar uno impide terminar su lección en este mapa.",
+      "doorFixed": "Las puertas de mazmorra se pueden mover o eliminar, pero no girar ni cambiar de tamaño.",
+      "deletedTitle": "Objetos de juego eliminados",
+      "deletedHint": "Eliminados de este mapa. Restaura uno para devolverlo al lugar donde estaba.",
+      "deletedRow": "{kind}: «{name}»",
+      "restore": "Restaurar",
+      "restoredLater": "Restaurado. Aparecerá en la vista después de recargar el mapa."
     },
     "lightTool": {
-      "title": "Point Lights",
-      "hint": "Click the ground to drop a light. Lights render in the editor and in playtest ({max} max; nearest few shine at once).",
-      "none": "No lights yet.",
-      "color": "Color",
-      "intensity": "Intensity",
-      "range": "Range (yd)",
-      "height": "Height (yd)",
-      "deleteTitle": "Remove this light",
-      "capReached": "Light limit reached ({max}).",
-      "lightN": "Light {num}",
-      "selectTitle": "Select this light in the world (bulb badge enlarges; Delete removes it)"
+      "title": "Luces puntuales",
+      "hint": "Haz clic en el suelo para colocar una luz. Las luces se muestran en el editor y en la prueba de juego (máximo {max}; solo unas pocas cercanas iluminan a la vez).",
+      "none": "Aún no hay luces.",
+      "color": "Color de la luz",
+      "intensity": "Intensidad",
+      "range": "Alcance (yardas)",
+      "height": "Altura (yardas)",
+      "deleteTitle": "Quitar esta luz",
+      "capReached": "Se ha alcanzado el límite de luces ({max}).",
+      "lightN": "Luz {num}",
+      "selectTitle": "Selecciona esta luz en el mundo (el indicador de bombilla aumenta; Supr la elimina)"
     },
     "soundTool": {
-      "title": "Point Sounds",
-      "hint": "Click the ground to drop a looping sound emitter, then pick a clip and set its max volume and radius. The falloff sphere shows how far it carries; it plays spatially in playtest.",
-      "none": "No point sounds yet.",
-      "clip": "Sound effect",
-      "volume": "Max volume",
-      "radius": "Radius (yd)",
-      "height": "Height (yd)",
-      "deleteTitle": "Remove this sound",
-      "capReached": "Point sound limit reached ({max}).",
-      "soundN": "Sound {num}",
-      "selectTitle": "Select this sound in the world (badge enlarges; Delete removes it)"
+      "title": "Sonidos puntuales",
+      "hint": "Haz clic en el suelo para colocar un emisor de sonido en bucle; luego elige un clip y fija su volumen máximo y radio. La esfera de atenuación muestra hasta dónde llega; se reproduce espacialmente en la prueba de juego.",
+      "none": "Aún no hay sonidos puntuales.",
+      "clip": "Efecto de sonido",
+      "volume": "Volumen máximo",
+      "radius": "Radio (yardas)",
+      "height": "Altura (yardas)",
+      "deleteTitle": "Quitar este sonido",
+      "capReached": "Se ha alcanzado el límite de sonidos puntuales ({max}).",
+      "soundN": "Sonido {num}",
+      "selectTitle": "Selecciona este sonido en el mundo (su indicador aumenta; Supr lo elimina)"
     },
     "decalTool": {
-      "title": "Decals",
-      "hint": "Pick a decal, then click the ground to stamp it. Stamps drape over the terrain and only load when the camera is near, so a map can carry plenty. Click a stamp to select it; Delete removes it.",
-      "none": "No decals stamped yet.",
-      "library": "Decal library",
-      "libraryTitle": "Built-in decals that ship with the editor (original CC0 art). Pick one, then click the ground to stamp it.",
-      "importDecal": "Import decal image",
-      "importTitle": "Pick a PNG/WebP with transparency: it becomes a stampable decal (stored in this browser, and packed into map bundles)",
-      "imported": "Imported",
-      "importFailed": "Could not read that image.",
-      "importedDecal": "Imported \"{name}\".",
-      "size": "Size (yd)",
-      "rotation": "Rotation",
-      "aspect": "Stretch",
-      "opacity": "Opacity",
-      "glow": "Glow",
-      "tint": "Tint",
-      "sortOrder": "Draw over",
-      "randomRotate": "Random rotation per stamp",
-      "stamped": "Stamped \"{name}\".",
-      "removed": "Removed decal.",
-      "capReached": "Decal limit reached ({max}).",
-      "decalN": "Decal {num}",
-      "deleteTitle": "Remove this decal",
-      "selectTitle": "Select this decal in the world (Delete removes it)",
-      "pickFirst": "Pick a decal from the library first.",
-      "catArcane": "Arcane",
-      "catBurn": "Burns",
-      "catDamage": "Damage",
-      "catGore": "Gore",
-      "catNature": "Nature",
-      "catTracks": "Tracks",
-      "catMarker": "Markers"
+      "title": "Calcomanías",
+      "hint": "Elige una calcomanía y haz clic en el suelo para estamparla. Las estampas se adaptan al terreno y solo se cargan cuando la cámara está cerca, así que un mapa puede contener muchas. Haz clic en una estampa para seleccionarla; Supr la elimina.",
+      "none": "Aún no se han estampado calcomanías.",
+      "library": "Biblioteca de calcomanías",
+      "libraryTitle": "Calcomanías integradas que se incluyen con el editor (arte original CC0). Elige una y luego haz clic en el suelo para estamparla.",
+      "importDecal": "Importar imagen de calcomanía",
+      "importTitle": "Elige un PNG/WebP con transparencia: se convierte en una calcomanía que puedes estampar (se guarda en este navegador y se incluye en los paquetes de mapas)",
+      "imported": "Importado",
+      "importFailed": "No se pudo leer esa imagen.",
+      "importedDecal": "Se importó \"{name}\".",
+      "size": "Tamaño (yardas)",
+      "rotation": "Rotación",
+      "aspect": "Estirar",
+      "opacity": "Opacidad",
+      "glow": "Resplandor",
+      "tint": "Tinte",
+      "sortOrder": "Dibujar encima",
+      "randomRotate": "Rotación aleatoria en cada estampa",
+      "stamped": "Se ha estampado «{name}».",
+      "removed": "Calcomanía eliminada.",
+      "capReached": "Se ha alcanzado el límite de calcomanías ({max}).",
+      "decalN": "Calcomanía {num}",
+      "deleteTitle": "Quitar esta calcomanía",
+      "selectTitle": "Selecciona esta calcomanía en el mundo (Supr la elimina)",
+      "pickFirst": "Elige primero una calcomanía de la biblioteca.",
+      "catArcane": "Arcano",
+      "catBurn": "Quemaduras",
+      "catDamage": "Daño",
+      "catGore": "Sangre y vísceras",
+      "catNature": "Naturaleza",
+      "catTracks": "Huellas",
+      "catMarker": "Marcadores"
     },
     "markerTool": {
-      "title": "AI Markers",
-      "hint": "Editor-only notes for AI quest/event generation (\"quest giver here\", \"chest here\"). Never shown in playtest.",
-      "place": "Place markers instead of moving the spawn",
-      "kind": "Marker type",
-      "npc": "NPC",
-      "object": "Interactable object",
-      "none": "No markers yet.",
-      "defaultName": "{kind} {num}",
-      "deleteTitle": "Remove this marker",
-      "capReached": "Marker limit reached ({max})."
+      "title": "Marcadores de IA",
+      "hint": "Notas exclusivas del editor para generar misiones y eventos mediante IA («personaje que da misiones aquí», «cofre aquí»). Nunca se muestran en la prueba de juego.",
+      "place": "Coloca marcadores en lugar de mover el punto de aparición",
+      "kind": "Tipo de marcador",
+      "npc": "PNJ",
+      "object": "Objeto interactivo",
+      "none": "Aún no hay marcadores.",
+      "defaultName": "{kind} n.º {num}",
+      "deleteTitle": "Quitar este marcador",
+      "capReached": "Se ha alcanzado el límite de marcadores ({max})."
     },
     "appearance": {
-      "title": "Appearance (shader)",
-      "tint": "Tint color",
-      "opacity": "Opacity",
-      "glow": "Glow color",
-      "glowStrength": "Glow strength",
-      "fire": "Fire effect (animated flame)",
-      "reset": "Reset appearance",
-      "hint": "Renders the same in playtest: tint recolors, opacity fades (ghosts), glow adds emissive light."
+      "title": "Apariencia (sombreador)",
+      "tint": "Color del tinte",
+      "opacity": "Opacidad",
+      "glow": "Color del resplandor",
+      "glowStrength": "Intensidad del resplandor",
+      "fire": "Efecto de fuego (llama animada)",
+      "reset": "Restablecer apariencia",
+      "hint": "Se ve igual en la prueba de juego: el tinte cambia el color, la opacidad permite transparencias y el resplandor añade luz emisiva."
     },
     "fire": {
-      "title": "Asset fire effects",
-      "hint": "Add independent procedural fire sources, select one, then use the Move gizmo in the viewport to place it precisely on the model.",
-      "legacy": "Legacy single flame",
-      "customize": "Open full controls",
-      "add": "+ Add fire emitter",
-      "removeAll": "Remove all fire",
-      "emitter": "Fire {count}",
-      "preset": "Effect preset",
-      "enabled": "Emitter enabled",
-      "anchor": "Attach to",
-      "anchorBase": "Model base",
-      "anchorCenter": "Model center",
-      "anchorTop": "Model top",
-      "position": "Position",
-      "positionX": "Local X (yd)",
-      "positionY": "Local Y (yd)",
-      "positionZ": "Local Z (yd)",
-      "flameShape": "Flame shape",
-      "scale": "Overall scale",
-      "width": "Flame width",
-      "height": "Flame height",
-      "layers": "Flame layers",
-      "intensity": "Shader intensity",
-      "opacity": "Flame opacity",
-      "light": "Glow light",
-      "glow": "Glow intensity",
-      "glowRange": "Glow radius (yd)",
-      "smoke": "Smoke",
-      "smokeAmount": "Smoke amount",
-      "smokeScale": "Smoke scale",
-      "smokeRise": "Smoke rise",
-      "colorMotion": "Color & motion",
-      "hue": "Fire hue",
-      "saturation": "Saturation",
-      "speed": "Animation speed",
-      "turbulence": "Turbulence",
-      "flicker": "Flicker",
-      "embers": "Flying embers",
-      "blend": "Blend mode",
-      "blendAdditive": "Additive glow",
-      "blendAlpha": "Natural alpha",
-      "duplicate": "Duplicate emitter",
-      "remove": "Remove emitter",
+      "title": "Efectos de fuego del recurso",
+      "hint": "Añade fuentes independientes de fuego procedimental, selecciona una y usa el manipulador Mover de la vista para colocarla con precisión en el modelo.",
+      "legacy": "Llama única antigua",
+      "customize": "Abrir todos los controles",
+      "add": "+ Añadir emisor de fuego",
+      "removeAll": "Quitar todo el fuego",
+      "emitter": "Fuego {count}",
+      "preset": "Preajuste de efecto",
+      "enabled": "Emisor activado",
+      "anchor": "Vincular a",
+      "anchorBase": "Base del modelo",
+      "anchorCenter": "Centro del modelo",
+      "anchorTop": "Parte superior del modelo",
+      "position": "Posición",
+      "positionX": "X local (yardas)",
+      "positionY": "Y local (yardas)",
+      "positionZ": "Z local (yardas)",
+      "flameShape": "Forma de la llama",
+      "scale": "Escala general",
+      "width": "Anchura de la llama",
+      "height": "Altura de la llama",
+      "layers": "Capas de llama",
+      "intensity": "Intensidad del sombreador",
+      "opacity": "Opacidad de la llama",
+      "light": "Luz de resplandor",
+      "glow": "Intensidad del resplandor",
+      "glowRange": "Radio del resplandor (yardas)",
+      "smoke": "Humo",
+      "smokeAmount": "Cantidad de humo",
+      "smokeScale": "Escala del humo",
+      "smokeRise": "Ascenso del humo",
+      "colorMotion": "Color y movimiento",
+      "hue": "Matiz del fuego",
+      "saturation": "Saturación",
+      "speed": "Velocidad de animación",
+      "turbulence": "Turbulencia",
+      "flicker": "Parpadeo",
+      "embers": "Ascuas voladoras",
+      "blend": "Modo de mezcla",
+      "blendAdditive": "Resplandor aditivo",
+      "blendAlpha": "Alfa natural",
+      "duplicate": "Duplicar emisor",
+      "remove": "Quitar emisor",
       "style": {
-        "torch": "Torch",
-        "bonfire": "Bonfire",
-        "wildfire": "Wildfire",
-        "soulfire": "Soul fire",
-        "embers": "Ember bed"
+        "torch": "Antorcha",
+        "bonfire": "Hoguera",
+        "wildfire": "Incendio",
+        "soulfire": "Fuego de almas",
+        "embers": "Lecho de brasas"
       }
     },
     "sculpt": {
-      "hint": "Drag to raise the ground; tick the box to carve downward instead.",
-      "shapeTitle": "Brush Shape",
-      "hardness": "Brush hardness",
-      "alphaTitle": "Sculpt alpha",
-      "alphaNone": "Round",
-      "alphaHint": "Alphas shape the actual terrain surface and stay identical in editor and playtest.",
-      "lower": "Lower instead of raise",
-      "grab": "Grab / pull (snake hook)",
-      "grabHint": "Press to grab the ground under the brush, then drag and the terrain follows your cursor in any direction - up lifts it, down shoves it in, sideways slides it across the map, like pulling clay. One grab is one undo step. Brush size sets how wide a chunk you pull.",
-      "shiftHint": "Hold Shift while dragging to do the opposite (raise becomes lower, and back).",
-      "autoTex": "Auto texture by angle",
-      "autoTexHint": "Each stroke repaints the sculpted area by ground angle: one texture below the threshold, another above it (instant cliffs).",
-      "autoTexAngle": "Steep from (degrees)",
-      "autoTexFlat": "Flat ground texture",
-      "autoTexSteep": "Steep ground texture",
-      "autoTexNone": "Leave as is"
+      "hint": "Arrastra para elevar el suelo; marca la casilla para excavar hacia abajo.",
+      "shapeTitle": "Forma del pincel",
+      "hardness": "Dureza del pincel",
+      "alphaTitle": "Máscara alfa de escultura",
+      "alphaNone": "Redondas",
+      "alphaHint": "Las máscaras alfa dan forma a la superficie real del terreno y se mantienen idénticas en el editor y en la prueba de juego.",
+      "lower": "Bajar en vez de elevar",
+      "grab": "Agarrar o tirar (gancho de serpiente)",
+      "grabHint": "Pulsa para agarrar el suelo bajo el pincel, luego arrastra y el terreno seguirá el cursor en cualquier dirección: hacia arriba lo eleva, hacia abajo lo hunde y hacia los lados lo desliza por el mapa, como si tiraras de arcilla. Cada agarre es un paso de deshacer. El tamaño del pincel fija la anchura del bloque que arrastras.",
+      "shiftHint": "Mantén Mayús al arrastrar para hacer lo contrario (elevar pasa a rebajar y viceversa).",
+      "autoTex": "Texturizado automático por ángulo",
+      "autoTexHint": "Cada pincelada vuelve a pintar la zona esculpida según el ángulo del suelo: una textura por debajo del umbral y otra por encima (acantilados instantáneos).",
+      "autoTexAngle": "Pendiente pronunciada desde (grados)",
+      "autoTexFlat": "Textura de suelo llano",
+      "autoTexSteep": "Textura de suelo escarpado",
+      "autoTexNone": "Dejar como está"
     },
     "materials": {
-      "title": "Materials",
-      "hint": "Pick a texture for each part of this model. Textures tile in world space, ignore the model UVs, and save with the map.",
-      "loading": "The model is still loading. Select it again in a moment to edit its materials.",
-      "original": "Original",
-      "texture": "Texture",
-      "tile": "Texture scale (yards per tile)",
-      "color": "Tint",
-      "reset": "Restore original"
+      "title": "Materiales",
+      "hint": "Elige una textura para cada parte de este modelo. Las texturas se repiten en el espacio del mundo, ignoran las coordenadas UV del modelo y se guardan con el mapa.",
+      "loading": "El modelo sigue cargando. Vuelve a seleccionarlo en un momento para editar sus materiales.",
+      "original": "Versión original",
+      "texture": "Textura",
+      "tile": "Escala de textura (yardas por tesela)",
+      "color": "Tinte",
+      "reset": "Restaurar original"
     },
     "flatten": {
       "style": {
-        "smooth": "Smooth",
-        "sharpen": "Sharpen",
-        "noise": "Noise",
-        "terrace": "Terrace"
+        "smooth": "Suavizar",
+        "sharpen": "Agudizar",
+        "noise": "Ruido",
+        "terrace": "Crear terrazas"
       },
       "styleHint": {
-        "smooth": "Averages the ground under the brush - repeated passes melt bumps away.",
-        "sharpen": "The inverse of Smooth: ridges crest harder and gullies bite deeper with each pass.",
-        "noise": "Paints natural undulation across the whole brush: layered swells and dips with finer detail on top. One stroke keeps one pattern, so dragging builds rolling ground; stroke again to layer new detail.",
-        "terrace": "Pulls slopes into stepped ledges. Brush strength sets the step height."
+        "smooth": "Promedia el suelo bajo el pincel; las pasadas repetidas hacen desaparecer los bultos.",
+        "sharpen": "Lo contrario de Suavizar: las crestas se afilan y los barrancos se ahondan con cada pasada.",
+        "noise": "Pinta ondulaciones naturales en todo el pincel: elevaciones y depresiones en capas con detalles más finos encima. Una pincelada mantiene un patrón, así que arrastrar crea terreno ondulado; vuelve a pintar para superponer detalles nuevos.",
+        "terrace": "Convierte las pendientes en salientes escalonados. La intensidad del pincel fija la altura de los escalones."
       },
-      "noiseSize": "Bump size (yards)",
-      "noiseRough": "Roughness",
-      "noiseHint": "Small bumps with high roughness read as rocky, broken ground; big bumps with low roughness roll like meadow hills. Brush strength sets how tall they stand.",
+      "noiseSize": "Tamaño de relieve (yardas)",
+      "noiseRough": "Rugosidad",
+      "noiseHint": "Los bultos pequeños con mucha rugosidad parecen terreno rocoso y quebrado; los bultos grandes con poca rugosidad forman colinas de pradera. La intensidad del pincel fija su altura.",
       "hint": "Aplanar nivela el suelo a la altura bajo el cursor cuando empieza el arrastre.",
       "hardEdge": "Borde duro",
-      "smoothMode": "Smooth instead of flatten",
-      "shiftHint": "Hold Shift while dragging to swap flatten and smooth for that stroke.",
-      "levelTitle": "Level height (yards)",
-      "levelPlaceholder": "Drag start",
-      "levelClear": "Clear",
-      "levelHint": "Every drag levels the ground to this height. Right-click the ground to pick another.",
-      "levelHintNone": "Right-click the ground to lock its height, then drag anywhere to level to it. Empty: each drag levels to where it starts.",
-      "levelPicked": "Level locked at {height} yards."
+      "smoothMode": "Suavizar en vez de aplanar",
+      "shiftHint": "Mantén Mayús al arrastrar para intercambiar aplanado y suavizado durante esa pincelada.",
+      "levelTitle": "Altura de nivelación (yardas)",
+      "levelPlaceholder": "Inicio del arrastre",
+      "levelClear": "Despejar",
+      "levelHint": "Cada arrastre nivela el suelo a esta altura. Haz clic derecho en el suelo para elegir otra.",
+      "levelHintNone": "Haz clic derecho en el suelo para fijar su altura y luego arrastra en cualquier lugar para nivelarlo a ella. Si está vacío, cada arrastre nivela a la altura donde empieza.",
+      "levelPicked": "Nivel fijado a {height} yardas."
     },
     "slope": {
-      "hint": "Right-click the ground where the slope should start. Then press where it should end and drag along the path: the ground eases into a smooth ramp between the two heights.",
-      "start": "Start height: {height} yards",
-      "noStart": "No start set yet. Right-click the ground to set one.",
-      "clearStart": "Clear start",
-      "needStart": "Right-click the ground first to set where the slope starts.",
-      "startPicked": "Slope start set at {height} yards."
+      "hint": "Haz clic derecho en el suelo donde deba empezar la pendiente. Luego pulsa donde deba terminar y arrastra por el recorrido: el suelo forma una rampa suave entre las dos alturas.",
+      "start": "Altura inicial: {height} yardas",
+      "noStart": "Aún no se ha fijado el inicio. Haz clic derecho en el suelo para fijarlo.",
+      "clearStart": "Borrar inicio",
+      "needStart": "Haz clic derecho primero en el suelo para fijar dónde empieza la pendiente.",
+      "startPicked": "Inicio de pendiente fijado a {height} yardas."
     },
     "pond": {
-      "title": "Create a pond",
-      "add": "Add pond",
-      "radius": "Pond radius",
-      "depth": "Pond depth",
-      "hint": "Click the ground to dig a round pond and fill it with water. The circle includes the softly sloping bank. Undo removes the water and basin together.",
-      "invalid": "Cannot dig a pond on this ground. Choose another spot."
+      "title": "Crear un estanque",
+      "add": "Añadir estanque",
+      "radius": "Radio del estanque",
+      "depth": "Profundidad del estanque",
+      "hint": "Haz clic en el suelo para excavar un estanque redondo y llenarlo de agua. El círculo incluye la orilla de pendiente suave. Deshacer quita el agua y la cuenca a la vez.",
+      "invalid": "No se puede excavar un estanque en este terreno. Elige otro lugar."
     },
     "water": {
       "title": "Nivel del Agua",
       "level": "Nivel del agua",
       "hint": "Fija la altura de la superficie del agua para el mapa entero, de {min} a {max} yardas.",
       "reset": "Restablecer al nivel integrado",
-      "tintTitle": "Water tint",
-      "hue": "Hue",
-      "light": "Lightness",
-      "tintReset": "Reset tint",
-      "waterfallTitle": "Waterfalls",
-      "placeWaterfall": "Place waterfall",
-      "placeWaterfallTitle": "Arm the Place tool with an animated waterfall (click a cliff to drop it)",
-      "waterfallLabel": "Waterfall",
-      "waterfallHint": "An animated falling-water sheet with a foam pool. Scale it up a cliff with S or the gizmo; stretch just the height with the Y scale handle."
+      "tintTitle": "Tinte del agua",
+      "hue": "Matiz",
+      "light": "Luminosidad",
+      "tintReset": "Restablecer tinte",
+      "waterfallTitle": "Cascadas",
+      "placeWaterfall": "Colocar cascada",
+      "placeWaterfallTitle": "Prepara la herramienta Colocar con una cascada animada (haz clic en un acantilado para colocarla)",
+      "waterfallLabel": "Cascada",
+      "waterfallHint": "Una lámina de agua en caída animada con una poza de espuma. Escálala por un acantilado con S o el manipulador; estira solo su altura con el tirador de escala Y."
     },
     "place": {
       "title": "Colocar Elemento",
@@ -11248,100 +12588,100 @@ export const es: EnTranslations = {
       "none": "Elige un elemento del explorador de abajo y luego haz clic en el suelo para colocarlo."
     },
     "collider": {
-      "title": "Collision Volumes",
-      "hint": "Pick a shape, then click the ground to drop it. Use Move, Rotate, and Scale (or the sliders below) to shape it.",
-      "shapeLabel": "Collider shape",
-      "box": "Box collider",
-      "sphere": "Sphere collider",
-      "plane": "Floor plane",
-      "wall": "Wall plane",
-      "width": "Width",
-      "height": "Height",
-      "depth": "Depth",
-      "diameter": "Diameter",
-      "floorOffset": "Floor height offset",
-      "sizeHint": "Dimensions are yards at scale 1; the Scale tool multiplies them.",
-      "playtestNote": "Volumes show green in the editor and are invisible in playtest: boxes and spheres block movement, floor planes raise the walkable ground.",
-      "hideVolumes": "Hide collision volumes",
-      "hideVolumesHint": "Hides the green volume overlays in the viewport (they still block in playtest)."
+      "title": "Volúmenes de colisión",
+      "hint": "Elige una forma y haz clic en el suelo para colocarla. Usa Mover, Girar y Escalar (o los controles deslizantes inferiores) para darle forma.",
+      "shapeLabel": "Forma del volumen de colisión",
+      "box": "Volumen de colisión cúbico",
+      "sphere": "Volumen de colisión esférico",
+      "plane": "Plano de suelo",
+      "wall": "Plano de pared",
+      "width": "Anchura",
+      "height": "Altura",
+      "depth": "Profundidad",
+      "diameter": "Diámetro",
+      "floorOffset": "Desplazamiento de altura del suelo",
+      "sizeHint": "Las dimensiones se expresan en yardas con escala 1; la herramienta Escalar las multiplica.",
+      "playtestNote": "Los volúmenes se ven verdes en el editor y son invisibles en la prueba de juego: las cajas y esferas bloquean el movimiento; los planos de suelo elevan el terreno transitable.",
+      "hideVolumes": "Ocultar volúmenes de colisión",
+      "hideVolumesHint": "Oculta las superposiciones verdes de los volúmenes en la vista (siguen bloqueando en la prueba de juego)."
     },
     "foliageTool": {
-      "title": "Foliage Brush",
-      "hint": "Drag across the ground to scatter the enabled foliage inside the brush; each stroke is one undo step. Use Erase to remove pieces.",
-      "ambientTitle": "Existing map foliage",
-      "ambientHint": "Built-in trees and rocks are procedural and cannot be selected. Point the camera at an area, then convert this zone (recommended), the nearest batch, or the whole map.",
-      "makeZoneEditable": "Make THIS zone editable",
-      "makeZoneEditableHint": "Converts every tree and rock in the zone the camera is over into editable placements, the performance-safe way to edit a far area, one region at a time.",
-      "makeAmbientEditable": "Make nearby foliage editable",
-      "makeAllAmbientEditable": "Make ALL foliage editable",
-      "ambientAllHint": "Converting the whole map turns thousands of trees and rocks into individual placements, which uses more memory than the zone or batch options.",
-      "ambientEditableHint": "Ambient foliage is off. Every foliage piece painted with this brush can be selected, moved, rotated, scaled, or erased.",
-      "ambientConverted": "Made the {count} nearest foliage pieces editable.",
-      "ambientConvertedAll": "All ambient foliage ({count} pieces) is now editable.",
-      "ambientPartial": "Converted {count} pieces; raise the limit or convert again for the rest.",
-      "density": "Density",
-      "minScale": "Min size",
-      "maxScale": "Max size",
-      "grass": "Grass (animated)",
-      "grassHue": "Grass hue",
-      "grassLight": "Grass lightness",
-      "grassClump": "Clump size (strands)",
-      "grassPreview": "The color new grass will paint with",
-      "ferns": "Ferns and mushrooms",
-      "bushes": "Bushes",
-      "trees": "Trees",
-      "rocks": "Rocks",
-      "collide": "New foliage blocks movement",
-      "noneSelected": "Enable at least one foliage group to paint.",
-      "customTitle": "Custom brush asset",
-      "customHint": "Scatter your own asset instead of the built-in sets. Pick any model from the browser below, then brush as usual.",
-      "customPick": "Pick from asset browser",
-      "customChosen": "Brushing: {name}",
-      "customClear": "Back to built-in foliage",
-      "customNeedsPick": "Open the asset browser and pick an asset for the custom brush first."
+      "title": "Pincel de vegetación",
+      "hint": "Arrastra por el suelo para esparcir la vegetación activada dentro del pincel; cada pincelada es un paso de deshacer. Usa Borrar para quitar piezas.",
+      "ambientTitle": "Vegetación existente del mapa",
+      "ambientHint": "Los árboles y rocas integrados son procedimentales y no se pueden seleccionar. Apunta la cámara a una zona y convierte esta zona (recomendado), el lote más cercano o todo el mapa.",
+      "makeZoneEditable": "Permitir editar ESTA zona",
+      "makeZoneEditableHint": "Convierte cada árbol y roca de la zona situada bajo la cámara en elementos colocados editables; permite editar una zona lejana sin sobrecargar el rendimiento, una región cada vez.",
+      "makeAmbientEditable": "Permitir editar la vegetación cercana",
+      "makeAllAmbientEditable": "Permitir editar TODA la vegetación",
+      "ambientAllHint": "Convertir todo el mapa transforma miles de árboles y rocas en elementos colocados individuales, lo que consume más memoria que las opciones de zona o lote.",
+      "ambientEditableHint": "La vegetación ambiental está desactivada. Cada pieza de vegetación pintada con este pincel se puede seleccionar, mover, girar, escalar o borrar.",
+      "ambientConverted": "Ahora se pueden editar las {count} piezas de vegetación más cercanas.",
+      "ambientConvertedAll": "Ahora se puede editar toda la vegetación ambiental ({count} piezas).",
+      "ambientPartial": "Se han convertido {count} piezas; aumenta el límite o vuelve a convertir para incluir el resto.",
+      "density": "Densidad",
+      "minScale": "Tamaño mínimo",
+      "maxScale": "Tamaño máximo",
+      "grass": "Hierba (animada)",
+      "grassHue": "Matiz de la hierba",
+      "grassLight": "Luminosidad de la hierba",
+      "grassClump": "Tamaño de mata (briznas)",
+      "grassPreview": "El color con el que se pintará la hierba nueva",
+      "ferns": "Helechos y setas",
+      "bushes": "Arbustos",
+      "trees": "Árboles",
+      "rocks": "Rocas",
+      "collide": "La vegetación nueva bloquea el movimiento",
+      "noneSelected": "Activa al menos un grupo de vegetación para pintar.",
+      "customTitle": "Recurso personalizado del pincel",
+      "customHint": "Esparce tu propio recurso en lugar de los conjuntos integrados. Elige cualquier modelo del explorador inferior y usa el pincel como de costumbre.",
+      "customPick": "Elegir del explorador de recursos",
+      "customChosen": "Pintando con pincel: {name}",
+      "customClear": "Volver a la vegetación integrada",
+      "customNeedsPick": "Abre el explorador de recursos y elige primero un recurso para el pincel personalizado."
     },
     "meshFixTool": {
-      "title": "Mesh Fix",
-      "hint": "Wireframe is on while this tool is active. Drag over the stretched terrain polys draped across a cave mouth (from outside or from inside the cave) to REMOVE them; every poly centred under the brush stops drawing. Draw-only: the ground you walk on is unchanged. One undo step per stroke.",
-      "restore": "Restore mode (bring removed polys back under the brush)",
-      "nudgeHint": "To MOVE a stretched poly instead of removing it, use Raise or Lower with a very small brush on its vertices.",
-      "count": "{n} removed spots",
-      "clear": "Restore everything",
-      "capReached": "Mesh Fix is full ({max} spots). Restore some before removing more.",
-      "miss": "Aim at the terrain mesh: nothing was under the cursor.",
-      "vertexMode": "Vertices mode (select and move single vertices)",
-      "vertexHint": "Every terrain vertex near the cursor shows as a small square; selected ones turn yellow. Click one to select it, drag a box to take several, Shift+click or Shift+drag to add, Ctrl/Cmd+click to toggle, Alt+click to drop. Then DRAG a selected vertex to move it up or down. Draw-only: the ground you walk on is unchanged.",
-      "vertexCount": "{sel} selected, {n} vertices moved",
-      "vertexReset": "Reset selected vertices",
-      "vertexClearSel": "Clear selection",
-      "vertexClearAll": "Reset every moved vertex"
+      "title": "Corrección de malla",
+      "hint": "La estructura de alambre está activada mientras esta herramienta está en uso. Arrastra sobre los polígonos de terreno estirados que cubren una entrada de cueva (desde fuera o desde dentro) para ELIMINARLOS; cada polígono cuyo centro quede bajo el pincel deja de dibujarse. Solo afecta al dibujo: el suelo por el que caminas no cambia. Un paso de deshacer por pincelada.",
+      "restore": "Modo de restauración (recupera los polígonos eliminados bajo el pincel)",
+      "nudgeHint": "Para MOVER un polígono estirado en lugar de eliminarlo, usa Elevar o Rebajar con un pincel muy pequeño sobre sus vértices.",
+      "count": "{n} puntos eliminados",
+      "clear": "Restaurar todo",
+      "capReached": "Corrección de malla está llena ({max} puntos). Restaura algunos antes de quitar más.",
+      "miss": "Apunta a la malla del terreno: no había nada bajo el cursor.",
+      "vertexMode": "Modo Vértices (seleccionar y mover vértices individuales)",
+      "vertexHint": "Cada vértice del terreno cercano al cursor aparece como un cuadradito; los seleccionados se vuelven amarillos. Haz clic en uno para seleccionarlo, arrastra un rectángulo para abarcar varios, usa Mayús+clic o Mayús+arrastrar para añadir, Ctrl/Cmd+clic para alternar y Alt+clic para quitar. Luego ARRASTRA un vértice seleccionado para subirlo o bajarlo. Solo afecta al dibujo: el suelo por el que caminas no cambia.",
+      "vertexCount": "{sel} seleccionados, {n} vértices movidos",
+      "vertexReset": "Restablecer vértices seleccionados",
+      "vertexClearSel": "Borrar selección",
+      "vertexClearAll": "Restablecer todos los vértices movidos"
     },
     "clutterTool": {
-      "title": "Clutter Brush",
-      "hint": "Drag across the ground to scatter the enabled clutter inside the brush; each stroke is one undo step. Pieces never block movement.",
-      "tierNote": "Clutter shows in game on High graphics and up; lower tiers skip it at no cost.",
-      "erase": "Erase mode (lift painted clutter under the brush)",
-      "density": "Density",
-      "minScale": "Min size",
-      "maxScale": "Max size",
-      "clumps": "Clumps (0 = even spread)",
-      "kindsTitle": "Clutter kinds",
+      "title": "Pincel de detalles dispersos",
+      "hint": "Arrastra por el suelo para esparcir los tipos de detalles dispersos activados dentro del pincel; cada pincelada es un paso de deshacer. Las piezas nunca bloquean el movimiento.",
+      "tierNote": "Los detalles dispersos se muestran en el juego con calidad gráfica Alta o superior; las calidades inferiores los omiten sin coste.",
+      "erase": "Modo de borrado (quita los detalles dispersos pintados bajo el pincel)",
+      "density": "Densidad",
+      "minScale": "Tamaño mínimo",
+      "maxScale": "Tamaño máximo",
+      "clumps": "Agrupación (0 = distribución uniforme)",
+      "kindsTitle": "Tipos de detalles dispersos",
       "kinds": {
-        "tile_broken": "Cracked paving slabs",
-        "tile_shards": "Tile shards",
-        "pebbles": "Pebbles",
-        "stones": "Loose stones",
-        "letter": "Dropped letters",
-        "paper_scraps": "Crumpled paper",
-        "leaves": "Fallen leaves",
-        "straw": "Straw",
-        "splinters": "Wood splinters",
-        "pot_shards": "Broken pottery"
+        "tile_broken": "Losas agrietadas",
+        "tile_shards": "Fragmentos de baldosa",
+        "pebbles": "Guijarros",
+        "stones": "Piedras sueltas",
+        "letter": "Cartas caídas",
+        "paper_scraps": "Papel arrugado",
+        "leaves": "Hojas caídas",
+        "straw": "Paja",
+        "splinters": "Astillas de madera",
+        "pot_shards": "Cerámica rota"
       },
-      "noneSelected": "Enable at least one clutter kind to paint.",
-      "count": "{count} clutter stamps painted",
-      "clearAll": "Remove all painted clutter",
-      "capReached": "Clutter limit reached ({max} stamps); erase some to paint more."
+      "noneSelected": "Activa al menos un tipo de detalle disperso para pintar.",
+      "count": "{count} estampas de detalles dispersos pintadas",
+      "clearAll": "Quitar todos los detalles dispersos pintados",
+      "capReached": "Se ha alcanzado el límite de detalles dispersos ({max} estampas); borra algunos para pintar más."
     },
     "blockerTool": {
       "title": "Muro de Bloqueo",
@@ -11350,7 +12690,7 @@ export const es: EnTranslations = {
     },
     "camp": {
       "title": "Campamento de Criaturas",
-      "chooseMob": "Choose a mob model",
+      "chooseMob": "Elige un modelo de criatura",
       "mob": "Criatura",
       "count": "Cantidad",
       "radius": "Radio",
@@ -11359,139 +12699,139 @@ export const es: EnTranslations = {
       "playtestNote": "Las criaturas solo aparecen en la prueba de juego, nunca en la vista del editor.",
       "selected": "Campamento: {mob}",
       "none": "Ningún campamento seleccionado.",
-      "catalogMeta": "{family} | Level {min}-{max}",
-      "statFamily": "Family: {value}",
-      "statAggro": "Aggro: {value} yd",
-      "statScale": "Scale: {value}",
-      "overrideLevels": "Override template levels",
-      "levelMin": "Minimum level",
-      "levelMax": "Maximum level",
-      "aiNotesPlaceholder": "Describe behavior, patrol logic, encounter pacing, or dialogue cues for the AI.",
-      "questNotesPlaceholder": "Explain how this camp should support objectives, rewards, or quest progression.",
-      "tagElite": "Elite",
-      "tagRare": "Rare",
-      "tagBoss": "Boss",
-      "tagCaster": "Caster",
-      "tagSupport": "Support",
-      "tagSummoner": "Summoner",
-      "tagEnrage": "Berserk",
-      "tagSwimmer": "Swimmer",
-      "tagStationary": "Fixed"
+      "catalogMeta": "{family} | Nivel {min}-{max}",
+      "statFamily": "Familia: {value}",
+      "statAggro": "Agresión: {value} yardas",
+      "statScale": "Escala: {value}",
+      "overrideLevels": "Sustituir niveles de la plantilla",
+      "levelMin": "Nivel mínimo",
+      "levelMax": "Nivel máximo",
+      "aiNotesPlaceholder": "Describe el comportamiento, la lógica de patrulla, el ritmo de los encuentros o las pautas de diálogo para la IA.",
+      "questNotesPlaceholder": "Explica cómo debe contribuir este campamento a los objetivos, las recompensas o el progreso de las misiones.",
+      "tagElite": "Élite",
+      "tagRare": "Raro",
+      "tagBoss": "Jefe",
+      "tagCaster": "Lanzador de hechizos",
+      "tagSupport": "Apoyo",
+      "tagSummoner": "Invocador",
+      "tagEnrage": "Frenético",
+      "tagSwimmer": "Nadador",
+      "tagStationary": "Fijo"
     },
     "authoring": {
-      "browseAll": "Browse all",
-      "search": "Search all models...",
-      "searchLabel": "Search catalog",
-      "filterLabel": "Filter catalog group",
-      "allGroups": "All",
-      "defaults": "Defaults",
-      "noResults": "No matching entries.",
-      "showing": "Showing {shown} of {total}. Refine the search to see the rest.",
-      "resultCount": "{count} entries",
-      "aiBrief": "AI and Quest Brief",
-      "aiNotes": "AI direction",
-      "questNotes": "Quest-building notes",
-      "vfxTitle": "Ambient VFX",
-      "vfxPreset": "Preset",
-      "vfxNone": "None",
-      "vfxArcane": "Arcane motes",
-      "vfxFire": "Fire embers",
-      "vfxFrost": "Frost shimmer",
-      "vfxHoly": "Holy glow",
-      "vfxNature": "Nature wisps",
-      "vfxShadow": "Shadow motes",
-      "vfxIntensity": "VFX intensity",
-      "vfxHint": "Pooled particles keep the effect lightweight in the editor and playtest."
+      "browseAll": "Explorar todo",
+      "search": "Buscar en todos los modelos...",
+      "searchLabel": "Buscar en el catálogo",
+      "filterLabel": "Filtrar grupo del catálogo",
+      "allGroups": "Todos",
+      "defaults": "Valores predeterminados",
+      "noResults": "No hay entradas coincidentes.",
+      "showing": "Se muestran {shown} de {total}. Acota la búsqueda para ver el resto.",
+      "resultCount": "{count} entradas",
+      "aiBrief": "Instrucciones de IA y misiones",
+      "aiNotes": "Indicaciones para la IA",
+      "questNotes": "Notas para crear misiones",
+      "vfxTitle": "Efectos visuales ambientales",
+      "vfxPreset": "Preajuste",
+      "vfxNone": "Ninguno",
+      "vfxArcane": "Motas arcanas",
+      "vfxFire": "Ascuas de fuego",
+      "vfxFrost": "Destellos de escarcha",
+      "vfxHoly": "Resplandor sagrado",
+      "vfxNature": "Volutas de naturaleza",
+      "vfxShadow": "Motas de sombra",
+      "vfxIntensity": "Intensidad de los efectos visuales",
+      "vfxHint": "La reutilización de partículas mantiene bajo el coste del efecto en el editor y en la prueba de juego."
     },
     "entityTool": {
-      "title": "NPCs and Mobs",
-      "hint": "Select an NPC to configure its rig, role, VFX, and AI brief. Select a mob to set its type, levels, stat modifiers, patrol, and respawn.",
-      "selected": "Selected: {name}",
-      "none": "Click a mob or NPC in the map view to select it.",
-      "facing": "Facing",
-      "oneMob": "1 mob",
-      "manyMobs": "{count} mobs",
-      "name": "Display name",
-      "titleField": "Title",
-      "role": "Story role",
-      "rolePlaceholder": "Quest giver, merchant, guard, trainer...",
-      "characterModel": "Rigged character",
-      "placeNpc": "Place NPC",
-      "chooseNpcModel": "Choose a character model",
-      "placeNpcHint": "{name} is ready. Click the terrain to place this NPC.",
-      "cancelPlacement": "Cancel placement",
-      "automaticModel": "Automatic template rig",
-      "automaticModelHint": "Use the character assigned by this NPC template.",
-      "aiNotesPlaceholder": "Describe personality, dialogue tone, schedules, reactions, and interaction rules.",
-      "questNotesPlaceholder": "Leave instructions for future AI-authored quests, objectives, and story beats.",
-      "categoryNpc": "NPCs",
-      "categoryPlayer": "Player rigs",
-      "categoryHumanoid": "Humanoids",
-      "categoryCreature": "Creatures",
-      "categoryForm": "Forms"
+      "title": "PNJ y criaturas",
+      "hint": "Selecciona un PNJ para configurar su esqueleto, papel, efectos visuales e instrucciones de IA. Selecciona una criatura para fijar su tipo, niveles, modificadores de estadísticas, patrulla y reaparición.",
+      "selected": "Seleccionado: {name}",
+      "none": "Haz clic en una criatura o PNJ de la vista del mapa para seleccionarlo.",
+      "facing": "Dirección",
+      "oneMob": "1 criatura",
+      "manyMobs": "{count} criaturas",
+      "name": "Nombre visible",
+      "titleField": "Título",
+      "role": "Papel en la historia",
+      "rolePlaceholder": "Personaje que da misiones, mercader, guardia, instructor...",
+      "characterModel": "Personaje con esqueleto",
+      "placeNpc": "Colocar PNJ",
+      "chooseNpcModel": "Elige un modelo de personaje",
+      "placeNpcHint": "{name} está listo. Haz clic en el terreno para colocar este PNJ.",
+      "cancelPlacement": "Cancelar colocación",
+      "automaticModel": "Esqueleto automático de plantilla",
+      "automaticModelHint": "Usa el personaje asignado por esta plantilla de PNJ.",
+      "aiNotesPlaceholder": "Describe la personalidad, el tono de diálogo, los horarios, las reacciones y las reglas de interacción.",
+      "questNotesPlaceholder": "Deja instrucciones para futuras misiones, objetivos y momentos narrativos creados por IA.",
+      "categoryNpc": "PNJ",
+      "categoryPlayer": "Esqueletos de jugador",
+      "categoryHumanoid": "Humanoides",
+      "categoryCreature": "Criaturas",
+      "categoryForm": "Formas"
     },
     "mobTool": {
-      "hint": "Click a mob in the map view to edit its type, levels, stats, patrol, and respawn.",
-      "typeHeader": "Mob: {name}",
-      "typeHeaderMany": "Mob: {name} ({count} selected)",
-      "type": "Mob type",
-      "mixedType": "Mixed types",
-      "statLevels": "Template levels {min}-{max}",
-      "mixedHint": "The selected mobs differ. Values shown are the first one; edits apply to all of them.",
-      "overrideLevels": "Override level range",
-      "levelDefaultHint": "Using the template level range for this mob.",
-      "statsTitle": "Stat modifiers",
-      "statsHint": "Multipliers on the level-derived stats. Above 1 is a bonus, below 1 a penalty. Click a value to type an exact number.",
-      "statHealth": "Health",
-      "statDamage": "Damage",
-      "statArmor": "Armor",
-      "statMoveSpeed": "Move speed",
-      "statAttackSpeed": "Swing time",
-      "statScale": "Size",
-      "statDefault": "{value}x default",
-      "statBonus": "{value}x (+{percent}%)",
-      "statPenalty": "{value}x (-{percent}%)",
-      "statsReset": "Reset modifiers",
-      "respawnTitle": "Respawn",
-      "respawnDefault": "Default respawn speed",
-      "respawnDefaultHint": "Using the realm default for this mob (rares and bosses take longer).",
-      "respawnSeconds": "Respawn after",
-      "seconds": "{value}s",
-      "patrolTitle": "Patrol",
-      "patrolNone": "This mob wanders near its spawn point. Set a patrol to walk it along a path.",
-      "patrolNoneNpc": "This character stands where you placed it. Set a patrol to walk it along a path.",
-      "patrolSet": "Set patrol route",
-      "patrolEdit": "Edit patrol route",
-      "patrolClear": "Clear patrol",
-      "patrolPickHint": "Click the map to drop each waypoint in order. Double-click the last one, or press Enter, to finish.",
-      "patrolDraftPoints": "Waypoints placed: {count}",
-      "patrolPoints": "Patrolling {count} waypoints",
-      "patrolMode": "At the end of the path",
-      "patrolLoop": "Loop back to the start",
-      "patrolPingpong": "Turn around and walk back",
-      "patrolSpeed": "Walk speed",
-      "patrolWait": "Pause at each waypoint",
-      "patrolWaitHint": "The pause is stamped on every waypoint you place from now on.",
-      "patrolFinish": "Finish route",
-      "patrolUndoPoint": "Remove last point",
-      "patrolCancel": "Cancel",
-      "patrolNeedPoints": "Place at least two waypoints before finishing the route.",
-      "patrolFull": "A patrol route holds at most {max} waypoints.",
-      "patrolSaved": "Patrol set: {count} waypoints.",
-      "patrolRemoved": "Patrol cleared.",
-      "yardsPerSecond": "{value} yd/s",
-      "delete": "Delete mob",
-      "deleteMany": "Delete {count} mobs",
-      "deleted": "Deleted {count} mobs.",
-      "deleteNpc": "Delete character",
-      "deleteManyNpcs": "Delete {count} characters",
-      "deletedNpcs": "Deleted {count} characters."
+      "hint": "Haz clic en una criatura de la vista del mapa para editar su tipo, niveles, estadísticas, patrulla y reaparición.",
+      "typeHeader": "Criatura: {name}",
+      "typeHeaderMany": "Criatura: {name} ({count} seleccionadas)",
+      "type": "Tipo de criatura",
+      "mixedType": "Tipos mezclados",
+      "statLevels": "Niveles de plantilla {min}-{max}",
+      "mixedHint": "Las criaturas seleccionadas son distintas. Se muestran los valores de la primera; las ediciones se aplican a todas.",
+      "overrideLevels": "Sustituir intervalo de niveles",
+      "levelDefaultHint": "Se usa el intervalo de niveles de la plantilla para esta criatura.",
+      "statsTitle": "Modificadores de estadísticas",
+      "statsHint": "Multiplicadores de las estadísticas derivadas del nivel. Por encima de 1 es una bonificación; por debajo de 1, una penalización. Haz clic en un valor para escribir un número exacto.",
+      "statHealth": "Salud",
+      "statDamage": "Daño",
+      "statArmor": "Armadura",
+      "statMoveSpeed": "Velocidad de movimiento",
+      "statAttackSpeed": "Tiempo entre golpes",
+      "statScale": "Tamaño",
+      "statDefault": "{value}x del valor predeterminado",
+      "statBonus": "{value}x (aumento del {percent}%)",
+      "statPenalty": "{value}x (reducción del {percent}%)",
+      "statsReset": "Restablecer modificadores",
+      "respawnTitle": "Reaparición",
+      "respawnDefault": "Velocidad de reaparición predeterminada",
+      "respawnDefaultHint": "Se usa el valor predeterminado del reino para esta criatura (los raros y jefes tardan más).",
+      "respawnSeconds": "Reaparecer tras",
+      "seconds": "{value} s",
+      "patrolTitle": "Patrulla",
+      "patrolNone": "Esta criatura deambula cerca de su punto de aparición. Fija una patrulla para que recorra un camino.",
+      "patrolNoneNpc": "Este personaje permanece donde lo colocaste. Fija una patrulla para que recorra un camino.",
+      "patrolSet": "Fijar ruta de patrulla",
+      "patrolEdit": "Editar ruta de patrulla",
+      "patrolClear": "Borrar patrulla",
+      "patrolPickHint": "Haz clic en el mapa para colocar cada punto de ruta en orden. Haz doble clic en el último o pulsa Intro para terminar.",
+      "patrolDraftPoints": "Puntos de ruta colocados: {count}",
+      "patrolPoints": "Patrullando {count} puntos de ruta",
+      "patrolMode": "Al final del camino",
+      "patrolLoop": "Volver al inicio en bucle",
+      "patrolPingpong": "Dar la vuelta y regresar andando",
+      "patrolSpeed": "Velocidad al caminar",
+      "patrolWait": "Pausa en cada punto de ruta",
+      "patrolWaitHint": "La pausa se aplica a todos los puntos de ruta que coloques a partir de ahora.",
+      "patrolFinish": "Terminar ruta",
+      "patrolUndoPoint": "Quitar último punto",
+      "patrolCancel": "Cancelar",
+      "patrolNeedPoints": "Coloca al menos dos puntos de ruta antes de terminar la ruta.",
+      "patrolFull": "Una ruta de patrulla admite como máximo {max} puntos de ruta.",
+      "patrolSaved": "Patrulla fijada: {count} puntos de ruta.",
+      "patrolRemoved": "Patrulla borrada.",
+      "yardsPerSecond": "{value} yardas/s",
+      "delete": "Eliminar criatura",
+      "deleteMany": "Eliminar {count} criaturas",
+      "deleted": "Se han eliminado {count} criaturas.",
+      "deleteNpc": "Eliminar personaje",
+      "deleteManyNpcs": "Eliminar {count} personajes",
+      "deletedNpcs": "Se han eliminado {count} personajes."
     },
     "spawn": {
       "title": "Punto de Aparición",
       "hint": "Haz clic en el suelo para definir dónde aparece el jugador en la prueba de juego.",
       "position": "Aparición: {x}, {z}",
-      "area": "Spawn area: {width} x {height} yd",
+      "area": "Zona de aparición: {width} x {height} yardas",
       "unset": "Usando la posición inicial integrada.",
       "clear": "Borrar punto de aparición"
     },
@@ -11512,30 +12852,30 @@ export const es: EnTranslations = {
       "blockerHint": "Al hacer clic cerca de un muro de bloqueo, se elimina ese muro en su lugar."
     },
     "grassClearTool": {
-      "title": "Remove Grass",
-      "hint": "Click or drag to scrub away the procedural meadow grass, including the grass baked into the built-in world. Use a large brush to clear a wide area in one stroke.",
-      "restore": "Restore all grass"
+      "title": "Quitar hierba",
+      "hint": "Haz clic o arrastra para quitar la hierba de pradera procedimental, incluida la hierba precalculada del mundo integrado. Usa un pincel grande para despejar una zona amplia de una sola pincelada.",
+      "restore": "Restaurar toda la hierba"
     },
     "selection": {
       "title": "Selección",
-      "heightOffset": "Height offset (yards)",
-      "heightStep": "Step (yards)",
-      "raiseAsset": "Raise",
-      "lowerAsset": "Lower",
-      "heightHint": "Negative offsets sink assets below their base.",
+      "heightOffset": "Desplazamiento de altura (yardas)",
+      "heightStep": "Incremento (yardas)",
+      "raiseAsset": "Elevar",
+      "lowerAsset": "Rebajar",
+      "heightHint": "Los desplazamientos negativos hunden los recursos por debajo de su base.",
       "none": "Nada seleccionado. Usa Seleccionar y haz clic en un elemento colocado.",
-      "squareCollision": "Square collision (follows rotation)",
+      "squareCollision": "Colisión cuadrada (sigue la rotación)",
       "asset": "Elemento: {name}",
       "x": "X",
       "y": "Y",
       "z": "Z",
-      "multiCount": "{count} assets selected",
-      "selectAllOfAsset": "Select all of this asset ({count})",
-      "selectAllOfAssetTitle": "Select every placement of this asset on the map, so a move, delete or property change applies to all of them.",
-      "multiHint": "Moving, Shift+D duplicate, and Delete apply to the whole selection; Shift+click adds or removes assets.",
-      "setGround": "Set to ground",
-      "setGroundTitle": "Seat the selected assets back on the terrain under them, removing any float or lift",
-      "snapGround": "Snap to ground when moving",
+      "multiCount": "{count} recursos seleccionados",
+      "selectAllOfAsset": "Seleccionar todos los ejemplares de este recurso ({count})",
+      "selectAllOfAssetTitle": "Selecciona todos los ejemplares de este recurso del mapa para que mover, eliminar o cambiar una propiedad se aplique a todos.",
+      "multiHint": "Mover, duplicar con Mayús+D y Supr se aplican a toda la selección; Mayús+clic añade o quita recursos.",
+      "setGround": "Colocar en el suelo",
+      "setGroundTitle": "Vuelve a apoyar los recursos seleccionados en el terreno situado debajo, eliminando cualquier separación o elevación",
+      "snapGround": "Ajustar al suelo al mover",
       "rotation": "Rotación",
       "scale": "Escala",
       "collide": "Bloquea el movimiento",
@@ -11543,73 +12883,73 @@ export const es: EnTranslations = {
       "radiusAuto": "Auto",
       "radiusAutoTitle": "Restablecer el radio de colisión para que siga la escala del elemento",
       "radiusHint": "Auto deriva el radio de colisión de la escala del elemento; arrastra el control deslizante para anularlo.",
-      "collisionBaked": "Blocking with the baked model shape ({count} boxes hugging the mesh). Drag the radius slider to override with a simple circle; Auto restores the baked shape.",
-      "collisionCustom": "Custom footprint (circle/square) - overrides the baked model shape. Press Auto to restore it.",
+      "collisionBaked": "Bloqueo con la forma precalculada del modelo ({count} cajas ajustadas a la malla). Arrastra el control de radio para sustituirla por un círculo simple; Automático restaura la forma precalculada.",
+      "collisionCustom": "Huella personalizada (círculo/cuadrado): sustituye la forma precalculada del modelo. Pulsa Automático para restaurarla.",
       "footprints": "Mostrar huellas de colisión",
-      "sway": "Wind sway",
-      "swayHint": "Sways this asset in the wind. On by default for plants. Applies to EVERY placement of this asset on the map, not just the selected one.",
-      "collisionTitle": "Collision",
-      "collisionType": "Collision type",
-      "collisionTypeBaked": "Baked hitboxes",
-      "collisionTypeBasic": "Basic (radius)",
-      "collisionTypeMesh": "True collision (heavy)",
-      "collisionTypeNone": "No collision",
-      "collisionEdited": "Custom hitboxes ({count} boxes). The sim blocks with exactly these.",
-      "hitboxEdit": "Edit hitboxes",
-      "hitboxDone": "Done editing",
-      "hitboxAdd": "Add hitbox",
-      "hitboxDelete": "Delete selected",
-      "hitboxReset": "Reset to baked",
-      "hitboxSelected": "{count} hitboxes selected",
-      "hitboxHint": "Click a hitbox to select it; Ctrl/Shift+click selects several. Use the Move, Rotate, and Scale tools (or the gizmo) to shape them like any other object. Delete removes the selected boxes; Esc leaves edit mode.",
-      "hitboxCap": "Hitbox limit reached ({max} per asset).",
-      "hitboxSavePreset": "Save as preset",
-      "hitboxClearPreset": "Clear saved preset",
-      "hitboxPresetSaved": "Hitbox preset saved for {name}. New placements copy these boxes.",
-      "hitboxPresetCleared": "Hitbox preset cleared.",
-      "hitboxPresetHint": "Presets live on this device: every future placement of this asset spawns with the saved hitboxes.",
-      "meshBaking": "Baking true collision from the model mesh...",
-      "meshBakeDone": "True collision ready ({count} boxes).",
-      "meshBakeFailed": "Could not bake true collision for this asset.",
-      "meshReady": "True collision active: a dense box set hugging the real model mesh.",
-      "meshHint": "True collision rebuilds the hitboxes from the actual model mesh (many small boxes). Expensive - keep it for edge cases; it bakes once per asset when selected.",
-      "collisionCopyAll": "Copy collision to all {name} ({count})",
-      "collisionCopyAllHint": "Gives every other {name} on the map the same collision type and shape, sized to each copy so a small one never gets a giant footprint.",
-      "collisionCopyConfirmTitle": "Copy collision to all {name}?",
-      "collisionCopyConfirmBody": "All {count} other {name} on the map take this collision type and shape, each sized to its own scale (a small copy gets a small footprint, never this one), replacing their own. Ctrl+Z reverts the whole copy.",
-      "collisionCopyConfirm": "Copy to all",
-      "collisionCopied": "Copied collision to {count} {name}.",
-      "scaleAllTitle": "Scale all copies",
-      "scaleMin": "Scale min",
-      "scaleMax": "Scale max",
-      "scaleAllButton": "Scale all {name} ({count})",
-      "scaleAllHint": "Rolls a random scale between min and max onto every copy of this asset (set min and max equal for a uniform scale).",
-      "scaleAllConfirmTitle": "Scale all {name}?",
-      "scaleAllConfirmBody": "Every one of the {count} {name} on the map (this one included) gets a random scale between {min} and {max}, replacing its current scale. Ctrl+Z reverts it.",
-      "scaleAllConfirm": "Scale all",
-      "scaleAllDone": "Scaled {count} {name}.",
+      "sway": "Balanceo por el viento",
+      "swayHint": "Balancea este recurso con el viento. Activado de forma predeterminada para plantas. Se aplica a TODOS los ejemplares de este recurso en el mapa, no solo al seleccionado.",
+      "collisionTitle": "Colisión",
+      "collisionType": "Tipo de colisión",
+      "collisionTypeBaked": "Cajas de colisión precalculadas",
+      "collisionTypeBasic": "Básica (radio)",
+      "collisionTypeMesh": "Colisión real (costosa)",
+      "collisionTypeNone": "Sin colisión",
+      "collisionEdited": "Cajas de colisión personalizadas ({count} cajas). La simulación bloquea exactamente con ellas.",
+      "hitboxEdit": "Editar cajas de colisión",
+      "hitboxDone": "Terminar edición",
+      "hitboxAdd": "Añadir caja de colisión",
+      "hitboxDelete": "Eliminar seleccionados",
+      "hitboxReset": "Restablecer al precálculo",
+      "hitboxSelected": "{count} cajas de colisión seleccionadas",
+      "hitboxHint": "Haz clic en una caja de colisión para seleccionarla; Ctrl/Mayús+clic selecciona varias. Usa Mover, Girar y Escalar (o el manipulador) para darles forma como a cualquier objeto. Supr quita las cajas seleccionadas; Esc sale del modo de edición.",
+      "hitboxCap": "Se ha alcanzado el límite de cajas de colisión ({max} por recurso).",
+      "hitboxSavePreset": "Guardar como preajuste",
+      "hitboxClearPreset": "Borrar preajuste guardado",
+      "hitboxPresetSaved": "Preajuste de cajas de colisión guardado para {name}. Las nuevas colocaciones copian estas cajas.",
+      "hitboxPresetCleared": "Preajuste de cajas de colisión borrado.",
+      "hitboxPresetHint": "Los preajustes se guardan en este dispositivo: cada colocación futura de este recurso aparece con las cajas de colisión guardadas.",
+      "meshBaking": "Precalculando la colisión real a partir de la malla del modelo...",
+      "meshBakeDone": "Colisión real lista ({count} cajas).",
+      "meshBakeFailed": "No se pudo precalcular la colisión real de este recurso.",
+      "meshReady": "Colisión real activa: un conjunto denso de cajas ajustadas a la malla real del modelo.",
+      "meshHint": "La colisión real reconstruye las cajas de colisión a partir de la malla real del modelo (muchas cajas pequeñas). Es costosa; resérvala para casos especiales. Se precalcula una vez por recurso al seleccionarlo.",
+      "collisionCopyAll": "Copiar colisión a todos los {name} ({count})",
+      "collisionCopyAllHint": "Da a todos los demás {name} del mapa el mismo tipo y forma de colisión, ajustados al tamaño de cada copia para que una pequeña nunca tenga una huella gigante.",
+      "collisionCopyConfirmTitle": "¿Copiar la colisión a todos los {name}?",
+      "collisionCopyConfirmBody": "Los otros {count} {name} del mapa reciben este tipo y forma de colisión, cada uno ajustado a su propia escala (una copia pequeña recibe una huella pequeña, nunca esta), sustituyendo los suyos. Ctrl+Z revierte toda la copia.",
+      "collisionCopyConfirm": "Copiar a todos",
+      "collisionCopied": "Se ha copiado la colisión a {count} {name}.",
+      "scaleAllTitle": "Cambiar escala de todas las copias",
+      "scaleMin": "Escala mínima",
+      "scaleMax": "Escala máxima",
+      "scaleAllButton": "Cambiar escala de todos los {name} ({count})",
+      "scaleAllHint": "Asigna una escala aleatoria entre el mínimo y el máximo a cada copia de este recurso (iguala ambos valores para una escala uniforme).",
+      "scaleAllConfirmTitle": "¿Cambiar escala de todos los {name}?",
+      "scaleAllConfirmBody": "Cada uno de los {count} {name} del mapa (incluido este) recibe una escala aleatoria entre {min} y {max}, que sustituye su escala actual. Ctrl+Z lo revierte.",
+      "scaleAllConfirm": "Cambiar escala de todos",
+      "scaleAllDone": "Se ha cambiado la escala de {count} {name}.",
       "duplicate": "Duplicar",
       "delete": "Eliminar",
-      "pieces": "Edit pieces ({count})",
-      "piecesHint": "Splits this Blender-built building into its kit pieces and shell, each its own placement to move, rotate, scale or delete. Ctrl+Z puts the building back together.",
-      "piecesDone": "Split into {count} pieces.",
-      "piecesCap": "Not enough placement room to split this building.",
-      "combine": "Combine ({count})",
-      "combineHint": "Joins the selection into one object. The pieces of a split building become the building again; anything else is grouped, so it picks, drags and deletes as one.",
-      "combineRejoined": "Joined back into {name}.",
-      "combineGrouped": "Grouped {count} placements.",
-      "combineNeedsTwo": "Select at least two placements to combine.",
-      "ungroup": "Ungroup ({count})",
-      "ungroupDone": "Ungrouped {count} placements.",
+      "pieces": "Editar piezas ({count})",
+      "piecesHint": "Divide este edificio creado en Blender en sus piezas y envolvente, cada una como elemento independiente que se puede mover, girar, escalar o eliminar. Ctrl+Z vuelve a unir el edificio.",
+      "piecesDone": "Dividido en {count} piezas.",
+      "piecesCap": "No hay suficiente espacio de colocación para dividir este edificio.",
+      "combine": "Combinar ({count})",
+      "combineHint": "Une la selección en un solo objeto. Las piezas de un edificio dividido vuelven a formar el edificio; cualquier otra cosa se agrupa, para seleccionarla, arrastrarla y eliminarla como una unidad.",
+      "combineRejoined": "Se han vuelto a unir en {name}.",
+      "combineGrouped": "Se han agrupado {count} elementos colocados.",
+      "combineNeedsTwo": "Selecciona al menos dos elementos colocados para combinarlos.",
+      "ungroup": "Desagrupar ({count})",
+      "ungroupDone": "Se han desagrupado {count} elementos colocados.",
       "deleteHint": "Eliminar quita la selección; Ctrl+Z la restaura.",
       "moveHint": "Mover: arrastra el elemento por el suelo en la vista 3D, o desplázalo con las teclas de flecha (0,5 yd, Mayús para 2 yd).",
       "wheelHint": "Mayús+rueda gira el elemento, Alt+rueda lo escala, Ctrl+D lo duplica."
     },
     "transform": {
-      "moveHint": "Drag a gizmo arrow to move along that axis, or the yellow square to move freely. Arrow keys nudge.",
-      "rotateHint": "Drag a gizmo ring to rotate around that axis. Shift+scroll also rotates in 15 degree steps.",
-      "scaleHint": "Drag a gizmo axis handle to stretch that axis, or the yellow center cube to scale uniformly.",
-      "pickHint": "Click an asset to select it; the gizmo appears on the selection."
+      "moveHint": "Arrastra una flecha del manipulador para mover por ese eje, o el cuadrado amarillo para mover libremente. Las flechas del teclado desplazan ligeramente.",
+      "rotateHint": "Arrastra un anillo del manipulador para girar alrededor de ese eje. Mayús+rueda también gira en incrementos de 15 grados.",
+      "scaleHint": "Arrastra el tirador de un eje del manipulador para estirar ese eje, o el cubo central amarillo para escalar uniformemente.",
+      "pickHint": "Haz clic en un recurso para seleccionarlo; el manipulador aparece en la selección."
     },
     "marker": {
       "title": "Marcador",
@@ -11632,7 +12972,7 @@ export const es: EnTranslations = {
       "all": "Completo"
     },
     "procgen": {
-      "title": "Procedural",
+      "title": "Procedimental",
       "count": "Cantidad",
       "scatter": "Esparcir elementos de la categoría",
       "hills": "Generar colinas suaves",
@@ -11647,46 +12987,46 @@ export const es: EnTranslations = {
       "searchPlaceholder": "Buscar elementos...",
       "empty": "Ningún elemento coincide.",
       "uploadedTab": "Subidos",
-      "importedTab": "Imported",
-      "importedEmpty": "No imported models this session. Use Import Model to load a .glb or .gltf from this computer.",
-      "removeImported": "Remove imported model (this session only)",
+      "importedTab": "Importados",
+      "importedEmpty": "No hay modelos importados en esta sesión. Usa Importar modelo para cargar un archivo .glb o .gltf de este equipo.",
+      "removeImported": "Quitar modelo importado (solo en esta sesión)",
       "uploadedEmpty": "Aún no hay elementos subidos. Usa Subir Elemento para añadir un modelo GLB (hasta 8 MiB).",
       "uploadedSignIn": "Inicia sesión desde el juego para subir y colocar tus propios modelos GLB.",
       "uploadedLoadFailed": "No se pudieron cargar tus elementos subidos.",
       "deleteAsset": "Eliminar elemento subido",
       "deleteAssetConfirm": "¿Eliminar el elemento subido \"{name}\"? Los mapas que lo usan pierden el modelo.",
       "pick": "Colocar {name}",
-      "collisionMaster": "Collision Master: author this asset’s default collision",
+      "collisionMaster": "Editor de colisiones: define la colisión predeterminada de este recurso",
       "categoryTab": "{category} ({count})",
-      "resizeHandle": "Drag to resize the asset browser",
-      "allTab": "All ({count})",
-      "favouritesTab": "Favourites ({count})",
-      "recentsTab": "Recent",
-      "favouritesEmpty": "No favourites yet. Click the star on any asset to keep it here.",
-      "recentsEmpty": "Nothing placed yet in this browser. Assets you place appear here.",
-      "favouriteAdd": "Add {name} to favourites",
-      "favouriteRemove": "Remove {name} from favourites",
-      "subcategoryAll": "All ({count})",
+      "resizeHandle": "Arrastra para cambiar el tamaño del explorador de recursos",
+      "allTab": "Todos ({count})",
+      "favouritesTab": "Favoritos ({count})",
+      "recentsTab": "Recientes",
+      "favouritesEmpty": "Aún no hay favoritos. Haz clic en la estrella de cualquier recurso para guardarlo aquí.",
+      "recentsEmpty": "Aún no has colocado nada en este navegador. Los recursos que coloques aparecerán aquí.",
+      "favouriteAdd": "Añadir {name} a favoritos",
+      "favouriteRemove": "Quitar {name} de favoritos",
+      "subcategoryAll": "Todos ({count})",
       "subcategoryTab": "{name} ({count})",
       "collision": {
-        "baked": "Collision: baked boxes (auto-generated shape)",
-        "authored": "Collision: authored in Collision Master",
-        "none": "Collision: none, placements block only by their soft circle, if any"
+        "baked": "Colisión: cajas precalculadas (forma generada automáticamente)",
+        "authored": "Colisión: definida en el Editor de colisiones",
+        "none": "Colisión: ninguna; las instancias solo bloquean mediante su círculo de colisión suave, si lo tienen"
       },
       "subcategory": {
-        "buildings": "Buildings",
-        "props": "Props",
-        "nature": "Nature",
-        "environment": "Environment",
-        "structure": "Structure",
-        "furniture": "Furniture",
-        "containers": "Containers",
-        "lighting": "Lighting",
-        "decor": "Decor",
-        "other": "Other",
-        "enemies": "Enemies",
-        "players": "Players",
-        "modular": "Modular"
+        "buildings": "Edificios",
+        "props": "Atrezo",
+        "nature": "Naturaleza",
+        "environment": "Entorno",
+        "structure": "Estructuras",
+        "furniture": "Muebles",
+        "containers": "Contenedores",
+        "lighting": "Iluminación",
+        "decor": "Decoración",
+        "other": "Otros",
+        "enemies": "Enemigos",
+        "players": "Jugadores",
+        "modular": "Piezas modulares"
       },
       "category": {
         "biome": "Bioma",
@@ -11702,111 +13042,111 @@ export const es: EnTranslations = {
       }
     },
     "collisionMaster": {
-      "title": "Collision Master",
-      "mapName": "Collision Master: {name}",
-      "assetLabel": "Authoring default collision for {name}.",
-      "hint": "Build this asset’s collision with the Selection panel below: pick the collision type, edit boxes with the gizmo (move / rotate / scale), add or delete boxes. Lock In saves it to the project as the asset’s default everywhere.",
-      "fromBake": "From bake",
-      "fromBakeTitle": "Start from the asset’s auto-baked voxel boxes",
-      "fittedBox": "Fitted box",
-      "fittedBoxTitle": "Start from one box fitted around the whole asset",
-      "singleBox": "Single box",
-      "singleBoxTitle": "Start from one plain box at the asset’s base",
-      "fromCylinder": "Start from cylinder",
-      "fromCylinderTitle": "Start from one editable cylinder around the asset base",
-      "fromClear": "Start from clear",
-      "fromClearTitle": "Remove every collision shape and begin with an empty scene",
-      "polySnap": "Poly snap brush",
-      "polySnapHint": "Drag across the model’s surface to lay a collision plane that hugs the geometry: the drag start/end set its length and yaw, the sampled heights its vertical band. Great for walls, roofs, and ramps.",
-      "devOnly": "Lock In writes to the project files, so it needs the local dev server (npm run dev).",
-      "lockIn": "Lock In",
-      "lockInTitle": "Save as this asset’s default collision (writes to the project) and return to your map",
-      "cancel": "Back to map",
-      "catalogOnly": "Collision Master works on catalogue assets. Imported models keep their import bake.",
-      "adopted": "Updated {count} placement(s) already in this map to use the collision you just authored.",
-      "copyEmpty": "No collision volumes to copy.",
-      "copied": "Copied {n} collision volume(s), paste with Ctrl+V (works across assets).",
-      "pasted": "Pasted {n} collision volume(s).",
-      "saveFailed": "Could not save your map before opening Collision Master.",
-      "stashOnly": "Browser storage is blocked, so the map is held in memory: you will return to it from Collision Master, but export it if you want a durable copy.",
-      "noBoxes": "No collision boxes to lock in. Add at least one box, or pick Basic/None.",
-      "meshUnsupported": "True Mesh is a per-map bake and cannot be a project default. Pick Baked, Basic, or None.",
-      "saveEndpointFailed": "Saving the default failed: {error}",
-      "saveUnreachable": "Could not reach the save endpoint (is the dev server running?). Your collision was downloaded as a file so nothing is lost; start \"npm run dev\" and Lock In again, or merge the file into data/asset_collision_overrides.json.",
-      "locked": "Locked in: {name} now uses this collision everywhere.",
-      "presetPromptTitle": "Save as preset too?",
-      "presetPromptBody": "Lock In already made this the default collision for {name} across the whole project, and every copy in your map now uses it. A preset goes one step further on this device only: each NEW placement of {name} spawns carrying these boxes as its own editable hitboxes, so you can tweak them per copy with Edit Hitboxes. Not needed for the collision to work.",
-      "presetPromptYes": "Save preset",
-      "presetPromptNo": "No thanks",
-      "presetPromptDontAsk": "Don't ask again (turn it back on under More > \"Ask about presets on Lock In\")",
-      "barLabel": "Collision modeling tools",
-      "modeObject": "Object",
-      "modeObjectTitle": "Object mode (Tab): move / rotate / scale whole volumes with the gizmo",
-      "modeVertex": "Vertex",
-      "modeVertexTitle": "Vertex select (Z): click a vertex and the gizmo moves ONLY that vertex; Ctrl+drag lassos several",
-      "modeEdge": "Edge",
-      "modeEdgeTitle": "Edge select (V): click an edge and the gizmo moves / rotates / scales its two vertices",
-      "modeFace": "Face",
-      "modeFaceTitle": "Face select (C): click a face and the gizmo moves / rotates / scales that face locally",
-      "addMenu": "Add",
-      "addMenuTitle": "Add a collision primitive: real triangulated solids (a cylinder is a true cylinder mesh)",
-      "primBox": "Box",
-      "primPlane": "Plane",
-      "primCylinder": "Cylinder",
-      "primSphere": "Sphere",
-      "primWedge": "Ramp",
-      "primTitle": "Add a {name} primitive to the collision set",
-      "polySnapShort": "Poly Snap",
-      "polyBuildShort": "Poly Build",
-      "polyBuildHint": "Poly Build: click-drag a face of the model to extrude it outward and hand-build shapes. Toggle off to orbit/select again.",
-      "polyBuildFail": "This model is at its detail limit, cannot extrude any further.",
-      "sculptTitle": "Dynamic mesh sculpt brush",
-      "sculptSettings": "Sculpt settings",
-      "sculptOff": "Sculpt: Off",
-      "sculptGrab": "Sculpt: Grab",
-      "sculptInflate": "Sculpt: Inflate",
-      "sculptDeflate": "Sculpt: Deflate",
-      "sculptSmooth": "Sculpt: Smooth",
-      "sculptPinch": "Sculpt: Pinch",
-      "sculptCrease": "Sculpt: Crease",
-      "sculptRelax": "Sculpt: Relax",
-      "sculptRadius": "Radius",
-      "sculptStrength": "Strength",
-      "sculptDetail": "Detail",
-      "dyntopo": "Dyntopo",
-      "dyntopoTitle": "Dynamic topology locally splits long edges and safely collapses short edges around the sculpt brush.",
-      "symmetry": "Symmetry",
-      "symmetryHint": "Mirror each sculpt stroke across the selected local X, Y, and Z axes.",
-      "loopCut": "Loop Cut",
-      "loopCutTitle": "Insert an edge loop: in Edge mode, pick an edge, then Loop Cut adds a parallel ring of edges around the shape (drag the new loop to slide it).",
-      "loopCutFail": "Pick a box edge in Edge mode first, loop cut needs a quad edge (not a cap/sphere).",
-      "weld": "Weld",
-      "weldTitle": "Merge the selected vertices at their center.",
-      "subdivide": "Subdivide",
-      "subdivideTitle": "Split every triangle into four shared-edge triangles for more modeling detail.",
-      "inset": "Inset",
-      "insetTitle": "Inset the selected face and create a connected border ring.",
-      "fill": "Fill",
-      "fillTitle": "Fill three or more selected boundary vertices with a new face.",
-      "mirror": "Mirror X",
-      "mirrorTitle": "Append a mirrored copy of the selected volume across its local X axis.",
-      "topologyFail": "That topology operation cannot be applied to the current selection.",
-      "rampToggle": "Walkable",
-      "rampToggleTitle": "Walkable ramp: the selected volume raises the walkable ground along its slope (the player walks up it) instead of blocking. Ramp primitives start walkable.",
-      "duplicate": "Dup",
-      "duplicateTitle": "Duplicate the selected boxes",
-      "delete": "Del",
-      "deleteTitle": "Delete the selected boxes",
-      "openFromSelection": "Collision Master",
-      "openFromSelectionTitle": "Author this asset’s DEFAULT collision in the Collision Master scene (saves to the project; your map auto-saves and you return here)",
-      "heroTitle": "Collision Master",
-      "heroStatus": "Asset collision: {mode}"
+      "title": "Editor de colisiones",
+      "mapName": "Editor de colisiones: {name}",
+      "assetLabel": "Definiendo la colisión predeterminada de {name}.",
+      "hint": "Construye la colisión de este recurso con el panel Selección inferior: elige el tipo de colisión, edita cajas con el manipulador (mover, girar o escalar) y añade o elimina cajas. Confirmar la guarda en el proyecto como colisión predeterminada del recurso en todas partes.",
+      "fromBake": "Desde el precálculo",
+      "fromBakeTitle": "Empieza con las cajas de vóxeles precalculadas automáticamente del recurso",
+      "fittedBox": "Caja ajustada",
+      "fittedBoxTitle": "Empieza con una caja ajustada alrededor de todo el recurso",
+      "singleBox": "Caja única",
+      "singleBoxTitle": "Empieza con una caja simple en la base del recurso",
+      "fromCylinder": "Empezar desde un cilindro",
+      "fromCylinderTitle": "Empieza con un cilindro editable alrededor de la base del recurso",
+      "fromClear": "Empezar desde cero",
+      "fromClearTitle": "Quita todas las formas de colisión y empieza con una escena vacía",
+      "polySnap": "Pincel de ajuste de polígonos",
+      "polySnapHint": "Arrastra sobre la superficie del modelo para colocar un plano de colisión que se ajuste a su geometría: el inicio y el final del arrastre fijan su longitud y giro horizontal, y las alturas muestreadas fijan su banda vertical. Ideal para paredes, tejados y rampas.",
+      "devOnly": "Confirmar escribe en los archivos del proyecto, por lo que necesita el servidor de desarrollo local (npm run dev).",
+      "lockIn": "Confirmar",
+      "lockInTitle": "Guarda como colisión predeterminada de este recurso (escribe en el proyecto) y vuelve a tu mapa",
+      "cancel": "Volver al mapa",
+      "catalogOnly": "El Editor de colisiones funciona con recursos del catálogo. Los modelos importados conservan el precálculo de su importación.",
+      "adopted": "Se han actualizado {count} elementos ya colocados en este mapa para que usen la colisión que acabas de definir.",
+      "copyEmpty": "No hay volúmenes de colisión para copiar.",
+      "copied": "Se han copiado {n} volúmenes de colisión; pega con Ctrl+V (funciona entre recursos distintos).",
+      "pasted": "Se han pegado {n} volúmenes de colisión.",
+      "saveFailed": "No se pudo guardar tu mapa antes de abrir el Editor de colisiones.",
+      "stashOnly": "El almacenamiento del navegador está bloqueado, así que el mapa se mantiene en memoria: volverás a él desde el Editor de colisiones, pero expórtalo si quieres una copia duradera.",
+      "noBoxes": "No hay cajas de colisión para confirmar. Añade al menos una caja o elige Básica/Ninguna.",
+      "meshUnsupported": "La malla real es un precálculo por mapa y no puede ser un valor predeterminado del proyecto. Elige Precalculada, Básica o Ninguna.",
+      "saveEndpointFailed": "No se pudo guardar el valor predeterminado: {error}",
+      "saveUnreachable": "No se pudo contactar con el punto de guardado (¿está en marcha el servidor de desarrollo?). Tu colisión se ha descargado como archivo para que no se pierda nada; inicia «npm run dev» y confirma de nuevo, o integra el archivo en data/asset_collision_overrides.json.",
+      "locked": "Confirmado: {name} usa ahora esta colisión en todas partes.",
+      "presetPromptTitle": "¿Guardar también como preajuste?",
+      "presetPromptBody": "Confirmar ya ha establecido esta colisión como predeterminada para {name} en todo el proyecto, y todas las copias de tu mapa ya la usan. Un preajuste va un paso más allá solo en este dispositivo: cada colocación NUEVA de {name} aparece con estas cajas como cajas de colisión editables propias, para ajustarlas por copia con Editar cajas de colisión. No hace falta para que la colisión funcione.",
+      "presetPromptYes": "Guardar preajuste",
+      "presetPromptNo": "No, gracias",
+      "presetPromptDontAsk": "No volver a preguntar (se puede reactivar en Más > «Preguntar por preajustes al confirmar»)",
+      "barLabel": "Herramientas de modelado de colisiones",
+      "modeObject": "Objeto",
+      "modeObjectTitle": "Modo Objeto (Tab): mueve, gira o escala volúmenes completos con el manipulador",
+      "modeVertex": "Vértice",
+      "modeVertexTitle": "Selección de vértices (Z): haz clic en un vértice y el manipulador mueve SOLO ese vértice; Ctrl+arrastrar selecciona varios con un lazo",
+      "modeEdge": "Arista",
+      "modeEdgeTitle": "Selección de aristas (V): haz clic en una arista y el manipulador mueve, gira o escala sus dos vértices",
+      "modeFace": "Rostro",
+      "modeFaceTitle": "Selección de caras (C): haz clic en una cara y el manipulador mueve, gira o escala esa cara localmente",
+      "addMenu": "Añadir",
+      "addMenuTitle": "Añade una primitiva de colisión: sólidos triangulados reales (un cilindro es una malla cilíndrica real)",
+      "primBox": "Caja",
+      "primPlane": "Plano",
+      "primCylinder": "Cilindro",
+      "primSphere": "Esfera",
+      "primWedge": "Rampa",
+      "primTitle": "Añade una primitiva de {name} al conjunto de colisiones",
+      "polySnapShort": "Ajuste de polígonos",
+      "polyBuildShort": "Construcción de polígonos",
+      "polyBuildHint": "Construcción de polígonos: haz clic y arrastra una cara del modelo para extruirla hacia fuera y construir formas a mano. Desactívalo para volver a orbitar o seleccionar.",
+      "polyBuildFail": "Este modelo ha alcanzado su límite de detalle y no permite más extrusiones.",
+      "sculptTitle": "Pincel de escultura de malla dinámica",
+      "sculptSettings": "Ajustes de escultura",
+      "sculptOff": "Esculpir: desactivado",
+      "sculptGrab": "Esculpir: arrastrar",
+      "sculptInflate": "Esculpir: inflar",
+      "sculptDeflate": "Esculpir: desinflar",
+      "sculptSmooth": "Esculpir: suavizar",
+      "sculptPinch": "Esculpir: pellizcar",
+      "sculptCrease": "Esculpir: pliegue",
+      "sculptRelax": "Esculpir: relajar",
+      "sculptRadius": "Radio",
+      "sculptStrength": "Intensidad",
+      "sculptDetail": "Detalle",
+      "dyntopo": "Topología dinámica",
+      "dyntopoTitle": "La topología dinámica divide localmente las aristas largas y contrae de forma segura las aristas cortas alrededor del pincel de escultura.",
+      "symmetry": "Simetría",
+      "symmetryHint": "Refleja cada pincelada de escultura respecto a los ejes locales X, Y y Z seleccionados.",
+      "loopCut": "Corte en bucle",
+      "loopCutTitle": "Inserta un bucle de aristas: en modo Arista, elige una arista; Corte en bucle añade un anillo paralelo de aristas alrededor de la forma (arrastra el bucle nuevo para deslizarlo).",
+      "loopCutFail": "Elige primero una arista de caja en modo Arista; el corte en bucle necesita una arista de cuadrilátero (no una tapa ni una esfera).",
+      "weld": "Soldar",
+      "weldTitle": "Fusiona los vértices seleccionados en su centro.",
+      "subdivide": "Subdividir",
+      "subdivideTitle": "Divide cada triángulo en cuatro triángulos con aristas compartidas para obtener más detalle de modelado.",
+      "inset": "Insertar hacia dentro",
+      "insetTitle": "Inserta la cara seleccionada hacia dentro y crea un anillo de borde conectado.",
+      "fill": "Rellenar",
+      "fillTitle": "Rellena tres o más vértices de contorno seleccionados con una cara nueva.",
+      "mirror": "Reflejar en X",
+      "mirrorTitle": "Añade una copia reflejada del volumen seleccionado respecto a su eje X local.",
+      "topologyFail": "Esa operación de topología no se puede aplicar a la selección actual.",
+      "rampToggle": "Transitable",
+      "rampToggleTitle": "Rampa transitable: el volumen seleccionado eleva el suelo transitable según su pendiente (el jugador sube por ella) en vez de bloquear. Las primitivas de rampa empiezan siendo transitables.",
+      "duplicate": "Duplicar",
+      "duplicateTitle": "Duplicar las cajas seleccionadas",
+      "delete": "Borrar",
+      "deleteTitle": "Eliminar las cajas seleccionadas",
+      "openFromSelection": "Editor de colisiones",
+      "openFromSelectionTitle": "Define la colisión PREDETERMINADA de este recurso en la escena del Editor de colisiones (se guarda en el proyecto; tu mapa se guarda automáticamente y vuelves aquí)",
+      "heroTitle": "Editor de colisiones",
+      "heroStatus": "Colisión del recurso: {mode}"
     },
     "importModel": {
-      "notModel": "Pick a .glb or .gltf file.",
-      "tooLarge": "That file is over the 64 MiB import limit.",
-      "imported": "Imported \"{name}\". It is kept for this session; re-import it after a reload.",
-      "failed": "Could not read that model file."
+      "notModel": "Elige un archivo .glb o .gltf.",
+      "tooLarge": "Ese archivo supera el límite de importación de 64 MiB.",
+      "imported": "Se ha importado «{name}». Se conserva durante esta sesión; vuelve a importarlo después de recargar.",
+      "failed": "No se pudo leer ese archivo de modelo."
     },
     "upload": {
       "notGlb": "Elige un archivo .glb.",
@@ -11819,21 +13159,21 @@ export const es: EnTranslations = {
     "openDrawer": {
       "title": "Abrir Mapa",
       "close": "Cerrar",
-      "tabShipped": "Shipped Maps",
+      "tabShipped": "Mapas incluidos",
       "tabLocal": "Este navegador",
       "tabMine": "Mis mapas del servidor",
       "tabPublic": "Mapas públicos",
       "colName": "Nombre",
-      "colType": "Type",
+      "colType": "Tipo",
       "colUpdated": "Actualizado",
       "colStatus": "Estado",
       "statusPublic": "Público",
       "statusPrivate": "Privado",
       "open": "Abrir",
-      "openCopy": "Open Copy",
-      "typePublished": "Published to Game ({slug})",
-      "typeShippedPublished": "{group} · your published version",
-      "publishedUnreadable": "Could not read the published map \"{slug}\" from the dev server.",
+      "openCopy": "Abrir copia",
+      "typePublished": "Publicado en el juego ({slug})",
+      "typeShippedPublished": "{group} · tu versión publicada",
+      "publishedUnreadable": "No se pudo leer el mapa publicado «{slug}» desde el servidor de desarrollo.",
       "fork": "Bifurcar",
       "publish": "Publicar",
       "unpublish": "Despublicar",
@@ -11856,43 +13196,43 @@ export const es: EnTranslations = {
       "savedServer": "Se guardó \"{name}\" en el servidor (v{version}).",
       "savedLocalOnly": "Se guardó \"{name}\" en este navegador. Inicia sesión para guardar en línea.",
       "saveFailedLocal": "El guardado local falló (almacenamiento bloqueado).",
-      "openFailedLocal": "That save could not be read (corrupt or truncated). Its file may still import via More > Import if you exported a copy.",
+      "openFailedLocal": "No se pudo leer ese guardado (está dañado o truncado). Si exportaste una copia, quizá aún puedas importar su archivo desde Más > Importar.",
       "opened": "Se abrió \"{name}\".",
-      "waterReapplied": "Water rebuilt from the current terrain.",
-      "shippedMapOpened": "Opened an editable copy of \"{name}\".",
-      "publishedMapOpened": "Opened your published \"{name}\": this is the version the game ships for that map.",
+      "waterReapplied": "Agua reconstruida a partir del terreno actual.",
+      "shippedMapOpened": "Se ha abierto una copia editable de «{name}».",
+      "publishedMapOpened": "Se ha abierto tu «{name}» publicado: esta es la versión que incluye el juego para ese mapa.",
       "imported": "Se importó \"{name}\".",
       "importFailed": "Importación cancelada, o el archivo no es un mapa válido.",
-      "importMissingDeps": "{count} model/texture/skybox file(s) are missing, so parts of the map are blank. Re-import the .wocmap.zip bundle to include them.",
+      "importMissingDeps": "Faltan {count} archivos de modelos, texturas o fondos de cielo, por lo que algunas partes del mapa están en blanco. Vuelve a importar el paquete .wocmap.zip para incluirlos.",
       "exported": "Se descargó \"{name}\".",
-      "bundleExported": "Exported \"{name}\" with its models, textures, and skybox. Import the .wocmap.zip (not a loose .json) on the other computer.",
-      "exportBlockedMissingDeps": "Export blocked: {count} referenced model, texture, or skybox file(s) are missing from this browser. Restore them before exporting so the engine receives a complete map.",
-      "exportBlockedInvalid": "Export blocked because the map did not pass the engine compatibility check. Save a copy and review the latest edits before trying again.",
+      "bundleExported": "Se ha exportado «{name}» con sus modelos, texturas y fondo de cielo. Importa el .wocmap.zip (no un .json suelto) en el otro equipo.",
+      "exportBlockedMissingDeps": "Exportación bloqueada: faltan {count} archivos de modelos, texturas o fondos de cielo referenciados en este navegador. Restáuralos antes de exportar para que el motor reciba un mapa completo.",
+      "exportBlockedInvalid": "Exportación bloqueada porque el mapa no superó la comprobación de compatibilidad del motor. Guarda una copia y revisa las últimas ediciones antes de volver a intentarlo.",
       "newMap": "Mapa nuevo iniciado a partir del mundo integrado.",
-      "newFlatMap": "Blank map started.",
+      "newFlatMap": "Mapa en blanco iniciado.",
       "forked": "Bifurcado a \"{name}\". Ahora editas tu propia copia.",
       "published": "Mapa publicado. Ahora cualquiera puede encontrarlo y bifurcarlo.",
       "unpublished": "Mapa despublicado.",
       "deleted": "Mapa eliminado.",
       "assetPlacedFirst": "Elige primero un elemento en el explorador.",
       "loading3d": "Cargando el mundo...",
-      "loading3dAssets": "Loading assets...",
-      "loading3dEngine": "Starting the engine...",
-      "loading3dZone": "Building the world...",
+      "loading3dAssets": "Cargando recursos...",
+      "loading3dEngine": "Iniciando el motor...",
+      "loading3dZone": "Construyendo el mundo...",
       "playtestLaunch": "Iniciando la prueba de juego...",
       "playtestFailed": "No se pudo iniciar la prueba de juego (almacenamiento bloqueado).",
       "draftSaved": "Borrador autoguardado.",
       "draftRestored": "Se restauró el borrador autoguardado.",
       "autosaveFailed": "El autoguardado falló (el almacenamiento del navegador está lleno o bloqueado). Exporta el mapa para conservar una copia de seguridad.",
       "terrainCapReached": "Límite de ediciones de terreno alcanzado ({max}). Las marcas de esculpido adicionales no se añadieron.",
-      "caveCapReached": "Cave limit reached ({max}). Delete or undo a cave first.",
-      "holeCapReached": "Hole limit reached ({max}). Delete or undo a hole first.",
+      "caveCapReached": "Se ha alcanzado el límite de cuevas ({max}). Primero elimina o deshaz una cueva.",
+      "holeCapReached": "Se ha alcanzado el límite de agujeros ({max}). Primero elimina o deshaz un agujero.",
       "placementCapReached": "Límite de colocaciones alcanzado ({max}). Los elementos adicionales no se añadieron.",
-      "entityCapReached": "The map entity limit was reached. Some copied NPCs or mobs were not pasted.",
-      "selectionCopied": "Copied {count} selected item(s).",
-      "selectionPasted": "Pasted {count} item(s).",
-      "selectionNothingToCopy": "Select an asset, NPC, or mob before copying.",
-      "selectionNothingToPaste": "Copy an asset, NPC, or mob before pasting.",
+      "entityCapReached": "Se ha alcanzado el límite de entidades del mapa. No se han pegado algunos PNJ o criaturas copiados.",
+      "selectionCopied": "Se han copiado {count} elementos seleccionados.",
+      "selectionPasted": "Se han pegado {count} elementos.",
+      "selectionNothingToCopy": "Selecciona un recurso, PNJ o criatura antes de copiar.",
+      "selectionNothingToPaste": "Copia un recurso, PNJ o criatura antes de pegar.",
       "blockerCapReached": "Límite de muros de bloqueo alcanzado ({max}). El muro nuevo no se añadió.",
       "campCapReached": "Límite de campamentos alcanzado ({max}). El campamento nuevo no se añadió.",
       "autosaveOff": "Autoguardado desactivado: {reason} Guarda manualmente y luego vuelve a activarlo."
@@ -11912,15 +13252,15 @@ export const es: EnTranslations = {
       "nameLabel": "Nombre del mapa nuevo"
     },
     "newMap": {
-      "title": "New Map",
-      "hint": "Pick a preset or set the size in yards. The map is bounded: terrain rim walls and invisible perimeter blockers keep playtest inside it.",
-      "width": "Width (yards)",
-      "height": "Height (yards)",
-      "scale": "Scale multiplier",
-      "interior": "Interior (60 x 60)",
-      "zone": "Zone (240 x 360)",
-      "openWorld": "Open World (360 x 1080)",
-      "create": "Create"
+      "title": "Mapa nuevo",
+      "hint": "Elige un preajuste o fija el tamaño en yardas. El mapa está delimitado: los muros del borde del terreno y los bloqueos invisibles del perímetro mantienen la prueba de juego dentro.",
+      "width": "Anchura (yardas)",
+      "height": "Altura (yardas)",
+      "scale": "Multiplicador de escala",
+      "interior": "Espacio interior (60 x 60)",
+      "zone": "Zona (240 x 360)",
+      "openWorld": "Mundo abierto (360 x 1080)",
+      "create": "Crear"
     },
     "serverError": {
       "invalid_map_name": "Ese nombre de mapa no está permitido. Usa letras, números, espacios, apóstrofos o guiones.",
@@ -11945,166 +13285,166 @@ export const es: EnTranslations = {
       "unknown": "Algo salió mal al comunicarse con el servidor."
     },
     "lighting": {
-      "title": "Lighting",
-      "presetLabel": "Lighting preset",
-      "day": "Day",
-      "overcast": "Overcast",
-      "dusk": "Dusk",
-      "night": "Night",
-      "customHint": "Custom lighting (edited from a preset).",
-      "sun": "Sun intensity",
-      "ambient": "Ambient intensity",
-      "environment": "Sky ambience",
-      "azimuth": "Sun direction",
-      "elevation": "Sun height",
-      "nightFloor": "Night brightness",
-      "nightFloorHint": "How much daylight the deepest night keeps. 0 is the shipped night; around 0.35 stays readable and cool instead of murky.",
-      "caveLight": "Cave brightness",
-      "caveLightHint": "How dark carved cave walls go with depth. 0 is the shipped cave dark; around 0.4 keeps a big cavern readable by torchlight.",
-      "sunColor": "Sun color",
-      "skyColor": "Sky tint",
-      "hint": "Map lighting is saved and used by both the editor and playtest.",
-      "skyboxTitle": "Skybox",
-      "skyboxDefault": "Default sky",
-      "skybox_toon_day": "Toon Blue Sky",
-      "skybox_vale_day": "Vale Day HDR",
-      "skybox_marsh_overcast": "Marsh Overcast HDR",
-      "skybox_peaks_dawn": "Peaks Dawn HDR",
-      "skybox_hollow_dusk": "Hollow Dusk HDR",
-      "skybox_amber_sunset": "Amber Sunset HDR",
-      "skybox_ember_storm": "Ember Storm HDR",
-      "skybox_frost_twilight": "Frost Twilight HDR",
-      "skybox_fen_day": "Fen Day HDR",
-      "skybox_night": "Night HDR",
-      "skybox_nightbloom_dream": "Nightbloom Dream HDR",
-      "skybox_wraithwood_gloom": "Wraithwood Gloom HDR",
-      "skybox_vale_backdrop": "Vale Painted Backdrop",
-      "skybox_marsh_backdrop": "Marsh Painted Backdrop",
-      "skybox_peaks_backdrop": "Peaks Painted Backdrop",
-      "skybox_space_galaxy": "Space Galaxy",
-      "skyboxUpload": "Upload skybox...",
-      "skyboxCustomActive": "Custom skybox active.",
-      "skyboxHint": "Pick a bundled sky or upload a panoramic (equirectangular) image. Saved with the map - playtest shows it in-game.",
-      "skyboxImported": "Skybox imported.",
-      "skyboxImportFailed": "Could not import that image.",
-      "skyboxTooLarge": "Skybox image is too large (max 24 MB).",
-      "skyboxMissing": "That skybox is not stored in this browser anymore.",
-      "birdsTitle": "Birds",
-      "birds": "Birds in the sky",
-      "birdCount": "How many",
-      "birdFormation": "Fly in V formation",
-      "worldSpeedTitle": "World Speed",
-      "worldSpeed": "Animation speed",
-      "worldSpeedHint": "Speeds up or slows every ambient motion (water, fire, foliage sway, birds, weather). Cosmetic only; it never changes playtest gameplay or timing.",
-      "worldSpeedReset": "Reset to normal speed",
-      "zoneTitle": "Zone atmosphere",
-      "zoneHint": "Choose a zone, then give it its own lighting, skybox, and ambience speed.",
-      "zoneSelect": "Zone to edit",
-      "zoneReset": "Use map atmosphere"
+      "title": "Iluminación",
+      "presetLabel": "Preajuste de iluminación",
+      "day": "Día",
+      "overcast": "Nublado",
+      "dusk": "Anochecer",
+      "night": "Noche",
+      "customHint": "Iluminación personalizada (editada a partir de un preajuste).",
+      "sun": "Intensidad del sol",
+      "ambient": "Intensidad ambiental",
+      "environment": "Ambiente del cielo",
+      "azimuth": "Dirección del sol",
+      "elevation": "Altura del sol",
+      "nightFloor": "Brillo nocturno",
+      "nightFloorHint": "Cuánta luz diurna conserva la noche más profunda. 0 es la noche incluida; alrededor de 0,35 mantiene la visibilidad y un tono frío en lugar de turbio.",
+      "caveLight": "Brillo de las cuevas",
+      "caveLightHint": "Cuánto se oscurecen las paredes de las cuevas excavadas con la profundidad. 0 es la oscuridad de cueva incluida; alrededor de 0,4 mantiene una caverna grande visible a la luz de una antorcha.",
+      "sunColor": "Color del sol",
+      "skyColor": "Tinte del cielo",
+      "hint": "La iluminación del mapa se guarda y se usa tanto en el editor como en la prueba de juego.",
+      "skyboxTitle": "Fondo de cielo",
+      "skyboxDefault": "Cielo predeterminado",
+      "skybox_toon_day": "Cielo azul de dibujos animados",
+      "skybox_vale_day": "Día en el valle HDR",
+      "skybox_marsh_overcast": "Pantano nublado HDR",
+      "skybox_peaks_dawn": "Amanecer en las cumbres HDR",
+      "skybox_hollow_dusk": "Anochecer en la oquedad HDR",
+      "skybox_amber_sunset": "Atardecer ámbar HDR",
+      "skybox_ember_storm": "Tormenta de ascuas HDR",
+      "skybox_frost_twilight": "Crepúsculo de escarcha HDR",
+      "skybox_fen_day": "Día en el pantano HDR",
+      "skybox_night": "Noche HDR",
+      "skybox_nightbloom_dream": "Sueño de flor nocturna HDR",
+      "skybox_wraithwood_gloom": "Penumbra del Bosque de los Espectros HDR",
+      "skybox_vale_backdrop": "Fondo pintado del valle",
+      "skybox_marsh_backdrop": "Fondo pintado del pantano",
+      "skybox_peaks_backdrop": "Fondo pintado de las cumbres",
+      "skybox_space_galaxy": "Galaxia espacial",
+      "skyboxUpload": "Subir fondo de cielo...",
+      "skyboxCustomActive": "Fondo de cielo personalizado activo.",
+      "skyboxHint": "Elige un cielo incluido o sube una imagen panorámica (equirectangular). Se guarda con el mapa; la prueba de juego lo muestra dentro del juego.",
+      "skyboxImported": "Fondo de cielo importado.",
+      "skyboxImportFailed": "No se pudo importar esa imagen.",
+      "skyboxTooLarge": "La imagen del fondo de cielo es demasiado grande (máximo 24 MB).",
+      "skyboxMissing": "Ese fondo de cielo ya no está guardado en este navegador.",
+      "birdsTitle": "Aves",
+      "birds": "Aves en el cielo",
+      "birdCount": "Cantidad",
+      "birdFormation": "Volar en formación en V",
+      "worldSpeedTitle": "Velocidad del mundo",
+      "worldSpeed": "Velocidad de animación",
+      "worldSpeedHint": "Acelera o ralentiza todo el movimiento ambiental (agua, fuego, balanceo de vegetación, aves y clima). Solo es cosmético; nunca cambia la jugabilidad ni los tiempos de la prueba de juego.",
+      "worldSpeedReset": "Restablecer velocidad normal",
+      "zoneTitle": "Atmósfera de la zona",
+      "zoneHint": "Elige una zona y dale su propia iluminación, fondo de cielo y velocidad ambiental.",
+      "zoneSelect": "Zona para editar",
+      "zoneReset": "Usar atmósfera del mapa"
     },
     "music": {
-      "title": "Music",
-      "hint": "Pick the soundtrack for the whole map, or drag boxes to give areas their own track. Playtest switches as you cross them.",
-      "zoneTrack": "Map track",
-      "default": "Auto (biome theme)",
-      "areasTitle": "Music areas",
-      "areaTrack": "Track for new areas",
-      "rowTrack": "Track for this area",
-      "dragHint": "Drag a box on the ground to add an area with the track above. Click an area to select it (Delete removes it). Smaller areas win where they overlap.",
-      "none": "No music areas yet.",
-      "areaN": "Area {num}",
-      "selectArea": "Select this area in the world (its box highlights; Delete removes it)",
-      "removeArea": "Remove this music area",
-      "areaCap": "Music area limit reached ({max}).",
-      "previewZone": "Now playing: {zone}",
-      "previewOff": "Area music stopped.",
-      "previewDisabled": "Music is switched off in Settings.",
+      "title": "Música",
+      "hint": "Elige la banda sonora de todo el mapa o arrastra rectángulos para dar pistas propias a distintas zonas. La prueba de juego cambia de pista al cruzarlas.",
+      "zoneTrack": "Pista del mapa",
+      "default": "Automático (tema del bioma)",
+      "areasTitle": "Zonas musicales",
+      "areaTrack": "Pista para zonas nuevas",
+      "rowTrack": "Pista para esta zona",
+      "dragHint": "Arrastra un rectángulo sobre el suelo para añadir una zona con la pista de arriba. Haz clic en una zona para seleccionarla (Supr la elimina). Donde se solapan, tienen prioridad las zonas más pequeñas.",
+      "none": "Aún no hay zonas musicales.",
+      "areaN": "Área {num}",
+      "selectArea": "Selecciona esta zona en el mundo (su caja se resalta; Supr la elimina)",
+      "removeArea": "Quitar esta zona musical",
+      "areaCap": "Se ha alcanzado el límite de zonas musicales ({max}).",
+      "previewZone": "Reproduciendo: {zone}",
+      "previewOff": "Música de la zona detenida.",
+      "previewDisabled": "La música está desactivada en Ajustes.",
       "track": {
-        "town_eastbrook": "Town: Eastbrook (warm pastoral)",
-        "town_fenbridge": "Town: Fenbridge (old medieval)",
-        "town_highwatch": "Town: Highwatch (brisk march)",
-        "town_goldcrest": "Town: Goldcrest Harbor (trading port)",
-        "vale": "Vale (playful meadow)",
-        "vale_legacy": "Vale legacy (original theme)",
-        "marsh": "Marsh (croaky swamp)",
-        "peaks": "Peaks (heroic folk)",
-        "dungeon_hollow_crypt": "Dungeon: Hollow Crypt (skeletal dance)",
-        "dungeon_sunken_bastion": "Dungeon: Sunken Bastion (flooded fortress)",
-        "dungeon_gravewyrm_sanctum": "Dungeon: Gravewyrm Sanctum (boss route)"
+        "town_eastbrook": "Pueblo: Eastbrook (pastoral cálido)",
+        "town_fenbridge": "Pueblo: Fenbridge (medieval antiguo)",
+        "town_highwatch": "Pueblo: Highwatch (marcha viva)",
+        "town_goldcrest": "Pueblo: Puerto de Goldcrest (puerto comercial)",
+        "vale": "Valle (pradera alegre)",
+        "vale_legacy": "Valle antiguo (tema original)",
+        "marsh": "Pantano (ciénaga de croares)",
+        "peaks": "Cumbres (folclore heroico)",
+        "dungeon_hollow_crypt": "Mazmorra: La Cripta Hueca (danza esquelética)",
+        "dungeon_sunken_bastion": "Mazmorra: El Bastión Sumergido (fortaleza inundada)",
+        "dungeon_gravewyrm_sanctum": "Mazmorra: Santuario del Gravewyrm (ruta de jefes)"
       }
     },
     "weather": {
-      "title": "Weather",
-      "showSnowfall": "Show snowfall",
-      "snowfallHint": "A Studio preview setting, remembered in this browser.",
-      "zoneTitle": "Weather in this zone",
-      "zoneHint": "This zone's weather overrides the map-wide sky while the player is inside it, so one realm can have its own storms.",
-      "auto": "Auto",
-      "clear": "Clear",
-      "rain": "Rain",
-      "snow": "Snow",
-      "blizzard": "Blizzard",
-      "sparkle": "Golden sparkles",
-      "intensity": "Intensity",
-      "cloudCover": "Cloud cover",
-      "cloudHeight": "Cloud height (yd)",
-      "cloudHint": "Low clouds hug the terrain and read as rolling ground fog.",
-      "aurora": "Aurora",
-      "auroraHint": "Curtains hang high over the camera wherever it goes: brightest at night, faint by day.",
-      "scheduleTitle": "Dynamic weather",
-      "scheduleWins": "A schedule is running: it overrides the fixed weather above.",
-      "stepMode": "Weather for this step",
-      "stepMinutes": "Minutes this step lasts",
-      "minutesShort": "min",
-      "removeStep": "Remove this step",
-      "addStep": "Add step",
-      "addStepTitle": "Cycle through the steps in order, each holding for its minutes, then repeat",
-      "scheduleHint": "Steps loop in order (Rain 5 min, then Clear 10 min, ...). Saves with the map and runs in playtest."
+      "title": "Clima",
+      "showSnowfall": "Mostrar nevada",
+      "snowfallHint": "Un ajuste de vista previa del taller que se recuerda en este navegador.",
+      "zoneTitle": "Clima de esta zona",
+      "zoneHint": "El clima de esta zona sustituye el cielo general del mapa mientras el jugador está dentro, de modo que un reino puede tener sus propias tormentas.",
+      "auto": "Automático",
+      "clear": "Despejar",
+      "rain": "Lluvia",
+      "snow": "Nieve",
+      "blizzard": "Ventisca",
+      "sparkle": "Destellos dorados",
+      "intensity": "Intensidad",
+      "cloudCover": "Nubosidad",
+      "cloudHeight": "Altura de las nubes (yardas)",
+      "cloudHint": "Las nubes bajas se ciñen al terreno y parecen niebla que rueda por el suelo.",
+      "aurora": "Aurora polar",
+      "auroraHint": "Las cortinas cuelgan muy por encima de la cámara adondequiera que vaya: brillantes de noche y tenues de día.",
+      "scheduleTitle": "Clima dinámico",
+      "scheduleWins": "Hay una programación en marcha: sustituye el clima fijo de arriba.",
+      "stepMode": "Clima de este paso",
+      "stepMinutes": "Minutos que dura este paso",
+      "minutesShort": "minutos",
+      "removeStep": "Quitar este paso",
+      "addStep": "Añadir paso",
+      "addStepTitle": "Recorre los pasos en orden, manteniendo cada uno durante sus minutos, y luego repite",
+      "scheduleHint": "Los pasos se repiten en orden (Lluvia 5 min, luego Despejado 10 min, etc.). Se guarda con el mapa y funciona en la prueba de juego."
     },
     "camera": {
-      "title": "Camera",
-      "axisWidget": "Camera axis views",
-      "snapPositiveX": "View from positive X",
-      "snapNegativeX": "View from negative X",
-      "snapPositiveY": "View from above",
-      "snapNegativeY": "View from below",
-      "snapPositiveZ": "View from positive Z",
-      "snapNegativeZ": "View from negative Z",
-      "focus": "Focus selection (.)",
-      "focusTitle": "Move the orbit pivot onto the selected object so the camera revolves around it; with nothing selected, frame the whole map",
-      "freeFly": "Free-Fly (Shift+F)",
-      "freeFlyHint": "WASD moves, Q/E goes up and down, dragging looks around like first person, and the wheel sets the speed.",
-      "invertPan": "Invert camera",
-      "showBoundary": "Show map boundary walls",
-      "showPlayer": "Show playtest player",
-      "wireframe": "Wireframe mode",
-      "xray": "Transparent X-ray mode",
-      "speedTitle": "Movement speeds",
-      "moveSpeed": "WASD move speed",
-      "lookSpeed": "Mouse look speed",
-      "panSpeed": "Pan speed",
-      "speedHint": "How fast the viewport camera flies, looks, and pans. Editor only. In Free-Fly the mouse wheel is the throttle: it changes this move speed instead of zooming.",
-      "flySpeedSet": "Fly speed {value}x",
-      "resetSpeeds": "Reset speeds",
-      "perfTitle": "Performance overlay",
-      "perfShow": "Show overlay in the viewport",
-      "perfHint": "A live readout pinned to the viewport corner while you edit.",
-      "perfFps": "FPS",
-      "perfFrameMs": "Frame time (ms)",
-      "perfAssets": "Placed assets",
-      "perfTris": "Scene polygons",
-      "perfSelTris": "Selected polygons",
-      "perfTerrain": "Terrain edits",
-      "perfStreaming": "Terrain streaming",
-      "perfCoords": "World (x, z)",
-      "assetViewTitle": "Asset view distance",
-      "assetViewDistance": "Placed assets fade out at",
-      "assetViewMax": "As far as the fog",
-      "assetViewHint": "How far placed decor renders before it fades out and stops drawing, to save performance. Lower it to cull distant assets sooner; raise it to see farther. Saved with the map, so playtest matches.",
-      "visibilityTitle": "Terrain visibility",
-      "visibilityDistance": "Visible terrain distance",
-      "loadingHaze": "Loading haze",
-      "visibilityHint": "Original-detail terrain streams near the camera. Haze hides each zone until it is ready. Higher distances use more GPU and memory."
+      "title": "Cámara",
+      "axisWidget": "Vistas de ejes de cámara",
+      "snapPositiveX": "Vista desde X positivo",
+      "snapNegativeX": "Vista desde X negativo",
+      "snapPositiveY": "Vista desde arriba",
+      "snapNegativeY": "Vista desde abajo",
+      "snapPositiveZ": "Vista desde Z positivo",
+      "snapNegativeZ": "Vista desde Z negativo",
+      "focus": "Centrar selección (.)",
+      "focusTitle": "Mueve el pivote orbital al objeto seleccionado para que la cámara gire a su alrededor; sin selección, encuadra todo el mapa",
+      "freeFly": "Vuelo libre (Shift+F)",
+      "freeFlyHint": "WASD mueve, Q/E sube y baja, arrastrar permite mirar alrededor como en primera persona y la rueda ajusta la velocidad.",
+      "invertPan": "Invertir cámara",
+      "showBoundary": "Mostrar muros del límite del mapa",
+      "showPlayer": "Mostrar jugador de la prueba de juego",
+      "wireframe": "Modo de estructura de alambre",
+      "xray": "Modo transparente de rayos X",
+      "speedTitle": "Velocidades de movimiento",
+      "moveSpeed": "Velocidad de movimiento con WASD",
+      "lookSpeed": "Velocidad de giro con el ratón",
+      "panSpeed": "Velocidad de desplazamiento lateral",
+      "speedHint": "Velocidad a la que la cámara de la vista vuela, gira y se desplaza lateralmente. Solo afecta al editor. En Vuelo libre, la rueda del ratón actúa como acelerador: cambia esta velocidad de movimiento en lugar de acercar o alejar.",
+      "flySpeedSet": "Velocidad de vuelo {value}x",
+      "resetSpeeds": "Restablecer velocidades",
+      "perfTitle": "Panel de rendimiento",
+      "perfShow": "Mostrar panel superpuesto en la vista",
+      "perfHint": "Lectura en vivo fijada a la esquina de la vista mientras editas.",
+      "perfFps": "Fotogramas por segundo",
+      "perfFrameMs": "Tiempo por fotograma (ms)",
+      "perfAssets": "Recursos colocados",
+      "perfTris": "Polígonos de la escena",
+      "perfSelTris": "Polígonos seleccionados",
+      "perfTerrain": "Ediciones del terreno",
+      "perfStreaming": "Carga progresiva del terreno",
+      "perfCoords": "Mundo (x, z)",
+      "assetViewTitle": "Distancia de visión de recursos",
+      "assetViewDistance": "Los recursos colocados se desvanecen a",
+      "assetViewMax": "Hasta la niebla",
+      "assetViewHint": "Distancia a la que se dibuja la decoración colocada antes de desvanecerse y dejar de dibujarse para ahorrar rendimiento. Redúcela para descartar antes los recursos lejanos; auméntala para ver más lejos. Se guarda con el mapa, por lo que la prueba de juego coincide.",
+      "visibilityTitle": "Visibilidad del terreno",
+      "visibilityDistance": "Distancia de terreno visible",
+      "loadingHaze": "Neblina de carga",
+      "visibilityHint": "El terreno con su detalle original se carga progresivamente cerca de la cámara. La neblina oculta cada zona hasta que está lista. Las distancias mayores consumen más GPU y memoria."
     },
     "hints": {
       "nav3d": "Arrastra para orbitar, usa la rueda para hacer zoom. Mientras arrastras, WASD vuela y Q/E cambia la altura.",
@@ -12120,24 +13460,24 @@ export const es: EnTranslations = {
       "close": "Cerrar",
       "tool": {
         "select": "Elige elementos colocados para moverlos, girarlos y escalarlos; haz clic en un marcador 2D para editarlo.",
-        "move": "Move the selected asset with the 3-axis gizmo arrows.",
-        "rotate": "Rotate the selected asset with the gizmo rings.",
-        "scale": "Scale the selected asset with the gizmo handles, per axis or uniformly.",
+        "move": "Mueve el recurso seleccionado con las flechas de tres ejes del manipulador.",
+        "rotate": "Gira el recurso seleccionado con los anillos del manipulador.",
+        "scale": "Escala el recurso seleccionado con los tiradores del manipulador, por eje o de manera uniforme.",
         "raise": "Eleva el terreno bajo el pincel.",
         "lower": "Rebaja el terreno bajo el pincel.",
         "smooth": "Suaviza los bultos hacia la altura media local.",
         "flatten": "Nivela el suelo a la altura donde empieza el arrastre.",
-        "slope": "Right-click to set the start height, then drag from another height to lay a smooth ramp.",
-        "pond": "Click to dig a local pond with its own water surface.",
+        "slope": "Haz clic derecho para fijar la altura inicial y luego arrastra desde otra altura para crear una rampa suave.",
+        "pond": "Haz clic para excavar un estanque local con su propia superficie de agua.",
         "paint": "Pinta cubierta de bioma sobre la predeterminada de la zona.",
         "water": "Ajusta el nivel del agua del mapa entero.",
         "place": "Coloca elementos del catálogo o subidos sobre el suelo.",
-        "foliage": "Brush-paint grass, bushes, trees, and rocks with size variation.",
-        "clutter": "Brush-paint ground clutter (broken tiles, pebbles, letters, leaves) that renders on High graphics and up.",
-        "meshfix": "Remove stretched leftover terrain polys around a cut or cave mouth, or restore them. Wireframe turns on while the tool is active.",
-        "tree": "Grow a fully customizable tree: trunk, branches, canopy volumes and leaves.",
+        "foliage": "Pinta con pincel hierba, arbustos, árboles y rocas con variación de tamaño.",
+        "clutter": "Pinta con pincel detalles dispersos de suelo (baldosas rotas, guijarros, cartas y hojas) que se muestran con calidad gráfica Alta o superior.",
+        "meshfix": "Quita los polígonos de terreno estirados que sobren alrededor de un corte o entrada de cueva, o restáuralos. La estructura de alambre se activa mientras la herramienta está en uso.",
+        "tree": "Crea un árbol totalmente personalizable: tronco, ramas, volúmenes de copa y hojas.",
         "blocker": "Arrastra muros invisibles que bloquean el movimiento en la prueba de juego.",
-        "collider": "Drop box, sphere, or floor-plane collision volumes, invisible in playtest.",
+        "collider": "Coloca volúmenes de colisión de caja, esfera o plano de suelo, invisibles en la prueba de juego.",
         "camp": "Añade y edita campamentos de criaturas que aparecen en la prueba de juego.",
         "spawn": "Define dónde aparece el jugador en la prueba de juego.",
         "region": "Selecciona con un recuadro terreno y elementos para copiar y pegar.",
@@ -12149,7 +13489,7 @@ export const es: EnTranslations = {
         "undo": "Ctrl+Z deshace el último cambio; Ctrl+Y o Ctrl+Mayús+Z lo rehace.",
         "save": "Ctrl+S guarda el mapa.",
         "duplicate": "Ctrl+D duplica el elemento seleccionado.",
-        "multiSelect": "Shift+click adds or removes assets. In the NPC and Mob tool, Ctrl+click selects multiple entities.",
+        "multiSelect": "Mayús+clic añade o quita recursos. En la herramienta de PNJ y criaturas, Ctrl+clic selecciona varias entidades.",
         "nudge": "Las teclas de flecha desplazan el elemento seleccionado 0,5 yardas; mantén Mayús para 2 yardas.",
         "wheel": "Mayús+rueda gira el elemento seleccionado; Alt+rueda lo escala.",
         "delete": "Supr elimina el elemento o campamento seleccionado.",
@@ -12211,51 +13551,51 @@ export const es: EnTranslations = {
       "dialog": "Diálogo del editor"
     },
     "dungeon": {
-      "title": "Dungeon layout",
-      "collapse": "Fold",
-      "expand": "Expand",
-      "exit": "Back to map",
-      "hint": "Click selects (again cycles overlaps). Drag moves. Arrows nudge, Delete removes, Ctrl+Z undoes. Shift-drag pans, middle-drag orbits.",
-      "none": "Nothing selected. Click an outline on the floor plan.",
-      "addRoom": "Add room",
-      "addDoor": "Add door",
-      "addBarrier": "Add barrier",
-      "addOpening": "Add opening",
-      "addDecor": "Add decor",
-      "delete": "Delete",
-      "validate": "Validate",
-      "save": "Save to source",
-      "saved": "Layout written to src/sim/dungeon_layout.ts (dev server)",
-      "saveFailed": "Dev save endpoint unavailable; downloaded the layout instead",
-      "unsaved": "Unsaved layout changes",
-      "noIssues": "No issues found",
+      "title": "Distribución de mazmorra",
+      "collapse": "Plegar",
+      "expand": "Expandir",
+      "exit": "Volver al mapa",
+      "hint": "Un clic selecciona (los siguientes recorren los solapamientos). Arrastrar mueve. Las flechas desplazan ligeramente, Supr elimina y Ctrl+Z deshace. Mayús+arrastrar desplaza la vista y arrastrar con el botón central orbita.",
+      "none": "No hay nada seleccionado. Haz clic en un contorno del plano de planta.",
+      "addRoom": "Añadir habitación",
+      "addDoor": "Añadir puerta",
+      "addBarrier": "Añadir barrera",
+      "addOpening": "Añadir abertura",
+      "addDecor": "Añadir decoración",
+      "delete": "Eliminar",
+      "validate": "Validar",
+      "save": "Guardar en el origen",
+      "saved": "Distribución escrita en src/sim/dungeon_layout.ts (servidor de desarrollo)",
+      "saveFailed": "Punto de guardado de desarrollo no disponible; se ha descargado la distribución",
+      "unsaved": "Cambios de distribución sin guardar",
+      "noIssues": "No se han encontrado problemas",
       "kind": {
-        "room": "Room",
-        "door": "Door",
-        "barrier": "Barrier",
-        "opening": "Visual opening",
-        "decor": "Decor",
-        "dais": "Boss dais"
+        "room": "Habitación",
+        "door": "Puerta",
+        "barrier": "Barrera",
+        "opening": "Abertura visual",
+        "decor": "Decoración",
+        "dais": "Estrado del jefe"
       },
       "field": {
-        "id": "Id",
-        "key": "Model",
-        "style": "Style",
-        "x0": "West edge (x0)",
-        "x1": "East edge (x1)",
-        "z0": "Near edge (z0)",
-        "z1": "Far edge (z1)",
+        "id": "Identificador",
+        "key": "Modelo",
+        "style": "Estilo",
+        "x0": "Borde oeste (x0)",
+        "x1": "Borde este (x1)",
+        "z0": "Borde cercano (z0)",
+        "z1": "Borde lejano (z1)",
         "x": "X",
         "z": "Z",
-        "y": "Height offset",
-        "yaw": "Yaw (radians)",
-        "hw": "Half width",
-        "hd": "Half depth",
-        "r": "Collision radius",
-        "scale": "Scale",
-        "scaleX": "Scale X",
-        "scaleZ": "Scale Z",
-        "innerScale": "Inner scale"
+        "y": "Desplazamiento de altura",
+        "yaw": "Giro horizontal (radianes)",
+        "hw": "Mitad de la anchura",
+        "hd": "Mitad de la profundidad",
+        "r": "Radio de colisión",
+        "scale": "Escala",
+        "scaleX": "Escala X",
+        "scaleZ": "Escala Z",
+        "innerScale": "Escala interior"
       }
     }
   },
@@ -12319,7 +13659,15 @@ export const es: EnTranslations = {
     "whitepaper": "Libro blanco",
     "terms": "Términos de Servicio",
     "privacy": "Política de Privacidad",
-    "discordLabel": "Únete al Discord"
+    "discordLabel": "Únete al Discord",
+    "levyStreet": "Levy Street",
+    "guidesLabel": "Guías de jugadores",
+    "guideFree": "MMORPGs gratuitos",
+    "guideGamesLikeWow": "Juegos como WoW",
+    "guideBest": "Mejores MMORPGs",
+    "guideNew": "Nuevos MMORPGs",
+    "guideBrowser": "MMORPGs de navegador",
+    "guideGamesLikeDiablo": "Juegos como Diablo"
   },
   "settings": {
     "languageLoading": "Cargando idioma...",
@@ -12372,6 +13720,8 @@ export const es: EnTranslations = {
     "serverOffline": "Desconectado",
     "play": "Jugar",
     "playAria": "Jugar World of ClaudeCraft",
+    "playLoading": "Cargando",
+    "playStarting": "Iniciando",
     "serverLabel": "Elige tu mundo",
     "serverAria": "Selecciona el mundo: En Línea o Desconectado",
     "serverOfflineSub": "Mundo local instantáneo"
@@ -12399,173 +13749,173 @@ export const es: EnTranslations = {
     "realm": "Mundo",
     "newCharacter": "Nuevo personaje",
     "appearance": "Apariencia",
-    "modelLoading": "Loading character...",
-    "previewPinchHint": "Pinch to zoom",
+    "modelLoading": "Cargando personaje...",
+    "previewPinchHint": "Pellizca para acercar o alejar",
     "customize": "Personalizar",
     "body": "Cuerpo",
     "genderMale": "Hombre",
     "genderFemale": "Mujer",
-    "bodyTypeA": "Type A",
-    "bodyTypeB": "Type B",
+    "bodyTypeA": "Tipo A",
+    "bodyTypeB": "Tipo B",
     "wocHead": {
       "hair": {
-        "swept": "Swept",
-        "long": "Long",
-        "mohawk": "Mohawk",
-        "quiff": "Cropped Quiff",
-        "undercut": "Undercut",
-        "topknot": "Topknot",
-        "shoulder": "Shoulder Length",
-        "bald": "Bald",
-        "waves": "Waves",
-        "ponytail": "High Ponytail",
-        "braid": "Braid",
-        "bob": "Bob",
-        "crown": "Braided Crown",
-        "twins": "Twin Braids",
-        "curls": "Curly Updo"
+        "swept": "Peinado de lado",
+        "long": "Largo",
+        "mohawk": "Cresta",
+        "quiff": "Tupé corto",
+        "undercut": "Laterales rapados",
+        "topknot": "Moño alto",
+        "shoulder": "Hasta los hombros",
+        "bald": "Calvo",
+        "waves": "Ondas",
+        "ponytail": "Coleta alta",
+        "braid": "Trenza",
+        "bob": "Corte bob",
+        "crown": "Corona trenzada",
+        "twins": "Dos trenzas",
+        "curls": "Recogido rizado"
       },
       "beard": {
-        "none": "Clean Shaven",
-        "moustache": "Moustache",
-        "handlebar": "Handlebar",
-        "goatee": "Goatee",
-        "chin": "Chin Beard",
-        "boxed": "Boxed Beard",
-        "long": "Long Beard",
-        "chops": "Mutton Chops",
-        "chinstrap": "Chinstrap"
+        "none": "Afeitado",
+        "moustache": "Bigote",
+        "handlebar": "Bigote de manillar",
+        "goatee": "Perilla",
+        "chin": "Barba de mentón",
+        "boxed": "Barba cuadrada",
+        "long": "Barba larga",
+        "chops": "Patillas anchas",
+        "chinstrap": "Barba de mandíbula"
       },
       "nose": {
-        "default": "Classic",
-        "broad": "Broad",
-        "aquiline": "Aquiline",
-        "button": "Button",
-        "soft": "Soft"
+        "default": "Clásico",
+        "broad": "Ancha",
+        "aquiline": "Aguileña",
+        "button": "Respingona",
+        "soft": "Suave"
       },
       "mouth": {
-        "default": "Classic",
-        "full": "Full",
-        "smirk": "Smirk",
-        "relaxed": "Relaxed",
-        "cupids_bow": "Cupid's Bow",
-        "narrow": "Narrow",
-        "thin": "Thin",
-        "rounded": "Rounded"
+        "default": "Clásico",
+        "full": "Voluminoso",
+        "smirk": "Sonrisa ladeada",
+        "relaxed": "Relajado",
+        "cupids_bow": "Arco de Cupido",
+        "narrow": "Estrecho",
+        "thin": "Delgado",
+        "rounded": "Redondeado"
       },
       "brows": {
-        "default": "Classic",
-        "slim": "Slim",
-        "arched": "Arched",
-        "soft": "Soft",
-        "straight": "Straight",
-        "relaxed": "Relaxed",
-        "soft_arch": "Soft Arch",
-        "rounded": "Rounded"
+        "default": "Clásico",
+        "slim": "Fino",
+        "arched": "Arqueadas",
+        "soft": "Suave",
+        "straight": "Recto",
+        "relaxed": "Relajado",
+        "soft_arch": "Arco suave",
+        "rounded": "Redondeado"
       },
       "ears": {
-        "default": "Classic",
-        "large": "Large",
-        "pointed": "Pointed",
-        "round": "Round"
+        "default": "Clásico",
+        "large": "Grande",
+        "pointed": "Puntiagudas",
+        "round": "Redondas"
       },
       "eyes": {
-        "default": "Classic",
-        "almond": "Almond",
-        "hooded": "Hooded"
+        "default": "Clásico",
+        "almond": "Almendrados",
+        "hooded": "Encapotados"
       }
     },
     "wocBuilder": {
       "cat": {
-        "bodyType": "Body Type",
-        "skinTone": "Skin Tone",
-        "face": "Face",
-        "eyesBrows": "Eyes and Brows",
-        "eyeColor": "Eye Color",
-        "hairstyle": "Hairstyle",
-        "facialHair": "Facial Hair",
-        "hairColor": "Hair Color",
-        "browColor": "Eyebrow Color",
-        "piercings": "Piercings"
+        "bodyType": "Tipo de cuerpo",
+        "skinTone": "Tono de piel",
+        "face": "Rostro",
+        "eyesBrows": "Ojos y cejas",
+        "eyeColor": "Color de ojos",
+        "hairstyle": "Peinado",
+        "facialHair": "Vello facial",
+        "hairColor": "Color de cabello",
+        "browColor": "Color de cejas",
+        "piercings": "Perforaciones"
       },
       "section": {
-        "hair": "Hairstyle",
-        "nose": "Nose",
-        "mouth": "Lips",
-        "brows": "Brow Shape",
-        "ears": "Ears",
-        "eyes": "Eye Shape"
+        "hair": "Peinado",
+        "nose": "Nariz",
+        "mouth": "Labios",
+        "brows": "Forma de cejas",
+        "ears": "Orejas",
+        "eyes": "Forma de ojos"
       },
       "slider": {
-        "eyeSpacing": "Eye Spacing",
-        "eyeSize": "Eye Size",
-        "eyeTilt": "Eye Tilt",
-        "browHeight": "Brow Height",
-        "chinWidth": "Chin Width",
-        "bodyScale": "Body Size"
+        "eyeSpacing": "Separación de ojos",
+        "eyeSize": "Tamaño de ojos",
+        "eyeTilt": "Inclinación de ojos",
+        "browHeight": "Altura de cejas",
+        "chinWidth": "Anchura del mentón",
+        "bodyScale": "Tamaño del cuerpo"
       },
       "bodyGlyph": {
         "a": "A",
         "b": "B"
       },
       "piercing": {
-        "none": "None",
-        "lobes": "Lobes",
-        "ears": "Full Ears",
-        "brow": "Brow",
-        "nose": "Nostril",
-        "septum": "Septum",
-        "lip": "Lip",
-        "full": "Full Set"
+        "none": "Ninguno",
+        "lobes": "Lóbulos",
+        "ears": "Orejas completas",
+        "brow": "Ceja",
+        "nose": "Fosa nasal",
+        "septum": "Tabique nasal",
+        "lip": "Labio",
+        "full": "Conjunto completo"
       },
       "skin": {
-        "porcelain": "Porcelain",
-        "ivory": "Ivory",
-        "rose": "Rose",
-        "peach": "Peach",
-        "fair": "Fair",
-        "beige": "Beige",
-        "sand": "Sand",
-        "honey": "Honey",
-        "olive": "Olive",
-        "caramel": "Caramel",
-        "tan": "Tan",
-        "bronze": "Bronze",
-        "chestnut": "Chestnut",
-        "umber": "Umber",
-        "mahogany": "Mahogany",
-        "ebony": "Ebony"
+        "porcelain": "Porcelana",
+        "ivory": "Marfil",
+        "rose": "Rosado",
+        "peach": "Melocotón",
+        "fair": "Claro",
+        "beige": "Tono beige",
+        "sand": "Arena",
+        "honey": "Miel",
+        "olive": "Oliva",
+        "caramel": "Caramelo",
+        "tan": "Bronceado",
+        "bronze": "Bronce",
+        "chestnut": "Castaño",
+        "umber": "Sombra tostada",
+        "mahogany": "Caoba",
+        "ebony": "Ébano"
       },
       "eye": {
-        "brown": "Brown",
-        "darkBrown": "Dark Brown",
-        "hazel": "Hazel",
-        "amber": "Amber",
-        "green": "Green",
-        "teal": "Teal",
-        "blue": "Blue",
-        "paleBlue": "Pale Blue",
-        "grey": "Grey",
-        "violet": "Violet"
+        "brown": "Marrón",
+        "darkBrown": "Marrón oscuro",
+        "hazel": "Avellana",
+        "amber": "Ámbar",
+        "green": "Verde",
+        "teal": "Verde azulado",
+        "blue": "Azul",
+        "paleBlue": "Azul pálido",
+        "grey": "Gris",
+        "violet": "Violeta"
       },
       "hairColor": {
-        "platinum": "Platinum",
-        "blonde": "Blonde",
-        "golden": "Golden",
-        "copper": "Copper",
-        "red": "Red",
-        "auburn": "Auburn",
-        "lightBrown": "Light Brown",
-        "brown": "Brown",
-        "darkBrown": "Dark Brown",
-        "black": "Black",
-        "silver": "Silver",
-        "white": "White"
+        "platinum": "Platino",
+        "blonde": "Rubio",
+        "golden": "Dorado",
+        "copper": "Cobrizo",
+        "red": "Rojo",
+        "auburn": "Castaño rojizo",
+        "lightBrown": "Castaño claro",
+        "brown": "Marrón",
+        "darkBrown": "Marrón oscuro",
+        "black": "Negro",
+        "silver": "Plateado",
+        "white": "Blanco"
       },
-      "matchHair": "Match Hair",
-      "resetDefault": "Reset to Default",
-      "customColorAria": "Pick a custom color",
-      "customSkinAria": "Pick a custom skin tone"
+      "matchHair": "Igualar al cabello",
+      "resetDefault": "Restablecer valores predeterminados",
+      "customColorAria": "Elige un color personalizado",
+      "customSkinAria": "Elige un tono de piel personalizado"
     },
     "hair": "Cabello",
     "brows": "Cejas",
@@ -12741,7 +14091,7 @@ export const es: EnTranslations = {
     "browSoft": "Suaves",
     "browThick": "Gruesas",
     "browAngled": "Inclinadas",
-    "earrings": "Piercings",
+    "earrings": "Perforaciones",
     "jewelMaterial": "Material de joyería",
     "jewelDefault": "Original",
     "jewelGold": "Oro",
@@ -13924,6 +15274,10 @@ export const es: EnTranslations = {
     "selectClass": "Selecciona una clase.",
     "pickClass": "Elige una clase.",
     "returnToLogin": "Volver al inicio de sesión",
+    "searchUpdates": "Buscar actualizaciones",
+    "noUpdateFound": "No hay actualizaciones. Inténtalo de nuevo en breve.",
+    "updateUnavailable": "Actualiza desde tu tienda de juegos o descarga el cliente más reciente.",
+    "updateSearchFailed": "No se pudieron comprobar las actualizaciones. Inténtalo de nuevo.",
     "api": {
       "tooManyAttempts": "Demasiados intentos. Espera un minuto e inténtalo de nuevo.",
       "usernameShape": "El usuario debe tener 3-24 caracteres y usar letras, dígitos o guion bajo.",
@@ -14034,9 +15388,9 @@ export const es: EnTranslations = {
   "character": {
     "loading": "Cargando...",
     "noneYet": "Aún no hay personajes. Crea uno abajo.",
-    "membershipRequired": "Renew your membership to play this character.",
-    "membershipSlots": "Unlock slots with a membership",
-    "emptySlot": "Available character slot",
+    "membershipRequired": "Renueva tu membresía para jugar con este personaje.",
+    "membershipSlots": "Desbloquea espacios con una membresía",
+    "emptySlot": "Espacio de personaje disponible",
     "levelClass": "Nivel {level} {className}",
     "inWorld": "en el mundo",
     "takeOver": "Tomar control",
@@ -14046,7 +15400,7 @@ export const es: EnTranslations = {
     "lockoutRaids": "Bandas",
     "lockoutDungeons": "Mazmorras",
     "lockoutWorldBosses": "Jefes del mundo",
-    "lockoutWeeklyQuests": "Weekly quests",
+    "lockoutWeeklyQuests": "Misiones semanales",
     "takeOverConfirm": "Esto desconectará a este personaje de otra sesión y lo traerá aquí. ¿Continuar?",
     "renameRequired": "cambio de nombre requerido",
     "delete": "Eliminar",
@@ -14155,6 +15509,17 @@ export const es: EnTranslations = {
     "androidOpenStep": "Abre World of ClaudeCraft desde el nuevo icono.",
     "otherStandaloneDetail": "Mantén el dispositivo en pantalla completa horizontal.",
     "otherInstallDetail": "Instala o agrega esta página a la pantalla de inicio para la mejor experiencia móvil a pantalla completa."
+  },
+  "graphicsPrompt": {
+    "title": "Elige la calidad gráfica",
+    "intro": "Elige un ajuste gráfico para este dispositivo. Los ajustes más bajos ofrecen mayor fluidez; los más altos, un aspecto más detallado.",
+    "autoDesc": "Elige un ajuste adecuado para este dispositivo. Detectado: {preset}.",
+    "lowDesc": "El rendimiento más fluido. Ideal para teléfonos, tabletas y equipos con gráficos antiguos o integrados.",
+    "mediumDesc": "Equilibrio entre calidad visual y rendimiento. Adecuado para la mayoría de los portátiles.",
+    "highDesc": "Más detalle y escenarios más completos. Adecuado para una tarjeta gráfica dedicada.",
+    "ultraDesc": "El ajuste fijo con mayor calidad visual. Adecuado para una tarjeta gráfica de gama alta.",
+    "changeLater": "Puedes cambiarlo cuando quieras en Opciones, en Calidad gráfica.",
+    "confirm": "Continuar"
   },
   "serverUnavailable": {
     "title": "World of ClaudeCraft: Mundo no disponible",
@@ -14631,7 +15996,7 @@ export const es: EnTranslations = {
       "deathRecapCauterized": "Has muerto. La quemadura de Cauterizar acabó contigo.",
       "respawn": "Te sientes descansado y completo de nuevo.",
       "respawnKeeperToll": "El Guardián Pálido te ha revivido, pero has salido debilitado: el Tañido del Guardián drena tus atributos hasta que se desvanece.",
-      "moonbridgeBanner": "The Moonbridge Rises",
+      "moonbridgeBanner": "El Puente Lunar se alza",
       "ignoringChat": "Ignorando el chat de {name}.",
       "noLongerIgnoring": "Ya no ignoras a {name}.",
       "playerNotNearby": "Ese jugador no está cerca.",
@@ -14803,6 +16168,7 @@ export const es: EnTranslations = {
       "passive": "Pasivo",
       "defensive": "Defensivo",
       "aggressive": "Agresivo",
+      "assist": "Asistir",
       "petAttackTitle": "Ataque de mascota",
       "petAttackDesc": "Ordena a tu mascota atacar a tu objetivo hostil actual.",
       "waterJetTitle": "Chorro de Agua",
@@ -14816,10 +16182,11 @@ export const es: EnTranslations = {
       "healDemonDesc": "Gasta maná para canalizar sanación hacia tu demonio durante 5 segundos.",
       "healPetDesc": "Haz clic y luego haz clic en comida de tus bolsas para alimentar y sanar a tu mascota durante 5 segundos.",
       "stanceTitle": "Actitud de mascota",
-      "stanceDesc": "Haz clic para elegir Pasivo, Defensivo o Agresivo.",
+      "stanceDesc": "Haz clic para elegir Pasivo, Defensivo, Agresivo o Asistir.",
       "passiveDesc": "Solo ataca cuando se lo ordenas.",
       "defensiveDesc": "Ataca a enemigos que te dañen a ti o a tu mascota.",
       "aggressiveDesc": "Ataca a enemigos hostiles cercanos.",
+      "assistDesc": "Solo ataca a tu objetivo actual después de que uses una habilidad sobre él. Ignora a los enemigos que te atacan.",
       "rename": "Renombrar mascota",
       "revive": "Remendar",
       "abandon": "Abandonar mascota",
@@ -14835,10 +16202,10 @@ export const es: EnTranslations = {
     "social": {
       "title": "Comunidad",
       "friendsTab": "Amigos",
-      "friendFirstPage": "First page",
-      "friendNextPage": "Next page",
-      "boundFriend": "Bound friend",
-      "boundFriendLink": "Bound friends are linked by their referral invitation.",
+      "friendFirstPage": "Primera página",
+      "friendNextPage": "Página siguiente",
+      "boundFriend": "Amigo vinculado",
+      "boundFriendLink": "Los amigos vinculados están unidos por su invitación de recomendación.",
       "guildTab": "Hermandad",
       "ignoreTab": "Ignorar",
       "leaveParty": "Salir del grupo",
@@ -14949,6 +16316,7 @@ export const es: EnTranslations = {
       "cooldownMinutes": "{minutes}m",
       "attackTooltip": "Activa o desactiva el autoataque sobre tu objetivo. Hacer clic derecho en un enemigo también ataca.",
       "attackRemoveHint": "Clic derecho para quitarlo de la barra y liberar el espacio.",
+      "moveHint": "Mantén Mayús y arrastra para mover",
       "emptySlot": "Ranura vacía",
       "slotAria": "Ranura de acción {slot}: {ability}",
       "emptySlotAria": "Ranura de acción {slot}: vacía",
@@ -15067,160 +16435,168 @@ export const es: EnTranslations = {
       "hoard_cast_mimic_bite": "Mordisco Voraz",
       "hoard_cast_mimic_leap": "Salto Aplastante",
       "hoard_cast_coin_spit": "Monedas Malditas",
-      "crypt_grave_bolt": "Grave Bolt",
-      "crypt_raise_bones": "Raise Bones",
-      "crypt_murder_call": "Murder Call",
-      "crypt_stone_shriek": "Stone Shriek",
-      "crypt_grave_cleave": "Grave Cleave",
-      "crypt_barrowflame_breath": "Barrowflame Breath",
-      "crypt_tail_lash": "Tail Lash",
-      "crypt_wing_gust": "Wing Gust",
-      "crypt_grave_rupture": "Grave Rupture",
-      "crypt_carrion_eye": "Carrion Eye",
-      "crypt_marrow_crush": "Marrow Crush",
-      "crypt_rimesilk_spit": "Rimesilk Spit",
-      "crypt_gravespark_volley": "Gravespark Volley",
-      "crypt_morthen_rite_wakes": "The Rite Wakes",
-      "crypt_morthen_rise": "Rise of the Gravecaller",
-      "crypt_morthen_proclaim": "Grave Proclamation",
-      "crypt_morthen_descend": "Descent",
-      "crypt_knellwyrm_arrive": "Descending from the Sky",
-      "crypt_knellwyrm_pyre_strafe": "Pyre Strafe",
-      "crypt_knellwyrm_strafe_run": "Strafing Run",
-      "crypt_knellwyrm_dread_bellow": "Dread Bellow",
-      "crypt_marrow_shovelful": "Shovelful",
-      "crypt_marrow_measure": "Measured for the Grave",
-      "crypt_marrow_burial_toll": "Burial Toll",
-      "crypt_marrow_gravediggers_blow": "Gravedigger's Blow",
-      "crypt_lady_brides_lament": "Bride's Lament",
-      "crypt_lady_frozen_embrace": "Frozen Embrace",
-      "crypt_lady_embrace_hold": "Frozen Embrace",
-      "crypt_lady_bridal_freeze": "Bridal Freeze",
-      "crypt_ilvane_dirge": "Dirge of the Hollow",
-      "crypt_ilvane_unbroken_dirge": "Unbroken Verse",
-      "crypt_ilvane_bone_organ": "Bone Organ",
-      "crypt_morthen_shadow_pulse": "Shadow Pulse",
-      "crypt_morthen_rite_of_the_unquiet": "Rite of the Unquiet",
-      "crypt_morthen_reap_the_unquiet": "Reap the Unquiet",
-      "kituse_crypt_relight_candle": "Relight the Candle",
-      "crypt_knellwyrm_knell_rise": "Burning Knell",
-      "crypt_knellwyrm_knell_mark": "Burning Knell",
-      "crypt_knellwyrm_knell_breath": "Burning Knell",
-      "crypt_knellwyrm_knell_land": "Burning Knell",
-      "bastion_brine_mend": "Brine Mend",
-      "bastion_fog_ward": "Fog Ward",
-      "bastion_halberd_sweep": "Halberd Sweep",
-      "bastion_piercing_bolt": "Piercing Bolt",
-      "bastion_claw_sweep": "Claw Sweep",
-      "bastion_shell_slam": "Shell Slam",
-      "ghost_captain_broadside": "Spectral Broadside",
-      "ghost_captain_anchor": "Cursed Anchor",
-      "ghost_captain_boarding": "Phantom Boarding",
-      "bastion_boathook": "Boathook Drag",
-      "bastion_fog_bank": "Fog Bank",
-      "bastion_brine_column": "Brine Column",
-      "bastion_loose_on_my_mark": "Loose on My Mark",
-      "bastion_oathbound_charge": "Oathbound Charge",
-      "bastion_gaolers_cudgel": "Gaoler's Cudgel",
-      "bastion_mist_surge": "Mist Surge",
-      "bastion_drowning_hymn": "Drowning Hymn",
-      "bastion_iron_cage": "Iron Cage",
-      "bastion_drowned_anchor_cast": "Drowned Anchor",
-      "bastion_shackle_pair": "Shackle Pair",
-      "bastion_shadowstep": "Shadow Crossing",
-      "bastion_reaping_scythe": "Reaping Scythe",
-      "bastion_veil_rise": "Fog Veil",
-      "bastion_veil_gather": "Gathering Fog",
-      "bastion_vael_rise": "Death Rises",
-      "bastion_vael_sink": "Into the Fog",
-      "bastion_hallowed_brine": "Hallowed Brine",
-      "bastion_rebounding_bulwark": "Rebounding Bulwark",
-      "bastion_tide_sentence": "Sentence of the Tide",
-      "bastion_oath_kneel": "Unbroken Oath",
-      "bastion_oath_vigil": "Unbroken Oath",
-      "temple_lullaby": "Lullaby",
-      "cantor_last_verse": "The Last Verse",
-      "temple_call_the_tide": "Call the Tide",
-      "temple_static_coil": "Static Coil",
-      "temple_snapper_snap": "Snap",
-      "temple_trident_sweep": "Trident Sweep",
-      "temple_sea_song": "Sea-Song",
-      "temple_tidal_slap": "Tidal Slap",
-      "temple_tide_breath": "Freezing Breath",
-      "temple_moonlight_lance": "Moonlight Lance",
-      "temple_prism_flare": "Prism Flare",
-      "temple_resonant_slam": "Resonant Slam",
-      "temple_moonwater_bolt": "Moonwater Bolt",
-      "temple_drowning_aria": "Drowning Aria",
-      "temple_mere_surge": "Mere Surge",
-      "temple_tideglass_fracture": "Tideglass Fracture",
-      "temple_undertow": "Undertow",
-      "temple_lunar_tide": "Lunar Tide",
-      "temple_skewering_trident": "Skewering Trident",
-      "temple_pale_mending": "Pale Mending",
-      "temple_glimmer_venom": "Glimmer Venom",
-      "temple_pearl_slam": "Tidal Wingbeat",
-      "temple_lightning_spit": "Lightning Spit",
-      "temple_crushing_torrent": "Crushing Torrent",
-      "temple_hydra_tsunami": "Tsunami",
-      "temple_ysolei_call": "Moonspawn Call",
-      "temple_ysolei_wrath": "Drowned Wrath",
-      "temple_frostlocked_torrent": "Frostlocked Torrent",
-      "temple_venom_current": "Venom Current",
-      "temple_toxic_rime": "Toxic Rime",
-      "temple_beckoning_moon": "Beckoning Moon",
-      "temple_falling_moon": "Falling Moon",
-      "temple_prism_glare": "Prism Glare",
-      "temple_arcing_spark": "Arcing Spark",
-      "temple_call_of_the_shallows": "Call of the Shallows",
-      "wildheart_ancestral_sap": "Ancestral Sap",
-      "wildheart_plant_totem": "Plant Totem",
-      "wildheart_entangling_lash": "Entangling Lash",
-      "wildheart_saurian_tail_swipe": "Tail Swipe",
-      "wildheart_saurian_stomp": "Earthshaking Stomp",
-      "wildheart_quarry_mark": "Quarry Mark",
-      "wildheart_war_roar": "War Roar",
-      "wildheart_toad_hex": "Toad Hex",
-      "wildheart_rattling_dread": "Rattling Dread",
-      "wildheart_snaring_tongue": "Snaring Tongue",
-      "wildheart_beast_pit_quake": "Beast Pit Quake",
-      "wildheart_jaguar_heel": "Heel!",
-      "wildheart_gorgebloom_seed_rain": "Seed Rain",
-      "wildheart_gorgebloom_vine_lash": "Vine Lash",
-      "wildheart_gorgebloom_gorge": "Gorge",
-      "wildheart_zulgar_pulse": "Wildheart Pulse",
-      "wildheart_zulgar_spirit_hunt": "Spirit of the Hunt",
-      "sanctum_cinder_breath": "Cinder Breath",
-      "sanctum_warming_rite": "Warming Rite",
-      "sanctum_goad": "Goad",
-      "sanctum_plant_brazier": "Plant Soul Brazier",
-      "sanctum_ice_block_toss": "Ice Block Toss",
-      "sanctum_tusker_tusk_sweep": "Tusk Sweep",
-      "sanctum_tusker_trample": "Trample",
-      "sanctum_thaw_the_held": "Thaw the Held",
-      "sanctum_counterweight_lash": "Counterweight Lash",
-      "sanctum_branding_iron": "Branding Iron",
-      "sanctum_rime_breath": "Rime Breath",
-      "kituse_sanctum_topple_brazier": "Topple Brazier",
-      "trash_demo_nova": "Test Nova",
-      "trash_demo_nova_unstoppable": "Test Nova",
-      "trash_demo_walker": "Test Orb",
-      "sanctum_korgath_maul_arc": "Maul Arc",
-      "sanctum_korgath_chain_flail": "Chain Flail",
-      "sanctum_korgath_threshold_charge": "Threshold Charge",
-      "sanctum_korgath_foremans_bellow": "Foreman's Bellow",
-      "sanctum_korgath_strain": "Strain",
-      "sanctum_korgath_stomp": "Shuddering Stomp",
-      "sanctum_goadsmith_rerivet": "Re-rivet",
-      "sanctum_velkhar_soulfire_trench": "Soulfire Trench",
-      "sanctum_velkhar_shadow_volley": "Shadow Volley",
-      "sanctum_korzul_break_free": "Break Free",
-      "sanctum_korzul_grave_breath": "Grave Breath",
-      "sanctum_korzul_tail_sweep": "Tail Sweep",
-      "sanctum_korzul_grave_inferno": "Grave Inferno",
-      "sanctum_korzul_wing_gale": "Wing Gale",
-      "sanctum_korzul_plunging_fire": "Plunging Fire",
-      "sanctum_korzul_crashing_descent": "Crashing Descent"
+      "crypt_grave_bolt": "Descarga sepulcral",
+      "crypt_raise_bones": "Alzar huesos",
+      "crypt_murder_call": "Llamada de la bandada",
+      "crypt_stone_shriek": "Chillido de piedra",
+      "crypt_grave_cleave": "Hendidura sepulcral",
+      "crypt_barrowflame_breath": "Aliento de llama tumular",
+      "crypt_tail_lash": "Latigazo de cola",
+      "crypt_wing_gust": "Ráfaga de alas",
+      "crypt_grave_rupture": "Ruptura sepulcral",
+      "crypt_carrion_eye": "Ojo carroñero",
+      "crypt_marrow_crush": "Aplastamiento de médula",
+      "crypt_rimesilk_spit": "Escupitajo de seda escarchada",
+      "crypt_gravespark_volley": "Salva de chispas sepulcrales",
+      "crypt_morthen_rite_wakes": "El rito despierta",
+      "crypt_morthen_rise": "Ascenso del Invocador de Tumbas",
+      "crypt_morthen_proclaim": "Proclamación sepulcral",
+      "crypt_morthen_descend": "Descenso",
+      "crypt_knellwyrm_arrive": "Descenso del cielo",
+      "crypt_knellwyrm_pyre_strafe": "Pasada de fuego de pira",
+      "crypt_knellwyrm_strafe_run": "Pasada de ataque",
+      "crypt_knellwyrm_dread_bellow": "Bramido de pavor",
+      "crypt_marrow_shovelful": "Palada",
+      "crypt_marrow_measure": "Medido para la tumba",
+      "crypt_marrow_burial_toll": "Toque fúnebre",
+      "crypt_marrow_gravediggers_blow": "Golpe del sepulturero",
+      "crypt_lady_brides_lament": "Lamento de la novia",
+      "crypt_lady_frozen_embrace": "Abrazo helado",
+      "crypt_lady_embrace_hold": "Abrazo helado",
+      "crypt_lady_bridal_freeze": "Congelación nupcial",
+      "crypt_ilvane_dirge": "Canto fúnebre de la oquedad",
+      "crypt_ilvane_unbroken_dirge": "Verso ininterrumpido",
+      "crypt_ilvane_bone_organ": "Órgano de hueso",
+      "crypt_morthen_shadow_pulse": "Pulso de sombras",
+      "crypt_morthen_rite_of_the_unquiet": "Rito de los inquietos",
+      "crypt_morthen_reap_the_unquiet": "Segar a los inquietos",
+      "kituse_crypt_relight_candle": "Reencender la vela",
+      "crypt_knellwyrm_knell_rise": "Doblar ardiente",
+      "crypt_knellwyrm_knell_mark": "Doblar ardiente",
+      "crypt_knellwyrm_knell_breath": "Doblar ardiente",
+      "crypt_knellwyrm_knell_land": "Doblar ardiente",
+      "bastion_brine_mend": "Restauración de salmuera",
+      "bastion_fog_ward": "Resguardo de niebla",
+      "bastion_halberd_sweep": "Barrido de alabarda",
+      "bastion_piercing_bolt": "Proyectil perforante",
+      "bastion_claw_sweep": "Barrido de garras",
+      "bastion_shell_slam": "Golpe de caparazón",
+      "ghost_captain_broadside": "Andanada espectral",
+      "ghost_captain_anchor": "Ancla maldita",
+      "ghost_captain_boarding": "Abordaje fantasma",
+      "bastion_boathook": "Arrastre de bichero",
+      "bastion_fog_bank": "Banco de niebla",
+      "bastion_brine_column": "Columna de salmuera",
+      "bastion_loose_on_my_mark": "Disparad a mi señal",
+      "bastion_oathbound_charge": "Carga del juramento",
+      "bastion_gaolers_cudgel": "Garrote del carcelero",
+      "bastion_mist_surge": "Oleada de bruma",
+      "bastion_drowning_hymn": "Himno de ahogamiento",
+      "bastion_iron_cage": "Jaula de hierro",
+      "bastion_drowned_anchor_cast": "Ancla ahogada",
+      "bastion_shackle_pair": "Grilletes emparejados",
+      "bastion_shadowstep": "Cruce de sombras",
+      "bastion_reaping_scythe": "Guadaña segadora",
+      "bastion_veil_rise": "Velo de niebla",
+      "bastion_veil_gather": "Niebla que se acumula",
+      "bastion_vael_rise": "La muerte se alza",
+      "bastion_vael_sink": "Hacia la niebla",
+      "bastion_hallowed_brine": "Salmuera consagrada",
+      "bastion_rebounding_bulwark": "Baluarte de rebote",
+      "bastion_tide_sentence": "Sentencia de la marea",
+      "bastion_oath_kneel": "Juramento intacto",
+      "bastion_oath_vigil": "Juramento intacto",
+      "temple_lullaby": "Nana",
+      "cantor_last_verse": "El último verso",
+      "temple_call_the_tide": "Invocar la marea",
+      "temple_static_coil": "Espiral de estática",
+      "temple_snapper_snap": "Dentellada",
+      "temple_trident_sweep": "Barrido de tridente",
+      "temple_sea_song": "Canto del mar",
+      "temple_tidal_slap": "Bofetada de marea",
+      "temple_tide_breath": "Aliento congelante",
+      "temple_moonlight_lance": "Lanza de luz lunar",
+      "temple_prism_flare": "Fulgor del prisma",
+      "temple_resonant_slam": "Golpe resonante",
+      "temple_moonwater_bolt": "Descarga de agua lunar",
+      "temple_drowning_aria": "Aria de ahogamiento",
+      "temple_mere_surge": "Oleada de la laguna",
+      "temple_score": "La partitura",
+      "temple_score_answer": "Responder a la partitura",
+      "temple_tideglass_fracture": "Fractura de cristal de marea",
+      "temple_undertow": "Resaca",
+      "temple_lunar_tide": "Marea lunar",
+      "temple_skewering_trident": "Tridente empalador",
+      "temple_pale_mending": "Restauración pálida",
+      "temple_glimmer_venom": "Veneno reluciente",
+      "temple_pearl_slam": "Aleteo de marea",
+      "temple_lightning_spit": "Escupitajo de relámpagos",
+      "temple_crushing_torrent": "Torrente aplastante",
+      "temple_hydra_tsunami": "Ola de tsunami",
+      "temple_ysolei_call": "Llamada del engendro lunar",
+      "temple_ysolei_wrath": "Cólera ahogada",
+      "temple_frostlocked_torrent": "Torrente aprisionado en hielo",
+      "temple_venom_current": "Corriente venenosa",
+      "temple_toxic_rime": "Escarcha tóxica",
+      "temple_beckoning_moon": "Luna que llama",
+      "temple_falling_moon": "Luna descendente",
+      "temple_prism_glare": "Resplandor del prisma",
+      "temple_arcing_spark": "Chispa en arco",
+      "temple_call_of_the_shallows": "Llamada de los bajíos",
+      "wildheart_ancestral_sap": "Savia ancestral",
+      "wildheart_plant_totem": "Colocar tótem",
+      "wildheart_entangling_lash": "Latigazo enredador",
+      "wildheart_saurian_tail_swipe": "Barrido de cola",
+      "wildheart_saurian_stomp": "Pisotón sísmico",
+      "wildheart_quarry_mark": "Marca de la presa",
+      "wildheart_war_roar": "Rugido de guerra",
+      "wildheart_toad_hex": "Maleficio de sapo",
+      "wildheart_rattling_dread": "Pavor estremecedor",
+      "wildheart_snaring_tongue": "Lengua atrapadora",
+      "wildheart_beast_pit_quake": "Terremoto del foso de bestias",
+      "wildheart_jaguar_heel": "¡Junto!",
+      "wildheart_gorgebloom_seed_rain": "Lluvia de semillas",
+      "wildheart_gorgebloom_vine_lash": "Latigazo de lianas",
+      "wildheart_gorgebloom_gorge": "Atracón",
+      "wildheart_zulgar_pulse": "Pulso de Corazón Salvaje",
+      "wildheart_zulgar_spirit_hunt": "Espíritu de la caza",
+      "wildheart_zulgar_hunting_spear": "Lanza de caza",
+      "wildheart_zulgar_idol_wakes": "El ídolo despierta",
+      "kituse_wildheart_pull_spear": "Extraer la lanza",
+      "wildheart_idols_breath": "Aliento del ídolo",
+      "wildheart_sun_glyph_kindle": "Encendido",
+      "wildheart_sun_glyph_cold": "Enfriamiento",
+      "sanctum_cinder_breath": "Aliento de ceniza",
+      "sanctum_warming_rite": "Rito de calentamiento",
+      "sanctum_goad": "Aguijada",
+      "sanctum_plant_brazier": "Colocar brasero de almas",
+      "sanctum_ice_block_toss": "Lanzamiento de bloque de hielo",
+      "sanctum_tusker_tusk_sweep": "Barrido de colmillos",
+      "sanctum_tusker_trample": "Pisotear",
+      "sanctum_thaw_the_held": "Descongelar a los cautivos",
+      "sanctum_counterweight_lash": "Latigazo del contrapeso",
+      "sanctum_branding_iron": "Hierro de marcar",
+      "sanctum_rime_breath": "Aliento de escarcha",
+      "kituse_sanctum_topple_brazier": "Volcar brasero",
+      "trash_demo_nova": "Nova de prueba",
+      "trash_demo_nova_unstoppable": "Nova de prueba",
+      "trash_demo_walker": "Orbe de prueba",
+      "sanctum_korgath_maul_arc": "Arco de maza",
+      "sanctum_korgath_chain_flail": "Mangual de cadenas",
+      "sanctum_korgath_threshold_charge": "Carga del umbral",
+      "sanctum_korgath_foremans_bellow": "Bramido del capataz",
+      "sanctum_korgath_strain": "Tensión",
+      "sanctum_korgath_stomp": "Pisotón estremecedor",
+      "sanctum_goadsmith_rerivet": "Remachar de nuevo",
+      "sanctum_velkhar_soulfire_trench": "Zanja de fuego de almas",
+      "sanctum_velkhar_shadow_volley": "Salva de sombras",
+      "sanctum_korzul_break_free": "Liberarse",
+      "sanctum_korzul_grave_breath": "Aliento sepulcral",
+      "sanctum_korzul_tail_sweep": "Barrido de la cola",
+      "sanctum_korzul_grave_inferno": "Infierno sepulcral",
+      "sanctum_korzul_wing_gale": "Vendaval de alas",
+      "sanctum_korzul_plunging_fire": "Fuego descendente",
+      "sanctum_korzul_crashing_descent": "Descenso aplastante"
     }
   },
   "questUi": {
@@ -15264,6 +16640,8 @@ export const es: EnTranslations = {
       "clueTalkAria": "Preguntar sobre la pista: {name}",
       "clueDeliver": "Entrega {count} {item}.",
       "clueDeliverAria": "Entregar {count} {item} a {name}",
+      "attuneHearthstone": "Vincular aquí mi piedra de hogar aliada.",
+      "attuneHearthstoneAria": "Vincula tu piedra de hogar aliada a {hub} con {name}",
       "profIntroHint": "Habla con {name} para \"{quest}\".",
       "nythraxisDeathlessKingWarning": "Las tres reliquias cuentan la misma historia: Aldren luchó para defender a su rey, Malric rompió el límite de la muerte y Voss intentó detener lo que vino después. El sello se debilita, y la cripta abandonada es el camino hacia abajo.",
       "browseGoods": "Déjame ver tus mercancías.",
@@ -15288,8 +16666,8 @@ export const es: EnTranslations = {
       "rewards": "Recompensas",
       "xpReward": "{xp} de experiencia",
       "itemReward": "Recompensa de objeto:",
-      "chooseReward": "Choose your reward:",
-      "rewardChoices": "You will be able to choose one of these rewards:",
+      "chooseReward": "Elige tu recompensa:",
+      "rewardChoices": "Podrás elegir una de estas recompensas:",
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Requiere nivel {level}"
     },
@@ -15305,6 +16683,7 @@ export const es: EnTranslations = {
       "activeStatus": "Misión de mundo activa",
       "expiresIn": "Caduca en {time}",
       "mineOre": "Extrae mineral de cobre",
+      "mineMaterial": "Extrae {name}",
       "recoverObject": "Recupera {name}",
       "redirectLeyBeam": "Redirige el rayo ley",
       "matchConfections": "Combina dulces encantados",
@@ -15652,6 +17031,7 @@ export const es: EnTranslations = {
       "clueCasketOpened": "El cofre contiene {money} y {items}.",
       "treasureMapEarned": "Todas las misiones de mundo del día están hechas: has encontrado un {map}.",
       "treasureMapLost": "Todas las misiones de mundo del día están hechas, pero no tienes sitio en las bolsas para el mapa del tesoro.",
+      "worldQuestRewardMailed": "Tus bolsas están llenas. Tu recompensa se envió al buzón: {items}.",
       "treasureMapRead": "Estudias el {map}. La X está en algún lugar de {zone}.",
       "treasureMapUpgraded": "El mapa se ha redibujado con tinta más fina: ahora es un {map}.",
       "treasureVaultOpened": "El suelo cede. Un tesoro enterrado se abre ante ti.",
@@ -15667,7 +17047,7 @@ export const es: EnTranslations = {
       "incomplete": "Esa misión no está completada.",
       "giverMissing": "El dador de esa misión no está cerca.",
       "turnInMissing": "La entrega de esa misión no está cerca.",
-      "rewardNotOffered": "That reward is not offered.",
+      "rewardNotOffered": "Esa recompensa no está disponible.",
       "tooFar": "Está demasiado lejos.",
       "escortAway": "Tu escolta no está en su puesto ahora mismo. Volverá allí en breve."
     }
@@ -15720,8 +17100,8 @@ export const es: EnTranslations = {
       "scroll": "Pergamino",
       "bag": "Bolsa",
       "mount": "Montura",
-      "buddy": "Buddy",
-      "buddyCosmetic": "Buddy cosmetic"
+      "buddy": "Compañero",
+      "buddyCosmetic": "Cosmético de compañero"
     },
     "stats": {
       "armor": "Armadura",
@@ -15737,17 +17117,18 @@ export const es: EnTranslations = {
       "parry": "Parada"
     },
     "tooltip": {
-      "referralFullSet": "Equip all {pieces} friendship armor pieces to gain {percent}% more experience while in a party with {member}. Their membership must be active.",
-      "referralInviter": "the member who invited you",
-      "referralRetained": "Armor stats keep scaling even when you are not in a party with your inviter.",
-      "referralDormant": "Inactive: this account has not received friendship armor through a member referral.",
-      "membershipToken": "Use: Consume this token to add {days} days of membership to your account. Any remaining membership time is kept. This token can be traded or sold at the auction house before redemption.",
-      "membershipAdaptive": "Stats and armor adapt to your class and specialization.",
-      "membershipScaling": "Item level matches your level. At level 20, this armor perfects at item level 25.",
-      "membershipPerfected": "Perfected: item level {level}.",
-      "membershipFullSet": "Equip all {pieces} membership armor pieces to gain {percent}% more experience. Requires an active membership.",
-      "membershipRequired": "Armor stats and set benefits stop when membership expires and return when you renew.",
-      "membershipDormant": "Inactive: renew your membership to restore armor stats and set benefits.",
+      "referralFullSet": "Equipa las {pieces} piezas de armadura de la amistad para obtener un {percent}% más de experiencia mientras estás en un grupo con {member}. Su membresía debe estar activa.",
+      "referralInviter": "el miembro que te invitó",
+      "referralRetained": "Las estadísticas de la armadura siguen escalando aunque no estés en un grupo con quien te invitó.",
+      "referralDormant": "Inactivo: esta cuenta no ha recibido armadura de la amistad mediante la invitación de un miembro.",
+      "membershipToken": "Uso: consume esta ficha para añadir {days} días de membresía a tu cuenta. Se conserva todo el tiempo de membresía restante. Esta ficha se puede intercambiar o vender en la casa de subastas antes de canjearla.",
+      "membershipAdaptive": "Las estadísticas y la armadura se adaptan a tu clase y especialización.",
+      "membershipWeaponAdaptive": "Cambia su tipo de arma, apariencia y estadísticas para adaptarse a tu clase y especialización mientras está equipada.",
+      "membershipScaling": "Nivel de objeto {level}. Siempre 5 niveles de objeto por encima del nivel de tu personaje.",
+      "membershipPerfected": "Perfeccionado: nivel de objeto {level}.",
+      "membershipFullSet": "Equipa las {pieces} piezas de armadura de membresía para obtener un {percent}% más de experiencia. Requiere una membresía activa.",
+      "membershipRequired": "Las estadísticas del equipo y las ventajas de conjunto se desactivan cuando caduca la membresía y vuelven al renovar.",
+      "membershipDormant": "Inactivo: renueva tu membresía para restaurar las estadísticas del equipo y las ventajas de conjunto.",
       "qualityKind": "{kind} {quality}",
       "currentlyEquipped": "Equipado actualmente",
       "ifYouEquip": "Si equipas esto",
@@ -15755,6 +17136,7 @@ export const es: EnTranslations = {
       "dps": "({dps} de daño por segundo)",
       "armorStat": "{value} de armadura",
       "stat": "+{value} {stat}",
+      "warfareMainHandOnly": "La Pericia bélica se cuenta solo en la mano principal.",
       "useFood": "Uso: restaura {amount} de salud durante {seconds} s. Debes permanecer sentado mientras comes.",
       "useDrink": "Uso: restaura {amount} de maná durante {seconds} s. Debes permanecer sentado mientras bebes.",
       "useElixir": "Uso: aumenta tu {stat} en {value} durante {minutes} min. Reemplaza cualquier otro elixir o pergamino del mismo atributo. Se puede usar en combate.",
@@ -15817,6 +17199,9 @@ export const es: EnTranslations = {
       "levelClass": "Nivel {level} {className}"
     },
     "vendor": {
+      "basicRiding": "Entrenamiento de Monta",
+      "advancedRiding": "Entrenamiento avanzado de Monta",
+      "ridingSpeed": "Aumenta tu velocidad de movimiento al montar un {speed}%. Se aplica a todas las monturas.",
       "goodsTitle": "{name}: mercancías",
       "close": "Cerrar vendedor",
       "hint": "Haz clic en un objeto de tus bolsas para venderlo mientras esta ventana esté abierta.",
@@ -15843,7 +17228,8 @@ export const es: EnTranslations = {
       "sellQuantityCancel": "Cancelar",
       "sellJunk": "Vender basura",
       "sellJunkAria": "Vender toda la basura por {price}",
-      "sellJunkHint": "Vende todos los objetos grises de tus bolsas excepto los objetos de misión."
+      "sellJunkHint": "Vende todos los objetos grises de tus bolsas excepto los objetos de misión.",
+      "sellJunkNoBuyback": "Los objetos grises sin firma no aparecen en la lista de recompra; venderlos es irreversible."
     },
     "market": {
       "title": "Mercado Mundial",
@@ -15956,7 +17342,7 @@ export const es: EnTranslations = {
       "historyEmpty": "Todavía no hay ventas. Los objetos que vendas en el Mercado Mundial aparecerán aquí.",
       "historyNote": "Tus ventas recientes en el Mercado Mundial.",
       "saleBuyer": "Vendido a {buyer}",
-      "saleOlder": "Más {count} ventas anteriores, incluidas en el total.",
+      "saleOlder": "Más {count} ventas anteriores que no se muestran.",
       "ordersTab": "Solicitados",
       "ordersNote": "Publica lo que quieres y el oro queda retenido en el Mercader. Las publicaciones a tu precio o por debajo se completan al instante; el resto espera un vendedor. El Mercader se queda con una comisión del {cut}% de quien entregue. Tienes {used}/{max} pedidos abiertos.",
       "ordersListAria": "Pedidos de compra abiertos",
@@ -16026,7 +17412,8 @@ export const es: EnTranslations = {
       "tooManyOrders": "Puedes mantener como máximo {count} pedidos abiertos a la vez.",
       "orderClosed": "Ese pedido ya no está abierto.",
       "orderOwn": "Ese es tu propio pedido. Cancélalo para retirarlo.",
-      "orderNotYours": "Ese pedido no es tuyo."
+      "orderNotYours": "Ese pedido no es tuyo.",
+      "orderTrackedItem": "El Mercader no acepta pedidos de equipo único."
     },
     "loot": {
       "takeAll": "Recoger botín",
@@ -16048,8 +17435,8 @@ export const es: EnTranslations = {
   "entities": {
     "abilities": {
       "courier": {
-        "name": "Courier",
-        "description": "Summon a flying donkey to carry items between your bags and the nearest bank. It flies at 250% of normal running speed. Choose up to 24 stacks per trip. Membership is required to start a new trip."
+        "name": "Mensajero",
+        "description": "Invoca un burro volador para transportar objetos entre tus bolsas y el banco más cercano. Cada viaje tarda hasta 15 segundos en llegar al banco y hasta 15 segundos en volver; vuela más rápido en las rutas largas. Elige hasta 24 pilas por viaje. Los objetos devueltos desbordan las bolsas llenas y luego el mensajero desaparece hasta que vuelvas a invocarlo. El viaje de vuelta se pausa mientras estás muerto o dentro de una instancia. Se requiere membresía para iniciar un viaje nuevo."
       },
       "sport_kick": {
         "name": "Patada",
@@ -16107,6 +17494,10 @@ export const es: EnTranslations = {
         "name": "Andanada",
         "description": "Hace llover flechas sobre un área de 8 m durante 3 s. Los enemigos dentro sufren {damage} de daño Físico cada 0.5 s. El daño aumenta con el poder de ataque a distancia."
       },
+      "phosphor_flask": {
+        "name": "Frasco de Fósforo",
+        "description": "Un recipiente sellado con una mezcla química reactiva que estalla en llamas al rojo blanco sobre un área de 8 m durante 3 s. Los enemigos que permanezcan en las llamas sufren {damage} de daño de Fuego cada 0,5 s. El daño aumenta con el poder de ataque a distancia."
+      },
       "pack_command": {
         "name": "Orden de Manada",
         "description": "Ordena a tu mascota viva golpear por 36 a 48 de daño Físico. El daño aumenta con el poder de ataque de la mascota. Un impacto restaura 20 de concentración y otorga 1 de Ferocidad de Manada durante 30 s, hasta 3. Cada acumulación aumenta un 10% todo el daño infligido por tu mascota. Este golpe usa las acumulaciones que tenías antes del impacto."
@@ -16129,19 +17520,19 @@ export const es: EnTranslations = {
       },
       "bloodhook": {
         "name": "Garfio Sangriento",
-        "description": "Carga contra un enemigo y aplica Herida de Garfio Sangriento, infligiendo 34 de daño Físico base más un 26% de tu poder de ataque a distancia durante 12 s en 4 pulsos. (Distintivo de Arte de Campo)"
+        "description": "Cargas contra un enemigo y le aplicas una herida de Garfio Sangriento, que inflige 34 de daño físico base más un 26% de tu poder de ataque a distancia durante 12 s en 4 pulsos. Al llegar, ralentiza al objetivo un 30% durante 3 s. (Distintivo de Supervivencia)"
       },
       "shrapnel_charge": {
         "name": "Carga de Metralla",
-        "description": "Golpea al objetivo por 24 a 30 de daño Físico y hasta a otros 4 enemigos a menos de 6 metros por 13 a 17. Los demás objetivos también sangran por 12 de daño durante 6 s. Si el objetivo principal tiene tu Herida de Garfio Sangriento, inflige 1 pulso de herida al instante. El daño directo aumenta con el poder de ataque a distancia."
+        "description": "Dispara en un cono de 10 m delante de ti. Tu objetivo, o el enemigo más cercano alcanzado si está fuera del cono, recibe de 24 a 30 de daño físico. Los demás enemigos en el cono reciben de 7 a 9 y sangran 12 de daño durante 6 s. Si el objetivo principal tiene tu herida de Garfio Sangriento, recibe inmediatamente 1 pulso de la herida. Alcanzar a un enemigo otorga 1 de Ímpetu de Caza. El daño directo aumenta con el poder de ataque a distancia."
       },
       "bloodtrail_assault": {
         "name": "Asalto del Rastro de Sangre",
-        "description": "Durante 12 s, el Garfio Sangriento propaga una herida al 60% de potencia a un máximo de 2 enemigos cercanos, el Desgarraheridas ordena un ataque de mascota de 18 de daño, y la Carga de Metralla gana 2 metros, inflige un 25% más de daño base a su objetivo principal y desencadena un 50% más de daño de herida."
+        "description": "Durante 12 s, Garfio Sangriento propaga una herida al 60% de potencia a un máximo de 2 enemigos a 5 m, Desgarro Cruento ordena un ataque de mascota de 18 de daño y Carga de Metralla alcanza 2 m más lejos, inflige un 25% más de daño base al objetivo principal y activa un 50% más de daño de herida. Si no tienes mascota viva, tu Enfoque también se regenera un 100% más rápido."
       },
       "trailbreak": {
         "name": "Quiebrasendas",
-        "description": "Salta 12 metros hacia atrás. Si tienes Ímpetu de Caza, lo refresca y prepara la Reentrada durante 12 s."
+        "description": "Salta 25 metros hacia atrás y te libera de los enraizamientos y las ralentizaciones de movimiento. Si tienes Ímpetu de Caza, lo refresca y prepara la Reentrada durante 12 s."
       },
       "wildheart": {
         "name": "Corazón Salvaje",
@@ -16151,9 +17542,25 @@ export const es: EnTranslations = {
         "name": "Piel de Caparazón",
         "description": "Reduce el daño recibido un 60% durante 8 s, pero impide atacar mientras está activa."
       },
+      "play_dead": {
+        "name": "Hacerse el muerto",
+        "description": "Cae al suelo y finge estar muerto: tu salud y tu concentración se muestran vacías para todos. Los enemigos se olvidan de ti, y los jugadores enemigos que te tienen como objetivo pierden su objetivo. Moverte, atacar o usar otra habilidad lo termina. Si lo lanzas en movimiento, tienes 1 s para detenerte antes de que el movimiento lo termine. Vuelve a lanzarlo para levantarte."
+      },
+      "tactical_camo": {
+        "name": "Camuflaje Táctico",
+        "description": "Confúndete con el entorno: los enemigos apenas te perciben y te mueves al 80% de velocidad. Atacar o recibir daño rompe Camuflaje Táctico. Úsalo de nuevo para salir. (Supervivencia)"
+      },
       "frostjaw_trap": {
         "name": "Trampa Fauces de Escarcha",
-        "description": "Coloca una trampa en el enemigo seleccionado o a tus pies. Se arma tras 0,75 s y dura 30 s. El primer enemigo que la active queda inmovilizado durante 3 s, y los enemigos a menos de 4 metros quedan ralentizados un 50% durante 4 s."
+        "description": "Coloca una trampa en la ubicación seleccionada. Se arma tras 0,75 s y dura 1 min, y solo tú y tu grupo pueden verla. El primer enemigo que la active queda inmovilizado durante 3 s, y los enemigos a menos de 4 metros quedan ralentizados un 50% durante 4 s."
+      },
+      "bear_trap": {
+        "name": "Trampa para Osos",
+        "description": "Coloca una trampa en la ubicación seleccionada. Se arma tras 0,75 s y dura 1 min; solo tú y tu grupo pueden verla. El primer enemigo que la active sangra por {damage} de daño Físico durante 15 s y queda ralentizado un 50% durante 4 s. El daño aumenta con el poder de ataque a distancia. Solo puede haber una Trampa para Osos activa a la vez. Puede coexistir con tu Trampa Fauces de Escarcha. Colocar otra Trampa para Osos reemplaza la anterior."
+      },
+      "scatterbolt": {
+        "name": "Ráfaga de Virotes",
+        "description": "Dispara una ráfaga de virotes en un cono de 90 grados que alcanza 8 metros frente a ti y repele a los enemigos hasta dejarlos a una distancia de hasta 20 metros de ti. Los enemigos inmunes a la repulsión no se ven afectados. No inflige daño."
       },
       "pack_rally": {
         "name": "Reunión de Manada",
@@ -16269,7 +17676,7 @@ export const es: EnTranslations = {
       },
       "mass_barrier": {
         "name": "Barrera masiva",
-        "description": "Protege a ti y hasta a 4 aliados cercanos en un radio de 30 m; cada escudo absorbe 130 de daño durante 60 s. (Talento de mago)"
+        "description": "Protege a ti y hasta a 4 aliados cercanos en un radio de 30 m; cada escudo absorbe {damage} de daño durante 15 s. (Talento de mago)"
       },
       "overload": {
         "name": "Sobrecarga",
@@ -16406,7 +17813,7 @@ export const es: EnTranslations = {
       },
       "kidney_shot": {
         "name": "Golpe Bajo",
-        "description": "Movimiento final que aturde al objetivo durante 1 s más 1 s por punto de combo (5 puntos de combo: 6 s)."
+        "description": "Movimiento final que aturde al objetivo durante 2 s más 1 s por punto de combo (5 puntos de combo: 7 s)."
       },
       "ambush": {
         "name": "Golpe del Acechador",
@@ -16415,7 +17822,7 @@ export const es: EnTranslations = {
       },
       "stealth": {
         "name": "Velo Crepuscular",
-        "description": "Te oculta entre las sombras: los enemigos apenas te notan, pero te mueves un 50% más lento. Atacar o recibir daño rompe el Velo Crepuscular. Vuelve a lanzarla para salir.",
+        "description": "Te oculta entre las sombras: los enemigos apenas te notan y te mueves a velocidad completa. Atacar o recibir daño rompe el Velo Crepuscular. Vuelve a lanzarla para salir.",
         "specNote_subtlety": "Cada apertura que uses desde el Velo Crepuscular añade 1 de Penumbra (máx. 3)."
       },
       "adrenaline_rush": {
@@ -16459,7 +17866,7 @@ export const es: EnTranslations = {
       },
       "vanish": {
         "name": "Fuga de humo",
-        "description": "Desaparece de la vista, entrando en Duskveil incluso en combate. Te mueves un 50% más lento mientras estás oculto. Dura hasta 10 s."
+        "description": "Desaparece de la vista, entrando en Duskveil incluso en combate. Te mueves a velocidad completa mientras estás oculto. Dura hasta 10 s."
       },
       "instant_poison": {
         "name": "Mordisco de Víbora",
@@ -16692,11 +18099,11 @@ export const es: EnTranslations = {
       },
       "hunting_momentum": {
         "name": "Ímpetu de Caza",
-        "description": "Pasiva: el Golpe Destripador otorga 1 de Ímpetu de Caza durante 8 s, hasta 3. Con 3 acumulaciones, el Desgarraheridas inflige un 45% más de daño de golpe y consume las acumulaciones. (Arte de Campo)"
+        "description": "Pasivo: Golpe Destripador y una Carga de Metralla que alcance a un enemigo otorgan 1 de Ímpetu de Caza cada uno, hasta 3. Dura hasta gastarse o salir de combate, y cada acumulación aumenta tu velocidad un 15%. Con 3 acumulaciones, Desgarro Cruento inflige un 60% más de daño de golpe y las consume. (Supervivencia)"
       },
       "fieldcraft_reentry": {
         "name": "Reentrada Armada",
-        "description": "Pasiva: Quiebrasendas refresca el Ímpetu de Caza y prepara tu próximo Golpe Destripador o Garfio Sangriento durante 12 s. El Golpe Destripador inflige un 15% más de daño por acumulación. El Garfio Sangriento inflige de 18 a 24 de daño Físico adicional, aumentado un 15% por acumulación y por tu poder de ataque a distancia. Con 3 acumulaciones, cualquiera de los dos ataques consume el Ímpetu de Caza. (Arte de Campo)"
+        "description": "Pasivo: Con Ímpetu de Caza, Quiebrasendas prepara tu siguiente Golpe Destripador o Garfio Sangriento durante 12 s. Golpe Destripador inflige un 15% más de daño por acumulación. Garfio Sangriento inflige de 18 a 24 de daño físico adicional, aumentado un 15% por acumulación y por el poder de ataque a distancia. Con 3 acumulaciones, cualquiera de los dos consume Ímpetu de Caza. (Supervivencia)"
       },
       "wing_clip": {
         "name": "Tajo Aprisionante",
@@ -16708,7 +18115,7 @@ export const es: EnTranslations = {
       },
       "aspect_of_the_cheetah": {
         "name": "Aspecto del Corcel",
-        "description": "Adoptas el aspecto del corcel y aumentas tu velocidad de movimiento un 30% durante 30 min. Mientras esté activo, recibir daño te aturde, reduciendo tu velocidad de movimiento a la mitad durante 4 s (cada golpe reinicia el aturdimiento)."
+        "description": "Adoptas el aspecto del corcel y aumentas tu velocidad de movimiento un 30% durante 30 min. Mientras esté activo, recibir daño te aturde, reduciendo tu velocidad de movimiento a la mitad durante 2 s (cada golpe reinicia el aturdimiento)."
       },
       "aimed_shot": {
         "name": "Tensado Largo",
@@ -16764,18 +18171,18 @@ export const es: EnTranslations = {
       },
       "thunder_reservoir": {
         "name": "Reserva de Truenos",
-        "description": "Pasiva: el Arco Eléctrico y el Relámpago Bifurcado otorgan Trueno, hasta 5. Con 5 de Trueno, la Sacudida Terrestre inflige un 125% más de daño o el Terremoto un 100% más, y luego consume todo el Trueno. (Llamatruenos)"
+        "description": "Pasiva: Arco Eléctrico, Relámpago Bifurcado y Explosión de Magma otorgan Trueno, hasta 5. Sacudida Terrestre consume todo el Trueno e inflige un 25% más de daño por cada Trueno (125% con 5). Despertar de Falla consume todo el Trueno e inflige un 20% más de daño por cada Trueno (100% con 5). (Llamatruenos)"
       },
       "lightning_overload": {
-        "name": "Arc Overload",
+        "name": "Sobrecarga de Arco",
         "description": "Pasiva: Arco Eléctrico y Relámpago Bifurcado tienen un 20% de probabilidad de sufrir una Sobrecarga, golpeando de nuevo a su primer objetivo por el 50% del daño infligido y otorgando 1 de Trueno. (Thundercall)"
       },
       "lava_burst": {
-        "name": "Magma Burst",
-        "description": "Inflige {damage} de daño de Fuego. Siempre asesta golpe crítico a un objetivo que arda con tu Sacudida de Ascuas. Oleada de Magma: cada tic de Sacudida de Ascuas tiene un 20% de probabilidad de reiniciar este tiempo de reutilización y hacer que tu próximo Magma Burst en los 10 s siguientes sea instantáneo. El daño aumenta con el poder con hechizos. (Thundercall)"
+        "name": "Explosión de Magma",
+        "description": "Inflige {damage} de daño de Fuego. Un impacto otorga 1 de Trueno. Siempre asesta golpe crítico a un objetivo que arda con tu Sacudida de Ascuas. Un golpe crítico inflige un 24% adicional del daño normal. Oleada de Magma: cada tic de Sacudida de Ascuas tiene un 20% de probabilidad de reiniciar este tiempo de reutilización y hacer que tu próxima Explosión de Magma en los 10 s siguientes sea instantánea. El daño aumenta con el poder con hechizos. (Thundercall)"
       },
       "thunderstorm": {
-        "name": "Stormbreak",
+        "name": "Ruptura de la Tormenta",
         "description": "Invoca un trueno, infligiendo {damage} de daño de Naturaleza a los enemigos en 10 m y ralentizándolos un 50% durante 5 s. Restaura el 8% de tu maná máximo. El daño aumenta con el poder con hechizos. (Thundercall)"
       },
       "rockbiter_weapon": {
@@ -16796,7 +18203,7 @@ export const es: EnTranslations = {
       },
       "flame_shock": {
         "name": "Sacudida de Ascuas",
-        "description": "Inflige {damage} de daño de Fuego, y después {overTime} de daño de Fuego durante 12 s. El impacto inicial aumenta con el poder con hechizos."
+        "description": "Inflige {damage} de daño de Fuego, y después {overTime} de daño de Fuego durante {duration} s. El impacto inicial aumenta con el poder con hechizos."
       },
       "flametongue_weapon": {
         "name": "Arma Tizón Ígneo",
@@ -16929,7 +18336,8 @@ export const es: EnTranslations = {
       },
       "healing_touch": {
         "name": "Cura Silvestre",
-        "description": "Sana a un objetivo amistoso por {damage}."
+        "description": "Sana a un objetivo amistoso por {damage}.",
+        "specNote_restoration": "Cada lanzamiento completado añade 1 de Verdor (máx. 3). El Verdor acumulado acorta este lanzamiento: 2,2 s con 1 de Verdor, 1,9 s con 2 y 1,5 s con 3. Bendición de la Naturaleza lo vuelve instantáneo, gratuito y un 25% más fuerte."
       },
       "mark_of_the_wild": {
         "name": "Resguardo Silvestre",
@@ -16945,9 +18353,9 @@ export const es: EnTranslations = {
         "description": "Solo en Forma de lechúcico lunar. Golpea por {damage} de daño Arcano, añade una fase de Marea Lunar y extiende tu Tempestad Lunar 6 s, hasta {duration} s por aplicación. Con la Marea Lunar llena, Semilla Lunar se convierte en Oleada Lunar."
       },
       "rejuvenation": {
-        "name": "Floración Silvestre",
+        "name": "Remiendo de Esporas",
         "description": "Sana al objetivo por {damage} a lo largo de 12 s.",
-        "specNote_restoration": "Plantar una floración NUEVA añade 1 de Verdor (máx. 5). Con 5 de Verdor, Alivio presto se convierte en Sobrefloración."
+        "specNote_restoration": "Cada lanzamiento añade 1 de Verdor (máx. 3), incluso si renueva una floración que ya está activa. Con 3 de Verdor, Alivio presto se convierte en Sobrefloración."
       },
       "thorns": {
         "name": "Guardia de Zarzas",
@@ -16959,12 +18367,12 @@ export const es: EnTranslations = {
       },
       "bear_form": {
         "name": "Forma de Bruin",
-        "description": "Cambias a forma de oso: armadura +110%, salud máxima +30%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Lánzala de nuevo para volver a forma de taumaturgo."
+        "description": "Cambias a forma de oso: armadura +110%, salud máxima +30%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Golpeas el doble de rápido con la mitad de daño por golpe, y cada golpe genera el doble de ira. Lánzala de nuevo para volver a forma de taumaturgo."
       },
       "maul": {
         "name": "Rompehuesos",
         "description": "Un ataque brutal que aumenta el daño cuerpo a cuerpo en {damage} y genera una amenaza enorme. Se activa en tu siguiente golpe. Solo en Forma de Bruin.",
-        "specNote_feral": "Cada golpe conectado añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Quiebramédula: un golpe de 78 a 96 de daño con alta amenaza; por debajo de la mitad de salud, en su lugar te protege con un escudo del 18% de tu salud máxima y restaura 15 de ira."
+        "specNote_feral": "Cada golpe conectado añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Quiebramédula: un golpe de 78 a 96 de daño con alta amenaza; por debajo de la mitad de salud, en su lugar te sana un 18% de tu salud máxima y restaura 15 de ira."
       },
       "growl": {
         "name": "Amenazar",
@@ -16975,17 +18383,22 @@ export const es: EnTranslations = {
         "description": "Un rugido funesto: todos los enemigos en un radio de 10 m son provocados, su amenaza hacia ti sube hasta igualar la de su enemigo más odiado, y quedan obligados a atacarte durante 3 s. Solo en Forma de Bruin."
       },
       "cat_form": {
-        "name": "Forma de lobo",
-        "description": "Te transforma en lobo: la agilidad sube con tu nivel, poder de ataque +8 más 2 por nivel, tus ataques usan energía y puntos de combo, y generas un 29% menos de amenaza. Lánzalo de nuevo para volver a la forma de lanzador."
+        "name": "Forma felina",
+        "description": "Adopta forma de gato: la agilidad aumenta con tu nivel, el poder de ataque sube 8 más 2 por nivel, tus ataques usan energía y puntos de combo, te mueves un 15% más rápido y generas un 29% menos de amenaza. Cambiar a cualquier forma otorga Zancada Trotadora, un breve aumento de velocidad. Úsalo de nuevo para volver a la forma de lanzador."
       },
       "claw": {
         "name": "Garra Desgarradora",
-        "description": "Araña al enemigo por daño de arma más {damage}. Otorga 1 punto de combo. Solo en Forma de lobo.",
+        "description": "Araña al enemigo por daño de arma más {damage}. Otorga 1 punto de combo. Solo en Forma felina.",
         "specNote_feral": "Cada golpe conectado añade 1 de Sangre Antigua (máx. 3)."
+      },
+      "scratch": {
+        "name": "Arañazo",
+        "description": "Araña a los objetivos cercanos en un radio de 6 m e inflige daño de arma más {damage}. Otorga 1 punto de combo por objetivo alcanzado. Revela a los enemigos en sigilo dentro del barrido. Solo en Forma Felina.",
+        "specNote_feral": "Cada golpe que acierta añade 1 de Sangre Antigua (máximo 3)."
       },
       "ferocious_bite": {
         "name": "Mordisco Sangriento",
-        "description": "Movimiento final que causa {damage}. Solo en Forma de lobo.",
+        "description": "Movimiento final que causa {damage}. Solo en Forma felina.",
         "specNote_feral": "Cada golpe conectado añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Cosecha Roja, que consume la Sangre Antigua para un golpe más fuerte que también inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, y restaura energía."
       },
       "swipe": {
@@ -16995,8 +18408,8 @@ export const es: EnTranslations = {
       },
       "regrowth": {
         "name": "Segundo Florecer",
-        "description": "Sana a un objetivo amistoso por {damage} y una cantidad adicional a lo largo de 21 s.",
-        "specNote_restoration": "Plantar una floración NUEVA añade 1 de Verdor (máx. 5)."
+        "description": "Sana a un objetivo amistoso por {damage} y una cantidad adicional a lo largo de 15 s. Si el efecto dura todo su tiempo, vuelve a sanar al objetivo por la misma cantidad que la sanación inicial.",
+        "specNote_restoration": "Cada lanzamiento añade 1 de Verdor (máx. 3), incluso si renueva una floración que ya está activa."
       },
       "barkskin": {
         "name": "Piel de Roble",
@@ -17033,23 +18446,23 @@ export const es: EnTranslations = {
       },
       "hibernate": {
         "name": "Letargo",
-        "description": "Sume al objetivo en un sueño profundo de hasta 8 s. Cualquier daño lo despertará."
+        "description": "Sume al objetivo en un sueño profundo durante un máximo de 8 s. Cualquier daño lo despierta. Contra jugadores, cada repetición en 18 s dura la mitad que la anterior y la cuarta falla."
       },
       "dash": {
         "name": "Carrera",
-        "description": "Esprinta hacia delante, aumentando la velocidad de movimiento un 50% durante 15 s. Solo en Forma de lobo."
+        "description": "Adopta Forma felina si aún no estás en ella y corre un 50% más rápido durante 15 s. Se puede usar en cualquier forma. Es instantáneo y no activa la reutilización global."
       },
       "pounce": {
         "name": "Golpe Sigiloso",
-        "description": "Apertura desde el sigilo que aturde al objetivo durante 2 s. Otorga 1 punto de combo. Solo en Forma de lobo."
+        "description": "Apertura desde el sigilo que aturde al objetivo durante 2 s. Otorga 1 punto de combo. Solo en Forma felina."
       },
       "lunge": {
         "name": "Embestida felina",
         "description": "Cambias a Forma felina si aún no lo estás y te lanzas contra un enemigo a un máximo de 25 m. Al llegar, inflige un 60% de daño de arma, otorga 1 punto de combo y, como Colmillo salvaje, añade 1 Sangre antigua (máx. 3); si la embestida se interrumpe antes de llegar, recupera su reutilización. Utilizable en cualquier forma."
       },
       "hamstring_bite": {
-        "name": "Takedown",
-        "description": "Movimiento final que aturde al objetivo durante 1 s más 1 s por punto de combo (5 puntos de combo: 6 s). Solo en Forma de lobo."
+        "name": "Derribo",
+        "description": "Movimiento final que aturde al objetivo durante 1 s más 1 s por punto de combo (5 puntos de combo: 6 s). Solo en Forma felina."
       },
       "insect_swarm": {
         "name": "Enjambre Punzante",
@@ -17057,11 +18470,11 @@ export const es: EnTranslations = {
       },
       "tigers_fury": {
         "name": "Sangre de Lobo",
-        "description": "Genera {rage} de energía y aumenta el poder de ataque en {buff} durante {duration} s. Solo en Forma de lobo."
+        "description": "Genera {rage} de energía y aumenta el poder de ataque en {buff} durante {duration} s. Solo en Forma felina."
       },
       "rip": {
         "name": "Grieta Sangrienta",
-        "description": "Movimiento final que hace sangrar al objetivo cada 2 s durante 24 s: 36 de daño más 24 por punto de combo gastado (5 puntos de combo: {damage} en total). Solo en Forma de lobo.",
+        "description": "Remate que hace sangrar al objetivo cada 2 s durante 24 s: 72 de daño más 48 por punto de combo gastado (5 puntos: {damage} en total). Solo en Forma felina.",
         "specNote_feral": "El golpe conectado añade 1 de Sangre Antigua (máx. 3)."
       },
       "mortal_strike": {
@@ -17222,11 +18635,11 @@ export const es: EnTranslations = {
       },
       "cold_blood": {
         "name": "Sangre fría",
-        "description": "Concentra tu instinto asesino para que tu siguiente ataque sea un golpe crítico. (motor de Knifework)"
+        "description": "Concentra tu instinto asesino para que tus siguientes 5 ataques sean golpes críticos. (motor de Knifework)"
       },
       "blade_flurry": {
         "name": "Aluvión de acero",
-        "description": "Desata una ráfaga de cuchillas que aumenta la velocidad de ataque un 20% durante 12 s. (motor de Thuggery)"
+        "description": "Desata una ráfaga de cuchillas que aumenta la velocidad de ataque un 20% durante 30 s. (motor de Thuggery)"
       },
       "hemorrhage": {
         "name": "Hemorragia",
@@ -17262,11 +18675,12 @@ export const es: EnTranslations = {
       },
       "feral_charge": {
         "name": "Oleada primigenia",
-        "description": "Desata una oleada primigenia. En Forma de lobo, aumenta la regeneración de energía un 100% durante 10 s. En Forma de Bruin, genera 50 p. de ira al instante. (habilidad distintiva de Feral)"
+        "description": "Desata una oleada primigenia. En Forma felina, aumenta la regeneración de energía un 100% durante 10 s. En Forma de Bruin, genera 50 p. de ira al instante. (habilidad distintiva de Feral)"
       },
       "swiftmend": {
         "name": "Alivio presto",
-        "description": "Consume un efecto de sanación periódica en un objetivo amistoso para sanarlo por {damage}. Plantar Floración Silvestre y Segundo Florecer añade Verdor; con 5 de Verdor este botón se convierte en Sobrefloración, que sana al instante a todos los aliados que lleven tus efectos de sanación periódica por un 60% de lo que les quedaba por sanar. (habilidad distintiva de Corazón del Bosque)"
+        "description": "Consume un efecto de sanación periódica en un objetivo amistoso para sanarlo por {damage}. Cada lanzamiento de Remiendo de Esporas, Segundo Florecer y Cura Silvestre añade 1 de Verdor; con 3 de Verdor este botón se convierte en Sobrefloración, que sana al instante a todos los aliados que lleven tus efectos de sanación periódica por un 60% de lo que les quedaba por sanar. (habilidad distintiva de Restauración)",
+        "specNote_restoration": "Consume un efecto de sanación periódica de un objetivo aliado para sanarlo {damage}. Las aplicaciones de Remiendo de Esporas y Segundo Florecer añaden Verdor; con 5 de Verdor este botón se convierte en Sobrefloración, que sana al instante a cada aliado con tus efectos de sanación periódica un 60% de la sanación que les quedaba. (Distintivo de Restauración)"
       },
       "moonlash": {
         "name": "Oleada Lunar",
@@ -17282,19 +18696,37 @@ export const es: EnTranslations = {
       },
       "marrowbreak": {
         "name": "Quiebramédula",
-        "description": "Consume tus 3 de Sangre Antigua para un golpe pesado de alta amenaza que inflige {damage} de daño. Por debajo de la mitad de salud, en su lugar te protege con un escudo del 18% de tu salud máxima durante 8 s y te devuelve 15 de ira."
+        "description": "Consume tus 3 de Sangre Antigua para un golpe pesado de alta amenaza que inflige {damage} de daño. Por debajo de la mitad de salud, en su lugar te sana un 18% de tu salud máxima y te devuelve 15 de ira."
       },
       "wildwake": {
         "name": "Despertar Silvestre",
-        "description": "Incita a un aliado caído a florecer de pronto, devolviéndolo a la vida a tu lado con un 35% de su salud y maná, incluso en pleno combate. (Corazón del Bosque)"
+        "description": "Incita a un aliado caído a florecer de pronto, devolviéndolo a la vida a tu lado con un 35% de su salud y maná, incluso en pleno combate. (Restauración)"
       },
       "grove_awakening": {
         "name": "Despertar del Bosque",
-        "description": "Devuelve a la vida a todos los miembros caídos de tu grupo o banda en un radio de 40 yardas y dentro de tu línea de visión, de vuelta a tu lado con un 30% de salud y maná. No puede lanzarse en combate. (Corazón del Bosque)"
+        "description": "Devuelve a la vida a todos los miembros caídos de tu grupo o banda en un radio de 40 yardas y dentro de tu línea de visión, de vuelta a tu lado con un 30% de salud y maná. No puede lanzarse en combate. (Restauración)"
+      },
+      "sporemender_form": {
+        "name": "Forma de Sanador de Esporas",
+        "description": "Adopta la forma de Sanador de Esporas: aumenta un 20% la sanación y un 40% la armadura, pero reduce un 20% la velocidad de movimiento. Conservas todos los hechizos de tu forma de lanzador. Dura hasta que cambies de forma. Cambiar a cualquier forma otorga Zancada Trotadora, un breve aumento de velocidad. Úsalo de nuevo para volver a la forma de lanzador. (Distintivo de Restauración)"
+      },
+      "spore_burst": {
+        "name": "Estallido de Esporas",
+        "description": "Invoca un hongo de esporas en la zona objetivo. Tras {duration} s estalla, sana {healing} a los aliados e inflige {damage} de daño de Naturaleza a los enemigos en un radio de 8 m.",
+        "specNote_balance": "Con 3 de Marea Lunar es un 25% más potente y consume tu Marea Lunar.",
+        "specNote_restoration": "También aplica Remiendo de Esporas a cada aliado que sane. Con el Verdor al máximo es un 25% más potente y consume tu Verdor."
+      },
+      "natures_boon": {
+        "name": "Bendición de la Naturaleza",
+        "description": "Tus hechizos pueden activar Bendición de la Naturaleza durante 10 s: el hechizo que indique será gratuito, un 25% más potente y utilizable en cualquier forma. Una nueva activación renueva la duración.",
+        "specNote_feral": "Cada ataque automático cuerpo a cuerpo que acierte tiene una probabilidad de 1 entre 15 de activarlo para Remiendo de Esporas, o para Piel de Roble en Forma de Bruin.",
+        "specNote_balance": "Cada Descarga Silvestre o Caída Celeste que lances tiene un 10% de probabilidad de activarlo para Estallido de Esporas, como máximo una vez cada 10 s.",
+        "specNote_restoration": "Cada pulso de tus efectos de sanación periódica tiene un 10% de probabilidad de activarlo para Estallido de Esporas, como máximo una vez cada 10 s."
       },
       "overbloom": {
         "name": "Sobrefloración",
-        "description": "Consume 5 de Verdor. Cosecha cada sanación periódica tuya en todos los aliados por un {buff}% de su sanación restante, elimina esos efectos y planta una Floración Silvestre nueva en el objetivo."
+        "description": "Consume 3 de Verdor. Cosecha cada sanación periódica tuya en todos los aliados por un {buff}% de su sanación restante, elimina esos efectos y planta una Remiendo de Esporas nueva en el objetivo.",
+        "specNote_restoration": "Consume tus 5 de Verdor: cada aliado con tus efectos de sanación periódica recibe al instante un {buff}% de la sanación que les quedaba, se eliminan los efectos y el objetivo recibe un nuevo Remiendo de Esporas."
       },
       "summon_imp": {
         "name": "Invocar Emberkin",
@@ -17366,7 +18798,7 @@ export const es: EnTranslations = {
       },
       "iron_resolve": {
         "name": "Temple de Hierro",
-        "description": "Aprietas los dientes e ignoras el dolor: gasta hasta 40 de ira (20 como mínimo) para absorber {absorbPerRage} de daño por cada punto de ira gastado, durante un máximo de 10 s. (Protección)"
+        "description": "Aprietas los dientes e ignoras el dolor: un escudo absorbe daño equivalente al {damage}% de tu salud máxima al lanzarlo, durante un máximo de {duration} s. (Protección)"
       },
       "faultline": {
         "name": "Falla",
@@ -17638,7 +19070,7 @@ export const es: EnTranslations = {
       },
       "multi_shot": {
         "name": "Disparo Dividido",
-        "description": "Dispara una salva al área objetivo e inflige {damage} de daño físico a los enemigos en un radio de 8 m. (talento de Cazador)"
+        "description": "Dispara una salva al área objetivo e inflige {damage} de daño físico a los enemigos a 8 yardas o menos. (talento de Cazador)"
       },
       "prayer_of_healing": {
         "name": "Coro Sanador",
@@ -17666,7 +19098,7 @@ export const es: EnTranslations = {
       },
       "shadowstep": {
         "name": "Paso Sombrío",
-        "description": "Avanzas entre las sombras hacia tu objetivo, amigo o enemigo, sin romper el Duskveil. (talento de Pícaro)"
+        "description": "Avanzas entre las sombras hacia tu objetivo, amigo o enemigo, sin romper el Duskveil. Almacena hasta 2 cargas. (talento de Pícaro)"
       },
       "silence": {
         "name": "Silencio",
@@ -17727,7 +19159,7 @@ export const es: EnTranslations = {
       },
       "typhoon": {
         "name": "Tifón",
-        "description": "Una ráfaga de viento repele a todos los enemigos en un radio de 8 m y los aturde, reduciendo su velocidad de movimiento un 50% durante 4 s."
+        "description": "Una ráfaga de viento lanza a todos los enemigos a 8 m o menos 15 m lejos de ti y los atonta, reduciendo su velocidad un 50% durante 4 s. Los jugadores enemigos salen despedidos por el aire en línea recta: si caen por un borde, siguen avanzando y reciben daño de caída; una caída mortal cuenta como una baja tuya."
       },
       "voidfeast": {
         "name": "Festín del Vacío",
@@ -17771,16 +19203,16 @@ export const es: EnTranslations = {
       },
       "prowl": {
         "name": "Acechar",
-        "description": "Entra en sigilo mientras estás en Forma de lobo y te mueves un 5% más lento. No puede usarse en combate."
+        "description": "Entra en sigilo mientras estás en Forma felina y te mueves un 5% más lento. No puede usarse en combate."
       },
       "rake": {
         "name": "Desollar",
-        "description": "Desuella al enemigo por daño de arma más {damage} y causa daño de sangrado durante 18 s. Otorga 1 punto de combo. Solo en Forma de lobo.",
+        "description": "Desuella al enemigo por daño de arma más {damage} y causa {overTime} de daño de sangrado durante 18 s. Otorga 1 punto de combo. Solo en Forma felina.",
         "specNote_feral": "Cada golpe conectado añade 1 de Sangre Antigua (máx. 3)."
       },
       "revive_pet": {
         "name": "Remendar",
-        "description": "Remienda a tu mascota y restaura {overTime} de salud durante 12 s en pulsos cada 3 s mientras esté viva. Si está muerta, la revive con un 35% de salud."
+        "description": "Restaura el 10% de la salud máxima de tu compañero vivo cada segundo durante 8 s. Si tu compañero está muerto, lo revive con un 50% de salud."
       }
     },
     "items": {
@@ -18835,7 +20267,7 @@ export const es: EnTranslations = {
         "name": "Pica de Fragmentos de Skerrit"
       },
       "loomshard_eye": {
-        "name": "The Barrowglass Eye"
+        "name": "El Ojo de Cristal del Túmulo"
       },
       "barrowhide_pauldrons": {
         "name": "Hombreras Tumulares"
@@ -19329,6 +20761,9 @@ export const es: EnTranslations = {
       "reins_avian_strider": {
         "name": "Riendas del Corcel Esmeralda del Valle"
       },
+      "reins_nightwing_chimera": {
+        "name": "Riendas de la Quimera de Ala Nocturna"
+      },
       "reins_goblin_rocket_sled": {
         "name": "Llave de encendido: Trineo cohete goblin"
       },
@@ -19340,6 +20775,9 @@ export const es: EnTranslations = {
       },
       "reins_chimeglass_tortoise": {
         "name": "Campana del guardián del camino: Tolliver"
+      },
+      "reins_wobbles_slime": {
+        "name": "Silla de gelatina: Tembleques"
       },
       "reins_rickshaw_mount": {
         "name": "Riendas vinculadas: Rickshaw Atahuesos"
@@ -19901,114 +21339,6 @@ export const es: EnTranslations = {
       },
       "ps_passing_stone": {
         "name": "Piedra de Paso"
-      },
-      "whistle_ember_fox": {
-        "name": "Ember Fox Whistle"
-      },
-      "whistle_moss_hare": {
-        "name": "Moss Hare Whistle"
-      },
-      "whistle_frog": {
-        "name": "Frog Whistle"
-      },
-      "whistle_crimson_claw_crab": {
-        "name": "Crimson Claw Crab Whistle"
-      },
-      "whistle_golden_sentinel": {
-        "name": "Golden Sentinel Whistle"
-      },
-      "whistle_nightfang": {
-        "name": "Nightfang Whistle"
-      },
-      "whistle_tuskhorn_boar": {
-        "name": "Tuskhorn Boar Whistle"
-      },
-      "whistle_emerald_wolf": {
-        "name": "Emerald Wolf Whistle"
-      },
-      "whistle_tiger": {
-        "name": "Tiger Whistle"
-      },
-      "whistle_cate_coin": {
-        "name": "Cate Coin Whistle"
-      },
-      "whistle_alon": {
-        "name": "Alon Whistle"
-      },
-      "whistle_trollface": {
-        "name": "Trollface Whistle"
-      },
-      "whistle_ansem": {
-        "name": "Ansem Whistle"
-      },
-      "whistle_triple_t": {
-        "name": "Triple T Whistle"
-      },
-      "whistle_kekius": {
-        "name": "Kekius Whistle"
-      },
-      "whistle_solbot": {
-        "name": "Solbot Whistle"
-      },
-      "whistle_frostfire": {
-        "name": "Frostfire Whistle"
-      },
-      "whistle_rocky": {
-        "name": "Rocky Whistle"
-      },
-      "whistle_proud_grunt": {
-        "name": "Proud Grunt Whistle"
-      },
-      "whistle_loot_goblin": {
-        "name": "Loot Goblin Whistle"
-      },
-      "whistle_penny_goldspark": {
-        "name": "Penny Goldspark Whistle"
-      },
-      "whistle_stag": {
-        "name": "Stag Whistle"
-      },
-      "whistle_alpaca": {
-        "name": "Alpaca Whistle"
-      },
-      "whistle_horse": {
-        "name": "Horse Whistle"
-      },
-      "whistle_sapling": {
-        "name": "Sapling Whistle"
-      },
-      "whistle_bull": {
-        "name": "Bull Whistle"
-      },
-      "whistle_spider": {
-        "name": "Spider Whistle"
-      },
-      "whistle_raptor": {
-        "name": "Raptor Whistle"
-      },
-      "whistle_skeleton": {
-        "name": "Skeleton Whistle"
-      },
-      "whistle_crystal_lich": {
-        "name": "Crystal Lich Whistle"
-      },
-      "whistle_forgemaw": {
-        "name": "Forgemaw The Molten Whistle"
-      },
-      "whistle_crystal_tide": {
-        "name": "Crystal Tide Whistle"
-      },
-      "whistle_phantom": {
-        "name": "Phantom Whistle"
-      },
-      "whistle_emberfall_phoenix": {
-        "name": "Emberfall Phoenix Whistle"
-      },
-      "charm_stag_acorn": {
-        "name": "Acorn Crown Charm"
-      },
-      "charm_stag_gilded": {
-        "name": "Gilded Charm"
       },
       "lastflame_core": {
         "name": "Núcleo de la Última Llama"
@@ -21582,1460 +22912,1499 @@ export const es: EnTranslations = {
       "vanguard_warstaff": {
         "name": "Bastón de Guerra de la Vanguardia"
       },
+      "infernal_quiver": {
+        "name": "Carcaj infernal"
+      },
+      "lychgate_buckler": {
+        "name": "Broquel del portal del camposanto"
+      },
+      "bastion_kite_shield": {
+        "name": "Escudo cometa del bastión"
+      },
+      "barrowfield_tower_shield": {
+        "name": "Escudo torre del Campo de Túmulos"
+      },
       "brookwatch_robe": {
-        "name": "Brookwatch Robe"
+        "name": "Toga de la guardia del arroyo"
       },
       "brookwatch_leggings": {
-        "name": "Brookwatch Leggings"
+        "name": "Leotardos de la guardia del arroyo"
       },
       "brookwatch_slippers": {
-        "name": "Brookwatch Slippers"
+        "name": "Zapatillas de la guardia del arroyo"
       },
       "brookwatch_hood": {
-        "name": "Brookwatch Hood"
+        "name": "Capucha de la guardia del arroyo"
       },
       "brookwatch_gloves": {
-        "name": "Brookwatch Gloves"
+        "name": "Guantes de la guardia del arroyo"
       },
       "brookwatch_mantle": {
-        "name": "Brookwatch Mantle"
+        "name": "Manto de la guardia del arroyo"
       },
       "brookwatch_sash": {
-        "name": "Brookwatch Sash"
+        "name": "Fajín de la guardia del arroyo"
       },
       "brookwatch_jerkin": {
-        "name": "Brookwatch Jerkin"
+        "name": "Coleto de la guardia del arroyo"
       },
       "brookwatch_breeches": {
-        "name": "Brookwatch Breeches"
+        "name": "Calzones de la guardia del arroyo"
       },
       "brookwatch_boots": {
-        "name": "Brookwatch Boots"
+        "name": "Botas de la guardia del arroyo"
       },
       "brookwatch_cap": {
-        "name": "Brookwatch Cap"
+        "name": "Gorro de la guardia del arroyo"
       },
       "brookwatch_grips": {
-        "name": "Brookwatch Grips"
+        "name": "Guantes de agarre de la guardia del arroyo"
       },
       "brookwatch_shoulderpads": {
-        "name": "Brookwatch Shoulderpads"
+        "name": "Hombreras acolchadas de la guardia del arroyo"
       },
       "brookwatch_belt": {
-        "name": "Brookwatch Belt"
+        "name": "Cinturón de la guardia del arroyo"
       },
       "brookwatch_hauberk": {
-        "name": "Brookwatch Hauberk"
+        "name": "Loriga de la guardia del arroyo"
       },
       "brookwatch_legguards": {
-        "name": "Brookwatch Legguards"
+        "name": "Guardapiernas de la guardia del arroyo"
       },
       "brookwatch_sabatons": {
-        "name": "Brookwatch Sabatons"
+        "name": "Escarpes de la guardia del arroyo"
       },
       "brookwatch_helm": {
-        "name": "Brookwatch Helm"
+        "name": "Yelmo de la guardia del arroyo"
       },
       "brookwatch_gauntlets": {
-        "name": "Brookwatch Gauntlets"
+        "name": "Guanteletes de la guardia del arroyo"
       },
       "brookwatch_pauldrons": {
-        "name": "Brookwatch Pauldrons"
+        "name": "Hombreras de placas de la guardia del arroyo"
       },
       "brookwatch_girdle": {
-        "name": "Brookwatch Girdle"
+        "name": "Faja de la guardia del arroyo"
       },
       "brookwatch_chainmail": {
-        "name": "Brookwatch Chainmail"
+        "name": "Cota de malla de la guardia del arroyo"
       },
       "brookwatch_chausses": {
-        "name": "Brookwatch Chausses"
+        "name": "Calzas de malla de la guardia del arroyo"
       },
       "brookwatch_greaves": {
-        "name": "Brookwatch Greaves"
+        "name": "Grebas de la guardia del arroyo"
       },
       "brookwatch_coif": {
-        "name": "Brookwatch Coif"
+        "name": "Almófar de la guardia del arroyo"
       },
       "brookwatch_handguards": {
-        "name": "Brookwatch Handguards"
+        "name": "Guardamanos de la guardia del arroyo"
       },
       "brookwatch_spaulders": {
-        "name": "Brookwatch Spaulders"
+        "name": "Espaldares de la guardia del arroyo"
       },
       "brookwatch_cord": {
-        "name": "Brookwatch Cord"
+        "name": "Cordón de la guardia del arroyo"
       },
       "hedgerow_robe": {
-        "name": "Hedgerow Robe"
+        "name": "Toga del seto"
       },
       "hedgerow_leggings": {
-        "name": "Hedgerow Leggings"
+        "name": "Leotardos del seto"
       },
       "hedgerow_slippers": {
-        "name": "Hedgerow Slippers"
+        "name": "Zapatillas del seto"
       },
       "hedgerow_hood": {
-        "name": "Hedgerow Hood"
+        "name": "Capucha del seto"
       },
       "hedgerow_gloves": {
-        "name": "Hedgerow Gloves"
+        "name": "Guantes del seto"
       },
       "hedgerow_mantle": {
-        "name": "Hedgerow Mantle"
+        "name": "Manto del seto"
       },
       "hedgerow_sash": {
-        "name": "Hedgerow Sash"
+        "name": "Fajín del seto"
       },
       "hedgerow_jerkin": {
-        "name": "Hedgerow Jerkin"
+        "name": "Coleto del seto"
       },
       "hedgerow_breeches": {
-        "name": "Hedgerow Breeches"
+        "name": "Calzones del seto"
       },
       "hedgerow_boots": {
-        "name": "Hedgerow Boots"
+        "name": "Botas del seto"
       },
       "hedgerow_cap": {
-        "name": "Hedgerow Cap"
+        "name": "Gorro del seto"
       },
       "hedgerow_grips": {
-        "name": "Hedgerow Grips"
+        "name": "Guantes de agarre del seto"
       },
       "hedgerow_shoulderpads": {
-        "name": "Hedgerow Shoulderpads"
+        "name": "Hombreras acolchadas del seto"
       },
       "hedgerow_belt": {
-        "name": "Hedgerow Belt"
+        "name": "Cinturón del seto"
       },
       "hedgerow_hauberk": {
-        "name": "Hedgerow Hauberk"
+        "name": "Loriga del seto"
       },
       "hedgerow_legguards": {
-        "name": "Hedgerow Legguards"
+        "name": "Guardapiernas del seto"
       },
       "hedgerow_sabatons": {
-        "name": "Hedgerow Sabatons"
+        "name": "Escarpes del seto"
       },
       "hedgerow_helm": {
-        "name": "Hedgerow Helm"
+        "name": "Yelmo del seto"
       },
       "hedgerow_gauntlets": {
-        "name": "Hedgerow Gauntlets"
+        "name": "Guanteletes del seto"
       },
       "hedgerow_pauldrons": {
-        "name": "Hedgerow Pauldrons"
+        "name": "Hombreras de placas del seto"
       },
       "hedgerow_girdle": {
-        "name": "Hedgerow Girdle"
+        "name": "Faja del seto"
       },
       "hedgerow_chainmail": {
-        "name": "Hedgerow Chainmail"
+        "name": "Cota de malla del seto"
       },
       "hedgerow_chausses": {
-        "name": "Hedgerow Chausses"
+        "name": "Calzas de malla del seto"
       },
       "hedgerow_greaves": {
-        "name": "Hedgerow Greaves"
+        "name": "Grebas del seto"
       },
       "hedgerow_coif": {
-        "name": "Hedgerow Coif"
+        "name": "Almófar del seto"
       },
       "hedgerow_handguards": {
-        "name": "Hedgerow Handguards"
+        "name": "Guardamanos del seto"
       },
       "hedgerow_spaulders": {
-        "name": "Hedgerow Spaulders"
+        "name": "Espaldares del seto"
       },
       "hedgerow_cord": {
-        "name": "Hedgerow Cord"
+        "name": "Cordón del seto"
       },
       "bogwalker_robe": {
-        "name": "Bogwalker Robe"
+        "name": "Toga del caminante del pantano"
       },
       "bogwalker_leggings": {
-        "name": "Bogwalker Leggings"
+        "name": "Leotardos del caminante del pantano"
       },
       "bogwalker_slippers": {
-        "name": "Bogwalker Slippers"
+        "name": "Zapatillas del caminante del pantano"
       },
       "bogwalker_hood": {
-        "name": "Bogwalker Hood"
+        "name": "Capucha del caminante del pantano"
       },
       "bogwalker_gloves": {
-        "name": "Bogwalker Gloves"
+        "name": "Guantes del caminante del pantano"
       },
       "bogwalker_mantle": {
-        "name": "Bogwalker Mantle"
+        "name": "Manto del caminante del pantano"
       },
       "bogwalker_sash": {
-        "name": "Bogwalker Sash"
+        "name": "Fajín del caminante del pantano"
       },
       "bogwalker_jerkin": {
-        "name": "Bogwalker Jerkin"
+        "name": "Coleto del caminante del pantano"
       },
       "bogwalker_breeches": {
-        "name": "Bogwalker Breeches"
+        "name": "Calzones del caminante del pantano"
       },
       "bogwalker_boots": {
-        "name": "Bogwalker Boots"
+        "name": "Botas del caminante del pantano"
       },
       "bogwalker_cap": {
-        "name": "Bogwalker Cap"
+        "name": "Gorro del caminante del pantano"
       },
       "bogwalker_grips": {
-        "name": "Bogwalker Grips"
+        "name": "Guantes de agarre del caminante del pantano"
       },
       "bogwalker_shoulderpads": {
-        "name": "Bogwalker Shoulderpads"
+        "name": "Hombreras acolchadas del caminante del pantano"
       },
       "bogwalker_belt": {
-        "name": "Bogwalker Belt"
+        "name": "Cinturón del caminante del pantano"
       },
       "bogwalker_hauberk": {
-        "name": "Bogwalker Hauberk"
+        "name": "Loriga del caminante del pantano"
       },
       "bogwalker_legguards": {
-        "name": "Bogwalker Legguards"
+        "name": "Guardapiernas del caminante del pantano"
       },
       "bogwalker_sabatons": {
-        "name": "Bogwalker Sabatons"
+        "name": "Escarpes del caminante del pantano"
       },
       "bogwalker_helm": {
-        "name": "Bogwalker Helm"
+        "name": "Yelmo del caminante del pantano"
       },
       "bogwalker_gauntlets": {
-        "name": "Bogwalker Gauntlets"
+        "name": "Guanteletes del caminante del pantano"
       },
       "bogwalker_pauldrons": {
-        "name": "Bogwalker Pauldrons"
+        "name": "Hombreras de placas del caminante del pantano"
       },
       "bogwalker_girdle": {
-        "name": "Bogwalker Girdle"
+        "name": "Faja del caminante del pantano"
       },
       "bogwalker_chainmail": {
-        "name": "Bogwalker Chainmail"
+        "name": "Cota de malla del caminante del pantano"
       },
       "bogwalker_chausses": {
-        "name": "Bogwalker Chausses"
+        "name": "Calzas de malla del caminante del pantano"
       },
       "bogwalker_greaves": {
-        "name": "Bogwalker Greaves"
+        "name": "Grebas del caminante del pantano"
       },
       "bogwalker_coif": {
-        "name": "Bogwalker Coif"
+        "name": "Almófar del caminante del pantano"
       },
       "bogwalker_handguards": {
-        "name": "Bogwalker Handguards"
+        "name": "Guardamanos del caminante del pantano"
       },
       "bogwalker_spaulders": {
-        "name": "Bogwalker Spaulders"
+        "name": "Espaldares del caminante del pantano"
       },
       "bogwalker_cord": {
-        "name": "Bogwalker Cord"
+        "name": "Cordón del caminante del pantano"
       },
       "thornspire_robe": {
-        "name": "Thornspire Robe"
+        "name": "Toga de la aguja de espinas"
       },
       "thornspire_leggings": {
-        "name": "Thornspire Leggings"
+        "name": "Leotardos de la aguja de espinas"
       },
       "thornspire_slippers": {
-        "name": "Thornspire Slippers"
+        "name": "Zapatillas de la aguja de espinas"
       },
       "thornspire_hood": {
-        "name": "Thornspire Hood"
+        "name": "Capucha de la aguja de espinas"
       },
       "thornspire_gloves": {
-        "name": "Thornspire Gloves"
+        "name": "Guantes de la aguja de espinas"
       },
       "thornspire_mantle": {
-        "name": "Thornspire Mantle"
+        "name": "Manto de la aguja de espinas"
       },
       "thornspire_sash": {
-        "name": "Thornspire Sash"
+        "name": "Fajín de la aguja de espinas"
       },
       "thornspire_jerkin": {
-        "name": "Thornspire Jerkin"
+        "name": "Coleto de la aguja de espinas"
       },
       "thornspire_breeches": {
-        "name": "Thornspire Breeches"
+        "name": "Calzones de la aguja de espinas"
       },
       "thornspire_boots": {
-        "name": "Thornspire Boots"
+        "name": "Botas de la aguja de espinas"
       },
       "thornspire_cap": {
-        "name": "Thornspire Cap"
+        "name": "Gorro de la aguja de espinas"
       },
       "thornspire_grips": {
-        "name": "Thornspire Grips"
+        "name": "Guantes de agarre de la aguja de espinas"
       },
       "thornspire_shoulderpads": {
-        "name": "Thornspire Shoulderpads"
+        "name": "Hombreras acolchadas de la aguja de espinas"
       },
       "thornspire_belt": {
-        "name": "Thornspire Belt"
+        "name": "Cinturón de la aguja de espinas"
       },
       "thornspire_hauberk": {
-        "name": "Thornspire Hauberk"
+        "name": "Loriga de la aguja de espinas"
       },
       "thornspire_legguards": {
-        "name": "Thornspire Legguards"
+        "name": "Guardapiernas de la aguja de espinas"
       },
       "thornspire_sabatons": {
-        "name": "Thornspire Sabatons"
+        "name": "Escarpes de la aguja de espinas"
       },
       "thornspire_helm": {
-        "name": "Thornspire Helm"
+        "name": "Yelmo de la aguja de espinas"
       },
       "thornspire_gauntlets": {
-        "name": "Thornspire Gauntlets"
+        "name": "Guanteletes de la aguja de espinas"
       },
       "thornspire_pauldrons": {
-        "name": "Thornspire Pauldrons"
+        "name": "Hombreras de placas de la aguja de espinas"
       },
       "thornspire_girdle": {
-        "name": "Thornspire Girdle"
+        "name": "Faja de la aguja de espinas"
       },
       "thornspire_chainmail": {
-        "name": "Thornspire Chainmail"
+        "name": "Cota de malla de la aguja de espinas"
       },
       "thornspire_chausses": {
-        "name": "Thornspire Chausses"
+        "name": "Calzas de malla de la aguja de espinas"
       },
       "thornspire_greaves": {
-        "name": "Thornspire Greaves"
+        "name": "Grebas de la aguja de espinas"
       },
       "thornspire_coif": {
-        "name": "Thornspire Coif"
+        "name": "Almófar de la aguja de espinas"
       },
       "thornspire_handguards": {
-        "name": "Thornspire Handguards"
+        "name": "Guardamanos de la aguja de espinas"
       },
       "thornspire_spaulders": {
-        "name": "Thornspire Spaulders"
+        "name": "Espaldares de la aguja de espinas"
       },
       "thornspire_cord": {
-        "name": "Thornspire Cord"
+        "name": "Cordón de la aguja de espinas"
       },
       "hollowveil_robe": {
-        "name": "Hollowveil Robe"
+        "name": "Toga del velo hueco"
       },
       "hollowveil_leggings": {
-        "name": "Hollowveil Leggings"
+        "name": "Leotardos del velo hueco"
       },
       "hollowveil_slippers": {
-        "name": "Hollowveil Slippers"
+        "name": "Zapatillas del velo hueco"
       },
       "hollowveil_hood": {
-        "name": "Hollowveil Hood"
+        "name": "Capucha del velo hueco"
       },
       "hollowveil_gloves": {
-        "name": "Hollowveil Gloves"
+        "name": "Guantes del velo hueco"
       },
       "hollowveil_mantle": {
-        "name": "Hollowveil Mantle"
+        "name": "Manto del velo hueco"
       },
       "hollowveil_sash": {
-        "name": "Hollowveil Sash"
+        "name": "Fajín del velo hueco"
       },
       "hollowveil_jerkin": {
-        "name": "Hollowveil Jerkin"
+        "name": "Coleto del velo hueco"
       },
       "hollowveil_breeches": {
-        "name": "Hollowveil Breeches"
+        "name": "Calzones del velo hueco"
       },
       "hollowveil_boots": {
-        "name": "Hollowveil Boots"
+        "name": "Botas del velo hueco"
       },
       "hollowveil_cap": {
-        "name": "Hollowveil Cap"
+        "name": "Gorro del velo hueco"
       },
       "hollowveil_grips": {
-        "name": "Hollowveil Grips"
+        "name": "Guantes de agarre del velo hueco"
       },
       "hollowveil_shoulderpads": {
-        "name": "Hollowveil Shoulderpads"
+        "name": "Hombreras acolchadas del velo hueco"
       },
       "hollowveil_belt": {
-        "name": "Hollowveil Belt"
+        "name": "Cinturón del velo hueco"
       },
       "hollowveil_hauberk": {
-        "name": "Hollowveil Hauberk"
+        "name": "Loriga del velo hueco"
       },
       "hollowveil_legguards": {
-        "name": "Hollowveil Legguards"
+        "name": "Guardapiernas del velo hueco"
       },
       "hollowveil_sabatons": {
-        "name": "Hollowveil Sabatons"
+        "name": "Escarpes del velo hueco"
       },
       "hollowveil_helm": {
-        "name": "Hollowveil Helm"
+        "name": "Yelmo del velo hueco"
       },
       "hollowveil_gauntlets": {
-        "name": "Hollowveil Gauntlets"
+        "name": "Guanteletes del velo hueco"
       },
       "hollowveil_pauldrons": {
-        "name": "Hollowveil Pauldrons"
+        "name": "Hombreras de placas del velo hueco"
       },
       "hollowveil_girdle": {
-        "name": "Hollowveil Girdle"
+        "name": "Faja del velo hueco"
       },
       "hollowveil_chainmail": {
-        "name": "Hollowveil Chainmail"
+        "name": "Cota de malla del velo hueco"
       },
       "hollowveil_chausses": {
-        "name": "Hollowveil Chausses"
+        "name": "Calzas de malla del velo hueco"
       },
       "hollowveil_greaves": {
-        "name": "Hollowveil Greaves"
+        "name": "Grebas del velo hueco"
       },
       "hollowveil_coif": {
-        "name": "Hollowveil Coif"
+        "name": "Almófar del velo hueco"
       },
       "hollowveil_handguards": {
-        "name": "Hollowveil Handguards"
+        "name": "Guardamanos del velo hueco"
       },
       "hollowveil_spaulders": {
-        "name": "Hollowveil Spaulders"
+        "name": "Espaldares del velo hueco"
       },
       "hollowveil_cord": {
-        "name": "Hollowveil Cord"
+        "name": "Cordón del velo hueco"
       },
       "trailwarden_robe": {
-        "name": "Trailwarden Robe"
+        "name": "Toga del guardián de la senda"
       },
       "trailwarden_leggings": {
-        "name": "Trailwarden Leggings"
+        "name": "Leotardos del guardián de la senda"
       },
       "trailwarden_slippers": {
-        "name": "Trailwarden Slippers"
+        "name": "Zapatillas del guardián de la senda"
       },
       "trailwarden_hood": {
-        "name": "Trailwarden Hood"
+        "name": "Capucha del guardián de la senda"
       },
       "trailwarden_gloves": {
-        "name": "Trailwarden Gloves"
+        "name": "Guantes del guardián de la senda"
       },
       "trailwarden_mantle": {
-        "name": "Trailwarden Mantle"
+        "name": "Manto del guardián de la senda"
       },
       "trailwarden_sash": {
-        "name": "Trailwarden Sash"
+        "name": "Fajín del guardián de la senda"
       },
       "trailwarden_jerkin": {
-        "name": "Trailwarden Jerkin"
+        "name": "Coleto del guardián de la senda"
       },
       "trailwarden_breeches": {
-        "name": "Trailwarden Breeches"
+        "name": "Calzones del guardián de la senda"
       },
       "trailwarden_boots": {
-        "name": "Trailwarden Boots"
+        "name": "Botas del guardián de la senda"
       },
       "trailwarden_cap": {
-        "name": "Trailwarden Cap"
+        "name": "Gorro del guardián de la senda"
       },
       "trailwarden_grips": {
-        "name": "Trailwarden Grips"
+        "name": "Guantes de agarre del guardián de la senda"
       },
       "trailwarden_shoulderpads": {
-        "name": "Trailwarden Shoulderpads"
+        "name": "Hombreras acolchadas del guardián de la senda"
       },
       "trailwarden_belt": {
-        "name": "Trailwarden Belt"
+        "name": "Cinturón del guardián de la senda"
       },
       "trailwarden_hauberk": {
-        "name": "Trailwarden Hauberk"
+        "name": "Loriga del guardián de la senda"
       },
       "trailwarden_legguards": {
-        "name": "Trailwarden Legguards"
+        "name": "Guardapiernas del guardián de la senda"
       },
       "trailwarden_sabatons": {
-        "name": "Trailwarden Sabatons"
+        "name": "Escarpes del guardián de la senda"
       },
       "trailwarden_helm": {
-        "name": "Trailwarden Helm"
+        "name": "Yelmo del guardián de la senda"
       },
       "trailwarden_gauntlets": {
-        "name": "Trailwarden Gauntlets"
+        "name": "Guanteletes del guardián de la senda"
       },
       "trailwarden_pauldrons": {
-        "name": "Trailwarden Pauldrons"
+        "name": "Hombreras de placas del guardián de la senda"
       },
       "trailwarden_girdle": {
-        "name": "Trailwarden Girdle"
+        "name": "Faja del guardián de la senda"
       },
       "trailwarden_chainmail": {
-        "name": "Trailwarden Chainmail"
+        "name": "Cota de malla del guardián de la senda"
       },
       "trailwarden_chausses": {
-        "name": "Trailwarden Chausses"
+        "name": "Calzas de malla del guardián de la senda"
       },
       "trailwarden_greaves": {
-        "name": "Trailwarden Greaves"
+        "name": "Grebas del guardián de la senda"
       },
       "trailwarden_coif": {
-        "name": "Trailwarden Coif"
+        "name": "Almófar del guardián de la senda"
       },
       "trailwarden_handguards": {
-        "name": "Trailwarden Handguards"
+        "name": "Guardamanos del guardián de la senda"
       },
       "trailwarden_spaulders": {
-        "name": "Trailwarden Spaulders"
+        "name": "Espaldares del guardián de la senda"
       },
       "trailwarden_cord": {
-        "name": "Trailwarden Cord"
+        "name": "Cordón del guardián de la senda"
       },
       "highgale_robe": {
-        "name": "Highgale Robe"
+        "name": "Toga del vendaval de altura"
       },
       "highgale_leggings": {
-        "name": "Highgale Leggings"
+        "name": "Leotardos del vendaval de altura"
       },
       "highgale_slippers": {
-        "name": "Highgale Slippers"
+        "name": "Zapatillas del vendaval de altura"
       },
       "highgale_hood": {
-        "name": "Highgale Hood"
+        "name": "Capucha del vendaval de altura"
       },
       "highgale_gloves": {
-        "name": "Highgale Gloves"
+        "name": "Guantes del vendaval de altura"
       },
       "highgale_mantle": {
-        "name": "Highgale Mantle"
+        "name": "Manto del vendaval de altura"
       },
       "highgale_sash": {
-        "name": "Highgale Sash"
+        "name": "Fajín del vendaval de altura"
       },
       "highgale_jerkin": {
-        "name": "Highgale Jerkin"
+        "name": "Coleto del vendaval de altura"
       },
       "highgale_breeches": {
-        "name": "Highgale Breeches"
+        "name": "Calzones del vendaval de altura"
       },
       "highgale_boots": {
-        "name": "Highgale Boots"
+        "name": "Botas del vendaval de altura"
       },
       "highgale_cap": {
-        "name": "Highgale Cap"
+        "name": "Gorro del vendaval de altura"
       },
       "highgale_grips": {
-        "name": "Highgale Grips"
+        "name": "Guantes de agarre del vendaval de altura"
       },
       "highgale_shoulderpads": {
-        "name": "Highgale Shoulderpads"
+        "name": "Hombreras acolchadas del vendaval de altura"
       },
       "highgale_belt": {
-        "name": "Highgale Belt"
+        "name": "Cinturón del vendaval de altura"
       },
       "highgale_hauberk": {
-        "name": "Highgale Hauberk"
+        "name": "Loriga del vendaval de altura"
       },
       "highgale_legguards": {
-        "name": "Highgale Legguards"
+        "name": "Guardapiernas del vendaval de altura"
       },
       "highgale_sabatons": {
-        "name": "Highgale Sabatons"
+        "name": "Escarpes del vendaval de altura"
       },
       "highgale_helm": {
-        "name": "Highgale Helm"
+        "name": "Yelmo del vendaval de altura"
       },
       "highgale_gauntlets": {
-        "name": "Highgale Gauntlets"
+        "name": "Guanteletes del vendaval de altura"
       },
       "highgale_pauldrons": {
-        "name": "Highgale Pauldrons"
+        "name": "Hombreras de placas del vendaval de altura"
       },
       "highgale_girdle": {
-        "name": "Highgale Girdle"
+        "name": "Faja del vendaval de altura"
       },
       "highgale_chainmail": {
-        "name": "Highgale Chainmail"
+        "name": "Cota de malla del vendaval de altura"
       },
       "highgale_chausses": {
-        "name": "Highgale Chausses"
+        "name": "Calzas de malla del vendaval de altura"
       },
       "highgale_greaves": {
-        "name": "Highgale Greaves"
+        "name": "Grebas del vendaval de altura"
       },
       "brookwatch_tunic": {
-        "name": "Brookwatch Tunic"
+        "name": "Túnica de la guardia del arroyo"
       },
       "brookwatch_legwraps": {
-        "name": "Brookwatch Legwraps"
+        "name": "Vendas de piernas de la guardia del arroyo"
       },
       "brookwatch_treads": {
-        "name": "Brookwatch Treads"
+        "name": "Pisadas de la guardia del arroyo"
       },
       "brookwatch_headguard": {
-        "name": "Brookwatch Headguard"
+        "name": "Guardacabeza de la guardia del arroyo"
       },
       "brookwatch_handwraps": {
-        "name": "Brookwatch Handwraps"
+        "name": "Vendas de manos de la guardia del arroyo"
       },
       "brookwatch_shoulderguards": {
-        "name": "Brookwatch Shoulderguards"
+        "name": "Guardahombros de la guardia del arroyo"
       },
       "brookwatch_waistguard": {
-        "name": "Brookwatch Waistguard"
+        "name": "Guardacintura de la guardia del arroyo"
       },
       "hedgerow_tunic": {
-        "name": "Hedgerow Tunic"
+        "name": "Túnica del seto"
       },
       "hedgerow_legwraps": {
-        "name": "Hedgerow Legwraps"
+        "name": "Vendas de piernas del seto"
       },
       "hedgerow_treads": {
-        "name": "Hedgerow Treads"
+        "name": "Pisadas del seto"
       },
       "hedgerow_headguard": {
-        "name": "Hedgerow Headguard"
+        "name": "Guardacabeza del seto"
       },
       "hedgerow_handwraps": {
-        "name": "Hedgerow Handwraps"
+        "name": "Vendas de manos del seto"
       },
       "hedgerow_shoulderguards": {
-        "name": "Hedgerow Shoulderguards"
+        "name": "Guardahombros del seto"
       },
       "hedgerow_waistguard": {
-        "name": "Hedgerow Waistguard"
+        "name": "Guardacintura del seto"
       },
       "bogwalker_tunic": {
-        "name": "Bogwalker Tunic"
+        "name": "Túnica del caminante del pantano"
       },
       "bogwalker_legwraps": {
-        "name": "Bogwalker Legwraps"
+        "name": "Vendas de piernas del caminante del pantano"
       },
       "bogwalker_treads": {
-        "name": "Bogwalker Treads"
+        "name": "Pisadas del caminante del pantano"
       },
       "bogwalker_headguard": {
-        "name": "Bogwalker Headguard"
+        "name": "Guardacabeza del caminante del pantano"
       },
       "bogwalker_handwraps": {
-        "name": "Bogwalker Handwraps"
+        "name": "Vendas de manos del caminante del pantano"
       },
       "bogwalker_shoulderguards": {
-        "name": "Bogwalker Shoulderguards"
+        "name": "Guardahombros del caminante del pantano"
       },
       "bogwalker_waistguard": {
-        "name": "Bogwalker Waistguard"
+        "name": "Guardacintura del caminante del pantano"
       },
       "thornspire_tunic": {
-        "name": "Thornspire Tunic"
+        "name": "Túnica de la aguja de espinas"
       },
       "thornspire_legwraps": {
-        "name": "Thornspire Legwraps"
+        "name": "Vendas de piernas de la aguja de espinas"
       },
       "thornspire_treads": {
-        "name": "Thornspire Treads"
+        "name": "Pisadas de la aguja de espinas"
       },
       "thornspire_headguard": {
-        "name": "Thornspire Headguard"
+        "name": "Guardacabeza de la aguja de espinas"
       },
       "thornspire_handwraps": {
-        "name": "Thornspire Handwraps"
+        "name": "Vendas de manos de la aguja de espinas"
       },
       "thornspire_shoulderguards": {
-        "name": "Thornspire Shoulderguards"
+        "name": "Guardahombros de la aguja de espinas"
       },
       "thornspire_waistguard": {
-        "name": "Thornspire Waistguard"
+        "name": "Guardacintura de la aguja de espinas"
       },
       "hollowveil_tunic": {
-        "name": "Hollowveil Tunic"
+        "name": "Túnica del velo hueco"
       },
       "hollowveil_legwraps": {
-        "name": "Hollowveil Legwraps"
+        "name": "Vendas de piernas del velo hueco"
       },
       "hollowveil_treads": {
-        "name": "Hollowveil Treads"
+        "name": "Pisadas del velo hueco"
       },
       "hollowveil_headguard": {
-        "name": "Hollowveil Headguard"
+        "name": "Guardacabeza del velo hueco"
       },
       "hollowveil_handwraps": {
-        "name": "Hollowveil Handwraps"
+        "name": "Vendas de manos del velo hueco"
       },
       "hollowveil_shoulderguards": {
-        "name": "Hollowveil Shoulderguards"
+        "name": "Guardahombros del velo hueco"
       },
       "hollowveil_waistguard": {
-        "name": "Hollowveil Waistguard"
+        "name": "Guardacintura del velo hueco"
       },
       "trailwarden_tunic": {
-        "name": "Trailwarden Tunic"
+        "name": "Túnica del guardián de la senda"
       },
       "trailwarden_legwraps": {
-        "name": "Trailwarden Legwraps"
+        "name": "Vendas de piernas del guardián de la senda"
       },
       "trailwarden_treads": {
-        "name": "Trailwarden Treads"
+        "name": "Pisadas del guardián de la senda"
       },
       "trailwarden_headguard": {
-        "name": "Trailwarden Headguard"
+        "name": "Guardacabeza del guardián de la senda"
       },
       "trailwarden_handwraps": {
-        "name": "Trailwarden Handwraps"
+        "name": "Vendas de manos del guardián de la senda"
       },
       "trailwarden_shoulderguards": {
-        "name": "Trailwarden Shoulderguards"
+        "name": "Guardahombros del guardián de la senda"
       },
       "trailwarden_waistguard": {
-        "name": "Trailwarden Waistguard"
+        "name": "Guardacintura del guardián de la senda"
       },
       "highgale_tunic": {
-        "name": "Highgale Tunic"
+        "name": "Túnica del vendaval de altura"
       },
       "highgale_legwraps": {
-        "name": "Highgale Legwraps"
+        "name": "Vendas de piernas del vendaval de altura"
       },
       "highgale_treads": {
-        "name": "Highgale Treads"
+        "name": "Pisadas del vendaval de altura"
       },
       "highgale_headguard": {
-        "name": "Highgale Headguard"
+        "name": "Guardacabeza del vendaval de altura"
       },
       "highgale_handwraps": {
-        "name": "Highgale Handwraps"
+        "name": "Vendas de manos del vendaval de altura"
       },
       "highgale_shoulderguards": {
-        "name": "Highgale Shoulderguards"
+        "name": "Guardahombros del vendaval de altura"
       },
       "highgale_waistguard": {
-        "name": "Highgale Waistguard"
+        "name": "Guardacintura del vendaval de altura"
       },
       "highgale_coif": {
-        "name": "Highgale Coif"
+        "name": "Almófar del vendaval de altura"
       },
       "highgale_handguards": {
-        "name": "Highgale Handguards"
+        "name": "Guardamanos del vendaval de altura"
       },
       "highgale_spaulders": {
-        "name": "Highgale Spaulders"
+        "name": "Espaldares del vendaval de altura"
       },
       "highgale_cord": {
-        "name": "Highgale Cord"
+        "name": "Cordón del vendaval de altura"
       },
       "breakwater_mantle": {
-        "name": "Breakwater Mantle"
+        "name": "Manto del rompeolas"
       },
       "breakwater_shoulderpads": {
-        "name": "Breakwater Shoulderpads"
+        "name": "Hombreras acolchadas del rompeolas"
       },
       "breakwater_spaulders": {
-        "name": "Breakwater Spaulders"
+        "name": "Espaldares del rompeolas"
       },
       "gravebell_treads": {
-        "name": "Gravebell Treads"
+        "name": "Pisadas de campana sepulcral"
       },
       "gravebell_greaves": {
-        "name": "Gravebell Greaves"
+        "name": "Grebas de campana sepulcral"
       },
       "cryptbound_tunic": {
-        "name": "Cryptbound Tunic"
+        "name": "Túnica ligada a la cripta"
       },
       "cryptbound_chainmail": {
-        "name": "Cryptbound Chainmail"
+        "name": "Cota de malla ligada a la cripta"
       },
       "oathbroken_leggings": {
-        "name": "Oathbroken Leggings"
+        "name": "Leotardos del juramento roto"
       },
       "oathbroken_breeches": {
-        "name": "Oathbroken Breeches"
+        "name": "Calzones del juramento roto"
       },
       "oathbroken_legwraps": {
-        "name": "Oathbroken Legwraps"
+        "name": "Vendas de piernas del juramento roto"
       },
       "oathbroken_legguards": {
-        "name": "Oathbroken Legguards"
+        "name": "Guardapiernas del juramento roto"
       },
       "oathbroken_chausses": {
-        "name": "Oathbroken Chausses"
+        "name": "Calzas de malla del juramento roto"
       },
       "seamist_legwraps": {
-        "name": "Seamist Legwraps"
+        "name": "Vendas de piernas de bruma marina"
       },
       "seamist_chausses": {
-        "name": "Seamist Chausses"
+        "name": "Calzas de malla de bruma marina"
       },
       "warmonger_treads": {
-        "name": "Warmonger Treads"
+        "name": "Pisadas del belicista"
       },
       "warmonger_greaves": {
-        "name": "Warmonger Greaves"
+        "name": "Grebas del belicista"
       },
       "sparkglass_leggings": {
-        "name": "Sparkglass Leggings"
+        "name": "Leotardos de cristal chispeante"
       },
       "sparkglass_breeches": {
-        "name": "Sparkglass Breeches"
+        "name": "Calzones de cristal chispeante"
       },
       "sparkglass_legwraps": {
-        "name": "Sparkglass Legwraps"
+        "name": "Vendas de piernas de cristal chispeante"
       },
       "sparkglass_legguards": {
-        "name": "Sparkglass Legguards"
+        "name": "Guardapiernas de cristal chispeante"
       },
       "sparkglass_chausses": {
-        "name": "Sparkglass Chausses"
+        "name": "Calzas de malla de cristal chispeante"
       },
       "stillhymn_treads": {
-        "name": "Stillhymn Treads"
+        "name": "Pisadas del himno quieto"
       },
       "stillhymn_greaves": {
-        "name": "Stillhymn Greaves"
+        "name": "Grebas del himno quieto"
       },
       "pearlglow_headguard": {
-        "name": "Pearlglow Headguard"
+        "name": "Guardacabeza de fulgor perlado"
       },
       "pearlglow_coif": {
-        "name": "Pearlglow Coif"
+        "name": "Almófar de fulgor perlado"
       },
       "sealkeeper_gloves": {
-        "name": "Sealkeeper Gloves"
+        "name": "Guantes del guardián del sello"
       },
       "sealkeeper_grips": {
-        "name": "Sealkeeper Grips"
+        "name": "Guantes de agarre del guardián del sello"
       },
       "sealkeeper_handwraps": {
-        "name": "Sealkeeper Handwraps"
+        "name": "Vendas de manos del guardián del sello"
       },
       "sealkeeper_gauntlets": {
-        "name": "Sealkeeper Gauntlets"
+        "name": "Guanteletes del guardián del sello"
       },
       "sealkeeper_handguards": {
-        "name": "Sealkeeper Handguards"
+        "name": "Guardamanos del guardián del sello"
       },
       "fetterbound_leggings": {
-        "name": "Fetterbound Leggings"
+        "name": "Leotardos encadenados"
       },
       "fetterbound_breeches": {
-        "name": "Fetterbound Breeches"
+        "name": "Calzones encadenados"
       },
       "fetterbound_legwraps": {
-        "name": "Fetterbound Legwraps"
+        "name": "Vendas de piernas encadenadas"
       },
       "fetterbound_legguards": {
-        "name": "Fetterbound Legguards"
+        "name": "Guardapiernas encadenados"
       },
       "fetterbound_chausses": {
-        "name": "Fetterbound Chausses"
+        "name": "Calzas de malla encadenadas"
       },
       "shroudcaller_tunic": {
-        "name": "Shroudcaller Tunic"
+        "name": "Túnica del invocador de mortajas"
       },
       "shroudcaller_chainmail": {
-        "name": "Shroudcaller Chainmail"
+        "name": "Cota de malla del invocador de mortajas"
       },
       "wyrmshadow_tunic": {
-        "name": "Wyrmshadow Tunic"
+        "name": "Túnica de sombra de vermis"
       },
       "wyrmshadow_chainmail": {
-        "name": "Wyrmshadow Chainmail"
+        "name": "Cota de malla de sombra de vermis"
       },
       "cinderbrood_shoulderpads": {
-        "name": "Cinderbrood Shoulderpads"
+        "name": "Hombreras acolchadas de la prole de ceniza"
       },
       "cinderbrood_shoulderguards": {
-        "name": "Cinderbrood Shoulderguards"
+        "name": "Guardahombros de la prole de ceniza"
       },
       "cinderbrood_pauldrons": {
-        "name": "Cinderbrood Pauldrons"
+        "name": "Hombreras de placas de la prole de ceniza"
       },
       "hoarfrost_mantle": {
-        "name": "Hoarfrost Mantle"
+        "name": "Manto de Escarcha"
       },
       "hoarfrost_shoulderpads": {
-        "name": "Hoarfrost Shoulderpads"
+        "name": "Hombreras acolchadas de Escarcha"
       },
       "hoarfrost_spaulders": {
-        "name": "Hoarfrost Spaulders"
+        "name": "Espaldares de Escarcha"
       },
       "blackmere_mantle": {
-        "name": "Blackmere Mantle"
+        "name": "Manto de la Laguna Negra"
       },
       "blackmere_shoulderpads": {
-        "name": "Blackmere Shoulderpads"
+        "name": "Hombreras acolchadas de la Laguna Negra"
       },
       "blackmere_shoulderguards": {
-        "name": "Blackmere Shoulderguards"
+        "name": "Guardahombros de la Laguna Negra"
       },
       "blackmere_pauldrons": {
-        "name": "Blackmere Pauldrons"
+        "name": "Hombreras de placas de la Laguna Negra"
       },
       "blackmere_spaulders": {
-        "name": "Blackmere Spaulders"
+        "name": "Espaldares de la Laguna Negra"
       },
       "reedhush_mantle": {
-        "name": "Reedhush Mantle"
+        "name": "Manto del silencio del juncal"
       },
       "reedhush_shoulderpads": {
-        "name": "Reedhush Shoulderpads"
+        "name": "Hombreras acolchadas del silencio del juncal"
       },
       "reedhush_shoulderguards": {
-        "name": "Reedhush Shoulderguards"
+        "name": "Guardahombros del silencio del juncal"
       },
       "reedhush_pauldrons": {
-        "name": "Reedhush Pauldrons"
+        "name": "Hombreras de placas del silencio del juncal"
       },
       "reedhush_spaulders": {
-        "name": "Reedhush Spaulders"
+        "name": "Espaldares del silencio del juncal"
       },
       "cairnking_mantle": {
-        "name": "Cairnking Mantle"
+        "name": "Manto del rey del túmulo"
       },
       "cairnking_shoulderpads": {
-        "name": "Cairnking Shoulderpads"
+        "name": "Hombreras acolchadas del rey del túmulo"
       },
       "cairnking_shoulderguards": {
-        "name": "Cairnking Shoulderguards"
+        "name": "Guardahombros del rey del túmulo"
       },
       "cairnking_pauldrons": {
-        "name": "Cairnking Pauldrons"
+        "name": "Hombreras de placas del rey del túmulo"
       },
       "cairnking_spaulders": {
-        "name": "Cairnking Spaulders"
+        "name": "Espaldares del rey del túmulo"
       },
       "palehunt_mantle": {
-        "name": "Palehunt Mantle"
+        "name": "Manto de la caza pálida"
       },
       "palehunt_shoulderpads": {
-        "name": "Palehunt Shoulderpads"
+        "name": "Hombreras acolchadas de la caza pálida"
       },
       "palehunt_shoulderguards": {
-        "name": "Palehunt Shoulderguards"
+        "name": "Guardahombros de la caza pálida"
       },
       "palehunt_pauldrons": {
-        "name": "Palehunt Pauldrons"
+        "name": "Hombreras de placas de la caza pálida"
       },
       "palehunt_spaulders": {
-        "name": "Palehunt Spaulders"
+        "name": "Espaldares de la caza pálida"
       },
       "jadeshrine_mantle": {
-        "name": "Jadeshrine Mantle"
+        "name": "Manto del santuario de jade"
       },
       "jadeshrine_shoulderpads": {
-        "name": "Jadeshrine Shoulderpads"
+        "name": "Hombreras acolchadas del santuario de jade"
       },
       "jadeshrine_shoulderguards": {
-        "name": "Jadeshrine Shoulderguards"
+        "name": "Guardahombros del santuario de jade"
       },
       "jadeshrine_pauldrons": {
-        "name": "Jadeshrine Pauldrons"
+        "name": "Hombreras de placas del santuario de jade"
       },
       "jadeshrine_spaulders": {
-        "name": "Jadeshrine Spaulders"
+        "name": "Espaldares del santuario de jade"
       },
       "gildhedge_mantle": {
-        "name": "Gildhedge Mantle"
+        "name": "Manto del seto dorado"
       },
       "gildhedge_shoulderpads": {
-        "name": "Gildhedge Shoulderpads"
+        "name": "Hombreras acolchadas del seto dorado"
       },
       "gildhedge_spaulders": {
-        "name": "Gildhedge Spaulders"
+        "name": "Espaldares del seto dorado"
       },
       "saltwrack_mantle": {
-        "name": "Saltwrack Mantle"
+        "name": "Manto del estrago salino"
       },
       "saltwrack_shoulderpads": {
-        "name": "Saltwrack Shoulderpads"
+        "name": "Hombreras acolchadas del estrago salino"
       },
       "saltwrack_spaulders": {
-        "name": "Saltwrack Spaulders"
+        "name": "Espaldares del estrago salino"
       },
       "brookwatch_vest": {
-        "name": "Brookwatch Vest"
+        "name": "Chaleco de la guardia del arroyo"
       },
       "brookwatch_trousers": {
-        "name": "Brookwatch Trousers"
+        "name": "Pantalones de la guardia del arroyo"
       },
       "brookwatch_moccasins": {
-        "name": "Brookwatch Moccasins"
+        "name": "Mocasines de la guardia del arroyo"
       },
       "brookwatch_cowl": {
-        "name": "Brookwatch Cowl"
+        "name": "Capucha amplia de la guardia del arroyo"
       },
       "brookwatch_mitts": {
-        "name": "Brookwatch Mitts"
+        "name": "Mitones de la guardia del arroyo"
       },
       "brookwatch_epaulets": {
-        "name": "Brookwatch Epaulets"
+        "name": "Charreteras de la guardia del arroyo"
       },
       "brookwatch_cinch": {
-        "name": "Brookwatch Cinch"
+        "name": "Ceñidor de la guardia del arroyo"
       },
       "hedgerow_vest": {
-        "name": "Hedgerow Vest"
+        "name": "Chaleco del seto"
       },
       "hedgerow_trousers": {
-        "name": "Hedgerow Trousers"
+        "name": "Pantalones del seto"
       },
       "hedgerow_moccasins": {
-        "name": "Hedgerow Moccasins"
+        "name": "Mocasines del seto"
       },
       "hedgerow_cowl": {
-        "name": "Hedgerow Cowl"
+        "name": "Capucha amplia del seto"
       },
       "hedgerow_mitts": {
-        "name": "Hedgerow Mitts"
+        "name": "Mitones del seto"
       },
       "hedgerow_epaulets": {
-        "name": "Hedgerow Epaulets"
+        "name": "Charreteras del seto"
       },
       "hedgerow_cinch": {
-        "name": "Hedgerow Cinch"
+        "name": "Ceñidor del seto"
       },
       "bogwalker_vest": {
-        "name": "Bogwalker Vest"
+        "name": "Chaleco del caminante del pantano"
       },
       "bogwalker_trousers": {
-        "name": "Bogwalker Trousers"
+        "name": "Pantalones del caminante del pantano"
       },
       "bogwalker_moccasins": {
-        "name": "Bogwalker Moccasins"
+        "name": "Mocasines del caminante del pantano"
       },
       "bogwalker_cowl": {
-        "name": "Bogwalker Cowl"
+        "name": "Capucha amplia del caminante del pantano"
       },
       "bogwalker_mitts": {
-        "name": "Bogwalker Mitts"
+        "name": "Mitones del caminante del pantano"
       },
       "bogwalker_epaulets": {
-        "name": "Bogwalker Epaulets"
+        "name": "Charreteras del caminante del pantano"
       },
       "bogwalker_cinch": {
-        "name": "Bogwalker Cinch"
+        "name": "Ceñidor del caminante del pantano"
       },
       "thornspire_vest": {
-        "name": "Thornspire Vest"
+        "name": "Chaleco de la aguja de espinas"
       },
       "thornspire_trousers": {
-        "name": "Thornspire Trousers"
+        "name": "Pantalones de la aguja de espinas"
       },
       "thornspire_moccasins": {
-        "name": "Thornspire Moccasins"
+        "name": "Mocasines de la aguja de espinas"
       },
       "thornspire_cowl": {
-        "name": "Thornspire Cowl"
+        "name": "Capucha amplia de la aguja de espinas"
       },
       "thornspire_mitts": {
-        "name": "Thornspire Mitts"
+        "name": "Mitones de la aguja de espinas"
       },
       "thornspire_epaulets": {
-        "name": "Thornspire Epaulets"
+        "name": "Charreteras de la aguja de espinas"
       },
       "thornspire_cinch": {
-        "name": "Thornspire Cinch"
+        "name": "Ceñidor de la aguja de espinas"
       },
       "hollowveil_vest": {
-        "name": "Hollowveil Vest"
+        "name": "Chaleco del velo hueco"
       },
       "hollowveil_trousers": {
-        "name": "Hollowveil Trousers"
+        "name": "Pantalones del velo hueco"
       },
       "hollowveil_moccasins": {
-        "name": "Hollowveil Moccasins"
+        "name": "Mocasines del velo hueco"
       },
       "hollowveil_cowl": {
-        "name": "Hollowveil Cowl"
+        "name": "Capucha amplia del velo hueco"
       },
       "hollowveil_mitts": {
-        "name": "Hollowveil Mitts"
+        "name": "Mitones del velo hueco"
       },
       "hollowveil_epaulets": {
-        "name": "Hollowveil Epaulets"
+        "name": "Charreteras del velo hueco"
       },
       "hollowveil_cinch": {
-        "name": "Hollowveil Cinch"
+        "name": "Ceñidor del velo hueco"
       },
       "trailwarden_vest": {
-        "name": "Trailwarden Vest"
+        "name": "Chaleco del guardián de la senda"
       },
       "trailwarden_trousers": {
-        "name": "Trailwarden Trousers"
+        "name": "Pantalones del guardián de la senda"
       },
       "trailwarden_moccasins": {
-        "name": "Trailwarden Moccasins"
+        "name": "Mocasines del guardián de la senda"
       },
       "trailwarden_cowl": {
-        "name": "Trailwarden Cowl"
+        "name": "Capucha amplia del guardián de la senda"
       },
       "trailwarden_mitts": {
-        "name": "Trailwarden Mitts"
+        "name": "Mitones del guardián de la senda"
       },
       "trailwarden_epaulets": {
-        "name": "Trailwarden Epaulets"
+        "name": "Charreteras del guardián de la senda"
       },
       "trailwarden_cinch": {
-        "name": "Trailwarden Cinch"
+        "name": "Ceñidor del guardián de la senda"
       },
       "highgale_vest": {
-        "name": "Highgale Vest"
+        "name": "Chaleco del vendaval de altura"
       },
       "highgale_trousers": {
-        "name": "Highgale Trousers"
+        "name": "Pantalones del vendaval de altura"
       },
       "highgale_moccasins": {
-        "name": "Highgale Moccasins"
+        "name": "Mocasines del vendaval de altura"
       },
       "highgale_cowl": {
-        "name": "Highgale Cowl"
+        "name": "Capucha amplia del vendaval de altura"
       },
       "highgale_mitts": {
-        "name": "Highgale Mitts"
+        "name": "Mitones del vendaval de altura"
       },
       "highgale_epaulets": {
-        "name": "Highgale Epaulets"
+        "name": "Charreteras del vendaval de altura"
       },
       "highgale_cinch": {
-        "name": "Highgale Cinch"
+        "name": "Ceñidor del vendaval de altura"
       },
       "breakwater_shoulderguards": {
-        "name": "Breakwater Shoulderguards"
+        "name": "Guardahombros del rompeolas"
       },
       "breakwater_pauldrons": {
-        "name": "Breakwater Pauldrons"
+        "name": "Hombreras de placas del rompeolas"
       },
       "breakwater_epaulets": {
-        "name": "Breakwater Epaulets"
+        "name": "Charreteras del rompeolas"
       },
       "gravebell_moccasins": {
-        "name": "Gravebell Moccasins"
+        "name": "Mocasines de campana sepulcral"
       },
       "oathbroken_trousers": {
-        "name": "Oathbroken Trousers"
+        "name": "Pantalones del juramento roto"
       },
       "sparkglass_trousers": {
-        "name": "Sparkglass Trousers"
+        "name": "Pantalones de cristal chispeante"
       },
       "stillhymn_moccasins": {
-        "name": "Stillhymn Moccasins"
+        "name": "Mocasines del himno quieto"
       },
       "sealkeeper_mitts": {
-        "name": "Sealkeeper Mitts"
+        "name": "Mitones del guardián del sello"
       },
       "fetterbound_trousers": {
-        "name": "Fetterbound Trousers"
+        "name": "Pantalones encadenados"
       },
       "wyrmshadow_vest": {
-        "name": "Wyrmshadow Vest"
+        "name": "Chaleco de sombra de vermis"
       },
       "cinderbrood_spaulders": {
-        "name": "Cinderbrood Spaulders"
+        "name": "Espaldares de la prole de ceniza"
       },
       "cinderbrood_epaulets": {
-        "name": "Cinderbrood Epaulets"
+        "name": "Charreteras de la prole de ceniza"
       },
       "hoarfrost_shoulderguards": {
-        "name": "Hoarfrost Shoulderguards"
+        "name": "Guardahombros de Escarcha"
       },
       "hoarfrost_pauldrons": {
-        "name": "Hoarfrost Pauldrons"
+        "name": "Hombreras de placas de Escarcha"
       },
       "hoarfrost_epaulets": {
-        "name": "Hoarfrost Epaulets"
+        "name": "Charreteras de Escarcha"
       },
       "blackmere_epaulets": {
-        "name": "Blackmere Epaulets"
+        "name": "Charreteras de la Laguna Negra"
       },
       "reedhush_epaulets": {
-        "name": "Reedhush Epaulets"
+        "name": "Charreteras del silencio del juncal"
       },
       "cairnking_epaulets": {
-        "name": "Cairnking Epaulets"
+        "name": "Charreteras del rey del túmulo"
       },
       "palehunt_epaulets": {
-        "name": "Palehunt Epaulets"
+        "name": "Charreteras de la caza pálida"
       },
       "jadeshrine_epaulets": {
-        "name": "Jadeshrine Epaulets"
+        "name": "Charreteras del santuario de jade"
       },
       "gildhedge_shoulderguards": {
-        "name": "Gildhedge Shoulderguards"
+        "name": "Guardahombros del seto dorado"
       },
       "gildhedge_pauldrons": {
-        "name": "Gildhedge Pauldrons"
+        "name": "Hombreras de placas del seto dorado"
       },
       "gildhedge_epaulets": {
-        "name": "Gildhedge Epaulets"
+        "name": "Charreteras del seto dorado"
       },
       "saltwrack_shoulderguards": {
-        "name": "Saltwrack Shoulderguards"
+        "name": "Guardahombros del estrago salino"
       },
       "saltwrack_pauldrons": {
-        "name": "Saltwrack Pauldrons"
+        "name": "Hombreras de placas del estrago salino"
       },
       "saltwrack_epaulets": {
-        "name": "Saltwrack Epaulets"
+        "name": "Charreteras del estrago salino"
       },
       "muster_shardpike": {
-        "name": "Muster Shardpike"
+        "name": "Pica de Fragmentos de la leva"
       },
       "knucklebone_of_balgath": {
-        "name": "Knucklebone of Balgath"
+        "name": "Tabas de Balgath"
       },
       "muster_standard": {
-        "name": "Muster Standard"
+        "name": "Estandarte de la leva"
       },
       "guttered_eye": {
-        "name": "The Guttered Eye"
+        "name": "El Ojo Extinguido"
       },
       "barrowstone_heart": {
-        "name": "Barrowstone Heart"
+        "name": "Corazón de Piedra Tumular"
       },
       "muster_grapnel": {
-        "name": "Muster Grapnel"
+        "name": "Garfio de la leva"
       },
       "craterglass_stave": {
-        "name": "Craterglass Stave"
+        "name": "Báculo de cristal de cráter"
       },
       "gravedirt_treads": {
-        "name": "Gravedirt Treads"
+        "name": "Pisadas de tierra sepulcral"
       },
       "bellrope_girdle": {
-        "name": "Bellrope Girdle"
+        "name": "Faja de cuerda de campana"
       },
       "sextons_spadehaft": {
-        "name": "Sexton's Spadehaft"
+        "name": "Mango de pala del sacristán"
       },
       "rimesilk_mantle": {
-        "name": "Rimesilk Mantle"
+        "name": "Manto de seda escarchada"
       },
       "bonechill_carapace_vest": {
-        "name": "Bonechill Hauberk"
+        "name": "Loriga del frío de huesos"
       },
       "rimeweb_hunters_leggings": {
-        "name": "Rime-Laced Leggings"
+        "name": "Leotardos entretejidos de escarcha"
       },
       "rimeweb_fang": {
-        "name": "Bride's Icicle"
+        "name": "Carámbano de la novia"
       },
       "cantors_cassock": {
-        "name": "Cantor's Cassock"
+        "name": "Sotana del cantor"
       },
       "choirward_leggings": {
-        "name": "Choirward Leggings"
+        "name": "Leotardos del resguardo del coro"
       },
       "choristers_gloves": {
-        "name": "Chorister's Gloves"
+        "name": "Guantes del corista"
       },
       "cantors_hymnal": {
-        "name": "Cantor's Hymnal"
+        "name": "Himnario del cantor"
       },
       "gravecallers_vestments": {
-        "name": "Gravecaller's Vestments"
+        "name": "Vestimentas del Invocador de Tumbas"
       },
       "unquiet_stalkers_hood": {
-        "name": "Unquiet Stalker's Hood"
+        "name": "Capucha del acechador inquieto"
       },
       "sextons_burial_spade": {
-        "name": "Sexton's Burial Spade"
+        "name": "Pala funeraria del sacristán"
       },
       "rimesilk_hood": {
-        "name": "Rimesilk Hood"
+        "name": "Capucha de seda escarchada"
       },
       "knight_commanders_longsword": {
-        "name": "Knight-Commander's Longsword"
+        "name": "Espada larga del caballero comandante"
       },
       "gaolers_chain_girdle": {
-        "name": "Gaoler's Chain Girdle"
+        "name": "Faja de cadenas del carcelero"
       },
       "rusted_shackle_grips": {
-        "name": "Rusted Shackle Grips"
+        "name": "Guantes de agarre de grilletes oxidados"
       },
       "drowned_wardens_mantle": {
-        "name": "Drowned Warden's Mantle"
+        "name": "Manto del guardián ahogado"
       },
       "gaolyard_cudgel": {
-        "name": "Gaolyard Cudgel"
+        "name": "Garrote del patio de la prisión"
       },
       "drowned_commanders_breastplate": {
-        "name": "Drowned Commander's Breastplate"
+        "name": "Coraza del comandante ahogado"
       },
       "gaolyard_striders": {
-        "name": "Gaolyard Striders"
+        "name": "Botas de caminante del patio de la prisión"
       },
       "jailers_iron_gauntlets": {
-        "name": "Jailer's Iron Gauntlets"
+        "name": "Guanteletes de hierro del carcelero"
       },
       "turnkeys_keyring_belt": {
-        "name": "Turnkey's Keyring Belt"
+        "name": "Cinturón de llavero del alcaide"
       },
       "turnkeys_lantern_cowl": {
-        "name": "Turnkey's Lantern Cowl"
+        "name": "Capucha amplia del farol del alcaide"
       },
       "conchplate_girdle": {
-        "name": "Conchplate Girdle"
+        "name": "Faja de placas de caracola"
       },
       "pale_chorus_leggings": {
-        "name": "Pale Chorus Leggings"
+        "name": "Leotardos del coro pálido"
       },
       "refrain_silk_gloves": {
-        "name": "Refrain Silk Gloves"
+        "name": "Guantes de seda del estribillo"
       },
       "chorus_conch": {
-        "name": "Chorus Conch"
+        "name": "Caracola del coro"
       },
       "tideglass_pauldrons": {
-        "name": "Tideglass Pauldrons"
+        "name": "Hombreras de placas de cristal de marea"
       },
       "moonburn_treads": {
-        "name": "Moonburn Treads"
+        "name": "Pisadas de abrasión lunar"
       },
       "prism_etched_cowl": {
-        "name": "Prism-Etched Cowl"
+        "name": "Capucha amplia grabada con prismas"
       },
       "tideglass_shiv": {
-        "name": "Tideglass Shiv"
+        "name": "Navaja de cristal de marea"
       },
       "pale_chorus_vestment": {
-        "name": "Pale Chorus Vestment"
+        "name": "Vestidura del coro pálido"
       },
       "tideglass_warmaul": {
-        "name": "Tideglass Warmaul"
+        "name": "Maza de guerra de cristal de marea"
       },
       "beastpit_warbelt": {
-        "name": "Beastpit Warbelt"
+        "name": "Cinturón de guerra del foso de bestias"
       },
       "jaguar_hide_jerkin": {
-        "name": "Jaguar-Hide Jerkin"
+        "name": "Coleto de piel de jaguar"
       },
       "hexbone_handwraps": {
-        "name": "Hexbone Handwraps"
+        "name": "Vendas de manos de hueso embrujado"
       },
       "rootbound_sabatons": {
-        "name": "Rootbound Sabatons"
+        "name": "Escarpes atados con raíces"
       },
       "pollen_dusted_leggings": {
-        "name": "Pollen-Dusted Leggings"
+        "name": "Leotardos espolvoreados de polen"
       },
       "bloomsilk_cowl": {
-        "name": "Bloomsilk Cowl"
+        "name": "Capucha de seda floral"
       },
       "falls_blessed_staff": {
-        "name": "Falls-Blessed Staff"
+        "name": "Bastón bendecido por las cascadas"
       },
       "fanglords_hide_mantle": {
-        "name": "Fanglord's Hide Mantle"
+        "name": "Manto de pellejo del señor de los colmillos"
       },
       "thornroot_greathelm": {
-        "name": "Thorncrowned Greathelm"
+        "name": "Gran yelmo coronado de espinas"
       },
       "foremans_grips": {
-        "name": "Foreman's Grips"
+        "name": "Guantes de agarre del capataz"
       },
       "serac_stride_boots": {
-        "name": "Serac-Stride Boots"
+        "name": "Botas de paso de serac"
       },
       "seal_rune_mantle": {
-        "name": "Seal-Rune Mantle"
+        "name": "Manto de runas del sello"
       },
       "thawbound_legguards": {
-        "name": "Thawbound Legguards"
+        "name": "Guardapiernas ligados al deshielo"
       },
       "pyre_tenders_hood": {
-        "name": "Pyre-Tender's Hood"
+        "name": "Capucha del cuidador de piras"
       },
       "meltwater_cord": {
-        "name": "Meltwater Cord"
+        "name": "Cordón de agua de deshielo"
       },
       "hammer_of_the_open_lock": {
-        "name": "Hammer of the Open Lock"
+        "name": "Martillo del sello abierto"
       },
       "vestments_of_the_waking_rite": {
-        "name": "Vestments of the Waking Rite"
+        "name": "Vestimentas del rito que despierta"
       },
       "spadeworn_gauntlets": {
-        "name": "Spadeworn Gauntlets"
+        "name": "Guanteletes gastados por la pala"
       },
       "gravedirt_grips": {
-        "name": "Gravedirt Grips"
+        "name": "Guantes de agarre de tierra sepulcral"
       },
       "bellrope_mitts": {
-        "name": "Bellrope Mitts"
+        "name": "Mitones de cuerda de campana"
       },
       "rimewreath_coif": {
-        "name": "Rimewreath Coif"
+        "name": "Almófar de corona de escarcha"
       },
       "rime_laced_hood": {
-        "name": "Rime-Laced Hood"
+        "name": "Capucha entretejida de escarcha"
       },
       "lamenting_veil": {
-        "name": "Lamenting Veil"
+        "name": "Velo del lamento"
       },
       "choirward_pauldrons": {
-        "name": "Choirward Pauldrons"
+        "name": "Hombreras de placas del resguardo del coro"
       },
       "choristers_spaulders": {
-        "name": "Chorister's Spaulders"
+        "name": "Espaldares del corista"
       },
       "cantors_stole": {
-        "name": "Cantor's Stole"
+        "name": "Estola del cantor"
       },
       "knellbound_hauberk": {
-        "name": "Knellbound Hauberk"
+        "name": "Loriga ligada al doblar"
       },
       "candlewatch_jerkin": {
-        "name": "Candlewatch Jerkin"
+        "name": "Coleto de la vigilia de las velas"
       },
       "robe_of_the_unquiet_rite": {
-        "name": "Robe of the Unquiet Rite"
+        "name": "Toga del rito de los inquietos"
       },
       "gravecallers_rod": {
-        "name": "Gravecaller's Rod"
+        "name": "Vara del Invocador de Tumbas"
       },
       "portcullis_girdle": {
-        "name": "Portcullis Girdle"
+        "name": "Faja del rastrillo"
       },
       "cellwatch_belt": {
-        "name": "Cellwatch Belt"
+        "name": "Cinturón de la guardia de las celdas"
       },
       "lanternwick_sash": {
-        "name": "Lanternwick Sash"
+        "name": "Fajín de mecha de farol"
       },
       "turnkeys_shank": {
-        "name": "Turnkey's Shank"
+        "name": "Punzón del alcaide"
       },
       "gaolyard_jerkin": {
-        "name": "Gaolyard Jerkin"
+        "name": "Coleto del patio de la prisión"
       },
       "brinewarden_robe": {
-        "name": "Brinewarden Robe"
+        "name": "Toga del guardián de la salmuera"
       },
       "fogbinders_rod": {
-        "name": "Fogbinder's Rod"
+        "name": "Vara del Fogbinder"
       },
       "conchplate_sabatons": {
-        "name": "Conchplate Sabatons"
+        "name": "Escarpes de placas de caracola"
       },
       "pale_chorus_slippers": {
-        "name": "Pale Chorus Slippers"
+        "name": "Zapatillas del coro pálido"
       },
       "tideglass_gauntlets": {
-        "name": "Tideglass Gauntlets"
+        "name": "Guanteletes de cristal de marea"
       },
       "moonburn_grips": {
-        "name": "Moonburn Grips"
+        "name": "Guantes de agarre de abrasión lunar"
       },
       "prism_etched_handwraps": {
-        "name": "Prism-Etched Handwraps"
+        "name": "Vendas de manos grabadas con prismas"
       },
       "mere_crested_helm": {
-        "name": "Mere-Crested Helm"
+        "name": "Yelmo con cresta de la laguna"
       },
       "mereskin_hood": {
-        "name": "Mereskin Hood"
+        "name": "Capucha de piel de la laguna"
       },
       "merewater_cowl": {
-        "name": "Merewater Cowl"
+        "name": "Capucha amplia de agua de la laguna"
       },
       "merecleaver": {
-        "name": "Merecleaver"
+        "name": "Hendidor de la laguna"
       },
       "moonwrack_stave": {
-        "name": "Moonwrack Stave"
+        "name": "Báculo de ruina lunar"
+      },
+      "vanguard_feral_staff": {
+        "name": "Bastón feral de la Vanguardia"
+      },
+      "vanguard_band_of_might": {
+        "name": "Anillo de Vanguardia de Poder"
+      },
+      "vanguard_band_of_precision": {
+        "name": "Anillo de Vanguardia de Precisión"
+      },
+      "vanguard_band_of_focus": {
+        "name": "Anillo de Vanguardia de Enfoque"
+      },
+      "vanguard_band_of_mending": {
+        "name": "Anillo de Vanguardia de Curación"
+      },
+      "vanguard_pendant_of_might": {
+        "name": "Colgante de Vanguardia de Poder"
+      },
+      "vanguard_pendant_of_precision": {
+        "name": "Colgante de Vanguardia de Precisión"
+      },
+      "vanguard_pendant_of_focus": {
+        "name": "Colgante de Vanguardia de Enfoque"
+      },
+      "vanguard_pendant_of_mending": {
+        "name": "Colgante de Vanguardia de Curación"
       },
       "gourdlight_sweet": {
         "name": "Gourdlight Sweet"
@@ -23118,65 +24487,68 @@ export const es: EnTranslations = {
       "gourdlight_crow_feather": {
         "name": "Gourdlight Crow Feather"
       },
+      "membership_staff": {
+        "name": "Bastón del cambio"
+      },
       "membership_token": {
-        "name": "Membership Token (30 Days)"
+        "name": "Ficha de membresía (30 días)"
       },
       "referral_satchel": {
-        "name": "Friendship Satchel"
+        "name": "Morral de la amistad"
       },
       "referral_hollow_charm": {
-        "name": "Oathkeeper's Heart"
+        "name": "Corazón del guardián del juramento"
       },
       "referral_fog_charm": {
-        "name": "Awakened Oathkeeper's Heart"
+        "name": "Corazón despierto del guardián del juramento"
       },
       "reins_referral_tank": {
-        "name": "Friendship Tank Reins"
+        "name": "Riendas de tanque de la amistad"
       },
       "reins_referral_raptor": {
-        "name": "Friendship Raptor Reins"
+        "name": "Riendas de raptor de la amistad"
       },
       "referral_helmet": {
-        "name": "Friendship Helm"
+        "name": "Yelmo de la amistad"
       },
       "referral_shoulder": {
-        "name": "Friendship Pauldrons"
+        "name": "Hombreras de placas de la amistad"
       },
       "referral_chest": {
-        "name": "Friendship Cuirass"
+        "name": "Coraza de la amistad"
       },
       "referral_waist": {
-        "name": "Friendship Girdle"
+        "name": "Faja de la amistad"
       },
       "referral_legs": {
-        "name": "Friendship Legguards"
+        "name": "Guardapiernas de la amistad"
       },
       "referral_gloves": {
-        "name": "Friendship Gauntlets"
+        "name": "Guanteletes de la amistad"
       },
       "referral_feet": {
-        "name": "Friendship Boots"
+        "name": "Botas de la amistad"
       },
       "membership_helmet": {
-        "name": "Membership Helm"
+        "name": "Yelmo de membresía"
       },
       "membership_shoulder": {
-        "name": "Membership Pauldrons"
+        "name": "Hombreras de placas de membresía"
       },
       "membership_chest": {
-        "name": "Membership Cuirass"
+        "name": "Coraza de membresía"
       },
       "membership_waist": {
-        "name": "Membership Girdle"
+        "name": "Faja de membresía"
       },
       "membership_legs": {
-        "name": "Membership Legguards"
+        "name": "Guardapiernas de membresía"
       },
       "membership_gloves": {
-        "name": "Membership Gauntlets"
+        "name": "Guanteletes de membresía"
       },
       "membership_feet": {
-        "name": "Membership Boots"
+        "name": "Botas de membresía"
       },
       "conjured_water4": {
         "name": "Agua de Manantial Conjurada"
@@ -23661,6 +25033,12 @@ export const es: EnTranslations = {
       "emissary_cache": {
         "name": "Alijo del Emisario"
       },
+      "pvp_trophy_skull": {
+        "name": "Cráneo Trofeo"
+      },
+      "pvp_skull_bag": {
+        "name": "Bolsa de Cráneos"
+      },
       "clue_scroll": {
         "name": "Pergamino de Pistas"
       },
@@ -23669,6 +25047,12 @@ export const es: EnTranslations = {
       },
       "heroic_mark": {
         "name": "Marca Heroica"
+      },
+      "lantern_seal": {
+        "name": "Sello del farol"
+      },
+      "reins_lantern_hall_destrier": {
+        "name": "Riendas del Destrero del Salón del Farol"
       },
       "wyrmfall_core": {
         "name": "Núcleo de Caída del Wyrm"
@@ -24034,22 +25418,22 @@ export const es: EnTranslations = {
         "name": "Corazón del Crisol"
       },
       "gaolers_iron_key": {
-        "name": "Gaoler's Iron Key"
+        "name": "Llave de hierro del carcelero"
       },
       "fanglords_whistle": {
-        "name": "Fanglord's Whistle"
+        "name": "Silbato del señor de los colmillos"
       },
       "gorgebloom_seedpod": {
-        "name": "Gorgebloom Seedpod"
+        "name": "Vaina de semillas de la Flor Devoradora"
       },
       "foremans_last_link": {
-        "name": "Foreman's Last Link"
+        "name": "Último eslabón del capataz"
       },
       "phial_of_the_tithe": {
-        "name": "Phial of the Tithe"
+        "name": "Redoma del diezmo"
       },
       "quenchwater_flask": {
-        "name": "Quenchwater Flask"
+        "name": "Frasco de agua de temple"
       },
       "rift_watchers_band": {
         "name": "Anillo del Vigía de la Brecha"
@@ -24186,7 +25570,7 @@ export const es: EnTranslations = {
         "name": "Huesos inquietos"
       },
       "marrow_restless_bones": {
-        "name": "Restless Bones"
+        "name": "Huesos inquietos"
       },
       "gorrak": {
         "name": "Gorrak el Despiadado"
@@ -24306,73 +25690,73 @@ export const es: EnTranslations = {
         "name": "Morthen el Gravecaller"
       },
       "ossuary_sentinel": {
-        "name": "Ossuary Sentinel"
+        "name": "Centinela del Osario"
       },
       "hollow_gravedigger": {
-        "name": "Hollow Gravedigger"
+        "name": "Sepulturero Hueco"
       },
       "rime_egg_sac": {
-        "name": "Rime Egg Sac"
+        "name": "Saco de Huevos de Escarcha"
       },
       "rimeweb_hatchling": {
-        "name": "Rimeweb Hatchling"
+        "name": "Cría de Telaraña Escarchada"
       },
       "rimeweb_spinner": {
-        "name": "Rimeweb Spinner"
+        "name": "Tejedora de Telaraña Escarchada"
       },
       "candlewright_acolyte": {
-        "name": "Candlewright Acolyte"
+        "name": "Acólito Cerero"
       },
       "hollow_chorister": {
-        "name": "Hollow Chorister"
+        "name": "Corista Hueco"
       },
       "bound_soul": {
-        "name": "Bound Soul"
+        "name": "Alma atada"
       },
       "rimeweb": {
-        "name": "Lady of the Bonechill"
+        "name": "Dama del Frío de Huesos"
       },
       "cantor_ilvane": {
         "name": "Cantor Ilvane"
       },
       "crypt_ossuary_warrior": {
-        "name": "Ossuary Warrior"
+        "name": "Guerrero del Osario"
       },
       "crypt_gravecaller_adept": {
-        "name": "Gravecaller Adept"
+        "name": "Adepto Invocador de Tumbas"
       },
       "crypt_ossuary_cutthroat": {
-        "name": "Ossuary Cutthroat"
+        "name": "Degollador del Osario"
       },
       "crypt_gravecaller_necromancer": {
-        "name": "Gravecaller Necromancer"
+        "name": "Nigromante Invocador de Tumbas"
       },
       "crypt_bone_minion": {
-        "name": "Bone Minion"
+        "name": "Esbirro de Hueso"
       },
       "crypt_bone_brute": {
-        "name": "Bone Brute"
+        "name": "Bruto de Hueso"
       },
       "crypt_bone_pile": {
-        "name": "Stirring Bones"
+        "name": "Huesos Agitados"
       },
       "crypt_chapel_gargoyle": {
-        "name": "Chapel Gargoyle"
+        "name": "Gárgola de la Capilla"
       },
       "crypt_crow_caller": {
-        "name": "Crow Caller"
+        "name": "Invocador de Cuervos"
       },
       "crypt_carrion_crow": {
-        "name": "Carrion Crow"
+        "name": "Cuervo Carroñero"
       },
       "crypt_ossuary_drake": {
-        "name": "Ossuary Drake"
+        "name": "Draco del Osario"
       },
       "crypt_knellwyrm": {
-        "name": "Knellwyrm"
+        "name": "Vermis del Doblar"
       },
       "crypt_remembrance_candle": {
-        "name": "Remembrance Candle"
+        "name": "Vela del recuerdo"
       },
       "bastion_revenant": {
         "name": "Aparecido del Bastión"
@@ -24390,100 +25774,100 @@ export const es: EnTranslations = {
         "name": "Vael el Fogbinder"
       },
       "drowned_watchman": {
-        "name": "Drowned Watchman"
+        "name": "Vigía Ahogado"
       },
       "fogbound_arbalest": {
-        "name": "Fogbound Arbalest"
+        "name": "Ballestero de la Niebla"
       },
       "barnacle_crawler": {
-        "name": "Wreckbound Sailor"
+        "name": "Marinero del Naufragio"
       },
       "bastion_warhound": {
-        "name": "Bastion Warhound"
+        "name": "Sabueso de Guerra del Bastión"
       },
       "mistweaver": {
-        "name": "Mist Chanter"
+        "name": "Cantor de la Bruma"
       },
       "drowned_sergeant": {
-        "name": "Drowned Sergeant"
+        "name": "Sargento Ahogado"
       },
       "shackled_prisoner": {
-        "name": "Shackled Prisoner"
+        "name": "Prisionero Encadenado"
       },
       "gaol_turnkey": {
-        "name": "Gaol Turnkey"
+        "name": "Alcaide de la Prisión"
       },
       "turretback_hermit": {
-        "name": "Shipwreck Captain"
+        "name": "Capitán del Naufragio"
       },
       "vael_fog_shade": {
-        "name": "Vael the Fogbinder"
+        "name": "Vael el Fogbinder"
       },
       "gaoler_ossick": {
-        "name": "Gaoler Ossick"
+        "name": "Carcelero Ossick"
       },
       "bastion_gaol_cage": {
-        "name": "Iron Cage"
+        "name": "Jaula de hierro"
       },
       "bastion_drowned_anchor": {
-        "name": "Drowned Anchor"
+        "name": "Ancla ahogada"
       },
       "lagoon_snapper": {
-        "name": "Lagoon Snapper"
+        "name": "Tortuga Mordedora de la Laguna"
       },
       "ice_wraith": {
-        "name": "Ice Wraith"
+        "name": "Espectro de Hielo"
       },
       "moonlit_siren": {
-        "name": "Moonlit Siren"
+        "name": "Sirena Iluminada por la Luna"
       },
       "tidewisp": {
-        "name": "Tidewisp"
+        "name": "Fuego Fatuo de Marea"
       },
       "drowned_pilgrim": {
-        "name": "Drowned Pilgrim"
+        "name": "Peregrino Ahogado"
       },
       "mere_hydra_head_left": {
-        "name": "Mere Hydra"
+        "name": "Hidra de la Laguna"
       },
       "mere_hydra_head_center": {
-        "name": "Mere Hydra"
+        "name": "Hidra de la Laguna"
       },
       "mere_hydra_head_right": {
-        "name": "Mere Hydra"
+        "name": "Hidra de la Laguna"
       },
       "tideglass_colossus": {
-        "name": "Tideglass Colossus"
+        "name": "Coloso de Cristal de Marea"
       },
       "tideglass_reflection": {
-        "name": "Tideglass Reflection"
+        "name": "Reflejo de Cristal de Marea"
       },
       "tideglass_reflection_warrior": {
-        "name": "Tideglass Reflection"
+        "name": "Reflejo de Cristal de Marea"
       },
       "tideglass_reflection_paladin": {
-        "name": "Tideglass Reflection"
+        "name": "Reflejo de Cristal de Marea"
       },
       "tideglass_reflection_hunter": {
-        "name": "Tideglass Reflection"
+        "name": "Reflejo de Cristal de Marea"
       },
       "tideglass_reflection_rogue": {
-        "name": "Tideglass Reflection"
+        "name": "Reflejo de Cristal de Marea"
       },
       "tideglass_reflection_priest": {
-        "name": "Tideglass Reflection"
+        "name": "Reflejo de Cristal de Marea"
       },
       "tideglass_reflection_shaman": {
-        "name": "Tideglass Reflection"
+        "name": "Reflejo de Cristal de Marea"
       },
       "tideglass_reflection_mage": {
-        "name": "Tideglass Reflection"
+        "name": "Reflejo de Cristal de Marea"
       },
       "tideglass_reflection_warlock": {
-        "name": "Tideglass Reflection"
+        "name": "Reflejo de Cristal de Marea"
       },
       "tideglass_reflection_druid": {
-        "name": "Tideglass Reflection"
+        "name": "Reflejo de Cristal de Marea"
       },
       "sanctum_boneguard": {
         "name": "Guardahuesos del Santuario"
@@ -24639,25 +26023,25 @@ export const es: EnTranslations = {
         "name": "Thunzharr, el Pico Despierto"
       },
       "balgath_cyclops": {
-        "name": "Balgath, the One-Eyed Foreman"
+        "name": "Balgath, el Capataz Tuerto"
       },
       "thunzharr_stormling": {
         "name": "Elemental de tormenta despierto"
       },
       "muster_footman": {
-        "name": "Muster Footman"
+        "name": "Infante de la leva"
       },
       "muster_chaplain": {
-        "name": "Muster Chaplain"
+        "name": "Capellán de la Leva"
       },
       "muster_sergeant": {
-        "name": "Muster Sergeant"
+        "name": "Sargento de la leva"
       },
       "muster_drillmaster": {
-        "name": "Muster Drillmaster"
+        "name": "Instructor de la Leva"
       },
       "muster_effigy": {
-        "name": "Straw Foreman"
+        "name": "Capataz de Paja"
       },
       "gourdlight_thatchgrin": {
         "name": "Old Thatchgrin"
@@ -25044,106 +26428,109 @@ export const es: EnTranslations = {
         "name": "Domador de Bestias Fanglord"
       },
       "sunbone_totem_binder": {
-        "name": "Sunbone Totem-Binder"
+        "name": "Vinculador de Tótems de Hueso Solar"
       },
       "sunbone_totem": {
-        "name": "Sunbone Totem"
+        "name": "Tótem de Hueso Solar"
       },
       "sunbone_dread_totem": {
-        "name": "Sunbone Dread Totem"
+        "name": "Tótem de Pavor de Hueso Solar"
       },
       "basin_raptor": {
-        "name": "Basin Raptor"
+        "name": "Raptor de la Cuenca"
       },
       "spore_toad": {
-        "name": "Spore Toad"
+        "name": "Sapo de Esporas"
       },
       "vine_lasher": {
-        "name": "Snarlvine Lasher"
+        "name": "Azotador de Liana Gruñidora"
       },
       "great_saurian": {
-        "name": "Great Saurian"
+        "name": "Gran Saurio"
       },
       "howdah_hexcaller": {
-        "name": "Howdah Hexcaller"
+        "name": "Invocador de Maleficios de la Plataforma"
       },
       "fanglord_jaguar": {
-        "name": "Fanglord's Great Jaguar"
+        "name": "Gran Jaguar del Señor de los Colmillos"
       },
       "the_gorgebloom": {
-        "name": "The Gorgebloom"
+        "name": "La Flor Devoradora"
       },
       "wildheart_high_priest": {
         "name": "Zulgar, Voz de la Cuenca"
       },
       "broodsworn_thawcaller": {
-        "name": "Broodsworn Thawcaller"
+        "name": "Invocador del Deshielo Juramentado a la Prole"
       },
       "broodsworn_goadsmith": {
-        "name": "Broodsworn Goadsmith"
+        "name": "Herrero de Aguijadas Juramentado a la Prole"
       },
       "broodsworn_pyre_tender": {
-        "name": "Broodsworn Pyre-Tender"
+        "name": "Cuidador de Piras Juramentado a la Prole"
       },
       "soul_brazier": {
-        "name": "Soul Brazier"
+        "name": "Brasero de Almas"
       },
       "rime_whelp": {
-        "name": "Rime Whelp"
+        "name": "Cría de Escarcha"
       },
       "ogre_sledge_hauler": {
-        "name": "Ogre Sledge-Hauler"
+        "name": "Ogro Arrastrador de Trineos"
       },
       "glacier_splinter": {
-        "name": "Glacier Splinter"
+        "name": "Esquirla de Glaciar"
       },
       "sledge_tusker": {
-        "name": "Sledge Tusker"
+        "name": "Colmilludo del Trineo"
       },
       "sanctum_shackle_hammer": {
-        "name": "Hammer Shackle"
+        "name": "Grillete del Martillo"
       },
       "sanctum_shackle_tongs": {
-        "name": "Tongs Shackle"
+        "name": "Grillete de las Tenazas"
       },
       "sanctum_shackle_anvil": {
-        "name": "Anvil Shackle"
+        "name": "Grillete del Yunque"
       },
       "sanctum_shackle_bellows": {
-        "name": "Bellows Shackle"
+        "name": "Grillete del Fuelle"
       },
       "thorn_sprout": {
-        "name": "Thorn Sprout"
+        "name": "Brote Espinoso"
+      },
+      "wildheart_hunting_spear": {
+        "name": "Lanza de caza"
       },
       "buddy_ember_fox": {
-        "name": "Ember Fox"
+        "name": "Zorro de Ascuas"
       },
       "buddy_emberfall_phoenix": {
-        "name": "Emberfall Phoenix"
+        "name": "Fénix de Lluvia de Ascuas"
       },
       "buddy_moss_hare": {
-        "name": "Moss Hare"
+        "name": "Liebre de Musgo"
       },
       "buddy_frog": {
-        "name": "Frog"
+        "name": "Rana"
       },
       "buddy_crimson_claw_crab": {
-        "name": "Crimson Claw Crab"
+        "name": "Cangrejo de Pinza Carmesí"
       },
       "buddy_golden_sentinel": {
-        "name": "Golden Sentinel"
+        "name": "Centinela Dorado"
       },
       "buddy_nightfang": {
-        "name": "Nightfang"
+        "name": "Colmillo Nocturno"
       },
       "buddy_tuskhorn_boar": {
-        "name": "Tuskhorn Boar"
+        "name": "Jabalí Colmillo Cornudo"
       },
       "buddy_emerald_wolf": {
-        "name": "Emerald Wolf"
+        "name": "Lobo Esmeralda"
       },
       "buddy_tiger": {
-        "name": "Tiger"
+        "name": "Tigre"
       },
       "buddy_cate_coin": {
         "name": "Cate Coin"
@@ -25167,55 +26554,55 @@ export const es: EnTranslations = {
         "name": "Solbot"
       },
       "buddy_frostfire": {
-        "name": "Frostfire"
+        "name": "Fuegoescarcha"
       },
       "buddy_rocky": {
         "name": "Rocky"
       },
       "buddy_proud_grunt": {
-        "name": "Proud Grunt"
+        "name": "Bruto Orgulloso"
       },
       "buddy_loot_goblin": {
-        "name": "Loot Goblin"
+        "name": "Goblin del Botín"
       },
       "buddy_penny_goldspark": {
-        "name": "Penny Goldspark"
+        "name": "Penny Chispa Dorada"
       },
       "buddy_stag": {
-        "name": "Stag"
+        "name": "Ciervo"
       },
       "buddy_alpaca": {
         "name": "Alpaca"
       },
       "buddy_horse": {
-        "name": "Tug, the Warhorse"
-      },
-      "buddy_sapling": {
-        "name": "Sapling"
+        "name": "Tug, el Caballo de Guerra"
       },
       "buddy_bull": {
-        "name": "Bull"
+        "name": "Toro"
       },
       "buddy_spider": {
-        "name": "Spider"
+        "name": "Araña"
       },
       "buddy_raptor": {
         "name": "Raptor"
       },
       "buddy_skeleton": {
-        "name": "Skeleton"
+        "name": "Esqueleto"
       },
       "buddy_crystal_lich": {
-        "name": "Crystal Lich"
+        "name": "Liche de Cristal"
       },
       "buddy_forgemaw": {
-        "name": "Forgemaw The Molten"
+        "name": "Fauciforja el Fundido"
+      },
+      "buddy_sprites": {
+        "name": "Parpadeo y Destello"
       },
       "buddy_crystal_tide": {
-        "name": "Crystal Tide"
+        "name": "Marea de Cristal"
       },
       "buddy_phantom": {
-        "name": "Phantom"
+        "name": "Fantasma"
       },
       "ironvein_foreman": {
         "name": "Capataz Vena de Hierro"
@@ -25492,13 +26879,13 @@ export const es: EnTranslations = {
       },
       "socketwright_skerrit": {
         "name": "Maben Skerrit",
-        "title": "the Socketwright",
-        "greeting": "Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, {className}? Aim for my work."
+        "title": "el Artífice de Engarces",
+        "greeting": "Han pasado cuarenta años desde que pulí ese ojo y lo puse en su cuenca, y ni un día cobrado. ¿Quieres herir al Capataz, {className}? Apunta a mi trabajo."
       },
       "muster_commander": {
-        "name": "Muster Commander",
-        "title": "Fenbridge Muster",
-        "greeting": "Pikes first, {className}, then everyone. That is the whole of it, and it has kept this camp alive."
+        "name": "Comandante de la Leva",
+        "title": "Leva de Fenbridge",
+        "greeting": "Las picas primero, {className}; luego, todos. Eso es todo, y ha mantenido vivo este campamento."
       },
       "brother_aldric_fen": {
         "name": "Hermano Aldric",
@@ -25722,28 +27109,28 @@ export const es: EnTranslations = {
       },
       "innkeeper_maudie": {
         "name": "Maudie Tapwright",
-        "title": "Innkeeper",
-        "greeting": "Come in out of the damp, friend, and mind the step down to the fire. The kettle is on, the benches are warm, and the rooms upstairs are dry. Travelers from Fenbridge swear the marsh road is quiet by day, but nobody walks it after dark. Sit a while and rest your feet."
+        "title": "Tabernero",
+        "greeting": "Entra y deja atrás la humedad, amigo; cuidado con el escalón al bajar al fuego. La tetera está puesta, los bancos están calientes y las habitaciones de arriba están secas. Los viajeros de Fenbridge juran que el camino de la ciénaga es tranquilo de día, pero nadie lo recorre de noche. Siéntate un rato y descansa los pies."
       },
       "patron_amos_eelby": {
         "name": "Amos Eelby",
-        "title": "Eel Fisher",
-        "greeting": "Pull up a bench, {className}. Grissel here swears the big eel under Fenbridge is a myth. I've had my hand on him twice. Twice! Slippery as a tax collector, and near as long as this bench."
+        "title": "Pescador de Anguilas",
+        "greeting": "Acércate un banco, {className}. Grissel jura que la gran anguila bajo Fenbridge es un mito. La he tenido en mis manos dos veces. ¡Dos! Resbaladiza como un recaudador y casi tan larga como este banco."
       },
       "patron_grissel_sedgeworth": {
         "name": "Grissel Sedgeworth",
-        "title": "Peat Cutter",
-        "greeting": "Don't mind Amos. Forty years cutting peat and I've pulled more strange things out of this bog than he's pulled eels: boots, bones, a helmet with the head still worried about it. Warm yourself, the fire's free."
+        "title": "Cortador de Turba",
+        "greeting": "No hagas caso a Amos. Llevo cuarenta años cortando turba y he sacado más cosas extrañas de este pantano que él anguilas: botas, huesos, un casco cuya cabeza aún se preocupaba por él. Caliéntate; el fuego es gratis."
       },
       "patron_ned_oxley": {
         "name": "Ned Oxley",
-        "title": "Drover",
-        "greeting": "Drove forty head down the causeway and lost two to the mire before Fenbridge. Maudie's ale is the only thing on this road that never lets a man down. Buy your own, mind."
+        "title": "Arriero",
+        "greeting": "Conduje cuarenta cabezas por la calzada y perdí dos en la ciénaga antes de Fenbridge. La cerveza de Maudie es lo único de este camino que nunca decepciona a nadie. Cómprate la tuya, eso sí."
       },
       "patron_hester_quillby": {
         "name": "Hester Quillby",
-        "title": "Mapmaker",
-        "greeting": "Every map of this marsh I've ever bought was wrong within a season. The water moves the paths, and the paths move the water. So I draw my own, and I sit here where it's dry while the ink sets."
+        "title": "Cartógrafo",
+        "greeting": "Todos los mapas de esta ciénaga que he comprado dejaron de ser correctos en menos de una estación. El agua mueve los senderos y los senderos mueven el agua. Así que dibujo los míos y me siento aquí, donde está seco, mientras se asienta la tinta."
       },
       "gourdlight_keeper": {
         "name": "Hester Gourdwick",
@@ -25975,10 +27362,25 @@ export const es: EnTranslations = {
         "title": "Maestro del boticario",
         "greeting": "Mida dos veces y vierta una vez, {className}. El boticario no tiene paciencia con los reactivos derramados."
       },
-      "steward_ansel_hale": {
-        "name": "Ansel Hale",
-        "title": "Steward of the Manor",
-        "greeting": "Welcome to the manor, {className}. Warm yourself at the hearth, mind the rugs, and do not touch the high table. The lantern burns all night so the square can find its way home."
+      "guildmaster_hesper_dunmore": {
+        "name": "Hesper Dunmore",
+        "title": "Maestro de Hermandad del Salón del Farol",
+        "greeting": "Bienvenido al Salón del Farol, {className}. Tobias mantiene los contratos semanales en el tablón, Garrick cambia nuestros sellos por honores dignos de llevar y Mira te encontrará un grupo para cualquier puerta bajo la montaña. Trae un trofeo y colgará en el salón a mi espalda."
+      },
+      "contract_clerk_tobias_wren": {
+        "name": "Tobias Wren",
+        "title": "Oficial de Contratos",
+        "greeting": "Tres contratos por semana, publicados en cada reinicio. Sin firmas ni tasas: completa uno y los sellos son tuyos."
+      },
+      "guild_quartermaster_garrick_holt": {
+        "name": "Garrick Holt",
+        "title": "Intendente de Hermandad",
+        "greeting": "Sellos por honores, amigo. Nada de mis estantes afilará una hoja, pero cada salón de Highwatch sabrá dónde te lo ganaste."
+      },
+      "guild_recruiter_mira_fairweather": {
+        "name": "Mira Fairweather",
+        "title": "Reclutadora de Hermandad",
+        "greeting": "¿Buscas grupo? Cada cripta, bastión y templo de este mapa tiene un nombre en mi lista. Dime adónde te diriges."
       },
       "farmer_jessica": {
         "name": "Granjera Jessica",
@@ -26052,8 +27454,8 @@ export const es: EnTranslations = {
       },
       "cantor_laverock": {
         "name": "Laverock",
-        "title": "Last Cantor of the Pale Choir",
-        "greeting": "I was the youngest voice of the Pale Choir. On the night of the rite I did not drink, and I ran. Every full moon since, I hear them singing under the water. I must see her before I die. Let me walk behind you. I will not fight, and I will not slow you."
+        "title": "Último Cantor del Coro Pálido",
+        "greeting": "Fui la voz más joven del Coro Pálido. La noche del rito no bebí y huí. Desde entonces, cada luna llena los oigo cantar bajo el agua. Debo verla antes de morir. Déjame caminar detrás de ti. No lucharé y no te retrasaré."
       },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
@@ -26282,48 +27684,48 @@ export const es: EnTranslations = {
         }
       },
       "q_muster_summons": {
-        "title": "The Muster's Summons",
-        "text": "Every spear I could spare is dug in around the Starfall Crater, {playerName}, ringing the thing that walks out of it. The Muster Commander holds the camp on the southern rise above the crater, south-east of here. Report to the Commander. You will be told how we fight him, and you will listen, because the ones who did not are in the reeds.",
-        "completion": "Fenwick's runner, is it? Good. Listen, because I say this once and he never says it at all. Balgath walks our pickets: the crater rim, the west flats, the south rise, the gap on the south-west rim, and round again, and every post he stops at, he flattens. Steel does not bite him. His hide turns it, and a raid that hacks at him only dies tired. The one weakness is his eye. A braced pike through the Barrowglass blinds him, and while he is blind his hide sloughs off: that is when the whole raid hits him, and hits hard. Then it closes over and we wait for the next chance. The rack lends its pikes to recruits of level 19 or lower: the young ones put the eye out, the veterans make the window count. Pikes first, {playerName}, then everyone.",
+        "title": "El llamamiento de la leva",
+        "text": "Todas las lanzas de las que pude prescindir están atrincheradas alrededor del Cráter de la Estrella Caída, {playerName}, rodeando a la cosa que sale de él. El Comandante de la Leva mantiene el campamento en la elevación del sur sobre el cráter, al sureste de aquí. Preséntate ante él. Te dirán cómo luchamos contra esa cosa y escucharás, porque quienes no lo hicieron están entre los juncos.",
+        "completion": "¿El mensajero de Fenwick? Bien. Escucha, porque lo digo una vez y él nunca lo dice. Balgath recorre nuestras avanzadas: el borde del cráter, los llanos del oeste, la elevación del sur, la brecha del borde suroeste y vuelta a empezar; cada puesto en el que se detiene lo aplasta. El acero no lo hiere. Su piel lo desvía y una banda que lo acuchilla solo muere cansada. Su única debilidad es el ojo. Una pica afirmada que atraviese el Cristal del Túmulo lo ciega y, mientras está ciego, su piel se desprende: entonces toda la banda lo golpea, y con fuerza. Luego vuelve a cubrirse y esperamos la siguiente oportunidad. El armero presta sus picas a reclutas de nivel 19 o inferior: los jóvenes apagan el ojo y los veteranos aprovechan la oportunidad. Las picas primero, {playerName}; luego, todos.",
         "objectives": {
           "0": {
-            "label": "Report to the Muster Commander"
+            "label": "Preséntate al Comandante de la Leva"
           }
         }
       },
       "q_muster_pike_drill": {
-        "title": "Pikes First",
-        "text": "Talk is cheap and pikes are not, and the rack lends them only to recruits of level 19 or lower. Take a Shardpike off the rack beside me, then walk to the Straw Foreman at the west end of camp: the lads built him out of planks and straw, half the size of the real one, with a lantern where the eye goes. Couch the pike and hold the point true while the drillmaster pounds the ground, because the real one shakes it harder. When your arms are sure, put the point through the lantern. His planks will come off: then hit him with your own weapon, {playerName}, and feel the difference.",
-        "completion": "You felt it bite, did you? On the real one that is fourteen breaths with the whole raid swinging, and then his hide closes over again. Keep the lesson. The Foreman will test it.",
+        "title": "Las picas primero",
+        "text": "Hablar es barato y las picas no, y el armero solo las presta a reclutas de nivel 19 o inferior. Toma una Pica de Fragmentos del armero junto a mí y camina hasta el Capataz de Paja del extremo oeste del campamento: los muchachos lo construyeron con tablones y paja, de la mitad del tamaño del auténtico, con un farol donde va el ojo. Afirma la pica y mantén recta la punta mientras el instructor golpea el suelo, porque el de verdad lo sacude más fuerte. Cuando tus brazos estén seguros, atraviesa el farol con la punta. Sus tablones se desprenderán: entonces golpéalo con tu propia arma, {playerName}, y nota la diferencia.",
+        "completion": "Has notado que mordía, ¿verdad? Con el de verdad son catorce respiraciones con toda la banda golpeando y luego vuelve a cubrirse con su piel. Guarda la lección. El Capataz te pondrá a prueba.",
         "objectives": {
           "0": {
-            "label": "Shardpike taken from the muster rack"
+            "label": "Pica de Fragmentos tomada del armero de la leva"
           },
           "1": {
-            "label": "Straw Foreman's lantern put out"
+            "label": "Farol del Capataz de Paja apagado"
           },
           "2": {
-            "label": "Blows landed while its planks are down"
+            "label": "Golpes acertados mientras sus tablones están caídos"
           }
         }
       },
       "q_muster_trophy": {
-        "title": "A Chip Off the Foreman",
-        "text": "Every week he stands back up, and every week we knock him down again. That takes a raid, and the muster cannot raise one on its own. Find the next raid that goes after Balgath and help bring him down, {playerName}. Strike him, shield the ones who do, or mend them: every hand that fights him counts. When he falls, come back and report to me. The muster pays for every kill.",
-        "completion": "Down again, and you were in the fight that did it. Fenbridge will have my report tonight. The purse is thin this far out, but it is yours. Come back when he is up again.",
+        "title": "Una esquirla del capataz",
+        "text": "Cada semana vuelve a ponerse en pie y cada semana lo derribamos de nuevo. Hace falta una banda y la leva no puede reunirla sola. Encuentra la próxima banda que vaya a por Balgath y ayuda a derribarlo, {playerName}. Golpéalo, protege a quienes lo hacen o cúralos: cuenta toda mano que luche contra él. Cuando caiga, vuelve e infórmame. La leva paga por cada muerte.",
+        "completion": "Ha vuelto a caer y tú estuviste en el combate que lo consiguió. Fenbridge recibirá mi informe esta noche. La bolsa es escasa tan lejos de todo, pero es tuya. Vuelve cuando se levante otra vez.",
         "objectives": {
           "0": {
-            "label": "Balgath slain"
+            "label": "Balgath derrotado"
           }
         }
       },
       "q_socketwrights_due": {
-        "title": "The Socketwright's Due",
-        "text": "I set the Barrowglass in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
-        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "title": "Lo debido al Artífice de Engarces",
+        "text": "Yo mismo puse el Cristal del Túmulo en esa cuenca: pulí la lente, la asenté y la encajé recta. Los maestros de los túmulos nunca me pagaron un cobre y ahora mi trabajo anda por ahí aplastando el pantano. Toma mi Pica de Fragmentos. Planta el extremo y mantén la punta estable todo el tiempo que haga falta; cuando tus brazos estén seguros, atraviesa el ojo. La piel que lleva está ligada a esa esquirla, {playerName}: ciégalo y cada hoja de la ciénaga por fin lo herirá.",
+        "completion": "Has notado que cedía, ¿verdad? Cuarenta años de intereses, pagados a través de la cuenca. La pica es tuya, amigo. Sanará, siempre lo hace, así que vuelve a cobrar cuando te apetezca.",
         "objectives": {
           "0": {
-            "label": "The Foreman's eye put out"
+            "label": "Ojo del capataz apagado"
           }
         }
       },
@@ -28955,35 +30357,35 @@ export const es: EnTranslations = {
         }
       },
       "goldcrest_harbor": {
-        "name": "Goldcrest Harbor",
-        "welcome": "Goldcrest Harbor, seat of the World Market. Every road, tide and ledger in the realm meets here.",
+        "name": "Puerto de Goldcrest",
+        "welcome": "Puerto de Goldcrest, sede del Mercado Mundial. Todos los caminos, mareas y registros del reino convergen aquí.",
         "pois": {
           "0": {
-            "label": "The Grand Gate"
+            "label": "La Gran Puerta"
           },
           "1": {
-            "label": "Grand Plaza"
+            "label": "Gran Plaza"
           },
           "2": {
-            "label": "The Goldcrest Exchange"
+            "label": "La Bolsa de Goldcrest"
           },
           "3": {
-            "label": "Market Ward"
+            "label": "Barrio del Mercado"
           },
           "4": {
-            "label": "Harbor Ward"
+            "label": "Barrio del Puerto"
           },
           "5": {
-            "label": "Highcrown Citadel"
+            "label": "Ciudadela de Corona Alta"
           },
           "6": {
-            "label": "The Lightspire"
+            "label": "La Aguja de Luz"
           },
           "7": {
-            "label": "The Gold Light"
+            "label": "La Luz Dorada"
           },
           "8": {
-            "label": "The Golden Span"
+            "label": "El Puente Dorado"
           }
         }
       }
@@ -29264,14 +30666,14 @@ export const es: EnTranslations = {
         "body": "La venta está liquidada y los bienes son tuyos. El paquete adjunto lleva exactamente el objeto que pagaste, retenido en depósito desde el momento en que se publicó hasta que tu pago se confirmó.\n\nUn registro de la venta vive en el libro de la Bolsa.\n\n- El Corredor de la Bolsa"
       },
       "membership_token_delivery": {
-        "sender": "The Ravenpost",
-        "subject": "Your membership token",
-        "body": "Your purchased token is enclosed. Redeem it to add 30 days of membership to your account, or trade it with another adventurer."
+        "sender": "El Correo del Cuervo",
+        "subject": "Tu ficha de membresía",
+        "body": "Se adjunta la ficha que has comprado. Canjéala para añadir 30 días de membresía a tu cuenta o intercámbiala con otro aventurero."
       },
       "membership_annual_reward": {
-        "sender": "The Ravenpost",
-        "subject": "Your annual membership mount",
-        "body": "Your annual membership payment is complete. Your tank mount key is enclosed. Keep the key in your bags or bank to own this mount. It remains yours after membership expires. Riding skill is required."
+        "sender": "El Correo del Cuervo",
+        "subject": "Tu montura de membresía anual",
+        "body": "El pago de tu membresía anual se ha completado. La Quimera de Ala Nocturna ya está desbloqueada para todos los personajes de tu cuenta, y se adjuntan sus riendas. Sigue siendo tuya cuando caduca la membresía. Se requiere equitación."
       },
       "woc_market_return": {
         "sender": "El Corredor de la Bolsa",
@@ -29287,6 +30689,11 @@ export const es: EnTranslations = {
         "sender": "El Correo del Cuervo",
         "subject": "Tu recompensa del cofre",
         "body": "La cámara fue despejada, pero no recogiste tu parte del cofre. Los cuervos te la han traído aquí, con los bienes y las monedas que ganaste adjuntos.\n\n- El Correo del Cuervo"
+      },
+      "world_quest_reward": {
+        "sender": "El Correo del Cuervo",
+        "subject": "Tu recompensa de misión del mundo",
+        "body": "Tus bolsas estaban llenas cuando ganaste esta recompensa de misión del mundo, así que los cuervos te la han traído aquí. Haz espacio y recógela en cualquier pilar de cuervos.\n\n- El Correo del Cuervo"
       }
     },
     "itemSets": {
@@ -29403,7 +30810,7 @@ export const es: EnTranslations = {
       },
       "forgewall": {
         "name": "Égida de la Muralla de la Forja",
-        "bonus2": "Determinación de Hierro convierte la furia en 5 de absorción por punto en lugar de 4.",
+        "bonus2": "El escudo de Determinación de Hierro absorbe el 25% de tu salud máxima en lugar del 20%.",
         "bonus4": "Lanzar Rompeescudos reduce 2 s el tiempo de reutilización restante de Determinación de Hierro."
       },
       "frostquench": {
@@ -29422,7 +30829,7 @@ export const es: EnTranslations = {
       },
       "grovespring": {
         "name": "Atuendo de Fuente del Bosque",
-        "bonus2": "Sanación Rápida consume primero tu Floración Salvaje o Segunda Floración y sana un 25% más. El daño recibido ya no retrasa tus hechizos.",
+        "bonus2": "Alivio presto consume primero tu Remiendo de Esporas o Segundo Florecer y sana un 25 por ciento más. El daño recibido ya no retrasa tus lanzamientos.",
         "bonus4": "Sobrefloración cosecha el 75% de tus efectos restantes y almacena 1 Verdancia después."
       },
       "hexthread": {
@@ -29515,77 +30922,77 @@ export const es: EnTranslations = {
       },
       "vanguard_druid_balance": {
         "name": "Vestimenta Guardaestrellas",
-        "bonus2": "El tiempo de lanzamiento de Raíces Aferradoras se reduce 0,5 s.",
+        "bonus2": "El tiempo de lanzamiento de Raíces Aferradoras se reduce 0,5 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Lanzar Raíces Aferradoras te permite lanzar hechizos en movimiento y aumenta tu velocidad de movimiento un 20% durante 4 s. No puede ocurrir más de una vez cada 20 s."
       },
       "vanguard_druid_feral": {
         "name": "Piel Crinsangre",
-        "bonus2": "El tiempo de reutilización de Embestida de Bruin se reduce 3 s.",
-        "bonus4": "Embestida de Bruin te otorga un escudo por el 6% de tu salud máxima durante 6 s."
+        "bonus2": "El tiempo de reutilización de Embestida de Bruin se reduce 3 s. El daño recibido ya no retrasa tus hechizos.",
+        "bonus4": "Reduce el tiempo de reutilización de Carrera en 15 s."
       },
       "vanguard_druid_restoration": {
         "name": "Vestimenta Florcardo",
-        "bonus2": "El tiempo de reutilización de Alivio Presto se reduce 1 s.",
+        "bonus2": "El tiempo de reutilización de Alivio Presto se reduce 1 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Alivio Presto también aumenta tu velocidad de movimiento un 30% durante 3 s."
       },
       "vanguard_hunter_beast_mastery": {
         "name": "Arnés Guardamanada",
-        "bonus2": "El tiempo de reutilización de Disparo Aturdidor se reduce 4 s.",
+        "bonus2": "El tiempo de reutilización de Disparo Aturdidor se reduce 4 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Disparo Aturdidor reduce 1 s el tiempo de reutilización restante de Cólera de las Bestias."
       },
       "vanguard_hunter_marksmanship": {
         "name": "Arnés Vistalarga",
-        "bonus2": "El tiempo de reutilización de Quiebrasendas se reduce 4 s.",
+        "bonus2": "El tiempo de reutilización de Quiebrasendas se reduce 4 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Quiebrasendas hace que tu próximo Tensado Largo en los siguientes 6 s sea instantáneo. No puede ocurrir más de una vez cada 15 s."
       },
       "vanguard_hunter_survival": {
         "name": "Arnés Colmillotrampa",
-        "bonus2": "El tiempo de reutilización de Garfio Sangriento se reduce 3 s.",
+        "bonus2": "El tiempo de reutilización de Garfio Sangriento se reduce 3 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Garfio Sangriento otorga 1 de Ímpetu de Caza."
       },
       "vanguard_mage_arcane": {
         "name": "Vestiduras Atahoras",
-        "bonus2": "El tiempo de reutilización de Barrera Temporal se reduce 2 s.",
+        "bonus2": "El tiempo de reutilización de Barrera Temporal se reduce 2 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Barrera Temporal también aumenta la velocidad de movimiento del objetivo protegido un 20% durante 3 s."
       },
       "vanguard_mage_fire": {
         "name": "Galas Azoteascuas",
-        "bonus2": "Lluvia de Ascuas se recarga 3 s más rápido.",
+        "bonus2": "Lluvia de Ascuas se recarga 3 s más rápido. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Lanzar Lluvia de Ascuas reduce 2 s el tiempo de reutilización restante de Barrera Llameante."
       },
       "vanguard_mage_frost": {
         "name": "Atuendo Guardaescarcha",
-        "bonus2": "El tiempo de reutilización de Atadura de Hielo se reduce 2 s.",
+        "bonus2": "El tiempo de reutilización de Atadura de Hielo se reduce 2 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Lanzar Atadura de Hielo reduce 5 s el tiempo de reutilización restante de Paso Fugaz."
       },
       "vanguard_paladin_holy": {
         "name": "Galas Velasol",
-        "bonus2": "El tiempo de reutilización de Pacto de Vida se reduce 30 s.",
+        "bonus2": "El tiempo de reutilización de Pacto de Vida se reduce 30 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Pacto de Vida también otorga a tu aliado un escudo por el 8% de su salud máxima durante 6 s."
       },
       "vanguard_paladin_protection": {
         "name": "Bastión Votoescudo",
-        "bonus2": "El tiempo de reutilización de Cadena de Juramento se reduce 2 s.",
+        "bonus2": "El tiempo de reutilización de Cadena de Juramento se reduce 2 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Los enemigos arrastrados por Cadena de Juramento lanzan hechizos un 30% más lento durante 4 s, y Cadena de Juramento te otorga Represalia Solar cuando ata a un enemigo que puede ser arrastrado."
       },
       "vanguard_paladin_retribution": {
         "name": "Placas de Guerra Marcaluz",
-        "bonus2": "El tiempo de reutilización de Llamada de la Valquiria se reduce 15 s.",
+        "bonus2": "El tiempo de reutilización de Llamada de la Valquiria se reduce 15 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Llamada de la Valquiria reinicia el tiempo de reutilización de Edicto Final, y tu próximo Edicto Final en los 6 s siguientes a impactar inflige un 15% más de daño."
       },
       "vanguard_priest_discipline": {
         "name": "Vestimenta Salmovelo",
-        "bonus2": "El tiempo de reutilización de Alarido Psíquico se reduce 3 s.",
+        "bonus2": "El tiempo de reutilización de Alarido Psíquico se reduce 3 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Cuando tu Salmo de Protección se consume por completo, el aliado protegido gana un 20% de velocidad de movimiento durante 3 s. No puede ocurrir más de una vez cada 8 s."
       },
       "vanguard_priest_holy": {
         "name": "Vestimenta Alagracia",
-        "bonus2": "El tiempo de reutilización de Paso del Velo se reduce 6 s.",
+        "bonus2": "El tiempo de reutilización de Paso del Velo se reduce 6 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Paso del Velo también te otorga un escudo por el 8% de tu salud máxima durante 6 s."
       },
       "vanguard_priest_shadow": {
         "name": "Galas Himnocaso",
-        "bonus2": "Letanía de Aflicción también ralentiza el movimiento del objetivo un 30% mientras la canalizas.",
+        "bonus2": "Letanía de Aflicción también ralentiza el movimiento del objetivo un 30% mientras la canalizas. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Invocar Diezmademonio también te otorga un escudo por el 10% de tu salud máxima durante 8 s."
       },
       "vanguard_rogue_assassination": {
@@ -29595,7 +31002,7 @@ export const es: EnTranslations = {
       },
       "vanguard_rogue_combat": {
         "name": "Cueros Marcariña",
-        "bonus2": "El tiempo de reutilización de Talones Veloces se reduce 60 s.",
+        "bonus2": "El tiempo de reutilización de Talones Veloces se reduce 15 s.",
         "bonus4": "Mientras Talones Veloces está activo, Tajo Perverso y Golpe al Cuerpo otorgan 1 punto de combo adicional."
       },
       "vanguard_rogue_subtlety": {
@@ -29605,32 +31012,32 @@ export const es: EnTranslations = {
       },
       "vanguard_shaman_elemental": {
         "name": "Cota de Batalla Escritormenta",
-        "bonus2": "El tiempo de reutilización de Desatar Arma se reduce 3 s.",
+        "bonus2": "El tiempo de reutilización de Desatar Arma se reduce 3 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Desatar Arma te permite lanzar hechizos en movimiento y aumenta tu velocidad de movimiento un 20% durante 4 s. No puede ocurrir más de una vez cada 20 s."
       },
       "vanguard_shaman_enhancement": {
         "name": "Cota de Guerra Vendavalnato",
-        "bonus2": "Golpe Ancestral ralentiza la velocidad de movimiento del objetivo un 30% durante 4 s.",
+        "bonus2": "Golpe Ancestral ralentiza la velocidad de movimiento del objetivo un 30% durante 4 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Golpe Ancestral reduce 4 s el tiempo de reutilización restante de Trance Elemental."
       },
       "vanguard_shaman_restoration": {
         "name": "Malla Guardamar",
-        "bonus2": "Aguas Reparadoras se lanza 0,5 s más rápido sobre un aliado por debajo del 50% de salud.",
+        "bonus2": "Aguas Reparadoras se lanza 0,5 s más rápido sobre un aliado por debajo del 50% de salud. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Llamada de la Marea también otorga a su objetivo un escudo por el 5% de tu salud máxima durante 6 s."
       },
       "vanguard_warlock_affliction": {
         "name": "Vestiduras Plumapavor",
-        "bonus2": "El tiempo de lanzamiento de Espanto se reduce 0,3 s.",
+        "bonus2": "El tiempo de lanzamiento de Espanto se reduce 0,3 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Consumir te sana un 30% más y puede canalizarse en movimiento."
       },
       "vanguard_warlock_demonology": {
         "name": "Galas Atamédula",
-        "bonus2": "El tiempo de reutilización de Armadura de Huesos se reduce 10 s.",
+        "bonus2": "El tiempo de reutilización de Armadura de Huesos se reduce 10 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Mandato: siega reduce 2 s el tiempo de reutilización restante de Armadura de Huesos."
       },
       "vanguard_warlock_destruction": {
         "name": "Vestiduras Coronaescoria",
-        "bonus2": "El tiempo de reutilización de Piel de Escoria se reduce 30 s.",
+        "bonus2": "El tiempo de reutilización de Piel de Escoria se reduce 30 s. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Cada segundo lanzamiento de Conflagrar hace que tu próxima Descarga de Ruina en los 8 s siguientes sea instantánea."
       },
       "vanguard_warrior_arms": {
@@ -29655,31 +31062,31 @@ export const es: EnTranslations = {
       },
       "warfare_ashstalker": {
         "name": "Equipo Ashstalker",
-        "bonus2": "Aumenta la Defensa de Pericia bélica en 40.",
+        "bonus2": "Aumenta la Defensa de Pericia bélica en 40. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Aumenta el Ataque de Pericia bélica en 40, y el control de masas que te lanzan jugadores hostiles dura un 15% menos.",
         "bonus7": "Aumenta el Ataque y la Defensa de Pericia bélica en 80. Matar a un jugador hostil otorga Paso de Ceniza, aumentando la velocidad de movimiento un 40% durante 6 s."
       },
       "warfare_cinderweave": {
         "name": "Equipo de batalla Cinderweave",
-        "bonus2": "Aumenta la Defensa de Pericia bélica en 40.",
+        "bonus2": "Aumenta la Defensa de Pericia bélica en 40. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Aumenta el Ataque de Pericia bélica en 40, y el control de masas que te lanzan jugadores hostiles dura un 15% menos.",
         "bonus7": "Aumenta el Ataque y la Defensa de Pericia bélica en 80. Tus hechizos tienen un 15% de probabilidad de otorgar Guarda de Ascua, absorbiendo 120 de daño durante 8 s."
       },
       "warfare_furyforged": {
         "name": "Equipo de batalla Furyforged",
-        "bonus2": "Aumenta la Defensa de Pericia bélica en 40.",
+        "bonus2": "Aumenta la Defensa de Pericia bélica en 40. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Aumenta el Ataque de Pericia bélica en 40, y el control de masas que te lanzan jugadores hostiles dura un 15% menos.",
         "bonus7": "Aumenta el Ataque y la Defensa de Pericia bélica en 80. Matar a un jugador hostil otorga Juramento Inquebrantado, absorbiendo 200 de daño durante 10 s."
       },
       "warfare_stormbound": {
         "name": "Vestiduras Stormbound",
-        "bonus2": "Aumenta la Defensa de Pericia bélica en 40.",
+        "bonus2": "Aumenta la Defensa de Pericia bélica en 40. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Aumenta el Ataque de Pericia bélica en 40, y el control de masas que te lanzan jugadores hostiles dura un 15% menos.",
         "bonus7": "Aumenta el Ataque y la Defensa de Pericia bélica en 80. Tus hechizos tienen un 15% de probabilidad de otorgar Guarda de Ascua, absorbiendo 120 de daño durante 8 s."
       },
       "warfare_thornhide": {
         "name": "Atuendo Thornhide",
-        "bonus2": "Aumenta la Defensa de Pericia bélica en 40.",
+        "bonus2": "Aumenta la Defensa de Pericia bélica en 40. El daño recibido ya no retrasa tus hechizos.",
         "bonus4": "Aumenta el Ataque de Pericia bélica en 40, y el control de masas que te lanzan jugadores hostiles dura un 15% menos.",
         "bonus7": "Aumenta el Ataque y la Defensa de Pericia bélica en 80. Tus hechizos tienen un 15% de probabilidad de otorgar Guarda de Espinas, aumentando la esquiva un 15% durante 6 s."
       },
@@ -29723,6 +31130,6 @@ export const es: EnTranslations = {
     "noticeboardName": "Tablón de anuncios",
     "farmPatchName": "Bancales de jardín",
     "realmBuilderMonumentName": "Monumento al constructor de reinos",
-    "musterRackName": "Muster Weapon Rack"
+    "musterRackName": "Armero de la leva"
   }
 };

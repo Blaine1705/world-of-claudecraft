@@ -27,6 +27,25 @@ function apply(client: ClientWorld, self: Record<string, unknown>): void {
 }
 
 describe('personal haunted pumpkin wire state', () => {
+  it('keeps guild snapshots and Heroic Marks invalidation through the seasonal layer', () => {
+    const state = new SeasonalWireState();
+    expect(
+      state.applyQuestSelfSnapshot({
+        hmarks: 3,
+        gcon: { week: '2026-10-26', offered: [], done: [], lifetime: 2 },
+      }),
+    ).toBe(true);
+    expect(state.heroicMarks).toBe(3);
+    expect(state.guildContracts.week).toBe('2026-10-26');
+    expect(state.guildContracts.lifetime).toBe(2);
+    expect(state.applyQuestSelfSnapshot({ hmarks: 3, hpf: [] })).toBe(false);
+    expect(state.applyQuestSelfSnapshot({})).toBe(false);
+    expect(state.guildContracts.lifetime).toBe(2);
+    state.resetQuestWorldWireState();
+    expect(state.heroicMarks).toBe(0);
+    expect(state.guildContracts.lifetime).toBe(0);
+  });
+
   it('accepts only distinct catalog ids and freezes the decoded result', () => {
     const ids = GOURDLIGHT_PUMPKINS.slice(0, 2).map((pumpkin) => pumpkin.id);
     expect(ids).toHaveLength(2);

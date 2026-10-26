@@ -149,6 +149,11 @@ export const editorStrings = {
   // Browser tab title. Hyphen separator (not a dash character).
   docTitle: 'ClaudeCraft Studio - World of ClaudeCraft',
   untitledMap: 'Untitled Map',
+  liveWorld: {
+    name: 'Live world touch-ups',
+    scope:
+      'Live world: edit terrain height and paint, roads, gameplay-object positions and added props. Existing buildings stay fixed. Use Export to save touch-ups for review.',
+  },
   flatMapName: 'Flat World',
   // The offline character name a playtest boots with.
   playtestPlayerName: 'Mapmaker',
@@ -228,6 +233,9 @@ export const editorStrings = {
     fullBuildProgress: 'Building zones: {done}/{total}',
     fullBuildDone: 'All {total} zones resident.',
     publishMap: 'Publish to Game',
+    pushMapChanges: 'Push changes to repo map',
+    pushMapChangesTitle:
+      "Apply only what you changed since opening this repo map onto the repo file as it is now, keeping everyone else's pushes.",
     publishMapTitle:
       'Write this map into the local repo as real game content (data/maps + src/sim/maps); boot it with ?map=<slug>',
     unpublishMap: 'Remove from Game',
@@ -760,6 +768,29 @@ export const editorStrings = {
     roadAuthored: 'Road {n}',
     roadHint:
       'Roads blend into the terrain like the built-in world roads and flatten bumps beneath them.',
+    roadMode: 'Roads tool',
+    roadModeDraw: 'Draw a new road',
+    roadModeEdit: 'Edit roads',
+    roadEditHint:
+      'Click a road to select it. Drag a waypoint to move it, drag the road line to add a bend, and press Delete to remove the held waypoint.',
+    roadEditNone: 'No road selected. Click one in the view or pick it from a list below.',
+    roadEditing: 'Editing: {name}',
+    roadWaypoints: 'Waypoints: {n}',
+    roadWaypointHeld: 'Waypoint {n} selected.',
+    roadDeletePoint: 'Delete waypoint',
+    roadRemove: 'Remove road',
+    roadReset: 'Reset to default',
+    roadRestore: 'Restore',
+    roadSelect: 'Select',
+    roadBuiltin: 'World road {n}',
+    roadBuiltinEdited: '{name} (changed)',
+    roadBuiltinRemoved: '{name} (removed)',
+    roadWorldList: 'World roads ({n})',
+    roadBuiltinNote:
+      "World roads are the game's own roads. Changes apply to this map only, and Reset puts the road back.",
+    roadPointTooShort: 'A road needs at least two waypoints. Use Remove road instead.',
+    roadPointLimit: 'This road already has as many waypoints as it can hold.',
+    roadRemoved: 'Road removed. Undo brings it back.',
     prefabSave: 'Save selection as prefab',
     prefabName: 'Prefab name',
     prefabSaved: 'Prefab saved: {name}',
@@ -822,6 +853,41 @@ export const editorStrings = {
   },
 
   // Publish to Game (dev-only): the map → repo pipeline.
+  push: {
+    notLinked:
+      'This map was not opened from a repo map, so there is nothing to push into. Open one from Open, Shipped maps first.',
+    baseMissing:
+      'The version you started from is no longer available. Reopen the repo map and redo your changes.',
+    repoMissing: 'The repo map this copy came from is gone.',
+    missingIds:
+      'Some items in the repo map have no id or share one, so your changes cannot be matched to it.',
+    nothing: 'Nothing to push: this copy has no changes since you opened it.',
+    done: 'Pushed {count} changes into {slug}. The editor now shows the merged map.',
+    withUpgrades:
+      'One of your edits was to an item the editor added when it opened the map, so its upgrades were saved too.',
+    overwriteTitle: 'Replace newer repo changes?',
+    overwriteBody:
+      'Someone pushed changes to this repo map after you opened it. Publish replaces the whole file and would drop them. Use Push changes to repo map to keep them.',
+    conflictsTitle: 'Push refused: conflicting changes',
+    conflictsBody:
+      '{count} of your changes clash with changes pushed since you opened this map. Nothing was written. Reopen the repo map from Open, then redo these:',
+    conflictRow: '{kind} {id}: {reason}',
+    conflictsMore: 'And {count} more.',
+    reasonBoth: 'you and someone else both changed it',
+    reasonDeleted: 'one of you deleted it and the other changed it',
+    reasonOverlap: 'your terrain stroke overlaps a newer stroke',
+    kindPlacement: 'Asset',
+    kindTerrain: 'Terrain stroke',
+    kindGrassClear: 'Grass clearing',
+    kindNpc: 'NPC',
+    kindObjectMove: 'Gameplay object',
+    kindPaint: 'Painted cells',
+    kindField: 'Map setting',
+    kindRoad: 'Road',
+    kindRoadEdit: 'World road',
+    close: 'Close',
+  },
+
   publish: {
     failed: 'Publish blocked: {error}',
     noDevServer:

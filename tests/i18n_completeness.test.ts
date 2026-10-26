@@ -158,6 +158,7 @@ describe('i18n whole-catalog completeness', () => {
     const BRAND_ALLOW = new Set([
       'footer.copyright', // "{year} World of ClaudeCraft" - brand
       'footer.githubLink', // repository URL
+      'footer.levyStreet', // "Levy Street" - studio brand (footer backlink)
       'fiesta.bracket', // "Fiesta" event brand
       'serverUnavailable.logoAlt', // "World of ClaudeCraft" logo alt text - brand
       'guide.brand', // "World of ClaudeCraft" - brand (Guide)
@@ -231,6 +232,7 @@ describe('i18n whole-catalog completeness', () => {
         'hudChrome.bank.vaultSearch',
         'hudChrome.mapAtlas.collapseHint',
         'hudChrome.mapAtlas.expandHint',
+        'hudChrome.graphicsRestore.note',
         'guide.nav.worldPvp',
         'guide.settingsPage.ifColorblindMode',
         'guide.settingsPage.ifTargetAurasBelowFrame',
@@ -530,6 +532,8 @@ describe('i18n CLDR pluralization', () => {
       // The signpost guild board's live count line (guild board categories).
       'guildBoardShown',
       'guildMembers',
+      // The Item history prompt's rolled-off transfers line (item tracking).
+      'itemHistoryEarlierHidden',
       'playersMatching',
       'playersOnline',
       'playtimeDays',

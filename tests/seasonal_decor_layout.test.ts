@@ -5,7 +5,6 @@
 // red when a city rework drops a building onto the dressing: re-running the gate
 // after other PRs merge catches it.
 import { afterEach, describe, expect, it } from 'vitest';
-import { AUTHORED_TOWN_BUILDINGS } from '../src/sim/authored_town_registry';
 import { isBlocked, streetlampPlacements } from '../src/sim/colliders';
 import { GOURDLIGHT_KEEPER_POSTS } from '../src/sim/content/gourdlight_eve';
 import { GOURDLIGHT_DECOR_CITIES } from '../src/sim/content/gourdlight_eve_decor';
@@ -45,6 +44,7 @@ import {
   stallSpotProblem,
 } from '../src/sim/seasonal_decor_stall';
 import { resolvedKeeperPosts } from '../src/sim/seasonal_keeper_posts';
+import { SEASONAL_EVENT_TOWNS } from '../src/sim/seasonal_towns';
 import { INTERACT_RANGE } from '../src/sim/types';
 import { groundHeight, roadDistance } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
@@ -230,19 +230,24 @@ describe('seasonal decor placement against the live world', () => {
       if (!stall) continue;
       expect(stallRoomProblem(WORLD_SEED, stall.x, stall.z, stall.yaw), post.post.id).toBeNull();
     }
-    // the old Fenbridge spot in the market lane: the footprint itself fitted, the room did not
-    expect(stallRoomProblem(WORLD_SEED, -3.6, 286.5, 0)).toBe('cramped');
+    // Follow the rebuilt town's actual inn instead of a superseded market coordinate.
+    const inn = SEASONAL_EVENT_TOWNS.find((town) => town.id === 'fenbridge')?.buildings.find(
+      (building) => building.kind === 'inn',
+    );
+    if (!inn) throw new Error('Fenbridge inn missing from seasonal event towns');
+    const { x, z } = inn.reach.center;
+    expect(stallRoomProblem(WORLD_SEED, x, z, 0)).toBe('cramped');
     expect(
       stallSpotProblem(
         WORLD_SEED,
-        -3.6,
-        286.5,
+        x,
+        z,
         0,
         Object.values(NPCS)
           .filter((n) => n.id !== 'gourdlight_keeper')
           .map((n) => n.pos),
       ),
-    ).toBe('cramped');
+    ).toBe('collider');
     // Fenbridge's booth now stands out on the green where the Eastbrook road comes in
     const fen = resolvedKeeperPosts(WORLD_SEED).find((p) => p.post.id === 'fenbridge');
     expect(fen?.moved).toBe(false);
@@ -306,8 +311,12 @@ describe('seasonal decor placement against the live world', () => {
       const strawCount = ground.filter((p) => straw(p.kind)).length;
       expect(strawCount, `${rule.zoneId} straw pieces`).toBeLessThanOrEqual(16);
       expect(strawCount / ground.length, `${rule.zoneId} straw share`).toBeLessThan(0.3);
+      // Every dressed post carries a lantern; ground pieces may be rejected by
+      // the rebuilt town's colliders, so they cannot count all dressed posts.
       const lampClusters = new Set(
-        ground.filter((p) => /^lamp:\d+:a$/.test(p.anchor)).map((p) => p.anchor.split(':')[1]),
+        layout.lanterns
+          .filter((p) => Math.hypot(p.x - hub.x, p.z - hub.z) <= rule.radius + 3)
+          .map((p) => p.anchor.split(':')[1]),
       );
       const strawLamps = new Set(
         ground
@@ -398,7 +407,9 @@ describe('seasonal decor placement against the live world', () => {
   // Owner note 2026-10-18: no pumpkins at the church. Every event city's chapel is a
   // quiet place: no ground piece, lantern or garland at it, round it or inside it.
   it('keeps every piece of dressing away from the chapels', () => {
-    const chapels = AUTHORED_TOWN_BUILDINGS.filter((b) => b.kind === 'chapel');
+    const chapels = SEASONAL_EVENT_TOWNS.flatMap((town) => town.buildings).filter(
+      (b) => b.kind === 'chapel',
+    );
     expect(chapels.map((c) => c.id).sort()).toEqual([...SEASONAL_CHAPEL_IDS].sort());
     expect(chapels.length).toBe(3);
     for (const c of chapels) {

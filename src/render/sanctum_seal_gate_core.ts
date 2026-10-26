@@ -6,6 +6,24 @@
 // the door's terrain height. Cosmetic only: nothing here is a telegraph, and
 // the effects tier only thins the puffs.
 
+/** The flagged floor of the gate tunnel and the lane between the pylons
+ *  (door-local): the meadow's grass never grows through it (foliage_core.ts
+ *  insidePavedGrassExclusion reads it), so the threshold reads as frozen
+ *  flags going back into the dark. */
+export const SANCTUM_TUNNEL_FLOOR = { halfWidth: 3.7, lz0: -2.2, lz1: 28.5 } as const;
+
+/** Whether a world point lies on the tunnel's flagged floor (plus `pad`). */
+export function onSanctumSealGateFloor(
+  door: { readonly x: number; readonly z: number },
+  x: number,
+  z: number,
+  pad = 0,
+): boolean {
+  const f = SANCTUM_TUNNEL_FLOOR;
+  const lz = z - door.z;
+  return Math.abs(x - door.x) <= f.halfWidth + pad && lz >= f.lz0 - pad && lz <= f.lz1 + pad;
+}
+
 /** The static effects tier (src/game/ui_effects_profile.ts resolves it). */
 export type SealGateEffectsTier = 'low' | 'medium' | 'high' | 'ultra';
 
@@ -20,8 +38,20 @@ export const SANCTUM_RUNE_LIGHT = {
 } as const;
 
 /** The cold mist film across the tunnel mouth, just behind the pylons (the
- *  portal look: the walk-in trigger fires before a player reaches it). */
-export const SANCTUM_MIST_FILM = { lz: 2.6, width: 7.4, height: 9.8, centerY: 4.9 } as const;
+ *  portal look: the walk-in trigger fires before a player reaches it): a cold
+ *  slate haze that veils the tunnel's dark rather than glowing white by day,
+ *  and a faint rune-blue breath (additive, so it only ever adds a little
+ *  light) drifting over it. */
+export const SANCTUM_MIST_FILM = {
+  lz: 2.6,
+  width: 7.4,
+  height: 9.8,
+  centerY: 4.9,
+  hazeColor: 0x5b778c,
+  hazeOpacity: 0.42,
+  breathColor: 0x3f9fff,
+  breathOpacity: 0.2,
+} as const;
 
 /** The rime fan: frost on the ground within about 12 yd of the gate, in a fan
  *  that follows the cold coming out of the mouth. */
@@ -41,6 +71,10 @@ export const SANCTUM_MIST_FLOW = {
   startY: 0.8,
   endY: 0.2,
   spread: 9.0,
+  /** A cold grey-blue breath, thin: it reads against the plaza, never as fog
+   *  a player must see through. */
+  color: 0xa9bccb,
+  opacity: 0.2,
 } as const;
 
 /** Puff count by the static effects tier (never the FPS governor). */
@@ -138,10 +172,10 @@ export function rimeFanAlpha(row: number, col: number): number {
 
 // ---- the spur's Thornpeak rock and the glacier ice --------------------------------
 //
-// The rock spur the tunnel is cut into and the two rock cheeks of the ice tongue
+// The rock spur the tunnel is cut into (and any rock the icefall node carries)
 // are the MOUNTAIN, not the Smith's masonry: they are shaded to the Thornpeak
 // terrain's own snow-crusted rock (src/render/sanctum_seal_gate_surface.ts), and
-// the ice tongue to weathered glacier ice. Colours are LINEAR albedo (the
+// the icefall to weathered glacier ice. Colours are LINEAR albedo (the
 // painter feeds them to a lit material, the scene's lights grade them), so the
 // set piece answers day, dusk and night exactly as the ground around it does.
 
@@ -160,11 +194,11 @@ export const SANCTUM_THORNPEAK_ROCK = {
   rockDark: [0.12, 0.12, 0.123] as LinearRgb,
   /** Old snow and rime, the same cold white the terrain's snow cover reads. */
   snow: [0.58, 0.59, 0.6] as LinearRgb,
-  /** The Blender build's baked outer-rock luminance (its MOUNTAIN tone after
-   *  the band, tone and crack tints, measured over the shipped GLB): the
-   *  vertex colour divided by it keeps the carved cracks and ledges as relief
-   *  in the new tone. */
-  bakedLuma: 0.26,
+  /** The Blender build's baked outer-rock luminance (the sculpted spur's
+   *  paint, its baked occlusion and snow, measured over the shipped GLB): the
+   *  vertex colour divided by it keeps the carved cleaves, ledges and joints
+   *  as relief in the new tone. */
+  bakedLuma: 0.29,
   /** Snow lies where the surface faces up: the world-normal y (plus a little
    *  noise) where it starts and where it is full. */
   snowLo: 0.45,
@@ -206,33 +240,20 @@ export const SANCTUM_GLACIER_ICE = {
   deep: [0.05, 0.16, 0.3] as LinearRgb,
   frost: [0.58, 0.62, 0.67] as LinearRgb,
   edge: [0.46, 0.68, 0.8] as LinearRgb,
-  /** The icefall's serac steps: one band every stepHeight yards up the
-   *  face (the band line wanders by up to stepWander yards), each topped by a
-   *  snow cap capDepth of a band deep and split from the next by a crevasse
-   *  crevasseWidth of a band wide. */
-  stepHeight: 3.6,
-  stepWander: 2.6,
-  /** The bow of each band line, yards of drop per square yard off the
-   *  tongue's centre line (the builder's ICE_CX, lx -18). */
-  stepBow: 0.035,
-  tongueLx: -18,
-  capDepth: 0.26,
-  crevasseWidth: 0.09,
   /** Annual layers: one band every this many yards up the face. */
   layerPeriod: 1.2,
-  /** Firn and old snow veil most of the tongue: the cover's base share, how
-   *  much the macro patches swing it, and how much an upward face adds. Blue
-   *  ice shows on the steep snout faces, in the bare patches and down every
-   *  crevasse. */
-  firnBase: 0.22,
-  firnSwing: 1.1,
-  firnUp: 0.8,
   /** How far the thin-edge scatter pulls the albedo toward `edge`. */
   edgeAmount: 0.55,
-  /** The builder's baked old snow: vertex red above lo starts it, hi is full
-   *  (its ICE_WHITE red is 0.64 linear, its glacier blue 0.21). */
-  snowLo: 0.3,
-  snowHi: 0.58,
+  /** The sculpt's paint, read by its LINEAR luminance (the builder's deep
+   *  core 0.05, clear body 0.31, pale arrises 0.62, snow crust 0.86): the
+   *  core fades out between deepLo and deepHi, the pale ice comes in between
+   *  paleLo and paleHi, the crust between snowLo and snowHi. */
+  deepLo: 0.07,
+  deepHi: 0.24,
+  paleLo: 0.42,
+  paleHi: 0.64,
+  snowLo: 0.68,
+  snowHi: 0.82,
   roughClear: 0.32,
   roughFrost: 0.82,
 } as const;

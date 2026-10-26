@@ -28,6 +28,21 @@ async function hunterVisual() {
         scene: new THREE.Group(),
         animations: [
           'Ranged_Shoot',
+          'Woc_Attack_Rifle',
+          'Woc_Attack_1H_0',
+          'Woc_Attack_1H_1',
+          'Woc_Attack_1H_Stab',
+          'Woc_Attack_2H_0',
+          'Woc_Attack_2H_1',
+          'Woc_Attack_Dual',
+          'Woc_Attack_Dual#main',
+          'Woc_Attack_Dual#off',
+          'Woc_Attack_Offhand_Stab',
+          'Woc_Cast_Directed',
+          'Woc_Cast_Omni',
+          'Woc_Cast_Shoot',
+          'Woc_Cast_Omni_Release',
+          'Woc_Channel_Directed',
           '1H_Chop',
           '1H_Slash',
           'Cast_Raise',
@@ -61,8 +76,8 @@ describe('the hunter releases a held aim through the tail half of its shot clip'
   it('mints both halves and plays the tail when the aim is held, the whole shot otherwise', async () => {
     const visual = await hunterVisual();
     const peek = visual as unknown as Peek;
-    const aim = peek.action('Ranged_Shoot#aim');
-    const release = peek.action('Ranged_Shoot#release');
+    const aim = peek.action('Woc_Attack_Rifle#aim');
+    const release = peek.action('Woc_Attack_Rifle#release');
     expect(aim).not.toBeNull();
     expect(release).not.toBeNull();
     // the snap shot (2026-09-29): split at 0.17 s, the release is the rest of the clip (the
@@ -72,7 +87,7 @@ describe('the hunter releases a held aim through the tail half of its shot clip'
 
     // Not holding an aim: the launch cue plays the authored shot from the raise.
     visual.playAttack();
-    expect(peek.current?.getClip().name).toBe('Ranged_Shoot');
+    expect(peek.current?.getClip().name).toBe('Woc_Attack_Rifle');
 
     // Holding the aim (the cast state, head half frozen at its hold point):
     // the same cue releases the tail, never the raise again.
@@ -84,12 +99,12 @@ describe('the hunter releases a held aim through the tail half of its shot clip'
     }
     peek.current = aim;
     visual.playAttack();
-    expect(peek.current?.getClip().name).toBe('Ranged_Shoot#release');
+    expect(peek.current?.getClip().name).toBe('Woc_Attack_Rifle#release');
 
     // A per-ability entry still names the tail for the damage-event arm.
     peek.baseState = 'idle';
     visual.playAttack('aimed_shot');
-    expect(peek.current?.getClip().name).toBe('Ranged_Shoot#release');
+    expect(peek.current?.getClip().name).toBe('Woc_Attack_Rifle#release');
   }, 30000);
 });
 
@@ -210,9 +225,9 @@ describe('live WOC combat event linkage', () => {
   it('keeps Hunter melee autos swinging after a melee skill, while shot launches still shoot', async () => {
     const h = await harness();
     h.event(damage('Gutting Strike', 'raptor_strike'));
-    expect(h.peek.current?.getClip().name).toBe('1H_Chop');
+    expect(h.peek.current?.getClip().name).toBe('Woc_Attack_1H_0');
     h.event(damage(null));
-    expect(['1H_Chop', '1H_Slash']).toContain(h.peek.current?.getClip().name);
+    expect(['Woc_Attack_1H_0', 'Woc_Attack_1H_1']).toContain(h.peek.current?.getClip().name);
     h.event({
       type: 'spellfx',
       sourceId: 1,
@@ -221,7 +236,7 @@ describe('live WOC combat event linkage', () => {
       school: 'physical',
       attackAnimation: 'ranged-shot',
     });
-    expect(h.peek.current?.getClip().name).toBe('Ranged_Shoot');
+    expect(h.peek.current?.getClip().name).toBe('Woc_Attack_Rifle');
   }, 30000);
 
   it('keeps physical proc and wound events from replacing the Hunter melee skill with a shot', async () => {
@@ -237,7 +252,7 @@ describe('live WOC combat event linkage', () => {
     ]) {
       h.event(damage(label));
       expect(h.attackCount(), label).toBe(1);
-      expect(h.peek.current?.getClip().name, label).toBe('1H_Slash');
+      expect(h.peek.current?.getClip().name, label).toBe('Woc_Attack_1H_1');
     }
   }, 30000);
 
@@ -251,13 +266,13 @@ describe('live WOC combat event linkage', () => {
       school: 'arcane',
       wand: true,
     });
-    expect(h.peek.current?.getClip().name).toBe('Cast_Shoot');
+    expect(h.peek.current?.getClip().name).toBe('Woc_Cast_Shoot');
   }, 30000);
 
   it('keeps Measured Shot on the held release across the real painter and renderer', async () => {
     const h = await harness();
     await h.usePainter();
-    const aim = h.peek.action('Ranged_Shoot#aim')!;
+    const aim = h.peek.action('Woc_Attack_Rifle#aim')!;
     aim.play();
     aim.paused = true;
     aim.time = 0.15;
@@ -272,7 +287,7 @@ describe('live WOC combat event linkage', () => {
       ability: 'measured_shot',
       attackAnimation: 'ranged-shot',
     });
-    expect(h.peek.current?.getClip().name).toBe('Ranged_Shoot#release');
+    expect(h.peek.current?.getClip().name).toBe('Woc_Attack_Rifle#release');
     expect(h.attackCount()).toBe(1);
   }, 30000);
 
@@ -294,19 +309,19 @@ describe('live WOC combat event linkage', () => {
   it('uses a spell gesture for Hunter pet care and a sustained loop for Druid healing channels', async () => {
     const { VISUALS } = await import('../src/render/characters/manifest');
     const hunter = VISUALS.player_hunter.clips;
-    for (const id of ['tame_beast', 'revive_pet'])
-      expect(hunter.castByAbility?.[id] ?? hunter.cast, id).toBe('Cast_Loop');
+    expect(hunter.castByAbility?.tame_beast ?? hunter.cast).toBe('Woc_Channel_Directed');
+    expect(hunter.castByAbility?.revive_pet ?? hunter.cast).toBe('Woc_Cast_Omni');
     const druid = VISUALS.player_druid.clips;
-    expect(druid.castByAbility?.tranquility ?? druid.cast).toBe('Cast_Loop');
+    expect(druid.castByAbility?.tranquility ?? druid.cast).toBe('Woc_Cast_Omni');
   });
 
   it.each([
-    ['hunter', 'tame_beast'],
-    ['hunter', 'revive_pet'],
-    ['druid', 'tranquility'],
+    ['hunter', 'tame_beast', 'Woc_Channel_Directed'],
+    ['hunter', 'revive_pet', 'Woc_Cast_Omni'],
+    ['druid', 'tranquility', 'Woc_Cast_Omni'],
   ] as const)(
     'runs the %s %s channel until cast ends',
-    async (cls, ability) => {
+    async (cls, ability, expectedClip) => {
       const h = await harness(`player_${cls}`);
       const state: AnimState = {
         speed: 0,
@@ -324,7 +339,7 @@ describe('live WOC combat event linkage', () => {
         sitting: false,
       };
       for (let i = 0; i < 50; i++) h.visual.update(0.05, state, true);
-      expect(h.peek.current?.getClip().name).toBe('Cast_Loop');
+      expect(h.peek.current?.getClip().name).toBe(expectedClip);
       expect(h.peek.current?.paused).toBe(false);
       expect(h.peek.current?.isRunning()).toBe(true);
       h.visual.update(0.05, { ...state, casting: false, castingAbility: null }, true);
@@ -338,7 +353,7 @@ describe('live WOC combat event linkage', () => {
     async (kind) => {
       const h = await harness();
       h.event({ ...damage('Woundrend'), kind } as SimEvent);
-      expect(h.peek.current?.getClip().name).toBe('1H_Slash');
+      expect(h.peek.current?.getClip().name).toBe('Woc_Attack_1H_1');
       expect(h.attackCount()).toBe(1);
     },
     60000,
@@ -359,9 +374,12 @@ describe('live WOC combat event linkage', () => {
     async (cls) => {
       const h = await harness(`player_${cls}`);
       h.event(damage(null));
-      expect(['1H_Chop', '1H_Slash', '2H_Chop', 'Dual_Chop#main']).toContain(
-        h.peek.current?.getClip().name,
-      );
+      expect([
+        'Woc_Attack_1H_0',
+        'Woc_Attack_1H_1',
+        'Woc_Attack_2H_0',
+        'Woc_Attack_Dual#main',
+      ]).toContain(h.peek.current?.getClip().name);
     },
     60000,
   );
@@ -371,12 +389,12 @@ describe('live WOC combat event linkage', () => {
     h.event(damage('Woundrend', 'mongoose_bite'));
     h.event(damage('Unknown attack'));
     expect(h.attackCount()).toBe(2);
-    expect(['1H_Chop', '1H_Slash']).toContain(h.peek.current?.getClip().name);
+    expect(['Woc_Attack_1H_0', 'Woc_Attack_1H_1']).toContain(h.peek.current?.getClip().name);
     h.event(damage('Bloodhook Re-entry'));
-    expect(h.peek.current?.getClip().name).toBe('1H_Slash');
+    expect(h.peek.current?.getClip().name).toBe('Woc_Attack_1H_Stab');
   }, 30000);
 
-  it('preserves explicit Hunter ranged hits and keeps channel pulses from replacing the held volley', async () => {
+  it('preserves explicit Hunter ranged hits without restarting on ground-zone or channel pulses', async () => {
     const h = await harness();
     for (const [name, id] of [
       ['Splitshot', 'multi_shot'],
@@ -384,17 +402,21 @@ describe('live WOC combat event linkage', () => {
       ['Rattling Shot', 'concussive_shot'],
     ]) {
       h.event(damage(name, id));
-      expect(h.peek.current?.getClip().name, id).toBe('Ranged_Shoot');
+      expect(h.peek.current?.getClip().name, id).toBe('Woc_Attack_Rifle');
     }
     const before = h.attackCount();
     h.event(damage('Volley'));
+    expect(h.attackCount()).toBe(before);
     h.event(damage('Fevered Draw', 'rapid_fire'));
     expect(h.attackCount()).toBe(before);
   }, 30000);
 
-  it.each(['frostCone', 'fireCone'] as const)(
+  it.each([
+    ['frostCone', 'Woc_Cast_Shoot'],
+    ['fireCone', 'Woc_Cast_Omni_Release'],
+  ] as const)(
     'releases a Mage %s with its casting hand',
-    async (fx) => {
+    async (fx, expectedClip) => {
       const h = await harness('player_mage');
       h.event({
         type: 'spellfx',
@@ -404,7 +426,7 @@ describe('live WOC combat event linkage', () => {
         school: fx === 'fireCone' ? 'fire' : 'frost',
         ability: fx === 'fireCone' ? 'dragons_breath' : 'glacial_front',
       });
-      expect(h.peek.current?.getClip().name).toBe('Cast_Shoot');
+      expect(h.peek.current?.getClip().name).toBe(expectedClip);
     },
     60000,
   );
@@ -412,7 +434,7 @@ describe('live WOC combat event linkage', () => {
   it('releases the Paladin timed Mercy Lance when its direct damage resolves', async () => {
     const h = await harness('player_paladin');
     h.event({ ...damage('Mercy Lance', 'mercy_lance'), school: 'holy' } as SimEvent);
-    expect(h.peek.current?.getClip().name).toBe('Cast_Shoot');
+    expect(h.peek.current?.getClip().name).toBe('Woc_Cast_Shoot');
   }, 30000);
 
   it('preserves the Needle of Fate release when its dedicated projectile claims the event', async () => {
@@ -425,6 +447,6 @@ describe('live WOC combat event linkage', () => {
       school: 'shadow',
       ability: 'needle_of_fate',
     });
-    expect(h.peek.current?.getClip().name).toBe('Cast_Shoot');
+    expect(h.peek.current?.getClip().name).toBe('Woc_Cast_Shoot');
   }, 30000);
 });

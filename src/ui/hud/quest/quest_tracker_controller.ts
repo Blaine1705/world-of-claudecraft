@@ -15,6 +15,7 @@ import { type QuestTrackingState, sharedQuestTracking } from '../../quest_tracki
 import { forgeInstructionLines } from '../../world_quest_forge_view';
 import { gliderInstructionLines } from '../../world_quest_glider_view';
 import { investigationInstructionLines } from '../../world_quest_investigation_view';
+import { worldQuestReadsCompleted } from '../../world_quest_progress_state';
 import { shadowInstructionLines } from '../../world_quest_shadow_view';
 import { worldQuestTraceProgressInstruction } from '../../world_quest_trace_view';
 import { worldQuestDisplayName, worldQuestObjectiveLabel } from '../../world_quest_view';
@@ -28,6 +29,7 @@ import {
   questTrackerSections,
   type TrackedQuest,
 } from './quest_tracker';
+import { weeklyQuestTrackerRow } from './weekly_quest_tracker_view';
 import { buildWispMazeHud, type WispMazeHudController } from './wisp_maze_hud_controller';
 import { createWorldQuestTrackerVisibility } from './world_quest_tracker_visibility';
 
@@ -50,7 +52,10 @@ export interface QuestTrackerControllerDeps {
   document: Document;
   world(): Pick<IWorld, 'questLog' | 'cfg' | 'player' | 'worldQuestLog'> &
     Partial<
-      Pick<IWorld, 'abandonQuest' | 'clueHunt' | 'activeSeasonalEvent' | 'hauntedPumpkinsFound'>
+      Pick<
+        IWorld,
+        'abandonQuest' | 'clueHunt' | 'activeSeasonalEvent' | 'hauntedPumpkinsFound' | 'weeklyQuest'
+      >
     >;
   /** Injectable tracking set; production leaves it out and shares the HUD's one. */
   tracking?: QuestTrackingState;
@@ -189,8 +194,12 @@ export class QuestTrackerController {
         (!!progress.wispMaze && !progress.wispMaze.paused && progress.wispMaze.phase !== 'won') ||
         progress.glider?.phase === 'countdown' ||
         progress.glider?.phase === 'flying';
+      // The daily reward stays complete during practice, but an active lesson
+      // still needs its live instructions until the player leaves or finishes.
+      const practicingLesson = progress.state === 'active' && (lessonRunning || !!progress.shadow);
       const complete =
-        progress.state === 'completed' &&
+        worldQuestReadsCompleted(progress) &&
+        !practicingLesson &&
         !(progress.wispMaze && progress.wispMaze.phase !== 'won') &&
         progress.glider?.phase !== 'countdown' &&
         progress.glider?.phase !== 'flying';
@@ -240,7 +249,7 @@ export class QuestTrackerController {
                     quest.objective.type === 'tracing'
                       ? worldQuestTraceProgressInstruction(progress, quest)
                       : worldQuestObjectiveLabel(progress.questId),
-                  current: Math.min(progress.count, quest.count),
+                  current: complete ? quest.count : Math.min(progress.count, quest.count),
                   total: quest.count,
                   ...(quest.objective.type === 'tracing' ? { instruction: true } : {}),
                 },
@@ -276,6 +285,8 @@ export class QuestTrackerController {
         ],
       });
     }
+    const weeklyQuest = weeklyQuestTrackerRow(world.weeklyQuest);
+    if (weeklyQuest) quests.push(weeklyQuest);
     // The zone lookup only runs while an event is open: closed, the row is absent anyway
     // and the per-frame update stays free of it.
     const pumpkinRow = world.activeSeasonalEvent
@@ -466,7 +477,7 @@ export class QuestTrackerController {
       // quest id that reaches this list plain text (it has no log entry).
       const worldQuest = ownEntry(WORLD_QUESTS_BY_ID, quest.id);
       const behavior =
-        !worldQuest && quest.id !== HAUNTED_PUMPKIN_TRACKER_ID
+        !worldQuest && quest.number > 0
           ? ` role="button" tabindex="0" data-quest="${esc(quest.id)}"`
           : '';
       const badge =

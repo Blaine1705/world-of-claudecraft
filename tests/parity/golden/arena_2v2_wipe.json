@@ -8,8 +8,8 @@
     "first kill does not end the match; team wipe (isArenaTeamWiped) does",
     "endArenaMatch ranked Elo on both teams (arena2v2 standings) + returnFromArena"
   ],
-  "draws": 2021,
-  "drawDigest": "f9e0b332",
+  "draws": 2018,
+  "drawDigest": "729debac",
   "frames": [
     {
       "tick": 0,
@@ -43,8 +43,8 @@
       "state": "507e09fe",
       "events": "14dc52c1",
       "rng": {
-        "draws": 94,
-        "digest": "f94836fc"
+        "draws": 96,
+        "digest": "f1115032"
       }
     },
     {
@@ -54,8 +54,8 @@
       "state": "97594776",
       "events": "f3c46c01",
       "rng": {
-        "draws": 290,
-        "digest": "d5038b1d"
+        "draws": 294,
+        "digest": "4ef1d559"
       }
     },
     {
@@ -65,8 +65,8 @@
       "state": "3f2f5f35",
       "events": "1b9b3d0d",
       "rng": {
-        "draws": 514,
-        "digest": "c4f84513"
+        "draws": 521,
+        "digest": "8a8ffc8c"
       }
     },
     {
@@ -76,8 +76,8 @@
       "state": "004515b6",
       "events": "b9e4ab71",
       "rng": {
-        "draws": 525,
-        "digest": "3a6dc8d7"
+        "draws": 533,
+        "digest": "75f012b5"
       },
       "label": "bout-active",
       "players": [
@@ -713,8 +713,8 @@
       "state": "505de79c",
       "events": "1d399b4a",
       "rng": {
-        "draws": 531,
-        "digest": "bc30bbc0"
+        "draws": 537,
+        "digest": "ea9a9d98"
       },
       "label": "first-down",
       "players": [
@@ -1357,11 +1357,11 @@
       "tick": 103,
       "time": 5.15,
       "nextId": 1015,
-      "state": "a4e64200",
+      "state": "5cbecd2a",
       "events": "b563aeaa",
       "rng": {
-        "draws": 539,
-        "digest": "0ad18773"
+        "draws": 545,
+        "digest": "5c41c4ae"
       },
       "label": "team-wiped",
       "players": [
@@ -1494,7 +1494,8 @@
               0,
               0
             ],
-            "resetAtMs": 604805099
+            "resetAtMs": 604805099,
+            "weeklyBossUnlocks": {}
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
@@ -1629,7 +1630,8 @@
               0,
               0
             ],
-            "resetAtMs": 604805099
+            "resetAtMs": 604805099,
+            "weeklyBossUnlocks": {}
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
@@ -2106,29 +2108,29 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1015,
-      "state": "7bda2622",
+      "state": "f841bff4",
       "events": "741638a5",
       "rng": {
-        "draws": 759,
-        "digest": "64b0ada2"
+        "draws": 761,
+        "digest": "f1862f13"
       }
     },
     {
       "tick": 150,
       "time": 7.5,
       "nextId": 1015,
-      "state": "9b67387a",
+      "state": "97e6530c",
       "events": "741638a5",
       "rng": {
-        "draws": 1020,
-        "digest": "b56284b1"
+        "draws": 1026,
+        "digest": "f0473ec1"
       }
     },
     {
       "tick": 175,
       "time": 8.75,
       "nextId": 1015,
-      "state": "bbe98e2b",
+      "state": "15503d1d",
       "events": "741638a5",
       "rng": {
         "draws": 1335,
@@ -2139,7 +2141,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 1015,
-      "state": "f66d1d21",
+      "state": "a8f7a443",
       "events": "741638a5",
       "rng": {
         "draws": 1668,
@@ -2150,22 +2152,22 @@
       "tick": 225,
       "time": 11.25,
       "nextId": 1015,
-      "state": "b0efcc3b",
+      "state": "0137c8ed",
       "events": "e79e3029",
       "rng": {
-        "draws": 1882,
-        "digest": "2eab0647"
+        "draws": 1881,
+        "digest": "d1786449"
       }
     },
     {
       "tick": 243,
       "time": 12.15,
       "nextId": 1015,
-      "state": "6020130e",
+      "state": "9433a640",
       "events": "741638a5",
       "rng": {
-        "draws": 2021,
-        "digest": "f9e0b332"
+        "draws": 2018,
+        "digest": "729debac"
       },
       "label": "returned",
       "players": [
@@ -2298,7 +2300,8 @@
               0,
               0
             ],
-            "resetAtMs": 604805099
+            "resetAtMs": 604805099,
+            "weeklyBossUnlocks": {}
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
@@ -2433,7 +2436,8 @@
               0,
               0
             ],
-            "resetAtMs": 604805099
+            "resetAtMs": 604805099,
+            "weeklyBossUnlocks": {}
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
@@ -2915,11 +2919,11 @@
       "tick": 243,
       "time": 12.15,
       "nextId": 1015,
-      "state": "6020130e",
+      "state": "9433a640",
       "events": "741638a5",
       "rng": {
-        "draws": 2021,
-        "digest": "f9e0b332"
+        "draws": 2018,
+        "digest": "729debac"
       },
       "label": "final",
       "players": [
@@ -3052,7 +3056,8 @@
               0,
               0
             ],
-            "resetAtMs": 604805099
+            "resetAtMs": 604805099,
+            "weeklyBossUnlocks": {}
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}
@@ -3187,7 +3192,8 @@
               0,
               0
             ],
-            "resetAtMs": 604805099
+            "resetAtMs": 604805099,
+            "weeklyBossUnlocks": {}
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}

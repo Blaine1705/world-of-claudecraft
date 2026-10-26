@@ -1,8 +1,7 @@
 // Ground quest sparkle objects — Meshy-generated GLBs matching Kenney/Quaternius props.
 
 import * as THREE from 'three';
-import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
-import { loadGltf } from './assets/loader';
+import { type LoadedGltf, loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import {
   buildFarshoreSalvageObject,
@@ -143,7 +142,7 @@ const ITEM_MAT_OVERRIDES: Record<
   cursed_candle_stub: { emissive: 0x3cff6e, emissiveIntensity: 0.45 },
 };
 
-const gltfByUrl = new Map<string, GLTF>();
+const gltfByUrl = new Map<string, LoadedGltf>();
 const preparedByItem = new Map<string, THREE.Group>();
 const proceduralByItem = new Map<string, THREE.Group>();
 

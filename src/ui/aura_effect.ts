@@ -32,6 +32,11 @@ import {
   VERDANCE_STAGES,
 } from '../sim/combat/druid_engines';
 import {
+  SPOREMENDER_ARMOR_MULT,
+  SPOREMENDER_HEALING_DONE_PCT,
+  SPOREMENDER_MOVE_SPEED_MULT,
+} from '../sim/combat/druid_sporemender';
+import {
   COLDSIGHT_READ_AURA_ID,
   COLDSIGHT_READ_FELL_SHOT_MULT,
   COLDSIGHT_READ_LONG_DRAW_MULT,
@@ -123,6 +128,7 @@ import { bastionAuraEffectDescriptor } from './bastion_aura_effect';
 import { cryptAuraEffectDescriptor } from './crypt_aura_effect';
 import { gourdlightAuraEffectDescriptor } from './gourdlight_aura_effect';
 import { sanctumAuraEffectDescriptor } from './sanctum_aura_effect';
+import { templeAuraEffectDescriptor } from './temple_aura_effect';
 import { type TrinketAuraViewer, trinketAuraEffectDescriptor } from './trinket_aura_effect';
 import { wildheartAuraEffectDescriptor } from './wildheart_aura_effect';
 
@@ -199,6 +205,9 @@ export function auraEffectDescriptor(
   // The Hollow Crypt's trash and wing-boss marks say theirs (crypt_aura_effect.ts).
   const crypt = cryptAuraEffectDescriptor(a);
   if (crypt) return crypt;
+  // The Drowned Temple's boss auras say theirs (temple_aura_effect.ts).
+  const temple = templeAuraEffectDescriptor(a);
+  if (temple) return temple;
   // This is a four-second placement marker, not a damage-taken modifier. Its
   // countdown and localized name are the complete tooltip; the generic
   // vulnerability copy would misleadingly claim that it adds 0% damage taken.
@@ -752,6 +761,15 @@ export function auraEffectDescriptor(
       return { key: `${KEY}.formFireball`, nums: { pct: pctFromMult(a.value) } };
     case 'form_moonkin':
       return { key: `${KEY}.formMoonkin`, nums: { pct: 20, armorPct: 50 } };
+    case 'form_sporemender':
+      return {
+        key: `${KEY}.formSporemender`,
+        nums: {
+          pct: Math.round(SPOREMENDER_HEALING_DONE_PCT * 100),
+          armorPct: Math.round((SPOREMENDER_ARMOR_MULT - 1) * 100),
+          slowPct: Math.round((1 - SPOREMENDER_MOVE_SPEED_MULT) * 100),
+        },
+      };
     case 'form_shadow':
       return { key: `${KEY}.formShadow`, nums: { pct: Math.abs(round(a.value)) } };
     case 'soul_fragments':

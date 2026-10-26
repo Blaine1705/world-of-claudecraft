@@ -50,9 +50,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'ワイルドハート盆地',
+    desc: '牙王の獣使い、ゴージブルーム、ズルガーから得られる代表的な武器。',
   },
   conquerors_wildheart_basin_heroic: {
     name: '英雄: ワイルドハート盆地',
+    desc: '牙王の獣使い、ゴージブルーム、盆地の声ズルガーからヒロイックでのみ得られるエピック装備と装身具。',
   },
   // The arena entity reads ナイスラクシスのレイドアリーナ; the page collects the
   // raid's spoils rather than naming the room, so the arena noun is dropped and
@@ -167,11 +169,11 @@ export const table: ReliquaryLocaleTable = {
   // (wocStore.armoryTitle 武器庫).
   conquerors_warfare_gallery: {
     name: 'ウォーフェアギャラリー',
-    desc: '五つの戦争戦闘装備一式。名誉を積み、一つずつ手に入れます。',
+    desc: '第一シーズンの五つの戦争戦闘装備一式。今は金で一つずつ売られています。',
   },
   conquerors_warfare_armory: {
     name: 'ウォーフェア武器庫',
-    desc: '苦労して得た名誉で購入する戦争の装飾品と武器。',
+    desc: '苦労して得た名誉で購入する戦争の装飾品、武器、雑貨。',
   },
   conquerors_vanguard_gallery: {
     name: 'ヴァンガードギャラリー',

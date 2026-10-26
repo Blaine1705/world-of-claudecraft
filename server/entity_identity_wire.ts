@@ -5,6 +5,9 @@ import type { Entity } from '../src/sim/types';
 import { equippedInstanceWire } from './equipped_instance_wire';
 import { writePlayerIdentityWire } from './player_identity_wire';
 
+// Identity fields rarely change, so they ride only in "full" records: on an
+// entity's first snapshot for a session and again whenever one of them
+// changes. The client treats their absence in a record as "unchanged".
 export function identityFields(e: Entity): Record<string, unknown> {
   const out: Record<string, unknown> = { k: e.kind, tid: e.templateId, nm: e.name, lv: e.level };
   if (e.skinCatalog === 'mech') out.cat = 'mech';
@@ -13,6 +16,7 @@ export function identityFields(e: Entity): Record<string, unknown> {
   // distinct from the self-only persisted pick (`mntSel`): using `mnt` for both
   // made the appended self delta overwrite the live riding state in JSON.
   if (e.mountKey) out.mnt = e.mountKey;
+  if (e.kind === 'player') out.mntTier = e.ridingTier;
   if (e.buddyKey) out.bud = e.buddyKey;
   if (e.buddyAutoloot) out.budal = true;
   if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)

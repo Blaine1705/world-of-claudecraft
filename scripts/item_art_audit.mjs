@@ -163,22 +163,22 @@ const build = await buildItemArtAudit({
     // sheet pages, re-measured with `--verify-only` (116 generated Heroic definitions,
     // 86 with their own WebP, 30 weapon art aliases).
     // Buddy restoration adds 34 painted owners and two enumerated pending whistles.
-    // + Gourdlight Eve's four painted event items (gourdlight-eve-icons-2026-10-16):
-    // 2043 / 2072, measured with `--verify-only`.
-    // + Old Thatchgrin's two spoils (gourdlight-eve-thatchgrin-icons-2026-10-17): 2045 / 2074.
-    // At the feature/v045-integration merge into feature/halloween-event (2026-10-19): the
-    // integration's 2039 / 2068 plus the Halloween branch's 27 event items (spoils, candies,
-    // writs, draughts, broom reins, toys, daily errand items): 2066 / 2095, measured with
-    // `--verify-only` on the merged tree.
-    catalogCount: 2066,
-    liveItemCount: 2095,
-    // Five referral rewards reuse existing art until their own paintings land.
-    pendingArtCount: 142,
+    // + the membership Staff of Changing (PR 4281): 2040 / 2069, re-measured with
+    // `--verify-only`.
+    // Completed Season 2 painted armor leaves the pending ledger, plus Nightwing Chimaera mount.
+    // Wobbles the Slime's reins add one owner and one live definition.
+    // + the sprite whistle and Lantern Hall seal/reins: 2186 owners / 2215 live items.
+    // Recovered Season 2 feral staff and eight jewelry items, each with its own art.
+    catalogCount: 2191,
+    liveItemCount: 2220,
+    // Companion items are removed; only the Infernal Quiver awaits artwork.
+    pendingArtCount: 1,
     generatedHeroicDefinitions: 116,
     heroicDefinitionsWithOwnWebp: 86,
     heroicWeaponArtAliases: 30,
-    sheetPageCount: 44,
-    groupCount: 28,
+    // Completed Season 2 icons add pages to the grouped review sheets.
+    sheetPageCount: 45,
+    groupCount: 26,
   },
 });
 assertItemArtAuditPass(build);

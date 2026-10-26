@@ -546,7 +546,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1014,
-      "state": "ff264465",
+      "state": "d83122e3",
       "events": "557f26d5",
       "rng": {
         "draws": 4,
@@ -676,7 +676,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0535,
           "facing": 1.570796,
-          "fallStartY": -2,
+          "fallStartY": -0.251617,
           "fiveSecondRule": 99.25,
           "healPower": 2,
           "hp": 44,

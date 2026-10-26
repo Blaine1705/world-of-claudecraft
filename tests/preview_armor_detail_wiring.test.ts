@@ -72,9 +72,16 @@ describe('the HUD says whose character its shared turntable shows', () => {
     expect(inspect).toContain('this.mountSharedPreview(container, {');
     expect(inspect).toContain("framing: 'inspect'");
     expect(inspect).not.toContain("framing: 'sheet'");
+    // the own sheet's subject has its own module (self_preview_subject.ts, which
+    // tests/self_preview_subject.test.ts drives): the method mounts it, the module frames it
     const sheet = methodBody(hud, 'private mountCharPreview(');
-    expect(sheet).toContain('this.mountSharedPreview(container, {');
-    expect(sheet).toContain("framing: 'sheet'");
+    expect(sheet).toContain('this.mountSharedPreview(');
+    expect(sheet).toContain('selfPreviewSubject(this.sim, cls, skin, previewKey, tryOnSkinId)');
     expect(sheet).not.toContain("framing: 'inspect'");
+    const subject = stripComments(
+      readFileSync(new URL('../src/ui/self_preview_subject.ts', import.meta.url), 'utf8'),
+    );
+    expect(subject).toContain("framing: 'sheet'");
+    expect(subject).not.toContain("framing: 'inspect'");
   });
 });

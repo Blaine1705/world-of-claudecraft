@@ -1,6 +1,6 @@
 // The seasonal-event ClientWorld mirror (the IWorldSeasonal facet, online half),
 // one more link in the wire-state base-class chain (QuestWorldWireState ->
-// LanceWireState -> SeasonalWireState -> ReconWireState -> ClientWorld), so
+// LanceWireState -> GuildHallWireState -> SeasonalWireState -> ReconWireState -> ClientWorld), so
 // online.ts stays under its monolith ceiling. It owns the `season`, `tot` and
 // `hpf` self delta keys (server/quest_snapshot_wire.ts) and the knock verb.
 //
@@ -12,8 +12,7 @@
 import { GOURDLIGHT_PUMPKINS } from '../sim/content/gourdlight_pumpkins';
 import { isBuiltinWorldActive } from '../sim/data';
 import { syncSeasonalDecorColliders } from '../sim/seasonal_decor_colliders';
-import { LanceWireState } from './lance_wire_state';
-import type { QuestWorldWireState } from './quest_world_wire_state';
+import { GuildHallWireState } from './guild_hall_wire_state';
 
 /** A self `season` value: an event id, or null (an explicit clear). Anything else
  *  is dropped as version skew, never rendered. */
@@ -44,7 +43,7 @@ export function decodeHauntedPumpkinsWire(value: unknown): readonly string[] {
   return Object.freeze([...found].sort());
 }
 
-export class SeasonalWireState extends LanceWireState {
+export class SeasonalWireState extends GuildHallWireState {
   /** The world's seed (ClientWorld's own cfg), for the decor collider gate. */
   declare cfg: { seed: number };
   activeSeasonalEvent: string | null = null;
@@ -60,7 +59,7 @@ export class SeasonalWireState extends LanceWireState {
 
   /** The lance family's self apply, then the seasonal keys of the same record. */
   override applyQuestSelfSnapshot(
-    self: Parameters<QuestWorldWireState['applyQuestSelfSnapshot']>[0] & {
+    self: Parameters<GuildHallWireState['applyQuestSelfSnapshot']>[0] & {
       lance?: unknown;
       lrest?: unknown;
       lguide?: unknown;
@@ -69,14 +68,15 @@ export class SeasonalWireState extends LanceWireState {
       hpf?: unknown;
     },
     simTime?: unknown,
-  ): void {
-    super.applyQuestSelfSnapshot(self, simTime);
+  ): boolean {
+    const changed = super.applyQuestSelfSnapshot(self, simTime);
     if (self.season !== undefined) {
       this.activeSeasonalEvent = decodeSeasonWire(self.season);
       this.syncSeasonalColliders();
     }
     if (self.tot !== undefined) this.trickOrTreatedToday = decodeTrickOrTreatWire(self.tot);
     if (self.hpf !== undefined) this.hauntedPumpkinsFound = decodeHauntedPumpkinsWire(self.hpf);
+    return changed;
   }
 
   /** A fresh session starts closed until the server's first self record says

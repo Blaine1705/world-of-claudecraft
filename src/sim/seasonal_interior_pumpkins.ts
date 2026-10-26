@@ -18,11 +18,11 @@
 // One pumpkin per house at most, a few per city, taken in a fixed order. Pinned against
 // the live world by tests/seasonal_interior_pumpkins.test.ts. Pure: no rng, no clock.
 
-import { AUTHORED_TOWNS } from './authored_town_registry';
 import { isBlocked, supportHeightAt } from './colliders';
 import { NPCS } from './data';
 import { hash2 } from './rng';
 import type { SeasonalGroundPiece } from './seasonal_decor_layout';
+import { SEASONAL_EVENT_TOWNS } from './seasonal_towns';
 import { groundHeight } from './world';
 
 /** The pumpkin's footprint radius on its surface (yards, at its drawn size). */
@@ -141,7 +141,7 @@ export function interiorPumpkinJob(seed: number, memoize = true): InteriorPumpki
   const cached = memo.get(seed);
   if (cached) return { step: () => true, result: cached };
   const npcSpots = Object.values(NPCS).map((n) => n.pos);
-  const queue = AUTHORED_TOWNS.flatMap((town, townIndex) =>
+  const queue = SEASONAL_EVENT_TOWNS.flatMap((town, townIndex) =>
     town.buildings
       // never in a chapel: no event dressing at or in it (owner note 2026-10-18)
       .filter((b) => b.walkIn === true && b.kind !== 'chapel')
@@ -149,7 +149,7 @@ export function interiorPumpkinJob(seed: number, memoize = true): InteriorPumpki
       .sort((a, b) => hash2(hashId(a.id), 3, 0x51) - hash2(hashId(b.id), 3, 0x51))
       .map((house) => ({ townIndex, house })),
   );
-  const perTown = AUTHORED_TOWNS.map((): InteriorPumpkin[] => []);
+  const perTown = SEASONAL_EVENT_TOWNS.map((): InteriorPumpkin[] => []);
   let next = 0;
   const job = {
     result: null as InteriorPumpkin[] | null,
@@ -183,7 +183,7 @@ function hashId(id: string): number {
 
 function houseSpot(
   seed: number,
-  house: (typeof AUTHORED_TOWNS)[number]['buildings'][number],
+  house: (typeof SEASONAL_EVENT_TOWNS)[number]['buildings'][number],
   npcSpots: readonly { x: number; z: number }[],
 ): InteriorPumpkin | null {
   // the walled body (the record's footprint: its position and its walls' own size),

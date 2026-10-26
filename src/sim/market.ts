@@ -11,6 +11,7 @@
 
 import { bagPools, canGrantCopies, instancedCountCap } from './bags';
 import { rekeySigner } from './character_rename';
+import { MEMBERSHIP_TOKEN_ID } from './content/membership';
 import { ITEMS } from './data';
 import { formatMoney } from './format_money';
 import {
@@ -26,6 +27,7 @@ import {
   removeMatchingInstance,
   sanitizeEscrowSlot,
 } from './item_instance_transfer';
+import { publicProvenanceView } from './item_provenance';
 import { removeVendorSellUnits } from './items';
 import { collapseToLowestPerItem } from './market_collapse';
 import { planListingIds, playerListingIdFloor } from './market_listing_ids';
@@ -222,7 +224,7 @@ export interface MarketSave {
     key: string;
     copper: number;
     items: InvSlot[];
-    /** Additive: the pending sale ledger. Absent on every pre-ledger save and on
+    /** Additive: the sale ledger (History). Absent on every pre-ledger save and on
      *  any collection holding only returns, which load as an empty log. */
     sales?: MarketSaleLog;
   }[];
@@ -448,9 +450,8 @@ export class Market {
     // cloneInvSlot: an instanced return's payload must never alias between the
     // merged-away bucket and the surviving one.
     to.items.push(...from.items.map(cloneInvSlot));
-    // The ledger follows its gold: the merged-away bucket's copper landed in `to`
-    // above, so the rows explaining it have to travel with it or the surviving
-    // collection would show proceeds it cannot account for.
+    // The ledger follows its seller: the merged-away bucket's sale history moves
+    // to `to` with its gold, or the History tab would lose it on a rename.
     mergeSaleLogs(to.sales, from.sales);
     this.marketCollections.delete(fromKey);
     this.bumpCollections();
@@ -943,6 +944,7 @@ export class Market {
       return;
     }
     if (
+      listing.itemId !== MEMBERSHIP_TOKEN_ID &&
       !canGrantCopies(
         meta.inventory,
         bagPools(meta.bags),
@@ -1149,7 +1151,10 @@ export class Market {
     // eligibility), so they all merge into the same stack and ONE summed check is
     // the exact whole-sweep capacity question: nothing can fail after the first
     // settlement, which is what makes the sweep all-or-nothing.
-    if (!canGrantCopies(meta.inventory, bagPools(meta.bags), itemId, plan.units)) {
+    if (
+      itemId !== MEMBERSHIP_TOKEN_ID &&
+      !canGrantCopies(meta.inventory, bagPools(meta.bags), itemId, plan.units)
+    ) {
       this.ctx.error(meta.entityId, 'Your bags are full.');
       return [];
     }
@@ -1229,6 +1234,7 @@ export class Market {
       return;
     }
     if (
+      listing.itemId !== MEMBERSHIP_TOKEN_ID &&
       !canGrantCopies(
         meta.inventory,
         bagPools(meta.bags),
@@ -1273,7 +1279,8 @@ export class Market {
       return;
     }
     const col = this.collectionForSeller(meta);
-    if (!col || (col.copper <= 0 && col.items.length === 0 && isSaleLogEmpty(col.sales))) {
+    // The sale ledger is History, not a pickup: only gold and returned goods pend.
+    if (!col || (col.copper <= 0 && col.items.length === 0)) {
       this.ctx.error(meta.entityId, 'You have nothing to collect.');
       return;
     }
@@ -1291,19 +1298,17 @@ export class Market {
       this.ctx.bumpDeedStat(meta, 'marketSaleCopper', col.copper);
       col.copper = 0;
     }
-    // The ledger clears with the GOLD, not at the end of the method: the capacity
-    // gate below can leave items behind and return early, and rows describing gold
-    // already paid out must not survive to be shown (and re-shown) next collect.
-    // Cleared unconditionally, because a sale whose proceeds floored to 0 copper
-    // (a 1-copper listing against the Merchant's cut) still logs a row, and that
-    // row would otherwise be uncollectable forever.
-    col.sales = emptySaleLog();
+    // The sale ledger is deliberately NOT cleared here: it is what the History
+    // tab lists, and wiping it with the gold left that tab empty for every seller
+    // who had ever collected. It stays bounded by its own cap (market_sale_log.ts).
     // Capacity gate: items that don't fit stay in the collection box (never
     // destroyed); the gold above is always collected. Instance-aware on both
     // arms so a returned instanced listing keeps its payload here too.
+    // Membership tokens may use visible inventory overflow on every return/buy path.
     const kept: typeof col.items = [];
     for (const s of col.items) {
       if (
+        s.itemId === MEMBERSHIP_TOKEN_ID ||
         canGrantCopies(
           meta.inventory,
           bagPools(meta.bags),
@@ -1332,7 +1337,9 @@ export class Market {
       this.ctx.error(meta.entityId, 'Your bags are full.');
       return;
     }
-    this.marketCollections.delete(this.marketSellerKey(meta));
+    col.items = [];
+    // A bucket holding sale history stays (copper 0, no goods) so History survives.
+    if (isSaleLogEmpty(col.sales)) this.marketCollections.delete(this.marketSellerKey(meta));
   }
 
   // Once a second: return expired player listings to their seller's collection.
@@ -1382,7 +1389,7 @@ export class Market {
     const meta = this.ctx.players.get(pid);
     if (!meta) return false;
     const col = this.collectionForSeller(meta);
-    return !!col && (col.copper > 0 || col.items.length > 0 || !isSaleLogEmpty(col.sales));
+    return !!col && (col.copper > 0 || col.items.length > 0);
   }
 
   marketInfoFor(pid: number): import('../world_api').MarketInfo | null {
@@ -1435,6 +1442,12 @@ export class Market {
       // goods, so the full payload never crosses the wire. Conditional spread:
       // plain rows stay byte-identical (no `instance: undefined` key).
       ...(l.instance ? { instance: publicInstanceView(l.instance) } : {}),
+      // A tracked copy's history, so a buyer can weigh where it has been: the
+      // public projection only (names, dates, source, zone; never a character
+      // id, the parent guid, or the copy's own guid). A SIBLING of `instance`,
+      // never inside it: publicInstanceView feeds payload equality and its
+      // allowlist is pinned to the eqi wire, so the display trim stays as is.
+      ...(l.instance?.provenance ? { history: publicProvenanceView(l.instance.provenance) } : {}),
       ...(l.craftedRecipeId === undefined ? {} : { craftedRecipeId: l.craftedRecipeId }),
       ...(l.materialSources === undefined
         ? {}

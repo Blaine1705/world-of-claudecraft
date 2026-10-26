@@ -171,7 +171,6 @@ export const LAKE = { x: -92, z: 88, radius: 30 };
 
 export const ZONE1_ZONE: ZoneDef = {
   id: 'eastbrook_vale',
-  worldPvp: 'sanctuary',
   name: 'Eastbrook Vale',
   zMin: -180,
   zMax: 180,
@@ -1240,7 +1239,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     ],
     xpReward: 700,
     copperReward: 260,
-    itemRewards: {},
+    itemRewards: { warrior: 'lychgate_buckler' },
     minLevel: 5,
   },
   q_supplies: {
@@ -1959,12 +1958,12 @@ export const ZONE1_OBJECTS: GroundObjectDef[] = [
     itemId: 'supply_crate',
     name: 'Stolen Supply Crate',
     positions: [
-      { x: 58, z: -58 },
-      { x: 73, z: -70 },
-      { x: 86, z: -82 },
-      { x: 95, z: -97 },
-      { x: 64, z: -76 },
-      { x: 81, z: -94 },
+      { x: 65, z: 23 },
+      { x: 72, z: 15 },
+      { x: 82, z: 22 },
+      { x: 106, z: 40 },
+      { x: 110, z: 48 },
+      { x: 116, z: 37 },
     ],
   },
   {

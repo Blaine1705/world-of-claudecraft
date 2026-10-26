@@ -20,6 +20,9 @@ transforms and scenes. Elder leaves are excluded from simplification. Palm
 rebaking carries the index levels through dequantization and transforms with
 `carryGeometryLod`. Shared tree/palm consumers load the same derived source while
 retaining full geometry where their existing policy requires it.
+The derived `<model>_lod` copies are not placeable: `isSceneryLodCopyCatalogId`
+(in `scripts/assets/scenery_lod_build.mjs`) keeps them out of the Studio asset
+catalog and the collision bake, so an authored map places the source model.
 
 This changes geometry complexity, not view distance, collision or combat cues.
 The same Low policy applies on desktop and Android. Low hemisphere fill rises

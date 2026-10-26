@@ -102,7 +102,7 @@ describe('referral card controller', () => {
     expect(f.playReward).toHaveBeenCalledOnce();
     expect(popup.textContent).toContain('Friendship Satchel');
     expect(popup.textContent).toContain('Trailmate');
-    expect(popup.querySelector('img')?.getAttribute('src')).toContain('resonant_weave_bag.webp');
+    expect(popup.querySelector('img')?.getAttribute('src')).toBe('/ui/items/referral_satchel.webp');
     expect(popup.getAttribute('role')).toBe('dialog');
     expect(f.root.inert).toBe(true);
     expect(document.querySelector('.referral-celebration')!.contains(document.activeElement)).toBe(
@@ -113,6 +113,28 @@ describe('referral card controller', () => {
     f.replace({ ...f.snapshot, revision: 3 });
     expect(document.querySelector('.referral-celebration')).toBeNull();
     expect(f.send.mock.calls.filter(([a]) => a.type === 'redeem')).toHaveLength(1);
+  });
+
+  it('shows Wobbles artwork and celebrates the actual card-completion item', () => {
+    const f = setup();
+    f.card.participants[0].credited = 31;
+    f.card.participants[0].redeemed = 15;
+    f.controller.open();
+    expect(f.root.innerHTML).toContain('/ui/items/reins_wobbles_slime.webp');
+    expect(f.root.textContent).toContain('Wobbles the Slime mount.');
+    expect(f.root.textContent).toContain('Flicker and Glimmer buddy companions.');
+    expect(f.root.innerHTML).toContain('/ui/portraits/buddy_sprites.webp');
+    expect(f.root.innerHTML).not.toContain('whistle_sapling');
+    expect(f.root.innerHTML).not.toContain('reins_referral_tank');
+    f.root.querySelector<HTMLButtonElement>('[data-milestone="raid"]')!.click();
+    f.card.participants[0].redeemed = 31;
+    f.card.revision++;
+    f.replace({ ...f.snapshot, revision: 2 });
+    const popup = document.querySelector<HTMLElement>('.referral-celebration')!;
+    expect(popup.textContent).toContain('Jelly Saddle: Wobbles');
+    expect(popup.querySelector('img')?.getAttribute('src')).toBe(
+      '/ui/items/reins_wobbles_slime.webp',
+    );
   });
 
   it('defers celebration until consent is answered and keeps Escape inside the popup', () => {
@@ -403,7 +425,8 @@ describe('referral card controller', () => {
     f.card.participants[1].characterName = '<img src=x onerror=alert(1)>';
     f.controller.open();
     expect(f.root.textContent).toContain('<img src=x onerror=alert(1)>');
-    expect(f.root.querySelector('img')).toBeNull();
+    expect(f.root.querySelector('img[src="x"], [onerror]')).toBeNull();
+    expect(f.root.querySelector('img[src="/ui/items/referral_satchel.webp"]')).not.toBeNull();
     expect(f.root.querySelectorAll('.referral-stamp')).toHaveLength(5);
     expect(f.root.querySelectorAll('.referral-stamp [role="tooltip"]')).toHaveLength(5);
     expect(f.send).not.toHaveBeenCalled();

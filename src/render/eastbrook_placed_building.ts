@@ -16,6 +16,7 @@
 //     threshold, exactly as a placed asset's is;
 //   - the file: the profile's texture tier of the model, same geometry.
 import * as THREE from 'three';
+import type { PaintedTownId } from '../sim/painted_towns';
 import { GFX } from './gfx';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
 import { type OccluderFadeMat, occluderFadeRecordFor } from './occluder_fade';
@@ -48,7 +49,7 @@ export interface PlacedTownBuildingRecord {
 }
 
 /** Which town stands the building: names its group and its id field. */
-export type PlacedTown = 'eastbrook' | 'fenbridge' | 'highwatch';
+export type PlacedTown = 'eastbrook' | 'fenbridge' | 'highwatch' | PaintedTownId;
 
 const PLACED_BUILDING_ASSET_PREFIX = '/models/tidehold/';
 
@@ -151,12 +152,16 @@ export function buildPlacedTownBuilding(
   building: PlacedTownBuildingRecord,
   source: THREE.Object3D,
   groundAt: (x: number, z: number) => number,
+  extras: readonly THREE.Object3D[] = [],
 ): PlacedBuildingBuild {
   const { placement } = building;
   const clone = source.clone(true);
   // Bounds while the clone is parentless at the origin: the model's own frame.
   clone.updateMatrixWorld(true);
   const box = new THREE.Box3().setFromObject(clone);
+  // A town's own additions to a model (in the model's frame, inside its bounds): they join
+  // the building before its materials convert, so they fade, cull and reveal with it.
+  for (const extra of extras) clone.add(extra);
 
   const mats: OccluderFadeMat[] = [];
   const interiors: THREE.Object3D[] = [];

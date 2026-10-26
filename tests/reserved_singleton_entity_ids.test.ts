@@ -9,7 +9,7 @@ import {
 } from '../src/sim/content/gourdlight_eve';
 import { LAST_KEEP_SPIRIT_HEALER_ENTITY_ID } from '../src/sim/content/graveyards';
 import { HEALING_TRAINING_ENTITY_IDS } from '../src/sim/content/healing_training';
-import { HIGHWATCH_STEWARD_ENTITY_ID } from '../src/sim/content/highwatch_manor';
+import { HIGHWATCH_GUILD_ENTITY_IDS } from '../src/sim/content/highwatch_guild';
 import { CRUCIBLE_VENDOR_ENTITY_ID } from '../src/sim/content/ignivar_loot';
 import { TAVERN_KEEPER_ENTITY_ID, TAVERN_KEEPER_NPC_ID } from '../src/sim/content/mirefen_tavern';
 import { FURY_ENTITY_ID } from '../src/sim/content/pvp_honor';
@@ -37,12 +37,14 @@ const RESERVED: Record<string, number> = {
   HARBOR_HOUSE_KEEPER_ENTITY_ID,
   WEEKLY_KEEPER_ENTITY_ID,
   TAVERN_KEEPER_ENTITY_ID,
-  HIGHWATCH_STEWARD_ENTITY_ID,
   GOURDLIGHT_KEEPER_ENTITY_ID,
   GOURDLIGHT_KEEPER_FENBRIDGE_ENTITY_ID,
   GOURDLIGHT_KEEPER_HIGHWATCH_ENTITY_ID,
   ...Object.fromEntries(
     Object.entries(HEALING_TRAINING_ENTITY_IDS).map(([id, n]) => [`HEALING_TRAINING:${id}`, n]),
+  ),
+  ...Object.fromEntries(
+    Object.entries(HIGHWATCH_GUILD_ENTITY_IDS).map(([id, n]) => [`HIGHWATCH_GUILD:${id}`, n]),
   ),
 };
 

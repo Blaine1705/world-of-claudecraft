@@ -40,7 +40,7 @@ export const CANDLE_DECOR_CLEARANCE = 1.1;
 
 const NUDGES: readonly { dx: number; dz: number }[] = (() => {
   const out = [{ dx: 0, dz: 0 }];
-  for (const r of [0.5, 1, 1.6, 2.3]) {
+  for (const r of [0.5, 1, 1.6, 2.3, 3.2, 4.4]) {
     for (let k = 0; k < 8; k++) {
       const a = (k / 8) * Math.PI * 2 + r;
       out.push({ dx: Math.sin(a) * r, dz: Math.cos(a) * r });
@@ -99,12 +99,20 @@ export function resolveCursedCandleSites(seed: number): DailySite[] {
     const hub = zones.find((z) => z.id === rule.zoneId)?.hub;
     if (!hub) continue;
     const town = lamps
-      .map((lamp, index) => ({ lamp, index }))
-      .filter(({ lamp }) => Math.hypot(lamp.x - hub.x, lamp.z - hub.z) <= rule.radius)
+      .map((lamp, index) => ({
+        lamp,
+        index,
+        distance: Math.hypot(lamp.x - hub.x, lamp.z - hub.z),
+      }))
+      // Rebuilt towns may have fewer than five posts inside the dressing ring.
+      // Try those first, then nearby approach posts, preserving all clearance checks.
+      .filter(({ distance }) => distance <= rule.radius + 12)
       .sort(
         (a, b) =>
+          Number(a.distance > rule.radius) - Number(b.distance > rule.radius) ||
           anchorHash(`candle:${rule.zoneId}:${a.index}`, 4) -
-            anchorHash(`candle:${rule.zoneId}:${b.index}`, 4) || a.index - b.index,
+            anchorHash(`candle:${rule.zoneId}:${b.index}`, 4) ||
+          a.index - b.index,
       );
     let placed = 0;
     for (const { lamp, index } of town) {

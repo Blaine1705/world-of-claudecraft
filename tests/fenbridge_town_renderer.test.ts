@@ -50,13 +50,16 @@ import { isOccluderGhostMaterial } from '../src/render/occluder_ghost_variant_ke
 import { placedTownCameraInterior } from '../src/render/placed_town_interior_core';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
 import { createRevealGateCore } from '../src/render/reveal_gate_core';
-import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
+import { BASE_WORLD, BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { FENBRIDGE_LAYOUT, localToWorld } from '../src/sim/fenbridge_layout';
 import { terrainHeight } from '../src/sim/world';
 
 // This suite pins the BLENDED camera ghost (the transparent flip and its gate);
 // the dithered arm is pinned by tests/occluder_dither_fade.test.ts.
-beforeEach(() => setDitherFadeEnabledForTest(false));
+beforeEach(() => {
+  setDitherFadeEnabledForTest(false);
+  setActiveWorldContent(BASE_WORLD);
+});
 
 const ORIGINAL_GFX = {
   standardMaterials: GFX.standardMaterials,
@@ -1797,7 +1800,7 @@ describe('Fenbridge dedicated town renderer', () => {
     expect(rendererSource).toContain('buildFenbridgeTownView(this.sim.cfg.seed)');
     // the rebuilt towns ride one list: mounted, frozen and updated in loops
     expect(rendererSource).toContain(
-      'this.townViews = [this.eastbrookTownView, this.fenbridgeTownView, highwatch];',
+      'this.townViews = [this.eastbrookTownView, this.fenbridgeTownView, ...placed];',
     );
     expect(rendererSource).toContain("setRenderCategory(town.group, 'props')");
     expect(rendererSource.match(/\btown\.update\(/g)).toHaveLength(2);

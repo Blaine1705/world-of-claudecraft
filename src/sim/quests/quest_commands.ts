@@ -28,6 +28,7 @@ import { WISP_MAZE_QUEST_ID } from '../content/world_quest_wisp_maze';
 import { DUNGEONS, ITEMS, QUESTS } from '../data';
 import { formatMoney } from '../format_money';
 import { removePreferFungible } from '../items';
+import { grantFreshLoot } from '../loot/fresh_quality_grant';
 import type { ArchetypeState } from '../professions/archetype';
 import { armCadence, cadenceBlockedKeys } from '../professions/cadence';
 import { planGradeRemoval } from '../professions/material_grades';
@@ -535,9 +536,11 @@ export function turnInQuestCore(
     });
   }
   const rewardItem = questFixedReward(quest, meta.cls);
-  if (rewardItem) ctx.addItem(rewardItem, 1, meta.entityId);
+  // The quest labels a tracked reward copy's provenance (item_tracking.ts).
+  const rewardOpts = { source: `quest:${quest.id}` };
+  if (rewardItem) grantFreshLoot(ctx, rewardItem, 1, meta.entityId, rewardOpts);
   const chosen = rewardChoice ?? defaultRewardChoice(quest, meta.cls, meta.talents.spec);
-  if (chosen) ctx.addItem(chosen, 1, meta.entityId);
+  if (chosen) grantFreshLoot(ctx, chosen, 1, meta.entityId, rewardOpts);
   grantQuestRecipeReward(ctx, quest, meta);
   ctx.grantXp(quest.xpReward, meta);
   // Arm the repeat-cadence window (work orders): the quest stays

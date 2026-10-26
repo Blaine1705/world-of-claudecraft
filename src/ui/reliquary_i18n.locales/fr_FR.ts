@@ -44,9 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Le Bassin du Cœur Sauvage',
+    desc: 'Armes emblématiques du Maître des bêtes seigneur des crocs, de la Florengloutissante et de Zulgar.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Héroïque : le Bassin du Cœur Sauvage',
+    desc: 'Épiques et bijoux exclusifs au mode héroïque du Maître des bêtes seigneur des crocs, de la Florengloutissante et de Zulgar, Voix du Bassin.',
   },
   conquerors_nythraxis: {
     name: 'Raid de Nythraxis',
@@ -142,11 +144,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_gallery: {
     name: 'Galerie de Guerre',
-    desc: "Les cinq tenues de combat de Guerre, gagnées pièce par pièce avec de l'honneur.",
+    desc: "Les cinq tenues de combat de Guerre de la première saison, désormais vendues pièce par pièce pour de l'or.",
   },
   conquerors_warfare_armory: {
     name: 'Armurerie de Guerre',
-    desc: 'Bijoux et armes de Guerre achetés avec un honneur durement gagné.',
+    desc: 'Bijoux, armes et marchandises de Guerre achetés avec un honneur durement gagné.',
   },
   conquerors_vanguard_gallery: {
     name: 'Galerie de l’Avant-garde',

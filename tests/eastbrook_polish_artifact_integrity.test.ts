@@ -1380,6 +1380,7 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for Gourdlight Eve (feature/halloween-event): the seasonal decor's renderer wiring moved the renderer leaf, and again for its candle-light registry, for its field boss's effects layer, for its phase 3 rain and broom, for the Haunted Pumpkin hunt's renderer hooks, and for the polish pass's scarecrow audio sink. No capture was retaken.
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
+  // Re-minted for the release/v0.44.0 merge into the WebGL context restore. No capture was retaken.
   // Re-minted for the release/v0.44.0 base merges into PR 4193 (Buried Hoards), the second after PR 3847 landed. No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -1423,7 +1424,17 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // it moved the renderer leaf. Re-minted again for the towns preview (the manor, the
   // walk-in camera in every town, grand Fenbridge, Eastbrook stood out as the World of
   // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
-  '51d40fbcbeb49ef60cbc4c301b6d01f249f74b7db93022e96be8cf4c7e63423d';
+  // Re-minted for the painted towns merged over the art style integration tip:
+  // the renderer and town runtime leaves moved. No capture was retaken.
+  // Re-minted for the Mirefen mudfin huts: the torched hut fire's hand-off moved
+  // the renderer leaf. No capture was retaken.
+  // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
+  // No capture was retaken.
+  // Re-minted after merging v045-integration: guild hall, sprite model VFX and live-world
+  // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
+  // Re-minted for the one-colour market canopies on the current integration base.
+  // No capture was retaken.
+  '077cf3d93b5db4e9af40a48cd7e2e55881b9ed2b34ed4e36a73a23437797b1f8';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1467,10 +1478,17 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // it moved the renderer leaf. Re-minted again for the towns preview (the manor, the
   // walk-in camera in every town, grand Fenbridge, Eastbrook stood out as the World of
   // ClaudeCraft Studio map does): the layout and town runtime leaves moved. No capture was retaken.
-  // Re-minted for Gourdlight Eve's renderer wiring, and again for the Haunted Pumpkin
-  // hunt's renderer hooks, and for the polish pass's scarecrow audio sink. No capture was
-  // retaken.
-  'e62122e332b21bc7f95d489d531e46b5dc1325de87b61b4552ed44981283d4ac';
+  // Re-minted for the painted towns merged over the art style integration tip:
+  // the renderer and town runtime leaves moved. No capture was retaken.
+  // Re-minted for the Mirefen mudfin huts: the torched hut fire's hand-off moved
+  // the renderer leaf. No capture was retaken.
+  // Re-minted for low-gfx scenery bands and day/night cycle in renderer.ts.
+  // No capture was retaken.
+  // Re-minted after merging v045-integration: guild hall, sprite model VFX and live-world
+  // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
+  // Re-minted for the one-colour market canopies on the current integration base.
+  // No capture was retaken.
+  '2283f0a8183384f6f31dbe409c936f75dfce6f1427a6471a951889519d42cdc5';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2869,10 +2887,13 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // re-swept evidence. No capture was retaken.
       // Merging #4258 (the Mirefen tavern) over #4516: recomputed LAST again
       // over the re-swept evidence, then again for the towns preview. No capture was retaken.
-      // Gourdlight Eve's renderer wiring: recomputed LAST again, and again for the
-      // Haunted Pumpkin hunt's renderer hooks, and for the polish pass's scarecrow audio
-      // sink. No capture was retaken.
-    ).toBe('933b4ff7c59c4349983c27342cc899d794b06be686b3c6ba5868ea39f807d846');
+      // The Mirefen mudfin huts: recomputed LAST again over the re-swept
+      // evidence. No capture was retaken.
+      // Low-gfx scenery bands and day/night cycle in renderer.ts: recomputed
+      // LAST again over the re-swept evidence. No capture was retaken.
+      // One-colour market canopies on the current integration base: recomputed
+      // from the swept evidence. No capture was retaken.
+    ).toBe('95a7e50f8179187867462cc010f30403e3bbd8b47fd4963d8610916e164cd298');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

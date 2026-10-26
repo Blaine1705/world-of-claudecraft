@@ -6,7 +6,6 @@
 // is moved or refurnished under one.
 import { describe, expect, it } from 'vitest';
 import { wispPose } from '../src/render/seasonal_interior_wisps_core';
-import { AUTHORED_TOWNS } from '../src/sim/authored_town_registry';
 import { isBlocked, supportHeightAt } from '../src/sim/colliders';
 import { GOURDLIGHT_PUMPKINS } from '../src/sim/content/gourdlight_pumpkins';
 import { NPCS } from '../src/sim/data';
@@ -20,6 +19,7 @@ import {
   interiorPumpkins,
   resolveInteriorPumpkins,
 } from '../src/sim/seasonal_interior_pumpkins';
+import { SEASONAL_EVENT_TOWNS } from '../src/sim/seasonal_towns';
 import { groundHeight } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
@@ -42,9 +42,14 @@ function inBox(
 
 describe('the indoor pumpkins', () => {
   it('number six to ten, at least two in every event city, one per house at most', () => {
+    expect(SEASONAL_EVENT_TOWNS.map((town) => town.id)).toEqual([
+      'eastbrook',
+      'fenbridge',
+      'highwatch',
+    ]);
     expect(list.length).toBeGreaterThanOrEqual(6);
     expect(list.length).toBeLessThanOrEqual(10);
-    for (const town of AUTHORED_TOWNS) {
+    for (const town of SEASONAL_EVENT_TOWNS) {
       const ids = new Set(town.buildings.map((b) => b.id));
       const mine = list.filter((p) => ids.has(p.buildingId));
       expect(mine.length, town.id).toBeGreaterThanOrEqual(2);
@@ -55,7 +60,9 @@ describe('the indoor pumpkins', () => {
 
   it('sit inside a walk-in house body (never an annex), walled on all four sides', () => {
     for (const p of list) {
-      const house = AUTHORED_TOWNS.flatMap((t) => t.buildings).find((b) => b.id === p.buildingId);
+      const house = SEASONAL_EVENT_TOWNS.flatMap((t) => t.buildings).find(
+        (b) => b.id === p.buildingId,
+      );
       expect(house?.walkIn, p.anchor).toBe(true);
       if (!house) continue;
       const walls = {
@@ -92,10 +99,14 @@ describe('the indoor pumpkins', () => {
 
   // Owner note 2026-10-18: no pumpkins at the church, inside included.
   it('never stand in a chapel', () => {
-    const chapels = AUTHORED_TOWNS.flatMap((t) => t.buildings).filter((b) => b.kind === 'chapel');
+    const chapels = SEASONAL_EVENT_TOWNS.flatMap((t) => t.buildings).filter(
+      (b) => b.kind === 'chapel',
+    );
     expect(chapels.length).toBe(3);
     for (const p of list) {
-      const house = AUTHORED_TOWNS.flatMap((t) => t.buildings).find((b) => b.id === p.buildingId);
+      const house = SEASONAL_EVENT_TOWNS.flatMap((t) => t.buildings).find(
+        (b) => b.id === p.buildingId,
+      );
       expect(house?.kind, p.anchor).not.toBe('chapel');
       expect(chapelAt(p.x, p.z), p.anchor).toBeNull();
     }

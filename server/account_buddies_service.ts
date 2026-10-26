@@ -1,5 +1,5 @@
 import { type BuddyKey, buddyDef } from '../src/sim/content/buddies';
-import { ITEMS } from '../src/sim/data';
+import { buddyVendorOffer } from '../src/sim/content/buddy_offers';
 import type { Sim } from '../src/sim/sim';
 import { canBuyBuddyOffer } from '../src/sim/vendor_buddy_purchase';
 import {
@@ -117,8 +117,7 @@ export class AccountBuddiesService {
     item: string,
     options: { count?: number; bulk: boolean },
   ): boolean {
-    const def = ITEMS[item];
-    const key = def?.kind === 'buddy' ? def.buddy : undefined;
+    const key = buddyVendorOffer(item)?.buddy;
     if (!key || !buddyDef(key)) return false;
     if (!canBuyBuddyOffer(this.host.sim().ctx, session.pid, npc, item, options)) return true;
     const account = this.accounts.get(session.accountId);

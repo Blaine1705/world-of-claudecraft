@@ -39,10 +39,10 @@
 // it has landed (woc_armor_dressing.ts: on the spot, or as a unit of the work
 // queue behind a world view), through the host's compile gate.
 import * as THREE from 'three';
-import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { applyGeometryLod, type GeometryLodLevel } from '../assets/geometry_lod';
 import { classifyGltfKtx2Textures } from '../assets/ktx2_mip_release';
+import type { LoadedGltf } from '../assets/loader';
 import { loadGltf, releaseGltf } from '../assets/loader';
 import { GPU_WORK_PRIORITY } from '../background_gpu_queue';
 import { recordBuildSpan, timeBuildSpan } from '../build_spans';
@@ -87,7 +87,7 @@ interface AssembledPack {
   /** Which ask this is: a settle of an earlier one is dropped. */
   readonly attempt: number;
   /** The top parse, held from its landing until the medium pack settles. */
-  top: GLTF | null;
+  top: LoadedGltf | null;
   /** What the assembly made (and the pack frees): the material clones, the combined textures. */
   made: WocArmorTopAssembly | null;
 }

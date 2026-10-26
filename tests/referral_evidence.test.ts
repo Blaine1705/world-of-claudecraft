@@ -23,6 +23,7 @@ describe('authoritative referral evidence', () => {
     const joined = sim.events.find((e) => e.type === 'referralEvidence');
     expect(joined).toMatchObject({
       kind: 'party',
+      invited: true,
       participants: [
         { accountId: 1, characterId: 11 },
         { accountId: 2, characterId: 22 },
@@ -30,6 +31,7 @@ describe('authoritative referral evidence', () => {
     });
     sim.partyLeave(b);
     const left = sim.events.filter((e) => e.type === 'referralEvidence').at(-1);
+    expect(left).not.toHaveProperty('invited');
     expect(left).toMatchObject({
       kind: 'party',
       participants: expect.arrayContaining([

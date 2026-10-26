@@ -773,8 +773,8 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1121,
-      "state": "ca77c832",
-      "events": "1bb04e7b",
+      "state": "ab109d0a",
+      "events": "47871878",
       "rng": {
         "draws": 69,
         "digest": "0249f6ce"
@@ -921,14 +921,11 @@
               "gravewyrm_sanctum"
             ]
           },
+          "heroicMarks": 1,
           "inventory": [
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -982,7 +979,10 @@
               0,
               0
             ],
-            "resetAtMs": 604800000
+            "resetAtMs": 604800000,
+            "weeklyBossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            }
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -1122,6 +1122,7 @@
               "gravewyrm_sanctum"
             ]
           },
+          "heroicMarks": 1,
           "inventory": [
             {
               "count": 5,
@@ -1130,10 +1131,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -1186,7 +1183,10 @@
               0,
               0
             ],
-            "resetAtMs": 604800000
+            "resetAtMs": 604800000,
+            "weeklyBossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            }
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -1326,6 +1326,7 @@
               "gravewyrm_sanctum"
             ]
           },
+          "heroicMarks": 1,
           "inventory": [
             {
               "count": 5,
@@ -1334,10 +1335,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -1390,7 +1387,10 @@
               0,
               0
             ],
-            "resetAtMs": 604800000
+            "resetAtMs": 604800000,
+            "weeklyBossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            }
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -1530,6 +1530,7 @@
               "gravewyrm_sanctum"
             ]
           },
+          "heroicMarks": 1,
           "inventory": [
             {
               "count": 5,
@@ -1538,10 +1539,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -1594,7 +1591,10 @@
               0,
               0
             ],
-            "resetAtMs": 604800000
+            "resetAtMs": 604800000,
+            "weeklyBossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            }
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -1734,6 +1734,7 @@
               "gravewyrm_sanctum"
             ]
           },
+          "heroicMarks": 1,
           "inventory": [
             {
               "count": 5,
@@ -1742,10 +1743,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -1798,7 +1795,10 @@
               0,
               0
             ],
-            "resetAtMs": 604800000
+            "resetAtMs": 604800000,
+            "weeklyBossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            }
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -2240,7 +2240,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1121,
-      "state": "ca77c832",
+      "state": "ab109d0a",
       "events": "741638a5",
       "rng": {
         "draws": 69,
@@ -2388,14 +2388,11 @@
               "gravewyrm_sanctum"
             ]
           },
+          "heroicMarks": 1,
           "inventory": [
             {
               "count": 5,
               "itemId": "baked_bread"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -2449,7 +2446,10 @@
               0,
               0
             ],
-            "resetAtMs": 604800000
+            "resetAtMs": 604800000,
+            "weeklyBossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            }
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -2589,6 +2589,7 @@
               "gravewyrm_sanctum"
             ]
           },
+          "heroicMarks": 1,
           "inventory": [
             {
               "count": 5,
@@ -2597,10 +2598,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -2653,7 +2650,10 @@
               0,
               0
             ],
-            "resetAtMs": 604800000
+            "resetAtMs": 604800000,
+            "weeklyBossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            }
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -2793,6 +2793,7 @@
               "gravewyrm_sanctum"
             ]
           },
+          "heroicMarks": 1,
           "inventory": [
             {
               "count": 5,
@@ -2801,10 +2802,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -2857,7 +2854,10 @@
               0,
               0
             ],
-            "resetAtMs": 604800000
+            "resetAtMs": 604800000,
+            "weeklyBossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            }
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -2997,6 +2997,7 @@
               "gravewyrm_sanctum"
             ]
           },
+          "heroicMarks": 1,
           "inventory": [
             {
               "count": 5,
@@ -3005,10 +3006,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -3061,7 +3058,10 @@
               0,
               0
             ],
-            "resetAtMs": 604800000
+            "resetAtMs": 604800000,
+            "weeklyBossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            }
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {
@@ -3201,6 +3201,7 @@
               "gravewyrm_sanctum"
             ]
           },
+          "heroicMarks": 1,
           "inventory": [
             {
               "count": 5,
@@ -3209,10 +3210,6 @@
             {
               "count": 5,
               "itemId": "spring_water"
-            },
-            {
-              "count": 1,
-              "itemId": "heroic_mark"
             },
             {
               "count": 2,
@@ -3265,7 +3262,10 @@
               0,
               0
             ],
-            "resetAtMs": 604800000
+            "resetAtMs": 604800000,
+            "weeklyBossUnlocks": {
+              "korzul_the_gravewyrm": 2
+            }
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {

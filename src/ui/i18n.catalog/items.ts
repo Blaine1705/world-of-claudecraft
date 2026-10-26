@@ -85,14 +85,15 @@ const itemStringsEn = {
       membershipToken:
         'Use: Consume this token to add {days} days of membership to your account. Any remaining membership time is kept. This token can be traded or sold at the auction house before redemption.',
       membershipAdaptive: 'Stats and armor adapt to your class and specialization.',
-      membershipScaling:
-        'Item level matches your level. At level 20, this armor perfects at item level 25.',
+      membershipWeaponAdaptive:
+        'Changes its weapon type, appearance and stats to suit your class and specialization while equipped.',
+      membershipScaling: 'Item level {level}. Always 5 item levels above your character level.',
       membershipPerfected: 'Perfected: item level {level}.',
       membershipFullSet:
         'Equip all {pieces} membership armor pieces to gain {percent}% more experience. Requires an active membership.',
       membershipRequired:
-        'Armor stats and set benefits stop when membership expires and return when you renew.',
-      membershipDormant: 'Inactive: renew your membership to restore armor stats and set benefits.',
+        'Gear stats and set benefits stop when membership expires and return when you renew.',
+      membershipDormant: 'Inactive: renew your membership to restore gear stats and set benefits.',
       qualityKind: '{quality} {kind}',
       currentlyEquipped: 'Currently equipped',
       ifYouEquip: 'If you equip this',
@@ -100,6 +101,10 @@ const itemStringsEn = {
       dps: '({dps} damage per second)',
       armorStat: '{value} Armor',
       stat: '+{value} {stat}',
+      // Under a weapon's Warfare line: only the main hand's weapon counts its
+      // rating (countsWarfareRating, src/sim/pvp/power.ts), so a dual wielder's
+      // offhand weapon adds no Warfare.
+      warfareMainHandOnly: 'Warfare counts only in the main hand.',
       useFood: 'Use: Restores {amount} health over {seconds} sec. Must remain seated while eating.',
       useDrink:
         'Use: Restores {amount} mana over {seconds} sec. Must remain seated while drinking.',
@@ -231,6 +236,10 @@ const itemStringsEn = {
       levelClass: 'Level {level} {className}',
     },
     vendor: {
+      basicRiding: 'Riding Training',
+      advancedRiding: 'Advanced Riding Training',
+      ridingSpeed:
+        'Increase your movement speed while mounted by {speed}%. Applies to every mount.',
       goodsTitle: '{name}: Goods',
       close: 'Close vendor',
       hint: 'Click an item in your bags to sell it while this window is open.',
@@ -405,13 +414,12 @@ const itemStringsEn = {
       collectAll: 'Collect All',
       // The History tab: the itemized sale ledger, split out of Collect so a
       // completed sale stays visible after its proceeds are claimed. saleOlder
-      // covers the rows the ledger cap dropped, whose gold IS still counted in
-      // the Collect tab's proceeds total.
+      // covers the oldest rows the ledger cap dropped.
       history: 'History',
       historyEmpty: 'No sales yet. Items you sell on the World Market show up here.',
       historyNote: 'Your recent sales on the World Market.',
       saleBuyer: 'Sold to {buyer}',
-      saleOlder: 'Plus {count} earlier sales, included in the total.',
+      saleOlder: 'Plus {count} earlier sales not listed.',
       // The Wanted tab (src/sim/market_orders.ts): buy orders and the not-on-the-
       // market strip. Place card, order rows (Deliver / Withdraw), and the strip.
       ordersTab: 'Wanted',
@@ -493,6 +501,9 @@ const itemStringsEn = {
       orderClosed: 'That order is no longer open.',
       orderOwn: 'That is your own order. Cancel it to withdraw it.',
       orderNotYours: 'That is not your order.',
+      // A buy order for a tracked (epic or legendary, one-guid-per-copy) def:
+      // such copies only trade as their own listings, so no order could fill.
+      orderTrackedItem: 'The Merchant takes no orders for one-of-a-kind gear.',
     },
   },
 };
@@ -2634,10 +2645,12 @@ const ITEM_ENTITY_IDS = [
   'artisans_eye',
   'reins_terrorspark_groundshaker',
   'reins_avian_strider',
+  'reins_nightwing_chimera',
   'reins_goblin_rocket_sled',
   'reins_rallycart_rxt',
   'reins_lanternback_troll',
   'reins_chimeglass_tortoise',
+  'reins_wobbles_slime',
   'reins_rickshaw_mount',
   'reins_drakemaw_raptor',
   'reins_mech_bird',
@@ -2861,43 +2874,7 @@ const ITEM_ENTITY_IDS = [
   'ps_lustrous_pearl',
   'mother_of_pearl',
   'ps_passing_stone',
-  'whistle_ember_fox',
-  'whistle_moss_hare',
-  'whistle_frog',
-  'whistle_crimson_claw_crab',
-  'whistle_golden_sentinel',
-  'whistle_nightfang',
-  'whistle_tuskhorn_boar',
-  'whistle_emerald_wolf',
-  'whistle_tiger',
-  'whistle_cate_coin',
-  'whistle_alon',
-  'whistle_trollface',
-  'whistle_ansem',
-  'whistle_triple_t',
-  'whistle_kekius',
-  'whistle_solbot',
-  'whistle_frostfire',
-  'whistle_rocky',
-  'whistle_proud_grunt',
-  'whistle_loot_goblin',
-  'whistle_penny_goldspark',
-  'whistle_stag',
-  'whistle_alpaca',
-  'whistle_horse',
-  'whistle_sapling',
-  'whistle_bull',
-  'whistle_spider',
-  'whistle_raptor',
-  'whistle_skeleton',
-  'whistle_crystal_lich',
-  'whistle_forgemaw',
-  'whistle_crystal_tide',
-  'whistle_phantom',
-  'whistle_emberfall_phoenix',
   // Buddy cosmetic charms (content/buddy_cosmetics.ts tokens).
-  'charm_stag_acorn',
-  'charm_stag_gilded',
   // Crucible raid professions (docs/prd/ignivar-raid-professions.md).
   'lastflame_core',
   'forgefathers_ember',
@@ -3440,6 +3417,16 @@ const ITEM_ENTITY_IDS = [
   'vanguard_oath_blade',
   'vanguard_fang_dagger',
   'vanguard_warstaff',
+  // The Crucible raid's hunter quiver (content/ignivar_loot.ts), appended at
+  // the END under the append-only contract; resolves BY KEY. The name is
+  // wordy English, so its M16 non-Latin fills land in the overlays.
+  'infernal_quiver',
+  // The three leveling quest shields (content/quest_shields.ts), appended at the
+  // END under the append-only contract; resolve BY KEY. The names are wordy
+  // English, so their M16 non-Latin fills land in the overlays.
+  'lychgate_buckler',
+  'bastion_kite_shield',
+  'barrowfield_tower_shield',
   // The choose-one leveling quest gear (content/quest_leveling_gear.ts),
   // appended under the same append-only contract and resolved BY KEY from
   // APPENDED_ITEM_NAMES. Every name is wordy, so the M16 non-Latin fills land
@@ -3939,6 +3926,15 @@ const ITEM_ENTITY_IDS = [
   'merewater_cowl',
   'merecleaver',
   'moonwrack_stave',
+  'vanguard_feral_staff',
+  'vanguard_band_of_might',
+  'vanguard_band_of_precision',
+  'vanguard_band_of_focus',
+  'vanguard_band_of_mending',
+  'vanguard_pendant_of_might',
+  'vanguard_pendant_of_precision',
+  'vanguard_pendant_of_focus',
+  'vanguard_pendant_of_mending',
   // Gourdlight Eve, the autumn seasonal event (content/gourdlight_eve.ts),
   // appended under the same append-only contract, resolved BY KEY.
   'gourdlight_sweet',
@@ -4125,12 +4121,14 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   gatherers_cache: "Gatherer's Cache",
   artisans_eye: "Artisan's Eye",
   reins_avian_strider: 'Reins of the Viridian Valestrider',
+  reins_nightwing_chimera: 'Reins of the Nightwing Chimaera',
   reins_goblin_rocket_sled: 'Ignition Key: Goblin Rocket Sled',
   reins_rallycart_rxt: 'Ignition Key: Rallycart RXT',
   reins_terrorspark_groundshaker: 'Ignition Key: Dreadspark Groundshaker',
   reins_lanternback_troll: "Lamplighter's Yoke: Grumbol",
   reins_chimeglass_tortoise: "Roadwarden's Bellstrap: Tolliver",
   reins_rickshaw_mount: 'Bound Reins: Bonebound Rickshaw',
+  reins_wobbles_slime: 'Jelly Saddle: Wobbles',
   // Quest-dedupe pass (zones 1 to 3): English-appended until the release fill
   // folds them into the per-locale arrays.
   firebottle: 'Firebottle',
@@ -4420,42 +4418,6 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   ps_passing_stone: 'Passing Stone',
   // Buddies (cosmetic followers), same English-appended treatment until the
   // release fill folds them into the per-locale arrays.
-  whistle_ember_fox: 'Ember Fox Whistle',
-  whistle_moss_hare: 'Moss Hare Whistle',
-  whistle_frog: 'Frog Whistle',
-  whistle_crimson_claw_crab: 'Crimson Claw Crab Whistle',
-  whistle_golden_sentinel: 'Golden Sentinel Whistle',
-  whistle_nightfang: 'Nightfang Whistle',
-  whistle_tuskhorn_boar: 'Tuskhorn Boar Whistle',
-  whistle_emerald_wolf: 'Emerald Wolf Whistle',
-  whistle_tiger: 'Tiger Whistle',
-  whistle_cate_coin: 'Cate Coin Whistle',
-  whistle_alon: 'Alon Whistle',
-  whistle_trollface: 'Trollface Whistle',
-  whistle_ansem: 'Ansem Whistle',
-  whistle_triple_t: 'Triple T Whistle',
-  whistle_kekius: 'Kekius Whistle',
-  whistle_solbot: 'Solbot Whistle',
-  whistle_frostfire: 'Frostfire Whistle',
-  whistle_rocky: 'Rocky Whistle',
-  whistle_proud_grunt: 'Proud Grunt Whistle',
-  whistle_loot_goblin: 'Loot Goblin Whistle',
-  whistle_penny_goldspark: 'Penny Goldspark Whistle',
-  whistle_stag: 'Stag Whistle',
-  whistle_alpaca: 'Alpaca Whistle',
-  whistle_horse: 'Horse Whistle',
-  whistle_sapling: 'Sapling Whistle',
-  whistle_bull: 'Bull Whistle',
-  whistle_spider: 'Spider Whistle',
-  whistle_raptor: 'Raptor Whistle',
-  whistle_skeleton: 'Skeleton Whistle',
-  whistle_crystal_lich: 'Crystal Lich Whistle',
-  whistle_forgemaw: 'Forgemaw The Molten Whistle',
-  whistle_crystal_tide: 'Crystal Tide Whistle',
-  whistle_phantom: 'Phantom Whistle',
-  whistle_emberfall_phoenix: 'Emberfall Phoenix Whistle',
-  charm_stag_acorn: 'Acorn Crown Charm',
-  charm_stag_gilded: 'Gilded Charm',
   // Crucible raid professions, English-appended like the waves above (the
   // maintainer fills every locale at release).
   lastflame_core: 'Core of the Last Flame',
@@ -4992,6 +4954,10 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   vanguard_oath_blade: "Vanguard's Oath",
   vanguard_fang_dagger: "Vanguard's Fang",
   vanguard_warstaff: "Vanguard's Warstaff",
+  infernal_quiver: 'Infernal Quiver',
+  lychgate_buckler: 'Lychgate Buckler',
+  bastion_kite_shield: 'Bastion Kite Shield',
+  barrowfield_tower_shield: 'Barrowfield Tower Shield',
   brookwatch_robe: 'Brookwatch Robe',
   brookwatch_leggings: 'Brookwatch Leggings',
   brookwatch_slippers: 'Brookwatch Slippers',
@@ -5484,6 +5450,15 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   merewater_cowl: 'Merewater Cowl',
   merecleaver: 'Merecleaver',
   moonwrack_stave: 'Moonwrack Stave',
+  vanguard_feral_staff: "Vanguard's Feral Staff",
+  vanguard_band_of_might: "Vanguard's Band of Might",
+  vanguard_band_of_precision: "Vanguard's Band of Precision",
+  vanguard_band_of_focus: "Vanguard's Band of Focus",
+  vanguard_band_of_mending: "Vanguard's Band of Mending",
+  vanguard_pendant_of_might: "Vanguard's Pendant of Might",
+  vanguard_pendant_of_precision: "Vanguard's Pendant of Precision",
+  vanguard_pendant_of_focus: "Vanguard's Pendant of Focus",
+  vanguard_pendant_of_mending: "Vanguard's Pendant of Mending",
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {
@@ -5509,6 +5484,7 @@ function itemTranslations(names: readonly string[]): ItemEntityTranslations {
 function itemTranslationsEn(names: readonly string[]) {
   return {
     ...itemTranslations(names),
+    membership_staff: { name: 'Staff of Changing' },
     membership_token: { name: 'Membership Token (30 Days)' },
     referral_satchel: { name: 'Friendship Satchel' },
     referral_hollow_charm: { name: "Oathkeeper's Heart" },

@@ -110,6 +110,7 @@ export function mirefenTavernLayout() {
       ...(p.r !== undefined ? { r: p.r } : { hw: p.hw ?? 0.5, hd: p.hd ?? 0.5 }),
       height: p.height,
       base: tavernPropBaseY(p),
+      ...(p.model !== undefined ? { model: p.model } : {}),
     })),
     lanterns: TAVERN_LANTERNS,
     sconces: TAVERN_SCONCES.map((s) => ({

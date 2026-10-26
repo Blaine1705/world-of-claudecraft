@@ -20,6 +20,10 @@ import { BalancedSequencer } from './scripts/ci_balanced_sequencer.mjs';
 // vite.config.ts is outside tsconfig `include`, so this import is never type-checked.
 import { templateModulepreload } from './scripts/i18n_modulepreload.mjs';
 import {
+  headStylesheetsBlockingBootSplash,
+  moveHeadStylesheetsBehindBootSplash,
+} from './scripts/lib/boot_splash_stylesheets.mjs';
+import {
   emitCollisionOverridesModule,
   validateOverride,
 } from './scripts/lib/collision_overrides_emit.mjs';
@@ -27,7 +31,9 @@ import {
   diagnosticsCaptureAllowed,
   diagnosticsReadAllowed,
 } from './scripts/lib/diagnostics_capture_guard.mjs';
+import { gameModuleEntries, injectGameModules } from './scripts/lib/landing_game_modules.mjs';
 import { studioDevGuardMiddleware } from './scripts/lib/studio_dev_guard.mjs';
+import { readBase, snapshotBase } from './scripts/lib/studio_map_base.mjs';
 import { vitestBoundedRelatedPlugin } from './scripts/lib/vitest_bounded_related.mjs';
 import { shouldDisableVitestFsModuleCache } from './scripts/lib/vitest_fs_module_cache.mjs';
 
@@ -194,6 +200,66 @@ function i18nModulepreloadPlugin() {
       console.log(
         `[i18n] modulepreload: templated ${Object.keys(map).length} locale chunk URLs into index.html`,
       );
+    },
+  };
+}
+
+// Runs after Vite injects the built CSS <link>s, so those move too; dev and build share it.
+// The build re-reads its own output, so a Vite upgrade that injects CSS later fails loudly.
+function bootSplashStylesheetsPlugin() {
+  let outDir = path.resolve(root, 'dist');
+  return {
+    name: 'woc-boot-splash-stylesheets',
+    transformIndexHtml: { order: 'post' as const, handler: moveHeadStylesheetsBehindBootSplash },
+    configResolved(cfg: { root: string; build: { outDir: string } }) {
+      outDir = path.resolve(cfg.root, cfg.build.outDir);
+    },
+    closeBundle() {
+      for (const entry of ['index.html', 'play.html']) {
+        const file = path.join(outDir, entry);
+        if (!existsSync(file)) continue;
+        const blocking = headStylesheetsBlockingBootSplash(readFileSync(file, 'utf8'));
+        if (blocking.length > 0) {
+          throw new Error(
+            `${entry}: stylesheets left in <head> block the boot splash: ${blocking}`,
+          );
+        }
+      }
+    },
+  };
+}
+
+// The landing-first boot prefetches the game client after the home page has loaded
+// (src/ui/landing_first.ts). The client is a dynamic import of src/boot.ts, so its
+// chunk URLs only exist in the bundle: list them into index.html as JSON. Build-only;
+// in dev the list is absent and the prefetch is skipped.
+function landingGameModulesPlugin() {
+  let base = '/';
+  return {
+    name: 'woc-landing-game-modules',
+    apply: 'build' as const,
+    configResolved(cfg: { base: string }) {
+      base = cfg.base || '/';
+    },
+    transformIndexHtml: {
+      order: 'post' as const,
+      handler(
+        html: string,
+        ctx: {
+          path: string;
+          bundle?: Record<string, { code?: string } & Record<string, unknown>>;
+          chunk?: { fileName: string };
+        },
+      ) {
+        if (!ctx.bundle || !/(^|\/)index\.html$/.test(ctx.path)) return html;
+        const modules = gameModuleEntries(ctx.bundle, ctx.chunk?.fileName, base);
+        if (modules.length === 0) {
+          throw new Error(
+            'index.html: found no src/main.ts chunk to list for the landing prefetch',
+          );
+        }
+        return injectGameModules(html, modules);
+      },
     },
   };
 }
@@ -740,6 +806,7 @@ function studioMapPublishPlugin() {
   const SLUG_RE = /^[a-z0-9][a-z0-9_]{0,63}$/;
   const mapsDir = path.resolve(root, 'src/sim/maps');
   const dataDir = path.resolve(root, 'data/maps');
+  const baseCacheDir = path.resolve(root, 'node_modules/.cache/studio-map-bases');
   // Registry regeneration mirrors src/editor/map_publish_core.ts
   // emitPublishedMapRegistry byte-for-byte: entries sorted by slug, metadata
   // re-read from each module on disk so the registry is always a pure
@@ -998,8 +1065,30 @@ export function publishedMapBySlug(slug: string): PublishedMapEntry | undefined 
           res.end('not published');
           return;
         }
+        // Name this exact version as the base a later change-only push
+        // compares against (scripts/lib/studio_map_base.mjs).
+        const bytes = readFileSync(full);
+        res.setHeader('x-studio-map-base', snapshotBase(baseCacheDir, bytes));
         res.statusCode = 200;
-        res.end(readFileSync(full, 'utf8'));
+        res.end(bytes.toString('utf8'));
+      });
+      // One base version of a repo map by its blob id (a change-only push's
+      // "where I started"): the cached copy, else git's own object.
+      server.middlewares.use('/__studio_map/base', (req, res) => {
+        if (req.method !== 'GET') {
+          res.statusCode = 405;
+          res.end('GET only');
+          return;
+        }
+        const url = new URL(req.url ?? '', 'http://localhost');
+        const text = readBase(baseCacheDir, root, url.searchParams.get('id') ?? '');
+        if (text === null) {
+          res.statusCode = 404;
+          res.end('base not found');
+          return;
+        }
+        res.statusCode = 200;
+        res.end(text);
       });
     },
   };
@@ -1224,6 +1313,8 @@ export default defineConfig({
       : []),
     staticPageAliasPlugin(),
     i18nModulepreloadPlugin(),
+    bootSplashStylesheetsPlugin(),
+    landingGameModulesPlugin(),
     musicEditorSavePlugin(),
     studioDevGuardPlugin(),
     dungeonEditorSavePlugin(),

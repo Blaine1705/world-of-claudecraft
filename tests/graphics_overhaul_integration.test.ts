@@ -209,14 +209,18 @@ describe('graphics-overhaul integration', () => {
     const renderer = source('src/render/renderer.ts');
     const tail = renderer.slice(
       renderer.indexOf('lookAtFrozen(this.camera, this.cameraLookAt);\n    // Later readers'),
-      renderer.indexOf('sink.ambience('),
+      renderer.indexOf('updateCameraAudioListener(this, this.cameraLookAt);'),
     );
     // After the one aim, cameraLookAt is reset to the un-shifted avatar eye,
     // and the ambience is sampled there, never at the shifted pivot.
     expect(tail).toContain(
       'this.cameraLookAt.set(px - shoulder.x, eyeY + shoulder.drop, pz - shoulder.z);',
     );
-    expect(tail).toContain('sampleAmbienceInto(this.ambience, eye.x, eye.z, seed, this.weatherOn)');
+    expect(renderer).toContain('updateCameraAudioListener(this, this.cameraLookAt);');
+    const listener = source('src/render/camera_audio_listener.ts');
+    expect(listener).toContain(
+      'sampleAmbienceInto(h.ambience, eye.x, eye.z, h.sim.cfg.seed, h.weatherOn)',
+    );
     expect(tail).not.toMatch(/zoneBiomeAt\(px|sampleAmbienceInto\([^)]*\bpx\b/);
   });
 

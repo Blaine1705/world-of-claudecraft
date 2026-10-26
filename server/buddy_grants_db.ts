@@ -8,7 +8,7 @@
 // since; a character deletion cascades its rows. It cannot grow per event or
 // per session, so it registers no prune sweep by decision.
 
-import { buddyDef } from '../src/sim/content/buddies';
+import { BUDDY_KEYS, buddyDef } from '../src/sim/content/buddies';
 import { pool } from './db';
 
 export const BUDDY_GRANTS_SCHEMA = `
@@ -59,13 +59,13 @@ export async function takePendingBuddyGrants(characterId: number): Promise<Buddy
        INSERT INTO account_buddies AS current (account_id, owned)
        SELECT c.account_id, array_agg(DISTINCT g.buddy_key)
          FROM consumed g JOIN characters c ON c.id = $1
-        WHERE g.buddy_key = ANY(ARRAY['horse','crystal_lich','forgemaw']::text[])
+        WHERE g.buddy_key = ANY($2::text[])
         GROUP BY c.account_id
        ON CONFLICT (account_id) DO UPDATE SET owned = ARRAY(
          SELECT DISTINCT key FROM unnest(current.owned || EXCLUDED.owned) AS key ORDER BY key)
        RETURNING account_id
      ) SELECT buddy_key, cosmetic_id, id FROM consumed`,
-    [characterId],
+    [characterId, BUDDY_KEYS],
   );
   return (res.rows as { buddy_key: string | null; cosmetic_id: string | null; id: number }[])
     .sort((a, b) => a.id - b.id)

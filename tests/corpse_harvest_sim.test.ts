@@ -2552,9 +2552,17 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // `tagged`.
     // 222 with the Mirefen world-boss branch at the release/v0.45.0 merge: balgath_cyclops,
     // three muster soldiers, the drillmaster and the Straw Foreman effigy, all untagged.
-    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 291.
-    // The three retained cosmetic companions add untagged templates.
-    expect(Object.keys(MOBS).length - tagged.length).toBe(294);
+    // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 295,
+    // seventy-three new untagged templates (re-counted 2026-10 off the merged
+    // MOBS at 106a086b617: the 291 first written here undercounted by four).
+    // The three retained cosmetic companions (buddy_horse, buddy_crystal_lich,
+    // buddy_forgemaw; the account-wide buddy merge 7bc9c74af57) add untagged
+    // templates: 298. Plus buddy_sapling, the Sapling companion the referral
+    // stamp cards (642100fe8aa) brought back to the roster: 299. Full chain:
+    // tests/gathering.test.ts. Plus buddy_sprites, the flame-sprite pair: 300.
+    // Retiring buddy_sapling leaves 299. Zulgar's Hunting Spear is an encounter
+    // object without harvest components, bringing the merged roster to 300.
+    expect(Object.keys(MOBS).length - tagged.length).toBe(300);
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(

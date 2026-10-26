@@ -540,13 +540,21 @@ const MONOLITHS: MonolithRow[] = [
     // the Moonbridge banner) moved into log_event_route.ts logEventCue.
     // v0.45.0 integration: 18025 on the merged tree (wc -l); the lower of the two
     // parent pins (18054 and PR 4352's 18069) stands.
+    // LOWERED 18043 -> 18038: the promo card's advert list (Armory, membership,
+    // Refer a Friend) and its locale copy live in store_promo_card.ts storePromoSlides.
+    // wc -l, exact count.
     // LOWERED to 18043 at the v0.45.0 integration merge of #4479's head that moved
     // Deepglass and the Tidehold city out of the Studio import: the integration pin
     // 18054 minus that removal. Exact merged count (wc -l), zero slack.
     // LOWERED 18093 -> 18089 at the release/v0.45.0 merge into feature/mirefen-tavern:
     // the tavern's rest badge read (rest_indicator.ts restStateOf) pays for the tavern's wiring.
     // wc -l on the merged tree. Exact count.
-    ceiling: 18043,
+    // Combined guild extractions and integration changes, measured with wc -l.
+    // v0.45.2 recovery: reuse the Warfare confirmation formatter for gold,
+    // Honor and companions. Measured after recovery integration, zero slack.
+    // Main ce21c7a66f5 sync: parent pins 18043 (Halloween) and 17733 (main).
+    // Exact combined count; the three seasonal wiring lines are preserved.
+    ceiling: 17736,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1042,18 +1050,21 @@ const MONOLITHS: MonolithRow[] = [
     // the tavern's indoor camera clamp and seat pose extractions (interior_camera.ts,
     // chase_camera_floor_core.ts, seated_pose.ts) pays for the tavern's wiring. wc -l on the
     // merged tree. Exact count.
-    // LOWERED 12393 -> 12388 by Gourdlight Eve (feature/halloween-event): the canvas
-    // viewport measure moved to viewport_measure.ts, paying for the seasonal decor
-    // view's field, build and per-frame update, the trick fumes and the born helm bit.
-    // Exact count (wc -l after biome).
-    // LOWERED 12388 -> 12384 by Gourdlight Eve phase 2: the selection ring's hostility
-    // verdict moved to reaction.ts (isHostileSelectionTarget), paying for the field
-    // boss's fx layer (scarecrow_fx.ts) field, build, two routes, two updates and dispose.
-    // LOWERED for Haunted Pumpkins: shared loot sparkles moved into
-    // ground_object_sparkle.ts, paying for the personal pumpkin view hooks.
-    // Merge of feature/v045-integration (genshin artstyle, ceiling 12405) into the
-    // Halloween branch: renderer.ts is unchanged by that side, exact merged count stands.
-    ceiling: 12369,
+    // LOWERED 12405 -> 12400 with the torched mudfin hut fire: the burn cue's two
+    // inline bursts moved into hut_fire_fx.ts (the particle cloud owns and ticks it),
+    // leaving a one-line hand-off plus the light-pool hook. Same headroom as before.
+    // LOWERED 12405 -> 12381 at the merge of feature/lantern-hall-steed into
+    // feature/highwatch-adventurers-guild: Lantern Hall's steed and sword folded the three
+    // fiesta wrappers into one per-frame call (one host instead of three), net of the
+    // weapon-skin swing trail's one-line hook (weapon_skin_trail_core.ts). wc -l on the
+    // merged tree. Exact count.
+    // RE-PINNED at the merge of Lantern Hall (#4530) onto feature/v045-integration
+    // (46f0679547): both parent pins for the record, the integration 12400 and the guild
+    // 12381; the two sides' extractions compose to 12354 by wc -l on the merged tree.
+    // Exact count.
+    // First-person camera integration extracts the spatial-audio listener.
+    // Keep the release branch ceiling ratcheted down by the same eight lines.
+    ceiling: 12193,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1293,20 +1304,21 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 11642 -> 11639 by the tavern's seats: standUp moved whole into seating.ts
     // (bound straight into the context and the motion deps), paying for the sitOnSeat and
     // resting delegates. Exact count.
-    // LOWERED 11594 -> 11585 by Gourdlight Eve (feature/halloween-event): the offline
-    // leaderboard's row build moved to offline_leaderboard.ts, paying for the seasonal
-    // ctx view, tick call, save/restore lines and the three IWorldSeasonal delegates.
-    // Exact count (wc -l after biome).
-    // LOWERED for Haunted Pumpkins: character_calendar_save.ts owns the
-    // unchanged calendar-ledger save projection, including seasonal progress.
-    // LOWERED 11569 -> 11540 by Gourdlight Eve round 5: the right-click cancel command
-    // moved whole into combat/aura_cancel_command.ts, paying for the one-line puppet
-    // movement hook (seasonal/scarecrow_puppet.ts). Exact count (wc -l after biome).
-    // LOWERED 11540 -> 11511 by Gourdlight Eve round 12: the idle-mob throttle predicate
-    // moved whole into mob/idle_tick_skip.ts, so the night boss's unwatched bedtime
-    // (mob/slumber.ts settleUnwatchedSlumber) asks the same question the mob loop asks.
-    // Exact count (wc -l after biome).
-    ceiling: 11511,
+    // LOWERED to 11587 by /unstuck on custom maps: the world's graveyards and
+    // player start became ctx views spirit.ts defaults to, so both
+    // releasePlayerSpirit call sites dropped their explicit arguments. Exact count.
+    // LOWERED to 11582 by Lantern Hall, merged over the v0.45.0 integration: the quest half
+    // of a plain NPC talk moved to quests/npc_quest_talk.ts, paying for the guild's talk
+    // route and two IWorld members. wc -l on the merged tree, exact count.
+    // RE-PINNED at the merge of Lantern Hall (#4530) onto feature/v045-integration
+    // (46f0679547): both parent pins for the record, the integration 11587 and the guild
+    // 11582; the two sides' extractions compose to 11578 by wc -l on the merged tree.
+    // Exact count.
+    // LOWERED to 11487 at the merge of PR 4390 (riding ranks) over release/v0.45.0:
+    // riding progression lives in riding_training.ts. wc -l on the merged tree.
+    // 11485 after the courier full-bank sync (PR 4598). wc -l.
+    // 11490 with the difficulty menu fix (PR 4625) merged ahead of its landing. wc -l.
+    ceiling: 11410,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1562,7 +1574,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the merge of origin/feature/v045-integration (tip 43f0cfd0c04) into
     // feature/genshin-artstyle: both parents' non-overlapping additions compose to 10934
     // (wc -l < src/main.ts). Exact merged count, zero slack.
-    ceiling: 10934,
+    // Landing-first integration extracts the project counter and community tracking.
+    // Re-pin the combined release entrypoint at its measured size, with zero slack.
+    // LOWERED to 10773 at the merge of PR 4390 (riding ranks) over release/v0.45.0. wc -l.
+    ceiling: 10773,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1836,7 +1851,17 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 9840 -> 9835 at the release/v0.45.0 merge into feature/mirefen-tavern:
     // the tavern's tick_perf_log.ts mobZonePhase extraction pays for the tavern's wiring. wc -l
     // on the merged tree. Exact count.
-    ceiling: 9758,
+    // Guild purchase wiring is paid for by moving quest/delve resync to quest_snapshot_wire.
+    // Measured after formatting: 9751, below both merged parent ceilings.
+    // LOWERED to 9687 at the merge of PR 4390 (riding ranks) over release/v0.45.0: the
+    // identity encoder and account mount items live in sibling modules. wc -l.
+    // RE-PINNED to 9690 at the sync with the courier full-bank change (PR 4598): its
+    // wiring composes with the extractions above, still under the release 9751. wc -l.
+    // 9694 with the difficulty menu fix (PR 4625) merged ahead of its landing. wc -l.
+    // Membership boot wiring lives with its service factory.
+    // Main ce21c7a66f5 sync: parent pins 9758 (Halloween) and 9693 (main).
+    // Exact combined count; the three seasonal wiring lines are preserved.
+    ceiling: 9696,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -2355,7 +2380,16 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 827 -> 826 at World PvP (PR 4146 review): the state gained the pvpFlag
     // the name row was built with, paid for by three comment trims. Exact count
     // (wc -l < src/render/nameplate_canvas.ts), zero slack.
-    ceiling: 826,
+    // LOWERED 826 -> 823 at World PvP bounties: the state gained the bounty bit
+    // and the name row its blood-red fills, paid for by moving every tag fill
+    // rule (the guild colour tiers included) to nameplate_tag_fill_core.ts.
+    // Exact count (wc -l < src/render/nameplate_canvas.ts), zero slack.
+    // LOWERED 826 -> 792 at the Style of Enemy Highlight options: the text pens
+    // moved to nameplate_text_styles.ts and the new target cues (framed plate,
+    // overhead chevron, screen-edge arrow) draw from nameplate_target_highlight.ts,
+    // leaving only their call sites here. wc -l after biome. Exact count, zero slack.
+    // Keep inherited bounty/tag fills beside the extracted pens and new cues.
+    ceiling: 797,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {
@@ -2403,11 +2437,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 2327 -> 2288 with the open Fenbridge: the palisade's
     // full-height wall arm and the gate-arch jamb block retired with the
     // ring. wc -l. Exact count.
-    // LOWERED 2288 -> 2286 with Gourdlight Eve's decor collision: the mine
-    // mound footprint moved to mine_mound.ts, paying for setColliderGateOpen's
-    // late-built gate (the decor set itself is seasonal_decor_colliders.ts).
-    // wc -l. Exact count.
-    ceiling: 2286,
+    // LOWERED 2288 -> 2281 with the Mirefen mudfin huts: the mud hut collider
+    // moved to mudfin_huts.ts mudHutCollider, beside the table the renderer
+    // draws the huts from. wc -l. Exact count.
+    ceiling: 2279,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {
@@ -2543,7 +2576,8 @@ const MONOLITHS: MonolithRow[] = [
     // src/ui/store_mount_purchase.ts (the spend controller), the store body's
     // button wiring moved to src/ui/store_body_actions.ts, and both grant-SKU
     // controllers now build over one seam object (store_spend_controllers.ts).
-    ceiling: 1262,
+    // Summary and countdown formatting live in daily_rewards_chrome_view.ts.
+    ceiling: 1249,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },
   {

@@ -371,6 +371,7 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
   }> = [];
   const attachedTooltips: Array<{ el: HTMLElement; build: () => string }> = [];
   const mountPreview = vi.fn<InspectWindowDeps['mountPreview']>();
+  let currentWindow: InspectWindow;
   const openWith = (
     e: InspectEntity,
     selfStanding?: { curatorRank: number; owned: number; total: number } | null,
@@ -417,6 +418,7 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
         attachedTooltips.push({ el, build });
       },
     });
+    currentWindow = win;
     win.openInspect(e, 1_700_000_000_000, selfStanding, selfEquippedInstances, look);
     return root;
   };
@@ -588,12 +590,14 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
     );
     const standing = root.querySelector('.inspect-standing-row');
     const standingItems = [...(standing?.children ?? [])];
-    expect(standingItems).toHaveLength(2);
+    expect(standingItems).toHaveLength(3);
     // W12: the standing pill adopts the shared chip and numeric primitives.
     expect(standingItems[0]?.className).toBe('inspect-meta ui-chip ui-num');
     expect(standingItems[0]?.textContent).toContain('60');
-    expect(standingItems[1]?.classList.contains('inspect-reliquary')).toBe(true);
-    expect(standingItems[1]?.textContent).toContain('300');
+    // Player Info names the specialization by default (none chosen here).
+    expect(standingItems[1]?.classList.contains('inspect-spec')).toBe(true);
+    expect(standingItems[2]?.classList.contains('inspect-reliquary')).toBe(true);
+    expect(standingItems[2]?.textContent).toContain('300');
     const rail = root.querySelector('.inspect-honor-rail');
     const honors = [...root.querySelectorAll('.inspect-holder')];
     expect(honors).toHaveLength(4);
@@ -735,6 +739,27 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
     wearer.membershipActive = false;
     for (const attached of attachedTooltips) attached.build();
     expect(tooltipCalls.at(-1)?.wearer.membershipActive).toBe(false);
+  });
+
+  it('uses the remote applicant class, level and specialization for gear tooltips', () => {
+    openWith(baseEntity);
+    attachedTooltips.length = 0;
+    currentWindow.openRemote({
+      name: 'Applicant',
+      cls: 'mage',
+      level: 12,
+      specId: 'arcane',
+      skin: 0,
+      guild: null,
+      gear: { chest: 'membership_chest' },
+    });
+    for (const attached of attachedTooltips) attached.build();
+    expect(tooltipCalls.at(-1)?.wearer).toMatchObject({
+      name: 'Applicant',
+      templateId: 'mage',
+      level: 12,
+      specId: 'arcane',
+    });
   });
 
   it('a def-only row keeps the def name and def quality (the negative)', () => {

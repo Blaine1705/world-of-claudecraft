@@ -974,7 +974,7 @@ describe('the seven class equipment sets (2026-09-18) on the shared bodies', () 
         const def = VISUALS[key];
         expect(def.attackTimeScale, key).toBe(1);
         expect(def.hideWeaponsWhileSwimming, key).toBe(true);
-        expect(def.swimRise, key).toEqual({ stroke: -0.65, tread: -1.0 });
+        expect(def.swimRise, key).toEqual({ stroke: -1.0, tread: -1.3 });
         expect(def.clips.shoutEmote, key).toBeNull();
         expect(def.clips.climb, key).toBe('Climb');
         expect(def.clips.swim, key).toBe('Woc_Swim');
@@ -989,27 +989,39 @@ describe('the seven class equipment sets (2026-09-18) on the shared bodies', () 
     }
   });
 
-  it('casters raise and hold, release bolts through the throw, and channel the loop', () => {
+  it('casters weave their cast loops and release bolts and bursts through the keyed throws', () => {
     for (const cls of ['mage', 'priest', 'warlock', 'druid', 'shaman'] as const) {
       const clips = VISUALS[`player_${cls}`].clips;
-      expect(clips.cast, cls).toBe('Cast_Raise');
-      expect(clips.castHoldPointSeconds, cls).toBe(1.0);
-      expect(clips.castPlayOut, cls).toEqual(['Cast_Raise']);
+      expect(clips.cast, cls).toBe('Woc_Cast_Directed');
       for (const clip of Object.values(clips.attackByAbility ?? {})) {
-        expect(['Cast_Shoot', '1H_Chop', '1H_Slash', '2H_Chop'], cls).toContain(clip);
+        expect(
+          [
+            'Woc_Cast_Shoot',
+            'Woc_Cast_Omni_Release',
+            'Woc_Attack_1H_0',
+            'Woc_Attack_1H_1',
+            'Woc_Attack_2H_0',
+            'Woc_Special_1H',
+          ],
+          cls,
+        ).toContain(clip);
       }
       for (const clip of Object.values(clips.castByAbility ?? {}))
-        expect(clip, cls).toBe('Cast_Loop');
+        expect(['Woc_Channel_Directed', 'Woc_Cast_Omni'], cls).toContain(clip);
     }
     // The hunter aims from the shot clip's raise and releases its tail.
     const hunter = VISUALS.player_hunter.clips;
     expect(hunter.clipSplits).toEqual([
-      { clip: 'Ranged_Shoot', at: 0.17, names: ['Ranged_Shoot#aim', 'Ranged_Shoot#release'] },
+      {
+        clip: 'Woc_Attack_Rifle',
+        at: 0.17,
+        names: ['Woc_Attack_Rifle#aim', 'Woc_Attack_Rifle#release'],
+      },
     ]);
-    expect(hunter.cast).toBe('Ranged_Shoot#aim');
+    expect(hunter.cast).toBe('Woc_Attack_Rifle#aim');
     expect(hunter.castHoldPointSeconds).toBeLessThan(0.17);
-    expect(hunter.attackByAbility?.aimed_shot).toBe('Ranged_Shoot#release');
-    expect(hunter.attack).toEqual(['Ranged_Shoot']);
+    expect(hunter.attackByAbility?.aimed_shot).toBe('Woc_Attack_Rifle#release');
+    expect(hunter.attack).toEqual(['Woc_Attack_Rifle']);
     expect(VISUALS.player_hunter.weaponSlots).toBeUndefined();
     // Dual wielders split the two-strike clip like the warrior.
     expect(VISUALS.player_rogue.clips.dualWieldSplit).toBe(
@@ -1018,5 +1030,112 @@ describe('the seven class equipment sets (2026-09-18) on the shared bodies', () 
     expect(VISUALS.player_shaman.clips.dualWieldSplit).toBe(
       VISUALS.player_warrior.clips.dualWieldSplit,
     );
+  });
+
+  it('seats the female shoulder pivots inside the deltoid cap and keeps arm skin weights clean', async () => {
+    await MeshoptDecoder.ready;
+    const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).register(() => ({
+      name: 'KHR_texture_basisu',
+      loadTexture: () => Promise.resolve(new THREE.Texture()),
+    }));
+    const loadScene = async (url: string) => {
+      const bytes = publicFile(url);
+      const gltf = await loader.parseAsync(new Uint8Array(bytes).buffer, '');
+      gltf.scene.updateMatrixWorld(true);
+      return gltf.scene;
+    };
+
+    const baseScene = await loadScene(wocBaseUrl('female'));
+    const animsScene = await loadScene(wocAnimsUrl('female'));
+    const keyedScene = await loadScene(wocKeyedAnimsUrl('female'));
+
+    for (const [label, scene] of [
+      ['base_female', baseScene],
+      ['anims_female', animsScene],
+      ['woc_female', keyedScene],
+    ] as const) {
+      for (const side of ['l', 'r'] as const) {
+        const sign = side === 'l' ? 1 : -1;
+        const ua =
+          scene.getObjectByName(`upperarm.${side}`) ?? scene.getObjectByName(`upperarm${side}`);
+        const pad =
+          scene.getObjectByName(`armor_shoulder.${side}`) ??
+          scene.getObjectByName(`armor_shoulder${side}`);
+        expect(ua, `${label} upperarm.${side}`).toBeTruthy();
+        expect(pad, `${label} armor_shoulder.${side}`).toBeTruthy();
+        expect(ua?.position.y, `${label} upperarm.${side} local y`).toBeCloseTo(0.09827702, 5);
+        expect(pad?.position.y, `${label} armor_shoulder.${side} local y`).toBeCloseTo(
+          0.09827702,
+          5,
+        );
+        const worldPos = new THREE.Vector3();
+        ua?.getWorldPosition(worldPos);
+        expect(sign * worldPos.x, `${label} upperarm.${side} world x`).toBeCloseTo(0.1181, 3);
+      }
+    }
+
+    for (const cls of [...SETS, 'warrior', 'paladin'] as const) {
+      for (const tier of ['low', 'medium'] as const) {
+        const json = glb(wocArmorPackUrl('female', cls, tier)) as unknown as {
+          nodes: { name?: string; translation?: number[] }[];
+        };
+        for (const name of ['upperarm.l', 'armor_shoulder.l', 'upperarm.r', 'armor_shoulder.r']) {
+          const node = json.nodes.find((n) => n.name === name);
+          expect(node?.translation?.[1], `female_${cls}_${tier} ${name}`).toBeCloseTo(
+            0.09827702,
+            5,
+          );
+        }
+      }
+    }
+
+    const body = baseScene.getObjectByName('Character_Body') as THREE.SkinnedMesh;
+    expect(body?.isSkinnedMesh).toBe(true);
+    const pos = body.geometry.getAttribute('position');
+    const skinIdx = body.geometry.getAttribute('skinIndex');
+    const skinWgt = body.geometry.getAttribute('skinWeight');
+    const jointIdx = Object.fromEntries(WOC_JOINTS.map((name, i) => [name, i]));
+
+    let wristBlendedVerts = 0;
+    let shoulderBlendedVerts = 0;
+    const v = new THREE.Vector3();
+    for (let i = 0; i < pos.count; i++) {
+      v.fromBufferAttribute(pos, i);
+      body.applyBoneTransform(i, v);
+      const ax = Math.abs(v.x);
+      const side = v.x >= 0 ? 'l' : 'r';
+      const opp = v.x >= 0 ? 'r' : 'l';
+      const weights = new Float64Array(WOC_JOINTS.length);
+      for (let k = 0; k < 4; k++) {
+        const w = skinWgt.getComponent(i, k);
+        if (w > 0) weights[skinIdx.getComponent(i, k)] += w;
+      }
+
+      if (v.y > 0.85 && ax > 0.005) {
+        expect(weights[jointIdx[`clavicle.${opp}`]], `v${i} opp clavicle`).toBe(0);
+        expect(weights[jointIdx[`upperarm.${opp}`]], `v${i} opp upperarm`).toBe(0);
+      }
+      if (v.y > 0.85 && ax > 0.075) {
+        expect(weights[jointIdx.head], `v${i} outer shoulder head weight`).toBe(0);
+      }
+      if (v.y > 0.87 && ax >= 0.105 && ax <= 0.135) {
+        if (
+          weights[jointIdx[`upperarm.${side}`]] > 0.05 &&
+          weights[jointIdx.chest] + weights[jointIdx[`clavicle.${side}`]] > 0.05
+        ) {
+          shoulderBlendedVerts++;
+        }
+      }
+      if (v.y > 0.85 && ax >= 0.415 && ax <= 0.445) {
+        if (
+          weights[jointIdx[`lowerarm.${side}`]] > 0.02 &&
+          weights[jointIdx[`wrist.${side}`]] > 0.02
+        ) {
+          wristBlendedVerts++;
+        }
+      }
+    }
+    expect(shoulderBlendedVerts).toBeGreaterThan(80);
+    expect(wristBlendedVerts).toBeGreaterThan(80);
   });
 });

@@ -1141,6 +1141,7 @@ describe('admin api auth', () => {
       isAdmin: false,
       bannedAt: null,
       suspendedUntil: null,
+      deactivatedAt: null,
       moderationReason: '',
       chatMutedUntil: null,
       chatMuteReason: '',
@@ -1150,6 +1151,7 @@ describe('admin api auth', () => {
       isStreamer: false,
       streamerLinks: {},
       cheaterMark: null,
+      worldQuestBlock: null,
       lastLoginIp: null,
       playtimeSeconds: 0,
       characters: [],
@@ -1181,6 +1183,7 @@ describe('admin api auth', () => {
       isAdmin: false,
       bannedAt: null,
       suspendedUntil: null,
+      deactivatedAt: null,
       moderationReason: '',
       chatMutedUntil: null,
       chatMuteReason: '',
@@ -1190,6 +1193,7 @@ describe('admin api auth', () => {
       isStreamer: false,
       streamerLinks: {},
       cheaterMark: null,
+      worldQuestBlock: null,
       lastLoginIp: null,
       playtimeSeconds: 0,
       characters: [],
@@ -1935,6 +1939,7 @@ describe('admin api chat filter', () => {
       isAdmin: false,
       bannedAt: null,
       suspendedUntil: null,
+      deactivatedAt: null,
       moderationReason: '',
       chatMutedUntil: null,
       chatMuteReason: '',
@@ -1944,6 +1949,7 @@ describe('admin api chat filter', () => {
       isStreamer: false,
       streamerLinks: {},
       cheaterMark: null,
+      worldQuestBlock: null,
       lastLoginIp: null,
       playtimeSeconds: 0,
       characters: [],
@@ -2959,7 +2965,7 @@ describe('admin api R35 professions tooling (LEGACY dispatch arm)', () => {
       detail: 'copper_mining_pick x2',
       reason: 'lost to a bug',
     });
-    expect(fakeGame.adminRestoreItem).toHaveBeenCalledWith(42, 'copper_mining_pick', 2);
+    expect(fakeGame.adminRestoreItem).toHaveBeenCalledWith(42, 'copper_mining_pick', 2, undefined);
     const auditOrder = vi.mocked(recordProfessionsRestore).mock.invocationCallOrder[0];
     const mintOrder = vi.mocked(fakeGame.adminRestoreItem).mock.invocationCallOrder[0];
     expect(auditOrder).toBeLessThan(mintOrder);

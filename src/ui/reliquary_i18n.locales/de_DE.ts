@@ -44,9 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Das Wildherzbecken',
+    desc: 'Charakteristische Waffen des Fangfürsten-Bestienmeisters, der Schlingblüte und Zulgars.',
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Heroisch: Das Wildherzbecken',
+    desc: 'Nur auf heroischem Schwierigkeitsgrad erhältliche epische Gegenstände und Schmuckstücke des Fangfürsten-Bestienmeisters, der Schlingblüte und Zulgars, Stimme des Beckens.',
   },
   conquerors_nythraxis: {
     name: 'Nythraxis-Schlachtzug',
@@ -142,11 +144,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_gallery: {
     name: 'Kriegsführungsgalerie',
-    desc: 'Die fünf Kriegsführungs-Kampfausrüstungen, Stück für Stück mit Ehre verdient.',
+    desc: 'Die fünf Kriegsführungs-Kampfausrüstungen der ersten Saison, jetzt einzeln für Gold verkauft.',
   },
   conquerors_warfare_armory: {
     name: 'Kriegsführungsarsenal',
-    desc: 'Kriegsführungsschmuck und -waffen, gekauft mit hart erkämpfter Ehre.',
+    desc: 'Kriegsführungsschmuck, -waffen und -waren, gekauft mit hart erkämpfter Ehre.',
   },
   conquerors_vanguard_gallery: {
     name: 'Vorhutgalerie',

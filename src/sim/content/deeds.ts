@@ -2873,7 +2873,9 @@ export const DEEDS: Record<string, DeedDef> = {
   // tests/deeds_content.test.ts): the capstone is a dynamic meta over a
   // growing catalog, the feat_book_complete class, and the flag is what
   // keeps it OUT of BOOK_COMPLETE_REQUIREMENTS. Two catalog slots are
-  // owner-pended today (reins_lanternback_troll, reins_terrorspark_groundshaker;
+  // owner-pended today (reins_lanternback_troll, reins_wobbles_slime;
+  // reins_terrorspark_groundshaker left when the annual membership bundle
+  // began granting it;
   // masterwork:engineering was the third until masterwrought Phase 11o's
   // stats-bearing copperlens_ocular made the mark earnable, 2026-08-25, and
   // reins_drakemaw_raptor left the list when the Mirefen world boss took it),
@@ -3606,6 +3608,79 @@ export const DEEDS: Record<string, DeedDef> = {
       ],
     },
   },
+  // The sixth lifetime-XP rung, appended at the END per the append-only
+  // contract rather than beside its five siblings. Unlike those five it has
+  // no legacy milestone id: MILESTONE_DEED_TO_LEGACY is a frozen one-release
+  // mirror of the retired milestone system, so this rung is a deed title only
+  // (picked from the Book of Deeds like every post-unification title).
+  prog_titan: {
+    id: 'prog_titan',
+    name: 'Titan',
+    desc: 'Earn 10,000,000 lifetime experience.',
+    category: 'progression',
+    renown: 50,
+    trigger: { kind: 'lifetimeXp', amount: 10_000_000 },
+    reward: { kind: 'title', text: 'Titan' },
+  },
+  pvp_flag_1h: {
+    id: 'pvp_flag_1h',
+    name: 'Bold',
+    desc: 'Keep World PvP on while alive in the open world or a PvP match for 1 hour of played time. Sanctuary, PvE instances, death and logout pause progress; switching off resets it. Earned titles are permanent.',
+    category: 'pvp',
+    renown: 5,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Bold' },
+  },
+  pvp_flag_3h: {
+    id: 'pvp_flag_3h',
+    name: 'Defiant',
+    desc: 'Keep World PvP on while alive in the open world or a PvP match for 3 hours of played time. Sanctuary, PvE instances, death and logout pause progress; switching off resets it. Earned titles are permanent.',
+    category: 'pvp',
+    renown: 10,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Defiant' },
+  },
+  pvp_flag_6h: {
+    id: 'pvp_flag_6h',
+    name: 'Dauntless',
+    desc: 'Keep World PvP on while alive in the open world or a PvP match for 6 hours of played time. Sanctuary, PvE instances, death and logout pause progress; switching off resets it. Earned titles are permanent.',
+    category: 'pvp',
+    renown: 10,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Dauntless' },
+  },
+  pvp_flag_24h: {
+    id: 'pvp_flag_24h',
+    name: 'Unyielding',
+    desc: 'Keep World PvP on while alive in the open world or a PvP match for 24 hours of played time. Sanctuary, PvE instances, death and logout pause progress; switching off resets it. Earned titles are permanent.',
+    category: 'pvp',
+    renown: 25,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Unyielding' },
+  },
+  pvp_flag_168h: {
+    id: 'pvp_flag_168h',
+    name: 'Indomitable',
+    desc: 'Keep World PvP on while alive in the open world or a PvP match for 7 days of played time. Sanctuary, PvE instances, death and logout pause progress; switching off resets it. Earned titles are permanent.',
+    category: 'pvp',
+    renown: 50,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Indomitable' },
+  },
+  // The Evergarden wisp maze on Hard (the fifth shadow, a second chaser): a
+  // manual grant at the maze win in src/sim/world_quests.ts, on any Hard
+  // clear including a replay after the day's credit, the Arcane Calligraphy
+  // Gold precedent.
+  // Standard renown (10) for the harder tier; appended at the END per the
+  // append-only contract after the World PvP played-time title deeds.
+  exp_wisp_maze_hard: {
+    id: 'exp_wisp_maze_hard',
+    name: 'Brighter Than the Shadows',
+    desc: 'Recover the stolen coin purses and escape the Evergarden maze on Hard.',
+    category: 'exploration',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
   // Appended, never inserted: DEED_ORDER is derived from this object's key order and its
   // indices are pinned by tests/deeds_content.test.ts, so adding a deed anywhere but the
   // end silently re-points every later one.
@@ -3870,7 +3945,67 @@ export const DEEDS: Record<string, DeedDef> = {
     category: 'dungeon',
     renown: 10,
     trigger: { kind: 'manual' },
-  }, // Gourdlight Eve (content/gourdlight_eve.ts), the autumn seasonal event: a Feat,
+  },
+  // Lantern Hall, the Highwatch adventurers' guild (src/sim/guild_contracts.ts and
+  // src/sim/guild_quartermaster.ts), appended at the END. The three contract milestones are
+  // granted when a character's lifetime contract count reaches them; the three feats are the
+  // titles Garrick Holt sells for Lantern Seals. Every
+  // one cosmetic; the feats score nothing and sit outside the Book's completion (rule 2).
+  dgn_guild_first_contract: {
+    id: 'dgn_guild_first_contract',
+    name: 'Writ Signed',
+    desc: "Complete one of Lantern Hall's weekly dungeon contracts.",
+    category: 'dungeon',
+    renown: 5,
+    trigger: { kind: 'manual' },
+  },
+  dgn_guild_ten_contracts: {
+    id: 'dgn_guild_ten_contracts',
+    name: 'Regular at the Board',
+    desc: "Complete 10 of Lantern Hall's weekly dungeon contracts.",
+    category: 'dungeon',
+    renown: 10,
+    trigger: { kind: 'manual' },
+  },
+  dgn_guild_fifty_contracts: {
+    id: 'dgn_guild_fifty_contracts',
+    name: 'Contract Veteran',
+    desc: "Complete 50 of Lantern Hall's weekly dungeon contracts.",
+    category: 'dungeon',
+    renown: 25,
+    trigger: { kind: 'manual' },
+  },
+  feat_guild_writ_runner: {
+    id: 'feat_guild_writ_runner',
+    name: 'Writ-Runner',
+    desc: "Bought from Garrick Holt, Lantern Hall's quartermaster, for 6 Lantern Seals.",
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Writ-Runner' },
+    feat: true,
+  },
+  feat_guild_hallsworn: {
+    id: 'feat_guild_hallsworn',
+    name: 'Hallsworn',
+    desc: "Bought from Garrick Holt, Lantern Hall's quartermaster, for 14 Lantern Seals.",
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Hallsworn' },
+    feat: true,
+  },
+  feat_guild_of_lantern_hall: {
+    id: 'feat_guild_of_lantern_hall',
+    name: 'Of Lantern Hall',
+    desc: "Bought from Garrick Holt, Lantern Hall's quartermaster, for 24 Lantern Seals.",
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'of Lantern Hall' },
+    feat: true,
+  },
+  // Gourdlight Eve (content/gourdlight_eve.ts), the autumn seasonal event: a Feat,
   // zero Renown and outside Book completion, because the head drops only from Old
   // Thatchgrin, who stands only while the event runs (a seasonal window must never
   // gate the completion meta).

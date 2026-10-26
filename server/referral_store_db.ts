@@ -1,5 +1,6 @@
 import type { Pool, PoolClient } from 'pg';
 import type { CharacterState } from '../src/sim/character_state';
+import { REFERRAL_BUDDY } from '../src/sim/content/referral_rewards';
 import {
   createReferralCard,
   type ReferralCardResult,
@@ -475,9 +476,9 @@ export class PgReferralStore {
         if (row.tier === 5)
           await tx.query(
             `INSERT INTO account_buddies AS current(account_id,owned)
-          VALUES($1,ARRAY['sapling']::text[]) ON CONFLICT(account_id) DO UPDATE SET owned=ARRAY(
+          VALUES($1,ARRAY[$2]::text[]) ON CONFLICT(account_id) DO UPDATE SET owned=ARRAY(
           SELECT DISTINCT key FROM unnest(current.owned || EXCLUDED.owned) AS key ORDER BY key)`,
-            [row.accountId],
+            [row.accountId, REFERRAL_BUDDY],
           );
         await tx.query(
           'UPDATE referral_progress SET rewarded_mask=rewarded_mask | $2 WHERE account_id=$1',

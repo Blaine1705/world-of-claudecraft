@@ -263,6 +263,12 @@ describe('Wicked Wicks', () => {
   it('sets five candles in each event town, off the road, clear of the dressing and chapels', () => {
     const candles = gourdlightDailySites(WORLD_SEED).candles;
     expect(candles).toHaveLength(15);
+    for (const zone of ['eastbrook_vale', 'mirefen_marsh', 'thornpeak_heights']) {
+      expect(
+        candles.filter((c) => c.anchor.startsWith(`candle:${zone}:`)),
+        zone,
+      ).toHaveLength(5);
+    }
     const decor = seasonalDecorLayout(WORLD_SEED);
     for (const c of candles) {
       expect(roadDistance(c.x, c.z), c.anchor).toBeGreaterThanOrEqual(DAILY_SITE_ROAD_CLEARANCE);

@@ -1,3 +1,4 @@
+import { compileLiveWorldDocument } from './live_world_core';
 // The editor export boundary. Every artifact passes through the same sanitizer
 // as server map storage, projects through the editor-to-engine adapter, and
 // boots the real deterministic Sim before any bytes are offered to the user.
@@ -25,6 +26,7 @@ export interface PreparedMapExport {
 
 /** Canonicalize a document and prove the actual engine can consume it. */
 export function prepareMapForEngine(map: CustomMap): PreparedMapExport {
+  if (map.meta.overworldBase) compileLiveWorldDocument(map);
   const canonical = parseMap(serializeMap(map));
   if (!canonical) throw new ExportCompatibilityError();
   try {

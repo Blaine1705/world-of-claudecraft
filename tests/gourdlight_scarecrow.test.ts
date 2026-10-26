@@ -730,13 +730,13 @@ describe('the event-bound broom', () => {
     expect(sim.countItem(CARVED_PUMPKIN_HEAD_ID)).toBe(1);
   });
 
-  it('is the event-bound, soulbound reins of a base-speed ground mount', () => {
+  it('is the event-bound, soulbound reins of a cosmetic ground mount', () => {
     const def = ITEMS[GOURDLIGHT_BROOM_ID];
     expect(def.kind).toBe('mount');
     expect(def.seasonalEvent).toBe(GOURDLIGHT_EVE_ID);
     expect(def.soulbound).toBe(true);
-    expect(MOUNTS[GOURDLIGHT_BROOM_MOUNT as keyof typeof MOUNTS].moveSpeedPct).toBe(
-      MOUNTS.valorsteed.moveSpeedPct,
+    expect(MOUNTS[GOURDLIGHT_BROOM_MOUNT as keyof typeof MOUNTS]).not.toHaveProperty(
+      'moveSpeedPct',
     );
   });
 });

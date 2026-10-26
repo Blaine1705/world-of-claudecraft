@@ -12,7 +12,7 @@ vi.mock('../server/referral_game_adapter', () => ({
   },
 }));
 
-import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
+import { HEROIC_MARK_CURRENCY_ID } from '../src/sim/content/dungeon_difficulty';
 import { RETIRED_MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MECH_CHROMAS } from '../src/sim/content/skins';
 import { MOBS } from '../src/sim/data';
@@ -808,8 +808,8 @@ describe('GameServer sessions', () => {
     (server.sim as any).dealDamage(stayerPet, boss, boss.hp + 10, false, 'physical', null, 'hit');
     expect(boss.dead).toBe(true);
     expect({
-      stayerMarks: server.sim.countItem(HEROIC_MARK_ITEM_ID, stayer.pid),
-      leaverMarks: server.sim.countItem(HEROIC_MARK_ITEM_ID, leaver.pid),
+      stayerMarks: server.sim.meta(stayer.pid)!.heroicMarks,
+      leaverMarks: server.sim.meta(leaver.pid)!.heroicMarks,
       stayerLocked: server.sim.meta(stayer.pid)?.raidLockouts.has('hollow_crypt:heroic'),
       leaverLocked: server.sim.meta(leaver.pid)?.raidLockouts.has('hollow_crypt:heroic'),
     }).toEqual({
@@ -875,8 +875,8 @@ describe('GameServer sessions', () => {
     const result = {
       bossDead: boss.dead,
       recipients: boss.lootRecipientIds,
-      stayerMarks: server.sim.countItem(HEROIC_MARK_ITEM_ID, stayer.pid),
-      leaverMarks: server.sim.countItem(HEROIC_MARK_ITEM_ID, leaver.pid),
+      stayerMarks: server.sim.meta(stayer.pid)!.heroicMarks,
+      leaverMarks: server.sim.meta(leaver.pid)!.heroicMarks,
       stayerLocked: server.sim.meta(stayer.pid)?.raidLockouts.has('hollow_crypt:heroic'),
       leaverLocked: server.sim.meta(leaver.pid)?.raidLockouts.has('hollow_crypt:heroic'),
     };
@@ -988,6 +988,23 @@ describe('GameServer sessions', () => {
     await Promise.resolve();
     await Promise.resolve();
     expect(closePlaySession).toHaveBeenCalledWith(99, 1);
+  });
+
+  it('captures friends-mode logout permissions before live account teardown', async () => {
+    const server = new GameServer();
+    const session = expectJoined(server.join(fakeWs(), 22, 202, 'PrivateLogout', 'warrior', null));
+    session.presenceMode = 'friends';
+    const friends = new Set([99]);
+    session.friendAccountIds = friends;
+    const social = (
+      server as unknown as { social: { announcePresence: (...args: unknown[]) => Promise<void> } }
+    ).social;
+    const announce = vi.spyOn(social, 'announcePresence').mockResolvedValue();
+    await server.leave(session, 'test');
+    friends.clear();
+    const logout = announce.mock.calls.find((call) => call[1] === false);
+    expect(logout?.[2]).toMatchObject({ presenceMode: 'friends', friendAccountIds: new Set([99]) });
+    announce.mockRestore();
   });
 
   it('closes the session with the highest level reached for first-session activation', async () => {

@@ -101,30 +101,24 @@ describe('deed_i18n English resolution', () => {
     // 322 with the Mirefen world-boss branch's three combat deeds (cmb_balgath,
     // cmb_balgath_ten, cmb_point_taken), each a name and a desc, no title.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346.
-    // 347 with Gourdlight Eve's seasonal Feat, 348 with its field boss's, 351 with
-    // its three title-writ Feats, 352 with the Haunted Pumpkin hunt's Feat, 356 with the
-    // whole-event checklist (round 12: three sections and the meta).
-    expect(manifest.filter((row) => row.field === 'name').length).toBe(356);
+    // 352 with Lantern Hall's six (three contract milestones, three bought titles).
+    expect(manifest.filter((row) => row.field === 'name').length).toBe(369);
     // 289 descs at the release/v0.43.0 merge: plus the eight world-quest deeds.
     // 296 with the seven faction standing deeds. 298 with the two Clue Scroll
     // casket deeds. 300 with the Coinsack deed, 303 with the Mirefen three.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 327.
-    // 329 with Old Thatchgrin's Feat (feat_old_thatchgrin), 332 with the three
-    // title-writ Feats, 333 with feat_pumpkin_hunter, 337 with the four round 12 Feats.
-    expect(manifest.filter((row) => row.field === 'desc').length).toBe(337);
+    // 333 with Lantern Hall's six.
+    expect(manifest.filter((row) => row.field === 'desc').length).toBe(350);
     // 668 rows: 318 names + 299 descs + 51 titles (the three faction Champion
     // titles Riftwarden, Dawnkeeper and Forgemaster join the 47, then the
     // Clue Scroll Treasure Hunter title); 670 with the Coinsack deed's name and desc;
     // 676 with the Mirefen three.
-    // 729 with Old Thatchgrin's Feat (a name and a desc, no title).
-    // 738 with the three title-writ Feats (a name, a desc and a title each).
-    // 741 with the Haunted Pumpkin hunt's Feat (a name, a desc and the Hollow title).
-    // 750 with round 12's four Feats (a name and a desc each, the Gourdsworn title on the meta).
-    expect(manifest.length).toBe(750);
+    // 740 with Lantern Hall's six names, six descs and three titles.
+    expect(manifest.length).toBe(785);
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 725 rows, 52 titles
     // (the Drowned Temple lore guide's Witness of the Choir).
-    // 55 with Gourdlight Eve's three writ titles, 56 with the Hollow, 57 with the Gourdsworn.
-    expect(manifest.filter((row) => row.field === 'title').length).toBe(57);
+    // 55 with Lantern Hall's three (Writ-Runner, Hallsworn, of Lantern Hall).
+    expect(manifest.filter((row) => row.field === 'title').length).toBe(66);
     expect(manifest.filter((row) => row.id === 'cmb_balgath')).toEqual([
       { id: 'cmb_balgath', field: 'name', source: 'Foreman No More' },
       {

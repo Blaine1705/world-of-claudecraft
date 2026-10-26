@@ -27,9 +27,11 @@
 //               swap every dev kit and DPS fixture onto faction stock)
 // Each faction serves one role family across its whole ladder (the three
 // factions progress in parallel, so every character walks all three):
-//   Rift Watch    Agility (rogue, hunter, feral, enhancement)
+//   Rift Watch    Agility (rogue, hunter)
 //   Church Order  casters and healers
-//   Automatons    Strength and the stamina line (warrior, paladin, shaman)
+//   Automatons    Strength and the stamina line (warrior, paladin, enhancement
+//                 shaman; feral druids wear its jewelry and two-hander, since
+//                 Feral is a Strength spec: content/spec_primary_stat.ts)
 // Budgets are COPIED from the live raid and heroic tables, never invented:
 // jewelry mirrors content/ignivar_loot.ts IGNIVAR_JEWELRY_ITEMS (one 25
 // rating, 15 to 16 primary) and content/heroic_vendor.ts; waist and feet
@@ -44,8 +46,8 @@
 //
 // PRICE. Every row is bought with the selling faction's marks (earned from its
 // World Quests), never coin: buyValue is 0 and the gate carries the mark cost
-// (the one exception is the Valestrider reins, which keep their classic coin
-// price in content/items.ts),
+// (the Valestrider reins included: their def lives in content/items.ts with
+// buyValue 0, and they cost MOUNT_MARKS, above every other Champion row),
 // one figure per standing tier (MARKS below), formulas and recipes a step
 // under the gear of their tier. The allied rows (Cartographer's Ink, the
 // Allied Hearthstone and the Vanguard Duffel) carry no faction: every
@@ -53,6 +55,7 @@
 
 import type { FactionId, StandingTier } from '../factions';
 import { STANDING_THRESHOLDS } from '../factions';
+import { DRIFTHAVEN_NPC_PLACEMENTS_BY_ID } from '../painted_towns';
 import type { ItemDef, NpcDef } from '../types';
 
 export interface FactionVendorGate {
@@ -77,6 +80,8 @@ const MARKS: Readonly<Record<StandingTier, number>> = Object.freeze({
 const FORMULA_MARKS = 50;
 /** Trusted-tier toys (the glider, the target dummy, the battle standard). */
 const TOY_MARKS = 40;
+/** The Champion mount (the Viridian Valestrider): the ladder's headline reward. */
+const MOUNT_MARKS = 500;
 
 function gate(
   factionId: FactionId | undefined,
@@ -108,8 +113,8 @@ export const FACTION_VENDOR_GATES: Readonly<Record<string, FactionVendorGate>> =
   riftwarden_voidblade: gate('rift_watch', 'vanguard'),
   champion_rift_band: gate('rift_watch', 'champion'),
   riftwardens_pendant: gate('rift_watch', 'champion'),
-  // The mount keeps its classic 100 gold coin price (content/items.ts), no marks.
-  reins_avian_strider: gate('rift_watch', 'champion', 0),
+  // The mount is bought with marks like every other row, at its own figure.
+  reins_avian_strider: gate('rift_watch', 'champion', MOUNT_MARKS),
 
   // Church Order
   order_prayer_beads: gate('church_order', 'recognized'),
@@ -937,13 +942,15 @@ export const FACTION_VENDOR_STOCK: Readonly<Record<FactionId, readonly string[]>
 
 /** The 3 Faction Quartermasters and the World Quest Taskmaster. */
 export const FACTION_VENDOR_NPCS: Record<string, NpcDef> = {
-  // Rift Watch Quartermaster: Drifthaven (palmreach)
+  // Rift Watch Quartermaster: Drifthaven (palmreach). He keeps the counter of
+  // the provisioner's shop on the square's east side, looking out at the
+  // square (sim/painted_towns/drifthaven.ts).
   npc_rift_watch_quartermaster: {
     id: 'npc_rift_watch_quartermaster',
     name: 'Quartermaster Vaelen',
     title: 'Rift Watch Provisioner',
-    pos: { x: -302, z: 812 },
-    facing: 0.8,
+    pos: { ...DRIFTHAVEN_NPC_PLACEMENTS_BY_ID.npc_rift_watch_quartermaster.position },
+    facing: DRIFTHAVEN_NPC_PLACEMENTS_BY_ID.npc_rift_watch_quartermaster.facing,
     color: 0x4a7a9a,
     questIds: [],
     greeting:
