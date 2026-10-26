@@ -17,7 +17,7 @@ import {
   type CombatWallPlacement,
   isCombatWallTemplate,
   setCombatWalls,
-  wallAnchor,
+  wallPlacement,
 } from '../sim/instances/combat_wall_state';
 import type { Entity } from '../sim/types';
 
@@ -50,15 +50,7 @@ export function syncClientCombatWalls(world: CombatWallWireWorld): void {
     // Only this slot's walls (a mirrored neighbour is never in interest, but
     // the slot test keeps the publish exact).
     if (instanceSlotForZ(e.pos.z) !== instanceSlotForZ(self.pos.z)) continue;
-    walls.push({
-      id: e.id,
-      templateId: e.templateId,
-      x: wallAnchor(e.templateId, e.pos.x - o.x),
-      z: wallAnchor(e.templateId, e.pos.z - o.z),
-      y: e.pos.y,
-      rot: e.facing,
-      scale: e.scale,
-    });
+    walls.push(wallPlacement(e, o.x, o.z));
   }
   // Entity-id order: the same placement list whatever the map's insertion.
   walls.sort((a, b) => a.id - b.id);

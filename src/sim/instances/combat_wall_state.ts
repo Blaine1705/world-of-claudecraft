@@ -19,6 +19,7 @@
 // Pure leaf: no SimContext, no rng, no entity reads.
 
 import type { Collider } from '../colliders';
+import { noteAppendedColliders } from '../interior_collider_cells';
 
 /** A combat wall's footprint: an oriented box of half extents (hw, hd) about
  *  the object's position and yaw, scaled by the object's `scale`, standing
@@ -44,6 +45,34 @@ export interface CombatWallShape {
 export function wallAnchor(templateId: string, v: number): number {
   const step = COMBAT_WALL_SHAPES[templateId]?.anchorStep;
   return step ? Math.round(v / step) * step : v;
+}
+
+/** A wall entity's placement as both worlds publish it (combat_walls.ts,
+ *  net/combat_wall_wire.ts): instance-local, on its grid for a walking wall,
+ *  whose base height and (round) yaw ride the same grid so a drag over an
+ *  uneven floor republishes only when the anchor moves. */
+export function wallPlacement(
+  e: {
+    id: number;
+    templateId: string;
+    pos: { x: number; y: number; z: number };
+    facing: number;
+    scale: number;
+  },
+  ox: number,
+  oz: number,
+): CombatWallPlacement {
+  const shape = COMBAT_WALL_SHAPES[e.templateId];
+  const step = shape?.anchorStep;
+  return {
+    id: e.id,
+    templateId: e.templateId,
+    x: wallAnchor(e.templateId, e.pos.x - ox),
+    z: wallAnchor(e.templateId, e.pos.z - oz),
+    y: step ? Math.round(e.pos.y / step) * step : e.pos.y,
+    rot: step && shape.round ? 0 : e.facing,
+    scale: e.scale,
+  };
 }
 
 /** Every wall shape, by the object template id that carries it. A new wall
@@ -215,6 +244,8 @@ export function slotWalledColliders(base: Collider[], ox: number, oz: number): C
   const cached = row?.get(oz);
   if (cached && cached.base === base && cached.version === state.version) return cached.list;
   const list = base.concat(state.colliders);
+  // Indexed as the base plus its walls (only the walls' cells re-file).
+  noteAppendedColliders(list, base);
   if (!row) {
     row = new Map();
     composed.set(ox, row);
