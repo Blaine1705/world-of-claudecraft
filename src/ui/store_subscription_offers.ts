@@ -172,9 +172,9 @@ export function subscriptionOffersHtml(
   busy: boolean,
   pendingAnnual: boolean,
   deliveredAnnual: boolean,
-  canDiscoverAnnual = false,
-  tokenBadge = '',
-  nowSeconds = Math.floor(Date.now() / 1000),
+  canDiscoverAnnual: boolean,
+  tokenBadge: string,
+  nowSeconds: number,
 ): string {
   const offers = state.plans ?? [GAME_SUBSCRIPTION_PLANS.game_monthly];
   const badges = offers.map((offer) => planBadgeHtml(offer, state, busy, nowSeconds)).join('');

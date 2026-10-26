@@ -126,6 +126,7 @@ export class StoreSubscription {
       !!this.hooks()?.annualMountClaim &&
         (this.state.canManage || this.state.plan === 'game_annual'),
       this.tokenHtml(),
+      Math.floor(Date.now() / 1000),
     );
   }
 

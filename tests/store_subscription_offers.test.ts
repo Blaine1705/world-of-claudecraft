@@ -55,6 +55,9 @@ describe('membership plan badges', () => {
       false,
       false,
       false,
+      false,
+      '',
+      NOW,
     );
     expect(html).not.toContain('Claudium');
     expect(html).not.toContain('free trial');
