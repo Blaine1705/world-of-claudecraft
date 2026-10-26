@@ -46,6 +46,8 @@ import {
   COUNCIL_NAMES,
   COUNCIL_ROLES,
   type CouncilRole,
+  councilPillarFull,
+  councilPillarTemplate,
   councilSoulTemplate,
   endlessSongMult,
   COUNCIL_TUNING as T,
@@ -214,6 +216,7 @@ function burstSoul(s: CouncilScope, p: CouncilPillar, rubble: boolean): void {
     if (r) dropEncounterObject(s.ctx, s.inst, r.objectId);
   }
   s.st.souls = s.st.souls.filter((q) => q.pillarId !== p.e.id);
+  if (soul && rubble && !s.st.soulsSpent.includes(soul.role)) s.st.soulsSpent.push(soul.role);
   const speaker = firstLiving(s);
   if (soul && speaker && rubble)
     raidWarn(s, speaker, `soulBreak_${soul.role}`, BREAK_LINES[soul.role]);
@@ -501,6 +504,53 @@ export function crumbleSouls(s: CouncilScope): void {
   if (s.st.souls.length === 0) return;
   for (const p of councilPillars(s.ctx, s.inst)) if (p.soul) burstSoul(s, p, false);
   s.st.souls = [];
+}
+
+// ---- the tier changing mid-fight -----------------------------------------------------------
+
+/** Every soul leaves its pillar (the fight left mythic): each soul pillar is a
+ *  plain pillar of its kind again, whole, its bar, its song and its walk gone,
+ *  its soul seen climbing out of the stone. Nothing bursts, nothing falls. */
+export function releaseSouls(s: CouncilScope): number {
+  let n = 0;
+  for (const p of councilPillars(s.ctx, s.inst)) {
+    if (!p.soul) continue;
+    s.ctx.emit({
+      type: 'spellfxAt',
+      x: p.e.pos.x,
+      z: p.e.pos.z,
+      school: 'physical',
+      fx: 'burst',
+      ability: COUNCIL_CUES.soulBurst,
+      radius: p.r,
+    });
+    quietPillar(p.e);
+    p.e.templateId = councilPillarTemplate(councilPillarFull(p.risen), p.risen);
+    n++;
+  }
+  s.st.souls = [];
+  if (n > 0) syncPillarWalls(s.ctx, s.inst);
+  return n;
+}
+
+/**
+ * The fight's tier changed (`/dev heart council mythic|heroic on|off`): apply
+ * Soul in the Stone whole, never half. Off mythic every standing soul leaves
+ * its pillar; onto mythic every member already fallen this pull whose soul
+ * neither stands nor burst takes its pillar now, in the order they fell (the
+ * rest of mythic, the inheritances and the rock, read the rules each tick).
+ * Returns how many souls moved.
+ */
+export function syncSoulsToTier(s: CouncilScope): number {
+  if (!s.rules.soulInTheStone) return releaseSouls(s);
+  if (!firstLiving(s)) return 0;
+  let n = 0;
+  for (const role of s.st.fallen) {
+    if (s.st.souls.some((q) => q.role === role) || s.st.soulsSpent.includes(role)) continue;
+    const body = s.bodies[role];
+    if (body && takeSoul(s, role, body)) n++;
+  }
+  return n;
 }
 
 // ---- dev ------------------------------------------------------------------------------------

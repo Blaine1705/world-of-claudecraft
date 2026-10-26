@@ -112,4 +112,6 @@ export interface CouncilFightState {
   casts: number;
   /** Mythic: the souls standing in pillars, in the order they took them. */
   souls: CouncilSoul[];
+  /** Mythic: the souls whose pillar burst this pull (never taken again). */
+  soulsSpent: CouncilRole[];
 }

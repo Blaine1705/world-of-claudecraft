@@ -83,7 +83,14 @@ import {
   startSong,
   stepResonance,
 } from './council_song';
-import { crumbleSouls, soulDevTrigger, soulReadout, stepSouls, takeSoul } from './council_soul';
+import {
+  crumbleSouls,
+  soulDevTrigger,
+  soulReadout,
+  stepSouls,
+  syncSoulsToTier,
+  takeSoul,
+} from './council_soul';
 import type { CouncilFightState } from './council_state';
 import {
   clearStone,
@@ -199,6 +206,7 @@ function freshState(difficulty: CouncilDifficulty): CouncilFightState {
     lines: [],
     casts: 0,
     souls: [],
+    soulsSpent: [],
   };
 }
 
@@ -573,9 +581,15 @@ export function councilDevTrigger(
   if (verb === 'heroic' || verb === 'mythic') {
     const on = arg !== 'off';
     setCouncilDevTier(inst, verb, on);
-    const st = councilBodies(ctx, inst);
-    const live = st ? councilState(st) : null;
-    if (live) live.difficulty = councilDifficulty(inst);
+    const bodies = councilBodies(ctx, inst);
+    const live = bodies ? councilState(bodies) : null;
+    if (bodies && live && !live.finished) {
+      // A fight in progress takes the new tier whole (council_soul.ts):
+      // off mythic every soul leaves its pillar, onto it every fallen
+      // member's soul takes one, as if it had fallen on mythic.
+      live.difficulty = councilDifficulty(inst);
+      syncSoulsToTier(scopeOf(ctx, inst, live, bodies));
+    } else if (live) live.difficulty = councilDifficulty(inst);
     return on
       ? `The council fights on ${verb} for this run.`
       : `The council fights on ${councilDifficulty(inst)}.`;

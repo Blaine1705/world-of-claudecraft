@@ -182,6 +182,110 @@ describe('Hammer Council mythic: the switch', () => {
   });
 });
 
+describe('Hammer Council mythic: switched mid-fight, applied whole', () => {
+  it('off mythic every live soul leaves its pillar: plain, whole, quiet, standing where it was', () => {
+    const g = pulled();
+    kill(g, 'guardian');
+    kill(g, 'singer');
+    g.tick(20 * 13); // the Echo's bar and the song's clock both running
+    const held = souls(g);
+    expect(held.map((p) => p.soul).sort()).toEqual(['guardian', 'singer']);
+    const ids = held.map((p) => p.e.id);
+    const at = held.map((p) => ({ ...p.e.pos }));
+    const before = g.pillars().length;
+    g.dev('/dev heart council mythic off');
+    expect(g.st.difficulty).toBe('normal');
+    expect(g.st.souls).toEqual([]);
+    expect(souls(g)).toEqual([]);
+    // The same pillars, still standing, plain and whole for their kind.
+    expect(g.pillars().length).toBe(before);
+    ids.forEach((id, i) => {
+      const p = g.pillars().find((q) => q.e.id === id);
+      expect(p, `pillar ${id}`).toBeDefined();
+      if (!p) return;
+      expect(p.soul).toBeNull();
+      expect(p.integrity).toBe(p.risen ? T.risenIntegrity : T.columnIntegrity);
+      expect(p.e.castingAbility).toBeNull();
+      expect(p.e.auras.find((a) => a.id === COUNCIL_AURAS.endlessSong)).toBeUndefined();
+      expect(Math.hypot(p.e.pos.x - at[i].x, p.e.pos.z - at[i].z)).toBeLessThan(1e-9);
+    });
+    // Nothing of mythic keeps running: no Echo, no song, no soul retaken.
+    const ev = g.tick(20 * 25);
+    expect(hitsOf(ev, COUNCIL_NAMES.echo).length).toBe(0);
+    expect(hitsOf(ev, COUNCIL_NAMES.endlessSong).length).toBe(0);
+    expect(souls(g)).toEqual([]);
+    // And it held normal's rule: no pillar a soul's wall shape any more.
+    const o = g.world(0, 0);
+    for (const w of combatWallsAt(o.x, o.z)) expect(w.type).toBe('circle');
+  });
+
+  it('heroic on over mythic releases the souls the same way', () => {
+    const g = pulled();
+    kill(g, 'slabwright');
+    expect(souls(g).length).toBe(1);
+    g.dev('/dev heart council heroic on');
+    expect(g.st.difficulty).toBe('heroic');
+    expect(souls(g)).toEqual([]);
+  });
+
+  it('onto mythic every member already fallen takes its soul now, in the order they fell', () => {
+    const g = pulled('normal');
+    kill(g, 'singer');
+    kill(g, 'guardian');
+    expect(souls(g)).toEqual([]);
+    g.dev('/dev heart council mythic on');
+    expect(g.st.difficulty).toBe('mythic');
+    expect(g.st.souls.map((q) => q.role)).toEqual(['singer', 'guardian']);
+    expect(souls(g).length).toBe(2);
+    // Whole mythic: the souls act and the rock outlives nobody yet.
+    const ev = g.tick(20 * (T.echoFirst + T.echoCast + 0.5));
+    expect(hitsOf(ev, COUNCIL_NAMES.endlessSong).length).toBeGreaterThan(0);
+    // Off and on again: the released souls stand again, a burst one never.
+    g.dev('/dev heart council soulpip 0');
+    expect(g.st.soulsSpent.sort()).toEqual(['guardian', 'singer']);
+    g.dev('/dev heart council mythic off');
+    g.dev('/dev heart council mythic on');
+    expect(souls(g)).toEqual([]);
+  });
+});
+
+describe('Hammer Council mythic: the Walking Slab is cheap to move', () => {
+  it('its collider republishes only as its half-yard anchor moves, never every tick', () => {
+    const f = pulled(undefined, 6);
+    onlyWhole(f, 0);
+    kill(f, 'slabwright');
+    const slab = souls(f)[0];
+    expect(slab?.soul).toBe('slabwright');
+    const s0 = QUARRY_PILLAR_SPOTS[0];
+    const group = { x: s0.x + (MID.x - s0.x) * 0.6, z: s0.z + (MID.z - s0.z) * 0.6 };
+    for (const p of f.players.slice(1)) f.put(p, group.x, group.z);
+    const o = f.world(0, 0);
+    let last = combatWallsAt(o.x, o.z);
+    let publishes = 0;
+    const start = { ...slab.e.pos };
+    const ticks = 20 * 4;
+    for (let i = 0; i < ticks; i++) {
+      f.tick();
+      const now = combatWallsAt(o.x, o.z);
+      if (now !== last) publishes++;
+      last = now;
+    }
+    const walked = Math.hypot(slab.e.pos.x - start.x, slab.e.pos.z - start.z);
+    expect(walked).toBeGreaterThan(T.slabSpeed * 4 * 0.8);
+    // About one publish per anchor step crossed on each axis (half a yard),
+    // well under one a tick.
+    expect(publishes).toBeLessThanOrEqual(Math.ceil((walked / 0.5) * 2) + 2);
+    expect(publishes).toBeLessThan(ticks / 4);
+    // The wall still stands within half an anchor step of the stone.
+    const wall = last.find(
+      (w) =>
+        w.type === 'circle' &&
+        Math.hypot(w.x - (slab.e.pos.x - o.x), w.z - (slab.e.pos.z - o.z)) < 0.36,
+    );
+    expect(wall).toBeDefined();
+  });
+});
+
 describe('Hammer Council: normal and heroic never hold a soul', () => {
   for (const tier of ['normal', 'heroic'] as const) {
     it(`${tier}: every fall leaves the pillars plain and the rock gone with the Slabwright`, () => {
