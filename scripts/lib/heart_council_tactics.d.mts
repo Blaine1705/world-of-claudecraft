@@ -71,6 +71,7 @@ export function rockSpot(o: {
   hazards?: readonly Circle[];
   floor: FloorEllipse;
   home?: Point | null;
+  homeWeight?: number;
   range?: number;
   margin?: number;
 }): Point | null;

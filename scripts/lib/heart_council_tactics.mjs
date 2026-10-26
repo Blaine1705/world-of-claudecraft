@@ -204,6 +204,7 @@ export function rockSpot({
   hazards = [],
   floor,
   home,
+  homeWeight = 0.25,
   range = 24,
   margin = 1.2,
 }) {
@@ -222,7 +223,7 @@ export function rockSpot({
         const inner = soul.soul === 'slabwright' ? COUNCIL_REACH.slabGrind + 0.6 : 1.2;
         if (f > COUNCIL_REACH.soulRock - margin || f < inner) continue;
       }
-      const cost = r + (home ? 0.25 * Math.hypot(at.x - home.x, at.z - home.z) : 0);
+      const cost = r + (home ? homeWeight * Math.hypot(at.x - home.x, at.z - home.z) : 0);
       if (cost < bestCost) {
         bestCost = cost;
         best = at;
