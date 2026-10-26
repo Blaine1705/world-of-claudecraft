@@ -828,16 +828,16 @@ The council's effects are `src/render/smith_heart_fx/council_fx.ts` (pure plan
 | Moment | Look |
 |---|---|
 | The Slabwright, the Seam Singer | Provisional bodies of the kits' own stone, floating pieces stitched by ochre threads of the vein's light like the Heart's colossus: the Slabwright broad and blocky with slab shoulders, the Seam Singer tall and slender with glowing amber seam crystals; both about 2 to 2.5 times a player. Idle breath, a swing, cast poses (the Slabwright raises its arms and slams for Wake the Stone and the rock; the Singer lifts its arms and its crystals flare with the bar), a hunch and white-gold threads when one holds the Wrath, a fall into rubble. Their joints are kept apart from the pieces, so the official pipeline's models replace the pieces only |
-| The pillars | The quarry's carved columns (the Hammer kit's) and the risen stone (the rock kit's needles), each drawing its integrity on the model: a network of seams cracking open and burning hotter, a growing lean, and pips round its foot going dark one by one (a column has two, a risen pillar one; the last one throbs) |
+| The pillars | The quarry's carved columns (the Hammer kit's) and the risen stone (the rock kit's needles), each drawing its integrity on the model: a network of seams cracking open and burning hotter, a growing lean, and its pips round its foot: an arc of light on the floor for each piece it started with and, on it, a carved stone socket holding a gem of the vein's light (a spent one a dark stone; the last one throbs; a flash as one is lost) |
 | A pillar rising | Bursting out of the floor in under a second with a shudder, a ring of dust, shards thrown out and a shock ring at the knockback's reach |
 | A pillar losing a piece | Its seams flash, chips and dust off its face, a short shake |
 | A pillar falling | It tips, breaks and sinks into the floor in a cloud, shards flung; its rubble then lies as a hazard footprint (the danger colour) with the kits' rubble pieces until it is gone |
-| Mountain's Wrath | 2B's (cracks, lifted stones, dust wall) for whichever member holds it; the sight field (the trash engine's, every tier) shows the hatched safe shadow behind each pillar |
+| Mountain's Wrath | 2B's (cracks, lifted stones, dust wall) for whichever member holds it; the sight field (the trash engine's, every tier) shows the hatched safe shadow behind each pillar, faded out right at the camera's lens; over it, the REAL shadow behind each pillar the Wrath cannot see past: a strong dark wedge on the floor (between the two tangents from the caster, from the pillar's far face out to the reach, a hair inside the sim's own cover) with a bright pale rim and a faint curtain of light standing along its edges, so a player at ground level reads exactly where they are safe (`council_shelter_fx.ts`) |
 | The energy | A gauge on the floor round the holder filling with the energy (white-hot past 80) and a glow over its head with rising embers |
 | Hammer's Weight | A slab of stone dropping onto the tank and shattering (a lethal-coloured ring), then the tank's mark: a ring at its feet showing the time left and a stone hanging over its head |
 | Wake the Stone | The circle round its player at the knockback's reach (the control colour, ochre accent), filling with the mark, and the ghost of the pillar growing in it |
 | The heir's rising stone | The same circle locked on the floor (the danger colour) for its 2 s |
-| Falling Rock | The soak round its player (gold: gather in it) filling with the mark, motes drawn in, the boulder dropping out of the sky over its last 1.2 s; the impact's dust, shards and rings |
+| Falling Rock | The soak round its player (gold: gather in it) filling with the mark, motes drawn in; a thick bright rim at the soak's edge cut into one segment per second, each going dark as its second runs out, a white head sweeping to the end; a beacon of gold light over its player; the boulder hanging high over the soak from the moment the mark goes on, sinking, then dropping over its last 1.2 s while its shadow on the floor grows and darkens; the impact's dust, shards and rings (`council_soak_fx.ts`) |
 | Seam Bolt | An ochre crystal shard thrown on an arc with sparks, bursting on its mark |
 | Resonance | A notched ring round the player at the 3.5 yd reach and a shimmer round the body; while it cracks a pillar, a thread of light to that pillar and the pillar humming (shaking, its seams glowing) |
 | The stone remembers | A river of beads of stone light arcing from the fallen to each survivor, a flare on arrival |
@@ -846,8 +846,8 @@ The council's effects are `src/render/smith_heart_fx/council_fx.ts` (pure plan
 | Mythic: a soul pillar | Its cracks always open and burning in the soul's colour (the Guardian an ember red-orange, the Slabwright jade green, the Seam Singer sky blue: none of them a mark's colour), a sheath of that light climbing the stone, three soul pips in it round the foot, motes rising off it; it brightens as its behaviour charges |
 | Mythic: a pip struck off | The stone flashes and chips, the pip's light tears out of its foot in sparks and a ring |
 | Mythic: a soul pillar bursting | A flare of the soul's light, a slow column of it climbing away (the soul dissipating), rings, then the usual fall into rubble |
-| Mythic: Echo of Wrath | While its bar runs: a lethal ring out to the Echo's 45 yd filling with it, a dark shelter wedge behind every other pillar (drawn never wider than the sim's cover), embers drawn into the pillar; on landing rings race out, a wave of dust rolls over the floor, a flash and a shake |
-| Mythic: the Walking Slab | The stone eased along its path every frame, grinding round with a shudder and a dust trail, its two footprints riding with it (the crush lethal, the grind danger); a crush throws shards and dust off its player |
+| Mythic: Echo of Wrath | While its bar runs: a lethal ring out to the Echo's 45 yd filling with it, the real shadow behind every other pillar as the Wrath's (a dark wedge with a bright rim and a light curtain, never wider than the sim's cover), embers drawn into the pillar; on landing rings race out, a wave of dust rolls over the floor, a flash and a shake |
+| Mythic: the Walking Slab | Its own look (the Heart kit's `Kit_SlabCollar`, `Kit_SlabClaw` and `Kit_SlabFace`, `council_slab_fx.ts`): a collar of root rock heaped round its foot, five stone claws round it (the front pair reach out, slam down and bite, then haul the stone forward while the rear three push), a face of cracks on its front with the jade burning in its eyes and mouth, turned the way it drags; the stone lurching and rocking forward on each pull, gouges raked into the floor where the talons bite, grinding dust, its two footprints riding with it (the crush lethal, the grind danger); a crush throws shards and dust off its player and jolts the ground. Still a soul pillar first: its jade cracks, sheath and three jade pips |
 | Mythic: the Endless Song | A notched ring on the floor round the pillar that widens and brightens with every pulse sung, a clock ring closing on the stone until the next pulse, and the pulse's sound rings racing out over the whole Quarry, more of them and brighter as the song grows |
 
 Readability: every footprint (the floor telegraph), ring, gauge, pip, crack and lean draws
@@ -859,6 +859,18 @@ pieces draw with their shared slot materials, warmed with the interior), no ligh
 pools. The council's own cues are claimed (`councilClaims`), so no generic burst doubles
 them; the marks and cues are mirrored entity state, so online looks the same. The Hammer
 kit's plan keeps only the columns' sockets: the column itself is the council's.
+
+**Sound and voice (the polish pass, 2026-10-26).** The council's moments have their own
+sampled sounds (`heart_council_*`, ElevenLabs through `scripts/gen_sfx.mjs`, catalogued in
+`docs/design/sound_effects.md`), played by `src/game/smith_heart_council_audio.ts` off the
+council's own cues, bars and marks (the HUD's generic nova never doubles them): the Wrath's
+charge fitted to its bar and its blast, a pillar rising, cracking and falling, the rock's fall
+as it drops and its impact, the Seam Bolt, the song's swell; on mythic the soul flowing in,
+the Echo's charge and blast, the Walking Slab's grinding loop while it drags and its crush,
+each Endless Song pulse louder and deeper as it grows, a pip struck, a soul pillar bursting.
+The heroic pulse is one soft hum, cooled. The members speak as boss yells
+(`council_voice.ts`, `hudChrome.council.say.*`); their voices are auditions only until the
+designer picks one (`scripts/audition_raid_boss_voices.mjs --set council`).
 
 ## 6. Set pieces (phase 2 specs)
 
@@ -1011,9 +1023,26 @@ soul pillar). Every number here is a SKETCH, unmeasured.
 | Slabwright's soul: the Walking Slab | The pillar drags itself at 1.5 yd a second toward the largest group (the player with the most others within 8 yd, roster order on a tie; its group's centre), re-picked every 3 s, swerving round other pillars and the council's bodies and kept on the pit floor. Its wall moves with it (offline and online: the entity's position rides the snapshot and the combat-wall view follows it, its collider anchored on a half-yard grid in both worlds, `wallAnchor`, so the slot's collider index rebuilds a few times a second rather than every tick). Within 1.5 yd of its face: 380 to 440 and a throw, once per player every 1.5 s (Walking Slab); within 4 yd: 70 to 85 each second (Stone Drag). It shields nothing | `council_soul.ts` (`largestGroup`) |
 | Singer's soul: the Endless Song | A raid-wide pulse every 3 s (first 3 s after), 45 to 55 nature, each pulse 12 percent of the first louder, capped at 4 times it (`endlessSongMult`). The pulse count is a stack of an aura on the pillar and the clock to the next pulse is the pillar's own bar (`heart_endless_song`), so clients read both | `council_soul.ts` |
 
-Open items: the Resonance and Falling Rock tooltips do not yet state their mythic soul-pip
-rule (a wording change re-opens every locale's fill); the Echo's cover is pillars only (the
-Quarry floor is open, so no terrain hides anyone from it).
+The Resonance and Falling Rock tooltips (and the personal alert while a soul pillar stands)
+state the mythic soul-pip rule. The Echo's cover is pillars only (the Quarry floor is open, so
+no terrain hides anyone from it). Switched mid-fight (the dev lines), mythic applies whole
+(`council_soul.ts` `syncSoulsToTier`): off mythic every soul leaves its pillar, which stands
+plain, whole and quiet where it was; onto it every member already fallen takes its soul, in
+fall order, and a soul whose pillar burst is never taken again.
+
+The cover's fairness (polish pass): the line of sight is not widened. The Wrath's cover is the
+pillar's wall (radius 2.6 for a column, 2.2 for a risen pillar) and the carved column's shaft
+is only 1.5 yd round (its plinth 2.2), so a player who sees the stone between them and the
+caster is always covered, with room to spare; the Echo's (`pillarBetween`) is the wall plus a
+0.35 breath. The fix was the drawing: the shelter was a needle from the pillar's centre a full
+pillar narrower than the real shadow, and is now the real shadow.
+
+The Walking Slab's moving wall (polish pass): its half-yard anchor never held (its floor
+height and yaw changed every tick, so the slot republished and the whole field's cell index
+rebuilt every step, about 0.25 ms a tick on a ten-player claim). A walking round wall now
+anchors its height and yaw too (`combat_wall_state.ts` `wallPlacement`), and a walled list
+is indexed as its base's cells with only the walls filed over them
+(`interior_collider_cells.ts` `noteAppendedColliders`): about 0.03 ms a tick.
 
 Deterministic: every pick is ordered (integrity, distance, id; the group by roster order);
 the only rng draws are the damage rolls, in claim-player order, and only on mythic (no
@@ -1265,7 +1294,7 @@ on both difficulties (dungeon rework README, goal 4).
 | `/dev heart council energy <n>` | set the Wrath holder's energy (95: a Wrath in about 3 s) |
 | `/dev heart council <mechanic>` | force one mechanic now: wrath, weight, wake, rock, bolt, song (skips its timing guard), resonance [n] |
 | `/dev heart kill guardian`, `slabwright`, `singer` | kill one council member (try each order of the inheritance); `kill council` or `kill hammer` kills all three |
-| `/dev heart council mythic [on, off]` | the council's mythic prototype for this run (turning it on turns heroic off, and the other way round) |
+| `/dev heart council mythic [on, off]` | the council's mythic prototype for this run (turning it on turns heroic off, and the other way round); mid-fight it applies whole: off, every soul leaves its pillar; on, every member already fallen takes its soul |
 | `/dev heart council soul guardian`, `slabwright`, `singer` | that member's soul takes a pillar now (the most intact, as a fall would), even with the member alive |
 | `/dev heart council soulpip <n>` | leave every soul pillar at n pips (0 to 3; 0 bursts them as a last pip would) |
 

@@ -435,6 +435,127 @@ try {
       }
       await sleep(380);
     },
+    // Polish (SHOT_MYTHIC=1 for the soul ones): the Echo's safe shadows from a
+    // player's own camera at ground level, the Walking Slab's own look, the
+    // Falling Rock's countdown, the council's nameplates round a shared tank.
+    async p1_eco_suelo() {
+      await reset();
+      await pull();
+      await chat('/dev heart council soul guardian', 400);
+      const at = await soulAt();
+      if (at) {
+        // Two raiders behind column 1 (one at the edge of its shadow), one
+        // in the open; the camera behind a hidden raider, low.
+        const deg = 92;
+        const a = (deg * Math.PI) / 180;
+        const cx = MID.x + Math.sin(a) * 24;
+        const cz = MID.z + Math.cos(a) * 24;
+        const d = Math.hypot(cx - at[0], cz - at[1]);
+        const ux = (cx - at[0]) / d;
+        const uz = (cz - at[1]) / d;
+        await raider(1, cx + ux * 5, cz + uz * 5);
+        await raider(2, cx + ux * 8 - uz * 1.6, cz + uz * 8 + ux * 1.6);
+        await raider(3, cx + ux * 6 + uz * 6, cz + uz * 6 - ux * 6);
+        for (let i = 4; i < 8; i++) await raider(i, MID.x - 20 - i, MID.z - 12);
+        await place([cx + ux * 14 + uz * 3, cz + uz * 14 - ux * 3], [cx, cz], 0.0, 0.28, 9);
+      }
+      await setSoul({ timer: 0.05 });
+      await sleep(2300);
+    },
+    async p2_ira_suelo() {
+      await reset();
+      await pull();
+      // The Guardian at the middle; raiders tucked behind column 2.
+      const deg = 164;
+      const a = (deg * Math.PI) / 180;
+      const cx = MID.x + Math.sin(a) * 24;
+      const cz = MID.z + Math.cos(a) * 24;
+      const d = Math.hypot(cx - MID.x, cz - MID.z);
+      const ux = (cx - MID.x) / d;
+      const uz = (cz - MID.z) / d;
+      await raider(1, cx + ux * 5, cz + uz * 5);
+      await raider(2, cx + ux * 7 + uz * 1.5, cz + uz * 7 - ux * 1.5);
+      await raider(3, cx + ux * 6 - uz * 6.5, cz + uz * 6 + ux * 6.5);
+      for (let i = 4; i < 8; i++) await raider(i, MID.x + 18, MID.z - 14 + i);
+      await place([cx + ux * 8 - uz * 2, cz + uz * 8 + ux * 2], [cx, cz], 0.0, 0.32, 8);
+      await sleep(900);
+      await chat('/dev heart council wrath', 0);
+      await sleep(2400);
+    },
+    async p3_losa() {
+      await reset();
+      await pull();
+      const g = [MID.x - 14, MID.z - 8];
+      for (let i = 1; i < 8; i++)
+        await raider(i, g[0] + (i % 3) * 1.5 - 1.5, g[1] + Math.floor(i / 3) * 1.5 - 1.5);
+      await chat('/dev heart council soul slabwright', 600);
+      await sleep(5200);
+      const at = await soulAt();
+      if (at) {
+        const d = Math.hypot(g[0] - at[0], g[1] - at[1]) || 1;
+        const ux = (g[0] - at[0]) / d;
+        const uz = (g[1] - at[1]) / d;
+        await place([at[0] + ux * 9 - uz * 7, at[1] + uz * 9 + ux * 7], at, 0.0, 0.3, 11);
+      }
+      await sleep(1300);
+    },
+    async p4_roca() {
+      await reset();
+      await pull();
+      for (let i = 1; i < 8; i++) await raider(i, MID.x - 12 - i * 0.3, MID.z + 12);
+      await chat('/dev heart council rock', 1500);
+      const st = await state();
+      const pid = st?.rock?.playerId;
+      const at = [MID.x - 2, MID.z - 12];
+      await page.evaluate(
+        ([ox, oz, pid, x, z, raid]) => {
+          const w = window.__game.world;
+          const ids = [pid, ...raid.slice(1, 4)];
+          ids.forEach((id, k) => {
+            const e = w.entities.get(id);
+            if (!e) return;
+            const g = w.ctx.groundPos(ox + x + (k % 2) * 1.6 - 0.8, oz + z + (k > 1 ? 1.4 : -0.6));
+            e.pos = { ...g };
+            e.prevPos = { ...g };
+            w.ctx.rebucket(e);
+          });
+        },
+        [O.x, O.z, pid, at[0], at[1], await page.evaluate(() => window.__raid)],
+      );
+      await place([at[0] - 13, at[1] - 9], at, 0.0, 0.5, 19);
+      // Mid-countdown: about two of its five seconds gone.
+      const until = Date.now() + 8000;
+      while (Date.now() < until) {
+        const s2 = await state();
+        if (!s2?.rock || s2.rock.remaining < 2.6) break;
+        await sleep(25);
+      }
+    },
+    async p5_placas() {
+      await reset();
+      await pull();
+      // The three on the one tank, side by side, the Singer casting.
+      await page.evaluate(
+        ([ox, oz, x, z]) => {
+          const w = window.__game.world;
+          let k = 0;
+          for (const e of w.entities.values()) {
+            if (!/^heart_(hammer_guardian|slabwright|seam_singer)$/.test(e.templateId) || e.dead)
+              continue;
+            const g = w.ctx.groundPos(ox + x + (k - 1) * 3.2, oz + z + (k % 2) * 1.5);
+            e.pos = { ...g };
+            e.prevPos = { ...g };
+            w.ctx.rebucket(e);
+            k++;
+          }
+        },
+        [O.x, O.z, MID.x + 2, MID.z],
+      );
+      for (let i = 1; i < 8; i++) await raider(i, MID.x - 10 - i, MID.z - 6 + i);
+      // After the pull's lines (their bubbles gone).
+      await place([MID.x + 2, MID.z - 20], [MID.x + 2, MID.z], 0.0, 0.3, 20);
+      await sleep(13000);
+    },
     // Review only (never delivered): the two bodies close, the energy, the
     // Weight and a bolt.
     async r_cuerpos() {
