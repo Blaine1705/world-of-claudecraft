@@ -12,7 +12,12 @@ import {
   STACK_OFFSET_PX,
 } from '../src/render/nameplate_declutter';
 import { NAMEPLATE_DOT_SCALE_MAX, nameplateDotRowHeight } from '../src/render/nameplate_dots_core';
-import { nameplateSubRowsLift } from '../src/render/nameplate_heraldry_core';
+import {
+  NAMEPLATE_BOSS_FRAME_LIFT,
+  NAMEPLATE_CAST_ROW_STEP,
+  nameplateBarsLift,
+  nameplateSubRowsLift,
+} from '../src/render/nameplate_heraldry_core';
 
 // Independent oracle literals. This reference exists to catch drift in the
 // optimized spatial-hash implementation, so it must not import the production
@@ -432,6 +437,35 @@ describe('nameplate declutter', () => {
     const originalSy = anchors.map((n) => n.sy);
     declutterNameplates(anchors);
     expect(anchors.map((n) => n.sy)).toEqual(originalSy);
+  });
+});
+
+describe('nameplate declutter: bosses side by side', () => {
+  it("counts a boss frame and a cast bar in a plate's lift", () => {
+    expect(nameplateBarsLift(false, false)).toBe(0);
+    expect(nameplateBarsLift(true, false)).toBe(NAMEPLATE_CAST_ROW_STEP);
+    expect(nameplateBarsLift(false, true)).toBe(NAMEPLATE_BOSS_FRAME_LIFT);
+    expect(nameplateBarsLift(true, true)).toBe(NAMEPLATE_CAST_ROW_STEP + NAMEPLATE_BOSS_FRAME_LIFT);
+  });
+
+  it('stacks the Hammer Council round a shared tank so each name reads', () => {
+    // The capture's case: three boss plates within a name's width, two of
+    // them 19 px apart (one casting): bare labels, they were never nudged.
+    const plates = (lift: (cast: boolean) => number): NameplateAnchor[] => [
+      { id: 1, sx: 640, sy: 380, extraLift: lift(true) },
+      { id: 2, sx: 610, sy: 399, extraLift: lift(false) },
+      { id: 3, sx: 655, sy: 405, extraLift: lift(false) },
+    ];
+    const bare = declutterNameplatesInPlace(plates(() => 0).slice(0, 2));
+    expect(Math.abs(bare[0].sy - bare[1].sy)).toBe(19);
+    const out = declutterNameplatesInPlace(plates((cast) => nameplateBarsLift(cast, true)));
+    const ys = out.map((a) => a.sy).sort((a, b) => a - b);
+    for (let i = 1; i < ys.length; i++)
+      expect(ys[i] - ys[i - 1]).toBeGreaterThanOrEqual(STACK_OFFSET_PX + NAMEPLATE_BOSS_FRAME_LIFT);
+    expectHotPathMatchesReference(
+      plates((cast) => nameplateBarsLift(cast, true)),
+      'council',
+    );
   });
 });
 

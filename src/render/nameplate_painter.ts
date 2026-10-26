@@ -56,7 +56,11 @@ import {
   nameplateDotsInto,
 } from './nameplate_dots_core';
 import { isFriendlyNameplateHidden } from './nameplate_friendly_core';
-import { nameplateHeraldryLift, nameplateSubRowsLift } from './nameplate_heraldry_core';
+import {
+  nameplateBarsLift,
+  nameplateHeraldryLift,
+  nameplateSubRowsLift,
+} from './nameplate_heraldry_core';
 import { NameplatePaintGate } from './nameplate_paint_gate_core';
 import { type NameplatePickCandidate, pickNameplateHealthBarAt } from './nameplate_pick_core';
 import {
@@ -375,7 +379,8 @@ export class NameplatePainter {
       const extraLift =
         nameplateHeraldryLift(state.border) +
         nameplateDotRowHeight(state.dots.count, state.dots.scale) +
-        nameplateSubRowsLift(!!state.guild, state.currentTarget, !!state.title);
+        nameplateSubRowsLift(!!state.guild, state.currentTarget, !!state.title) +
+        nameplateBarsLift(state.castVisible, state.frame === 'boss');
       if (anchor) {
         anchor.id = id;
         anchor.sx = screenX;
