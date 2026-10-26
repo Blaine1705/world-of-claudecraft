@@ -82,7 +82,7 @@ from gravewyrm_sculpt import Sculpt, block
 from gwkit import add_sculpt, crystal, hull, mix, slab, sstep
 from heat_pieces import hex_column, _bundle_layout
 from hckit import GLOW, STONE
-from jaguar_head_sculpt import Ellipsoid, Noise, Polyline, RoundBox, RoundCone, rot
+from jaguar_head_sculpt import Ellipsoid, Noise, Polyline, RoundBox, RoundCone, Torus, rot
 from ring_pieces import (
     BASALT, BASALT_WORN, CHANNEL, CHANNEL_LIP, CURB, CURB_WORN, FASCIA, FASCIA_DARK, FLAG, FLAG_COOL, FLAG_DARK,
     FLAG_PALE, FLAG_WARM, GRIT, _area, _chip, polar_outline, prism_top,
@@ -1461,4 +1461,182 @@ def rubble_scatter(bpy):
             r = rng.uniform(0.0, 3.0)
             crystal(p, (math.cos(a) * r, math.sin(a) * r, 0.04), (1.4, 1.0, 0.05), p.vary((0.36, 0.34, 0.33), 0.04),
                     n=16, boxy=1.0, jitter=0.05, yaw=rng.uniform(0, TAU))
+    return p
+
+
+# ================================================================ the Walking Slab
+# Mythic's Walking Slab (the Slabwright's soul dragging its pillar across the
+# Quarry, src/render/smith_heart_fx/council_slab_fx.ts): the column gains
+# stone claws that grip its foot and drag it, a collar of root rock round its
+# foot, and a face of cracks with the soul's jade light burning in them. The
+# jade is fixed crystal (it carries its emitted colour: the Slabwright's soul
+# is always jade, render/smith_heart_fx/council_fx_core.ts SOUL_COLORS).
+JADE = (0.34, 0.9, 0.55)
+JADE_HOT = (0.8, 1.0, 0.86)
+JADE_DEEP = (0.12, 0.55, 0.32)
+
+
+def _jade_glow(p, f, lines, width, hot=0.0):
+    """The soul's jade burning in carved seams (fixed glow, sRGB)."""
+    for on in lines:
+        pts = [tuple(q) for q in f.snap(np.array(on, dtype=np.float64), lift=-0.05, steps=8)]
+        for i, (q0, q1) in enumerate(zip(pts, pts[1:])):
+            a = Vector(q0)
+            b = Vector(q1)
+            seg = b - a
+            if seg.length < 1e-3:
+                continue
+            t = i / max(1, len(pts) - 2)
+            col = mix(JADE, JADE_HOT, min(1.0, hot + 0.35 * math.sin(t * math.pi)))
+            with p.as_kind(PAINT):
+                crystal(p, tuple((a + b) / 2), (width, width, seg.length * 1.1), p.vary(col, 0.05), n=10,
+                        boxy=0.4, jitter=0.12, yaw=math.atan2(seg.x, -seg.y),
+                        pitch=math.atan2(math.hypot(seg.x, seg.y), seg.z), mat=GLOW)
+
+
+def slab_claw(bpy):
+    """One stone claw of the Walking Slab: a root of the room's granite that
+    grips the column's foot and reaches out to rake the floor. Three knuckled
+    segments arch out and down from a root mass hugging the column's face to
+    a hooked talon dug into the paving; a jade seam of the soul's light runs
+    along its back. Origin where it grips the column at floor level (on the
+    column's face), the claw reaching out along -Y; the runtime sets five
+    round the foot and swings each about its origin as it pulls."""
+    seed = 6301
+    p = HSP('Kit_SlabClaw', seed=seed, ao=0.6, ao_dist=1.2, dust=0.0)
+    rng = np.random.default_rng(seed)
+    f = Sculpt((-1.5, -4.6, -0.9), (1.5, 1.2, 3.4), 0.055)
+    n1 = Noise(seed + 3)
+    spine = [(0.0, 0.5, 2.55), (0.0, -0.35, 2.45), (0.0, -1.45, 2.05), (0.0, -2.45, 1.35),
+             (0.0, -3.25, 0.55), (0.0, -3.7, -0.3)]
+    f.put('g2', Polyline(spine, [0.7, 0.68, 0.56, 0.45, 0.32, 0.14]), 0.25)
+    # The knuckles: a broken block at every joint, turned its own way.
+    for i, (c, s) in enumerate((((0.0, -0.4, 2.5), (1.35, 1.15, 1.05)), ((0.0, -1.5, 2.08), (1.1, 1.0, 0.95)),
+                                ((0.0, -2.5, 1.38), (0.9, 0.85, 0.85)), ((0.0, -3.2, 0.62), (0.62, 0.6, 0.6)))):
+        f.put(TONES[i], block(rng, c, s, cuts=14, chamfer=(0.6, 0.9),
+                              R=rot(rx=float(rng.uniform(-0.35, 0.35)), rz=float(rng.uniform(-0.45, 0.45)))), 0.28)
+    # The grip: a heavy root mass spread against the column's face, and
+    # thinner roots creeping up it.
+    f.put('g0', Ellipsoid((0.0, 0.45, 1.3), (1.05, 0.6, 1.7)), 0.45)
+    for s in (-1, 1):
+        f.put('g1', Polyline([(s * 0.45, 0.6, 2.2), (s * 0.85, 0.85, 3.0), (s * 1.0, 1.0, 3.3)], [0.32, 0.2, 0.08]),
+              0.2)
+    # The talon: a hooked point, dug in.
+    f.put('g3', RoundCone((0.0, -3.35, 0.6), (0.0, -4.05, -0.7), 0.3, 0.035), 0.12)
+    # Two lesser talons either side of it.
+    for s in (-1, 1):
+        f.put('g3', RoundCone((s * 0.3, -3.0, 0.7), (s * 0.75, -3.6, -0.55), 0.2, 0.03), 0.1)
+    f.displace(lambda X, Y, Z: 0.07 * n1.fbm(X * 0.9, Y * 0.9, Z * 0.9, 3)
+               + 0.04 * (n1.ridged(X * 2.2, Y * 2.2, Z * 2.2, 2) - 0.45), band=0.5)
+    seam = _wander(rng, (0.0, 0.1, 3.2), (0.0, -3.1, 1.0), 12, 0.1)
+    lines = _seams(p, f, [seam], width=0.12)
+    _mesh(bpy, p, f, 'SlabClaw', 2000)
+    _jade_glow(p, f, lines, 0.13, hot=0.2)
+    return p
+
+
+def slab_collar(bpy):
+    """The root rock heaped round the Walking Slab's foot: a broken ring of
+    fused boulders and roots of the granite gripping the column (its inner
+    edge just inside the column's face, so it is never a floating ring),
+    jade cracks of the soul's light running through it. Origin at the
+    column's axis on the floor; the hole fits the carved column (radius
+    2.3) and, scaled, the risen pillar."""
+    seed = 6311
+    p = HSP('Kit_SlabCollar', seed=seed, ao=0.6, ao_dist=1.4, dust=0.1)
+    rng = np.random.default_rng(seed)
+    f = Sculpt((-4.2, -4.2, -0.8), (4.2, 4.2, 2.4), 0.07)
+    n1 = Noise(seed + 5)
+    # One fused heap: a low ring of root rock, boulders broken out of it.
+    f.put('g3', Torus((0.0, 0.0, 0.25), 2.7, 0.62, (0.0, 0.0, 1.0)), 0.5)
+    k = 0
+    for i in range(13):
+        a = TAU * i / 13 + float(rng.uniform(-0.1, 0.1))
+        r = float(rng.uniform(2.55, 2.95))
+        s = float(rng.uniform(1.25, 1.75))
+        h = float(rng.uniform(0.8, 1.35))
+        c = (math.cos(a) * r, math.sin(a) * r, h * 0.32)
+        f.put(TONES[k % len(TONES)], Ellipsoid(c, (s * 0.62, s * 0.52, h * 0.55), rot(rz=a)), 0.55)
+        f.put(TONES[(k + 2) % len(TONES)], block(rng, c, (s, s * 0.8, h), cuts=12, chamfer=(0.6, 0.9),
+                                                 R=rot(rz=a + float(rng.uniform(-0.4, 0.4)))), 0.5)
+        k += 1
+    # Roots climbing out of the heap over the plinth onto the shaft (radius
+    # 1.5 above the plinth's 2.2), hugging it.
+    for i in range(8):
+        a = TAU * i / 8 + 0.3
+        f.put('g1', Polyline([(math.cos(a) * 2.6, math.sin(a) * 2.6, 0.7),
+                              (math.cos(a + 0.1) * 2.05, math.sin(a + 0.1) * 2.05, 1.35),
+                              (math.cos(a + 0.2) * 1.62, math.sin(a + 0.2) * 1.62, float(rng.uniform(2.1, 2.8)))],
+                             [0.42, 0.28, 0.08]), 0.25)
+    # The column's own place (its plinth is the collar's inner wall).
+    f.sub(RoundCone((0.0, 0.0, -1.0), (0.0, 0.0, 1.2), 1.95, 1.95), 0.15)
+    f.displace(lambda X, Y, Z: 0.1 * n1.fbm(X * 0.6, Y * 0.6, Z * 0.6, 3)
+               + 0.05 * (n1.ridged(X * 1.6, Y * 1.6, Z * 1.6, 2) - 0.45), band=0.6)
+    _clamp(f, -_axes(f)[2] - 0.35)
+    seams = []
+    for i in range(6):
+        a = TAU * i / 6 + float(rng.uniform(-0.2, 0.2))
+        b = a + float(rng.uniform(0.4, 0.7))
+        seams.append(_wander(rng, (math.cos(a) * 2.7, math.sin(a) * 2.7, 1.3),
+                             (math.cos(b) * 3.3, math.sin(b) * 3.3, 0.5), 8, 0.12))
+    lines = _seams(p, f, seams, width=0.13)
+    _mesh(bpy, p, f, 'SlabCollar', 3200)
+    _jade_glow(p, f, lines, 0.14)
+    return p
+
+
+def slab_face(bpy):
+    """The Walking Slab's face: the column's front split into a face of
+    cracks, the Slabwright's soul looking out of the stone it drags. A curved
+    shield of the column's own granite (its radius, a little proud of it)
+    with a heavy brow ledge over two deep eye sockets, a jagged mouth split
+    under them, cracks running out across the stone; the jade burns in the
+    eyes, the mouth and the cracks. Origin on the column's axis at the floor;
+    the face looks along -Y from 4.6 to 8 yd up (a player's camera sees it
+    over the raid's heads)."""
+    seed = 6321
+    p = HSP('Kit_SlabFace', seed=seed, ao=0.6, ao_dist=1.0, dust=0.0)
+    rng = np.random.default_rng(seed)
+    # The carved column's shaft (hammer_pieces.pit_column: octagonal drums of
+    # radius 1.5); the runtime widens it round a risen pillar's rock.
+    R = 1.5
+    f = Sculpt((-2.4, -3.0, 4.0), (2.4, -0.4, 8.6), 0.045)
+    n1 = Noise(seed + 7)
+    # The shield: a slab of the stone curved round the column (a thick ring
+    # segment, cut to a rough face outline).
+    face_tones = ('g2', 'g0', 'g4', 'g2', 'g4', 'g0', 'g2')
+    for i in range(7):
+        a = math.radians(-48 + i * 16)
+        c = (math.sin(a) * (R + 0.18), -math.cos(a) * (R + 0.18), 6.35 + float(rng.uniform(-0.12, 0.12)))
+        f.put(face_tones[i], block(rng, c, (0.95, 0.5, 3.9 - abs(i - 3) * 0.4), cuts=12, chamfer=(0.55, 0.9),
+                                   R=rot(rz=-a)), 0.4)
+    # The brow: a heavy ledge across the face.
+    f.put('g3', block(rng, (0.0, -(R + 0.55), 7.25), (2.6, 0.8, 0.6), cuts=14, chamfer=(0.55, 0.88),
+                      R=rot(rx=-0.12)), 0.25)
+    # The eye sockets, the mouth.
+    for s in (-1, 1):
+        f.sub(Ellipsoid((s * 0.62, -(R + 0.6), 6.75), (0.36, 0.45, 0.26), rot(rz=s * 0.25)), 0.1)
+    f.sub(RoundBox((0.0, -(R + 0.6), 5.35), (0.72, 0.4, 0.12), 0.08), 0.08)
+    f.displace(lambda X, Y, Z: 0.05 * n1.fbm(X * 1.1, Y * 1.1, Z * 1.1, 3)
+               + 0.03 * (n1.ridged(X * 2.6, Y * 2.6, Z * 2.6, 2) - 0.45), band=0.4)
+    # The cracks of the face: down from the eyes, across the cheeks, the
+    # mouth's jag, up over the brow.
+    y = -(R + 0.7)
+    cracks = [
+        _wander(rng, (-0.62, y, 6.5), (-1.2, y + 0.35, 4.6), 8, 0.08),
+        _wander(rng, (0.62, y, 6.5), (1.3, y + 0.35, 4.5), 8, 0.08),
+        [(-0.75, y, 5.4), (-0.35, y, 5.2), (0.0, y, 5.45), (0.35, y, 5.2), (0.75, y, 5.4)],
+        _wander(rng, (0.0, y, 7.5), (0.3, y + 0.25, 8.4), 6, 0.1),
+        _wander(rng, (-1.0, y + 0.3, 7.0), (-1.9, y + 1.1, 7.8), 6, 0.1),
+    ]
+    lines = _seams(p, f, cracks, width=0.12)
+    _mesh(bpy, p, f, 'SlabFace', 2600)
+    _jade_glow(p, f, lines, 0.12, hot=0.25)
+    # The eyes: a cluster of jade crystal burning in each socket.
+    for s in (-1, 1):
+        for k in range(4):
+            core = (s * 0.62 + float(rng.uniform(-0.12, 0.12)), -(R + 0.42), 6.75 + float(rng.uniform(-0.1, 0.1)))
+            facet_crystal(p, core, (s * 0.2, -1.0, float(rng.uniform(-0.1, 0.25))), float(rng.uniform(0.3, 0.42)),
+                          float(rng.uniform(0.1, 0.15)), p.vary(JADE_HOT if k == 0 else JADE, 0.05), sides=6,
+                          twist=float(rng.uniform(0, TAU)))
     return p

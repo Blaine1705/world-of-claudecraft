@@ -57,6 +57,10 @@ BUILDERS = {
     'ColShardC': lambda: hp.col_shard(bpy, 'C'),
     'TornSocket': lambda: hp.torn_socket(bpy),
     'RubbleScatter': lambda: hp.rubble_scatter(bpy),
+    # Mythic's Walking Slab (the Slabwright's soul dragging its pillar).
+    'SlabClaw': lambda: hp.slab_claw(bpy),
+    'SlabCollar': lambda: hp.slab_collar(bpy),
+    'SlabFace': lambda: hp.slab_face(bpy),
 }
 
 
