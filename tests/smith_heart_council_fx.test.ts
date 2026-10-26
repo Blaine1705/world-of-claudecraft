@@ -81,7 +81,15 @@ describe('council_fx_core: integrity on the model', () => {
   });
 
   it('the rock drops only over its last moments, landing on the floor', () => {
-    expect(rockFall(ROCK_FALL_SECONDS + 0.5).visible).toBe(false);
+    // The rock hangs over the soak for the whole mark, sinking, then drops.
+    expect(rockFall(T.rockMarkSeconds).visible).toBe(true);
+    expect(rockFall(T.rockMarkSeconds + 0.5).visible).toBe(false);
+    expect(rockFall(T.rockMarkSeconds).height).toBeGreaterThan(
+      rockFall(ROCK_FALL_SECONDS + 0.5).height,
+    );
+    expect(rockFall(ROCK_FALL_SECONDS + 0.01).height).toBeGreaterThan(
+      rockFall(ROCK_FALL_SECONDS / 2).height,
+    );
     const mid = rockFall(ROCK_FALL_SECONDS / 2);
     expect(mid.visible).toBe(true);
     expect(rockFall(0.01).height).toBeLessThan(mid.height);
@@ -159,7 +167,17 @@ describe('CouncilFx over a fake world', () => {
     const marked = entity(2, 'player', 'mage', 0, -170);
     const column = entity(10, 'object', councilPillarTemplate(2, false), 16, -147);
     const risen = entity(11, 'object', councilPillarTemplate(3, true), -6, -170);
-    for (const e of [me, marked, column, risen]) entities.set(e.id, e);
+    // The Guardian winding up Mountain's Wrath (its energy full: the holder).
+    const guardian = entity(20, 'mob', 'heart_hammer_guardian', 30, -175);
+    Object.assign(guardian, {
+      resourceType: 'energy',
+      resource: 100,
+      maxResource: 100,
+      castingAbility: COUNCIL_CASTS.wrath,
+      castTotal: T.wrathCast,
+      castRemaining: 2,
+    });
+    for (const e of [me, marked, column, risen, guardian]) entities.set(e.id, e);
     marked.auras.push(aura(COUNCIL_AURAS.rockMark, 3, 5));
     me.auras.push(aura(COUNCIL_AURAS.resonance, 10, 15, 0.4, risen.id));
     const world = { entities, player: me, playerId: me.id } as unknown as IWorld;
@@ -201,6 +219,16 @@ describe('CouncilFx over a fake world', () => {
     expect(shown('smithHeartPillarPips')).toBe(2);
     expect(shown('smithHeartResonanceRing')).toBe(1);
     expect(shown('smithHeartResonanceThread')).toBe(1);
+    // The soak reads from afar: its countdown rim, its beacon, the rock's shadow.
+    expect(shown('smithHeartSoakRim')).toBe(1);
+    expect(shown('smithHeartSoakBeacon')).toBe(1);
+    expect(shown('smithHeartSoakShadow')).toBe(1);
+    // The Wrath's real shadow behind both pillars, with its light curtains.
+    expect(shown('smithHeartShelter:wrath')).toBe(2);
+    expect(shown('smithHeartShelterCurtain:wrath')).toBe(2);
+    guardian.castingAbility = null;
+    fx.update(1 / 30);
+    expect(shown('smithHeartShelter:wrath')).toBe(0);
     expect(shaken).toBeGreaterThan(0);
     // The rock's impact and a fall are claimed and drawn.
     const impact = {

@@ -12,10 +12,19 @@ import { TELEGRAPH_THREAT_COLORS } from '../src/render/floor_telegraph/telegraph
 import { CouncilFx } from '../src/render/smith_heart_fx/council_fx';
 import {
   councilClaims,
+  coverShadow,
   ECHO_SPEC,
-  echoShelter,
+  ROCK_FALL_SECONDS,
+  rockFall,
+  SHELTER_PAD,
+  SLAB_BITE_PHASE,
+  SLAB_CLAWS,
   SOUL_COLORS,
+  shadowPoint,
+  slabPull,
   slabReach,
+  slabTalon,
+  soakCountdown,
   songLook,
   songPulsesOf,
   soulPillarLook,
@@ -55,26 +64,82 @@ describe('council_fx_core: Soul in the Stone', () => {
     expect(soulPillarLook(2, 1, 0.5, out)).toBe(out);
   });
 
-  it("draws the Echo's shelter no wider than the sim's cover", () => {
+  it('the Walking Slab reaches, bites and hauls; still, it rests', () => {
+    expect(SLAB_CLAWS.filter((c) => c.ahead).length).toBe(2);
+    const at = (p: number, d = 1) => ({ ...slabPull(p, d) });
+    // The front claws reach up and out, then dig in once they have bitten.
+    expect(at(0.3).front).toBeGreaterThan(0.2);
+    expect(at(SLAB_BITE_PHASE + 0.05).front).toBeLessThan(0);
+    // The haul: the column surges ahead and rocks forward mid-pull.
+    expect(at(0.75).lurch).toBeGreaterThan(at(0.2).lurch);
+    expect(at(0.75).rock).toBeGreaterThan(0);
+    // One pull is a cycle.
+    expect(at(1.3).front).toBeCloseTo(at(0.3).front);
+    for (const p of [0, 0.3, 0.6, 0.9]) {
+      const still = at(p, 0);
+      expect(
+        Math.abs(still.front) + Math.abs(still.rear) + Math.abs(still.rock) + Math.abs(still.lurch),
+      ).toBe(0);
+    }
+    const t = slabTalon(10, 20, 0, 0, 1);
+    expect(t.x).toBeCloseTo(10);
+    expect(t.z).toBeGreaterThan(25);
+  });
+
+  it('the soak counts down and its rock hangs over it for the whole mark', () => {
+    const start = soakCountdown(T.rockMarkSeconds, T.rockMarkSeconds);
+    const late = soakCountdown(0.2, T.rockMarkSeconds);
+    expect(start.left).toBe(1);
+    expect(late.left).toBeLessThan(0.1);
+    expect(late.shadow).toBeGreaterThan(start.shadow);
+    expect(late.beacon).toBeGreaterThan(start.beacon);
+    // Continuous where it starts to drop.
+    expect(rockFall(ROCK_FALL_SECONDS + 1e-4).height).toBeCloseTo(
+      rockFall(ROCK_FALL_SECONDS).height,
+      2,
+    );
+  });
+
+  it("draws the Echo's and the Wrath's real shadow, never wider than the sim's cover", () => {
     expect(ECHO_SPEC.radius).toBe(T.echoRadius);
     expect(ECHO_SPEC.color).toBe(TELEGRAPH_THREAT_COLORS.lethal);
-    const w = echoShelter(0, 0, 0, 20, 2.6);
+    const sh = { sx: 0, sz: 0, px: 0, pz: 0, r: 0, reach: 0, yaw: 0, half: 0 };
+    const pt = { x: 0, z: 0 };
+    // The Echo: the sim's cover is pillarBetween (wall radius plus a breath).
+    const R = T.columnR;
+    const w = coverShadow(0, 0, 0, 20, R + SHELTER_PAD.echo, T.echoRadius, sh);
     expect(w).not.toBeNull();
     if (!w) return;
     expect(w.yaw).toBeCloseTo(0);
-    expect(w.range).toBeCloseTo(T.echoRadius - 20);
-    // Sample the wedge: every point inside is behind the pillar for the sim.
-    const pillar = [{ e: { pos: { x: 0, z: 20 } }, r: 2.6 }];
-    const half = ((w.arcDeg / 2) * Math.PI) / 180;
-    for (const a of [-half * 0.98, 0, half * 0.98])
-      for (const d of [1, 8, w.range * 0.98]) {
-        const p = { x: Math.sin(w.yaw + a) * d, z: 20 + Math.cos(w.yaw + a) * d };
-        // From the pillar's far face outward (its own footprint is the stone).
-        if (Math.hypot(p.x, p.z - 20) < 2.6) continue;
-        expect(pillarBetween(pillar, { x: 0, z: 0 }, p), `${a} ${d}`).not.toBeNull();
+    const pillar = [{ e: { pos: { x: 0, z: 20 } }, r: R }];
+    let widest = 0;
+    for (const across of [0, 0.02, 0.25, 0.5, 0.75, 0.98, 1])
+      for (const along of [0, 0.01, 0.2, 0.6, 0.98]) {
+        shadowPoint(w, across, along, pt);
+        expect(pillarBetween(pillar, { x: 0, z: 0 }, pt), `${across} ${along}`).not.toBeNull();
+        if (along === 0) widest = Math.max(widest, Math.abs(pt.x));
       }
-    expect(echoShelter(0, 0, 0, 60, 2.6)).toBeNull();
-    expect(echoShelter(0, 0, 0, 1, 2.6)).toBeNull();
+    // The real shadow starts as wide as the pillar (never a needle from its
+    // centre), and widens with the distance.
+    shadowPoint(w, 0, 0, pt);
+    const footHalf = Math.abs(pt.x);
+    shadowPoint(w, 0, 0.98, pt);
+    expect(Math.abs(pt.x)).toBeGreaterThan(footHalf + 1);
+    expect(widest).toBeGreaterThan(R * 0.9);
+    // Mountain's Wrath: the sight line against the wall itself.
+    const v = coverShadow(0, 0, 0, 20, R + SHELTER_PAD.wrath, T.wrathRadius, sh);
+    expect(v).not.toBeNull();
+    if (!v) return;
+    for (const across of [0, 0.5, 1])
+      for (const along of [0, 0.5, 0.98]) {
+        shadowPoint(v, across, along, pt);
+        // Distance from the pillar's centre to the sight segment.
+        const t = Math.max(0, Math.min(1, (20 * pt.z) / (pt.x * pt.x + pt.z * pt.z)));
+        const d = Math.hypot(pt.x * t, pt.z * t - 20);
+        expect(d, `${across} ${along}`).toBeLessThan(R);
+      }
+    expect(coverShadow(0, 0, 0, 60, R, T.echoRadius, sh)).toBeNull();
+    expect(coverShadow(0, 0, 0, 1, R, T.echoRadius, sh)).toBeNull();
   });
 
   it("reads the slab's footprints and the song's growth off the sim", () => {
@@ -184,6 +249,8 @@ describe('CouncilFx: soul pillars over a fake world', () => {
     expect(shown('smithHeartSoulGlow')).toBe(3);
     expect(shown('smithHeartSongFloor')).toBe(1);
     expect(shown('smithHeartSongClock')).toBe(1);
+    // The Echo's real shadow behind the one soulless pillar in its reach.
+    expect(shown('smithHeartShelter:echo')).toBe(1);
     // The slab walks: its drawn stone follows it.
     const holderAt = () => {
       let x = Number.NaN;

@@ -264,17 +264,59 @@ export function wakeGhost(fill: number): { height: number; glow: number } {
   return { height: 0.15 + 0.85 * f * f, glow: 0.25 + 0.75 * f };
 }
 
-/** Seconds before it lands that the falling rock shows over its soak. */
+/** Seconds before it lands that the rock drops (its last, accelerating fall). */
 export const ROCK_FALL_SECONDS = 1.2;
-/** How high over the floor the rock starts its fall. */
+/** How high over the floor that drop begins, and where the rock hangs when
+ *  the mark goes on (it sinks from there through the mark: the soak's threat
+ *  is in the sky for all of its five seconds, never only its last). */
 export const ROCK_FALL_HEIGHT = 20;
+export const ROCK_HANG_HEIGHT = 26;
 
-/** The falling rock over a soak with `remaining` seconds to go: visible, and
- *  its height over the floor (accelerating down). */
-export function rockFall(remaining: number): { visible: boolean; height: number; spin: number } {
-  if (remaining > ROCK_FALL_SECONDS || remaining < 0) return { visible: false, height: 0, spin: 0 };
+/** The rock over a soak with `remaining` of `duration` seconds to go:
+ *  visible for the whole mark, hanging high and turning, sinking slowly,
+ *  then dropping (accelerating) over its last ROCK_FALL_SECONDS. */
+export function rockFall(
+  remaining: number,
+  duration: number = T.rockMarkSeconds,
+): { visible: boolean; height: number; spin: number } {
+  if (remaining < 0 || remaining > Math.max(duration, ROCK_FALL_SECONDS) + 1e-6)
+    return { visible: false, height: 0, spin: 0 };
+  if (remaining > ROCK_FALL_SECONDS) {
+    const hang = Math.max(1e-3, duration - ROCK_FALL_SECONDS);
+    const u = Math.min(1, (remaining - ROCK_FALL_SECONDS) / hang);
+    return {
+      visible: true,
+      height: ROCK_FALL_HEIGHT + (ROCK_HANG_HEIGHT - ROCK_FALL_HEIGHT) * u,
+      spin: (1 - u) * 1.2,
+    };
+  }
   const t = 1 - remaining / ROCK_FALL_SECONDS;
-  return { visible: true, height: ROCK_FALL_HEIGHT * (1 - t * t), spin: t * 4.2 };
+  return { visible: true, height: ROCK_FALL_HEIGHT * (1 - t * t), spin: 1.2 + t * 4.2 };
+}
+
+/** The soak's countdown as it reads from the floor and from afar: the share
+ *  of its time left (the rim's sweep), the beacon over its player (bright as
+ *  the mark goes on, burning hotter to the end), and the rock's shadow on the
+ *  floor (a share of the soak's radius, growing as the rock comes down, its
+ *  darkness). The rim and the sweep are the soak's own radius (the sim's). */
+export function soakCountdown(
+  remaining: number,
+  duration: number,
+  out: { left: number; beacon: number; shadow: number; dark: number } = {
+    left: 0,
+    beacon: 0,
+    shadow: 0,
+    dark: 0,
+  },
+): { left: number; beacon: number; shadow: number; dark: number } {
+  const left = duration > 0 ? Math.max(0, Math.min(1, remaining / duration)) : 0;
+  const fall = rockFall(remaining, duration);
+  const near = 1 - fall.height / ROCK_HANG_HEIGHT;
+  out.left = left;
+  out.beacon = 0.55 + 0.45 * (1 - left);
+  out.shadow = 0.25 + 0.6 * near;
+  out.dark = 0.25 + 0.5 * near;
+  return out;
 }
 
 /** Resonance's ring round a marked player: its radius (the reach a pillar's
@@ -392,26 +434,75 @@ export const ECHO_SPEC = {
   shelterRim: 0xa8e4ff,
 } as const;
 
-/** The shelter a pillar (centre p, radius r) casts from a soul pillar at s
- *  out to the Echo's reach: the wedge's yaw (sim convention, away from s),
- *  its arc in degrees and its range from p's centre; null when p is out of
- *  reach or s stands inside it. Drawn from p's centre with the angle the
- *  shadow subtends at s, it is never wider than the true shadow (a player
- *  inside it is always covered). Pure. */
-export function echoShelter(
+/** How far inside the sim's own cover a drawn shelter's edge stands: the
+ *  Echo's cover is `pillarBetween` (the wall's radius plus a 0.35 breath,
+ *  council_pillars.ts), Mountain's Wrath's the sight line against the wall
+ *  itself (ctx.hasLineOfSight). Drawn a hair inside each, so a player whose
+ *  feet are in the dark is ALWAYS covered. */
+export const SHELTER_PAD = { echo: 0.25, wrath: -0.05 } as const;
+
+/** The real shadow a round cover (centre p, radius r) casts from a point
+ *  source s out to `reach` from s: the floor between the two tangents from
+ *  s, from the cover's far face outward (its width grows with the distance,
+ *  never a needle from the cover's centre). Null when the cover is out of
+ *  reach or s stands inside it. Fills `out`. Pure. */
+export interface CoverShadow {
+  sx: number;
+  sz: number;
+  px: number;
+  pz: number;
+  r: number;
+  reach: number;
+  /** Bearing from s through the cover's centre (sim convention) and the
+   *  half angle the cover subtends at s. */
+  yaw: number;
+  half: number;
+}
+
+export function coverShadow(
   sx: number,
   sz: number,
   px: number,
   pz: number,
   r: number,
-  reach: number = T.echoRadius,
-): { yaw: number; arcDeg: number; range: number } | null {
+  reach: number,
+  out: CoverShadow,
+): CoverShadow | null {
   const dx = px - sx;
   const dz = pz - sz;
   const d = Math.hypot(dx, dz);
-  if (d <= r + 0.1 || d >= reach) return null;
-  const half = Math.asin(Math.min(1, r / d));
-  return { yaw: Math.atan2(dx, dz), arcDeg: (half * 2 * 180) / Math.PI, range: reach - d };
+  if (r <= 0 || d <= r + 0.1 || d + r >= reach) return null;
+  out.sx = sx;
+  out.sz = sz;
+  out.px = px;
+  out.pz = pz;
+  out.r = r;
+  out.reach = reach;
+  out.yaw = Math.atan2(dx, dz);
+  out.half = Math.asin(Math.min(1, r / d));
+  return out;
+}
+
+/** A point of a shadow's floor: `across` 0 to 1 tangent to tangent,
+ *  `along` 0 at the cover's far face to 1 at the reach. Fills `out`. */
+export function shadowPoint(
+  sh: CoverShadow,
+  across: number,
+  along: number,
+  out: { x: number; z: number },
+): { x: number; z: number } {
+  const th = sh.yaw + (2 * Math.max(0, Math.min(1, across)) - 1) * sh.half * 0.995;
+  const ux = Math.sin(th);
+  const uz = Math.cos(th);
+  const qx = sh.px - sh.sx;
+  const qz = sh.pz - sh.sz;
+  const t = qx * ux + qz * uz;
+  const h2 = qx * qx + qz * qz - t * t;
+  const near = t + Math.sqrt(Math.max(0, sh.r * sh.r - h2));
+  const k = near + (sh.reach - near) * Math.max(0, Math.min(1, along));
+  out.x = sh.sx + ux * k;
+  out.z = sh.sz + uz * k;
+  return out;
 }
 
 /** The Walking Slab's footprints: under it (a crush, lethal) and near it
@@ -449,3 +540,76 @@ export function songPulsesOf(nextMult: number): number {
 
 /** Seconds the soul takes to flow from the fallen into its pillar. */
 export const SOUL_TAKE_SECONDS = 1.8;
+
+// ---- mythic: the Walking Slab's own look ---------------------------------------------------
+
+/** The Walking Slab's claws round its foot (the Heart kit's Kit_SlabClaw):
+ *  each one's bearing off the slab's heading (degrees) and whether it reaches
+ *  ahead and pulls (the front pair) or pushes from behind. */
+export const SLAB_CLAWS: readonly { bear: number; ahead: boolean }[] = [
+  { bear: -36, ahead: true },
+  { bear: 36, ahead: true },
+  { bear: 112, ahead: false },
+  { bear: 180, ahead: false },
+  { bear: 248, ahead: false },
+];
+/** Where a claw grips the column (yards from its axis), and its talon's
+ *  reach past that grip. */
+export const SLAB_CLAW_GRIP = 2.35;
+export const SLAB_CLAW_REACH = 3.9;
+/** Seconds of one pull while it drags at full pace. */
+export const SLAB_PULL_SECONDS = 1.15;
+/** The pull's phase when the front talons bite the floor (a gouge each). */
+export const SLAB_BITE_PHASE = 0.5;
+/** Seconds a gouge lies on the floor, fading. */
+export const SLAB_GOUGE_SECONDS = 7;
+
+const smooth01 = (a: number, b: number, x: number): number => {
+  const t = Math.max(0, Math.min(1, (x - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+};
+
+/** One pull of the Walking Slab at `phase` (0 to 1), `drag` how hard it moves
+ *  (0 still, 1 full pace): a front claw's swing about its grip (radians, up
+ *  and out above 0, dug in below), a rear claw's, the column's rock forward
+ *  (radians) and its lurch (yards ahead of its sim spot, a surge on the
+ *  pull). The front claws reach out (0 to 0.42), slam down and bite (to 0.5),
+ *  then haul the stone forward (0.5 to 1) while the rear ones push. Fills
+ *  `out`; still, everything rests (claws dug, the column upright). */
+export function slabPull(
+  phase: number,
+  drag: number,
+  out: { front: number; rear: number; rock: number; lurch: number } = {
+    front: 0,
+    rear: 0,
+    rock: 0,
+    lurch: 0,
+  },
+): { front: number; rear: number; rock: number; lurch: number } {
+  const p = phase - Math.floor(phase);
+  const d = Math.max(0, Math.min(1, drag));
+  const reach = smooth01(0, 0.42, p) * (1 - smooth01(0.42, 0.5, p));
+  const haul = smooth01(0.5, 1, p);
+  out.front = d * (0.5 * reach - 0.16 * (p >= 0.5 ? 1 - haul * 0.6 : smooth01(0.42, 0.5, p)));
+  out.rear = d * (0.22 * Math.sin(Math.PI * haul) - 0.06);
+  out.rock = d * (0.07 * Math.sin(Math.PI * haul) - 0.02 * reach);
+  out.lurch = d * (0.32 * Math.sin(Math.PI * haul) - 0.1);
+  return out;
+}
+
+/** Where a claw's talon bites the floor, from the slab's centre (x, z) and
+ *  heading: the claw's bearing, the grip and the reach. Fills `out`. */
+export function slabTalon(
+  x: number,
+  z: number,
+  heading: number,
+  bear: number,
+  scale: number,
+  out: { x: number; z: number } = { x: 0, z: 0 },
+): { x: number; z: number } {
+  const a = heading + (bear * Math.PI) / 180;
+  const r = (SLAB_CLAW_GRIP + SLAB_CLAW_REACH) * scale;
+  out.x = x + Math.sin(a) * r;
+  out.z = z + Math.cos(a) * r;
+  return out;
+}

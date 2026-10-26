@@ -88,6 +88,8 @@ import {
   wakeGhost,
 } from './council_fx_core';
 import { type CouncilFxHost, CouncilPillarsFx, RISEN_HEIGHT } from './council_pillars_fx';
+import { CouncilShelters } from './council_shelter_fx';
+import { CouncilSoakFx } from './council_soak_fx';
 import { CouncilSoulFx } from './council_soul_fx';
 import { chunkGeometry, Rubble } from './hammer_fx';
 
@@ -319,6 +321,12 @@ export class CouncilFx {
   private readonly materials: THREE.Material[] = [];
   private readonly pillarsFx: CouncilPillarsFx;
   private readonly soulFx: CouncilSoulFx;
+  /** The real safe shadows behind the pillars, for the Wrath and the Echo. */
+  private readonly shelters: CouncilShelters;
+  /** The soak's countdown rim, beacon and the rock's shadow. */
+  private readonly soak: CouncilSoakFx;
+  /** When the Wrath's shelters were last laid (the host clock), or -1. */
+  private wrathLaidAt = -1;
   /** The council's sounds (game/smith_heart_council_audio.ts), fed by this
    *  painter's cues, scan and frame. */
   private readonly audio = new CouncilAudio(sfx);
@@ -405,7 +413,9 @@ export class CouncilFx {
       materials: this.materials,
     };
     this.pillarsFx = new CouncilPillarsFx(host, carrier);
-    this.soulFx = new CouncilSoulFx(host, this.pillarsFx);
+    this.shelters = new CouncilShelters(host, this.pillarsFx);
+    this.soak = new CouncilSoakFx(this.root, this.uTime, this.geometries, this.materials);
+    this.soulFx = new CouncilSoulFx(host, this.pillarsFx, this.shelters);
     const bandGeo = new THREE.CylinderGeometry(1, 1, 1, 40, 1, true).translate(0, 0.5, 0);
     const ringGeo = new THREE.RingGeometry(0.93, 1, 96, 1).rotateX(-Math.PI / 2);
     const threadGeo = new THREE.CylinderGeometry(1, 1, 1, 8, 1, true)
@@ -753,6 +763,7 @@ export class CouncilFx {
     this.updateBolts(world, dt);
     this.updateStreams(world, dt);
     this.updateEnergy(world, dt);
+    this.updateWrathShelters(world);
     this.audio.update(dt, (id) => world.entities.get(id));
     this.debris.update(dt);
     this.particles.update(this.clock);
@@ -985,18 +996,25 @@ export class CouncilFx {
   }
 
   private updateRocks(world: IWorld): void {
-    for (const r of this.rocks) {
-      if (r.playerId < 0) continue;
+    for (let i = 0; i < this.rocks.length; i++) {
+      const r = this.rocks[i];
+      if (r.playerId < 0) {
+        this.soak.hide(i);
+        continue;
+      }
       const p = world.entities.get(r.playerId);
       const a = auraById(p, COUNCIL_AURAS.rockMark);
       if (!p || !a) {
         r.mesh.visible = false;
+        this.soak.hide(i);
         continue;
       }
-      const fall = rockFall(a.remaining);
+      const y = this.groundY(p.pos.x, p.pos.z);
+      const duration = a.duration > 0 ? a.duration : T.rockMarkSeconds;
+      this.soak.paint(i, p.pos.x, y, p.pos.z, T.rockRadius, a.remaining, duration);
+      const fall = rockFall(a.remaining, duration);
       r.mesh.visible = fall.visible;
       if (!fall.visible) continue;
-      const y = this.groundY(p.pos.x, p.pos.z);
       r.mesh.position.set(p.pos.x, y + 1.6 + fall.height, p.pos.z);
       r.mesh.quaternion.setFromAxisAngle(r.spinAxis, fall.spin);
       // A trail of grit off the falling stone.
@@ -1424,6 +1442,27 @@ export class CouncilFx {
       _moteColor[2] = look.crackle ? 0.7 : 0.32;
       this.particles.puff(e.pos.x + Math.sin(a) * r, y + 0.4, e.pos.z + Math.cos(a) * r, 1, _ember);
     }
+  }
+
+  /** Mountain's Wrath's bar on its holder: the real shadow behind every
+   *  pillar that covers from it, laid as the bar begins and again as the
+   *  pillars change, fading in over the bar's first moments. */
+  private updateWrathShelters(world: IWorld): void {
+    const e = this.haloHolder >= 0 ? world.entities.get(this.haloHolder) : undefined;
+    const casting = !!e && !e.dead && e.castingAbility === COUNCIL_CASTS.wrath && e.castTotal > 0;
+    if (!casting || !e) {
+      if (this.wrathLaidAt >= 0) {
+        this.shelters.hide('wrath');
+        this.wrathLaidAt = -1;
+      }
+      return;
+    }
+    if (this.wrathLaidAt < 0 || this.clock - this.wrathLaidAt > 0.25) {
+      this.wrathLaidAt = this.clock;
+      this.shelters.lay('wrath', e.pos.x, e.pos.z, T.wrathRadius);
+    }
+    const fill = Math.max(0, Math.min(1, 1 - e.castRemaining / e.castTotal));
+    this.shelters.paint('wrath', Math.min(0.92, 0.45 + fill * 2));
   }
 
   dispose(): void {

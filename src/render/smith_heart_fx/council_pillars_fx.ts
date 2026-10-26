@@ -46,10 +46,13 @@ import {
   SOUL_COLORS,
   soulPillarLook,
 } from './council_fx_core';
+import { CouncilPipSockets } from './council_pip_sockets';
+import { CouncilSlabRigs } from './council_slab_fx';
 import type { Rubble } from './hammer_fx';
 import { fxHash } from './hammer_fx_core';
 
 const SMITH_HEART = 'smith_heart';
+const _slab = { lurch: 0, rock: 0, heading: 0 };
 const COLUMN_PIECE = 'Kit_PitColumn';
 const NEEDLE_PIECES = ['Kit_RockNeedleA', 'Kit_RockNeedleB'] as const;
 /** A risen pillar's drawn height and radius (its wall's: 2.2 by 10). */
@@ -243,6 +246,8 @@ void main() {
 `;
 
 interface PillarSlot {
+  /** Its place in the pool (its sockets' row). */
+  index: number;
   id: number;
   state: 'idle' | 'standing' | 'falling' | 'sinking';
   risen: boolean;
@@ -294,6 +299,10 @@ interface RubbleSlot {
 
 export class CouncilPillarsFx {
   private readonly pillars: PillarSlot[] = [];
+  /** Mythic: the Walking Slab's claws, collar, face and gouges. */
+  private readonly slabs: CouncilSlabRigs;
+  /** The pips as carved stone sockets holding their light. */
+  private readonly sockets: CouncilPipSockets;
   private readonly rubble: RubbleSlot[] = [];
   /** Crack shells by kit piece (built once the kit lands). */
   private readonly shellGeo = new Map<string, THREE.BufferGeometry>();
@@ -315,6 +324,8 @@ export class CouncilPillarsFx {
     const sheathGeo = new THREE.CylinderGeometry(1, 1.06, 1, 36, 1, true).translate(0, 0.5, 0);
     this.h.geometries.push(pipGeo, drumGeo, sheathGeo);
     const drumMat = surfaceMat({ color: 0x8c8274, roughness: 0.9, flatShading: true });
+    this.slabs = new CouncilSlabRigs(h, POOLS.souls);
+    this.sockets = new CouncilPipSockets(h.root, POOLS.pillars, h.geometries, h.materials);
     // ---- the pillars ----
     for (let i = 0; i < POOLS.pillars; i++) {
       const holder = new THREE.Group();
@@ -404,6 +415,7 @@ export class CouncilPillarsFx {
       leanYaw.add(soulGlow);
       this.h.root.add(holder);
       this.pillars.push({
+        index: i,
         id: -1,
         state: 'idle',
         risen: false,
@@ -531,6 +543,7 @@ export class CouncilPillarsFx {
   update(dt: number): void {
     this.updatePillars(dt);
     this.updateRubble();
+    this.slabs.update(dt);
   }
 
   /** A kit piece's local box (its baked stone, else any slot), cached. */
@@ -662,6 +675,7 @@ export class CouncilPillarsFx {
 
   /** Light a pillar with a soul's colours (or put the stone's own back). */
   private setSoul(s: PillarSlot, soul: CouncilRole | null): void {
+    if (s.soul === 'slabwright' && soul !== 'slabwright') this.slabs.detach(s.id);
     s.soul = soul;
     const u = s.shellMat.uniforms;
     const pu = s.pipsMat.uniforms;
@@ -874,6 +888,7 @@ export class CouncilPillarsFx {
     }
     const y = this.h.groundY(x, z);
     if (best) {
+      this.slabs.detach(best.id);
       best.state = 'falling';
       best.endAt = this.h.now();
       best.id = -1;
@@ -918,6 +933,7 @@ export class CouncilPillarsFx {
 
   /** A pillar left without a fall (a reset, the council's fall): it sinks. */
   private sinkPillar(s: PillarSlot): void {
+    this.slabs.detach(s.id);
     s.state = 'sinking';
     s.endAt = this.h.now();
     s.id = -1;
@@ -967,6 +983,13 @@ export class CouncilPillarsFx {
         s.pipsMat.uniforms.uSlots.value = pillarPipSlots(s.risen);
         s.pipsMat.uniforms.uFlash.value = flash;
         s.pips.visible = true;
+        this.paintSockets(
+          s,
+          pillarPipSlots(s.risen),
+          pillarPips(s.integrity, s.risen),
+          C.pipLit,
+          flash,
+        );
         // Grit off a cracked pillar.
         if (look.grit > 0 && this.h.density > 0.5) {
           s.grit += dt * look.grit;
@@ -987,6 +1010,7 @@ export class CouncilPillarsFx {
         tip = fall.tip;
         sunk = fall.sunk;
         s.pips.visible = false;
+        this.sockets.hide(s.index);
         if (s.soul) s.soulGlowMat.uniforms.uAlpha.value = Math.max(0, 0.6 * fall.alpha);
         s.shellMat.uniforms.uCrack.value = 1;
         s.shellMat.uniforms.uHeat.value = 1.3;
@@ -999,6 +1023,7 @@ export class CouncilPillarsFx {
         const t = Math.min(1, (this.h.now() - s.endAt) / PILLAR_SETTLE_SECONDS);
         sunk = t * t;
         s.pips.visible = false;
+        this.sockets.hide(s.index);
         if (t >= 1) {
           this.retirePillar(s);
           continue;
@@ -1015,7 +1040,33 @@ export class CouncilPillarsFx {
     }
   }
 
+  /** A pillar's sockets round its foot, where its floor ring's arcs lie. */
+  private paintSockets(
+    s: PillarSlot,
+    slots: number,
+    lit: number,
+    hex: number,
+    flash: number,
+    out = 0,
+  ): void {
+    const p = s.holder.position;
+    // `out`: past the Walking Slab's collar and claws, so its pips show.
+    this.sockets.paint(
+      s.index,
+      p.x,
+      s.y,
+      p.z,
+      s.pips.scale.x * 1.08 + out,
+      slots,
+      lit,
+      hex,
+      flash,
+      this.h.now(),
+    );
+  }
+
   private retirePillar(s: PillarSlot): void {
+    this.sockets.hide(s.index);
     s.state = 'idle';
     s.id = -1;
     s.holder.visible = false;
@@ -1031,21 +1082,38 @@ export class CouncilPillarsFx {
     const soul = s.soul as CouncilRole;
     const now = this.h.now();
     let jitter = 0;
+    let rock = 0;
     if (soul === 'slabwright') {
       const e = s.id >= 0 ? this.h.entity(s.id) : undefined;
       if (e) {
         const k = 1 - Math.exp(-dt * 10);
         const nx = s.x + (e.pos.x - s.x) * k;
         const nz = s.z + (e.pos.z - s.z) * k;
-        const step = Math.hypot(nx - s.x, nz - s.z);
+        const dx = nx - s.x;
+        const dz = nz - s.z;
+        const step = Math.hypot(dx, dz);
         s.x = nx;
         s.z = nz;
         s.y = this.h.groundY(nx, nz);
-        s.holder.position.set(s.x, s.y, s.z);
+        if (!this.slabs.has(s.id)) this.slabs.attach(s.id, s, s.risen, s.x, s.z);
+        if (this.slabs.follow(s.id, s.x, s.z, dx, dz, dt, _slab)) {
+          // Its own walk: the face to the heading, the stone rocking forward
+          // and lurching on each pull (its sim spot never moves for it).
+          s.leanYaw.rotation.y = _slab.heading;
+          s.bodyYaw.rotation.y = s.rot - _slab.heading;
+          rock = _slab.rock;
+          s.holder.position.set(
+            s.x + Math.sin(_slab.heading) * _slab.lurch,
+            s.y,
+            s.z + Math.cos(_slab.heading) * _slab.lurch,
+          );
+        } else {
+          s.holder.position.set(s.x, s.y, s.z);
+          // Until the kit is in: the stone grinds round as it drags.
+          if (step > 1e-4) s.bodyYaw.rotation.y += (step / Math.max(1, s.radius)) * 0.35;
+        }
         if (step > 1e-4) {
-          // The stone grinds round as it drags: a slow turn, a shudder.
-          s.bodyYaw.rotation.y += (step / Math.max(1, s.radius)) * 0.35;
-          jitter = 0.05;
+          jitter = 0.03;
           s.grit += dt * 16 * this.h.density;
           while (s.grit >= 1) {
             s.grit -= 1;
@@ -1076,6 +1144,14 @@ export class CouncilPillarsFx {
     s.pipsMat.uniforms.uSlots.value = T.soulPips;
     s.pipsMat.uniforms.uFlash.value = flash;
     s.pips.visible = true;
+    this.paintSockets(
+      s,
+      T.soulPips,
+      s.integrity,
+      SOUL_COLORS[soul].hex,
+      flash,
+      soul === 'slabwright' ? 0.9 : 0,
+    );
     // Its light rising off the cracks.
     if (this.h.density > 0.5) {
       s.motes += dt * (6 + charge * 18);
@@ -1096,7 +1172,7 @@ export class CouncilPillarsFx {
     }
     jitter += rise.shudder + charge * 0.04;
     if (this.h.reducedMotion()) jitter = 0;
-    s.lean.rotation.x = 0;
+    s.lean.rotation.x = rock;
     s.leanYaw.position.set(
       jitter ? (this.h.rand() - 0.5) * 2 * jitter : 0,
       -rise.sunk * s.height,

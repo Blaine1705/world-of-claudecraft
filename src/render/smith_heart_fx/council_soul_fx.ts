@@ -35,13 +35,13 @@ import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import {
   COUNCIL_FX_COLORS as C,
   ECHO_SPEC,
-  echoShelter,
   COUNCIL_FX_POOLS as POOLS,
   SOUL_COLORS,
   songLook,
   songPulsesOf,
 } from './council_fx_core';
 import type { CouncilFxHost, CouncilPillarsFx } from './council_pillars_fx';
+import type { CouncilShelters } from './council_shelter_fx';
 
 const RING_VERT = /* glsl */ `
 varying vec2 vXZ;
@@ -88,54 +88,8 @@ interface SoulSlot {
   embers: number;
 }
 
-/** Stations along a shelter wedge's arc. */
-const SHELTER_SEG = 14;
-
-const SHELTER_VERT = /* glsl */ `
-attribute float aSide;
-attribute float aAlong;
-varying float vSide;
-varying float vAlong;
-varying vec2 vXZ;
-void main() {
-  vSide = aSide;
-  vAlong = aAlong;
-  vec4 w = modelMatrix * vec4(position, 1.0);
-  vXZ = w.xz;
-  gl_Position = projectionMatrix * viewMatrix * w;
-}
-`;
-/** The Echo's shelter: a dark, hatched shadow (the Echo cannot see here)
- *  with a pale rim along its two sides, fading out at the Echo's reach. */
-const SHELTER_FRAG = /* glsl */ `
-uniform float uTime;
-uniform float uAlpha;
-uniform vec3 uDark;
-uniform vec3 uRim;
-varying float vSide;
-varying float vAlong;
-varying vec2 vXZ;
-void main() {
-  float edge = 1.0 - min(vSide, 1.0 - vSide) * 2.0;
-  float rim = smoothstep(0.78, 0.96, edge);
-  float hatch = step(0.5, fract((vXZ.x + vXZ.y) * 0.7 - uTime * 0.35));
-  float fade = 1.0 - smoothstep(0.82, 1.0, vAlong);
-  vec3 col = mix(uDark, uRim, rim);
-  float a = uAlpha * fade * mix(0.66 + 0.16 * hatch, 1.0, rim);
-  gl_FragColor = vec4(col, a);
-  #include <colorspace_fragment>
-}
-`;
-
-interface WedgeSlot {
-  mesh: THREE.Mesh;
-  pos: THREE.BufferAttribute;
-  used: boolean;
-}
-
 /** Per-frame scratch (the frame allocates nothing). */
 const _paint = { fill: 0, clock: 0, range: 0, fade: 1 };
-const _shelters: { x: number; z: number; r: number }[] = [];
 const _rgb: [number, number, number] = [1, 1, 1];
 const _ember = {
   speed: 0,
@@ -188,12 +142,10 @@ const _song = { mult: 1, rings: 1, bright: 0, floor: 0 };
 
 export class CouncilSoulFx {
   private readonly slots: SoulSlot[] = [];
-  private readonly wedges: WedgeSlot[] = [];
-  private readonly shelterMat: THREE.ShaderMaterial;
-
   constructor(
     private readonly h: CouncilFxHost,
     private readonly pillars: CouncilPillarsFx,
+    private readonly shelters: CouncilShelters,
   ) {
     const ringGeo = new THREE.RingGeometry(0.9, 1, 120, 1).rotateX(-Math.PI / 2);
     this.h.geometries.push(ringGeo);
@@ -253,53 +205,6 @@ export class CouncilSoulFx {
         embers: 0,
       });
     }
-    this.shelterMat = new THREE.ShaderMaterial({
-      name: 'smithHeartEchoShelter',
-      uniforms: {
-        uTime: this.h.uTime,
-        uAlpha: { value: 0 },
-        uDark: { value: new THREE.Color(ECHO_SPEC.shelter) },
-        uRim: { value: new THREE.Color(ECHO_SPEC.shelterRim) },
-      },
-      vertexShader: SHELTER_VERT,
-      fragmentShader: SHELTER_FRAG,
-      transparent: true,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-    });
-    this.h.materials.push(this.shelterMat);
-    for (let i = 0; i < POOLS.wedges; i++) {
-      const g = new THREE.BufferGeometry();
-      const n = (SHELTER_SEG + 1) * 2;
-      const pos = new THREE.BufferAttribute(new Float32Array(n * 3), 3).setUsage(
-        THREE.DynamicDrawUsage,
-      );
-      const side = new Float32Array(n);
-      const along = new Float32Array(n);
-      const index: number[] = [];
-      for (let k = 0; k <= SHELTER_SEG; k++) {
-        side[k * 2] = k / SHELTER_SEG;
-        side[k * 2 + 1] = k / SHELTER_SEG;
-        along[k * 2] = 0;
-        along[k * 2 + 1] = 1;
-        if (k < SHELTER_SEG) {
-          const b = k * 2;
-          index.push(b, b + 1, b + 2, b + 1, b + 3, b + 2);
-        }
-      }
-      g.setAttribute('position', pos);
-      g.setAttribute('aSide', new THREE.BufferAttribute(side, 1));
-      g.setAttribute('aAlong', new THREE.BufferAttribute(along, 1));
-      g.setIndex(index);
-      this.h.geometries.push(g);
-      const mesh = new THREE.Mesh(g, this.shelterMat);
-      mesh.name = 'smithHeartEchoShelter';
-      mesh.renderOrder = floorVfxRenderOrder('encounter', 24);
-      mesh.frustumCulled = false;
-      mesh.visible = false;
-      this.h.root.add(mesh);
-      this.wedges.push({ mesh, pos, used: false });
-    }
   }
 
   beginScan(): void {
@@ -355,39 +260,12 @@ export class CouncilSoulFx {
   }
 
   private freeWedges(): void {
-    for (const w of this.wedges) {
-      w.used = false;
-      w.mesh.visible = false;
-    }
+    this.shelters.hide('echo');
   }
 
-  /** Lay the Echo's shelter wedges behind every soulless pillar it reaches. */
+  /** Lay the Echo's real shadows behind every soulless pillar it reaches. */
   private layWedges(x: number, z: number): void {
-    this.freeWedges();
-    const n = this.pillars.shelters(_shelters);
-    let k = 0;
-    for (let i = 0; i < n && k < this.wedges.length; i++) {
-      const p = _shelters[i];
-      const w = echoShelter(x, z, p.x, p.z, p.r, ECHO_SPEC.radius);
-      if (!w) continue;
-      const slot = this.wedges[k++];
-      // From the pillar's face out to the Echo's reach, on the floor.
-      const half = ((w.arcDeg / 2) * Math.PI) / 180;
-      for (let j = 0; j <= SHELTER_SEG; j++) {
-        const a = w.yaw - half + (2 * half * j) / SHELTER_SEG;
-        const sx = Math.sin(a);
-        const sz = Math.cos(a);
-        const ix = p.x + sx * p.r;
-        const iz = p.z + sz * p.r;
-        const ox = p.x + sx * (p.r + w.range);
-        const oz = p.z + sz * (p.r + w.range);
-        slot.pos.setXYZ(j * 2, ix, this.h.groundY(ix, iz) + 0.09, iz);
-        slot.pos.setXYZ(j * 2 + 1, ox, this.h.groundY(ox, oz) + 0.09, oz);
-      }
-      slot.pos.needsUpdate = true;
-      slot.mesh.visible = true;
-      slot.used = true;
-    }
+    this.shelters.lay('echo', x, z, ECHO_SPEC.radius);
   }
 
   // ---- the frame ----------------------------------------------------------------------------
@@ -434,7 +312,7 @@ export class CouncilSoulFx {
     const fill = Math.max(0, Math.min(1, 1 - e.castRemaining / e.castTotal));
     this.h.kit.paintFan(s.outer, paint(fill, clock, ECHO_SPEC.radius));
     // The shelters fade in over the bar's first moments.
-    this.shelterMat.uniforms.uAlpha.value = Math.min(1, 0.4 + fill * 2);
+    this.shelters.paint('echo', Math.min(0.92, 0.45 + fill * 2));
     this.pillars.charge.set(s.pillarId, fill);
     // Embers drawn in from the floor round it.
     if (this.h.density > 0.5) {
@@ -580,10 +458,10 @@ export class CouncilSoulFx {
     const p = this.h.entity(targetId);
     if (!p) return;
     const y = this.h.groundY(p.pos.x, p.pos.z);
-    const n = Math.round(18 * this.h.density);
+    const n = Math.round(30 * this.h.density);
     for (let i = 0; i < n; i++) {
       const a = this.h.rand() * Math.PI * 2;
-      const sp = 3 + this.h.rand() * 6;
+      const sp = 3 + this.h.rand() * 7;
       this.h.debris.throw(
         p.pos.x,
         y + 0.8,
@@ -603,6 +481,7 @@ export class CouncilSoulFx {
       color: C.dust,
       alpha: 0.5,
     });
-    this.h.shakeNear(p.pos.x, p.pos.z, 0.35, 25);
+    // A heavy stone running a player down: the ground itself jolts.
+    this.h.shakeNear(p.pos.x, p.pos.z, 0.75, 30);
   }
 }
