@@ -25830,4 +25830,20 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.pvpEntry': 'Wejście do aktywnego kręgu włącza PvP w świecie.',
   'hudChrome.hill.pvpBanner': 'PvP',
   'hudChrome.nameplate.hillBountyTag': 'Nagroda {honor}',
+  'hudChrome.wocStore.membershipsTab': 'Członkostwa',
+  'hudChrome.wocStore.membershipsUnavailable':
+    'Członkostwa są obecnie niedostępne. Spróbuj ponownie za chwilę.',
+  'hudChrome.wocStore.subscription.addMonth': 'Dodaj 1 miesiąc',
+  'hudChrome.wocStore.subscription.addYear': 'Dodaj 12 miesięcy',
+  'hudChrome.wocStore.subscription.billingBlocked':
+    'Zaktualizuj dane płatności w sekcji Zarządzaj subskrypcją, zanim dodasz czas członkostwa.',
+  'hudChrome.wocStore.subscription.endsOn': 'Członkostwo kończy się {date}',
+  'hudChrome.wocStore.subscription.renewsOn': 'Odnowienie: {date}',
+  'hudChrome.wocStore.subscription.stackCapped':
+    'Możesz zgromadzić maksymalnie 2 lata członkostwa naraz. Spróbuj ponownie bliżej daty odnowienia.',
+  'hudChrome.wocStore.subscription.stackTerms':
+    'Płatność następuje teraz. Czas zostanie dodany na koniec obecnego członkostwa, które następnie odnowi się zgodnie z tym planem.',
+  'hudChrome.wocStore.subscription.stackUnavailable':
+    'Dodawanie czasu członkostwa jest obecnie niedostępne. Spróbuj ponownie za chwilę.',
+  'hudChrome.wocStore.subscription.tokenPrice': '{price} za 30 dni',
 };

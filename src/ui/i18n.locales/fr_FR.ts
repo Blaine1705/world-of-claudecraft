@@ -26264,4 +26264,20 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPvpPage.hillBody':
     "Toutes les deux heures, une colline apparaît dans une des zones Les Terres du Dragon, Le Voile de Givre ou La Chute d'Ambre. Le royaume reçoit un avertissement quinze minutes avant et le cercle est marqué en terrain dégagé. La colline reste active trente minutes. Entrer dans le cercle actif lève votre drapeau JcJ mondial selon les conditions de niveau habituelles, même pour les membres d'un raid. Le groupe comptant le plus de joueurs admissibles à l'intérieur capture la colline après une minute de majorité ininterrompue ; un joueur seul compte comme un groupe d'une personne, mais les membres d'un raid et les joueurs sous le niveau requis pour le JcJ ne peuvent ni capturer ni gagner l'Honneur de la colline. Chaque détenteur à l'intérieur gagne de l'Honneur à un rythme croissant. Les versements et leur progression sont accélérés pour conserver l'Honneur total de l'ancien événement de quarante-cinq minutes. Un changement de détenteur réinitialise la progression. Sortir laisse votre drapeau levé ; /pvp off prend les cinq minutes habituelles et ne peut aboutir dans une colline active ni en combat. La barre affiche le contrôle, les effectifs et la progression de capture ; /hill indique l'emplacement.",
   'hudChrome.nameplate.hillBountyTag': 'Prime {honor}',
+  'hudChrome.wocStore.membershipsTab': 'Abonnements',
+  'hudChrome.wocStore.membershipsUnavailable':
+    'Les abonnements sont indisponibles pour le moment. Réessayez dans quelques instants.',
+  'hudChrome.wocStore.subscription.addMonth': 'Ajouter 1 mois',
+  'hudChrome.wocStore.subscription.addYear': 'Ajouter 12 mois',
+  'hudChrome.wocStore.subscription.billingBlocked':
+    "Mettez à jour vos informations de paiement dans Gérer l'abonnement avant d'ajouter du temps d'abonnement.",
+  'hudChrome.wocStore.subscription.endsOn': "L'abonnement se termine le {date}",
+  'hudChrome.wocStore.subscription.renewsOn': 'Renouvellement le {date}',
+  'hudChrome.wocStore.subscription.stackCapped':
+    "Vous pouvez cumuler jusqu'à 2 ans d'abonnement à la fois. Réessayez à l'approche de votre date de renouvellement.",
+  'hudChrome.wocStore.subscription.stackTerms':
+    'Paiement immédiat. La durée est ajoutée à la fin de votre abonnement actuel, puis celui-ci se renouvelle selon cette formule.',
+  'hudChrome.wocStore.subscription.stackUnavailable':
+    "L'ajout de temps d'abonnement est indisponible pour le moment. Réessayez dans quelques instants.",
+  'hudChrome.wocStore.subscription.tokenPrice': '{price} pour 30 jours',
 };
