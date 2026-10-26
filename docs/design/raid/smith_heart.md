@@ -1227,6 +1227,15 @@ on both difficulties (dungeon rework README, goal 4).
   look's pure plans and both painters over a fake world.
 - `tests/smith_heart_dev.test.ts`: the `/dev heart` family (the portal forcing and the
   hop included) and the dev-only door.
+- `tests/smith_heart_council_soul_wire.test.ts`: the Mythic soul pillars over the real
+  server snapshot path into the online mirror on the browser's timer wire (the soul and
+  its pips, the Walking Slab's position and collider, the Echo's and the Endless Song's
+  bars, the song's pulse count, the burst).
+- `scripts/heart_council_raid.mjs`: the council fought by ten bots over a live dev server
+  (two tanks, two healers, six damage dealers; nine and a human with `JOIN`), playing the
+  mechanics from the snapshots and writing a fight log; its positioning
+  (`scripts/lib/heart_council_tactics.mjs`) is pinned to the server's geometry by
+  `tests/smith_heart_council_bot_tactics.test.ts`.
 - Every new Smith's Heart test follows the path pattern `tests/smith_heart_*.test.ts`
   (walls in the `gravewyrm_sanctum_walls` pattern when the phase 2 kit adds walls).
 - Guard tests that must stay green: `tests/architecture.test.ts` (sim purity and

@@ -34,4 +34,7 @@ Rules:
 - Tests: `tests/smith_heart_council.test.ts` (on `tests/helpers/council_fight.ts`),
   `tests/smith_heart_council_ui.test.ts`, `tests/smith_heart_gating.test.ts`,
   `tests/smith_heart_pull.test.ts`, `tests/smith_heart_dev.test.ts`,
-  `tests/smith_heart_council_mythic.test.ts` (the mythic row and Soul in the Stone).
+  `tests/smith_heart_council_mythic.test.ts` (the mythic row and Soul in the Stone),
+  `tests/smith_heart_council_soul_wire.test.ts` (the soul pillars through the server into
+  the online mirror). A live raid of bots fights it over a dev server:
+  `scripts/heart_council_raid.mjs`.
