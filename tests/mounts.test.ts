@@ -17,6 +17,13 @@ vi.mock('../server/db', () => ({
   walletForAccount: vi.fn(async () => null),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  grantAccountMountSkins: vi.fn(async (_accountId: number, mountSkinIds: string[]) => ({
+    completedQuestIds: [],
+    mechChromaIds: [],
+    weaponSkinIds: [],
+    weaponSkinLoadout: {},
+    mountSkinIds,
+  })),
 }));
 
 import { meleeSwing, updatePlayerAutoAttack } from '../src/sim/combat/auto_attack';
@@ -41,6 +48,7 @@ import {
 } from '../src/sim/content/mounts';
 import { ITEMS, MOBS, NPCS, QUESTS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { exchangeHardLock } from '../src/sim/exchange_eligibility';
 import { guildBankPipeRefusal } from '../src/sim/guild_bank';
 import { sellItem, useItem } from '../src/sim/items';
 import { MARKET_HOUSE_STOCK } from '../src/sim/market';
@@ -824,6 +832,36 @@ describe('mount reins transfer (not soulbound: the collection trades hands)', ()
 
   it('the annual reward Chimaera stays refused by the exchange pipes (still soulbound)', () => {
     expect(guildBankPipeRefusal({ itemId: 'reins_nightwing_chimera', count: 1 })).not.toBe(null);
+  });
+
+  it('the annual Chimaera reins can never be listed on the $WOC exchange or salvaged', () => {
+    const def = ITEMS.reins_nightwing_chimera;
+    expect(exchangeHardLock(def, undefined)).toBe('no_market_list');
+    expect(def).toMatchObject({ soulbound: true, noDiscard: true, noSalvage: true });
+  });
+
+  it('the annual Chimaera entitlement unlocks it on every character of the account, reins or not', async () => {
+    const sim = makeWorld();
+    const first = join(sim);
+    const second = sim.addPlayer('warrior', 'Alt');
+    const sessions = [first, second].map((pid) => ({
+      accountId: 4002,
+      pid,
+      accountCosmetics: { ...EMPTY_LIVE_ACCOUNT_COSMETICS },
+    }));
+    const service = new AccountCosmeticsService({
+      sim: () => sim,
+      sessions: () => sessions,
+      resyncQuests: vi.fn(),
+    });
+    service.grantMembershipMount(4002);
+    await vi.waitFor(() =>
+      expect(mountOwned(sim.players.get(second)!, 'nightwing_chimera')).toBe(true),
+    );
+    expect(mountOwned(sim.players.get(first)!, 'nightwing_chimera')).toBe(true);
+    expect(ownedMounts(sim.players.get(second)!)).toContain('nightwing_chimera');
+    sim.setMembership(second, 0);
+    expect(mountOwned(sim.players.get(second)!, 'nightwing_chimera')).toBe(true);
   });
 
   it('the annual Chimaera remains owned and rideable after membership expires', () => {

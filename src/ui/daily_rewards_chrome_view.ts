@@ -20,7 +20,7 @@ export function wocStoreTabsHtml(): string {
     '<div class="woc-store-tabs">' +
     `<div class="woc-store-tablist ui-seg" role="tablist" aria-label="${esc(t('hudChrome.wocStore.tabsLabel'))}">` +
     `<button id="woc-store-tab-store" class="ui-seg-tab" type="button" role="tab" aria-controls="woc-store-panel" data-woc-store-tab="store">${esc(t('hudChrome.wocStore.storeTab'))}</button>` +
-    `<button id="woc-store-tab-rewards" class="ui-seg-tab" type="button" role="tab" aria-controls="woc-store-panel" data-woc-store-tab="rewards">${esc(t('hudChrome.wocStore.rewardsTab'))}</button>` +
+    `<button id="woc-store-tab-memberships" class="ui-seg-tab" type="button" role="tab" aria-controls="woc-store-panel" data-woc-store-tab="memberships">${esc(t('hudChrome.wocStore.membershipsTab'))}</button>` +
     '</div>' +
     `<span class="woc-store-loading" data-woc-store-loading role="status" aria-live="polite" aria-label="${esc(t('hudChrome.wocStore.loading'))}" aria-busy="false"><i aria-hidden="true"></i></span>` +
     `<span class="visually-hidden" data-charter-live role="status" aria-live="polite" aria-atomic="true"></span></div>`

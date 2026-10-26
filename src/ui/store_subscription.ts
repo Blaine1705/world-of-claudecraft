@@ -5,6 +5,7 @@ import {
   isGameSubscriptionPlan,
   SUBSCRIPTION_OFF,
   type SubscriptionLink,
+  type SubscriptionSnapshot,
   type SubscriptionStoreHooks,
   subscriptionLink,
 } from '../subscription_contract';
@@ -12,13 +13,18 @@ import { esc } from './esc';
 import { focusKeyAttr } from './focus_restore';
 import { t } from './i18n';
 import { mintIntentKey } from './purchase_intent_key';
-import { subscriptionOffersHtml } from './store_subscription_offers';
+import {
+  membershipBadgeHtml,
+  membershipBenefits,
+  subscriptionOffersHtml,
+  subscriptionPurchase,
+} from './store_subscription_offers';
 import { SubscriptionCheckoutIntents } from './subscription_checkout_intents';
 import { usdText } from './usd_text';
 
 /** Cold store section. Status refreshes on user entry/refresh, never the store polling timer. */
 export class StoreSubscription {
-  private state = { ...SUBSCRIPTION_OFF };
+  private state: SubscriptionSnapshot = { ...SUBSCRIPTION_OFF };
   private tokenState = { ...MEMBERSHIP_TOKEN_OFF };
   private tokenKey = this.savedTokenKey();
   private savedTokenKey(): string {
@@ -109,19 +115,17 @@ export class StoreSubscription {
   html(): string {
     if (this.owner !== this.hooks()) return '';
     if (!this.state.available)
-      return this.tokenState.available ? this.benefitsHtml() + this.tokenHtml() : '';
-    return (
-      subscriptionOffersHtml(
-        this.state,
-        this.busy,
-        this.intents.pending('game_annual'),
-        this.annualDelivered,
-        this.intents.pending('game_monthly'),
-        !!this.hooks()?.annualMountClaim &&
-          (this.state.canManage || this.state.plan === 'game_annual'),
-      ) +
-      this.benefitsHtml() +
-      this.tokenHtml()
+      return this.tokenState.available
+        ? `<div class="membership-badges">${this.tokenHtml()}</div>`
+        : '';
+    return subscriptionOffersHtml(
+      this.state,
+      this.busy,
+      this.intents.pending('game_annual'),
+      this.annualDelivered,
+      !!this.hooks()?.annualMountClaim &&
+        (this.state.canManage || this.state.plan === 'game_annual'),
+      this.tokenHtml(),
     );
   }
 
@@ -149,17 +153,18 @@ export class StoreSubscription {
             action === 'checkout' && isGameSubscriptionPlan(requested)
               ? requested
               : (this.state.plan ?? 'game_monthly');
-          const resume =
-            ['none', 'incomplete'].includes(this.state.status) && this.intents.pending(plan);
+          const purchase = subscriptionPurchase(this.state, plan, Math.floor(Date.now() / 1000));
           if (
             action === 'checkout' &&
-            ((!this.state.canCheckout && !resume) ||
+            ((purchase !== 'new' && purchase !== 'stack') ||
               !(this.state.plans ?? [{ plan: 'game_monthly' }]).some(
                 (offer) => offer.plan === plan,
               ))
           )
             throw new Error('plan unavailable');
           const accountId = this.state.accountId;
+          // Every click is a new checkout: retire any earlier attempt's key first.
+          if (action === 'checkout') this.intents.complete(plan);
           const key = action === 'checkout' ? this.intents.start(plan) : mintIntentKey();
           const result = subscriptionLink(await hooks.link(action, key, plan), action);
           if (hooks !== this.hooks() || accountId !== this.state.accountId)
@@ -236,19 +241,20 @@ export class StoreSubscription {
       }
     };
   }
-  private benefitsHtml(): string {
-    return `<section class="ui-card" data-membership-benefits><div class="charter-body"><h2 class="ui-h">${esc(t('hudChrome.wocStore.subscription.benefitsTitle'))}</h2><ul>${(['benefitBank', 'benefitSlots', 'benefitArmour', 'benefitBag', 'benefitTax'] as const).map((key) => `<li>${esc(t(`hudChrome.wocStore.subscription.${key}`))}</li>`).join('')}</ul><p>${esc(t('hudChrome.wocStore.subscription.benefitExpiry'))}</p></div></section>`;
-  }
-
   private tokenHtml(): string {
     if (!this.tokenState.available) return '';
-    return (
-      `<section class="ui-card membership-token-card" data-membership-token-section><div class="charter-body"><h2 class="ui-h">${esc(t('hudChrome.wocStore.subscription.tokenTitle'))}</h2>` +
-      `<p>${esc(t('hudChrome.wocStore.subscription.tokenTerms', { price: usdText(this.tokenState.price.unitAmount) }))}</p>` +
-      `<button type="button" class="ui-btn ui-btn--lg" data-membership-purchase-action="buy"${focusKeyAttr('membership-token-buy')}${this.busy || !this.tokenState.canCheckout ? ' disabled' : ''}>${esc(t('hudChrome.wocStore.subscription.tokenBuy'))}</button> ` +
-      `<button type="button" class="ui-btn ui-btn--lg" data-membership-purchase-action="claim"${focusKeyAttr('membership-token-claim')}${this.busy ? ' disabled' : ''}>${esc(t('hudChrome.wocStore.subscription.tokenClaim'))}</button>` +
-      `<p data-membership-token-status role="status"></p></div></section>`
-    );
+    const price = usdText(this.tokenState.price.unitAmount);
+    return membershipBadgeHtml({
+      id: 'membership_token',
+      title: t('hudChrome.wocStore.subscription.tokenTitle'),
+      price: t('hudChrome.wocStore.subscription.tokenPrice', { price }),
+      lines: [t('hudChrome.wocStore.subscription.tokenTerms', { price })],
+      benefits: membershipBenefits(),
+      action:
+        `<button type="button" class="ui-btn ui-btn--lg" data-membership-purchase-action="buy"${focusKeyAttr('membership-token-buy')}${this.busy || !this.tokenState.canCheckout ? ' disabled' : ''}>${esc(t('hudChrome.wocStore.subscription.tokenBuy'))}</button> ` +
+        `<button type="button" class="ui-btn ui-btn--lg" data-membership-purchase-action="claim"${focusKeyAttr('membership-token-claim')}${this.busy ? ' disabled' : ''}>${esc(t('hudChrome.wocStore.subscription.tokenClaim'))}</button>` +
+        '<p data-membership-token-status role="status"></p>',
+    });
   }
 
   private bindToken(body: HTMLElement): void {

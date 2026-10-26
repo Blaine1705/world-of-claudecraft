@@ -44,6 +44,10 @@ export interface SubscriptionSnapshot {
   currentPeriodEnd: number | null;
   canCheckout: boolean;
   canManage: boolean;
+  /** Live member: a monthly or annual purchase adds its period onto currentPeriodEnd. */
+  canStack?: boolean;
+  /** Latest end (unix seconds, like currentPeriodEnd) a stacked purchase may reach; Stripe caps renewals at two years. */
+  stackLimit?: number | null;
 }
 export const SUBSCRIPTION_OFF: SubscriptionSnapshot = {
   available: false,
@@ -98,6 +102,12 @@ export function subscriptionSnapshot(value: unknown): SubscriptionSnapshot {
     !(
       v.currentPeriodEnd === null ||
       (Number.isSafeInteger(v.currentPeriodEnd) && Number(v.currentPeriodEnd) > 0)
+    ) ||
+    (v.canStack !== undefined && typeof v.canStack !== 'boolean') ||
+    !(
+      v.stackLimit === undefined ||
+      v.stackLimit === null ||
+      (Number.isSafeInteger(v.stackLimit) && Number(v.stackLimit) > 0)
     )
   ) {
     return { ...SUBSCRIPTION_OFF };
@@ -146,6 +156,12 @@ export function subscriptionSnapshot(value: unknown): SubscriptionSnapshot {
     canCheckout:
       v.canCheckout && ['none', 'canceled', 'incomplete_expired'].includes(String(v.status)),
     canManage: v.canManage,
+    // A legacy service never advertises stacking; only a live membership can stack.
+    ...(v.canStack === true &&
+    typeof v.stackLimit === 'number' &&
+    ['active', 'trialing'].includes(String(v.status))
+      ? { canStack: true, stackLimit: v.stackLimit }
+      : {}),
   };
 }
 export function subscriptionLink(value: unknown, action: SubscriptionAction): SubscriptionLink {

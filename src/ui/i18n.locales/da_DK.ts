@@ -14339,7 +14339,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.rarity.legendary': 'Legendarisk',
   'hudChrome.wocStore.rarity.rare': 'Sjælden',
   'hudChrome.wocStore.rarity.uncommon': 'Ualmindelig',
-  'hudChrome.wocStore.rewardsTab': 'Daglige belønninger',
   'hudChrome.wocStore.scene.day': 'Dag',
   'hudChrome.wocStore.scene.dusk': 'Skumring',
   'hudChrome.wocStore.scene.night': 'Nat',
@@ -14489,7 +14488,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Bue af forsølvet stål og blå is, en glødende cyan kerne i grebet, en pil af massiv is og kold damp.',
   'hudChrome.wocStore.skins.winterbite.lore':
     'En bue af forsølvet stål og Thornpeak-is, dens stigrør oplyst af en kold cyan kerne, der fryser pilen til strengen. Det knækker en skaft af fast gletsjer-is, der reformerer hvert træk; bueskytten bærer ingen kogger på væggen, kun kulden. Highwatch holdt Sniger Ridge gennem en belejring med en lignende: en enkelt buemand, siger de, og en vinters værdi af pile, der altid allerede var der.',
-  'hudChrome.wocStore.storeTab': 'Butik',
+  'hudChrome.wocStore.storeTab': 'Kosmetikbutik',
   'hudChrome.wocStore.tabsLabel': 'Sektioner i WOC-butikken',
   'hudChrome.wocStore.title': 'WOC-butik',
   'hudChrome.wocStore.tryOn': 'Prøv på',
@@ -21893,7 +21892,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualDelivered':
     'Nøglen til dit pakkeridedyr er leveret med posten.',
   'hudChrome.wocStore.subscription.annualMount':
-    'Hent de sjælebundne tøjler til den natvingede kimære med posten efter betalingen på den figur, der købte pakken. Ridedyret forbliver dit, når medlemskabet udløber.',
+    'Låser den natvingede kimære op som ridedyr for alle figurer på din konto, og de sjælebundne tøjler sendes med posten til den figur, der køber den. Én pr. konto, og den forbliver din, når medlemskabet slutter.',
   'hudChrome.wocStore.subscription.annualPending':
     'Vend tilbage til den købende figur efter betalingen for at hente pakkens ridedyr. Hvis betalingen behandles, eller prøveperioden er aktiv, prøv igen efter den betalte opkrævning.',
   'hudChrome.wocStore.subscription.annualPrice': '{price} for 12 måneder, betalt på forhånd',
@@ -21919,7 +21918,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.manage': 'Administrer abonnement',
   'hudChrome.wocStore.subscription.monthlyTitle': 'Månedligt medlemskab',
   'hudChrome.wocStore.subscription.price': '{price} pr. måned',
-  'hudChrome.wocStore.subscription.resumeCheckout': 'Genoptag betaling',
   'hudChrome.wocStore.subscription.startTrial': 'Start 7 dages gratis prøveperiode',
   'hudChrome.wocStore.subscription.status.active': 'Aktivt',
   'hudChrome.wocStore.subscription.status.canceled': 'Opsagt',
@@ -23950,7 +23948,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Fremkald et flyvende æsel til at bære genstande mellem dine tasker og den nærmeste bank. Hver rejse tager op til 15 sekunder til banken og op til 15 sekunder tilbage, med hurtigere flyvning på længere ruter. Vælg op til 24 stakke pr. tur. Returnerede genstande opbevares som overskud i fulde tasker, og kureren forsvinder så, indtil den fremkaldes igen. Hjemrejsen sættes på pause, mens du er død eller inde i en instans. Medlemskab kræves for at starte en ny tur.',
   'entities.abilities.courier.name': 'Kurer',
   'entities.letters.membership_annual_reward.body':
-    'Din betaling for årsmedlemskabet er gennemført. Dit ridedyrs tøjler er vedlagt. Behold tøjlerne i dine tasker eller bank for at eje dette ridedyr. Det forbliver dit efter medlemskabets udløb. Ridefærdighed kræves.',
+    'Din betaling for årsmedlemskabet er gennemført. Den natvingede kimære er nu låst op for alle figurer på din konto, og dens tøjler er vedlagt. Den forbliver din efter medlemskabets udløb. Ridefærdighed kræves.',
   'entities.letters.membership_annual_reward.sender': 'Ravneposten',
   'entities.letters.membership_annual_reward.subject': 'Dit ridedyr fra årsmedlemskabet',
   'entities.letters.membership_token_delivery.body':

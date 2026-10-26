@@ -14514,7 +14514,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.rarity.legendary': 'Efsanevi',
   'hudChrome.wocStore.rarity.rare': 'Nadir',
   'hudChrome.wocStore.rarity.uncommon': 'Yaygın olmayan',
-  'hudChrome.wocStore.rewardsTab': 'Günlük Ödüller',
   'hudChrome.wocStore.scene.day': 'Gün',
   'hudChrome.wocStore.scene.dusk': 'Alacakaranlık',
   'hudChrome.wocStore.scene.night': 'Gece',
@@ -14662,7 +14661,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Gümüş rengi çelik ve mavi buz yay, yükselticide parlayan camgöbeği donmuş çekirdek, katı buz ve soğuk buhardan oluşan çentikli bir ok.',
   'hudChrome.wocStore.skins.winterbite.lore':
     "Gümüş rengi çelikten ve Thornpeak buzundan yapılmış bir yay; yükselticisi, okun teline doğru donmasını sağlayan soğuk camgöbeği bir çekirdekle aydınlatılıyor. Her çekişi yeniden şekillendiren katı buzul buzundan oluşan bir şaftı çentikliyor; okçu duvarda ok kılıfı taşımaz, sadece soğuktur. Highwatch, Sinsi Sokulmaer Ridge'i buna benzer biriyle kuşatma altında tuttu: Söylediklerine göre tek bir okçu ve her zaman orada olan bir kışa yetecek kadar ok vardı.",
-  'hudChrome.wocStore.storeTab': 'Mağaza',
+  'hudChrome.wocStore.storeTab': 'Kozmetik Mağazası',
   'hudChrome.wocStore.tabsLabel': 'WOC Mağaza bölümleri',
   'hudChrome.wocStore.title': 'WOC Mağazası',
   'hudChrome.wocStore.tryOn': 'Deneyin',
@@ -20487,7 +20486,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualDelivered':
     'Paket binek anahtarın postayla teslim edildi.',
   'hudChrome.wocStore.subscription.annualMount':
-    'Ödemeden sonra, bu paketi satın alan karakterde ruha bağlı Gece Kanadı Kimera dizginlerini postadan al. Üyelik sona erdikten sonra da binek senin kalır.',
+    'Hesabındaki tüm karakterler için Gece Kanadı Kimera bineğinin kilidini açar; ruha bağlı dizginleri satın alan karaktere postayla gönderilir. Hesap başına bir tane ve üyelik bittikten sonra da senin kalır.',
   'hudChrome.wocStore.subscription.annualPending':
     'Paket bineğini almak için ödemeden sonra satın alımı yapan karaktere dön. Ödeme işleniyorsa veya deneme süresi etkinse ücret alındıktan sonra tekrar dene.',
   'hudChrome.wocStore.subscription.annualPrice': '12 ay için {price}, peşin ödenir',
@@ -20512,7 +20511,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.manage': 'Aboneliği yönet',
   'hudChrome.wocStore.subscription.monthlyTitle': 'Aylık üyelik',
   'hudChrome.wocStore.subscription.price': 'Aylık {price}',
-  'hudChrome.wocStore.subscription.resumeCheckout': 'Ödemeye devam et',
   'hudChrome.wocStore.subscription.startTrial': '7 günlük ücretsiz denemeyi başlat',
   'hudChrome.wocStore.subscription.status.active': 'Etkin',
   'hudChrome.wocStore.subscription.status.canceled': 'İptal edildi',
@@ -23404,7 +23402,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'referralCards.waiting': 'Bağlı arkadaşının kabul etmesi bekleniyor.',
   'referralCards.yourCard': '{name} adlı karakterin damga kartı',
   'entities.letters.membership_annual_reward.body':
-    'Yıllık üyelik ödemen tamamlandı. Binek dizginlerin ektedir. Bu bineğe sahip olmak için dizginleri çantalarında veya bankada tut. Üyelik sona erdikten sonra da senin kalır. Binicilik becerisi gerekir.',
+    'Yıllık üyelik ödemen tamamlandı. Gece Kanadı Kimera artık hesabındaki tüm karakterler için açıldı ve dizginleri ektedir. Üyelik sona erdikten sonra da senin kalır. Binicilik becerisi gerekir.',
   'entities.letters.membership_annual_reward.sender': 'Kuzgun Postası',
   'entities.letters.membership_annual_reward.subject': 'Yıllık üyelik bineğin',
   'entities.letters.membership_token_delivery.body':

@@ -14558,7 +14558,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.rarity.legendary': 'Legendarisk',
   'hudChrome.wocStore.rarity.rare': 'Sällsynt',
   'hudChrome.wocStore.rarity.uncommon': 'Ovanlig',
-  'hudChrome.wocStore.rewardsTab': 'Dagliga belöningar',
   'hudChrome.wocStore.scene.day': 'Dag',
   'hudChrome.wocStore.scene.dusk': 'Skymning',
   'hudChrome.wocStore.scene.night': 'Natt',
@@ -14708,7 +14707,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Försilvrat stål och blå-is båge, en glödande cyan frusen kärna i stigaren, en nockad pil av solid is, kall ånga.',
   'hudChrome.wocStore.skins.winterbite.lore':
     'En båge av försilvrat stål och Thornpeak-is, dess stigare upplyst av en kall cyan kärna som fryser pilen till snöret. Det knackar ett schakt av fast glaciär-is som reformerar varje dragning; bågskytten bär inget koger på väggen, bara kylan. Highwatch höll Smygjagaer Ridge genom en belägring med en liknande: en enda bågeskytt, säger de, och en vinter med pilar som alltid redan fanns där.',
-  'hudChrome.wocStore.storeTab': 'Butik',
+  'hudChrome.wocStore.storeTab': 'Kosmetikbutik',
   'hudChrome.wocStore.tabsLabel': 'Delar av WOC-butiken',
   'hudChrome.wocStore.title': 'WOC-butik',
   'hudChrome.wocStore.tryOn': 'Prova',
@@ -21378,7 +21377,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualDelivered':
     'Nyckeln till ditt paketriddjur har levererats med posten.',
   'hudChrome.wocStore.subscription.annualMount':
-    'Hämta de själsbundna tyglarna till den nattvingade chimäran med posten efter betalning på den karaktär som köpte paketet. Riddjuret förblir ditt när medlemskapet går ut.',
+    'Låser upp riddjuret nattvingad chimär för alla karaktärer på ditt konto, och de själsbundna tyglarna skickas med posten till karaktären som köper den. En per konto, och den förblir din när medlemskapet tar slut.',
   'hudChrome.wocStore.subscription.annualPending':
     'Återvänd till den karaktär som gjorde köpet efter betalning för att hämta paketets riddjur. Om betalningen behandlas eller provperioden är aktiv, försök igen efter den betalda debiteringen.',
   'hudChrome.wocStore.subscription.annualPrice': '{price} för 12 månader, betalas i förskott',
@@ -21404,7 +21403,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.manage': 'Hantera prenumeration',
   'hudChrome.wocStore.subscription.monthlyTitle': 'Månadsmedlemskap',
   'hudChrome.wocStore.subscription.price': '{price} per månad',
-  'hudChrome.wocStore.subscription.resumeCheckout': 'Återuppta betalning',
   'hudChrome.wocStore.subscription.startTrial': 'Starta 7 dagars gratis provperiod',
   'hudChrome.wocStore.subscription.status.active': 'Aktiv',
   'hudChrome.wocStore.subscription.status.canceled': 'Avslutad',
@@ -24536,7 +24534,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Frammana en flygande åsna som bär föremål mellan dina väskor och närmaste bank. Varje resa tar upp till 15 sekunder till banken och upp till 15 sekunder tillbaka, med snabbare flygning på längre sträckor. Välj upp till 24 staplar per resa. Återlämnade föremål får plats även i fulla väskor, sedan försvinner kuriren tills den frammanas igen. Återresan pausas medan du är död eller inne i en instans. Medlemskap krävs för att påbörja en ny resa.',
   'entities.abilities.courier.name': 'Kurir',
   'entities.letters.membership_annual_reward.body':
-    'Din betalning för årsmedlemskapet är klar. Riddjurets tyglar är bifogade. Behåll tyglarna i dina väskor eller på banken för att äga detta riddjur. Det förblir ditt när medlemskapet går ut. Ridkunskap krävs.',
+    'Din betalning för årsmedlemskapet är klar. Den nattvingade chimären är nu upplåst för alla karaktärer på ditt konto, och dess tyglar är bifogade. Den förblir din när medlemskapet går ut. Ridkunskap krävs.',
   'entities.letters.membership_annual_reward.sender': 'Korpposten',
   'entities.letters.membership_annual_reward.subject': 'Ditt riddjur från årsmedlemskapet',
   'entities.letters.membership_token_delivery.body':

@@ -838,11 +838,10 @@ export const hudChromeStrings = {
       annualTerms:
         'Renews yearly at the same price. Pay with fiat through Stripe. Cancel in billing settings.',
       annualMount:
-        'After payment, collect the soulbound Nightwing Chimaera reins by mail on the character that purchased this bundle. The mount remains yours after membership expires.',
+        'Unlocks the Nightwing Chimaera mount for every character on your account, with its soulbound reins sent by mail to the character that buys it. One per account, and it stays yours after membership ends.',
       trialTerms:
         'Try membership free for {days} days, once per account. A payment method is required. You will be charged {price} when the trial ends unless you cancel.',
       startTrial: 'Start 7-day free trial',
-      resumeCheckout: 'Resume checkout',
       checkoutClosed:
         'This checkout has closed without an outstanding reward. Choose a membership plan again to start a new checkout.',
       annualClaim: 'Collect bundle mount',
@@ -850,6 +849,7 @@ export const hudChromeStrings = {
         'Return to the purchasing character after payment to collect the bundle mount. If payment is processing or the trial is active, try again after the paid charge.',
       annualDelivered: 'Your bundle mount key has been delivered by mail.',
       tokenTitle: 'Tradable membership token',
+      tokenPrice: '{price} for 30 days',
       benefitsTitle: 'Active membership benefits',
       benefitBank: "Access your other characters' banks at any banker.",
       benefitSlots: 'Unlock 10 additional character slots.',
@@ -869,6 +869,19 @@ export const hudChromeStrings = {
       price: '{price} per month',
       terms: 'Renews monthly. Pay with fiat through Stripe. Cancel in billing settings.',
       subscribe: 'Subscribe',
+      // Stacking (src/ui/store_subscription_offers.ts): a live member pays now and the period
+      // is added onto the end of their current membership.
+      addMonth: 'Add 1 month',
+      addYear: 'Add 12 months',
+      stackTerms:
+        'Paid now. The time is added to the end of your current membership, then it renews on this plan.',
+      stackCapped:
+        'You can hold up to 2 years of membership at once. Try again closer to your renewal date.',
+      stackUnavailable: 'Adding membership time is unavailable right now. Try again shortly.',
+      billingBlocked:
+        'Update your payment details in Manage subscription before adding membership time.',
+      renewsOn: 'Renews on {date}',
+      endsOn: 'Membership ends on {date}',
       manage: 'Manage subscription',
       ending: 'Cancels at the end of the billing period',
       error: 'Could not open billing. Allow popups and try again.',
@@ -887,8 +900,9 @@ export const hudChromeStrings = {
     title: 'WOC Store',
     close: 'Close WOC Store',
     tabsLabel: 'WOC Store sections',
-    storeTab: 'Store',
-    rewardsTab: 'Daily Rewards',
+    storeTab: 'Cosmetic Store',
+    membershipsTab: 'Memberships',
+    membershipsUnavailable: 'Memberships are unavailable right now. Try again shortly.',
     // The store's Machine Stable strip (content/mount_skins.ts): account-wide
     // mount skins sold for Claudium; wearing one is the Cosmetics window's job.
     mountsEyebrow: 'Account Mount Skins',

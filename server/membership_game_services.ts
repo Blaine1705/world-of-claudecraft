@@ -45,6 +45,8 @@ interface MembershipGameHost {
   observeCost(ms: number): void;
   mailWrite<T>(job: () => Promise<T>, signal?: AbortSignal): Promise<T>;
   database<T>(job: () => Promise<T>, signal?: AbortSignal): Promise<T>;
+  /** Refresh live sessions after an annual reward persisted the account mount entitlement. */
+  grantAnnualMount(accountId: number): void;
 }
 export const MEMBERSHIP_REFRESH_WORKERS = 4;
 export const MEMBERSHIP_REFRESH_MS = 30_000;
@@ -167,7 +169,10 @@ export class MembershipGameServices {
     receiptId: string,
   ): Promise<boolean> {
     this.annualDelivery ??= this.createDelivery(persistMembershipAnnualDelivery);
-    return this.annualDelivery(accountId, recipient, receiptId);
+    return this.annualDelivery(accountId, recipient, receiptId).then((delivered) => {
+      if (delivered) this.host.grantAnnualMount(accountId);
+      return delivered;
+    });
   }
 
   private createDelivery(persist: typeof persistMembershipTokenDelivery) {

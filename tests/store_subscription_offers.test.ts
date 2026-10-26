@@ -1,21 +1,34 @@
 import { describe, expect, it } from 'vitest';
 import { GAME_SUBSCRIPTION_PLANS, SUBSCRIPTION_OFF } from '../src/subscription_contract';
-import { subscriptionOffersHtml } from '../src/ui/store_subscription_offers';
+import {
+  addMonthsSeconds,
+  subscriptionOffersHtml,
+  subscriptionPurchase,
+} from '../src/ui/store_subscription_offers';
 
-describe('membership plan offers', () => {
-  it('shows membership prices, annual mount and trial terms without currency rewards', () => {
+const NOW = Date.UTC(2026, 9, 26) / 1000;
+const DAY = 86_400;
+const plans = Object.values(GAME_SUBSCRIPTION_PLANS);
+const badge = (html: string, id: string): string =>
+  html.split(`data-membership-badge="${id}"`)[1]?.split('</article>')[0] ?? '';
+
+describe('membership plan badges', () => {
+  it('shows one priced badge per plan with benefits, annual mount and trial terms', () => {
     const html = subscriptionOffersHtml(
       {
         ...SUBSCRIPTION_OFF,
         available: true,
         canCheckout: true,
-        plans: Object.values(GAME_SUBSCRIPTION_PLANS),
+        plans,
         trialEligible: true,
         trialDays: 7,
       },
       false,
       false,
       false,
+      false,
+      '',
+      NOW,
     );
     for (const text of [
       '$5.00 per month',
@@ -23,15 +36,19 @@ describe('membership plan offers', () => {
       'Renews yearly',
       'once per account',
       'payment method is required',
-      'soulbound Nightwing Chimaera reins',
+      'Nightwing Chimaera mount for every character on your account',
     ])
       expect(html).toContain(text);
     expect(html).not.toContain('Claudium');
-    const monthly = html.split('data-subscription-plan="game_annual"')[0];
-    expect(monthly).not.toContain('mount');
+    expect(badge(html, 'game_monthly')).not.toContain('Nightwing');
+    for (const id of ['game_monthly', 'game_annual']) {
+      expect(badge(html, id)).toContain('Unlock 10 additional character slots.');
+      expect(badge(html, id)).toContain('Start 7-day free trial');
+    }
     expect(html).not.toContain('$60.00');
     expect(html.match(/data-subscription-action="checkout"/g)).toHaveLength(2);
   });
+
   it('does not promise trial or rewards through a legacy monthly service', () => {
     const html = subscriptionOffersHtml(
       { ...SUBSCRIPTION_OFF, available: true, canCheckout: true },
@@ -43,40 +60,102 @@ describe('membership plan offers', () => {
     expect(html).not.toContain('free trial');
     expect(html).not.toContain('game_annual');
   });
-  it('offers only the saved annual checkout when the service has reserved an incomplete purchase', () => {
+
+  it('lets a live member add a month or a year and shows the renewal date', () => {
+    const state = {
+      ...SUBSCRIPTION_OFF,
+      available: true,
+      status: 'trialing' as const,
+      plan: 'game_monthly' as const,
+      plans,
+      trialEligible: false,
+      trialDays: 7 as const,
+      currentPeriodEnd: NOW + 5 * DAY,
+      canStack: true,
+      stackLimit: NOW + 730 * DAY,
+      canManage: true,
+    };
+    const html = subscriptionOffersHtml(state, false, false, false, false, '', NOW);
+    expect(badge(html, 'game_monthly')).toContain('Add 1 month');
+    expect(badge(html, 'game_annual')).toContain('Add 12 months');
+    expect(html).toContain('added to the end of your current membership');
+    expect(html).toContain('Renews on');
+    expect(html).toContain('data-subscription-action="portal"');
+    expect(html).not.toContain('Resume checkout');
+    expect(html).not.toMatch(/data-subscription-action="checkout"[^>]*disabled/);
+    expect(html).toContain('membership-badge--current" data-membership-badge="game_monthly"');
+    expect(html).not.toContain('membership-badge--current" data-membership-badge="game_annual"');
+  });
+
+  it('disables a stack that would pass the two-year limit', () => {
+    const state = {
+      ...SUBSCRIPTION_OFF,
+      available: true,
+      status: 'active' as const,
+      plan: 'game_annual' as const,
+      plans,
+      trialEligible: false,
+      trialDays: 7 as const,
+      currentPeriodEnd: NOW + 400 * DAY,
+      canStack: true,
+      stackLimit: NOW + 730 * DAY,
+    };
+    expect(subscriptionPurchase(state, 'game_monthly', NOW)).toBe('stack');
+    expect(subscriptionPurchase(state, 'game_annual', NOW)).toBe('capped');
+    const html = subscriptionOffersHtml(state, false, false, false, false, '', NOW);
+    expect(badge(html, 'game_annual')).toMatch(/data-subscription-action="checkout"[^>]*disabled/);
+    expect(badge(html, 'game_annual')).toContain('up to 2 years of membership');
+    expect(badge(html, 'game_monthly')).not.toContain('disabled');
+  });
+
+  it('sends a member with a billing problem to Manage subscription instead of checkout', () => {
     const html = subscriptionOffersHtml(
       {
         ...SUBSCRIPTION_OFF,
         available: true,
-        status: 'incomplete',
-        plans: Object.values(GAME_SUBSCRIPTION_PLANS),
+        status: 'past_due',
+        plan: 'game_monthly',
+        plans,
+        trialEligible: false,
+        trialDays: 7,
+        canManage: true,
       },
       false,
-      true,
       false,
+      false,
+      false,
+      '',
+      NOW,
     );
-    expect(html.match(/data-subscription-action="checkout"/g)).toHaveLength(1);
-    expect(html).toContain('data-subscription-checkout-plan="game_annual"');
-    expect(html).toContain('Resume checkout');
+    expect(html).not.toContain('data-subscription-action="checkout"');
+    expect(html).toContain('Update your payment details in Manage subscription');
+    expect(html).toContain('data-subscription-action="portal"');
   });
-  it('shows current annual renewal and management without new checkout during a trial', () => {
+
+  it('keeps the annual mount collection and the token badge in the same tab', () => {
     const html = subscriptionOffersHtml(
       {
         ...SUBSCRIPTION_OFF,
         available: true,
-        status: 'trialing',
+        status: 'active',
         plan: 'game_annual',
-        plans: Object.values(GAME_SUBSCRIPTION_PLANS),
+        plans,
         canManage: true,
       },
       true,
       true,
       false,
+      false,
+      '<article data-membership-badge="membership_token"></article>',
+      NOW,
     );
-    expect(html).toContain('$50.00');
-    expect(html).toContain('data-subscription-action="portal"');
-    expect(html).not.toContain('data-subscription-action="checkout"');
     expect(html).toContain('data-subscription-mount-claim');
+    expect(html).toContain('data-membership-badge="membership_token"');
     expect(html).toContain(' disabled');
+  });
+
+  it('adds calendar months in UTC seconds', () => {
+    expect(addMonthsSeconds(Date.UTC(2026, 0, 15) / 1000, 12)).toBe(Date.UTC(2027, 0, 15) / 1000);
+    expect(addMonthsSeconds(Date.UTC(2026, 10, 1) / 1000, 1)).toBe(Date.UTC(2026, 11, 1) / 1000);
   });
 });

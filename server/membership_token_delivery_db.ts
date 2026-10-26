@@ -3,6 +3,7 @@
 // Growth is one small row per paid token order or annual reward, with primary-key-only lookup.
 
 import {
+  MEMBERSHIP_ANNUAL_MOUNT,
   MEMBERSHIP_ANNUAL_REINS,
   MEMBERSHIP_ANNUAL_REWARD_SKU,
 } from '../src/membership_annual_contract';
@@ -22,6 +23,17 @@ CREATE TABLE IF NOT EXISTS membership_token_receipts (
   sku TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+-- Every paid annual reward is also an account mount entitlement. Idempotent backfill for
+-- receipts written before the entitlement existed; runs after the core account tables.
+INSERT INTO account_mount_cosmetics AS amc (account_id, skin_ids)
+SELECT DISTINCT r.account_id::int, '["${MEMBERSHIP_ANNUAL_MOUNT}"]'::jsonb
+  FROM membership_token_receipts r
+  JOIN accounts a ON a.id = r.account_id
+ WHERE r.sku = '${MEMBERSHIP_ANNUAL_REWARD_SKU}'
+ON CONFLICT (account_id) DO UPDATE SET
+  skin_ids = amc.skin_ids || EXCLUDED.skin_ids,
+  updated_at = now()
+WHERE NOT amc.skin_ids ? '${MEMBERSHIP_ANNUAL_MOUNT}';
 `;
 export interface MembershipTokenDeliveryClient {
   query(
@@ -119,6 +131,28 @@ async function persistMembershipRewardDelivery(
       if (previous.rows.length !== 1) throw new Error('Membership receipt identity mismatch');
       await client.query('COMMIT');
       return null;
+    }
+    if (annual) {
+      // One mount per account: every annual receipt unlocks it account-wide, but only the
+      // first ever mails the reins. Later annual purchases add membership time only.
+      await client.query(
+        `INSERT INTO account_mount_cosmetics AS amc (account_id, skin_ids)
+         VALUES ($1, jsonb_build_array($2::text))
+         ON CONFLICT (account_id) DO UPDATE SET
+           skin_ids = amc.skin_ids || EXCLUDED.skin_ids,
+           updated_at = now()
+         WHERE NOT amc.skin_ids ? $2::text`,
+        [accountId, MEMBERSHIP_ANNUAL_MOUNT],
+      );
+      const earlier = await client.query(
+        `SELECT 1 FROM membership_token_receipts
+         WHERE account_id = $1 AND sku = $2 AND receipt_id <> $3 LIMIT 1`,
+        [accountId, sku, receiptId],
+      );
+      if (earlier.rows.length > 0) {
+        await client.query('COMMIT');
+        return null;
+      }
     }
     await insertCustodyParcelRowIn((sql, values) => client.query(sql, values), parcel);
     try {

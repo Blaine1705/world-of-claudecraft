@@ -56,11 +56,11 @@ describe('subscription store section', () => {
     expect(localStorage.getItem('woc.subscription.41.game_annual.pending')).toBeNull();
   });
   it.each(['game_monthly', 'game_annual'] as const)(
-    'releases a definitively closed %s intent only before another explicit checkout gesture',
+    'starts a fresh %s checkout on every click instead of resuming a saved one',
     async (plan) => {
       runtime.desktop = true;
       const storageKey = `woc.subscription.41.${plan}.pending`;
-      localStorage.setItem(storageKey, 'expired-checkout-intent');
+      localStorage.setItem(storageKey, 'earlier-checkout-intent');
       const link = vi
         .fn()
         .mockResolvedValueOnce({ ok: false, url: null })
@@ -84,20 +84,15 @@ describe('subscription store section', () => {
       const button = document.querySelector<HTMLButtonElement>(
         `[data-subscription-checkout-plan="${plan}"]`,
       )!;
-      button.click();
-      await vi.waitFor(() => expect(button.disabled).toBe(false));
-      expect(localStorage.getItem(storageKey)).toBe('expired-checkout-intent');
-      button.click();
-      await vi.waitFor(() => expect(button.disabled).toBe(false));
-      expect(link).toHaveBeenCalledTimes(2);
-      expect(link.mock.calls[0][1]).toBe('expired-checkout-intent');
-      expect(link.mock.calls[1][1]).toBe('expired-checkout-intent');
-      expect(localStorage.getItem(storageKey)).toBeNull();
-      expect(document.body.textContent).toContain('Choose a membership plan again');
-      button.click();
-      await vi.waitFor(() => expect(link).toHaveBeenCalledTimes(3));
-      expect(link.mock.calls[2][1]).not.toBe('expired-checkout-intent');
-      expect(localStorage.getItem(storageKey)).toBe(link.mock.calls[2][1]);
+      for (let click = 1; click <= 3; click++) {
+        button.click();
+        await vi.waitFor(() => expect(link).toHaveBeenCalledTimes(click));
+        await vi.waitFor(() => expect(button.disabled).toBe(false));
+      }
+      const keys = link.mock.calls.map((call) => call[1]);
+      expect(keys).not.toContain('earlier-checkout-intent');
+      expect(new Set(keys).size).toBe(3);
+      expect(localStorage.getItem(storageKey)).toBe(keys[2]);
     },
   );
   it('uses authenticated account scope when switching accounts in the same panel', async () => {
@@ -129,7 +124,7 @@ describe('subscription store section', () => {
     expect(annualMountClaim).toHaveBeenLastCalledWith('first-account-intent');
     expect(panel.html()).not.toContain('key has been delivered');
   });
-  it('preserves available billing and saved annual key after a failed reward lookup', async () => {
+  it('offers no resume checkout and keeps the saved annual key after a failed reward lookup', async () => {
     runtime.desktop = true;
     localStorage.setItem('woc.subscription.41.game_annual.pending', 'known-annual-intent');
     const link = vi.fn(async () => ({ ok: true, url: 'https://checkout.stripe.com/c/pay/annual' }));
@@ -150,14 +145,13 @@ describe('subscription store section', () => {
     await panel.refresh();
     document.body.innerHTML = panel.html();
     panel.bind(document.body);
-    expect(document.body.textContent).toContain('Resume checkout');
-    document.querySelector<HTMLButtonElement>('[data-subscription-action="checkout"]')!.click();
-    await vi.waitFor(() =>
-      expect(link).toHaveBeenCalledWith('checkout', 'known-annual-intent', 'game_annual'),
-    );
+    expect(document.body.textContent).not.toContain('Resume checkout');
+    expect(document.querySelector('[data-subscription-action="checkout"]')).toBeNull();
+    expect(document.querySelector('[data-subscription-mount-claim]')).not.toBeNull();
     expect(localStorage.getItem('woc.subscription.41.game_annual.pending')).toBe(
       'known-annual-intent',
     );
+    expect(link).not.toHaveBeenCalled();
   });
   it('resumes annual mount delivery after reload without buying again or losing its intent', async () => {
     runtime.desktop = true;
@@ -204,10 +198,10 @@ describe('subscription store section', () => {
     expect(document.body.textContent).toContain('delivered by mail');
     expect(link).toHaveBeenCalledTimes(1);
   });
-  it('keeps checkout keys through status refresh and a new panel instance', async () => {
+  it('mints a new checkout key on every click, across refreshes and panel instances', async () => {
     runtime.desktop = true;
     vi.spyOn(window, 'open').mockReturnValue(null);
-    const link = vi.fn(async () => ({ ok: false, url: null }));
+    const link = vi.fn(async (_action: string, _key: string) => ({ ok: false, url: null }));
     const hooks: SubscriptionStoreHooks = {
       snapshot: async () => ({
         ...SUBSCRIPTION_OFF,
@@ -226,8 +220,41 @@ describe('subscription store section', () => {
       await vi.waitFor(() => expect(link).toHaveBeenCalledTimes(attempt + 1));
       if (attempt === 1) panel = panelWith(hooks);
     }
-    expect(link.mock.calls[0]).toEqual(link.mock.calls[1]);
-    expect(link.mock.calls[0]).toEqual(link.mock.calls[2]);
+    expect(new Set(link.mock.calls.map((call) => call[1])).size).toBe(3);
+  });
+  it('lets a live member stack a year onto their membership through checkout', async () => {
+    runtime.desktop = true;
+    const now = Math.floor(Date.now() / 1000);
+    const link = vi.fn(async () => ({ ok: true, url: 'https://checkout.stripe.com/c/pay/stack' }));
+    const panel = panelWith({
+      snapshot: async () => ({
+        ...SUBSCRIPTION_OFF,
+        available: true,
+        accountId: 41,
+        status: 'active',
+        plan: 'game_monthly',
+        plans: Object.values(GAME_SUBSCRIPTION_PLANS),
+        trialEligible: false,
+        trialDays: 7,
+        currentPeriodEnd: now + 10 * 86_400,
+        canStack: true,
+        stackLimit: now + 730 * 86_400,
+        canManage: true,
+      }),
+      link,
+    });
+    vi.spyOn(window, 'open').mockReturnValue(null);
+    await panel.refresh();
+    document.body.innerHTML = panel.html();
+    panel.bind(document.body);
+    const annual = document.querySelector<HTMLButtonElement>(
+      '[data-subscription-checkout-plan="game_annual"]',
+    )!;
+    expect(annual.textContent).toBe('Add 12 months');
+    annual.click();
+    await vi.waitFor(() =>
+      expect(link).toHaveBeenCalledWith('checkout', expect.any(String), 'game_annual'),
+    );
   });
   it('offers a new subscription after cancellation even when the account has a billing customer', async () => {
     const panel = panelWith({
@@ -337,7 +364,7 @@ describe('subscription store section', () => {
         ?.getAttribute('data-subscription-action'),
     ).toBe('portal');
   });
-  it('retries the same checkout intent and never marks the account active from a redirect', async () => {
+  it('retries with a fresh checkout and never marks the account active from a redirect', async () => {
     const link = vi
       .fn()
       .mockResolvedValueOnce({ ok: false, url: null })
@@ -364,7 +391,7 @@ describe('subscription store section', () => {
     await vi.waitFor(() =>
       expect(open).toHaveBeenCalledWith('https://checkout.stripe.com/c/pay/cs_test_1', '_blank'),
     );
-    expect(link.mock.calls[0]).toEqual(link.mock.calls[1]);
+    expect(link.mock.calls[0][1]).not.toBe(link.mock.calls[1][1]);
     expect(tab.opener).toBeNull();
     expect(panel.html()).toContain('Not subscribed');
   });
