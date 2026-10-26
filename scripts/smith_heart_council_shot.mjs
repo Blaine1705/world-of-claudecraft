@@ -10,7 +10,9 @@
 //   node scripts/smith_heart_council_shot.mjs <outDir> [label]
 //
 // Env: SHOT_URL (http://127.0.0.1:5191/), SHOT_W / SHOT_H (1600x900),
-// SHOT_PRESET (4), SHOT_ONLY (comma list of shot names), SHOT_HEROIC=1.
+// SHOT_PRESET (4), SHOT_ONLY (comma list of shot names), SHOT_HEROIC=1,
+// SHOT_MYTHIC=1 (the mythic switch on, and only the m* Soul in the Stone
+// shots).
 import fs from 'node:fs';
 import path from 'node:path';
 import puppeteer from 'puppeteer-core';
@@ -68,6 +70,7 @@ try {
     await chat(c, 1500);
   for (const p of ['h1', 'h2', 'h3']) await chat(`/dev heart kill pack ${p}`, 300);
   if (process.env.SHOT_HEROIC === '1') await chat('/dev heart council heroic on', 300);
+  if (process.env.SHOT_MYTHIC === '1') await chat('/dev heart council mythic on', 300);
   await page.waitForFunction(
     () => {
       let found = false;
@@ -183,6 +186,42 @@ try {
     }
   };
   const reset = () => chat('/dev heart council reset', 1500);
+  // The first soul pillar's instance-local spot, and a write to its soul.
+  const soulAt = () =>
+    page.evaluate(
+      ([ox, oz]) => {
+        const w = window.__game.world;
+        for (const e of w.entities.values()) {
+          const st = e.smithHeartFight;
+          const id = st?.souls?.[0]?.pillarId;
+          if (id === undefined) continue;
+          const p = w.entities.get(id);
+          return p ? [p.pos.x - ox, p.pos.z - oz] : null;
+        }
+        return null;
+      },
+      [O.x, O.z],
+    );
+  const setSoul = (patch) =>
+    page.evaluate((patch) => {
+      for (const e of window.__game.world.entities.values()) {
+        const s = e.smithHeartFight;
+        if (s?.souls?.[0]) {
+          Object.assign(s.souls[0], patch);
+          return;
+        }
+      }
+    }, patch);
+  // Stand `back` yards from a spot toward the Quarry's middle, facing it.
+  const aimAt = (at, back, yaw, pitch, dist, turn = 0) => {
+    const d = Math.hypot(MID.x - at[0], MID.z - at[1]) || 1;
+    const ux = (MID.x - at[0]) / d;
+    const uz = (MID.z - at[1]) / d;
+    const c = Math.cos(turn);
+    const s = Math.sin(turn);
+    const p = [at[0] + (ux * c - uz * s) * back, at[1] + (ux * s + uz * c) * back];
+    return place(p, at, yaw, pitch, dist);
+  };
   const col = (k, out) => {
     const deg = [20, 92, 164, 236, 308][k];
     const a = (deg * Math.PI) / 180;
@@ -309,6 +348,93 @@ try {
       await chat('/dev heart kill slabwright', 0);
       await sleep(1000);
     },
+    // Mythic (SHOT_MYTHIC=1): Soul in the Stone. The soul flowing into its
+    // pillar, the Echo of Wrath with the raid hiding, the Walking Slab
+    // dragging after the group, the Endless Song grown loud.
+    async m1_alma() {
+      await reset();
+      await pull();
+      for (let i = 1; i < 8; i++) await raider(i, MID.x - 12 - i, MID.z - 10 + i);
+      await page.evaluate(
+        ([ox, oz, x, z]) => {
+          const w = window.__game.world;
+          for (const e of w.entities.values()) {
+            if (e.templateId !== 'heart_hammer_guardian' || e.dead) continue;
+            const g = w.ctx.groundPos(ox + x, oz + z);
+            e.pos = { ...g };
+            e.prevPos = { ...g };
+            w.ctx.rebucket(e);
+          }
+        },
+        [O.x, O.z, MID.x - 4, MID.z + 8],
+      );
+      await place([MID.x - 24, MID.z + 4], [MID.x + 2, MID.z + 14], 0.0, 0.3, 22);
+      await sleep(900);
+      await chat('/dev heart kill guardian', 0);
+      await sleep(1250);
+    },
+    async m2_eco() {
+      await reset();
+      await pull();
+      await chat('/dev heart council soul guardian', 400);
+      const at = await soulAt();
+      if (at) {
+        // The raid hides behind the columns away from the soul pillar; one
+        // stands caught out in the open.
+        for (let i = 1; i < 8; i++) {
+          const k = [1, 4, 1, 4, 2, 3, 1][i - 1];
+          const deg = [20, 92, 164, 236, 308][k];
+          const a = (deg * Math.PI) / 180;
+          const cx = MID.x + Math.sin(a) * 24;
+          const cz = MID.z + Math.cos(a) * 24;
+          const d = Math.hypot(cx - at[0], cz - at[1]);
+          const out = i === 7 ? -12 : 4 + (i % 3) * 1.1;
+          await raider(i, cx + ((cx - at[0]) / d) * out, cz + ((cz - at[1]) / d) * out);
+        }
+        if (process.env.SHOT_TOP === '1') await aimAt(at, 20, 0.0, 1.25, 55, 0);
+        else await aimAt(at, 16, 0.0, 0.95, 46, 0.55);
+      }
+      await setSoul({ timer: 0.05 });
+      await sleep(2300);
+    },
+    async m3_losa() {
+      await reset();
+      await pull();
+      const g = [MID.x - 12, MID.z - 6];
+      for (let i = 1; i < 8; i++)
+        await raider(i, g[0] + (i % 3) * 1.5 - 1.5, g[1] + Math.floor(i / 3) * 1.5 - 1.5);
+      await chat('/dev heart council soul slabwright', 600);
+      await sleep(4200);
+      const at = await soulAt();
+      if (at) {
+        const d = Math.hypot(g[0] - at[0], g[1] - at[1]) || 1;
+        const ux = (g[0] - at[0]) / d;
+        const uz = (g[1] - at[1]) / d;
+        if (process.env.SHOT_TOP === '1') await place(g, at, 0, 1.2, 30);
+        else await place([g[0] + ux * 4 + uz * 4, g[1] + uz * 4 - ux * 4], at, 0.3, 0.72, 22);
+      }
+      await sleep(1600);
+    },
+    async m4_canto() {
+      await reset();
+      await pull();
+      for (let i = 1; i < 8; i++) await raider(i, MID.x - 12 - i, MID.z - 10 + i);
+      await chat('/dev heart council soul singer', 400);
+      await setSoul({ pulses: 14 });
+      const at = await soulAt();
+      if (at) await aimAt(at, 14, 0.0, 0.9, 40, 0.4);
+      // Shoot just after a pulse leaves the stone.
+      const until = Date.now() + 9000;
+      let last = null;
+      while (Date.now() < until) {
+        const s2 = await state();
+        const t = s2?.souls?.[0]?.timer;
+        if (last !== null && t > last + 1) break;
+        last = t ?? last;
+        await sleep(30);
+      }
+      await sleep(380);
+    },
     // Review only (never delivered): the two bodies close, the energy, the
     // Weight and a bolt.
     async r_cuerpos() {
@@ -342,6 +468,7 @@ try {
   };
   for (const [name, run] of Object.entries(scenes)) {
     if (!ONLY && name.startsWith('r_')) continue;
+    if (!ONLY && (process.env.SHOT_MYTHIC === '1') !== /^m\d/.test(name)) continue;
     if (ONLY && !ONLY.has(name)) continue;
     await run();
     await shoot(name);
