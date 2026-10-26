@@ -38,11 +38,9 @@ export class StoreSubscription {
     mint: mintIntentKey,
   });
   private annualDelivered = false;
-  constructor(
-    private readonly hooks: () => SubscriptionStoreHooks | undefined,
-    /** Repaints the store once an embedded checkout completes (webhooks settle shortly after). */
-    private readonly checkoutCompleted: () => void = () => {},
-  ) {}
+  /** Repaints the store once an embedded checkout completes (webhooks settle shortly after). */
+  private checkoutCompleted: () => void = () => {};
+  constructor(private readonly hooks: () => SubscriptionStoreHooks | undefined) {}
 
   /** Embedded Checkout mounts in the game like a Claudium top-up, so no tab or popup is
    *  needed. A hosted link (a service without embedding) still opens a tab. */
@@ -127,7 +125,8 @@ export class StoreSubscription {
     );
   }
 
-  bind(body: HTMLElement): void {
+  bind(body: HTMLElement, repaint: () => void = () => {}): void {
+    this.checkoutCompleted = repaint;
     this.bindToken(body);
     this.bindAnnual(body);
     for (const button of body.querySelectorAll<HTMLButtonElement>('[data-subscription-action]')) {

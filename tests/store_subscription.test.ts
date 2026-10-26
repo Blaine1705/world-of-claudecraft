@@ -376,7 +376,7 @@ describe('subscription store section', () => {
       const link = vi.fn(async () => ({ ok: true, url: null, stripe: intent }));
       const completed = vi.fn();
       const open = vi.spyOn(window, 'open').mockReturnValue(null);
-      const panel = new StoreSubscription(() => hooks, completed);
+      const panel = new StoreSubscription(() => hooks);
       const hooks: SubscriptionStoreHooks = {
         snapshot: async () => ({
           ...SUBSCRIPTION_OFF,
@@ -388,7 +388,7 @@ describe('subscription store section', () => {
       };
       await panel.refresh();
       document.body.innerHTML = panel.html();
-      panel.bind(document.body);
+      panel.bind(document.body, completed);
       const button = document.querySelector<HTMLButtonElement>('button')!;
       button.click();
       await vi.waitFor(() => expect(stripe.open).toHaveBeenCalledOnce());

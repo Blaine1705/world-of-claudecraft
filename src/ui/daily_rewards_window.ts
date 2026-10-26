@@ -147,10 +147,7 @@ export class DailyRewardsWindow {
   private mountInspect: MountInspect | null = null;
   private armoryGraphicsRestoreSkinId: string | null = null;
   private mountGraphicsRestoreSkinId: string | null = null;
-  private readonly subscription = new StoreSubscription(
-    () => this.deps.subscriptionHooks?.(),
-    () => void this.renderStore(null),
-  );
+  private readonly subscription = new StoreSubscription(() => this.deps.subscriptionHooks?.());
   private storeLoading = false;
   private storeReady = false;
   private previewFetched = false;
@@ -717,7 +714,7 @@ export class DailyRewardsWindow {
     // the card they just used. Same idiom as the bank window's grid repaint.
     const scrollTop = body.scrollTop;
     body.innerHTML = markup;
-    this.subscription.bind(body);
+    this.subscription.bind(body, () => void this.renderStore(null));
     body.scrollTop = scrollTop;
     this.paintedStoreBody = body;
     this.paintedStoreMarkup = markup;
