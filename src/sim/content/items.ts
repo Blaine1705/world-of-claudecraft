@@ -438,7 +438,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     sellValue: 0,
     buyValue: 0,
   },
-  // Annual membership reward, delivered only after verified payment.
+  // Annual membership reward, delivered only after verified payment. It can never leave the
+  // account: the same protected flags as referral reins, plus an account mount entitlement.
   reins_nightwing_chimera: {
     id: 'reins_nightwing_chimera',
     name: 'Reins of the Nightwing Chimaera',
@@ -448,6 +449,8 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     soulbound: true,
     noVendorSell: true,
     noDiscard: true,
+    noMarketList: true,
+    noSalvage: true,
     sellValue: 0,
   },
   // Legacy cosmetic reins; same inert, discardable treatment as mech_bird.

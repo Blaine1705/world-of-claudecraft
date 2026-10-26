@@ -14495,7 +14495,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.rarity.legendary': 'Legendarisch',
   'hudChrome.wocStore.rarity.rare': 'Zeldzaam',
   'hudChrome.wocStore.rarity.uncommon': 'Ongewoon',
-  'hudChrome.wocStore.rewardsTab': 'Dagelijkse beloningen',
   'hudChrome.wocStore.scene.day': 'Dag',
   'hudChrome.wocStore.scene.dusk': 'Schemering',
   'hudChrome.wocStore.scene.night': 'Nacht',
@@ -14646,7 +14645,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Boog van verzilverd staal en blauw ijs, een gloeiende cyaan bevroren kern in de stijgbuis, een nokvormige pijl van massief ijs, koude damp.',
   'hudChrome.wocStore.skins.winterbite.lore':
     "Een boog van verzilverd staal en ijs uit Doorntop, met in het middenstuk een koude cyaankern die de pijl aan de pees vastvriest. De boog legt een schacht van massief gletsjerijs aan die zich bij elke trek opnieuw vormt. De schutter draagt op de muur geen pijlkoker, alleen de kou. Met zo'n boog hield Hoogwacht de Belagerrug tijdens een belegering: één schutter, zo wordt verteld, en een wintervoorraad pijlen die er altijd al waren.",
-  'hudChrome.wocStore.storeTab': 'Winkel',
+  'hudChrome.wocStore.storeTab': 'Uiterlijkwinkel',
   'hudChrome.wocStore.tabsLabel': 'Onderdelen van de WOC-winkel',
   'hudChrome.wocStore.title': 'WOC-winkel',
   'hudChrome.wocStore.tryOn': 'Uitproberen',
@@ -22492,7 +22491,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.wyrmshadow_tunic.name': 'Drakenschaduwtuniek',
   'entities.items.wyrmshadow_vest.name': 'Drakenschaduwvest',
   'entities.letters.membership_annual_reward.body':
-    'De betaling voor je jaarlidmaatschap is voltooid. De teugels van je rijdier zijn bijgevoegd. Bewaar ze in je tassen of bank om dit rijdier te bezitten. Het blijft van jou nadat je lidmaatschap verloopt. Rijvaardigheid is vereist.',
+    'De betaling voor je jaarlidmaatschap is voltooid. De Nachtvleugelchimera is nu ontgrendeld voor elk personage op je account, en de teugels zijn bijgevoegd. Het blijft van jou nadat je lidmaatschap verloopt. Rijvaardigheid is vereist.',
   'entities.letters.membership_annual_reward.subject': 'Je rijdier voor het jaarlidmaatschap',
   'entities.letters.membership_token_delivery.body':
     'Je gekochte munt is bijgevoegd. Wissel die in om 30 dagen lidmaatschap aan je account toe te voegen of verhandel hem met een andere avonturier.',
@@ -23648,7 +23647,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualDelivered':
     'De sleutel voor je bundelrijdier is per post bezorgd.',
   'hudChrome.wocStore.subscription.annualMount':
-    'Haal na betaling de zielsgebonden teugels van de Nachtvleugelchimera per post op met het personage dat deze bundel kocht. Het rijdier blijft van jou nadat je lidmaatschap verloopt.',
+    'Ontgrendelt het rijdier Nachtvleugelchimera voor elk personage op je account, en de zielsgebonden teugels worden per post naar het personage gestuurd dat het koopt. Eén per account, en het blijft van jou nadat je lidmaatschap eindigt.',
   'hudChrome.wocStore.subscription.annualPending':
     'Keer na betaling terug naar het kopende personage om het bundelrijdier op te halen. Wordt de betaling verwerkt of loopt de proefperiode nog, probeer het dan na de betaalde afschrijving opnieuw.',
   'hudChrome.wocStore.subscription.annualPrice': '{price} voor 12 maanden, vooraf betaald',
@@ -23675,7 +23674,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.manage': 'Abonnement beheren',
   'hudChrome.wocStore.subscription.monthlyTitle': 'Maandelijks lidmaatschap',
   'hudChrome.wocStore.subscription.price': '{price} per maand',
-  'hudChrome.wocStore.subscription.resumeCheckout': 'Betaling hervatten',
   'hudChrome.wocStore.subscription.startTrial': 'Gratis proefperiode van 7 dagen starten',
   'hudChrome.wocStore.subscription.status.canceled': 'Opgezegd',
   'hudChrome.wocStore.subscription.status.incomplete': 'Betaling onvolledig',

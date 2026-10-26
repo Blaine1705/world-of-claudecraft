@@ -362,8 +362,7 @@ import { rearmMailPartitionsOnFailure, writeDirtyMailPartitions } from './mail_p
 import { dispatchMarketCommand, marketWirePromptCommand } from './market_commands';
 import { dispatchInventoryGroupingCommand } from './material_stack_wire';
 import { EMPTY_ACCOUNT_COSMETICS, reconcileWornMechChromaForJoin } from './mech_chroma_reconcile';
-import { configureMembershipBatchDatabase } from './membership_batch';
-import { MembershipGameServices } from './membership_game_services';
+import { createMembershipGameServices } from './membership_game_services';
 import {
   applyMobScanTick,
   createMobScanTickStats,
@@ -1414,7 +1413,7 @@ export class GameServer {
   sim: Sim;
   clients = new Map<number, ClientSession>(); // by pid
   private readonly vault: VaultGameServices; // Buried Hoard vault wiring (vault_game_services.ts)
-  readonly membership: MembershipGameServices;
+  readonly membership: ReturnType<typeof createMembershipGameServices>;
   private readonly referral: ReferralGameAdapter;
   private activityDeps: ActivityDetectDeps<ClientSession> | null = null; // built lazily once
   private readonly sessionsByCharacterId = new Map<number, ClientSession>();
@@ -1768,8 +1767,7 @@ export class GameServer {
       save: (session) => this.saveCharacter(session),
       kick: (session, message, reason) => void this.kickSession(session, message, reason),
     });
-    configureMembershipBatchDatabase((job) => this.withBackgroundDbPermit(job));
-    this.membership = new MembershipGameServices({
+    this.membership = createMembershipGameServices({
       sim: this.sim,
       session: (id) => this.sessionByCharacterId(id),
       enqueue: (id, job, signal) =>
@@ -1785,6 +1783,7 @@ export class GameServer {
       observeCost: (ms) => this.tickProfiler.add('membership', ms),
       database: (job, signal) => this.withBackgroundDbPermit(job, signal),
       mailWrite: (job, signal) => this.enqueueMarketWriteForSave(signal, job),
+      grantAnnualMount: (accountId) => this.cosmetics.grantMembershipMount(accountId),
     });
     this.sim.onBuddyGranted = (pid) => this.accountBuddies.granted(pid);
     this.referral = new ReferralGameAdapter({

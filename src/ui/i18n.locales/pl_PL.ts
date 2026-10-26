@@ -14746,7 +14746,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.rarity.legendary': 'Legendarny',
   'hudChrome.wocStore.rarity.rare': 'Rzadki',
   'hudChrome.wocStore.rarity.uncommon': 'Niezwykły',
-  'hudChrome.wocStore.rewardsTab': 'Codzienne nagrody',
   'hudChrome.wocStore.scene.day': 'Dzień',
   'hudChrome.wocStore.scene.dusk': 'Zmierzch',
   'hudChrome.wocStore.scene.night': 'Noc',
@@ -14894,7 +14893,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Posrebrzana stal i łuk z błękitnego lodu, świecący cyjanowy zamrożony rdzeń w pionie, strzała z cięciwą z litego lodu i zimnej pary.',
   'hudChrome.wocStore.skins.winterbite.lore':
     'Łuk ze srebrzonej stali i lodu Cierniowego Szczytu, jego pion oświetlony zimnym cyjanowym rdzeniem, który przytrzymuje strzałę na cięciwie. Łączy szyb z litego lodu lodowcowego, który odnawia każde zaciągnięcie; łucznik nie nosi na ścianie kołczanu, tylko chłód. Wysoka Straż utrzymała Podchodyer Ridge podczas oblężenia z kimś podobnym: jednym łucznikiem, jak mówią, i strzałami na całą zimę, które zawsze tam były.',
-  'hudChrome.wocStore.storeTab': 'Sklep',
+  'hudChrome.wocStore.storeTab': 'Sklep z kosmetykami',
   'hudChrome.wocStore.tabsLabel': 'Sekcje sklepu WOC',
   'hudChrome.wocStore.title': 'Sklep WOK',
   'hudChrome.wocStore.tryOn': 'Wypróbuj',
@@ -20649,7 +20648,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualDelivered':
     'Klucz do wierzchowca z pakietu został dostarczony pocztą.',
   'hudChrome.wocStore.subscription.annualMount':
-    'Po dokonaniu płatności odbierz pocztą związane z duszą wodze Chimery Nocnego Skrzydła na postaci, która kupiła ten pakiet. Wierzchowiec pozostaje twój po wygaśnięciu członkostwa.',
+    'Odblokowuje wierzchowca Chimerę Nocnego Skrzydła dla każdej postaci na twoim koncie, a związane z duszą wodze trafiają pocztą do postaci, która go kupi. Jeden na konto i pozostaje twój po zakończeniu członkostwa.',
   'hudChrome.wocStore.subscription.annualPending':
     'Po zapłacie wróć do postaci, która dokonała zakupu, aby odebrać wierzchowca z pakietu. Jeśli płatność jest przetwarzana lub trwa okres próbny, spróbuj ponownie po pobraniu opłaty.',
   'hudChrome.wocStore.subscription.annualPrice': '{price} za 12 miesięcy, płatne z góry',
@@ -20675,7 +20674,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.manage': 'Zarządzaj subskrypcją',
   'hudChrome.wocStore.subscription.monthlyTitle': 'Członkostwo miesięczne',
   'hudChrome.wocStore.subscription.price': '{price} miesięcznie',
-  'hudChrome.wocStore.subscription.resumeCheckout': 'Wznów płatność',
   'hudChrome.wocStore.subscription.startTrial': 'Rozpocznij bezpłatny okres próbny na 7 dni',
   'hudChrome.wocStore.subscription.status.active': 'Aktywne',
   'hudChrome.wocStore.subscription.status.canceled': 'Anulowane',
@@ -23608,7 +23606,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'referralCards.waiting': 'Oczekiwanie na akceptację powiązanego znajomego.',
   'referralCards.yourCard': 'Karta pieczątek postaci {name}',
   'entities.letters.membership_annual_reward.body':
-    'Płatność za roczne członkostwo została zakończona. Wodze wierzchowca są w załączniku. Zachowaj wodze w torbach lub banku, aby posiadać tego wierzchowca. Pozostanie twój po wygaśnięciu członkostwa. Wymagana jest umiejętność jeździectwa.',
+    'Płatność za roczne członkostwo została zakończona. Chimera Nocnego Skrzydła jest teraz odblokowana dla każdej postaci na twoim koncie, a jej wodze są w załączniku. Pozostanie twoja po wygaśnięciu członkostwa. Wymagana jest umiejętność jeździectwa.',
   'entities.letters.membership_annual_reward.sender': 'Krucza Poczta',
   'entities.letters.membership_annual_reward.subject': 'Twój wierzchowiec za roczne członkostwo',
   'entities.letters.membership_token_delivery.body':

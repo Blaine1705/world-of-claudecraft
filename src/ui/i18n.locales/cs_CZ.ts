@@ -14599,7 +14599,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.rarity.legendary': 'Legendární',
   'hudChrome.wocStore.rarity.rare': 'Vzácný',
   'hudChrome.wocStore.rarity.uncommon': 'Neobvyklý',
-  'hudChrome.wocStore.rewardsTab': 'Denní odměny',
   'hudChrome.wocStore.scene.day': 'Den',
   'hudChrome.wocStore.scene.dusk': 'Soumrak',
   'hudChrome.wocStore.scene.night': 'Noc',
@@ -14747,7 +14746,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Luk z postříbřené oceli a modrého ledu, ve středu září azurové zmrzlé jádro, na tětivě čeká šíp z pevného ledu a kolem proudí studená pára.',
   'hudChrome.wocStore.skins.winterbite.lore':
     'Luk z postříbřené oceli a thornpeakského ledu, jehož střed osvětluje studené azurové jádro, které přimrazí šíp k tětivě. S každým natažením se znovu vytvoří šíp z pevného ledovcového ledu. Lučištník na zdi nenosí toulec, jen chlad. Highwatch s podobným lukem udržel Stopařův hřeben během obléhání. Jediný lučištník, říká se, a zásoba šípů na celou zimu, které byly vždy připravené.',
-  'hudChrome.wocStore.storeTab': 'Obchod',
+  'hudChrome.wocStore.storeTab': 'Obchod s kosmetikou',
   'hudChrome.wocStore.tabsLabel': 'Sekce obchodu WOC',
   'hudChrome.wocStore.title': 'Obchod WOC',
   'hudChrome.wocStore.tryOn': 'Vyzkoušet',
@@ -20407,7 +20406,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualDelivered':
     'Klíč k jízdnímu zvířeti z balíčku byl doručen poštou.',
   'hudChrome.wocStore.subscription.annualMount':
-    'Po zaplacení si na postavě, která zakoupila tento balíček, vyzvedni poštou otěže Chiméry nočního křídla vázané na duši. Jízdní zvíře ti zůstane i po vypršení členství.',
+    'Odemkne jízdní zvíře Chiméra nočního křídla pro všechny postavy na tvém účtu a otěže vázané na duši pošle poštou postavě, která ho koupí. Jednou na účet a zůstane ti i po skončení členství.',
   'hudChrome.wocStore.subscription.annualPending':
     'Po zaplacení se vrať na postavu, která nákup provedla, a vyzvedni si jízdní zvíře z balíčku. Pokud se platba zpracovává nebo běží zkušební období, zkus to znovu po stržení platby.',
   'hudChrome.wocStore.subscription.annualPrice': '{price} za 12 měsíců, platba předem',
@@ -20433,7 +20432,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.manage': 'Spravovat předplatné',
   'hudChrome.wocStore.subscription.monthlyTitle': 'Měsíční členství',
   'hudChrome.wocStore.subscription.price': '{price} měsíčně',
-  'hudChrome.wocStore.subscription.resumeCheckout': 'Pokračovat v platbě',
   'hudChrome.wocStore.subscription.startTrial': 'Zahájit bezplatné zkušební období na 7 dní',
   'hudChrome.wocStore.subscription.status.active': 'Aktivní',
   'hudChrome.wocStore.subscription.status.canceled': 'Zrušeno',
@@ -23312,7 +23310,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'referralCards.waiting': 'Čekání na přijetí propojeným přítelem.',
   'referralCards.yourCard': 'Kartička s razítky postavy {name}',
   'entities.letters.membership_annual_reward.body':
-    'Platba za roční členství byla dokončena. Otěže tvého jízdního zvířete jsou přiloženy. Pro vlastnictví zvířete ponech otěže v brašnách nebo bance. Zůstane tvé i po vypršení členství. Vyžaduje dovednost jízdy.',
+    'Platba za roční členství byla dokončena. Chiméra nočního křídla je nyní odemčená pro všechny postavy na tvém účtu a její otěže jsou přiloženy. Zůstane tvá i po vypršení členství. Vyžaduje dovednost jízdy.',
   'entities.letters.membership_annual_reward.sender': 'Havraní pošta',
   'entities.letters.membership_annual_reward.subject': 'Tvé jízdní zvíře za roční členství',
   'entities.letters.membership_token_delivery.body':

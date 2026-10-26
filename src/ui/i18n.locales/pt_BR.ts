@@ -14875,7 +14875,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.rarity.legendary': 'Lendário',
   'hudChrome.wocStore.rarity.rare': 'Raro',
   'hudChrome.wocStore.rarity.uncommon': 'Incomum',
-  'hudChrome.wocStore.rewardsTab': 'Recompensas Diárias',
   'hudChrome.wocStore.scene.day': 'Dia',
   'hudChrome.wocStore.scene.dusk': 'Crepúsculo',
   'hudChrome.wocStore.scene.night': 'Noite',
@@ -15023,7 +15022,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Arco de aço prateado e gelo azul, núcleo ciano congelado e luminoso na empunhadura, flecha de gelo maciço engatilhada e vapor frio.',
   'hudChrome.wocStore.skins.winterbite.lore':
     'Um arco de aço prateado e gelo de Thornpeak, com a empunhadura iluminada por um núcleo ciano gelado que congela a flecha à corda. Ele engatilha uma haste de gelo glacial que se refaz a cada disparo; na muralha, o arqueiro não leva aljava, apenas o frio. Highwatch resistiu a um cerco na Crista do rastreador com um arco assim: um único arqueiro, dizem, e flechas para um inverno inteiro, sempre já prontas.',
-  'hudChrome.wocStore.storeTab': 'Loja',
+  'hudChrome.wocStore.storeTab': 'Loja de cosméticos',
   'hudChrome.wocStore.tabsLabel': 'Seções da loja WOC',
   'hudChrome.wocStore.title': 'Loja WOC',
   'hudChrome.wocStore.tryOn': 'Experimente',
@@ -22943,7 +22942,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.manage': 'Gerenciar assinatura',
   'hudChrome.wocStore.subscription.monthlyTitle': 'Assinatura mensal',
   'hudChrome.wocStore.subscription.price': '{price} por mês',
-  'hudChrome.wocStore.subscription.resumeCheckout': 'Retomar pagamento',
   'hudChrome.wocStore.subscription.startTrial': 'Iniciar teste gratuito de 7 dias',
   'hudChrome.wocStore.subscription.status.active': 'Ativo',
   'hudChrome.wocStore.subscription.status.canceled': 'Cancelado',
@@ -23856,7 +23854,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Invoque um burro voador para levar itens entre suas bolsas e o banco mais próximo. Cada viagem leva até 15 segundos até o banco e até 15 segundos de volta, voando mais rápido nas rotas longas. Escolha até 24 pilhas por viagem. Os itens devolvidos transbordam as bolsas cheias; depois o mensageiro desaparece até ser invocado de novo. A volta pausa enquanto você está morto ou em uma instância. É necessária assinatura para iniciar uma nova viagem.',
   'entities.items.reins_lantern_hall_destrier.name': 'Rédeas do Corcel do Salão da Lanterna',
   'entities.letters.membership_annual_reward.body':
-    'O pagamento da sua assinatura anual foi concluído. As rédeas da montaria estão anexas. Mantenha as rédeas nas bolsas ou no banco para possuir esta montaria. Ela continua sua após o fim da assinatura. É necessária habilidade de montaria.',
+    'O pagamento da sua assinatura anual foi concluído. A Quimera de Asa Noturna agora está desbloqueada para todos os personagens da sua conta, e as rédeas estão anexas. Ela continua sua após o fim da assinatura. É necessária habilidade de montaria.',
   'entities.letters.membership_token_delivery.body':
     'Sua ficha comprada está anexa. Resgate para adicionar 30 dias de assinatura à conta ou negocie com outro aventureiro.',
   'entities.npcs.cantor_laverock.greeting':
@@ -24662,7 +24660,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualDelivered':
     'A chave de montaria do seu pacote foi entregue pelo correio.',
   'hudChrome.wocStore.subscription.annualMount':
-    'Após pagar, colete pelo correio as rédeas vinculadas à alma da Quimera de Asa Noturna no personagem que comprou o pacote. A montaria continua sua depois que a assinatura vence.',
+    'Desbloqueia a montaria Quimera de Asa Noturna para todos os personagens da sua conta, e as rédeas vinculadas à alma chegam pelo correio ao personagem que a compra. Uma por conta, e continua sua depois que a assinatura termina.',
   'hudChrome.wocStore.subscription.annualPending':
     'Volte ao personagem comprador após pagar para coletar a montaria do pacote. Se o pagamento estiver processando ou o teste ativo, tente novamente após a cobrança paga.',
   'hudChrome.wocStore.subscription.annualPrice': '{price} por 12 meses, pagos antecipadamente',

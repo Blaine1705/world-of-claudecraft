@@ -446,6 +446,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountBankEmpty': 'この銀行は空です。',
   'hudChrome.bank.accountBagsEmpty': 'バッグは空です。',
   'hudChrome.wocStore.subscription.tokenTitle': '取引可能なメンバーシップトークン',
+  'hudChrome.wocStore.subscription.tokenPrice': '30日分で{price}',
   'hudChrome.wocStore.subscription.tokenTerms':
     '{price}の一括払いで30日分。このキャラクターに郵便で届きます。使用してメンバーシップ期間を追加するか、オークションで売却できます。',
   'hudChrome.wocStore.subscription.tokenBuy': 'メンバーシップトークンを購入',
@@ -476,6 +477,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.terms':
     '毎月自動更新されます。Stripe で法定通貨によるお支払いができます。請求設定から解約できます。',
   'hudChrome.wocStore.subscription.subscribe': '定期購入する',
+  'hudChrome.wocStore.subscription.addMonth': '1か月追加',
+  'hudChrome.wocStore.subscription.addYear': '12か月追加',
+  'hudChrome.wocStore.subscription.stackTerms':
+    '今すぐお支払い。期間は現在のメンバーシップの終了日に追加され、その後このプランで更新されます。',
+  'hudChrome.wocStore.subscription.stackCapped':
+    'メンバーシップは一度に最大2年分まで保持できます。更新日が近づいてから再度お試しください。',
+  'hudChrome.wocStore.subscription.stackUnavailable':
+    '現在メンバーシップ期間を追加できません。しばらくしてから再度お試しください。',
+  'hudChrome.wocStore.subscription.billingBlocked':
+    'メンバーシップ期間を追加する前に、「定期購入を管理」で支払い情報を更新してください。',
+  'hudChrome.wocStore.subscription.renewsOn': '{date}に更新',
+  'hudChrome.wocStore.subscription.endsOn': 'メンバーシップは{date}に終了',
   'hudChrome.wocStore.subscription.manage': '定期購入を管理',
   'hudChrome.wocStore.subscription.ending': '現在の請求期間の終了時に解約されます',
   'hudChrome.wocStore.subscription.error':
@@ -2590,8 +2603,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.title': 'WOCストア',
   'hudChrome.wocStore.close': 'WOCストアを閉じる',
   'hudChrome.wocStore.tabsLabel': 'WOCストアのセクション',
-  'hudChrome.wocStore.storeTab': 'ストア',
-  'hudChrome.wocStore.rewardsTab': 'デイリー報酬',
+  'hudChrome.wocStore.storeTab': 'コスメティックストア',
+  'hudChrome.wocStore.membershipsTab': 'メンバーシップ',
+  'hudChrome.wocStore.membershipsUnavailable':
+    '現在メンバーシップを利用できません。しばらくしてから再度お試しください。',
   'hudChrome.wocStore.mountsEyebrow': 'アカウント共有マウント',
   'hudChrome.wocStore.mountsTitle': '機械の厩舎',
   'hudChrome.wocStore.mountBuyAria': '{item}を購入',
@@ -21538,7 +21553,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualTerms':
     '同じ料金で毎年更新されます。Stripeで法定通貨を使ってお支払いください。請求設定で解約できます。',
   'hudChrome.wocStore.subscription.annualMount':
-    '支払い後、購入したキャラクターで郵便から魂に縛られたナイトウィング・キマイラの手綱を受け取れます。メンバーシップが終了しても騎乗動物は所有できます。',
+    'アカウントの全キャラクターでナイトウィング・キマイラの騎乗動物が解放され、魂に縛られた手綱は購入したキャラクターに郵便で届きます。1アカウントにつき1体で、メンバーシップ終了後も所有できます。',
   'hudChrome.wocStore.subscription.trialTerms':
     '1アカウントにつき1回、{days}日間無料で体験できます。支払い方法の登録が必要です。解約しない場合、体験終了時に{price}が請求されます。',
   'hudChrome.wocStore.subscription.startTrial': '7日間の無料体験を開始',
@@ -21546,11 +21561,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualPending':
     '支払い後、購入したキャラクターに戻って騎乗動物を受け取ってください。支払い処理中や無料体験中の場合は、課金後に再試行してください。',
   'hudChrome.wocStore.subscription.annualDelivered': 'セットの騎乗動物の鍵が郵便で届きました。',
-  'hudChrome.wocStore.subscription.resumeCheckout': '購入手続きを再開',
   'entities.letters.membership_annual_reward.sender': 'レイヴンポスト',
   'entities.letters.membership_annual_reward.subject': '年間メンバーシップの騎乗動物',
   'entities.letters.membership_annual_reward.body':
-    '年間メンバーシップの支払いが完了しました。騎乗動物の手綱を同封しました。所有するには手綱をバッグか銀行に保管してください。メンバーシップが終了しても所有権は維持されます。騎乗スキルが必要です。',
+    '年間メンバーシップの支払いが完了しました。ナイトウィング・キマイラがアカウントの全キャラクターで解放され、手綱を同封しました。メンバーシップが終了しても所有できます。騎乗スキルが必要です。',
   'hudChrome.wocStore.subscription.checkoutClosed':
     'この購入手続きは終了しており、未受領の特典はありません。メンバーシッププランをもう一度選び、新しい購入手続きを開始してください。',
   'itemUi.tooltip.referralFullSet':

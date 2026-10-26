@@ -15,7 +15,10 @@ import type { ClientSession } from './game';
 import { CUSTODY_PARCEL_LETTERS, confirmCustodyParcelBooked } from './mail_custody_overlay';
 import { transferCourierAccountLeg } from './membership_bank_db';
 import { createMembershipBankService } from './membership_bank_service';
-import { MEMBERSHIP_REFRESH_BATCH_SIZE } from './membership_batch';
+import {
+  configureMembershipBatchDatabase,
+  MEMBERSHIP_REFRESH_BATCH_SIZE,
+} from './membership_batch';
 import { consumeMembershipToken, redeemMembershipTokenAtomic } from './membership_redemption_db';
 import {
   bustMembership,
@@ -45,10 +48,18 @@ interface MembershipGameHost {
   observeCost(ms: number): void;
   mailWrite<T>(job: () => Promise<T>, signal?: AbortSignal): Promise<T>;
   database<T>(job: () => Promise<T>, signal?: AbortSignal): Promise<T>;
+  /** Refresh live sessions after an annual reward persisted the account mount entitlement. */
+  grantAnnualMount(accountId: number): void;
 }
 export const MEMBERSHIP_REFRESH_WORKERS = 4;
 export const MEMBERSHIP_REFRESH_MS = 30_000;
 export const MEMBERSHIP_REFRESH_COALESCE_MS = 25;
+
+/** Realm boot wires batch reads through the same admission gate as membership operations. */
+export function createMembershipGameServices(host: MembershipGameHost): MembershipGameServices {
+  configureMembershipBatchDatabase((job) => host.database(job));
+  return new MembershipGameServices(host);
+}
 
 interface MembershipAccountSessions {
   sessions: Set<ClientSession>;
@@ -167,7 +178,10 @@ export class MembershipGameServices {
     receiptId: string,
   ): Promise<boolean> {
     this.annualDelivery ??= this.createDelivery(persistMembershipAnnualDelivery);
-    return this.annualDelivery(accountId, recipient, receiptId);
+    return this.annualDelivery(accountId, recipient, receiptId).then((delivered) => {
+      if (delivered) this.host.grantAnnualMount(accountId);
+      return delivered;
+    });
   }
 
   private createDelivery(persist: typeof persistMembershipTokenDelivery) {

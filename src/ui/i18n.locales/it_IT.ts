@@ -15025,7 +15025,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.rarity.legendary': 'Leggendario',
   'hudChrome.wocStore.rarity.rare': 'Raro',
   'hudChrome.wocStore.rarity.uncommon': 'Non comune',
-  'hudChrome.wocStore.rewardsTab': 'Premi giornalieri',
   'hudChrome.wocStore.scene.day': 'Giorno',
   'hudChrome.wocStore.scene.dusk': 'Crepuscolo',
   'hudChrome.wocStore.scene.night': 'Notte',
@@ -15174,7 +15173,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Arco di acciaio argentato e ghiaccio azzurro, nucleo ciano ghiacciato e luminoso nell'impugnatura, freccia di ghiaccio massiccio incoccata e vapore freddo.",
   'hudChrome.wocStore.skins.winterbite.lore':
     "Un arco di acciaio argentato e ghiaccio di Thornpeak, con l'impugnatura illuminata da un freddo nucleo ciano che congela la freccia alla corda. Incocca un dardo di ghiaccio glaciale che si riforma a ogni tiro; sulla muraglia l'arciere non porta una faretra, soltanto il freddo. Highwatch resistette a un assedio sulla Cresta del braccatore grazie a un arco simile: un solo arciere, si dice, e frecce per un intero inverno, sempre già pronte.",
-  'hudChrome.wocStore.storeTab': 'Negozio',
+  'hudChrome.wocStore.storeTab': 'Negozio cosmetici',
   'hudChrome.wocStore.tabsLabel': 'Sezioni del negozio WOC',
   'hudChrome.wocStore.title': 'Negozio WOC',
   'hudChrome.wocStore.tryOn': 'Provalo',
@@ -21084,7 +21083,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Evoca un asino volante che trasporta oggetti tra le tue borse e la banca più vicina. Ogni viaggio richiede fino a 15 secondi per raggiungere la banca e fino a 15 secondi per tornare, volando più velocemente sui percorsi più lunghi. Scegli fino a 24 pile per viaggio. Gli oggetti restituiti possono superare la capienza delle borse piene, poi il corriere scompare finché non viene evocato di nuovo. Il viaggio di ritorno si interrompe mentre sei morto o all'interno di un'istanza. Per iniziare un nuovo viaggio serve un abbonamento.",
   'entities.abilities.courier.name': 'Corriere',
   'entities.letters.membership_annual_reward.body':
-    "Il pagamento del tuo abbonamento annuale è stato completato. Trovi allegate le redini della tua cavalcatura. Conservale nelle borse o in banca per possedere questa cavalcatura. Resta tua anche dopo la scadenza dell'abbonamento. Richiede l'abilità di cavalcare.",
+    "Il pagamento del tuo abbonamento annuale è stato completato. La Chimera Ala Notturna è ora sbloccata per tutti i personaggi del tuo account, e trovi allegate le sue redini. Resta tua anche dopo la scadenza dell'abbonamento. Richiede l'abilità di cavalcare.",
   'entities.letters.membership_annual_reward.sender': 'La Posta del Corvo',
   'entities.letters.membership_annual_reward.subject':
     "La tua cavalcatura dell'abbonamento annuale",
@@ -22260,7 +22259,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualDelivered':
     'La chiave della cavalcatura del pacchetto è stata consegnata per posta.',
   'hudChrome.wocStore.subscription.annualMount':
-    "Dopo il pagamento, ritira per posta le redini vincolate all'anima della Chimera Ala Notturna con il personaggio che ha acquistato il pacchetto. La cavalcatura resta tua dopo la scadenza dell'abbonamento.",
+    "Sblocca la cavalcatura Chimera Ala Notturna per tutti i personaggi del tuo account, e le sue redini vincolate all'anima arrivano per posta al personaggio che la acquista. Una per account, e resta tua dopo la fine dell'abbonamento.",
   'hudChrome.wocStore.subscription.annualPending':
     "Dopo il pagamento torna al personaggio che ha effettuato l'acquisto per ritirare la cavalcatura del pacchetto. Se il pagamento è in elaborazione o la prova è attiva, riprova dopo l'addebito.",
   'hudChrome.wocStore.subscription.annualPrice': '{price} per 12 mesi, pagati in anticipo',
@@ -22287,7 +22286,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.manage': 'Gestisci abbonamento',
   'hudChrome.wocStore.subscription.monthlyTitle': 'Abbonamento mensile',
   'hudChrome.wocStore.subscription.price': '{price} al mese',
-  'hudChrome.wocStore.subscription.resumeCheckout': 'Riprendi pagamento',
   'hudChrome.wocStore.subscription.startTrial': 'Inizia la prova gratuita di 7 giorni',
   'hudChrome.wocStore.subscription.status.active': 'Attivo',
   'hudChrome.wocStore.subscription.status.canceled': 'Annullato',

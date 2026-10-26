@@ -2210,6 +2210,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountBankEmpty': 'Этот банк пуст.',
   'hudChrome.bank.accountBagsEmpty': 'Ваши сумки пусты.',
   'hudChrome.wocStore.subscription.tokenTitle': 'Передаваемый жетон членства',
+  'hudChrome.wocStore.subscription.tokenPrice': '{price} за 30 дней',
   'hudChrome.wocStore.subscription.tokenTerms':
     'Разовый платёж {price} за 30 дней. Жетон придёт этому персонажу по почте. Используйте его, чтобы продлить членство, или продайте на аукционе.',
   'hudChrome.wocStore.subscription.tokenBuy': 'Купить жетон членства',
@@ -2241,6 +2242,18 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.terms':
     'Продлевается ежемесячно. Оплата фиатной валютой через Stripe. Отмена в настройках платежей.',
   'hudChrome.wocStore.subscription.subscribe': 'Подписаться',
+  'hudChrome.wocStore.subscription.addMonth': 'Добавить 1 месяц',
+  'hudChrome.wocStore.subscription.addYear': 'Добавить 12 месяцев',
+  'hudChrome.wocStore.subscription.stackTerms':
+    'Оплата сейчас. Срок добавляется к концу текущего членства, затем подписка продлевается по этому тарифу.',
+  'hudChrome.wocStore.subscription.stackCapped':
+    'Можно иметь не более 2 лет членства одновременно. Попробуйте ближе к дате продления.',
+  'hudChrome.wocStore.subscription.stackUnavailable':
+    'Сейчас нельзя добавить время членства. Повторите попытку чуть позже.',
+  'hudChrome.wocStore.subscription.billingBlocked':
+    'Прежде чем добавить время членства, обновите платёжные данные в разделе «Управление подпиской».',
+  'hudChrome.wocStore.subscription.renewsOn': 'Продление {date}',
+  'hudChrome.wocStore.subscription.endsOn': 'Членство заканчивается {date}',
   'hudChrome.wocStore.subscription.manage': 'Управление подпиской',
   'hudChrome.wocStore.subscription.ending': 'Будет отменена в конце расчётного периода',
   'hudChrome.wocStore.subscription.error':
@@ -4387,8 +4400,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.title': 'Магазин WOC',
   'hudChrome.wocStore.close': 'Закрыть магазин WOC',
   'hudChrome.wocStore.tabsLabel': 'Разделы магазина WOC',
-  'hudChrome.wocStore.storeTab': 'Магазин',
-  'hudChrome.wocStore.rewardsTab': 'Ежедневные награды',
+  'hudChrome.wocStore.storeTab': 'Магазин косметики',
+  'hudChrome.wocStore.membershipsTab': 'Членство',
+  'hudChrome.wocStore.membershipsUnavailable':
+    'Членство сейчас недоступно. Повторите попытку чуть позже.',
   'hudChrome.wocStore.mountsEyebrow': 'Маунты аккаунта',
   'hudChrome.wocStore.mountsTitle': 'Механическая конюшня',
   'hudChrome.wocStore.mountBuyAria': 'Купить: {item}',
@@ -23671,7 +23686,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualTerms':
     'Ежегодное продление по той же цене. Оплата обычной валютой через Stripe. Отмена в настройках платежей.',
   'hudChrome.wocStore.subscription.annualMount':
-    'После оплаты заберите по почте персональные поводья Ночнокрылой химеры на персонаже, купившем этот комплект. Верховое животное останется у вас после окончания подписки.',
+    'Открывает верховое животное Ночнокрылая химера для всех персонажей аккаунта, а персональные поводья приходят по почте персонажу, который его купил. Одно на аккаунт, и оно останется у вас после окончания подписки.',
   'hudChrome.wocStore.subscription.trialTerms':
     'Бесплатный пробный период на {days} дней доступен один раз на аккаунт. Требуется способ оплаты. Если не отменить подписку, по окончании будет списано {price}.',
   'hudChrome.wocStore.subscription.startTrial': 'Начать пробные 7 дней',
@@ -23680,11 +23695,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'После оплаты вернитесь на персонажа, купившего набор, чтобы получить транспорт. Если платеж обрабатывается или действует пробный период, повторите попытку после оплаты.',
   'hudChrome.wocStore.subscription.annualDelivered':
     'Ключ от транспорта набора доставлен по почте.',
-  'hudChrome.wocStore.subscription.resumeCheckout': 'Продолжить оформление',
   'entities.letters.membership_annual_reward.sender': 'Воронья почта',
   'entities.letters.membership_annual_reward.subject': 'Транспорт годового членства',
   'entities.letters.membership_annual_reward.body':
-    'Оплата годовой подписки завершена. К письму приложены поводья верхового животного. Храните поводья в сумках или банке, чтобы владеть им. Оно останется у вас после окончания подписки. Требуется навык верховой езды.',
+    'Оплата годовой подписки завершена. Ночнокрылая химера теперь доступна всем персонажам вашего аккаунта, а её поводья приложены к письму. Она останется у вас после окончания подписки. Требуется навык верховой езды.',
   'hudChrome.wocStore.subscription.checkoutClosed':
     'Это оформление завершено, неполученных наград нет. Выберите план членства ещё раз, чтобы начать новое оформление.',
   'itemUi.tooltip.referralFullSet':

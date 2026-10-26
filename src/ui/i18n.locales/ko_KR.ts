@@ -434,6 +434,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountBankEmpty': '이 은행은 비어 있습니다.',
   'hudChrome.bank.accountBagsEmpty': '가방이 비어 있습니다.',
   'hudChrome.wocStore.subscription.tokenTitle': '거래 가능한 멤버십 토큰',
+  'hudChrome.wocStore.subscription.tokenPrice': '30일 {price}',
   'hudChrome.wocStore.subscription.tokenTerms':
     '{price}를 한 번 결제하면 30일 이용권을 받습니다. 이 캐릭터에게 우편으로 전달됩니다. 사용하여 멤버십 기간을 추가하거나 경매장에서 판매하세요.',
   'hudChrome.wocStore.subscription.tokenBuy': '멤버십 토큰 구매',
@@ -464,6 +465,18 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.terms':
     '매월 자동 갱신됩니다. Stripe에서 법정 화폐로 결제하세요. 결제 설정에서 취소할 수 있습니다.',
   'hudChrome.wocStore.subscription.subscribe': '구독하기',
+  'hudChrome.wocStore.subscription.addMonth': '1개월 추가',
+  'hudChrome.wocStore.subscription.addYear': '12개월 추가',
+  'hudChrome.wocStore.subscription.stackTerms':
+    '지금 결제합니다. 기간이 현재 멤버십 종료일 뒤에 추가되고 이후 이 요금제로 갱신됩니다.',
+  'hudChrome.wocStore.subscription.stackCapped':
+    '멤버십은 한 번에 최대 2년까지 보유할 수 있습니다. 갱신일이 가까워지면 다시 시도하세요.',
+  'hudChrome.wocStore.subscription.stackUnavailable':
+    '지금은 멤버십 기간을 추가할 수 없습니다. 잠시 후 다시 시도하세요.',
+  'hudChrome.wocStore.subscription.billingBlocked':
+    '멤버십 기간을 추가하기 전에 구독 관리에서 결제 정보를 업데이트하세요.',
+  'hudChrome.wocStore.subscription.renewsOn': '{date}에 갱신',
+  'hudChrome.wocStore.subscription.endsOn': '멤버십 종료일: {date}',
   'hudChrome.wocStore.subscription.manage': '구독 관리',
   'hudChrome.wocStore.subscription.ending': '현재 결제 기간이 끝나면 취소됩니다',
   'hudChrome.wocStore.subscription.error':
@@ -2578,8 +2591,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.title': 'WOC 상점',
   'hudChrome.wocStore.close': 'WOC 상점 닫기',
   'hudChrome.wocStore.tabsLabel': 'WOC 상점 구역',
-  'hudChrome.wocStore.storeTab': '상점',
-  'hudChrome.wocStore.rewardsTab': '일일 보상',
+  'hudChrome.wocStore.storeTab': '외형 상점',
+  'hudChrome.wocStore.membershipsTab': '멤버십',
+  'hudChrome.wocStore.membershipsUnavailable':
+    '지금은 멤버십을 이용할 수 없습니다. 잠시 후 다시 시도하세요.',
   'hudChrome.wocStore.mountsEyebrow': '계정 탈것',
   'hudChrome.wocStore.mountsTitle': '기계 마구간',
   'hudChrome.wocStore.mountBuyAria': '{item} 구매',
@@ -21501,7 +21516,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualTerms':
     '같은 가격으로 매년 갱신됩니다. Stripe에서 법정 화폐로 결제하세요. 결제 설정에서 취소할 수 있습니다.',
   'hudChrome.wocStore.subscription.annualMount':
-    '결제 후 이 묶음을 구매한 캐릭터의 우편으로 귀속된 밤날개 키메라 고삐를 받으세요. 멤버십이 만료되어도 탈것은 계속 소유합니다.',
+    '계정의 모든 캐릭터에게 밤날개 키메라 탈것이 해제되고, 귀속된 고삐는 구매한 캐릭터에게 우편으로 전달됩니다. 계정당 하나이며 멤버십이 끝나도 계속 소유합니다.',
   'hudChrome.wocStore.subscription.trialTerms':
     '계정당 한 번 {days}일간 무료로 체험하세요. 결제 수단 등록이 필요합니다. 취소하지 않으면 체험 종료 시 {price}가 청구됩니다.',
   'hudChrome.wocStore.subscription.startTrial': '7일 무료 체험 시작',
@@ -21509,11 +21524,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualPending':
     '결제 후 구매한 캐릭터로 돌아와 탈것을 받으세요. 결제 처리 중이거나 체험 중이면 유료 결제가 완료된 뒤 다시 시도하세요.',
   'hudChrome.wocStore.subscription.annualDelivered': '묶음 탈것 열쇠가 우편으로 배송되었습니다.',
-  'hudChrome.wocStore.subscription.resumeCheckout': '결제 계속하기',
   'entities.letters.membership_annual_reward.sender': '까마귀 우편',
   'entities.letters.membership_annual_reward.subject': '연간 멤버십 탈것',
   'entities.letters.membership_annual_reward.body':
-    '연간 멤버십 결제가 완료되었습니다. 탈것 고삐가 동봉되어 있습니다. 탈것을 소유하려면 고삐를 가방이나 은행에 보관하세요. 멤버십이 만료되어도 계속 소유합니다. 탈것 타기 기술이 필요합니다.',
+    '연간 멤버십 결제가 완료되었습니다. 이제 계정의 모든 캐릭터에게 밤날개 키메라가 해제되었으며, 고삐가 동봉되어 있습니다. 멤버십이 만료되어도 계속 소유합니다. 탈것 타기 기술이 필요합니다.',
   'hudChrome.wocStore.subscription.checkoutClosed':
     '이 결제는 종료되었으며 미수령 보상이 없습니다. 멤버십 요금제를 다시 선택하여 새 결제를 시작하세요.',
   'itemUi.tooltip.referralFullSet':

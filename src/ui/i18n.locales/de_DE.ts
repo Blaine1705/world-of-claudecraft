@@ -13978,7 +13978,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.rarity.legendary': 'Legendär',
   'hudChrome.wocStore.rarity.rare': 'Selten',
   'hudChrome.wocStore.rarity.uncommon': 'Ungewöhnlich',
-  'hudChrome.wocStore.rewardsTab': 'Tägliche Belohnungen',
   'hudChrome.wocStore.scene.day': 'Tag',
   'hudChrome.wocStore.scene.dusk': 'Dämmerung',
   'hudChrome.wocStore.scene.night': 'Nacht',
@@ -14127,7 +14126,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Bogen aus versilbertem Stahl und blauem Eis, ein leuchtender cyanfarbener Frostkern im Mittelstück, ein eingelegter Pfeil aus massivem Eis und kalter Dunst.',
   'hudChrome.wocStore.skins.winterbite.lore':
     'Ein Bogen aus versilbertem Stahl und Eis aus Thornpeak. In seinem Mittelstück leuchtet ein kalter cyanfarbener Kern, der den Pfeil an der Sehne festfriert. Bei jedem Spannen bildet sich ein neuer Pfeil aus massivem Gletschereis. Der Bogenschütze auf der Mauer trägt keinen Köcher, nur die Kälte. Mit einem solchen Bogen hielt Highwatch den Pirscherkamm während einer Belagerung: ein einziger Schütze, so sagt man, und ein Winter voller Pfeile, die schon immer dort gewesen waren.',
-  'hudChrome.wocStore.storeTab': 'Shop',
+  'hudChrome.wocStore.storeTab': 'Kosmetik-Shop',
   'hudChrome.wocStore.tabsLabel': 'Bereiche des WOC-Shops',
   'hudChrome.wocStore.title': 'WOC-Shop',
   'hudChrome.wocStore.tryOn': 'Ausprobieren',
@@ -21897,7 +21896,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualDelivered':
     'Der Schlüssel für dein Paketreittier wurde per Post zugestellt.',
   'hudChrome.wocStore.subscription.annualMount':
-    'Hole nach der Zahlung die seelengebundenen Zügel der Nachtflügelchimäre per Post mit dem Charakter ab, der dieses Paket gekauft hat. Das Reittier bleibt nach Ablauf der Mitgliedschaft dein Eigentum.',
+    'Schaltet die Nachtflügelchimäre als Reittier für alle Charaktere deines Kontos frei. Die seelengebundenen Zügel werden per Post an den kaufenden Charakter geschickt. Einmal pro Konto, und sie bleibt nach Ende der Mitgliedschaft dein Eigentum.',
   'hudChrome.wocStore.subscription.annualPending':
     'Kehre nach der Zahlung zum kaufenden Charakter zurück, um das Paketreittier abzuholen. Wird die Zahlung noch verarbeitet oder läuft der Testzeitraum, versuche es nach der kostenpflichtigen Abbuchung erneut.',
   'hudChrome.wocStore.subscription.annualPrice': '{price} für 12 Monate, im Voraus bezahlt',
@@ -21923,7 +21922,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.manage': 'Abonnement verwalten',
   'hudChrome.wocStore.subscription.monthlyTitle': 'Monatliche Mitgliedschaft',
   'hudChrome.wocStore.subscription.price': '{price} pro Monat',
-  'hudChrome.wocStore.subscription.resumeCheckout': 'Bezahlvorgang fortsetzen',
   'hudChrome.wocStore.subscription.startTrial': 'Kostenlosen 7-Tage-Test starten',
   'hudChrome.wocStore.subscription.status.canceled': 'Gekündigt',
   'hudChrome.wocStore.subscription.status.incomplete': 'Zahlung unvollständig',
@@ -25569,7 +25567,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.wyrmshadow_tunic.name': 'Wyrmschattentunika',
   'entities.items.wyrmshadow_vest.name': 'Wyrmschattenweste',
   'entities.letters.membership_annual_reward.body':
-    'Deine jährliche Mitgliedschaftszahlung ist abgeschlossen. Die Zügel deines Reittiers liegen bei. Bewahre sie in deinen Taschen oder auf der Bank auf, damit dir dieses Reittier gehört. Es bleibt auch nach Ablauf deiner Mitgliedschaft in deinem Besitz. Reitfertigkeit erforderlich.',
+    'Deine jährliche Mitgliedschaftszahlung ist abgeschlossen. Die Nachtflügelchimäre ist jetzt für alle Charaktere deines Kontos freigeschaltet, und ihre Zügel liegen bei. Sie bleibt auch nach Ablauf deiner Mitgliedschaft in deinem Besitz. Reitfertigkeit erforderlich.',
   'entities.letters.membership_annual_reward.sender': 'Die Rabenpost',
   'entities.letters.membership_annual_reward.subject': 'Dein Reittier zur Jahresmitgliedschaft',
   'entities.letters.membership_token_delivery.body':

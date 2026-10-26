@@ -14,6 +14,11 @@
    written per element by the HUD, never on :root. */
 @layer tokens {
   :root {
+    --color-membership-border: #6f592d;
+    --color-membership-highlight: rgb(200 163 74 / 10%);
+    --color-membership-surface: rgb(5 10 15 / 60%);
+    --color-membership-current: #c8a34a;
+    --color-membership-heading: #f3dfaa;
     --color-vehicle-integrity: #2f8c4a;
     --color-vehicle-danger: #b72b27;
     --color-vehicle-text: #ffffff;

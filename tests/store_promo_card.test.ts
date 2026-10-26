@@ -518,6 +518,7 @@ describe('store promo card', () => {
     let member = false;
     const deps = {
       openStore: vi.fn(),
+      openMemberships: vi.fn(),
       openReferralCards: vi.fn(),
       membershipActive: () => member,
     };
@@ -528,9 +529,11 @@ describe('store promo card', () => {
       '/ui/store/membership-promo.webp',
       '/ui/store/referral-promo.webp',
     ]);
+    slides[0].onOpen();
     slides[1].onOpen();
     slides[2].onOpen();
     expect(deps.openStore).toHaveBeenCalledOnce();
+    expect(deps.openMemberships).toHaveBeenCalledOnce();
     expect(deps.openReferralCards).toHaveBeenCalledOnce();
     expect(slides[1].available?.()).toBe(true);
     member = true;

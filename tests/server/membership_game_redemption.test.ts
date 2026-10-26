@@ -42,6 +42,7 @@ function fixture() {
     kick: vi.fn(),
     observeCost: vi.fn(),
     mailWrite: async (job) => job(),
+    grantAnnualMount: vi.fn(),
     database: async (job) => job(),
   };
   return { host, session, inventory, service: new MembershipGameServices(host) };

@@ -6929,7 +6929,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.rarity.legendary': 'Légendaire',
   'hudChrome.wocStore.rarity.rare': 'Rare',
   'hudChrome.wocStore.rarity.uncommon': 'Inhabituel',
-  'hudChrome.wocStore.rewardsTab': 'Récompenses quotidiennes',
   'hudChrome.wocStore.scene.day': 'Jour',
   'hudChrome.wocStore.scene.dusk': 'Crépuscule',
   'hudChrome.wocStore.scene.night': 'Nuit',
@@ -7077,7 +7076,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Arc d’acier argenté et de glace bleue, cœur gelé cyan lumineux dans la poignée, flèche de glace massive encochée et vapeur froide.',
   'hudChrome.wocStore.skins.winterbite.lore':
     'Un arc d’acier argenté et de glace de Thornpeak, dont la poignée est éclairée par un cœur cyan glacé qui fige la flèche sur la corde. Il encoche un trait de glace de glacier massive qui se reforme à chaque tension. Sur le rempart, l’archer ne porte aucun carquois, seulement le froid. Highwatch a tenu la Crête du Traqueur durant un siège avec un arc semblable : un unique archer, dit-on, et tout un hiver de flèches qui se trouvaient toujours déjà là.',
-  'hudChrome.wocStore.storeTab': 'Boutique',
+  'hudChrome.wocStore.storeTab': 'Boutique cosmétique',
   'hudChrome.wocStore.tabsLabel': 'Sections de la boutique WOC',
   'hudChrome.wocStore.title': 'Boutique WOC',
   'hudChrome.wocStore.tryOn': 'Essayer',
@@ -21959,7 +21958,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualDelivered':
     "La clé de votre monture d'offre a été livrée par courrier.",
   'hudChrome.wocStore.subscription.annualMount':
-    "Après le paiement, récupérez par courrier les rênes liées à l'âme de la Chimère Aile-de-nuit avec le personnage qui a acheté cette offre. La monture reste à vous après l'expiration de l'abonnement.",
+    "Débloque la monture Chimère Aile-de-nuit pour tous les personnages de votre compte, et ses rênes liées à l'âme sont envoyées par courrier au personnage qui l'achète. Une par compte, et elle reste à vous après la fin de l'abonnement.",
   'hudChrome.wocStore.subscription.annualPending':
     "Revenez sur le personnage acheteur après le paiement pour récupérer la monture de l'offre. Si le paiement est en cours ou si l'essai est actif, réessayez après le prélèvement payant.",
   'hudChrome.wocStore.subscription.annualPrice': "{price} pour 12 mois, payés d'avance",
@@ -21987,7 +21986,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.manage': "Gérer l'abonnement",
   'hudChrome.wocStore.subscription.monthlyTitle': 'Abonnement mensuel',
   'hudChrome.wocStore.subscription.price': '{price} par mois',
-  'hudChrome.wocStore.subscription.resumeCheckout': 'Reprendre le paiement',
   'hudChrome.wocStore.subscription.startTrial': "Commencer l'essai gratuit de 7 jours",
   'hudChrome.wocStore.subscription.status.canceled': 'Résilié',
   'hudChrome.wocStore.subscription.status.incomplete': 'Paiement incomplet',
@@ -25663,7 +25661,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.wyrmshadow_tunic.name': "Tunique de l'Ombre du wyrm",
   'entities.items.wyrmshadow_vest.name': "Gilet de l'Ombre du wyrm",
   'entities.letters.membership_annual_reward.body':
-    "Le paiement de votre abonnement annuel est terminé. Les rênes de votre monture sont jointes. Gardez les rênes dans vos sacs ou à la banque pour posséder cette monture. Elle reste à vous après l'expiration de l'abonnement. La compétence d'équitation est nécessaire.",
+    "Le paiement de votre abonnement annuel est terminé. La Chimère Aile-de-nuit est désormais débloquée pour tous les personnages de votre compte, et ses rênes sont jointes. Elle reste à vous après l'expiration de l'abonnement. La compétence d'équitation est nécessaire.",
   'entities.letters.membership_annual_reward.sender': 'La Poste aux corbeaux',
   'entities.letters.membership_annual_reward.subject': "Votre monture d'abonnement annuel",
   'entities.letters.membership_token_delivery.body':

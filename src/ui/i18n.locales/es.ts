@@ -15004,7 +15004,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.rarity.legendary': 'Legendario',
   'hudChrome.wocStore.rarity.rare': 'Raro',
   'hudChrome.wocStore.rarity.uncommon': 'Poco común',
-  'hudChrome.wocStore.rewardsTab': 'Recompensas diarias',
   'hudChrome.wocStore.scene.day': 'Día',
   'hudChrome.wocStore.scene.dusk': 'Crepúsculo',
   'hudChrome.wocStore.scene.night': 'Noche',
@@ -15155,7 +15154,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Arco de acero plateado y hielo azul, con un núcleo congelado cian brillante en la empuñadura, una flecha de hielo macizo lista para disparar y vapor frío.',
   'hudChrome.wocStore.skins.winterbite.lore':
     'Un arco de acero plateado y hielo de Thornpeak, con la empuñadura iluminada por un núcleo cian frío que congela la flecha a la cuerda. Carga un astil de hielo glaciar macizo que vuelve a formarse con cada tensado; el arquero no lleva carcaj en el muro, solo el frío. Highwatch resistió un asedio en la Cresta del Acechador con uno como este: un solo arquero, según cuentan, y flechas para un invierno entero que parecían estar allí desde siempre.',
-  'hudChrome.wocStore.storeTab': 'Tienda',
+  'hudChrome.wocStore.storeTab': 'Tienda de cosméticos',
   'hudChrome.wocStore.tabsLabel': 'Secciones de la tienda WOC',
   'hudChrome.wocStore.title': 'Tienda WOC',
   'hudChrome.wocStore.tryOn': 'Probar',
@@ -23314,7 +23313,6 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hudChrome.wocStore.subscription.manage': 'Gestionar suscripción',
   'hudChrome.wocStore.subscription.monthlyTitle': 'Membresía mensual',
   'hudChrome.wocStore.subscription.price': '{price} al mes',
-  'hudChrome.wocStore.subscription.resumeCheckout': 'Reanudar pago',
   'hudChrome.wocStore.subscription.startTrial': 'Iniciar prueba gratuita de 7 días',
   'hudChrome.wocStore.subscription.status.active': 'Activo',
   'hudChrome.wocStore.subscription.status.canceled': 'Cancelado',
@@ -24772,7 +24770,7 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hudChrome.wocStore.subscription.annualDelivered':
     'La llave de la montura de tu paquete se ha entregado por correo.',
   'hudChrome.wocStore.subscription.annualMount':
-    'Después del pago, recoge por correo las riendas ligadas al alma de la Quimera de Ala Nocturna con el personaje que compró este paquete. La montura sigue siendo tuya cuando caduca la membresía.',
+    'Desbloquea la montura Quimera de Ala Nocturna para todos los personajes de tu cuenta, y sus riendas ligadas al alma llegan por correo al personaje que la compra. Una por cuenta, y sigue siendo tuya cuando termina la membresía.',
   'hudChrome.wocStore.subscription.annualPending':
     'Vuelve al personaje comprador después del pago para recoger la montura del paquete. Si el pago se está procesando o la prueba está activa, inténtalo de nuevo después del cargo de pago.',
   'hudChrome.wocStore.subscription.annualPrice': '{price} por 12 meses, pagados por adelantado',
@@ -24902,7 +24900,7 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
     'Invoca un burro volador para transportar objetos entre tus bolsas y el banco más cercano. Cada viaje tarda hasta 15 segundos en llegar al banco y hasta 15 segundos en volver; vuela más rápido en las rutas largas. Elige hasta 24 pilas por viaje. Los objetos devueltos desbordan las bolsas llenas y luego el mensajero desaparece hasta que vuelvas a invocarlo. El viaje de vuelta se pausa mientras estás muerto o dentro de una instancia. Se requiere membresía para iniciar un viaje nuevo.',
   'entities.items.reins_lantern_hall_destrier.name': 'Riendas del Destrero del Salón del Farol',
   'entities.letters.membership_annual_reward.body':
-    'El pago de tu membresía anual se ha completado. Se adjuntan las riendas de tu montura. Conserva las riendas en tus bolsas o banco para ser dueño de esta montura. Sigue siendo tuya cuando caduca la membresía. Se requiere equitación.',
+    'El pago de tu membresía anual se ha completado. La Quimera de Ala Nocturna ya está desbloqueada para todos los personajes de tu cuenta, y se adjuntan sus riendas. Sigue siendo tuya cuando caduca la membresía. Se requiere equitación.',
   'entities.letters.membership_token_delivery.body':
     'Se adjunta la ficha que has comprado. Canjéala para añadir 30 días de membresía a tu cuenta o intercámbiala con otro aventurero.',
   'entities.npcs.cantor_laverock.greeting':

@@ -14525,7 +14525,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.rarity.legendary': 'Legendaris',
   'hudChrome.wocStore.rarity.rare': 'Langka',
   'hudChrome.wocStore.rarity.uncommon': 'Tidak Umum',
-  'hudChrome.wocStore.rewardsTab': 'Hadiah Harian',
   'hudChrome.wocStore.scene.day': 'Hari',
   'hudChrome.wocStore.scene.dusk': 'Senja',
   'hudChrome.wocStore.scene.night': 'Malam',
@@ -14676,7 +14675,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.winterbite.lore':
     'Busur dari baja perak dan es Thornpeak, dengan inti biru dingin yang membekukan anak panah pada talinya. Setiap tarikan membentuk kembali sebatang es gletser, sehingga pemanah di tembok tidak membawa tabung panah, hanya hawa dingin. Konon Highwatch mempertahankan Prowler Ridge sepanjang pengepungan dengan satu pemanah dan persediaan anak panah selama musim dingin.',
   'hudChrome.wocStore.skins.winterbite.name': 'Busur Wintergnaw',
-  'hudChrome.wocStore.storeTab': 'Toko',
+  'hudChrome.wocStore.storeTab': 'Toko Kosmetik',
   'hudChrome.wocStore.tabsLabel': 'Bagian Toko WOC',
   'hudChrome.wocStore.title': 'Toko WOC',
   'hudChrome.wocStore.tryOn': 'Coba Pakai',
@@ -24132,7 +24131,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualDelivered':
     'Kunci tunggangan bundelmu telah dikirim melalui surat.',
   'hudChrome.wocStore.subscription.annualMount':
-    'Setelah membayar, ambil kekang Kimera Nightwing terikat jiwa melalui surat pada karakter yang membeli bundel ini. Tunggangan tetap milikmu setelah keanggotaan berakhir.',
+    'Membuka tunggangan Kimera Nightwing untuk semua karakter di akunmu, dan kekang terikat jiwanya dikirim melalui surat ke karakter yang membelinya. Satu per akun, dan tetap milikmu setelah keanggotaan berakhir.',
   'hudChrome.wocStore.subscription.annualPending':
     'Kembali ke karakter pembeli setelah pembayaran untuk mengambil tunggangan bundel. Jika pembayaran diproses atau uji coba aktif, coba lagi setelah tagihan berbayar ditarik.',
   'hudChrome.wocStore.subscription.annualPrice': '{price} untuk 12 bulan, dibayar di muka',
@@ -24156,7 +24155,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.manage': 'Kelola langganan',
   'hudChrome.wocStore.subscription.monthlyTitle': 'Keanggotaan bulanan',
   'hudChrome.wocStore.subscription.price': '{price} per bulan',
-  'hudChrome.wocStore.subscription.resumeCheckout': 'Lanjutkan pembayaran',
   'hudChrome.wocStore.subscription.startTrial': 'Mulai uji coba gratis 7 hari',
   'hudChrome.wocStore.subscription.status.active': 'Aktif',
   'hudChrome.wocStore.subscription.status.canceled': 'Dibatalkan',
@@ -25439,7 +25437,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Panggil keledai terbang untuk membawa barang antara tasmu dan bank terdekat. Setiap perjalanan memerlukan hingga 15 detik ke bank dan hingga 15 detik kembali, terbang lebih cepat pada rute panjang. Pilih hingga 24 tumpukan per perjalanan. Barang yang kembali meluap jika tas penuh, lalu kurir menghilang sampai dipanggil lagi. Perjalanan kembali dijeda saat kamu mati atau berada dalam instans. Keanggotaan diperlukan untuk memulai perjalanan baru.',
   'entities.abilities.courier.name': 'Kurir',
   'entities.letters.membership_annual_reward.body':
-    'Pembayaran keanggotaan tahunanmu selesai. Kekang tungganganmu terlampir. Simpan kekang di tas atau bank untuk memiliki tunggangan ini. Tetap milikmu setelah keanggotaan berakhir. Memerlukan keterampilan berkuda.',
+    'Pembayaran keanggotaan tahunanmu selesai. Kimera Nightwing kini terbuka untuk semua karakter di akunmu, dan kekangnya terlampir. Tetap milikmu setelah keanggotaan berakhir. Memerlukan keterampilan berkuda.',
   'entities.letters.membership_annual_reward.sender': 'Pos Gagak',
   'entities.letters.membership_annual_reward.subject': 'Tunggangan keanggotaan tahunanmu',
   'entities.letters.membership_token_delivery.body':
