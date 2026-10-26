@@ -84,7 +84,18 @@ export function isDebuffAura(kind: AuraKind, value: number): boolean {
 // which hid it behind the buff bar's low-tier overflow cap alongside ordinary
 // stat buffs even though missing it costs the player a timing window, not just
 // a cosmetic icon.
-const DEBUFF_DISPLAY_AURA_IDS: ReadonlySet<string> = new Set(['shaman_stormsurge_ready']);
+// The Smith's Heart's Guardian of the Breath rides quiet `internal_cd` markers
+// for its wind, its pull, the pinned, the marked conductor and the spent
+// (encounters/smith_heart/breath_ids.ts, wind_drift.ts): each is a hazard the
+// player must read, so it sits on the debuff bar.
+const DEBUFF_DISPLAY_AURA_IDS: ReadonlySet<string> = new Set([
+  'shaman_stormsurge_ready',
+  'wind_drift',
+  'wind_draw',
+  'heart_breath_pinned',
+  'heart_breath_drawn_lightning',
+  'heart_breath_calm_spent',
+]);
 
 export function isDebuffDisplayAura(kind: AuraKind, value: number, id?: string): boolean {
   return isDebuffAura(kind, value) || (id !== undefined && DEBUFF_DISPLAY_AURA_IDS.has(id));

@@ -12,6 +12,12 @@
 // listed in render/characters/smith_heart_placeholder_looks.ts (the one list
 // phase 2 replaces). Loot is deliberately not wired (design doc, "Loot hook").
 
+import { THESSALY_POST } from '../encounters/smith_heart/breath_geometry';
+import {
+  BREATH_THESSALY_NPC,
+  BREATH_TUNING,
+  breathWindTemplate,
+} from '../encounters/smith_heart/breath_ids';
 import { COUNCIL_TUNING } from '../encounters/smith_heart/council_ids';
 import type {
   DungeonDef,
@@ -19,6 +25,7 @@ import type {
   DungeonObjectSpawn,
   DungeonSpawn,
   MobTemplate,
+  NpcDef,
   TrashKitDef,
 } from '../types';
 import {
@@ -301,22 +308,33 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
       ),
     },
   },
-  // The Breath: a winged bellows of wind. Its gust throws the raid back (the
-  // field's cliffs are walls: nobody falls), its lance paints a lane.
+  // The Guardian of the Breath (design doc 7.2, encounters/smith_heart/
+  // breath.ts): a living bellows of granite, crystal and storm. Phase 1 the
+  // Wind (its blows across the Cornice, the gaps in the rim, Thessaly's
+  // circles, the indrawn breath and the exhale), at half health the storm
+  // breaks, phase 2 the Storm. Every number a SKETCH (unmeasured): 43,000
+  // base (about 99,000 after the elite factor) for a 4 to 5 minute fight at
+  // the bot raid's measured 400 to 460 a second. Bellows Gust is the exhale
+  // now (encounter-driven: the fight casts it after the indrawn breath; its
+  // record stays the look's numbers: the whole Cornice, the throw). Storm
+  // Lance stays the trash kit's own line, on its own clock.
   heart_breath_guardian: {
-    ...boss('heart_breath_guardian', 'Guardian of the Breath', 28000, 0x5ab8e8, 3),
+    ...boss('heart_breath_guardian', 'Guardian of the Breath', 43000, 0x5ab8e8, 3.4),
+    ccImmune: true,
+    slowImmune: true,
     trashKit: {
       wingGust: {
         castId: C.breathGust,
         name: 'Bellows Gust',
-        castTime: 2,
-        every: 18,
-        first: 8,
+        castTime: BREATH_TUNING.gustCast,
+        every: 999,
+        first: 999,
         school: 'nature',
-        radius: 12,
-        knockback: 10,
-        min: 160,
-        max: 200,
+        radius: 60,
+        knockback: BREATH_TUNING.gustThrow,
+        min: BREATH_TUNING.gustMin,
+        max: BREATH_TUNING.gustMax,
+        encounterDriven: true,
       },
       line: {
         castId: C.breathLance,
@@ -663,6 +681,38 @@ export const SMITH_HEART_SEAL_OBJECTS: DungeonObjectSpawn[] = SMITH_HEART_SEAL_M
   lootable: false,
 }));
 
+/** The Storm Cornice's wind (encounters/smith_heart/breath_gale.ts): one
+ *  inert object at the plateau's middle whose template id carries the wind's
+ *  phase, bearing and length; still until the guardian is pulled. */
+export const SMITH_HEART_WIND_OBJECT: DungeonObjectSpawn = {
+  itemId: '',
+  name: 'Bellows Wind',
+  x: BREATH.cornice.x,
+  z: BREATH.cornice.z,
+  templateId: breathWindTemplate('still', 0, 0) as 'sh_breath_wind_still_0_0',
+  dungeonId: SMITH_HEART_DUNGEON,
+  lootable: false,
+};
+
+/** Captain Thessaly at the head of the Cornice climb (design doc 7.2): the
+ *  Highwatch captain fights beside the raid against the Guardian of the
+ *  Breath, out of its wind. A dynamic NPC (spawned with each claim, never on
+ *  the overworld) with no quests, so the raid never offers Highwatch's. */
+export const SMITH_HEART_NPCS: Record<string, NpcDef> = {
+  [BREATH_THESSALY_NPC]: {
+    id: BREATH_THESSALY_NPC,
+    name: 'Captain Thessaly',
+    title: 'Highwatch Captain',
+    pos: { x: 0, z: 0 },
+    facing: 0,
+    color: 0x85929e,
+    questIds: [],
+    greeting:
+      'Keep your feet, $C. When the bellows breathes, step into my calm and let the wind break on us.',
+    dynamic: true,
+  },
+};
+
 /** The quarry's five carved columns, the Hammer Council's starting pillars:
  *  spawned with the claim, their integrity in the template id, each a combat
  *  wall (encounters/smith_heart/council_pillars.ts). */
@@ -706,6 +756,17 @@ export const SMITH_HEART_DUNGEON_DEFS: Record<string, DungeonDef> = {
       ...SMITH_HEART_GATE_OBJECTS,
       ...SMITH_HEART_SEAL_OBJECTS,
       ...SMITH_HEART_PILLAR_OBJECTS,
+      SMITH_HEART_WIND_OBJECT,
+    ],
+    // Captain Thessaly at her post on the Cornice's climb (breath_thessaly.ts),
+    // facing the guardian.
+    npcs: [
+      {
+        npcId: BREATH_THESSALY_NPC,
+        x: THESSALY_POST.x,
+        z: THESSALY_POST.z,
+        facing: Math.atan2(BREATH.cornice.x - THESSALY_POST.x, BREATH.cornice.z - THESSALY_POST.z),
+      },
     ],
     gates: SMITH_HEART_GATES,
     // No bossChainPull: a raid holds five bosses, and a guardian pull that woke

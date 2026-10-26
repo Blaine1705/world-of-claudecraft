@@ -20,6 +20,7 @@ import type {
   CryptBossFightState,
   KnellwyrmKnellState,
 } from './encounters/hollow_crypt/boss_state';
+import type { BreathFightState } from './encounters/smith_heart/breath_state';
 import type { CouncilFightState } from './encounters/smith_heart/council_state';
 import type { GrassClearCircle } from './grass_clear';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
@@ -6085,7 +6086,10 @@ export interface DungeonObjectSpawn {
     // The Smith's Heart's quarry columns, the Hammer Council's starting
     // pillars (encounters/smith_heart/council_pillars.ts): the integrity left
     // rides the template id, and each stands as a combat wall.
-    | 'sh_council_pillar_2';
+    | 'sh_council_pillar_2'
+    // The Storm Cornice's wind (encounters/smith_heart/breath_gale.ts): its
+    // phase, bearing and length ride the template id.
+    | 'sh_breath_wind_still_0_0';
   dungeonId?: string;
   /**
    * This object is an encounter mechanic players INTERACT with, never a pickup, even
@@ -8112,6 +8116,10 @@ export interface Entity extends ClientMirroredEntityFields {
    *  the Seam Singer while they fight. Sim authority only; the client reads
    *  the fight from casts, auras, the energy bar and the pillar objects. */
   smithHeartFight?: CouncilFightState;
+  /** The Smith's Heart's Guardian of the Breath fight (encounters/smith_heart/
+   *  breath.ts), on the guardian. Sim authority only; the client reads the
+   *  fight from the wind object, the bars, the auras and the fight's objects. */
+  smithHeartBreath?: BreathFightState;
   /** A dead trash-kit mob's burst in the making (MobTemplate.trashKit.deathBurst,
    *  mob/trash_kit/death_burst.ts): seconds left, its floor ring, and whether it
    *  has gone off. A death cloud (trashKit.deathCloud, wildheart_kit.ts) rides

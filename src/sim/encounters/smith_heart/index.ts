@@ -1,6 +1,19 @@
 // The Smith's Heart's sim surface (public barrel).
 
 export {
+  breathDevTrigger,
+  breathDifficulty,
+  breathGuardian,
+  breathReadout,
+  breathScopeForDev,
+  setBreathDevTier,
+  tickBreathGuardian,
+} from './breath';
+export * from './breath_geometry';
+export * from './breath_ids';
+export type { BreathFightState } from './breath_state';
+
+export {
   councilBodies,
   councilDevTrigger,
   councilDifficulty,

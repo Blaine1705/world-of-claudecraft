@@ -25,7 +25,11 @@ import {
   SMITH_HEART_DEV_AREAS,
   smithHeartSealReadout,
 } from '../src/sim/dev/smith_heart_dev';
-import { smithHeartPortalBitSet, smithHeartProgress } from '../src/sim/encounters/smith_heart';
+import {
+  breathGuardian,
+  smithHeartPortalBitSet,
+  smithHeartProgress,
+} from '../src/sim/encounters/smith_heart';
 import { authoredFieldHeight } from '../src/sim/instances/authored_field';
 import { dungeonGateState } from '../src/sim/instances/dungeon_gates';
 import { enterDungeon } from '../src/sim/instances/dungeons';
@@ -258,6 +262,54 @@ describe('/dev heart', () => {
     expect(sealMasks(sim, fresh).length).toBeGreaterThan(0);
     for (const id of ['the_slab', 'hammer_pit_mouth', 'cornice_mouth'])
       expect(dungeonGateState(sim.ctx, fresh, gate(id)), id).not.toBe('open');
+  });
+
+  it('breath pulls the Guardian of the Breath on the Cornice and forces every mechanic', () => {
+    const { sim, dev, claim } = devSim();
+    sim.setPlayerLevel(20);
+    expect(dev('/dev heart breath pull')).toBe(true);
+    const inst = claim();
+    if (!inst) throw new Error('no claim');
+    const boss = breathGuardian(sim.ctx, inst);
+    expect(boss?.inCombat).toBe(true);
+    const o = instanceOrigin(DUNGEON.index, inst.slot);
+    expect(Math.hypot(sim.player.pos.x - o.x - 0, sim.player.pos.z - o.z - 198)).toBeLessThan(20);
+    sim.player.maxHp = 1e6;
+    sim.player.hp = 1e6;
+    sim.tick();
+    const replies: string[] = [];
+    for (const verb of [
+      'blow 90',
+      'blow sw',
+      'calm',
+      'circle',
+      'inhale',
+      'tornado',
+      'heroic',
+      'phase2',
+      'gust 45',
+      'chain',
+      'eye',
+      'conductor',
+      'mythic',
+      'mythic off',
+    ]) {
+      const out = (() => {
+        dev(`/dev heart breath ${verb}`);
+        return logs(sim.tick());
+      })();
+      sim.player.hp = sim.player.maxHp;
+      replies.push(`${verb}: ${out.find((l) => l.startsWith('[dev]')) ?? 'none'}`);
+    }
+    for (const r of replies) expect(r, r).not.toMatch(/: none$/);
+    expect(dev('/dev heart breath')).toBe(true);
+    expect(logs(sim.tick()).some((l) => l.includes('Guardian of the Breath'))).toBe(true);
+    // Reset: whole, home and out of its fight (standing beside it, the next
+    // tick pulls it again).
+    expect(dev('/dev heart breath reset')).toBe(true);
+    expect(boss?.smithHeartBreath).toBeUndefined();
+    expect(boss?.inCombat).toBe(false);
+    expect(boss?.hp).toBe(boss?.maxHp);
   });
 
   it('does nothing without devCommands, and the door refuses a non-dev world', () => {

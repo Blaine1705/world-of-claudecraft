@@ -244,7 +244,11 @@ import {
 } from './content/recipes';
 import { RIFT_ITEMS } from './content/rift/items';
 import { HOARD_MOBS, RIFT_MOBS } from './content/rift/mobs';
-import { SMITH_HEART_DUNGEON_DEFS, SMITH_HEART_MOBS } from './content/smith_heart';
+import {
+  SMITH_HEART_DUNGEON_DEFS,
+  SMITH_HEART_MOBS,
+  SMITH_HEART_NPCS,
+} from './content/smith_heart';
 import { SUNKEN_BASTION_MOBS } from './content/sunken_bastion';
 import { SUNKEN_BASTION_ITEMS } from './content/sunken_bastion_items';
 import {
@@ -577,6 +581,9 @@ export const NPCS: Record<string, NpcDef> = {
   ...MIREFEN_TAVERN_NPCS,
   // Its seated patrons (content/mirefen_tavern_patrons.ts), dynamic singletons too.
   ...MIREFEN_TAVERN_PATRON_NPCS,
+  // The Smith's Heart's Captain Thessaly (content/smith_heart.ts): dynamic,
+  // spawned per claim on the Storm Cornice, appended last so no placed NPC moves.
+  ...SMITH_HEART_NPCS,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the
