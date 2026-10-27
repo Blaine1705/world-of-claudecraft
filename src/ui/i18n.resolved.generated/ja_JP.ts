@@ -15141,6 +15141,7 @@ export const ja_JP: EnTranslations = {
       "accountSuspended": "このアカウントは {date} まで停止されています。",
       "alreadyInWorld": "キャラクターは既に世界にいます。",
       "accountSessionLimit": "このアカウントでは既に多くのキャラクターが世界にいます。",
+      "worldFightHold": "Another character on this account is still in the world after a fight. Try again in a few minutes.",
       "takenOver": "あなたのキャラクターは別のセッションに引き継がれました。",
       "vaultMailRecovering": "宝物庫の報酬メールを復旧しています。少し待ってからもう一度お試しください。",
       "renameBeforeEntering": "このキャラクターは世界に入る前に名前変更が必要です。",

@@ -361,6 +361,7 @@ function makeFakeHost() {
     worldPvpBooks: {
       recentDamage: new Map(),
       recentSupport: new Map(),
+      lastFightAt: new Map(),
       paidDeaths: new Set(),
       spoils: new Map(),
       killsByPair: new Map(),

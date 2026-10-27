@@ -15141,6 +15141,7 @@ export const tr_TR: EnTranslations = {
       "accountSuspended": "Bu hesap {date} tarihine kadar askıya alındı.",
       "alreadyInWorld": "Karakter zaten dünyada.",
       "accountSessionLimit": "Bu hesaba ait çok fazla karakter zaten dünyada.",
+      "worldFightHold": "Another character on this account is still in the world after a fight. Try again in a few minutes.",
       "takenOver": "Karakteriniz başka bir oturum tarafından devralındı.",
       "vaultMailRecovering": "Kasa ödül postanız geri yükleniyor. Lütfen kısa bir süre sonra tekrar deneyin.",
       "renameBeforeEntering": "Bu karakter dünyaya girmeden önce yeniden adlandırılmalıdır.",

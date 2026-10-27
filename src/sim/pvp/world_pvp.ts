@@ -71,6 +71,7 @@ import { updateWorldPvpRewards, worldPvpRewardPause } from './world_pvp_rewards'
 import { sanitizeWorldPvpRewardTicks } from './world_pvp_rewards_rules';
 import {
   WORLD_PVP_ASSIST_WINDOW,
+  WORLD_PVP_DEPARTURE_HOLD_WINDOW,
   WORLD_PVP_DISARM_SECONDS,
   WORLD_PVP_DR_WINDOW_SECONDS,
   WORLD_PVP_FORFEIT_PAYOUT_SECONDS,
@@ -149,6 +150,11 @@ export interface WorldPvpBooks {
   recentDamage: Map<number, Map<number, number>>;
   /** ally pid -> healer pid -> sim time of the last heal, shield or buff. */
   recentSupport: Map<number, Map<number, number>>;
+  /** player pid -> sim time of their last world-hostile hit, taken or dealt.
+   *  Read by the departure hold (world_pvp_forfeit.ts); kept across a death,
+   *  and swept once the stamp is older than WORLD_PVP_DEPARTURE_HOLD_WINDOW or
+   *  the player left the world. */
+  lastFightAt: Map<number, number>;
   /** Victims whose death already paid, so a re-entrant handleDeath on a corpse
    *  can never pay the kill twice. A pid leaves the set the moment the player
    *  is seen alive again (their next hit taken) and on the sweep. */
@@ -191,6 +197,7 @@ export function newWorldPvpBooks(): WorldPvpBooks {
   return {
     recentDamage: new Map(),
     recentSupport: new Map(),
+    lastFightAt: new Map(),
     paidDeaths: new Set(),
     killsByPair: new Map(),
     zoneOf: new Map(),
@@ -375,6 +382,11 @@ function sweepBooks(ctx: SimContext, books: WorldPvpBooks): void {
         if (ctx.time - at > WORLD_PVP_ASSIST_WINDOW) roster.delete(pid);
       }
       if (roster.size === 0 || !ctx.entities.has(subject)) book.delete(subject);
+    }
+  }
+  for (const [pid, at] of books.lastFightAt) {
+    if (ctx.time - at > WORLD_PVP_DEPARTURE_HOLD_WINDOW || !ctx.entities.has(pid)) {
+      books.lastFightAt.delete(pid);
     }
   }
   for (const pid of books.paidDeaths) {
@@ -589,6 +601,8 @@ export function worldPvpOnPlayerDamaged(ctx: SimContext, victim: Entity, source:
   const attacker = controllerOf(ctx, source);
   if (!attacker || !isWorldPvpHostile(ctx, attacker, victim)) return;
   noteRecent(books.recentDamage, victim.id, attacker.id, ctx.time);
+  books.lastFightAt.set(victim.id, ctx.time);
+  books.lastFightAt.set(attacker.id, ctx.time);
   if (worldPvpHitMarksAttacker(attacker, victim)) {
     const meta = autoRaiseTarget(ctx, attacker);
     if (meta) raiseFlag(ctx, attacker, meta, WORLD_PVP_MARKED_LINE);

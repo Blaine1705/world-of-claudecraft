@@ -15141,6 +15141,7 @@ export const pt_BR: EnTranslations = {
       "accountSuspended": "Esta conta está suspensa até {date}.",
       "alreadyInWorld": "O personagem já está no mundo.",
       "accountSessionLimit": "Personagens demais desta conta já estão no mundo.",
+      "worldFightHold": "Another character on this account is still in the world after a fight. Try again in a few minutes.",
       "takenOver": "Seu personagem foi assumido por outra sessão.",
       "vaultMailRecovering": "Seu correio de recompensa do cofre está sendo restaurado. Tente novamente em breve.",
       "renameBeforeEntering": "Este personagem precisa ser renomeado antes de entrar no mundo.",

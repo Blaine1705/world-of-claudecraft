@@ -15141,6 +15141,7 @@ export const zh_CN: EnTranslations = {
       "accountSuspended": "此账号被停用至 {date}。",
       "alreadyInWorld": "角色已在世界中。",
       "accountSessionLimit": "此账号已有太多角色在世界中。",
+      "worldFightHold": "Another character on this account is still in the world after a fight. Try again in a few minutes.",
       "takenOver": "你的角色已被另一个会话接管。",
       "vaultMailRecovering": "宝库奖励邮件正在恢复中。请稍后重试。",
       "renameBeforeEntering": "此角色必须先改名才能进入世界。",

@@ -15141,6 +15141,7 @@ export const cs_CZ: EnTranslations = {
       "accountSuspended": "Tento účet je pozastavený do {date}.",
       "alreadyInWorld": "Postava už je ve světě.",
       "accountSessionLimit": "Příliš mnoho postav na tomto účtu už je ve světě.",
+      "worldFightHold": "Another character on this account is still in the world after a fight. Try again in a few minutes.",
       "takenOver": "Tvoje postava byla převzata jinou relací.",
       "vaultMailRecovering": "Tvá odměna z trezoru se obnovuje. Zkus to za chvíli.",
       "renameBeforeEntering": "Tato postava musí být před vstupem do světa přejmenována.",

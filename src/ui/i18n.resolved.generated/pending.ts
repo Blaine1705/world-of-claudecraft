@@ -9,25 +9,65 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "errors.api.worldFightHold"
+  ],
+  "es_ES": [
+    "errors.api.worldFightHold"
+  ],
+  "fr_FR": [
+    "errors.api.worldFightHold"
+  ],
+  "fr_CA": [
+    "errors.api.worldFightHold"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "errors.api.worldFightHold"
+  ],
+  "de_DE": [
+    "errors.api.worldFightHold"
+  ],
+  "zh_CN": [
+    "errors.api.worldFightHold"
+  ],
+  "zh_TW": [
+    "errors.api.worldFightHold"
+  ],
+  "ko_KR": [
+    "errors.api.worldFightHold"
+  ],
+  "ja_JP": [
+    "errors.api.worldFightHold"
+  ],
+  "pt_BR": [
+    "errors.api.worldFightHold"
+  ],
+  "ru_RU": [
+    "errors.api.worldFightHold"
+  ],
+  "cs_CZ": [
+    "errors.api.worldFightHold"
+  ],
+  "nl_NL": [
+    "errors.api.worldFightHold"
+  ],
+  "pl_PL": [
+    "errors.api.worldFightHold"
+  ],
+  "id_ID": [
+    "errors.api.worldFightHold"
+  ],
+  "tr_TR": [
+    "errors.api.worldFightHold"
+  ],
+  "sv_SE": [
+    "errors.api.worldFightHold"
+  ],
+  "vi_VN": [
+    "errors.api.worldFightHold"
+  ],
+  "da_DK": [
+    "errors.api.worldFightHold"
+  ]
 };

@@ -169,6 +169,13 @@ ratings.
   in `world_pvp_rules.ts`. Lines: `worldPvpForfeitKillLine`,
   `worldPvpForfeitPayoutLine` (matcher rows in `src/ui/sim_i18n.ts`). Tests:
   `tests/world_pvp_forfeit.test.ts`, `tests/world_pvp_departure.test.ts`.
+  The same file owns the departure HOLD, `worldPvpHoldsDeparture`: a living
+  player with a world-hostile hit (taken or dealt, `WorldPvpBooks.lastFightAt`)
+  inside `WORLD_PVP_DEPARTURE_HOLD_WINDOW` is held in the world on a logout
+  (the server enters the linkdead grace instead of `leave()`), and while the
+  held body still answers true `planJoin` refuses the account's other
+  characters. Asked AFTER the forfeit, so a forfeited corpse leaves freely.
+  Tests: `tests/world_pvp_logout_hold.test.ts`.
 - `warfare_quartermaster.ts` spawns Warmarshal Draven Kole, the Highwatch
   WARFARE honor vendor, under his RESERVED entity id
   (`WARFARE_QUARTERMASTER_ENTITY_ID`, `1_000_000_002`, the singleton band

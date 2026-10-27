@@ -189,7 +189,11 @@ export {
   worldPvpKillHonorPool,
   worldPvpStreakEarnsBounty,
 } from './world_pvp_bounty_rules';
-export { forfeitWorldPvpFightOnDeparture, worldPvpFightOpponent } from './world_pvp_forfeit';
+export {
+  forfeitWorldPvpFightOnDeparture,
+  worldPvpFightOpponent,
+  worldPvpHoldsDeparture,
+} from './world_pvp_forfeit';
 export {
   loadWorldPvpPayouts,
   payDueWorldPvpPayouts,
@@ -202,6 +206,7 @@ export {
 } from './world_pvp_payouts';
 export {
   WORLD_PVP_ASSIST_WINDOW,
+  WORLD_PVP_DEPARTURE_HOLD_WINDOW,
   WORLD_PVP_DISARM_SECONDS,
   WORLD_PVP_DR_WINDOW_SECONDS,
   WORLD_PVP_FORFEIT_PAYOUT_SECONDS,

@@ -15141,6 +15141,7 @@ export const id_ID: EnTranslations = {
       "accountSuspended": "Akun ini ditangguhkan hingga {date}.",
       "alreadyInWorld": "Karakter sudah berada di dalam dunia.",
       "accountSessionLimit": "Terlalu banyak karakter dari akun ini yang sudah berada di dalam dunia.",
+      "worldFightHold": "Another character on this account is still in the world after a fight. Try again in a few minutes.",
       "takenOver": "Karakter Anda telah diambil alih oleh sesi lain.",
       "vaultMailRecovering": "Surat hadiah peti Anda sedang dipulihkan. Coba lagi nanti.",
       "renameBeforeEntering": "Karakter ini harus diganti namanya sebelum memasuki dunia.",
