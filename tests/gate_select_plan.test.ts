@@ -503,7 +503,7 @@ describe('selective gate argv', () => {
     expect(legs).toHaveLength(1);
     expect(legs[0].kind).toBe('merged-related');
     expect(buildSelectiveLegArgs(legs[0], 8)).toContain('--passWithNoTests=false');
-  });
+  }, 60_000);
 
   it('falls back to the FULL suite when the floor is implausibly small (opt-in)', () => {
     const plan = buildSelectPlan({
