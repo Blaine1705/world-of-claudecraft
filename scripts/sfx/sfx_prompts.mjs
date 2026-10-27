@@ -1505,6 +1505,83 @@ export const SFX = [
   },
 ];
 
+// --- The Smith's Heart: the Guardian of the Heat, TAKES STILL TO GENERATE.
+// The ElevenLabs credits ran out before this fight's sounds were made, so
+// src/game/smith_heart_heat_audio_core.ts builds every Heat sound from the
+// pack's existing samples (pitched and layered). These are the prompts for
+// the fight's own takes: when credits return, move each row into SFX above
+// (then `npm run sfx:gen`, `npm run sfx:conform`, `npm run sfx:manifest`) and
+// point its cue at `heart_heat_<name>`. Deliberately NOT in SFX: a row there
+// without its committed file fails the manifest's conformance checks.
+export const HEAT_SFX_TO_GENERATE = [
+  {
+    key: 'heart_heat_ray',
+    duration: 1,
+    prompt:
+      'A focused ray of white-hot fire fired from a singing crystal: a bright crystalline tone over a searing hiss and crackle of flame striking a body. Single event, no music.',
+  },
+  {
+    key: 'heart_heat_ray_back',
+    duration: 1.2,
+    prompt:
+      'A ray of fire swallowed by a huge living flame: a deep rising whoomph of fire being drawn in, a low satisfied roar of a furnace-like blaze growing hotter. No music, no voice.',
+  },
+  {
+    key: 'heart_heat_pulse',
+    duration: 0.8,
+    prompt:
+      'A soft heavy wave of heat rolling outward from a great fire: a low breathy whoosh of hot air with a faint crackle, short and unobtrusive. No music.',
+  },
+  {
+    key: 'heart_heat_windup',
+    duration: 6,
+    prompt:
+      'A colossal fire building toward an explosion: a rising roar of white-hot flame swelling for six seconds, crystal ringing and cracking under the strain, pressure mounting. Wordless, no melody, no music.',
+  },
+  {
+    key: 'heart_heat_overheat',
+    duration: 3,
+    prompt:
+      'A gigantic eruption of white fire filling a stone hall: a blinding thunderous blast of flame, a shockwave of roaring heat, crystal shards bursting, a long crackling tail. Single event, no music.',
+  },
+  {
+    key: 'heart_heat_crystal_rise',
+    duration: 2,
+    prompt:
+      'A glowing crystal tearing up out of cracked basalt: stone grinding and splitting, a rising bright crystalline chime humming with fire. No music.',
+  },
+  {
+    key: 'heart_heat_crystal_fade',
+    duration: 1.5,
+    prompt:
+      'A fire crystal burning out and cracking apart: a glassy splintering crack, the inner flame guttering out with a soft sigh, cinders tinkling. No music.',
+  },
+  {
+    key: 'heart_heat_burn',
+    duration: 0.6,
+    prompt:
+      'A short sharp sizzle of skin-searing heat, a hot crackle close to the ear. Single event, no music, no voice.',
+  },
+  {
+    key: 'heart_heat_channel_brim',
+    duration: 4,
+    prompt:
+      'A channel of liquid fire filling up and about to overflow: a deep rumbling bubbling of molten flame rising for four seconds, hissing and crackling. No music.',
+  },
+  {
+    key: 'heart_heat_channel_flow',
+    duration: 3,
+    prompt:
+      'A river of white-gold fire rushing down a stone channel: a powerful roaring flow of flame, crackling and hissing, pouring over an edge into a chasm. No music.',
+  },
+  {
+    key: 'heart_heat_embers',
+    duration: 1.5,
+    prompt:
+      'Burning embers scattered on a stone floor catching alight: a low smouldering crackle and hiss flaring up. No music.',
+  },
+];
+
 // Family ids that have creature vocalizations (used by the integration layer to
 // know which mobs have sound; templateId overrides handled in code, e.g. boar).
 export const MOB_VOICE_FAMILIES = [
