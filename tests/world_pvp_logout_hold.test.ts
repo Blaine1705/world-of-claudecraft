@@ -38,7 +38,9 @@ function fakeWs() {
   const ws: any = {
     readyState: 1,
     send: vi.fn(),
-    close: vi.fn(),
+    close: vi.fn(() => {
+      ws.readyState = 2;
+    }),
     ping: vi.fn(),
     terminate: vi.fn(() => {
       ws.readyState = 3;
@@ -106,6 +108,25 @@ describe('a logout soon after a world fight holds the body in the world', () => 
     expect(chaser.linkdead).toBe(true);
   });
 
+  it('closes the transport while keeping the held body in the world', () => {
+    const { server, runner } = chase(PAST_FORFEIT);
+    const ws = runner.ws;
+    server.handleMessage(runner, JSON.stringify({ t: 'logout' }));
+    expect(ws.close).toHaveBeenCalledOnce();
+    expect(runner.linkdead).toBe(true);
+    expect(runner.left).toBe(false);
+  });
+
+  it('ignores buffered logout frames while the body is linkdead', () => {
+    const { server, sim, runner } = chase(PAST_FORFEIT);
+    server.handleMessage(runner, JSON.stringify({ t: 'logout' }));
+    (sim as unknown as { time: number }).time += WORLD_PVP_DEPARTURE_HOLD_WINDOW;
+    server.handleMessage(runner, JSON.stringify({ t: 'logout' }));
+    expect(runner.left).toBe(false);
+    expect(runner.linkdead).toBe(true);
+    expect(server.clients.get(runner.pid)).toBe(runner);
+  });
+
   it('inside the forfeit window the forfeit wins: the leaver dies and leaves at once', () => {
     const { server, sim, runner } = chase(1);
     server.handleMessage(runner, JSON.stringify({ t: 'logout' }));
@@ -138,6 +159,25 @@ describe('a logout soon after a world fight holds the body in the world', () => 
 });
 
 describe('a held body cannot be pulled out by logging in another character', () => {
+  it('an owner takeover holds the body and still refuses an alt', async () => {
+    const { server, runner } = chase(PAST_FORFEIT);
+    const oldWs = runner.ws;
+    await expect(server.takeOverCharacter(12, 102)).resolves.toBe('taken-over');
+    expect(runner.left).toBe(false);
+    expect(runner.linkdead).toBe(true);
+    expect(oldWs.close).toHaveBeenCalledOnce();
+    expect(oldWs.send).toHaveBeenCalledWith(
+      JSON.stringify({ t: 'error', error: 'character taken over' }),
+    );
+    expect(server.join(fakeWs(), 12, 103, 'Gimel', 'warrior', null)).toEqual({
+      error: WORLD_FIGHT_HOLD_JOIN_ERROR,
+    });
+    const newWs = fakeWs();
+    expect(server.join(newWs, 12, 102, 'Bet', 'shaman', null)).toBe(runner);
+    expect(runner.ws).toBe(newWs);
+    expect(runner.linkdead).toBe(false);
+  });
+
   it('an alt on the same account is refused while the fight window is open', () => {
     const { server, runner } = chase(PAST_FORFEIT);
     server.handleMessage(runner, JSON.stringify({ t: 'logout' }));

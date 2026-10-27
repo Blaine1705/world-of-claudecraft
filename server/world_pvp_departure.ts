@@ -1,5 +1,6 @@
 import { forfeitWorldPvpFightOnDeparture, worldPvpHoldsDeparture } from '../src/sim/pvp';
 import type { Sim } from '../src/sim/sim';
+import type { ClientSession, GameServer } from './game';
 
 /** A session leaving the world mid world fight forfeits it: the leaver dies to
  *  their opponent now, the honor and the kill/death record land now, and the
@@ -34,6 +35,21 @@ export function forfeitWorldPvpFightOnSessionDeparture(
 export function worldFightHoldsLogout(sim: Sim, pid: number, canSave: boolean): boolean {
   forfeitWorldPvpFightOnSessionDeparture(sim, pid, canSave);
   return canSave && worldPvpHoldsDeparture(sim.ctx, pid);
+}
+
+/** Owner-requested logout or takeover closes the transport but retains a held
+ *  body. Mark it linkdead before closing so the close event cannot tear it
+ *  down. A takeover notice flushes before close, preserving the old client's
+ *  return to character select; a fresh transport can resume the same body. */
+export function holdWorldFightSession(
+  server: Pick<GameServer, 'sim' | 'socketClosed'>,
+  session: ClientSession,
+  notify?: () => void,
+): boolean {
+  if (!worldFightHoldsLogout(server.sim, session.pid, !session.escrowQuarantined)) return false;
+  notify?.();
+  if (server.socketClosed(session, session.ws)) session.ws.close();
+  return true;
 }
 
 /** Is a held (linkdead) body still inside its fight window? While it is, the

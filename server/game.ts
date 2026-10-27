@@ -537,8 +537,8 @@ import { activeWorldBossIdsWireJson, writeWorldBossWireFields } from './world_bo
 import * as objectCmds from './world_object_commands';
 import {
   forfeitWorldPvpFightOnSessionDeparture,
+  holdWorldFightSession,
   worldFightHoldsBody,
-  worldFightHoldsLogout,
 } from './world_pvp_departure';
 import { applyWorldQuestBlockLive as applyWorldQuestBlockLiveRuntime } from './world_quest_block_runtime';
 import { recordWorldQuestScoreEvent } from './world_quest_leaderboard';
@@ -5628,12 +5628,9 @@ export class GameServer {
     return result;
   }
 
-  // Force-disconnect the live session (if any) for a character the requesting
-  // account owns, so a fresh login can take its place. Awaits leave() so the
-  // departing session's state is saved and the sessionsByCharacterId slot is
-  // freed before the caller re-enters — otherwise the new login would race the
-  // old save (clobbering progress) or be rejected with "character already in
-  // world". Idempotent: a no-op (returns 'not-online') when nobody is online.
+  // Disconnect an owned character for login. A held fighter keeps its body
+  // for resume; otherwise await teardown/save before reopening its roster slot.
+  // Idempotent when nobody is online.
   async takeOverCharacter(
     accountId: number,
     characterId: number,
@@ -5641,7 +5638,10 @@ export class GameServer {
     const session = this.sessionByCharacterId(characterId);
     // Ownership is re-checked here (as at the REST layer): never kick another account.
     if (!session || session.accountId !== accountId) return 'not-online';
-    await this.kickSession(session, 'character taken over', 'character taken over');
+    const held = holdWorldFightSession(this, session, () =>
+      this.send(session, { t: 'error', error: 'character taken over' }),
+    );
+    if (!held) await this.kickSession(session, 'character taken over', 'character taken over');
     return 'taken-over';
   }
 
@@ -5786,7 +5786,7 @@ export class GameServer {
     // A socket can deliver already-buffered frames after leave() removes its
     // session and starts the awaited persistence flush. Never let that stale
     // authority mutate live state after the character snapshot was captured.
-    if (session.left || this.clients.get(session.pid) !== session) return;
+    if (session.left || session.linkdead || this.clients.get(session.pid) !== session) return;
     // beginShutdown flips this before its cancellation sweep. Buffered frames
     // must not mutate gameplay after that point or create an unstuck attempt
     // that can neither tick nor be included in the shutdown snapshot.
@@ -5968,9 +5968,7 @@ export class GameServer {
     // Deliberate logout: a clean leave, unless a recent world fight holds the body like a closed
     // tab. Either path marks the session, so the page reload's close is a socketClosed() no-op.
     if (msg.t === 'logout') {
-      const held = worldFightHoldsLogout(sim, pid, !session.escrowQuarantined);
-      if (held) this.socketClosed(session, session.ws);
-      else void this.leave(session, 'logout');
+      if (!holdWorldFightSession(this, session)) void this.leave(session, 'logout');
       return;
     }
     if (msg.t === 'input') {
