@@ -51,6 +51,7 @@ import {
   dropAura,
   dropBreathObject,
   guardianFree,
+  livePlayers,
   living,
   local,
   pickMarks,
@@ -76,7 +77,7 @@ export function startStorm(s: BreathScope): boolean {
   if (s.st.half !== 'wind') return false;
   const st = s.st;
   st.half = 'break';
-  clearWindAuras(s.ctx, s.inst);
+  clearWindAuras(s.ctx, s.inst, s.boss.id);
   clearCalm(s.ctx, s.inst, st);
   dropBreathObject(s.ctx, s.inst, st.vortex?.objectId ?? null);
   st.vortex = null;
@@ -171,7 +172,7 @@ function stepSpots(s: BreathScope): void {
       sp.tick -= DT;
       if (sp.tick <= 1e-9) {
         sp.tick += T.chargedTick;
-        for (const p of s.players) {
+        for (const p of livePlayers(s)) {
           const at = local(s.ctx, s.inst, p);
           if (Math.hypot(at.x - sp.x, at.z - sp.z) > sp.r) continue;
           s.ctx.dealDamage(
@@ -205,7 +206,7 @@ function stepSpots(s: BreathScope): void {
       ability: BREATH_CUES.strike,
     });
     const barrage = sp.kind === 'barrage';
-    for (const p of s.players) {
+    for (const p of livePlayers(s)) {
       const at = local(s.ctx, s.inst, p);
       if (Math.hypot(at.x - sp.x, at.z - sp.z) > sp.r) continue;
       s.ctx.dealDamage(
@@ -259,7 +260,7 @@ export function startFork(s: BreathScope): boolean {
 export function landFork(s: BreathScope, targetId: number | null): Entity[] {
   const t = targetId !== null ? s.ctx.entities.get(targetId) : undefined;
   if (!living(t)) return [];
-  const path = forkPath(t, s.players);
+  const path = forkPath(t, livePlayers(s));
   let from: Entity = s.boss;
   for (const p of path) {
     s.ctx.emit({
@@ -362,7 +363,7 @@ export function dischargeCradle(
 ): Entity[] {
   const o = s.ctx.instanceOriginOf(s.inst);
   const lifted = s.ctx.entities.get(c.playerId);
-  const under = s.players.filter((p) => {
+  const under = livePlayers(s).filter((p) => {
     if (p.id === c.playerId) return true;
     const at = local(s.ctx, s.inst, p);
     return Math.hypot(at.x - c.x, at.z - c.z) <= T.cradleR;
@@ -390,7 +391,7 @@ export function dischargeCradle(
       true,
     );
   if (share.backlash)
-    for (const p of s.players)
+    for (const p of livePlayers(s))
       s.ctx.dealDamage(
         s.boss,
         p,
@@ -491,7 +492,7 @@ function stepSwell(s: BreathScope): void {
     fx: 'nova',
     ability: BREATH_CUES.swell,
   });
-  for (const p of s.players)
+  for (const p of livePlayers(s))
     s.ctx.dealDamage(
       b,
       p,

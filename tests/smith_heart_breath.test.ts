@@ -135,6 +135,21 @@ describe('Guardian of the Breath: the push, the rim and the gaps', () => {
     expect(headway).toBeLessThan(7 - speed + 0.6);
   });
 
+  it('takes no wind along: a body carried off the Cornice mid-blow stops drifting at once', () => {
+    const f = pulled(3);
+    const p = f.players[1];
+    f.dev('/dev heart breath blow 90');
+    f.tick(10);
+    expect(has(p, WIND_DRIFT_AURA)).toBe(true);
+    // A teleport away mid-blow (a hearth, the exit, a dev jump).
+    f.put(p, 0, 70);
+    f.tick(1);
+    expect(has(p, WIND_DRIFT_AURA)).toBe(false);
+    const at = f.local(p);
+    f.tick(20);
+    expect(dist(f.local(p), at)).toBeLessThan(0.01);
+  });
+
   it('a body blown over the lip of a gap falls into the void and dies', () => {
     const f = pulled(3);
     const victim = f.players[1];

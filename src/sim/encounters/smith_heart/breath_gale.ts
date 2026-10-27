@@ -64,6 +64,7 @@ import {
   dropAura,
   dropBreathObject,
   guardianFree,
+  livePlayers,
   local,
   moveBreathObject,
   putMarker,
@@ -170,37 +171,74 @@ function stepStormGusts(s: BreathScope): void {
 
 // ---- the push, the rim, the void -----------------------------------------------------------
 
-/** Every claim player's wind auras for this tick: the blow's (or the pull's)
- *  on the non-anchored on the Cornice, none on anyone else. */
+/** How long a wind aura lives between top-ups (s): a body the fight stops
+ *  seeing (its claim freed under it) is never carried for long. */
+const WIND_AURA_LIFE = 1.5;
+/** A wind aura is topped up when it has less than this left (each top-up
+ *  moves its deadline on the wire; its value never changes). */
+const WIND_AURA_TOPUP = 0.6;
+
+/** Keep a wind aura on `p`: a fresh one when its numbers changed, else its
+ *  life topped up now and then. */
+function keepWind(
+  s: BreathScope,
+  p: Entity,
+  id: string,
+  name: string,
+  values: { value: number; value2: number; value3?: number },
+): void {
+  const a = auraOf(p, id);
+  if (a && a.value === values.value && a.value2 === values.value2 && a.value3 === values.value3) {
+    if (a.remaining < WIND_AURA_TOPUP) a.remaining = WIND_AURA_LIFE;
+    return;
+  }
+  putMarker(p, id, name, WIND_AURA_LIFE, s.boss.id, values);
+}
+
+/** Every player's wind auras for this tick: the blow's (or the pull's) on
+ *  the non-anchored on the Cornice; none on anyone else, wherever they went
+ *  (a hearth or a teleport mid-blow takes no wind along). */
 function syncWindAuras(s: BreathScope): void {
   const w = s.st.wind;
   const blowing = windBlowing(s.st);
   const pulling = w.phase === 'inhale';
   const heading = (w.bearing * Math.PI) / 180;
   const inFight = new Set(s.players.map((p) => p.id));
-  for (const p of corniceListeners(s.ctx, s.inst)) {
-    const held = !inFight.has(p.id) || anchored(p) || p.carriedBy !== undefined;
+  for (const meta of s.ctx.players.values()) {
+    const p = s.ctx.entities.get(meta.entityId);
+    if (!p) continue;
+    if (!inFight.has(p.id)) {
+      dropWindFrom(p, s.boss.id);
+      continue;
+    }
+    const held = anchored(p) || p.carriedBy !== undefined;
     if (held || !blowing) dropAura(p, WIND_DRIFT_AURA);
     if (held || !pulling) dropAura(p, WIND_PULL_AURA);
     if (held) continue;
-    if (blowing) {
-      const a = auraOf(p, WIND_DRIFT_AURA);
-      const speed = s.rules.windSpeed;
-      if (!a || a.value !== heading || a.value2 !== speed)
-        putMarker(p, WIND_DRIFT_AURA, BREATH_NAMES.wind, w.remaining + 0.2, s.boss.id, {
-          value: heading,
-          value2: speed,
-        });
-    } else if (pulling) {
-      const a = auraOf(p, WIND_PULL_AURA);
-      if (!a || a.value !== s.boss.pos.x || a.value2 !== s.boss.pos.z)
-        putMarker(p, WIND_PULL_AURA, BREATH_NAMES.pull, w.remaining + 0.2, s.boss.id, {
-          value: s.boss.pos.x,
-          value2: s.boss.pos.z,
-          value3: T.pullSpeed,
-        });
-    }
+    if (blowing)
+      keepWind(s, p, WIND_DRIFT_AURA, BREATH_NAMES.wind, {
+        value: heading,
+        value2: s.rules.windSpeed,
+      });
+    else if (pulling)
+      keepWind(s, p, WIND_PULL_AURA, BREATH_NAMES.pull, {
+        value: s.boss.pos.x,
+        value2: s.boss.pos.z,
+        value3: T.pullSpeed,
+      });
   }
+}
+
+/** Take the wind and pull auras one guardian put on `p` off it. */
+function dropWindFrom(p: Entity, sourceId: number): void {
+  if (
+    p.auras.some(
+      (a) => (a.id === WIND_DRIFT_AURA || a.id === WIND_PULL_AURA) && a.sourceId === sourceId,
+    )
+  )
+    p.auras = p.auras.filter(
+      (a) => !((a.id === WIND_DRIFT_AURA || a.id === WIND_PULL_AURA) && a.sourceId === sourceId),
+    );
 }
 
 /** The wind presses a body against the rim's wall: a hit each second. */
@@ -209,7 +247,7 @@ function stepPinned(s: BreathScope): void {
   const blowing = windBlowing(st);
   const heading = (st.wind.bearing * Math.PI) / 180;
   const still = new Set<number>();
-  for (const p of s.players) {
+  for (const p of livePlayers(s)) {
     if (!blowing || anchored(p)) continue;
     const at = local(s.ctx, s.inst, p);
     if (!pinnedAgainstRim(at.x, at.z, heading)) continue;
@@ -307,7 +345,7 @@ export function startInhale(s: BreathScope, force = false): boolean {
   let cx = 0;
   let cz = 0;
   let n = 0;
-  for (const p of s.players) {
+  for (const p of livePlayers(s)) {
     if (p.id === b.aggroTargetId) continue;
     cx += p.pos.x;
     cz += p.pos.z;
@@ -344,7 +382,7 @@ function stepVortex(s: BreathScope): void {
   v.tick -= DT;
   if (v.tick > 1e-9) return;
   v.tick += T.vortexTick;
-  for (const p of s.players) {
+  for (const p of livePlayers(s)) {
     const at = local(s.ctx, s.inst, p);
     if (Math.hypot(at.x - v.x, at.z - v.z) > T.vortexR) continue;
     s.ctx.dealDamage(
@@ -381,7 +419,7 @@ export function landGust(s: BreathScope): void {
     fx: 'nova',
     ability: BREATH_CUES.gust,
   });
-  for (const p of s.players) {
+  for (const p of livePlayers(s)) {
     s.ctx.dealDamage(
       b,
       p,
@@ -442,7 +480,7 @@ function stepGales(s: BreathScope): void {
     }
     const at = looseGalePos(g.k, g.t);
     moveBreathObject(s.ctx, s.inst, e, at.x, at.z);
-    for (const p of s.players) {
+    for (const p of livePlayers(s)) {
       const pl = local(s.ctx, s.inst, p);
       const dx = pl.x - at.x;
       const dz = pl.z - at.z;
@@ -505,10 +543,11 @@ export function startWindBars(s: BreathScope): void {
 }
 
 /** Take every wind aura and pin off the claim's players. */
-export function clearWindAuras(ctx: SimContext, inst: InstanceSlot): void {
-  for (const p of corniceListeners(ctx, inst)) {
-    dropAura(p, WIND_DRIFT_AURA);
-    dropAura(p, WIND_PULL_AURA);
-    dropAura(p, BREATH_AURAS.pinned);
+export function clearWindAuras(ctx: SimContext, inst: InstanceSlot, bossId: number): void {
+  for (const p of corniceListeners(ctx, inst)) dropAura(p, BREATH_AURAS.pinned);
+  // The wind wherever its players went.
+  for (const meta of ctx.players.values()) {
+    const p = ctx.entities.get(meta.entityId);
+    if (p) dropWindFrom(p, bossId);
   }
 }

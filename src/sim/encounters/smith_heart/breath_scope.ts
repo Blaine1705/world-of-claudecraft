@@ -68,6 +68,12 @@ export function corniceListeners(ctx: SimContext, inst: InstanceSlot): Entity[] 
   return out.sort((a, b) => a.id - b.id);
 }
 
+/** The scope's players still alive now (one killed earlier this tick takes
+ *  no further roll: the draws stay those of living targets). */
+export function livePlayers(s: Pick<BreathScope, 'players'>): Entity[] {
+  return s.players.filter((p) => !p.dead);
+}
+
 /** Is the guardian free to begin a bar now? */
 export function guardianFree(s: BreathScope): boolean {
   if (s.st.bar || s.boss.castingAbility !== null) return false;

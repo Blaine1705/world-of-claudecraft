@@ -33,6 +33,7 @@ import {
   type BreathScope,
   dropAura,
   dropBreathObject,
+  livePlayers,
   local,
   putMarker,
   raidWarn,
@@ -121,7 +122,7 @@ function stepCalm(s: BreathScope): void {
   }
   if (c.state !== 'hold') return;
   const thessaly = thessalyOf(s.ctx, s.inst);
-  for (const p of s.players) {
+  for (const p of livePlayers(s)) {
     if (c.seated.length >= T.circleSeats) break;
     const at = local(s.ctx, s.inst, p);
     if (Math.hypot(at.x - c.x, at.z - c.z) > T.circleR) continue;

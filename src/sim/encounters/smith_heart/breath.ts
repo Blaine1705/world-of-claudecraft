@@ -252,7 +252,7 @@ function clearFight(
     st.vortex = null;
     st.pinned = {};
   }
-  clearWindAuras(ctx, inst);
+  clearWindAuras(ctx, inst, boss.id);
   clearAnchors(corniceListeners(ctx, inst), st);
   // A lifted body whose cradle went without its fight (a dev reset) is set
   // down where it hangs.
@@ -436,7 +436,7 @@ export function breathDevTrigger(ctx: SimContext, inst: InstanceSlot, what: stri
   }
   if (verb === 'calm') {
     if (st.half !== 'wind') return 'The wind half is over (the storm has broken).';
-    clearWindAuras(ctx, inst);
+    clearWindAuras(ctx, inst, s.boss.id);
     setWind(s, 'calm', Math.max(0.5, T.calmMax - T.gatherSeconds), st.wind.bearing);
     return 'The wind falls calm.';
   }
