@@ -189,6 +189,20 @@ describe('the Rift body class is derived from content', () => {
 });
 
 describe('the two lanes follow what each kind of content spawns', () => {
+  it('loads Hoard costume bodies on demand without adding them to iOS world entry', () => {
+    for (const [alias, original] of [
+      ['form_trick_bat', 'mob_hoard_bat_swarmling'],
+      ['form_costume_goblin', 'mob_hoard_coinsack_scurrier'],
+    ]) {
+      expect(VISUALS[alias].lazyPreload, alias).toBe(true);
+      expect(VISUALS[alias].url).toBe(VISUALS[original].url);
+      for (const url of defUrls(VISUALS[alias]).filter(isStreamedBodyUrl)) {
+        expect(ios.postEntry, alias).not.toContain(url);
+        expect(riftOnlyBodyLanes().has(url), url).toBe(true);
+        expect(preload, url).toContain(url);
+      }
+    }
+  });
   it('puts every body a Rift template draws in the Rift lane, and only Buried Hoard bodies in the hoard lane', () => {
     const riftDrawn = new Set<string>();
     for (const id of Object.keys(RIFT_MOBS)) {

@@ -167,6 +167,9 @@ export function riftOnlyBodyLanes(): ReadonlyMap<string, RiftBodyLane> {
   const urls = new Set<string>();
   const shared = new Set<string>();
   for (const [key, def] of Object.entries(VISUALS)) {
+    // On-demand costume aliases do not make a Hoard body part of world entry.
+    // Original creature definitions still witness every real spawn.
+    if (key.startsWith('form_') && def.lazyPreload) continue;
     for (const url of defUrls(def)) (keys.has(key) ? urls : shared).add(url);
   }
   const riftDrawn = new Set<string>();
