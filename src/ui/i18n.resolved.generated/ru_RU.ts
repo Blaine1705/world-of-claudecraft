@@ -6796,6 +6796,20 @@ export const ru_RU: EnTranslations = {
         "death": "Холод... отпускает... Закалка ваша."
       }
     },
+    "quenchAlert": {
+      "coldTitle": "Холод",
+      "freezingTitle": "Вы замерзаете!",
+      "warmTitle": "Тепло группы",
+      "frozenTitle": "Скован инеем!",
+      "waterTitle": "Подо льдом!",
+      "coldLine": "Встаньте в пределах {radius} м от {others} или больше других игроков, чтобы согреться",
+      "warmLine": "Холод спадает. Сдвиньте группу в течение {seconds} сек, иначе лёд треснет",
+      "frozenLine": "Лёд разлетится через {seconds} сек: всем рядом отойти",
+      "waterLine": "Выберетесь через {seconds} сек",
+      "coldBar": "Холод {cold} / {max}",
+      "coldAria": "Холод {cold} из {max}",
+      "timeAria": "Осталось {seconds} сек"
+    },
     "sanctumAlert": {
       "quenchTitle": "В закалочной воде!",
       "quenchLine": "Она жжёт и замедляет: плывите к ближайшему льду или на берег",

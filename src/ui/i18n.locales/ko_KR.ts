@@ -21910,4 +21910,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.quenchGuardian.awake': "대장장이의 네 자루 검이 깨어났습니다. 담금질 숨결과 담금질 일격이 적중할 때마다 {delay}초 뒤(생명력 {lowPct}% 미만에서는 {low}초 뒤) 모든 검이 떠 있는 자리에서 같은 방향으로 그것을 되풀이합니다. 검 뒤, 공격 반대편은 언제나 안전합니다.",
   'hudChrome.auraEffect.quenchGuardian.deepening': "호수의 냉기가 {total}% 더 빠르게 오릅니다: 검이 깨어난 뒤 {every}초마다 {step}%씩(지금까지 {stacks}회).",
   'abilityUi.cast.heart_quench_blades_wake': "검의 각성",
+  // The Smith's Heart's Guardian of the Quench cold bar (M16 fills).
+  'hudChrome.quenchAlert.coldTitle': "냉기",
+  'hudChrome.quenchAlert.freezingTitle': "얼어붙는 중!",
+  'hudChrome.quenchAlert.warmTitle': "모여서 얻은 온기",
+  'hudChrome.quenchAlert.frozenTitle': "서리에 갇힘!",
+  'hudChrome.quenchAlert.waterTitle': "얼음 아래!",
+  'hudChrome.quenchAlert.coldLine': "{radius}미터 안에 다른 {others}명 이상과 모여 몸을 녹이세요",
+  'hudChrome.quenchAlert.warmLine': "냉기가 내려가고 있습니다. {seconds}초 안에 무리를 옮기지 않으면 얼음이 갈라집니다",
+  'hudChrome.quenchAlert.frozenLine': "{seconds}초 뒤 얼음이 부서집니다: 가까이 있는 모두 물러나세요",
+  'hudChrome.quenchAlert.waterLine': "{seconds}초 뒤 기어 올라옵니다",
+  'hudChrome.quenchAlert.coldBar': "냉기 {cold} / {max}",
+  'hudChrome.quenchAlert.coldAria': "냉기 {max} 중 {cold}",
+  'hudChrome.quenchAlert.timeAria': "{seconds}초 남음",
 };

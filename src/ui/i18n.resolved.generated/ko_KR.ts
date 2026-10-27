@@ -6796,6 +6796,20 @@ export const ko_KR: EnTranslations = {
         "death": "냉기가... 물러난다... 담금질은 너희의 것이다."
       }
     },
+    "quenchAlert": {
+      "coldTitle": "냉기",
+      "freezingTitle": "얼어붙는 중!",
+      "warmTitle": "모여서 얻은 온기",
+      "frozenTitle": "서리에 갇힘!",
+      "waterTitle": "얼음 아래!",
+      "coldLine": "{radius}미터 안에 다른 {others}명 이상과 모여 몸을 녹이세요",
+      "warmLine": "냉기가 내려가고 있습니다. {seconds}초 안에 무리를 옮기지 않으면 얼음이 갈라집니다",
+      "frozenLine": "{seconds}초 뒤 얼음이 부서집니다: 가까이 있는 모두 물러나세요",
+      "waterLine": "{seconds}초 뒤 기어 올라옵니다",
+      "coldBar": "냉기 {cold} / {max}",
+      "coldAria": "냉기 {max} 중 {cold}",
+      "timeAria": "{seconds}초 남음"
+    },
     "sanctumAlert": {
       "quenchTitle": "담금질 물속이다!",
       "quenchLine": "불타고 느려진다: 가장 가까운 얼음이나 물가로 헤엄쳐라",

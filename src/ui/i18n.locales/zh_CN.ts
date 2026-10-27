@@ -20848,4 +20848,17 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.quenchGuardian.awake': "铁匠的四把刃已苏醒。每次淬火吐息与回火打击命中后{delay}秒（生命值低于{lowPct}%时为{low}秒），每把刃都会在漂浮之处朝同一方向重复它。站在刃后、背对攻击的一侧，永远安全。",
   'hudChrome.auraEffect.quenchGuardian.deepening': "湖的寒意上升快了{total}%：自刃苏醒后每{every}秒再快{step}%（目前{stacks}次）。",
   'abilityUi.cast.heart_quench_blades_wake': "诸刃苏醒",
+  // The Smith's Heart's Guardian of the Quench cold bar (M16 fills).
+  'hudChrome.quenchAlert.coldTitle': "寒意",
+  'hudChrome.quenchAlert.freezingTitle': "快冻僵了！",
+  'hudChrome.quenchAlert.warmTitle': "抱团取暖",
+  'hudChrome.quenchAlert.frozenTitle': "被霜封住！",
+  'hudChrome.quenchAlert.waterTitle': "在冰下！",
+  'hudChrome.quenchAlert.coldLine': "站到{radius}码内有{others}名或更多其他玩家的地方取暖",
+  'hudChrome.quenchAlert.warmLine': "寒意正在下降。{seconds}秒内移动人群，否则冰面会裂开",
+  'hudChrome.quenchAlert.frozenLine': "冰层将在{seconds}秒后碎裂：附近的人请离开",
+  'hudChrome.quenchAlert.waterLine': "{seconds}秒后爬上岸",
+  'hudChrome.quenchAlert.coldBar': "寒意 {cold} / {max}",
+  'hudChrome.quenchAlert.coldAria': "寒意 {cold}/{max}",
+  'hudChrome.quenchAlert.timeAria': "剩余{seconds}秒",
 };

@@ -6796,6 +6796,20 @@ export const ja_JP: EnTranslations = {
         "death": "冷気が……離れていく……焼き入れはお前たちのものだ。"
       }
     },
+    "quenchAlert": {
+      "coldTitle": "冷気",
+      "freezingTitle": "凍えている！",
+      "warmTitle": "身を寄せた温もり",
+      "frozenTitle": "霜に閉ざされた！",
+      "waterTitle": "氷の下！",
+      "coldLine": "{radius}ヤード以内で他の{others}人以上と身を寄せて温まろう",
+      "warmLine": "冷気が下がっている。{seconds}秒以内に集団ごと移動しないと氷が割れる",
+      "frozenLine": "{seconds}秒後に氷が砕ける：近くの者は離れろ",
+      "waterLine": "{seconds}秒後に這い上がる",
+      "coldBar": "冷気 {cold} / {max}",
+      "coldAria": "冷気 {max}中{cold}",
+      "timeAria": "残り{seconds}秒"
+    },
     "sanctumAlert": {
       "quenchTitle": "焼き入れの水の中だ！",
       "quenchLine": "焼かれて鈍る：一番近い氷か岸まで泳げ",

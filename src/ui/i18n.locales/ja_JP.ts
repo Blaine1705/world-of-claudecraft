@@ -21915,4 +21915,17 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.quenchGuardian.awake': "鍛冶師の四本の剣が目覚めている。焼き入れの吐息と焼き戻しの一撃が決まるたび、{delay}秒後（体力{lowPct}%未満では{low}秒後）に、すべての剣が浮かぶ場所から同じ向きでそれを繰り返す。剣の陰、攻撃と反対側は常に安全だ。",
   'hudChrome.auraEffect.quenchGuardian.deepening': "湖の冷気の上昇が{total}%速くなっている：剣が目覚めてから{every}秒ごとに{step}%ずつ（これまでに{stacks}回）。",
   'abilityUi.cast.heart_quench_blades_wake': "剣の目覚め",
+  // The Smith's Heart's Guardian of the Quench cold bar (M16 fills).
+  'hudChrome.quenchAlert.coldTitle': "冷気",
+  'hudChrome.quenchAlert.freezingTitle': "凍えている！",
+  'hudChrome.quenchAlert.warmTitle': "身を寄せた温もり",
+  'hudChrome.quenchAlert.frozenTitle': "霜に閉ざされた！",
+  'hudChrome.quenchAlert.waterTitle': "氷の下！",
+  'hudChrome.quenchAlert.coldLine': "{radius}ヤード以内で他の{others}人以上と身を寄せて温まろう",
+  'hudChrome.quenchAlert.warmLine': "冷気が下がっている。{seconds}秒以内に集団ごと移動しないと氷が割れる",
+  'hudChrome.quenchAlert.frozenLine': "{seconds}秒後に氷が砕ける：近くの者は離れろ",
+  'hudChrome.quenchAlert.waterLine': "{seconds}秒後に這い上がる",
+  'hudChrome.quenchAlert.coldBar': "冷気 {cold} / {max}",
+  'hudChrome.quenchAlert.coldAria': "冷気 {max}中{cold}",
+  'hudChrome.quenchAlert.timeAria': "残り{seconds}秒",
 };

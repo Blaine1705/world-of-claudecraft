@@ -10,8 +10,9 @@
 //    never governed by it: the Iron Cage escape (the panel IS the escape
 //    button), Gaoler Ossick's chain alert (a live gauge the player steers by:
 //    the links left on the anchor and the shackle's reach used, with the
-//    distance), and the use prompt (the panel is the interact press on a
-//    brazier or a candle).
+//    distance), the Smith's Heart's Guardian of the Quench cold bar (the
+//    player's own gauge, steered by the whole fight), and the use prompt (the
+//    panel is the interact press on a brazier or a candle).
 //    It is a player-chosen interface preference, never a graphics-tier knob:
 //    this module takes the setting's own boolean and reads no preset, effects
 //    profile or governor (tests/dungeon_hints_setting.test.ts pins that).
@@ -31,6 +32,7 @@ export type DungeonPromptId =
   | 'sanctum'
   | 'crypt'
   | 'council'
+  | 'quench'
   | 'kitUse';
 
 /** Whether a prompt is ADVISORY (the hints setting governs it). A Record over
@@ -43,6 +45,7 @@ export const DUNGEON_PROMPT_ADVISORY: Readonly<Record<DungeonPromptId, boolean>>
   sanctum: true,
   crypt: true,
   council: true,
+  quench: false,
   kitUse: false,
 };
 
@@ -63,6 +66,8 @@ export interface DungeonPromptSlotState {
   crypt: boolean;
   /** The Smith's Heart's Hammer Council alert. */
   council: boolean;
+  /** The Smith's Heart's Guardian of the Quench cold bar. */
+  quench: boolean;
   /** The showing Crypt alert is a SOFT readout (ignored while crypt is false). */
   cryptSoft: boolean;
 }
@@ -77,6 +82,7 @@ export function usePromptYields(s: DungeonPromptSlotState): boolean {
     s.wildheart ||
     s.sanctum ||
     s.council ||
+    s.quench ||
     (s.crypt && !s.cryptSoft)
   );
 }

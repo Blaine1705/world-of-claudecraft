@@ -22323,4 +22323,17 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.quenchGuardian.awake': "Четыре клинка Кузнеца пробудились. Через {delay} сек после каждого Закаляющего дыхания и Закаляющего удара ({low} сек при здоровье ниже {lowPct}%) каждый клинок повторяет его со своего места, в ту же сторону. За клинком, с противоположной от атаки стороны, всегда безопасно.",
   'hudChrome.auraEffect.quenchGuardian.deepening': "Холод озера растёт на {total}% быстрее: на {step}% больше каждые {every} сек с пробуждения клинков ({stacks} раз).",
   'abilityUi.cast.heart_quench_blades_wake': "Пробуждение клинков",
+  // The Smith's Heart's Guardian of the Quench cold bar (M16 fills).
+  'hudChrome.quenchAlert.coldTitle': "Холод",
+  'hudChrome.quenchAlert.freezingTitle': "Вы замерзаете!",
+  'hudChrome.quenchAlert.warmTitle': "Тепло группы",
+  'hudChrome.quenchAlert.frozenTitle': "Скован инеем!",
+  'hudChrome.quenchAlert.waterTitle': "Подо льдом!",
+  'hudChrome.quenchAlert.coldLine': "Встаньте в пределах {radius} м от {others} или больше других игроков, чтобы согреться",
+  'hudChrome.quenchAlert.warmLine': "Холод спадает. Сдвиньте группу в течение {seconds} сек, иначе лёд треснет",
+  'hudChrome.quenchAlert.frozenLine': "Лёд разлетится через {seconds} сек: всем рядом отойти",
+  'hudChrome.quenchAlert.waterLine': "Выберетесь через {seconds} сек",
+  'hudChrome.quenchAlert.coldBar': "Холод {cold} / {max}",
+  'hudChrome.quenchAlert.coldAria': "Холод {cold} из {max}",
+  'hudChrome.quenchAlert.timeAria': "Осталось {seconds} сек",
 };

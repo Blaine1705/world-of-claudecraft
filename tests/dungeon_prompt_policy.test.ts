@@ -44,6 +44,7 @@ const ALL_IDS: DungeonPromptId[] = [
   'sanctum',
   'crypt',
   'council',
+  'quench',
   'kitUse',
 ];
 
@@ -60,6 +61,7 @@ describe('dungeon prompt policy: what the hints setting governs', () => {
       sanctum: true,
       crypt: true,
       council: true,
+      quench: false,
       kitUse: false,
     });
     expect(Object.keys(DUNGEON_PROMPT_ADVISORY).sort()).toEqual([...ALL_IDS].sort());
@@ -79,6 +81,8 @@ describe('dungeon prompt policy: what the hints setting governs', () => {
     expect(dungeonPromptEnabled('cage', false)).toBe(true);
     expect(dungeonPromptEnabled('chain', false)).toBe(true);
     expect(dungeonPromptEnabled('kitUse', false)).toBe(true);
+    // The Guardian of the Quench's cold bar is the player's own gauge.
+    expect(dungeonPromptEnabled('quench', false)).toBe(true);
   });
 });
 
@@ -91,6 +95,7 @@ describe('dungeon prompt policy: the shared slot', () => {
     sanctum: false,
     crypt: false,
     council: false,
+    quench: false,
     cryptSoft: false,
   };
 
@@ -107,6 +112,7 @@ describe('dungeon prompt policy: the shared slot', () => {
       'sanctum',
       'crypt',
       'council',
+      'quench',
     ] as const) {
       expect(usePromptYields({ ...none, [id]: true }), id).toBe(true);
     }

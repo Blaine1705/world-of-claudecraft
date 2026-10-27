@@ -6796,6 +6796,20 @@ export const zh_CN: EnTranslations = {
         "death": "寒意……放手了……淬火归你们了。"
       }
     },
+    "quenchAlert": {
+      "coldTitle": "寒意",
+      "freezingTitle": "快冻僵了！",
+      "warmTitle": "抱团取暖",
+      "frozenTitle": "被霜封住！",
+      "waterTitle": "在冰下！",
+      "coldLine": "站到{radius}码内有{others}名或更多其他玩家的地方取暖",
+      "warmLine": "寒意正在下降。{seconds}秒内移动人群，否则冰面会裂开",
+      "frozenLine": "冰层将在{seconds}秒后碎裂：附近的人请离开",
+      "waterLine": "{seconds}秒后爬上岸",
+      "coldBar": "寒意 {cold} / {max}",
+      "coldAria": "寒意 {cold}/{max}",
+      "timeAria": "剩余{seconds}秒"
+    },
     "sanctumAlert": {
       "quenchTitle": "身陷淬火之水！",
       "quenchLine": "它会灼烧并减速你：游向最近的冰面或岸边",

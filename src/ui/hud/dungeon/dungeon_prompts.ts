@@ -10,7 +10,8 @@
 // Burning Knell's half, Grasp of the Grave, the Reap, the Toll and Harmony
 // readouts, the Rite's candles and the Bound Souls) and the Smith's Heart's
 // Hammer Council's (council_alert_view.ts: the rock, the wake, the Weight,
-// Resonance), plus the trash engine's
+// Resonance) and its Guardian of the Quench's cold bar (quench_alert_view.ts:
+// the player's own gauge, never advisory), plus the trash engine's
 // use prompt (kit_use_prompt_view.ts on the same family: a Soul Brazier to kick
 // over, a Remembrance Candle to relight). It owns no DOM itself; it builds
 // each view from the frame's inputs and hands it to that prompt's painter. The
@@ -58,6 +59,7 @@ import {
   type KitUseBody,
   KitUseSceneScan,
 } from './kit_use_prompt_view';
+import { buildQuenchAlertView, QUENCH_ALERT_KINDS } from './quench_alert_view';
 import { SanctumAlertSceneScan, type SanctumSceneEntity } from './sanctum_alert_scene_core';
 import { buildSanctumAlertView, SANCTUM_ALERT_KINDS } from './sanctum_alert_view';
 import { buildWildheartAlertView, WILDHEART_ALERT_KINDS } from './wildheart_alert_view';
@@ -117,6 +119,7 @@ export class DungeonPrompts {
   private readonly sanctumScene = new SanctumAlertSceneScan();
   private readonly crypt: EncounterAlert;
   private readonly council: EncounterAlert;
+  private readonly quench: EncounterAlert;
   private readonly cryptScene = new CryptAlertSceneScan();
   private readonly councilSoul = new CouncilSoulScan();
   private readonly kitUse: EncounterAlert;
@@ -135,6 +138,7 @@ export class DungeonPrompts {
     sanctum: false,
     crypt: false,
     council: false,
+    quench: false,
     cryptSoft: false,
   };
 
@@ -165,6 +169,11 @@ export class DungeonPrompts {
       id: 'heart-council-alert',
       className: 'ui-panel-strong encounter-alert heart-council-alert',
       kinds: COUNCIL_ALERT_KINDS,
+    });
+    this.quench = new EncounterAlert(deps, {
+      id: 'heart-quench-alert',
+      className: 'ui-panel-strong encounter-alert heart-quench-alert',
+      kinds: QUENCH_ALERT_KINDS,
     });
     // A press on the use prompt is the interact key's own 'use' arm: target
     // the body it names, then the ordinary interact.
@@ -243,6 +252,11 @@ export class DungeonPrompts {
       ? buildCouncilAlertView({ auras: p.auras, soul: this.councilSoul.frame(f.world) })
       : HINT_HIDDEN;
     this.council.paint(council);
+    // The cold bar is the player's own gauge: never hidden by the hints.
+    const quench = dungeonPromptEnabled('quench', hints)
+      ? buildQuenchAlertView({ auras: p.auras, dead: p.dead })
+      : HINT_HIDDEN;
+    this.quench.paint(quench);
     // The use prompt last: it yields the shared slot to any prompt showing
     // above (a soft Crypt readout yields to it instead).
     const slot = this.slot;
@@ -253,6 +267,7 @@ export class DungeonPrompts {
     slot.sanctum = sanctum.visible;
     slot.crypt = crypt.visible;
     slot.council = council.visible;
+    slot.quench = quench.visible;
     slot.cryptSoft = cryptSoft;
     const use = usePromptYields(slot)
       ? null
@@ -277,6 +292,7 @@ export class DungeonPrompts {
     this.sanctum.dispose();
     this.crypt.dispose();
     this.council.dispose();
+    this.quench.dispose();
     this.kitUse.dispose();
   }
 }

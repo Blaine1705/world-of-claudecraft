@@ -9749,6 +9749,22 @@ export const hudChromeStrings = {
       death: 'The cold... lets go... The Quench is yours.',
     },
   },
+  // The Smith's Heart's Guardian of the Quench cold bar (src/ui/hud/dungeon/
+  // quench_alert_view.ts). Wordy (M16): non-Latin fills in the overlays.
+  quenchAlert: {
+    coldTitle: 'Cold',
+    freezingTitle: 'Freezing!',
+    warmTitle: 'Huddled warmth',
+    frozenTitle: 'Encased in rime!',
+    waterTitle: 'Under the ice!',
+    coldLine: 'Stand within {radius} yd of {others} or more others to warm up',
+    warmLine: 'Your cold is falling. Move the huddle within {seconds} sec or the ice cracks',
+    frozenLine: 'The ice shatters in {seconds} sec: everyone close, step away',
+    waterLine: 'Climbing out in {seconds} sec',
+    coldBar: 'Cold {cold} / {max}',
+    coldAria: 'Cold {cold} of {max}',
+    timeAria: '{seconds} seconds left',
+  },
   // The Gravewyrm Sanctum's encounter alert (src/ui/hud/dungeon/sanctum_alert_view.ts).
   // Wordy (M16): non-Latin fills in the overlays.
   sanctumAlert: {

@@ -6796,6 +6796,20 @@ export const en_XA: EnTranslations = {
         "death": "[Ţĥé çóļð... ļéţš ĝó... Ţĥé Ɋúéñçĥ íš ýóúŕš.]"
       }
     },
+    "quenchAlert": {
+      "coldTitle": "[Çóļð]",
+      "freezingTitle": "[Ƒŕééžíñĝ!]",
+      "warmTitle": "[Ĥúððļéð ŵáŕɱţĥ]",
+      "frozenTitle": "[Éñçášéð íñ ŕíɱé!]",
+      "waterTitle": "[Úñðéŕ ţĥé íçé!]",
+      "coldLine": "[Šţáñð ŵíţĥíñ {radius} ýð óƒ {others} óŕ ɱóŕé óţĥéŕš ţó ŵáŕɱ úþ]",
+      "warmLine": "[Ýóúŕ çóļð íš ƒáļļíñĝ. Ɱóʋé ţĥé ĥúððļé ŵíţĥíñ {seconds} šéç óŕ ţĥé íçé çŕáçķš]",
+      "frozenLine": "[Ţĥé íçé šĥáţţéŕš íñ {seconds} šéç: éʋéŕýóñé çļóšé, šţéþ áŵáý]",
+      "waterLine": "[Çļíɱƀíñĝ óúţ íñ {seconds} šéç]",
+      "coldBar": "[Çóļð {cold} / {max}]",
+      "coldAria": "[Çóļð {cold} óƒ {max}]",
+      "timeAria": "[{seconds} šéçóñðš ļéƒţ]"
+    },
     "sanctumAlert": {
       "quenchTitle": "[Íñ ţĥé ɋúéñçĥ-ŵáţéŕ!]",
       "quenchLine": "[Šŵíɱ óñţó íçé óŕ ţĥé šĥóŕé ţó éšçáþé ţĥé ŵáţéŕ ðáɱáĝé áñð šļóŵ]",
