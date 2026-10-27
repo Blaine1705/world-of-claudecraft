@@ -115,7 +115,9 @@ describe('mob portrait source manifest', () => {
     // 371: plus the Smith's Heart raid's fifteen (its eight vein warders and
     // callers, the Council's three, the three guardians and the final boss;
     // the bodyless bosses show their hidden placeholder rig, like the Spear).
-    expect(liveIds).toHaveLength(371);
+    // 375: plus the Guardian of the Heat's four (its Wellspawn, Wellkeeper,
+    // Seedflame and Rolling Cinder).
+    expect(liveIds).toHaveLength(375);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "cffcaf7c4accf3bc7bc21f9e30204ec8ad618c37fa6b7ebec400b8cd536fe995",
+  "rendererFingerprint": "6eb0a2e999566552d34632aba291c6182c6a119a1a3a80146f83ee7c3cc30bef",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "win32",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 6872966,
-      "sha256": "b9a94f002b008295a88e1928c6ac6c73c0d6f17ce3d702f892dbd8a772a5160c",
+      "bytes": 6885478,
+      "sha256": "92b54c03756c8c58ba2593f52a169f746406cbc08c1096487b438f20ef0a308f",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 371,
+  "portraitCount": 375,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -5176,7 +5176,7 @@
           "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
         },
         "idle": "Flying_Idle",
-        "height": 2.4,
+        "height": 4.3,
         "yaw": null,
         "hover": null,
         "show": null,
@@ -5190,11 +5190,79 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "e56a4e3505a3ace62d18bb508f6a00b6c8904ec4c977080ed2c8582f8260f096",
+      "sourceFingerprint": "1364f773973696e313837587cf95c5ac59f4863f140ed9c713c9a1e10cef54f4",
       "output": {
         "path": "public/ui/mobs/heart_heat_guardian.webp",
         "bytes": 2330,
         "sha256": "da04f69981b3560b636c0473e89c2a109f8e19bb8b809182e649286d83c8af0d"
+      }
+    },
+    {
+      "id": "heart_heat_rolling_cinder",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "smith_heart_rolling_cinder",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/golelingevolved.glb",
+          "path": "public/models/creatures/golelingevolved.glb",
+          "bytes": 85588,
+          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+        },
+        "idle": "Flying_Idle",
+        "height": 1.9,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "a844bd09c5bfae673703190e103522e5a253f2194c52936303ff8aad90be676d",
+      "output": {
+        "path": "public/ui/mobs/heart_heat_rolling_cinder.webp",
+        "bytes": 2330,
+        "sha256": "da04f69981b3560b636c0473e89c2a109f8e19bb8b809182e649286d83c8af0d"
+      }
+    },
+    {
+      "id": "heart_heat_seedflame",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_glimmerwisp",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/glimmerwisp.glb",
+          "path": "public/models/creatures/glimmerwisp.glb",
+          "bytes": 162784,
+          "sha256": "25010f4fcd2a0aba2a7ea3f01ceba83d7fb8731a2c9e7d292db8d1f211e6f1ef"
+        },
+        "idle": "Flying_Idle",
+        "height": 1.6,
+        "yaw": -1.5707963267948966,
+        "hover": 0.4,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": null
+      },
+      "tint": {
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
+      },
+      "sourceFingerprint": "664655b90882d6a00c538c49f641294ebb440276b508eb2a21dd8e800ed9528f",
+      "output": {
+        "path": "public/ui/mobs/heart_heat_seedflame.webp",
+        "bytes": 2276,
+        "sha256": "a0677b9068d23c1dcdc7030b8e3b00edfcd709c5d5e3494fb9cc73480ebd19b0"
       }
     },
     {
@@ -5229,6 +5297,74 @@
         "path": "public/ui/mobs/heart_heat_warder.webp",
         "bytes": 2416,
         "sha256": "a1aa2c0ca8dbf92b40fde1fdd512a2501b580e1811994f257ef2522077f5ebeb"
+      }
+    },
+    {
+      "id": "heart_heat_wellkeeper",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_elemental",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/golelingevolved.glb",
+          "path": "public/models/creatures/golelingevolved.glb",
+          "bytes": 85588,
+          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+        },
+        "idle": "Flying_Idle",
+        "height": 2.2,
+        "yaw": null,
+        "hover": 0.3,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.4
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#ffb04a",
+        "strength": 0.4
+      },
+      "sourceFingerprint": "cc92549bb7465b8522e52c812ccd85776ede3e57c16488a36000b906d2dcaf6d",
+      "output": {
+        "path": "public/ui/mobs/heart_heat_wellkeeper.webp",
+        "bytes": 2612,
+        "sha256": "10a098c6fd434089a15f373e300d838e2538afd0cfcf1ddfb4d5d91e5fbf26ec"
+      }
+    },
+    {
+      "id": "heart_heat_wellspawn",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_elemental",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/golelingevolved.glb",
+          "path": "public/models/creatures/golelingevolved.glb",
+          "bytes": 85588,
+          "sha256": "156f4c2dcf93c6e52a738d8a93e09d1988f933fe4f2d1f9d30411b5eae7f2b94"
+        },
+        "idle": "Flying_Idle",
+        "height": 2.2,
+        "yaw": null,
+        "hover": 0.3,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.4
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#ffd27a",
+        "strength": 0.4
+      },
+      "sourceFingerprint": "192318ce89a80aa9b81bcb7ab35560af0b13bae5ee13e371d8b8676ca798dac5",
+      "output": {
+        "path": "public/ui/mobs/heart_heat_wellspawn.webp",
+        "bytes": 2510,
+        "sha256": "9163eb951db870283915a74cf85d5b24f2b2da217620d7a008886bb95eae1009"
       }
     },
     {
