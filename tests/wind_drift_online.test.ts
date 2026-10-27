@@ -62,7 +62,7 @@ function wind(heading: number): Aura {
 }
 
 function inSteadyBlow(f: FrameRecord): boolean {
-  return f.tMs >= BLOW_AT_MS + EDGE_MS && f.tMs < BLOW_AT_MS + BLOW_MS - 50;
+  return f.tMs >= BLOW_AT_MS + EDGE_MS && f.tMs < BLOW_AT_MS + BLOW_MS - 450;
 }
 
 describe.each([
@@ -78,11 +78,18 @@ describe.each([
       movementWire: 2,
     });
     try {
+      let epochBefore = -1;
       const run = harness.runScript({
         durationMs: RUN_MS,
         // Held forward (north) the whole run, the way a player fights a blow.
         script: [{ atMs: 0, mi: { forward: true }, facing: 0 }],
         actions: [
+          {
+            atMs: 200,
+            run: () => {
+              epochBefore = harness.session.movementOverrideEpoch;
+            },
+          },
           {
             atMs: BLOW_AT_MS,
             run: () => {
@@ -91,6 +98,12 @@ describe.each([
           },
         ],
       });
+      // No server override epoch, ever: the blow's start and its end (the
+      // aura running out mid-tick, after the step it carried, as the fight's
+      // do) never stand the prediction down: the step check allows the last
+      // tick's wind too.
+      expect(harness.session.movementOverrideEpoch).toBe(epochBefore);
+      expect(run.frames.filter((f) => f.tMs > 200).every((f) => f.predictorActive)).toBe(true);
       const steady = run.frames.filter(inSteadyBlow);
       expect(steady.length).toBeGreaterThan(40);
       // The predictor owns the pose through the whole blow.
