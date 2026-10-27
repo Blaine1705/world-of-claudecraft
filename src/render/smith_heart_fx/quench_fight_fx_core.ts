@@ -23,6 +23,7 @@ import {
 import {
   bladeStateOf,
   crackOf,
+  danceEase,
   echoOf,
   echoReach,
   laneOf,
@@ -257,6 +258,60 @@ export function bladeLook(
     }
   }
   return out;
+}
+
+// ---- the blades' motion (smooth whatever the snapshot rate) -------------------------
+
+/** How fast a drawn blade follows its object between reads (1/s): a
+ *  float's small moves settle in about a fifth of a second. */
+export const BLADE_FOLLOW_RATE = 10;
+/** Past this (yards) a drawn blade jumps to its object (first sight, a wipe). */
+export const BLADE_SNAP = 8;
+
+/** One frame of a value following its target smoothly (frame-rate free). */
+export function followStep(cur: number, target: number, dt: number, rate: number): number {
+  return cur + (target - cur) * (1 - Math.exp(-rate * Math.max(0, dt)));
+}
+
+/** The awakening's fill drawn between the reads of its bar (`read`, sampled
+ *  on the scan's clock and the snapshots'): it runs on at the bar's own pace
+ *  (`total` seconds), catches up when behind the read, holds when far
+ *  ahead, and is 0 with no bar. Never steps. */
+export function wakeFillStep(cur: number, read: number, dt: number, total: number): number {
+  if (read <= 0) return 0;
+  const pace = total > 0 ? Math.max(0, dt) / total : 0;
+  let next = cur + pace;
+  if (next < read - 0.02) next = Math.min(read, cur + pace * 4);
+  if (next > read + 0.15) next = cur;
+  return clamp01(next);
+}
+
+/** A crossing blade's drawn spot `t` seconds into its flight from (ax, az)
+ *  to (bx, bz): on the sim's own eased curve (`danceEase`), so the drawn
+ *  blade is where the lane strikes; `speed` its share of the flight's peak
+ *  (0..1: its lean, its bank and its wake read it). */
+export function bladeFlight(
+  ax: number,
+  az: number,
+  bx: number,
+  bz: number,
+  t: number,
+  out: { x: number; z: number; speed: number },
+): { x: number; z: number; speed: number } {
+  const k = clamp01(T.danceFly > 0 ? t / T.danceFly : 1);
+  const e = danceEase(k);
+  out.x = ax + (bx - ax) * e;
+  out.z = az + (bz - az) * e;
+  out.speed = 4 * k * (1 - k);
+  return out;
+}
+
+/** A blade's bank (roll, radians): into its turn (its yaw rate, radians a
+ *  second), and in flight a slight lean to its own side (`side` +1 or -1:
+ *  the two crossing blades bank apart as they pass), at most 0.45. */
+export function bladeBank(yawRate: number, speed: number, side: number): number {
+  const b = -yawRate * 0.12 + 0.22 * side * clamp01(speed);
+  return Math.max(-0.45, Math.min(0.45, b));
 }
 
 /** The blades' homes and their sunk yaws (the layout's). */

@@ -14,11 +14,17 @@
 //    broad face turned the way the guardian's attacks would echo (the blade
 //    turns with the guardian) and a chevron of its light on the ice before it;
 //    blazing while an echo is held at it;
-//  - flying (heroic's crossing): leaning into its flight, a wake of frost and
-//    shards behind it;
+//  - flying (heroic's crossing): along the lane on the sim's own eased curve
+//    (`danceEase`: off its mark slowly, fastest mid-lane, settling onto the
+//    other's), leaning into its speed, banking, a trailing wake of frost
+//    laid on the ice and shards behind it;
 //  - left behind in the lake where it was sunk: a ring of broken ice.
 // The blades are what the echoes come from: their place, light and facing
 // draw on EVERY tier; the shards, mist and glints thin on the low tier.
+// Every motion is smooth whatever the snapshot rate (Jose's playtest: the
+// blades moved roughly online): the drawn blade follows its object, the
+// awakening runs on at its bar's pace between reads, the flight is drawn on
+// its curve from the lane's two ends; the sim stays the authority.
 //
 // Rules (src/render/CLAUDE.md): every material is built in the constructor
 // under the root before its gated attach (the kit's piece, which may land
@@ -33,6 +39,7 @@ import {
   echoOf,
   QUENCH_CASTS,
   QUENCH_GUARDIAN,
+  QUENCH_OBJECTS,
   type QuenchBladeState,
 } from '../../sim/encounters/smith_heart/quench_ids';
 import type { Entity } from '../../sim/types';
@@ -55,13 +62,19 @@ import { radialGlowTexture } from '../textures';
 import { EngineParticles } from '../trash_engine_fx/engine_particles';
 import {
   BLADE_FLOAT_LIFT,
+  BLADE_FOLLOW_RATE,
   BLADE_HOMES,
+  BLADE_SNAP,
   BLADE_TIP,
   type BladeLook,
+  bladeBank,
+  bladeFlight,
   bladeLook,
   QUENCH_FIGHT_COLORS as C,
   fightHash,
+  followStep,
   quenchClaimOrigin,
+  wakeFillStep,
 } from './quench_fight_fx_core';
 
 const SCAN_SEC = 0.1;
@@ -145,10 +158,24 @@ interface BladeView {
   state: QuenchBladeState;
   since: number;
   yaw: number;
-  lastX: number;
-  lastZ: number;
+  /** The drawn spot (world), following the object smoothly. */
+  px: number;
+  pz: number;
+  placed: boolean;
+  /** The drawn lift and roll (smoothed). */
+  lift: number;
+  bank: number;
+  /** The flight drawn from the lane's two ends (world), and its clock. */
+  flyAX: number;
+  flyAZ: number;
+  flyBX: number;
+  flyBZ: number;
+  flyT: number;
+  flying: boolean;
   burstDone: boolean;
 }
+
+const _flight = { x: 0, z: 0, speed: 0 };
 
 export class QuenchBladesFx {
   readonly readyForEntry: Promise<void>;
@@ -170,6 +197,10 @@ export class QuenchBladesFx {
   private readonly heldIds = new Set<number>();
   private rosterSeen = Number.NaN;
   private guardianId = -1;
+  private laneId = -1;
+  /** The awakening's bar as last read, its length, and the fill drawn. */
+  private wakeRead = 0;
+  private wakeTotal = 4;
   private wakeFill = 0;
   /** The claim's origin (world), while the player is in one. */
   private readonly origin = { x: 0, z: 0 };
@@ -340,8 +371,17 @@ export class QuenchBladesFx {
         state: 'sunk',
         since: 0,
         yaw: home.rot,
-        lastX: home.x,
-        lastZ: home.z,
+        px: 0,
+        pz: 0,
+        placed: false,
+        lift: 0,
+        bank: 0,
+        flyAX: 0,
+        flyAZ: 0,
+        flyBX: 0,
+        flyBZ: 0,
+        flyT: 0,
+        flying: false,
         burstDone: false,
       });
     });
@@ -412,7 +452,14 @@ export class QuenchBladesFx {
       this.scanTimer = SCAN_SEC;
       this.scan(world);
     }
-    if (this.near) for (const b of this.blades) this.pose(world, b, dt);
+    if (this.near) {
+      // The bar read gone while a blade still shows waking: it has all but
+      // risen (the float lands with the next read), so it never sinks back.
+      const waking = this.blades.some((b) => b.state === 'wake');
+      const read = this.wakeRead > 0 ? this.wakeRead : waking ? 1 : 0;
+      this.wakeFill = wakeFillStep(this.wakeFill, read, dt, this.wakeTotal);
+      for (const b of this.blades) this.pose(world, b, dt);
+    }
     this.particles.update(this.clock);
   }
 
@@ -437,9 +484,12 @@ export class QuenchBladesFx {
       this.rosterSeen = world.entityRosterVersion;
       this.bladeIds.length = 0;
       this.guardianId = -1;
+      this.laneId = -1;
       this.heldIds.clear();
       for (const e of world.entities.values()) {
         if (e.kind === 'mob' && e.templateId === QUENCH_GUARDIAN) this.guardianId = e.id;
+        else if (e.kind === 'object' && e.templateId.startsWith(QUENCH_OBJECTS.lanePrefix))
+          this.laneId = e.id;
         else if (e.kind === 'object' && bladeStateOf(e.templateId) !== null)
           this.bladeIds.push(e.id);
         else if (e.kind === 'object' && echoOf(e.templateId)) this.heldIds.add(e.id);
@@ -451,10 +501,9 @@ export class QuenchBladesFx {
       });
     }
     const g = this.guardianId >= 0 ? world.entities.get(this.guardianId) : undefined;
-    this.wakeFill =
-      g && g.castingAbility === QUENCH_CASTS.wake && g.castTotal > 0
-        ? 1 - g.castRemaining / g.castTotal
-        : 0;
+    const waking = !!g && g.castingAbility === QUENCH_CASTS.wake && g.castTotal > 0;
+    this.wakeRead = waking && g ? Math.max(0.001, 1 - g.castRemaining / g.castTotal) : 0;
+    if (waking && g) this.wakeTotal = g.castTotal;
   }
 
   private hide(b: BladeView): void {
@@ -481,41 +530,70 @@ export class QuenchBladesFx {
     const e = b.entityId >= 0 ? world.entities.get(b.entityId) : undefined;
     if (!e) {
       this.hide(b);
+      b.placed = false;
       return;
     }
     const state = bladeStateOf(e.templateId) ?? 'sunk';
     if (state !== b.state) {
       if (state === 'wake') b.burstDone = false;
       if (state === 'float' && b.state === 'wake') this.risenBurst(e);
+      if (state === 'fly') this.beginFlight(world, b, e);
       b.state = state;
       b.since = 0;
     } else b.since += dt;
     const look = bladeLook(state, b.since, this.wakeFill, this.clock, b.home, _look);
-    const floor = this.groundY(e.pos.x, e.pos.z);
+    // The drawn spot: on the flight's curve while it crosses, else following
+    // its object smoothly (a jump only on first sight or far away).
+    const lastX = b.px;
+    const lastZ = b.pz;
+    let speed = 0;
+    if (state === 'fly' && b.flying) {
+      b.flyT += dt;
+      const f = bladeFlight(b.flyAX, b.flyAZ, b.flyBX, b.flyBZ, b.flyT, _flight);
+      b.px = f.x;
+      b.pz = f.z;
+      speed = f.speed;
+    } else {
+      b.flying = false;
+      if (!b.placed || Math.hypot(e.pos.x - b.px, e.pos.z - b.pz) > BLADE_SNAP) {
+        b.px = e.pos.x;
+        b.pz = e.pos.z;
+      } else {
+        b.px = followStep(b.px, e.pos.x, dt, BLADE_FOLLOW_RATE);
+        b.pz = followStep(b.pz, e.pos.z, dt, BLADE_FOLLOW_RATE);
+      }
+    }
+    const fresh = !b.placed;
+    b.placed = true;
+    const floor = this.groundY(b.px, b.pz);
     b.holder.visible = true;
-    b.holder.position.set(e.pos.x, floor, e.pos.z);
-    // The yaw: its sunk yaw while sunk, else its face to the echo's way.
+    b.holder.position.set(b.px, floor, b.pz);
+    // The yaw: its sunk yaw while sunk, else its face to the echo's way; in
+    // flight its point along the lane.
     const home = BLADE_HOMES[b.home];
     const flying = state === 'fly';
     let want = state === 'sunk' ? home.rot : e.facing;
-    if (flying) {
-      const vx = e.pos.x - b.lastX;
-      const vz = e.pos.z - b.lastZ;
-      if (vx * vx + vz * vz > 1e-4) want = Math.atan2(vx, vz);
-    }
+    if (flying && b.flying) want = Math.atan2(b.flyBX - b.flyAX, b.flyBZ - b.flyAZ);
     let d = want - b.yaw;
     while (d > Math.PI) d -= Math.PI * 2;
     while (d < -Math.PI) d += Math.PI * 2;
-    b.yaw += d * Math.min(1, dt * (state === 'sunk' ? 30 : flying ? 8 : 3));
+    const turn = fresh ? d : d * (1 - Math.exp(-dt * (state === 'sunk' ? 30 : flying ? 9 : 3)));
+    b.yaw += turn;
     b.holder.rotation.y = b.yaw;
-    // The frame: the kit's sunk lean undone as it stands, its foot lifted.
+    // The frame: the kit's sunk lean undone as it stands, its foot lifted
+    // (smoothed: never a pop between the wake and the float), leaning into
+    // its speed and banking in flight.
     const shake = look.shake * 0.08;
     const jx = shake > 0 ? (fightHash(b.home, Math.floor(this.clock * 40)) - 0.5) * shake : 0;
     const jz = shake > 0 ? (fightHash(b.home + 9, Math.floor(this.clock * 40)) - 0.5) * shake : 0;
-    b.frame.position.set(jx, look.lift, jz);
-    _e.set(flying ? 0.5 : 0, 0, KIT_LEAN * look.upright, 'YXZ');
+    b.lift = fresh ? look.lift : followStep(b.lift, look.lift, dt, 14);
+    const yawRate = dt > 0 ? turn / dt : 0;
+    const side = b.home % 2 === 0 ? 1 : -1;
+    b.bank = followStep(b.bank, flying ? bladeBank(yawRate, speed, side) : 0, dt, 8);
+    b.frame.position.set(jx, b.lift, jz);
+    _e.set(flying ? 0.15 + 0.45 * speed : 0, 0, KIT_LEAN * look.upright + b.bank, 'YXZ');
     b.frame.rotation.copy(_e);
-    b.tip.visible = look.lift > 0.4;
+    b.tip.visible = b.lift > 0.4;
     // Its light: dim sunk, blazing while it holds an echo.
     const held = state !== 'sunk' && this.echoHeldAt(world, e.pos.x, e.pos.z);
     const light = Math.min(1.6, look.light + (held ? 0.6 + 0.3 * Math.sin(this.clock * 14) : 0));
@@ -532,14 +610,14 @@ export class QuenchBladesFx {
     if (awake) {
       const ax = Math.sin(b.yaw);
       const az = Math.cos(b.yaw);
-      const cx = e.pos.x + ax * 3.4;
-      const cz = e.pos.z + az * 3.4;
+      const cx = b.px + ax * 3.4;
+      const cz = b.pz + az * 3.4;
       b.chevron.position.set(cx, this.groundY(cx, cz) + 0.09, cz);
       b.chevron.rotation.y = b.yaw;
       b.chevronMat.uniforms.uAlpha.value = held ? 1 : 0.55;
     }
     // The torn socket at its home once it has risen out of the lake.
-    const torn = state !== 'sunk' && look.lift > 0.5;
+    const torn = state !== 'sunk' && b.lift > 0.5;
     b.socket.visible = torn;
     if (torn) {
       const hx = this.origin.x + home.x;
@@ -548,8 +626,63 @@ export class QuenchBladesFx {
       b.socketMat.uniforms.uAlpha.value = 1;
     }
     this.cosmetics(e, b, look, state, floor, dt);
-    b.lastX = e.pos.x;
-    b.lastZ = e.pos.z;
+    if (flying && !fresh) this.frostWake(lastX, lastZ, b.px, b.pz, floor, speed);
+  }
+
+  /** A crossing begins: the flight is drawn from the lane's end nearer the
+   *  blade to the other (the sim flies the same line), else from where it
+   *  stands to its object (no lane seen yet). */
+  private beginFlight(world: IWorld, b: BladeView, e: Entity): void {
+    const lane = this.laneId >= 0 ? world.entities.get(this.laneId) : undefined;
+    const fromX = b.placed ? b.px : e.pos.x;
+    const fromZ = b.placed ? b.pz : e.pos.z;
+    b.flyT = 0;
+    if (lane && lane.scale > 0) {
+      const ux = Math.sin(lane.facing) * lane.scale;
+      const uz = Math.cos(lane.facing) * lane.scale;
+      const ax = lane.pos.x - ux;
+      const az = lane.pos.z - uz;
+      const bx = lane.pos.x + ux;
+      const bz = lane.pos.z + uz;
+      const nearA = Math.hypot(fromX - ax, fromZ - az) <= Math.hypot(fromX - bx, fromZ - bz);
+      b.flyAX = nearA ? ax : bx;
+      b.flyAZ = nearA ? az : bz;
+      b.flyBX = nearA ? bx : ax;
+      b.flyBZ = nearA ? bz : az;
+      b.flying = true;
+      return;
+    }
+    b.flying = false;
+  }
+
+  /** The flight's wake: frost laid on the ice along the path it drew this
+   *  frame (spaced, so a fast frame leaves no gap), rime and shards. */
+  private frostWake(
+    x0: number,
+    z0: number,
+    x1: number,
+    z1: number,
+    floor: number,
+    speed: number,
+  ): void {
+    const d = Math.hypot(x1 - x0, z1 - z0);
+    if (d < 1e-3) return;
+    const n = Math.min(6, Math.ceil((d / 1.4) * this.density));
+    for (let i = 0; i < n; i++) {
+      const t = (i + this.rand()) / Math.max(1, n);
+      const x = x0 + (x1 - x0) * t;
+      const z = z0 + (z1 - z0) * t;
+      this.particles.puff(x, floor + 0.35, z, 1, {
+        speed: 0.6,
+        up: 0.2,
+        life: 2.4,
+        size: [1.3, 3.4],
+        color: C.mist,
+        alpha: 0.32 + 0.2 * speed,
+        drag: 1.6,
+        radius: 0.8,
+      });
+    }
   }
 
   private cosmetics(
@@ -614,14 +747,14 @@ export class QuenchBladesFx {
       }
     } else if (state === 'fly') {
       if (this.rand() < dt * 45 * this.density) {
-        this.particles.puff(e.pos.x, floor + 2 + this.rand() * 6, e.pos.z, 2, {
+        this.particles.puff(b.px, floor + 2 + this.rand() * 6, b.pz, 2, {
           speed: 1.5,
           life: 0.8,
           size: [0.8, 2.4],
           color: C.mist,
           alpha: 0.4,
         });
-        this.particles.puff(e.pos.x, floor + 1, e.pos.z, 1, {
+        this.particles.puff(b.px, floor + 1, b.pz, 1, {
           speed: 4,
           up: 2,
           life: 0.6,

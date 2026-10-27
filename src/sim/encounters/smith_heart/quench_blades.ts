@@ -44,6 +44,7 @@ import { startCrack } from './quench_ice';
 import {
   bladeStateOf,
   bladeTemplate,
+  danceEase,
   echoDelay,
   echoReach,
   echoTemplate,
@@ -471,9 +472,10 @@ function stepDance(s: QuenchScope): void {
     return;
   }
   if (d.phase === 'fly') {
-    // Both fly the same straight line, each from its end to the other's.
-    const k0 = Math.min(1, 1 - Math.max(0, d.remaining + DT) / T.danceFly);
-    const k = Math.min(1, 1 - Math.max(0, d.remaining) / T.danceFly);
+    // Both fly the same straight line, each from its end to the other's,
+    // eased in and out (danceEase: the painter draws the same curve).
+    const k0 = danceEase(1 - Math.max(0, d.remaining + DT) / T.danceFly);
+    const k = danceEase(1 - Math.max(0, d.remaining) / T.danceFly);
     if (ea)
       moveFightObject(
         s.ctx,
@@ -490,7 +492,7 @@ function stepDance(s: QuenchScope): void {
         d.to.x + (d.from.x - d.to.x) * k,
         d.to.z + (d.from.z - d.to.z) * k,
       );
-    strikeLane(s, Math.max(0, k0), k);
+    strikeLane(s, k0, k);
     if (d.remaining > 1e-9) return;
     // Landed: the blades have swapped places; the lane cracks.
     const A = st.blades[d.a];

@@ -18,6 +18,7 @@ import {
   CROSSING_PAIRS,
   coldStep,
   crackOf,
+  danceEase,
   echoDelay,
   echoOf,
   echoReach,
@@ -547,6 +548,41 @@ describe('Guardian of the Quench: heroic, the crossing', () => {
     f.tick(ticks(T.laneCrack) + 2);
     expect(f.objects(QUENCH_OBJECTS.hole).length).toBe(spots.length);
     expect(f.objects(QUENCH_OBJECTS.lanePrefix)).toEqual([]);
+  });
+
+  it('the blades fly eased in and out, on the one curve the painter draws (danceEase)', () => {
+    expect(danceEase(0)).toBe(0);
+    expect(danceEase(1)).toBe(1);
+    expect(danceEase(0.5)).toBeCloseTo(0.5);
+    expect(danceEase(0.1)).toBeLessThan(0.05);
+    expect(danceEase(0.9)).toBeGreaterThan(0.95);
+    const f = pulled(5);
+    f.dev('/dev heart quench heroic');
+    awake(f);
+    const before = blades(f);
+    f.dev('/dev heart quench dance');
+    const st = f.state();
+    if (!st?.dance) throw new Error('no crossing');
+    const [ia, ib] = CROSSING_PAIRS[st.dance.pair];
+    f.tick(ticks(T.danceWarn) + 1);
+    const ea = f.sim.ctx.entities.get(st.blades[ia].objectId);
+    if (!ea) throw new Error('blade');
+    const span = dist(before[ia], before[ib]);
+    // Sampled every tick: slow off the mark, fastest mid-lane, slow onto it.
+    const steps: number[] = [];
+    let last = f.local(ea);
+    for (let i = 0; i < ticks(T.danceFly); i++) {
+      f.tick(1);
+      const now = f.local(ea);
+      steps.push(dist(now, last));
+      last = now;
+    }
+    const n = steps.length;
+    const mid = steps[Math.floor(n / 2)];
+    expect(steps[0]).toBeLessThan(mid * 0.3);
+    expect(steps[n - 2]).toBeLessThan(mid * 0.3);
+    expect(mid).toBeGreaterThan((span / n) * 1.3);
+    expect(dist(f.local(ea), before[ib])).toBeLessThan(0.01);
   });
 
   it('never crosses on normal; mythic is heroic whole behind its own switch', () => {

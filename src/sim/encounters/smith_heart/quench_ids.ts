@@ -275,6 +275,15 @@ export function echoReach(kind: QuenchEchoKind): { arcDeg: number; range: number
     : { arcDeg: T.echoStrikeArcDeg, range: T.echoStrikeRange };
 }
 
+/** The crossing's flight at linear fraction `k` (0..1) of its time: eased
+ *  in and out (the blade gathers speed off its mark and settles onto the
+ *  other's), so the sim's blades, the lane's hits and the painter's blade
+ *  all ride one curve. Pure. */
+export function danceEase(k: number): number {
+  const c = Math.max(0, Math.min(1, k));
+  return c * c * (3 - 2 * c);
+}
+
 /** Seconds between the guardian's attack and its echoes at `hpFrac`. */
 export function echoDelay(hpFrac: number): number {
   return hpFrac <= QUENCH_TUNING.lowAt ? QUENCH_TUNING.echoDelayLow : QUENCH_TUNING.echoDelay;
