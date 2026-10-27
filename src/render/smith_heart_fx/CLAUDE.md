@@ -12,7 +12,7 @@ offline and online look the same. The interior's static dressing and air are
 
 | Module | Role |
 |---|---|
-| `index.ts` | Public surface: `HammerFx`, `BreathFx`, `BreathFightFx`, `BreathBody`, `QuenchFx`, `HeatFx`, `FinalFx`, `CouncilFx`, `CouncilBodies`, `SealShake`. |
+| `index.ts` | Public surface: `HammerFx`, `BreathFx`, `BreathFightFx`, `BreathBody`, `QuenchFx`, `HeatFx`, `HeatFightFx`, `HeatBody`, `FinalFx`, `CouncilFx`, `CouncilBodies`, `SealShake`. |
 | `council_fx_core.ts` | PURE (`RENDER_PURE_CORES`): the Hammer Council's look (design doc 5.18): a pillar's integrity on the model (`pillarLook`: seams, lean, heat, grit; `pillarPips`), its rise and fall timelines, the marks' footprints read off the sim's tuning (`COUNCIL_MARK_SPECS`, `RISE_SPOT_SPEC`) and their threat colours, the rock's fall, Resonance's ring, the heroic pulse's reach, the inheritance's arc, the energy's look, the cues it claims (`councilClaims`). |
 | `council_pillars_fx.ts` | `CouncilPillarsFx`, a part of `CouncilFx` (on its host: the root, the particles, the debris, the floor telegraph): the pillars (the Hammer kit's column, the rock kit's needle for a risen one) with their crack shells (the piece's own stone pushed out along its normals, a seam net that opens and burns per integrity), lean and pips, the rise, a lost piece, the fall into rubble (a danger footprint) and the sinking. |
 | `council_shelter_fx.ts` | `CouncilShelters`, a part of `CouncilFx`: the REAL safe shadow behind every soulless pillar while Mountain's Wrath's bar or the Echo of Wrath's runs (`coverShadow`, `shadowPoint`: between the tangents from the blast, from the pillar's far face out, drawn a hair inside the sim's cover, `SHELTER_PAD`): a dark wedge with a bright rim on every tier, a faint light curtain along its edges (shed on the low tier). |
@@ -42,6 +42,10 @@ offline and online look the same. The interior's static dressing and air are
 | `quench_blades_fx.ts` | `QuenchBladesFx`: the Smith's four blades over their claim objects: the kit's sunk blade, torn free with its tip shown, floating upright with its light and a chevron the way the echoes run, flying (heroic), the torn socket in the ice. |
 | `heat_fx_core.ts` | PURE (`RENDER_PURE_CORES`, phase 2I): the Heat guardian's numbers read off its sim template (Molten Pour's lane, length, width and bar; Searing Knell's radius and bar, its id still `heart_anvil_clang`), the pour's gather, seams and flow timelines, the knell's gather, cracks and wave, the seam and crack paths (always inside the lane and the radius), the pool sizes. |
 | `heat_fx.ts` | `HeatFx` (phase 2I): Molten Pour's lane and Searing Knell's ring through the shared floor telegraph (every tier, filling with the bar); the pour's gathering fire and its seams lighting down the lane, then the white-gold fire pouring down it behind a wave of flame, molten, crusting, smoking; the knell's sphere of fire and its cracks, then its wall of fire ringing out to the stun's edge, the rings of the toll, the sparks and ash. |
+| `heat_body_core.ts` | PURE (`RENDER_PURE_CORES`): the Guardian of the Heat's provisional body (design doc 7.4): a being of the first flame in columnar basalt and white-gold crystal, nothing of a forge (Heart kit colossus basalt repainted, Heat kit fire crystal, ember boulders and hearth-pillar column bundles), about three and a half players tall; the joints kept apart from the pieces; what the bars and one-shots do to it (`heatBodyAction`, `heatBodyLook`: Shed Heat's lean and the rise, Molten Pour's arm, the knell's sphere and toll, Hearthburst, the stoking, the wind-up's strain), how white its fire burns with the heat (`heatWhiteness`), the arms, the fall. |
+| `heat_body.ts` | `HeatBody`: the body over the bodyless guardian, its fire gold to white with the mirrored heat (the guardian's resource), the wind-up's white flash round the whole body (`HEAT_AURAS.overheating`), tongues of flame, embers and haze off it, the fall in smoke. |
+| `heat_fight_fx_core.ts` | PURE (`RENDER_PURE_CORES`): the Heat fight's look: the objects' kinds, the claimed cues (all of `HEAT_CUES`), the rise spots' fill, a crystal's rise and its charge toward each ray on the sim's clock (`crystalLook`), a ray's held beam (`beamLook`), Crystal Burn on a body (`burnLook`), the channel's states (`channelLook`), the embers, the pulse's ring, the wind-up's floor glow (`windupGlow`), Hearthburst's wave, the palette, the pools. |
+| `heat_fight_fx.ts` | `HeatFightFx`: every fight footprint at the sim's exact size on EVERY tier (the rise spots in danger, each crystal's reach in the soak's gold filling to its next ray, the channel's lane while it brims and flows, the embers' danger rim), the Kindled Crystals (the Heat kit's cluster, a stand-in until it lands), the rays held on their target, the burn climbing a body, the channel's bed and fire, the wind-up's floor glow, Hearthburst's wave; sparks, embers, haze and smoke cosmetic. Feeds `../../game/smith_heart_heat_audio.ts`. |
 | `hammer_fx.ts` | `HammerFx`: Mountain's Wrath (molten cracks racing out over its bar, loose stones lifting, dust drawn in; on landing the dust wall, rubble, rings, flash, grit off the terraces, a shake), Hammerfall (a fan of cracks in its arc, rubble, dust), the Slab breaking (the split flaring, the burst both ways, dust, rings, grit off the lintel while the halves part) and the Pit Mouth slamming shut (a dust skirt). |
 
 Rules:
@@ -55,6 +59,10 @@ Rules:
   floor telegraph on EVERY tier (threat colour `danger`, the vein's white-gold as the
   accent); its fire, sparks and smoke are cosmetic and thin. The Heat is the Hearth: its
   fire is white-gold, never volcanic red.
+- The Guardian of the Heat's rise spots, crystal reach rings, rays, the burn on bodies, the
+  channel's lane (brimming and flowing), the embers' rims and the wind-up's floor glow and body
+  flash draw on EVERY tier (`HeatFightFx`, `HeatBody`); sparks, embers, haze and smoke thin,
+  the shakes go under reduced motion. Its fire is the Hearth's white-gold, never volcanic red.
 - The Quench guardian's cone is actionable and drawn by `QuenchFx` through the shared floor
   telegraph on EVERY tier (threat colour `danger`, the vein's pale ice as the accent); its
   frost, mist and ice are cosmetic and thin.
@@ -99,5 +107,6 @@ Tests: `tests/smith_heart_council_fx.test.ts`, `tests/smith_heart_council_soul_f
 `tests/smith_heart_hammer_fx.test.ts`, `tests/smith_heart_breath_fx.test.ts`,
 `tests/smith_heart_breath_fight_fx.test.ts` and `tests/smith_heart_breath_body.test.ts` and
 `tests/smith_heart_quench_fx.test.ts`, `tests/smith_heart_quench_body.test.ts` (the Quench
-body's and fight's cores), `tests/smith_heart_heat_fx.test.ts` and
+body's and fight's cores), `tests/smith_heart_heat_fx.test.ts`, `tests/smith_heart_heat_body.test.ts`,
+`tests/smith_heart_heat_fight_fx.test.ts` and
 `tests/smith_heart_final_fx.test.ts` (each core and a smoke run over a fake world).

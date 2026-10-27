@@ -62,6 +62,8 @@ import {
   CouncilFx,
   FinalFx,
   HammerFx,
+  HeatBody,
+  HeatFightFx,
   HeatFx,
   QuenchBladesFx,
   QuenchBody,
@@ -171,6 +173,10 @@ export class RiftDeathZoneVisuals {
   // Its Heat guardian (Molten Pour's lane and Searing Knell's ring
   // telegraphs, and the first flame's fire).
   private readonly heatFx: HeatFx;
+  /** The Guardian of the Heat's fight in the Hearth (crystals, rays, burns,
+   *  the channel, the embers, the heat), and its body. */
+  private readonly heatFight: HeatFightFx;
+  private readonly heatBody: HeatBody;
   private readonly finalFx: FinalFx;
   private readonly councilFx: CouncilFx;
   private readonly councilBodies: CouncilBodies;
@@ -322,6 +328,8 @@ export class RiftDeathZoneVisuals {
     this.quenchBlades = new QuenchBladesFx(scene, groundY, world, compileGate, reducedMotion);
     this.quenchBody = new QuenchBody(scene, groundY, world, compileGate, reducedMotion, shake);
     this.heatFx = new HeatFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.heatFight = new HeatFightFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.heatBody = new HeatBody(scene, groundY, world, compileGate, reducedMotion, shake);
     this.finalFx = new FinalFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.councilFx = new CouncilFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.councilBodies = new CouncilBodies(
@@ -419,6 +427,8 @@ export class RiftDeathZoneVisuals {
     this.quenchBlades.update(dt);
     this.quenchBody.update(dt);
     this.heatFx.update(dt);
+    this.heatFight.update(dt);
+    this.heatBody.update(dt);
     this.finalFx.update(dt);
     this.councilFx.update(dt);
     this.councilBodies.update(dt);
@@ -475,6 +485,8 @@ export class RiftDeathZoneVisuals {
     this.quenchBlades.dispose();
     this.quenchBody.dispose();
     this.heatFx.dispose();
+    this.heatFight.dispose();
+    this.heatBody.dispose();
     this.finalFx.dispose();
     this.councilFx.dispose();
     this.councilBodies.dispose();
@@ -511,6 +523,8 @@ export class RiftDeathZoneVisuals {
     this.quenchBody.handleEvent(event);
     const quench = this.quenchFight.handleEvent(event);
     this.heatFx.handleEvent(event);
+    this.heatBody.handleEvent(event);
+    const heat = this.heatFight.handleEvent(event);
     this.finalFx.handleEvent(event);
     this.councilBodies.handleEvent(event);
     const council = this.councilFx.handleEvent(event);
@@ -524,7 +538,8 @@ export class RiftDeathZoneVisuals {
       crypt ||
       council ||
       breath ||
-      quench
+      quench ||
+      heat
     );
   }
 
