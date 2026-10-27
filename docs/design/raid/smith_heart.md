@@ -47,7 +47,7 @@ Sources of truth, in order:
 | The Quench guardian's effects | `src/render/smith_heart_fx/quench_fx.ts` (`QuenchFx`) |
 | The Heat vein's Blender kit (sources, build, plan, painter) | `docs/design/raid/kit/build_smith_heart_heat_kit.py` (the pieces: `heat_pieces.py`), `scripts/assets/smith_heart_heat_kit/build.mjs`, `src/render/smith_heart/heat_kit_plan_core.ts`, `src/render/smith_heart/heat_kit.ts` |
 | The Heat vein's floors, basalt, air, light and the pour | the `hearth` ground, `src/render/smith_heart/heat_hearth_floor.ts`, `heat_soot_core.ts`, `heat_air_core.ts` / `heat_air.ts`, `heat_pour_core.ts` / `heat_pour.ts`, `heart_environment.ts` (`smithHeartHeat`) |
-| The Heat guardian's effects | `src/render/smith_heart_fx/heat_fx.ts` (`HeatFx`) |
+| The Heat guardian's effects | `src/render/smith_heart_fx/heat_*.ts` (`HeatBody`, `HeatFx`, `HeatFightFx` with its parts `heat_well_fx.ts` and `heat_cinder_fx.ts`), its sounds `src/game/smith_heart_heat_audio*.ts` |
 | The Hammer Council (the first boss: three members, the pillars) | `src/sim/encounters/smith_heart/council*.ts` (`tickHammerCouncil`, `COUNCIL_TUNING`, `COUNCIL_DIFFICULTY`); its look `src/render/smith_heart_fx/council_fx.ts` and `council_bodies.ts`; its alert `src/ui/hud/dungeon/council_alert_view.ts` |
 | Dev commands | `src/sim/dev/smith_heart_dev.ts` (`/dev heart`) |
 
@@ -728,32 +728,33 @@ player sees changed. The kit is `docs/design/raid/kit/heat_pieces.py`, built by
 | The weather | Embers rising over every Heat walk and out of the chasm, thick in the Hearth's throat; tall tongues of the first flame among its crystal; smoke climbing out of the chasm and off the Hearth's crown; the fire deep in the chasm glowing under the walks; a halo round every cluster of crystal; the heat's shimmer over the mouth, the wellspring and the bridge's chasm | `heat_air.ts` (`planHeatAir`), the shared fire shaders `heart_fire_glsl.ts` |
 | The pour | The set piece's look (section 6.4's mechanic is not built): every 26 seconds the wellspring brims and glows, the channel's bed lights from its head to the lip, then white-gold fire runs down it, fills it, falls off the lip into the chasm and drains, cooling dark | `heat_pour.ts` (`heatPourLook`, `HEAT_POUR`) |
 
-Effects of the Heat guardian (`src/render/smith_heart_fx/heat_fx.ts`, presentation only,
-the sim untouched):
+Effects of the Heat guardian (`src/render/smith_heart_fx/heat_*.ts`, presentation only,
+the sim untouched; rebuilt with the fight on 2026-10-27, section 7.4):
 
 | Moment | Look |
 |---|---|
-| Molten Pour, on its bar | its footprint (a lane at the pour's exact length and width, aimed where the bar locked it) fills; the first flame gathers at the guardian, the floor's seams light down the lane toward its end, sparks run along it |
-| Molten Pour, landing | white-gold fire pours down the lane behind a wave of flame (never past its width), spatter and sparks thrown up, the lane left molten, cooling to a dark crust in plates and smoking a few seconds, a ring, a short shake |
-| Searing Knell, on its bar | its footprint (a ring at the stun's exact radius) fills; the fire is drawn into a sphere over the guardian, cracks of fire run out over the floor to the ring's edge |
-| Searing Knell, landing | a flash, a wall of white-gold fire ringing out to the stun's edge (never past it), the cracks flaring and fading, three rings of the toll, sparks and ash flung out, a short shake |
+| The giant | `heat_body.ts`: the provisional body (Heart kit colossus basalt, Heat kit crystal) drawn 2.8 times its frame (`HEAT_BODY_SCALE`), sunk to its waist in the wellspring; lava drips off it, its fire whitens phase by phase; the manifest's bodyless `smith_heart_heat_guardian` (height 4.3 at scale 3) carries its plate and click capsule over the visible part |
+| The first wellspring | `heat_well_fx.ts`: the pool at `HEARTH_WELL` (molten, boiling deeper each phase), a ring of basalt lip stumps, its burning rim; overflowing it heaves over its lip in slow swells |
+| Basalt Fist, on its bar | the giant rears its right fist over its head; the spot (the shared floor telegraph, `lethal`, its exact radius) fills with the bar, cracks of light race under it; the three lanes (`danger`) fill with it, clipped where the Hearth's floor ends (`floorReach`); a giant fist of basalt and crystal hangs in the smoke over the spot and plunges through the bar's last part |
+| Basalt Fist, landing | a white flash, rings, basalt flung up, a crater of molten cracks cooling over 6 s, a shake |
+| Molten Swell | a rolling wall of molten rock down each lane at the wave's own speed (drawn where the sim strikes), spray off its crest, a molten wake behind it crusting as it cools |
+| Hearth Flare | a bolt of the first flame from the giant to each far player, sparks where it strikes |
+| The overflow | the giant plunges under with a splash (it climbs back out sheeting lava); each river's lane fills over its warning, then the fire runs down it and dies |
+| Wellspawn, Wellkeepers, Seedflames | placeholder bodies (`mob_elemental`, `mob_glimmerwisp`) with a gold glow; a Kindling Mark's sigil over the marked player; Cinder Trail patches |
+| Hearthseeds | a crystal seed throbbing faster to its burst, its core and its reach on the floor (every tier) |
+| Wakefire | each band a ring on the floor at its exact radii, building over its warning, erupting in a sheet of flame, dying down |
+| Rolling Cinder | its fall's spot fills while the fireball plunges out of the smoke; the great ball of fire rolls (its own bodyless look, `smith_heart_rolling_cinder`), its track on the floor, chevrons over its quarry, a crust while it is held |
 
-Readability: the two footprints are the shared floor telegraph (threat colour `danger`,
-the vein's white-gold as the accent) on every graphics tier; before 2I these casts had
-only their bars. The pour's warning glow and its flow draw on every tier; the embers,
-sparks, smoke and haze are cosmetic (the low tier keeps a third of the particles and
-no haze; the flames, the halos and the chasm's glow stay), reduced motion drops the
-shake. Every effect is built with the interior or under one compile-gated root, so
-nothing links on first use; the channel's glow is a floor mark on the ground rung, the
-molten lane and the seams on the encounter band under the telegraph's fill front. No
-new collider: every solid stands on the layout's old ones or past the lips. No boss
-mechanic and no number changed.
+Readability: every footprint (the fist's spot, the lanes, the rivers, a seed's reach, every
+band, a fall, every burning patch) is the shared floor telegraph or a floor mark at its exact
+size on every graphics tier; only sparks, spray, smoke, haze and the shakes thin on the low
+tier, and reduced motion drops the shakes. Every effect is built under one compile-gated root
+(fixed pools, no light), so nothing links on first use.
 
-Player-visible text: the guardian's knell was "Anvil Clang"; it is now "Searing Knell"
-(the English source in `src/sim/content/smith_heart.ts`, `src/ui/sim_i18n.ts` and
-`src/ui/i18n.catalog/merge.ts`; its ids unchanged; the name was web-checked and collides
-with no other game's). The anvil bridge's gate reads "Hearth Mouth" (it read "Anvil
-Mouth"; its id `anvil_mouth` unchanged). The pour keeps "Molten Pour".
+Player-visible text: the old knell and pour are gone with the trash kit; the fight's names
+are section 7.4's (the English source in `heat_ids.ts` `HEAT_NAMES`, re-localized through
+`src/ui/sim_i18n.ts` and `src/ui/i18n.catalog/merge.ts`). The anvil bridge's gate reads
+"Hearth Mouth" (it read "Anvil Mouth"; its id `anvil_mouth` unchanged).
 
 ### 5.17 The Heart, the final room (phase 2J)
 
@@ -1265,66 +1266,76 @@ Quenching Breath and Tempering Strike were already shipped.
 ### 7.4 Guardian of the Heat
 
 The Hearth's boss (`heart_heat_guardian`, id frozen: its death lights the Heat vein and the
-seal's quarter exactly as before), "the flame that grows". **A PROPOSAL, not an approved
-design:** the owner went to sleep before answering the last questions on this boss and gave
-free rein; it is built as a playable Normal and Heroic prototype for him to judge in game.
-Every number below is a SKETCH, unmeasured, and every tunable (heat rate, pulse, crystal
-count and life, the ray's reach and cool, burn stacks and decay, the channel, the embers)
-lives in one table, `HEAT_TUNING` and `HEAT_DIFFICULTY` in
-`src/sim/encounters/smith_heart/heat_ids.ts`, so a change is one number. The code is
-`src/sim/encounters/smith_heart/heat*.ts` (the geometry `heat_geometry.ts` is pure, for the
-bots to reuse: the floor, the channel and its halves, the crystal sockets, a ray's pick).
+seal's quarter exactly as before), "the well of the first flame". A giant of basalt and
+white-gold crystal sunk to its waist in the first wellspring (layout `HEARTH_WELL`, at the
+foot of the altar-stone), towering some thirteen yards over the shore (about seven
+players). It never leaves the wellspring on any difficulty; the raid fights on the shore in
+front of it, and melee reaches it from the lip (its body radius is the pool's). Rebuilt on
+2026-10-27 from the owner's brief (the Ragnaros scale, drawn from his reference: a giant in
+its pool, a fist that slams a spot, the pool overflowing and its children walking home);
+the first proposal, the heat gauge with its crystals and channel, is gone whole.
 
-One phase, no change at half health (the Breath and the Quench already change at 50 percent).
-It avoids the other fire bosses: no falling anvils, red-hot metal absorbing healing or fire
-fields that grow (Varkhul), no brand cleansed in water, meteors or cone (Ignivar), no strike
-split among a group (the Council's Falling Rock). The crystals are Baleroc's (Firelands) as a
-concept only; the overheat is inspired by Teostra's Supernova (Monster Hunter).
+**A PROTOTYPE, numbers unmeasured.** Every tunable lives in one table, `HEAT_TUNING` and
+`HEAT_DIFFICULTY` in `src/sim/encounters/smith_heart/heat_ids.ts`, so a change is one number.
+The code is `src/sim/encounters/smith_heart/heat*.ts`: the coordinator `heat.ts` (the
+phases, the overflows' stages, the dev verbs), one module per mechanic, and the pure
+geometry `heat_geometry.ts` (the floor, the wellspring, the lanes, the posts) for the bots
+and the renderer to reuse.
+
+Three phases on every difficulty, split by two overflows. Heroic and Mythic end with phase 3
+like Normal: their extra pressure is the overflows' adds, the Seedflames, faster cinders and
+a quarter more damage, never a fourth phase. Damage floors at 70 and 40 percent: the
+guardian cannot be pushed past an overflow before it happens.
 
 | Piece | Rule | Where |
 |---|---|---|
-| The heat | 0 to 100 on the guardian (its resource: the target frame's bar), starting at 0 at the pull and rising 1 a second on its own. Every player on the Hearth's floor wears a quiet marker carrying it (its `value` the heat, `value2` the trend over the last second), which the heat gauge over the action bar reads | `heat_gauge.ts` |
-| Hearth Pulse | Every 3 s, Fire to everyone on the floor: 12 + 1.3 per point of heat (a tenth either way), so about 15 cold, about 90 at 60, about 130 at 90: the raid's healing check, heavy when the Hearth runs hot | `heat_gauge.ts` |
-| The wind-up | From 90 the guardian wears Overheating (the gauge flashes, the body burns white), with a raid warning and a line; it clears if the heat falls back under 85 | `heat_gauge.ts` |
-| Hearthburst | At 100 the Hearth overheats: 900 to 1,000 Fire to everyone on the floor on Normal (a near wipe against level-20 health, worse on a burned soaker), 2,400 to 2,600 on Heroic (a wipe). Then the Hearth has vented: the heat starts again from 0 | `heat_gauge.ts`, `HEAT_DIFFICULTY` |
-| Stoked Hearth (soft enrage) | Every 40 s the heat rises 20 percent faster, without end (a stack on the guardian) | `heat_gauge.ts` |
-| Shed Heat | Every 30 s (first at 14) a 2.5 s bar, planted: the guardian pours its heat into the floor and the rise spots show where crystals will tear up. Two crystals on Normal (one each side of the channel), three on Heroic (the third alternating sides wave by wave), from six hashed sockets | `heat_crystals.ts`, layout `HEARTH_CRYSTAL_SOCKETS` |
-| Kindled Crystals | Stand 20 s; objects, never bodies, so nothing can target or harm them. Every 2 s (first 1.5 s after rising) each fires a Kindled Ray at the NEAREST living player within 10 yd: 50 to 65 Fire, a stack of Crystal Burn, and 3 heat off the guardian. Nobody within 10 yd: the ray goes back into the guardian and adds 3 heat. So the raid keeps one soaker in every crystal's reach and rotates them as their burns stack | `heat_crystals.ts` |
-| Crystal Burn | 6 percent more spell damage taken a stack (Fire, Frost, Nature, Shadow and Arcane: a `spellvuln`, and all of the fight's fire is spell damage), at most 20; one stack fades 6 s after the last change on Normal, 10 s on Heroic. A soaker who takes every ray of one crystal ends its 20 s at 10 stacks (+60 percent) | `heat_crystals.ts` |
-| The channel | The wellspring's pour made part of the fight: a seam of the first flame across the Hearth's floor from its north wall to its south lip, through the hall's middle (layout `HEARTH_CHANNEL`, x = -215; the wellspring's own channel crosses the casting floor outside the Hearth, so the fight has its twin inside). Still the whole fight (a dull seam); every 26 s (first flow at 20) it brims 4 s (a raid warning), then flows 6 s: anyone within 3 yd of its line takes 90 to 110 Fire every half second. While it flows the floor is split in two, so a soaker can be cut off from their swap partner on the other side | `heat_channel.ts` |
-| Molten Pour | Kept: the trash kit's line (2 s bar every 12 s, first at 5, a 30 yd lane 6 yd wide, 240 to 280 Fire; step out) | content `trashKit.line` |
-| Searing Knell | Kept: the trash kit's screech (2.5 s bar every 20 s, first at 12, everyone within 10 yd stunned 2 s and struck for 140 to 170) | content `trashKit.screech` |
-| Heroic | Every fight damage 25 percent higher, three crystals, burns fade every 10 s, and Searing Knell leaves Knell Embers where each player it stunned stood (2.5 yd, 25 s, 70 to 85 Fire a second to anyone in them; at most 30 at once), so the melee and the tank move the fight after every knell | `HEAT_DIFFICULTY`, `heat_knell.ts` |
-| Mythic | Not now: one more `HEAT_DIFFICULTY` row, today heroic's whole, behind its own dev switch (`/dev heart heat mythic`), the seam for one later mythic-only mechanic | `heat.ts` `setHeatDevTier` |
-| One wipe | The fight ends when the guardian stops fighting: every bar, rise spot, crystal, burn, ember and heat marker gone, the heat back to 0, the channel's seam gone | `heat.ts` (`resetHeat`) |
-| Its fall | The Heat vein and the seal's quarter light as before (seal.ts reads the guardian's death); the Hearth settles and everything of the fight goes | `heat.ts` (`finishHeat`) |
+| Phase 1 (100 to 70) | Basalt Fist and its Molten Swells, Hearth Flare, Cinder Grip on the tank | `heat_fist.ts`, `heat_flare.ts` |
+| Basalt Fist | Every 22 s (first 8 s in) a 3 s bar, planted, its facing locked on a spot on the shore where a hashed player (never the tank while anyone else stands) stood. The spot shows at its exact 6 yd radius; whoever is inside when the bar ends takes 2,500 to 2,700 (a kill at level 20). Phases 1 to 3 | `heat_fist.ts` |
+| Molten Swell | 0.6 s after the slam three walls of molten rock roll out of the spot, one straight away from the wellspring and one to either side: 32 yd at 10 yd a second, 5 yd wide, 380 to 440 to each player a wall rolls over (once). The lanes show with the spot, so the raid already knows the gaps to stand in (the side toward the guardian is always clear) | `heat_fist.ts` |
+| Hearth Flare | Phase 1, every 4 s: everyone farther than 20 yd from the wellspring's middle (12 yd past its lip) takes 260 to 300 and is Flare-Scorched (25 percent more Fire and other magic damage taken, 8 s). The raid fights close. In phases 2 and 3 it strikes only the guardian's own target when that one stands out of reach | `heat_flare.ts` |
+| Wellspring Fire | The whole fight: whoever stands inside the lip burns, 120 to 140 every half second | `heat_flare.ts` |
+| Cinder Grip | The tank's stacking burn: every landed swing adds a stack (18 Fire a second each, 15 s, at most 10). The tanks swap around 5 | content `stackPoison` |
+| The overflows | At 70 and at 40 percent: it sinks 2.5 s into the wellspring (untargetable, nothing harms it), the Hearth overflows, then it rises over 3 s, still out of reach. Every 4.5 s three rivers of the first flame run out of the wellspring across the shore (2.5 s of warning down their lanes, then 3 s of fire, 180 to 220 every half second, from nine hashed bearings); every 3 s Falling Cinders strike random players (140 to 170; two on Normal, three on Heroic). Normal: 20 s of it, a pure dodge and heal check | `heat_overflow.ts` |
+| Wellspawn (Heroic) | Four children of the flame climb out at the room's edge as the Hearth overflows and walk to the wellspring (3 yd a second, walked by the encounter). They slow as they lose health, crawling from half health down (15 percent of their speed), and every slow, root, stun and control works on them. One that reaches the lip feeds the guardian 3 percent of its health and blasts the raid for 380 to 420. The overflow lasts until they are gone (at least 8 s, at most 45 s); survivors dive in when it ends | `heat_wellspawn.ts` |
+| Wellkeepers (Heroic, second overflow) | Two keepers rise by the wellspring and must be tanked. Every 10 s each puts a Kindling Mark on a player; 5 s later that player trails fire for 8 s (Cinder Trail: patches 2.5 yd wide that burn 15 s, 80 to 95 a second to allies, and heal a Wellspawn in them 8 percent of its health a second). The marked player leaves the group and the children's path. They sink back when the overflow ends | `heat_wellspawn.ts` |
+| Phase 2 (70 to 40) | Hearthseeds, Wakefire, the fist | `heat_seeds.ts`, `heat_zones.ts` |
+| Hearthseeds | Every 30 s (first 6 s in) a seed falls where each player stands (at most ten). It throbs 10 s, then bursts: up to 520 at the seed, falling off with the square of the distance to nothing at 22 yd. The raid drops them together and runs | `heat_seeds.ts` |
+| Seedflames (Heroic) | Each burst hatches a small fire elemental fixed on one hashed player; the raid burns them down together | `heat_seeds.ts` |
+| Wakefire | Phases 2 and 3, every 34 s (first 16 s into phase 2): the floor ignites in three bands round the wellspring (8 to 19 yd, 19 to 31, 31 and out), from the guardian outward or from the back inward (hashed run by run). Each band warns 4 s, ignites (900 to 1,000 to everyone in it) and burns 2 s more (220 to 260 every half second); the next begins its warning 2.5 s after the last, so the raid steps into the band that has just burned | `heat_zones.ts` |
+| Phase 3 (40 to 0) | The Rolling Cinders, Wakefire, the fist | `heat_cinders.ts` |
+| Rolling Cinder | Every 45 s (first 8 s in) a great living fireball falls on the shore (2 s of warning, 300 to 340 within 4 yd, the spot burning 8 s), then rolls after one hashed player (Hunted shows who; 3.2 yd a second on Normal, 4.4 on Heroic, nothing slows it). If it reaches them they die and those within 3 yd take 600 to 700; the cinder is spent. Its quarry gone, it picks another. It is a ward: any strike lands one point and knocks it 6 yd back, then Cooling Crust holds it against knockback for 5 s, so the raid assigns who strikes it and when. Nothing kills it | `heat_cinders.ts`, `heat_cinder_ward.ts` |
+| Heroic | A quarter more damage on every mechanic, the overflows' adds, the Seedflames, three Falling Cinders, faster cinders | `HEAT_DIFFICULTY` |
+| Mythic | Not now: one more `HEAT_DIFFICULTY` row, today heroic's whole, behind its own dev switch (`/dev heart heat mythic`); `mythicRule` is the seam for one later mythic-only mechanic | `heat.ts` `setHeatDevTier` |
+| One wipe | The fight ends when the guardian stops fighting: every bar, footprint, add and mark gone, the wellspring calm | `heat.ts` (`resetHeat`) |
+| Its fall | The Heat vein and the seal's quarter light as before (seal.ts reads the guardian's death) | `heat.ts` |
 
-**Health (sketch, unmeasured).** 43,000 base (about 99,000 after the elite factor), the
-other guardians' anchor: a 4 to 5 minute fight at the bot raid's measured 400 to 460 a
-second (it was 30,000 as a phase-1 sketch).
+Everything the client draws rides existing entity fields (no wire or `IWorld` change): the
+guardian's phase and stage on its state aura (`value`, `value2`, the stage's clock in
+`remaining`), its sinking as `hostile` off; the wellspring as a claim object whose template
+says calm or overflowing; the fist's spot, the lanes, the rolling waves, the rivers, the
+seeds, Wakefire's bands, a cinder's fall and every burning patch as objects whose template
+carries their state and time (a radius or half width in `scale`); the adds as mobs; the
+marks as auras.
 
-**The heat's arithmetic (sketch, unmeasured).** The heat rises 30 a cycle of 30 s; two
-crystals soaked perfectly take off 60 (20 rays of 3), so early on a good raid keeps the
-Hearth cool and the pulse light. Every missed ray costs 6 (3 not taken off, 3 added), the
-stoking adds 20 percent every 40 s, and the soakers' burns cap how long one player can
-stand in a ray, so the heat creeps up through the fight and Hearthburst is the hard end at
-about 6 to 7 minutes for a perfect raid, much sooner for a sloppy one. Heroic's third
-crystal cools faster but needs a third soaker, and the slower fading burns a real rotation.
+**Health (sketch, unmeasured).** 43,000 base (about 99,000 after the elite factor), the other
+guardians' anchor. Two overflows of 20 s (Normal) add about 45 s to a 4 to 5 minute fight.
 
-Role jobs: the tank keeps the guardian off the channel and turns Molten Pour away; one
-soaker per crystal stands within its 10 yd (nearest to it), handing the ray to a partner
-around 5 stacks; everyone else stays out of every crystal's reach unless soaking; nobody
-crosses the channel while it flows; healers carry the pulse, harder as the heat climbs, and
-everyone saves a defensive for Hearthburst if the heat gets away.
+Role jobs: the tank holds it from the shore, inside its reach, and swaps on Cinder Grip;
+everyone stays within 20 yd in phase 1, leaves the fist's spot and stands in the gaps
+between the lanes; through an overflow everyone dodges the rivers and heals through the
+bolts, and on Heroic the raid slows and burns the Wellspawn before they reach the lip while
+the marked player trails fire away from them; in phase 2 the raid drops the seeds together
+and runs, and steps into the band that has just burned; in phase 3 the assigned strikers knock
+each cinder back off its quarry, one after another as the crust wears off.
 
-IP check (2026-10-27, exact phrase plus coined token on the major game wikis): Kindled
-Crystal, Kindled Ray, Crystal Burn, Hearth Pulse, Stoked Hearth, Flowing Fire and Knell
-Embers returned no game use (CLEAR). Hearthburst (coined) returned no use; the nearest
-names are Hearthstone (the game), Skyrim's Hearthfire and Hearthstone's Spellburst, none in
-the same role (CLEAR, borderline noted). Shed Heat, Overheating and The Hearth's Heat are
-plain English (generic, kept). The brief's warnings were kept: no "Blaze of Glory", "Shards
-of Torment", "Torment", "Decimation Blade", "Supernova" or Ragnaros's coined names. Molten
-Pour and Searing Knell were already shipped.
+IP check (2026-10-27, exact phrase plus coined token on the major game wikis): Basalt Fist,
+Molten Swell, Hearth Flare, Wellkeeper, Wellspawn, Seedflame, Rolling Cinder, Cinder Grip,
+Hearthseed, Wakefire and Kindling Mark returned no game use (CLEAR). Rejected and renamed:
+"Hearthling" (Stonehearth's people) and "Cinderfall" (a rare elite in another MMO) gave way
+to Wellspawn and Cinder Scorch; "Flame Seed" (a fan game's item) gave way to Hearthseed.
+Cinder Trail, Falling Cinder, Wellspring Overflow, Fed Flame, Hunted, Cooling Crust,
+Flare-Scorched, The First Wellspring, The First Flame and Wellspring Fire are plain English
+(generic, kept). The brief's warnings were kept: none of Ragnaros's coined names.
 
 ### 7.5 The Masterless Strength (final)
 
@@ -1567,16 +1578,17 @@ on both difficulties (dungeon rework README, goal 4).
 | `/dev heart quench breath` | Quenching Breath now (echoed by every blade once they are awake) |
 | `/dev heart quench echo [strike]` | a breath (or a strike) echoed by every blade now; wakes the blades first if needed |
 | `/dev heart quench dance` | two blades cross the lake now, on any tier (wakes the blades first if needed) |
-| `/dev heart heat` | the Guardian of the Heat's readout (difficulty, health, heat and its trend, the stoking, crystals, the next Shed Heat, the channel's state, your burn, rays taken and sent back, overheats) |
-| `/dev heart heat pull` | set you down on the Hearth's floor beside the guardian (the door's side of the channel) and pull it |
-| `/dev heart heat reset` | the guardian whole, home and out of its fight; the Hearth calm (no heat, crystals, burns or embers) |
+| `/dev heart heat` | the Guardian of the Heat's readout (difficulty, health, phase and stage, the overflow's clock, the next fist, seeds, bands, cinders, Wellspawn, keepers, how many fed it, your Cinder Grip) |
+| `/dev heart heat pull` | set you down on the Hearth's shore before the wellspring and pull it |
+| `/dev heart heat reset` | the guardian whole, home in its wellspring and out of its fight; the Hearth calm |
 | `/dev heart heat heroic [on, off]`, `mythic [on, off]` | this run's tier for the fight (mythic is heroic whole for now); a live fight takes it at once |
-| `/dev heart heat heat <n>` | set the Hearth's heat (the wind-up follows from 90) |
-| `/dev heart heat crystals`, `shed` | Kindled Crystals rise now; `shed` runs Shed Heat's 2.5 s bar first |
-| `/dev heart heat channel` | the channel brims now (it flows 4 s on) |
-| `/dev heart heat overheat` | Hearthburst now (the heat vents to 0) |
-| `/dev heart heat burn [n]` | n stacks of Crystal Burn on you (5 if none) |
-| `/dev heart heat embers` | Knell Embers under you (on any tier) |
+| `/dev heart heat phase <1-3>` | jump the fight to that phase (its health set to the phase's top) |
+| `/dev heart heat intermission` (or `overflow`) | the guardian sinks and the Hearth overflows now (the first overflow in phase 1, the second from phase 2) |
+| `/dev heart heat fist` | Basalt Fist on the spot where you stand (3 s bar, then the swells) |
+| `/dev heart heat flare` | Hearth Flare now (everyone out of its reach) |
+| `/dev heart heat seeds` | Hearthseeds fall under the raid now |
+| `/dev heart heat zones` | a Wakefire run begins now |
+| `/dev heart heat ember` (or `cinder`) | a Rolling Cinder falls now |
 
 Pinned by `tests/smith_heart_dev.test.ts`, including the refusal without
 `devCommands` and the door refusing a non-dev world.
