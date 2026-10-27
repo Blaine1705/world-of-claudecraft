@@ -11680,6 +11680,7 @@ export type TranslationKeyFlat =
   | 'guide.worldPvpPage.hillBodyFlat'
   | 'guide.worldPvpPage.hillBodyPause'
   | 'guide.worldPvpPage.hillBodyRamp'
+  | 'guide.worldPvpPage.hillBodyTwoHour'
   | 'guide.worldPvpPage.hillHeading'
   | 'guide.worldPvpPage.intro'
   | 'guide.worldPvpPage.introZones'
