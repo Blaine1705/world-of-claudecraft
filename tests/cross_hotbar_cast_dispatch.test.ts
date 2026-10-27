@@ -143,6 +143,7 @@ describe('consumable item shortcuts use the real placement gate', () => {
       playerName: 'ItemShortcutTester',
       playerLevel: () => 1,
       talentSpec: () => null,
+      talentAllocation: () => ({ spec: 'arms', rows: {} }),
       knownAbilityIds: () => [],
       hasAura: () => false,
       showAttackButton: () => true,

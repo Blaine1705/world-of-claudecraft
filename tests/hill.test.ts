@@ -32,7 +32,7 @@ import {
   spawnHill,
   spawnHillNow,
 } from '../src/sim/pvp';
-import { HILL_READOUT_NONE_LINE, pickHillSpot } from '../src/sim/pvp/hill';
+import { HILL_READOUT_NONE_LINE, pickHillSpot, updateHill } from '../src/sim/pvp/hill';
 import { HILL_DEV_USAGE, parseHillDevCommand } from '../src/sim/pvp/hill_dev';
 import { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
@@ -48,6 +48,109 @@ const ARENA_FREE_WORLD: WorldContent = {
 };
 const SEED = 7;
 const FFA_IDS = ['drakelands', 'frostveil', 'amberfall'];
+
+describe('opt-in hill participation', () => {
+  it('flags on the entry tick even when the player leaves before the next presence pass', () => {
+    const {
+      sim,
+      pids: [a],
+    } = hillWorld(['Aleph']);
+    inside(sim, a);
+    sim.tick();
+    expect(ent(sim, a).pvpFlag).toBe(true);
+    outside(sim, a);
+    sim.tick();
+    expect(ent(sim, a).pvpFlag).toBe(true);
+    expect(sim.hillState.active?.counts.size).toBe(0);
+  });
+  it.each(FFA_IDS)('%s is safe without flags and still hosts hills', (zoneId) => {
+    const sim = world();
+    const a = addPlayer(sim, 'Aleph');
+    const b = addPlayer(sim, 'Bet');
+    const hill = spawnHillNow(sim.ctx, zoneId, { warn: true })!;
+    expect(hill).not.toBeNull();
+    place(sim, a, hill.x, hill.z);
+    place(sim, b, hill.x + 3, hill.z);
+    tickSeconds(sim, 1);
+    expect(ent(sim, a).pvpFlag).not.toBe(true);
+    expect(sim.isHostileTo(ent(sim, a), ent(sim, b))).toBe(false);
+    expect(sim.worldPvpInfoFor(a)?.zone).toBe('contested');
+    hill.risesAt = sim.time;
+    outside(sim, b);
+    tickSeconds(sim, 1);
+    expect(ent(sim, a).pvpFlag).toBe(true);
+    expect(ent(sim, b).pvpFlag).not.toBe(true);
+    expect(sim.isHostileTo(ent(sim, a), ent(sim, b))).toBe(false);
+    inside(sim, b, 3, 0);
+    tickSeconds(sim, 1);
+    expect(ent(sim, b).pvpFlag).toBe(true);
+    expect(sim.isHostileTo(ent(sim, a), ent(sim, b))).toBe(true);
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    expect(sim.isHostileTo(ent(sim, a), ent(sim, b))).toBe(false);
+  });
+
+  it('keeps the flag after leaving and defers an expired disarm while inside', () => {
+    const {
+      sim,
+      pids: [a],
+    } = hillWorld(['Aleph']);
+    inside(sim, a);
+    tickSeconds(sim, 6);
+    sim.setWorldPvpFlag(false, a);
+    expect(sim.worldPvpInfoFor(a)?.disarmRemaining).toBe(300);
+    tickSeconds(sim, 301);
+    expect(ent(sim, a).pvpFlag).toBe(true);
+    outside(sim, a);
+    tickSeconds(sim, 1);
+    expect(ent(sim, a).pvpFlag).toBe(false);
+    inside(sim, a);
+    tickSeconds(sim, 1);
+    expect(ent(sim, a).pvpFlag).toBe(true);
+    outside(sim, a);
+    tickSeconds(sim, 6);
+    expect(ent(sim, a).pvpFlag).toBe(true);
+    sim.setWorldPvpFlag(false, a);
+    tickSeconds(sim, 299);
+    expect(ent(sim, a).pvpFlag).toBe(true);
+    tickSeconds(sim, 2);
+    expect(ent(sim, a).pvpFlag).toBe(false);
+  });
+
+  it('does not flag or reward under-level players, dead players or jailed players', () => {
+    const {
+      sim,
+      pids: [low, dead, jailed],
+    } = hillWorld(['Low', 'Dead', 'Jailed']);
+    sim.setPlayerLevel(9, low);
+    ent(sim, dead).dead = true;
+    ent(sim, jailed).jailed = true;
+    for (const pid of [low, dead, jailed]) inside(sim, pid);
+    tickSeconds(sim, 2);
+    expect(sim.hillState.active?.counts.size).toBe(0);
+    for (const pid of [low, dead, jailed]) expect(ent(sim, pid).pvpFlag).not.toBe(true);
+    expect(sim.hillInfoFor(low)?.standing).toBe('level');
+  });
+
+  it('pays exactly 396 honor through the production event lifecycle in 45 minutes', () => {
+    const {
+      sim,
+      pids: [a],
+    } = hillWorld(['Aleph']);
+    inside(sim, a);
+    const hill = sim.hillState.active!;
+    // Drive the real one-second system pass without unrelated world AI ticks.
+    for (let second = 1; second <= 2700; second++) {
+      jumpTo(sim, second);
+      (sim as unknown as { tickCount: number }).tickCount = second * 20;
+      updateHill(sim.ctx);
+    }
+    expect(hill.honorPaid).toBe(396);
+    expect(sim.meta(a)!.honor).toBe(396);
+    expect(sim.hillState.active).toBeNull();
+    expect(ent(sim, a).pvpFlag).toBe(true);
+  });
+});
 
 function world(extra: Partial<SimConfig> = {}): Sim {
   const sim = new Sim({
@@ -211,7 +314,7 @@ describe('the schedule and the announcements', () => {
     expect(sim.hillInfoFor(a)).toMatchObject({ phase: 'warning', inside: false, contest: 0 });
   });
 
-  it('one hill per window, at a different time each window, and none on a switched-off realm', () => {
+  it('one hill per window, at independently seeded offsets every three hours, and none on a switched-off realm', () => {
     const sim = world();
     const offsets = new Set<number>();
     for (let w = 0; w < 6; w++) {
@@ -462,10 +565,10 @@ describe('the contest', () => {
     expect(sim.hillInfoFor(b)).toMatchObject({ challenger: 'you', contest: 3 });
   });
 
-  it('a raid does not count at all, while a player of any level does', () => {
+  it('a raid does not count, while a player at the flag level does', () => {
     const { sim, pids } = hillWorld(['R1', 'R2', 'R3', 'R4', 'R5', 'Solo', 'Novice']);
     const [r1, r2, r3, r4, r5, solo, novice] = pids;
-    sim.setPlayerLevel(9, novice);
+    sim.setPlayerLevel(10, novice);
     // A raid needs a full party of five to convert; three of them take the field.
     for (const pid of [r2, r3, r4, r5]) {
       sim.partyInvite(pid, r1);
@@ -484,7 +587,7 @@ describe('the contest', () => {
       yourCount: 0,
       challenger: 'none',
     });
-    // A level-9 lone player beside them counts, and takes it unopposed.
+    // A level-10 lone player beside them counts, and takes it unopposed.
     inside(sim, novice, 0, 6);
     tickSeconds(sim, HILL_CAPTURE_SECONDS + 1);
     expect(sim.hillState.active!.holder).toBe(`solo:${novice}`);
@@ -742,7 +845,7 @@ describe('the Honor trickle', () => {
     expect(honorEvents(seen, a)).toHaveLength(1);
   });
 
-  it('pays every holder of the party inside, whatever their level, and nobody else', () => {
+  it('pays eligible holders only, never an unflaggable novice or a rival', () => {
     const { sim, pids } = hillWorld(['A1', 'A2', 'A3', 'A4', 'Rival', 'Novice']);
     const party = pids.slice(0, 4);
     const [rival, novice] = pids.slice(4);
@@ -757,11 +860,11 @@ describe('the Honor trickle', () => {
     inside(sim, rival, 0, -6);
     tickSeconds(sim, HILL_CAPTURE_SECONDS + 1);
     expect(sim.hillState.active!.holder).toBe(`party:${sim.partyOf(party[0])!.id}`);
-    expect(sim.hillInfoFor(party[0])).toMatchObject({ holderCount: 5 });
+    expect(sim.hillInfoFor(party[0])).toMatchObject({ holderCount: 4 });
     sim.events = [];
     const seen = tickSeconds(sim, HILL_ACCRUAL_SECONDS + 1);
     const paid = [...party, novice, rival].filter((pid) => honorEvents(seen, pid).length > 0);
-    expect(paid).toEqual([...party, novice]);
+    expect(paid).toEqual(party);
     expect(sim.meta(rival)!.honor).toBe(0);
   });
 

@@ -137,6 +137,7 @@ describe.each(VENDORS)('Horse at %s', (npcKey) => {
     const view = buildWarfareVendorView(NPCS[npcKey].vendorItems!, ITEMS, ITEM_SETS, {
       honor,
       warfareVendor: true,
+      copper: 0,
       acquiredBuddyKeys: new Set<string>(),
       ownedItemIds: new Set<string>(),
       equippedItemIds: new Set<string>(),

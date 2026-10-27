@@ -140,7 +140,14 @@ export interface CharacterState extends ReferralRewardState {
     clueCasketsOpened?: number;
     // Treasure maps (src/sim/treasure_vault.ts), written only when set.
     treasureMap?: { rarity: string; siteId: string; seed: number };
-    vaultAttempt?: { id: string; rarity: string; siteId: string; seed: number };
+    vaultAttempt?: {
+      id: string;
+      rarity: string;
+      siteId: string;
+      seed: number;
+      expiresAtMs?: number;
+      bossKilledAtMs?: number;
+    };
     vaultAttemptSeq?: number;
     vaultGuestCycle?: string;
     vaultGuestPayouts?: number;

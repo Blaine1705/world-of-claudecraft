@@ -3965,10 +3965,6 @@
     border-color: #8d7138;
     box-shadow: 0 24px 80px rgb(0 0 0 / 72%);
   }
-  .membership-token-card .ui-btn {
-    min-height: 40px;
-  }
-
   .woc-store-tabs {
     display: flex;
     gap: 2px;
@@ -4089,6 +4085,74 @@
   }
   [data-subscription-section] p {
     margin-block: var(--spacing-sm);
+  }
+  /* Memberships tab: one badge per membership, price on top, benefits beneath. */
+  .membership-badges {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .membership-badge {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 16px;
+    border: 1px solid var(--color-membership-border);
+    border-radius: 10px;
+    background: linear-gradient(
+      160deg,
+      var(--color-membership-highlight),
+      var(--color-membership-surface) 55%
+    );
+  }
+  .membership-badge--current {
+    border-color: var(--color-membership-current);
+    box-shadow: 0 0 0 1px var(--color-membership-current) inset;
+  }
+  .membership-badge-head h3 {
+    margin: 0;
+    color: var(--color-membership-heading);
+    font-family: var(--title-font);
+    letter-spacing: 0.04em;
+  }
+  .membership-badge-price {
+    margin: 4px 0 0;
+    color: var(--color-accent);
+    font-size: 1.15em;
+    font-weight: 600;
+  }
+  .membership-badge p,
+  .membership-badge h4 {
+    margin: 0;
+  }
+  .membership-badge h4 {
+    margin-top: 6px;
+    color: var(--color-text-muted);
+    font-size: 0.9em;
+  }
+  .membership-badge-benefits {
+    margin: 0;
+    padding-left: 18px;
+  }
+  .membership-badge-action {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 8px;
+  }
+  .membership-badge-action .ui-btn {
+    min-height: 40px;
+  }
+  .membership-badge-note {
+    flex-basis: 100%;
+    color: var(--color-text-muted);
+  }
+  .membership-status .ui-btn {
+    min-height: 40px;
+    margin-inline-end: 8px;
   }
   .woc-store-balance {
     z-index: 1;
@@ -8121,6 +8185,9 @@
   .warfare-balance,
   .faction-currency-balance {
     color: var(--gold);
+  }
+  .warfare-balance .warfare-balance-gold {
+    margin-left: 12px;
   }
   .warfare-balance,
   .faction-currency-balance {
@@ -14423,6 +14490,19 @@
   .soc-add input {
     flex: 1;
   }
+  /* The Friends footer's presence setting (src/ui/social_window.ts). */
+  .soc-presence {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+  .soc-presence select {
+    flex: 1;
+    min-width: 0;
+  }
   .soc-add .btn {
     margin: 0;
     padding: 5px 12px;
@@ -15774,6 +15854,21 @@
     display: flex;
     overflow: hidden;
     container: finder-catalogue / inline-size;
+  }
+  .df-body-vault {
+    display: flex;
+    overflow-y: auto;
+  }
+  .df-vault-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  .df-vault-container .weekly-rewards {
+    flex: 1;
+    overflow-y: visible;
+    padding: 4px 12px 12px;
   }
   .df-cols {
     display: grid;
@@ -27918,6 +28013,26 @@
   .weekly-start-claim {
     align-self: flex-start;
     padding: 10px 22px;
+  }
+  .weekly-preview-notice {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: 8px 14px;
+    background: var(--color-ink-deep);
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+    font-size: 13px;
+    border-radius: var(--radius-sm);
+  }
+  .weekly-preview-notice-icon {
+    display: inline-flex;
+    align-items: center;
+    color: var(--color-accent);
+  }
+  .weekly-preview-notice-icon .ui-icon {
+    width: 20px;
+    height: 20px;
   }
   .weekly-claim-tracks {
     display: grid;

@@ -198,6 +198,7 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   fogbinders_rod: 'wand',
   merecleaver: 'axe',
   moonwrack_stave: 'staff',
+  vanguard_feral_staff: 'staff',
 };
 
 /**

@@ -561,6 +561,9 @@ export interface AccountDetail {
   online: boolean;
   bannedAt: string | null;
   suspendedUntil: string | null;
+  // Set when the player deactivated the account themselves; the moderation
+  // actions offer the audited reactivate while it is non-null.
+  deactivatedAt: string | null;
   moderationReason: string;
   chatMutedUntil: string | null;
   chatMuteReason: string;
@@ -571,6 +574,9 @@ export interface AccountDetail {
   // The operator-applied Cheater mark: remaining played-second budget, audited
   // reason, and when it was applied. Null when the account is not marked.
   cheaterMark?: { secondsRemaining: number; reason: string; setAt: string | null } | null;
+  // The operator world quest block: audited reason and when it was applied. Null
+  // when the account is not blocked.
+  worldQuestBlock?: { reason: string; blockedAt: string } | null;
   lastLoginIp: string | null;
   playtimeSeconds: number;
   characters: {

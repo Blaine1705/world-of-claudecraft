@@ -596,7 +596,7 @@ describe('Reliquary Conqueror catalog structure', () => {
       // +32 at the 2026-09-28 merge into feature/buried-hoards: the Buried Hoards page: 682.
       // +13 the Mirefen world boss page (seven relics, his staff and five trinkets): 695.
       // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 745.
-    ).toBe(762); // plus two referral reward mounts, nightwing_chimera and wobbles_slime
+    ).toBe(771); // plus two referral reward mounts, nightwing_chimera and wobbles_slime
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -742,8 +742,17 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
       buyValue: ITEMS[itemId]?.buyValue,
       priceHonor: ITEMS[itemId]?.priceHonor,
     });
+    // The ONE copper exemption, decided rather than inherited: Warfare Season 1
+    // (FURY_STOCK) sells for gold since the owner rule of 2026-10-02 ("make the
+    // last season of PvP sets just worth gold"). A repeat gold purchase climbs
+    // only the relic's obtain COUNT, which is information and never a score (no
+    // completion read or deed reads it, see syncReliquaryCompletionDeeds), so
+    // the climb is cosmetic. Named by id so any other copper-priced relic still
+    // reds here.
+    const season1Gold = new Set(FURY_STOCK);
     const vendorOffenders: string[] = [];
     let honorExempt = 0;
+    let season1Exempt = 0;
     for (const [npcId, npc] of Object.entries(NPCS)) {
       for (const itemId of npc.vendorItems ?? []) {
         if (!isCataloguedRelicItem(itemId)) continue;
@@ -751,18 +760,27 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
           honorExempt += 1;
           continue;
         }
+        if (season1Gold.has(itemId)) {
+          season1Exempt += 1;
+          continue;
+        }
         vendorOffenders.push(`${npcId}:${itemId}`);
       }
     }
     expect(vendorOffenders).toEqual([]);
+    expect(season1Exempt).toBe(FURY_STOCK.length * 2);
     // The exemption's own premises: it really covers the two Warfare counters
     // (the entry stock plus Warfare Season 2 on both NPCS rows) and nothing rides it that could also
     // be bought for copper (a dual-priced row would fall back into the sweep
     // above by construction; this pins the classifier's copper half live).
     // The Warfare Season 2 stock and the two honor trinkets ride the same
     // exemption on both counters.
-    expect(honorExempt).toBe(HONOR_QUARTERMASTER_STOCK.length * 2);
-    expect(HONOR_QUARTERMASTER_STOCK.every((id) => honorOnly(priceOf(id)))).toBe(true);
+    expect(honorExempt).toBe((HONOR_QUARTERMASTER_STOCK.length - FURY_STOCK.length) * 2);
+    expect(
+      HONOR_QUARTERMASTER_STOCK.filter((id) => !season1Gold.has(id)).every((id) =>
+        honorOnly(priceOf(id)),
+      ),
+    ).toBe(true);
     expect(honorOnly(priceOf('deacon_reliquary_helm'))).toBe(false);
     // The DUAL-PRICED arm, which the live catalog exhibits nowhere today: an
     // item purchasable with BOTH honor and copper is not exempt, because the
@@ -834,7 +852,7 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // +139: the Warfare Season 2 page (second release/v0.44.0 base merge): 489.
     // Plus the Mirefen world boss page's 13 items (seven relics, staff, five trinkets): 534.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 583.
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(585);
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(594);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }

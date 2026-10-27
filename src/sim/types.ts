@@ -8173,6 +8173,11 @@ export interface Entity extends ClientMirroredEntityFields {
    *  that module, and it rides the entity wire (`bty`). Absent/false is no
    *  bounty, so a character without one samples and serializes as before. */
   bounty?: boolean;
+  /** King of the Hill bounty (src/sim/pvp/hill_bounty.ts): the Honor this
+   *  player is worth while a kill streak on the risen hill lifts it above the
+   *  plain world kill. Rides the entity wire (`hbn`) so every nearby client tags
+   *  the nameplate and target frame; absent otherwise. */
+  hillBounty?: number;
   /** WARFARE Vitality switch (src/sim/pvp/vitality.ts): false while the player
    *  stands in a PvE instance (a dungeon, raid, delve or rift floor), so honor
    *  gear's health bonus never reaches raid content. Absent means the open
@@ -8389,7 +8394,7 @@ export interface Entity extends ClientMirroredEntityFields {
   riftTier?: RiftTier;
   // Treasure vault portals (src/sim/treasure_vault.ts): the character whose map
   // opened it (only they and their party may enter), the map's rarity, and the
-  // sim time the unentered portal closes.
+  // Host lockout-clock deadline (epoch ms online), shared with the vault attempt.
   vaultOwnerPid?: number;
   /** Stable owner identity across disconnect/reconnect; runtime pid may change. */
   vaultOwnerCharacterId?: number;
@@ -8851,6 +8856,9 @@ export interface NythraxisEncounterState {
   // Seconds left before Bone Storm may begin after a Soul Rend detonation
   // (nythraxis_soul_rend.ts); 0 when no detonation is settling.
   soulRendSettleTimer?: number;
+  // Seconds left before a Grave Eruption may begin after the Soul Rend marks
+  // detonate or are released (nythraxis_soul_rend.ts); 0 when no gap runs.
+  soulRendFireGapTimer?: number;
   // The Crown Endures: seconds since the first encounter tick (the clock runs
   // through the transition) and the enrage stack the boss carries once it has
   // run out (nythraxis_enrage_clock.ts).
@@ -9639,6 +9647,7 @@ export type SimEvent = { pid?: number } & (
   /** Server-only durable settlement input, never forwarded to clients. */
   | {
       type: 'treasureVaultOutcomePending';
+      bossKilledAtMs?: number;
       attemptId: string;
       ownerCharacterId: number;
       claims: {

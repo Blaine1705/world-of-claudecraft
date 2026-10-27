@@ -249,4 +249,5 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   vanguard_oath_blade: 'sword_rare_b_ember',
   vanguard_fang_dagger: 'dagger_rare_a_teal',
   vanguard_warstaff: 'staff_rare_a_teal',
+  vanguard_feral_staff: 'staff_rare_a_teal',
 };

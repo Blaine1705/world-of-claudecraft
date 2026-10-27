@@ -135,7 +135,6 @@ export class DungeonFinderWindow {
   // Clock slots refreshed in place between structural rebuilds.
   private clockSlots = new Map<string, HTMLElement>();
   private lastClockText = new Map<string, string>();
-
   private readonly vaultPane: WeeklyRewardsTab;
 
   constructor(private readonly deps: DungeonFinderWindowDeps) {

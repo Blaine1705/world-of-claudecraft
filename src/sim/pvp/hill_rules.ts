@@ -1,6 +1,6 @@
 // King of the Hill: the pure rules. Once every three hours, at a random
 // moment inside the window, a hill is announced somewhere in one of the
-// free-for-all zones; it rises HILL_WARNING_SECONDS later as a HILL_RADIUS
+// northern zones; it rises HILL_WARNING_SECONDS later as a HILL_RADIUS
 // circle on dry, open ground and stands for HILL_DURATION_SECONDS. The PARTY
 // with the most members standing inside it contests it, holds it after
 // HILL_CAPTURE_SECONDS of majority (a rival walking in pauses the clock, it
@@ -9,10 +9,13 @@
 // it. While it stands the realm hears where it is every HILL_NOTICE_SECONDS,
 // with the standings (hill_ranking.ts): the group that held it longest earns a
 // point toward the Weekly Vault's PvP row when it falls. Raid members do
-// not count; every level does. No SimContext, no rng, no clock: every function here is a plain function of its arguments so the
+// not count; players must meet the World PvP minimum level. No SimContext,
+// no rng, no clock: every function here is a plain function of its arguments so the
 // sim (hill.ts), the HUD bar and the tests read the same verdicts. The
 // ctx-bound system that owns the schedule, the presence pass, the contest
 // clock and the payouts is hill.ts.
+
+import { WORLD_PVP_MIN_LEVEL } from './world_pvp_rules';
 
 /** The circle's radius in yards (owner spec). */
 export const HILL_RADIUS = 50;
@@ -73,16 +76,20 @@ export const HILL_RIM_SAMPLES = 16;
 export const HILL_INNER_SAMPLES = 8;
 /** Clearance the centre must have from any collider: a hill never rises on
  *  a building, a wall or a fence. The rings are not collider-checked: the
- *  free-for-all zones are forests, a trunk on a sample point is not a
+ *  northern zones are forests, a trunk on a sample point is not a
  *  structure, and the hub exclusion keeps the circle off every settlement. */
 export const HILL_CENTER_CLEARANCE = 6;
 
 /** Whether a player counts on the hill (owner spec: parties only): a raid
- *  member does not, so a raid cannot flood the circle. Level does not matter:
- *  anyone on free-for-all ground is fair game, so anyone there can hold. */
-export type HillStanding = 'counted' | 'raid';
+ *  member does not, so a raid cannot flood the circle. Players below the normal
+ *  World PvP level cannot count or earn honor while immune to opponents. */
+export type HillStanding = 'counted' | 'raid' | 'level';
 
-export function hillStanding(party: { raid: boolean } | null): HillStanding {
+export function hillStanding(
+  party: { raid: boolean } | null,
+  level = WORLD_PVP_MIN_LEVEL,
+): HillStanding {
+  if (level < WORLD_PVP_MIN_LEVEL) return 'level';
   return party?.raid ? 'raid' : 'counted';
 }
 

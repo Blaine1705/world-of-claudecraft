@@ -20,12 +20,6 @@ export function vaultPortalVisible(
 
   const ownerCharacterId = entity.vaultOwnerCharacterId;
   if (ownerCharacterId !== undefined && viewerCharacterId === ownerCharacterId) return true;
-  if (
-    viewerCharacterId !== undefined &&
-    entity.vaultInitialPartyCharacterIds?.includes(viewerCharacterId)
-  )
-    return true;
-
   if (partyInfo?.members.some((member) => member.pid === ownerPid)) return true;
   return false;
 }

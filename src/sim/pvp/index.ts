@@ -26,6 +26,19 @@ export {
   warnNextHillNow,
 } from './hill';
 export {
+  HILL_BOUNTY_BASE_HONOR,
+  HILL_BOUNTY_DEATH_STREAK_HONOR,
+  HILL_BOUNTY_KILL_STREAK_HONOR,
+  HILL_BOUNTY_REPEAT_CAP,
+  HILL_CALLOUT_SECONDS,
+  HILL_SHUTDOWN_STREAK,
+  type HillCalloutKind,
+  type HillStreakCalloutKind,
+  hillBountyHonor,
+  hillRepeatHonorMultiplier,
+  hillStreakCallout,
+} from './hill_bounty_rules';
+export {
   HILL_RANKING_SHOWN,
   type HillHoldRecord,
   hillLongestHolds,
@@ -117,6 +130,7 @@ export {
 // public API in any meaningful sense: import it by path.
 export { loadHonorState, savedHonorState } from './honor_persist';
 export {
+  countsWarfareRating,
   PVP_DEFENSE_CAP,
   PVP_OFFENSE_CAP,
   PVP_RATING_PER_PCT,

@@ -31,43 +31,33 @@ describe('direct vault reward character snapshot', () => {
     };
   }
 
-  it('adds the immutable parcel and clears only the matching owner marker', () => {
+  it('adds the immutable parcel without clearing the timed owner lock', () => {
     const state = saved();
-    addVaultRewardToCharacterState(
-      state,
-      {
-        characterId: 7,
-        recipientName: 'Owner',
-        items: [{ itemId: 'thorium_ore', count: 3 }],
-        copper: 42,
-        mailDueAt: '2026-09-23T00:00:00.000Z',
-      },
-      '7:1',
-      true,
-    );
+    addVaultRewardToCharacterState(state, {
+      characterId: 7,
+      recipientName: 'Owner',
+      items: [{ itemId: 'thorium_ore', count: 3 }],
+      copper: 42,
+      mailDueAt: '2026-09-23T00:00:00.000Z',
+    });
     expect(state.inventory).toContainEqual(
       expect.objectContaining({ itemId: 'thorium_ore', count: 5 }),
     );
     expect(state.copper).toBe(52);
-    expect(state.worldQuests?.vaultAttempt).toBeUndefined();
+    expect(state.worldQuests?.vaultAttempt?.id).toBe('7:1');
     expect(state.worldQuests?.clueCasketsOpened).toBe(1);
   });
 
   it('keeps the permanent quality of a gear line on the saved copy', () => {
     const state = saved();
     const lootQuality: LootQualityDescriptor = { version: 1, tier: 2, weights: [9, 8, 7, 6, 5] };
-    addVaultRewardToCharacterState(
-      state,
-      {
-        characterId: 7,
-        recipientName: 'Owner',
-        items: [{ itemId: 'slagbreaker_helmet', count: 1, lootQuality: { ...lootQuality } }],
-        copper: 0,
-        mailDueAt: '2026-09-23T00:00:00.000Z',
-      },
-      '7:1',
-      true,
-    );
+    addVaultRewardToCharacterState(state, {
+      characterId: 7,
+      recipientName: 'Owner',
+      items: [{ itemId: 'slagbreaker_helmet', count: 1, lootQuality: { ...lootQuality } }],
+      copper: 0,
+      mailDueAt: '2026-09-23T00:00:00.000Z',
+    });
     expect(state.inventory.find((s) => s.itemId === 'slagbreaker_helmet')?.instance).toEqual({
       lootQuality,
     });
@@ -75,24 +65,19 @@ describe('direct vault reward character snapshot', () => {
 
   it('grants the plain copy for a malformed stored descriptor', () => {
     const state = saved();
-    addVaultRewardToCharacterState(
-      state,
-      {
-        characterId: 7,
-        recipientName: 'Owner',
-        items: [
-          {
-            itemId: 'slagbreaker_helmet',
-            count: 1,
-            lootQuality: { version: 1, tier: 9, weights: [1, 1, 1, 1, 1] } as never,
-          },
-        ],
-        copper: 0,
-        mailDueAt: '2026-09-23T00:00:00.000Z',
-      },
-      '7:1',
-      true,
-    );
+    addVaultRewardToCharacterState(state, {
+      characterId: 7,
+      recipientName: 'Owner',
+      items: [
+        {
+          itemId: 'slagbreaker_helmet',
+          count: 1,
+          lootQuality: { version: 1, tier: 9, weights: [1, 1, 1, 1, 1] } as never,
+        },
+      ],
+      copper: 0,
+      mailDueAt: '2026-09-23T00:00:00.000Z',
+    });
     const slot = state.inventory.find((s) => s.itemId === 'slagbreaker_helmet');
     expect(slot).toBeDefined();
     expect(slot?.count).toBe(1);
@@ -101,18 +86,13 @@ describe('direct vault reward character snapshot', () => {
 
   it('does not count a capped guest as paid', () => {
     const state = saved();
-    addVaultRewardToCharacterState(
-      state,
-      {
-        characterId: 8,
-        recipientName: 'Guest',
-        items: [],
-        copper: 0,
-        mailDueAt: '2026-09-23T00:00:00.000Z',
-      },
-      '7:1',
-      false,
-    );
+    addVaultRewardToCharacterState(state, {
+      characterId: 8,
+      recipientName: 'Guest',
+      items: [],
+      copper: 0,
+      mailDueAt: '2026-09-23T00:00:00.000Z',
+    });
     expect(state.copper).toBe(10);
     expect(state.worldQuests?.vaultGuestPayouts).toBeUndefined();
     expect(state.worldQuests?.vaultAttempt?.id).toBe('7:1');
@@ -120,19 +100,14 @@ describe('direct vault reward character snapshot', () => {
 
   it('does not charge a past-cycle guest claim to the new cycle', () => {
     const state = saved();
-    addVaultRewardToCharacterState(
-      state,
-      {
-        characterId: 8,
-        recipientName: 'Guest',
-        items: [{ itemId: 'thorium_ore', count: 1 }],
-        copper: 10,
-        mailDueAt: '2026-09-23T00:00:00.000Z',
-        guestCycle: '2026-09-22',
-      },
-      '7:1',
-      false,
-    );
+    addVaultRewardToCharacterState(state, {
+      characterId: 8,
+      recipientName: 'Guest',
+      items: [{ itemId: 'thorium_ore', count: 1 }],
+      copper: 10,
+      mailDueAt: '2026-09-23T00:00:00.000Z',
+      guestCycle: '2026-09-22',
+    });
     expect(state.copper).toBe(20);
     expect(state.worldQuests?.clueCasketsOpened).toBe(1);
     expect(state.worldQuests?.vaultGuestPayouts).toBeUndefined();
@@ -143,19 +118,14 @@ describe('direct vault reward character snapshot', () => {
     if (!state.worldQuests) throw new Error('missing world quest state');
     state.worldQuests.vaultGuestCycle = state.worldQuests.cycle;
     state.worldQuests.vaultGuestPayouts = 2;
-    addVaultRewardToCharacterState(
-      state,
-      {
-        characterId: 8,
-        recipientName: 'Guest',
-        items: [{ itemId: 'thorium_ore', count: 1 }],
-        copper: 10,
-        mailDueAt: '2026-09-23T00:00:00.000Z',
-        guestCycle: state.worldQuests.cycle,
-      },
-      '7:1',
-      false,
-    );
+    addVaultRewardToCharacterState(state, {
+      characterId: 8,
+      recipientName: 'Guest',
+      items: [{ itemId: 'thorium_ore', count: 1 }],
+      copper: 10,
+      mailDueAt: '2026-09-23T00:00:00.000Z',
+      guestCycle: state.worldQuests.cycle,
+    });
     expect(state.worldQuests.vaultGuestPayouts).toBe(2);
   });
 
@@ -163,18 +133,13 @@ describe('direct vault reward character snapshot', () => {
     const state = saved();
     const baseId = HOARD_BASE_ITEM_IDS[0];
     const tierId = hoardLootVariantId(baseId, 'rare');
-    addVaultRewardToCharacterState(
-      state,
-      {
-        characterId: 7,
-        recipientName: 'Owner',
-        items: [{ itemId: tierId, count: 1 }],
-        copper: 42,
-        mailDueAt: '2026-09-23T00:00:00.000Z',
-      },
-      '7:1',
-      true,
-    );
+    addVaultRewardToCharacterState(state, {
+      characterId: 7,
+      recipientName: 'Owner',
+      items: [{ itemId: tierId, count: 1 }],
+      copper: 42,
+      mailDueAt: '2026-09-23T00:00:00.000Z',
+    });
     expect(state.deedStats?.itemsDiscovered).toEqual(expect.arrayContaining([tierId, baseId]));
     expect(state.deedStats?.visited).toContain('quality:rare');
     expect(state.reliquary?.firstFind?.[baseId]).toEqual({ count: 1 });
@@ -204,23 +169,12 @@ describe('direct vault reward character snapshot', () => {
     const projected = addVaultRewardToCharacterState(
       structuredClone(before),
       claim,
-      '7:1',
-      true,
       prepared.items,
     );
     const next = vi.spyOn(sim.rng, 'next');
     try {
       expect(
-        grantHoardReward(
-          sim.ctx,
-          pid,
-          'rare',
-          { ...claim, capped: false },
-          true,
-          undefined,
-          true,
-          prepared.items,
-        ),
+        grantHoardReward(sim.ctx, pid, 'rare', { ...claim, capped: false }, true, prepared.items),
       ).toBe(true);
       expect(next).not.toHaveBeenCalled();
     } finally {
@@ -263,15 +217,9 @@ describe('direct vault reward character snapshot', () => {
       copper: 1,
       mailDueAt: '2026-09-23T00:00:00.000Z',
     };
-    addVaultRewardToCharacterState(projected, claim, '7:1', true);
+    addVaultRewardToCharacterState(projected, claim);
     expect(
-      grantHoardReward(
-        sim.ctx,
-        pid,
-        'rare',
-        { items: claim.items, copper: 1, capped: false },
-        true,
-      ),
+      grantHoardReward(sim.ctx, pid, 'rare', { items: claim.items, copper: 1, capped: false }),
     ).toBe(true);
     const live = sim.serializeCharacter(pid);
     expect(projected.deedStats).toEqual(live?.deedStats);

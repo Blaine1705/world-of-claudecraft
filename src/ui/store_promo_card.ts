@@ -108,6 +108,7 @@ export function storePromoLabels(): Record<
 
 export interface StorePromoSlideDeps {
   openStore(): void;
+  openMemberships(): void;
   openReferralCards(): void;
   membershipActive(): boolean;
 }
@@ -123,12 +124,12 @@ export function storePromoSlides(deps: StorePromoSlideDeps): StorePromoSlide[] {
       onOpen: deps.openStore,
     },
     {
-      // Membership is sold from the Store's subscription section, so this
-      // advert opens the Store too; members have nothing left to buy.
+      // Membership is sold from the store's Memberships tab, which this advert
+      // opens directly; members have nothing left to discover here.
       id: 'membership',
       image: '/ui/store/membership-promo.webp',
       labels: labels.membership,
-      onOpen: deps.openStore,
+      onOpen: deps.openMemberships,
       available: () => !deps.membershipActive(),
     },
     {

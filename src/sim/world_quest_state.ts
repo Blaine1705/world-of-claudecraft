@@ -49,6 +49,10 @@ export interface WorldQuestPlayerState {
   worldQuestLog: Map<string, WorldQuestProgress>;
   /** Session-only cycle override used by focused dev commands; never persisted. */
   devWorldQuestCycle?: string | null;
+  /** The operator world quest block (src/sim/world_quest_block.ts). Server-set
+   *  from the account row at join and on an admin change; never persisted in
+   *  the character blob, never true offline, never user-settable. */
+  worldQuestsBlocked?: boolean;
   /** Puzzle-area entry edges for this session. Never persisted or wired. */
   worldQuestAreas: Set<string>;
   /** Minigame unlocked by the area's physical activator for this session. */
@@ -78,8 +82,8 @@ export interface WorldQuestPlayerState {
   clueCasketsOpened: number;
   /**
    * Treasure maps (src/sim/treasure_vault.ts): the map read and not yet dug up
-   * (null when none), and the guest vault payouts taken in `vaultGuestCycle`
-   * (the owner's own vaults never count). Cycle-independent like the hunt.
+   * (null when none). Legacy guest payout counters remain in saves for
+   * compatibility with older versions; they no longer restrict rewards.
    */
   treasureMap: TreasureMapProgress | null;
   vaultAttempt: VaultAttempt | null;

@@ -184,11 +184,19 @@ import { BankWindow } from './bank_window';
 import { makeBankWindowFocus } from './bank_window_focus';
 import { closeBankBags, openBankCompanion, undockBagCompanions } from './bank_window_lifecycle';
 import {
+  BANNER_ADVANCE_GAP_MS,
   type BannerClass,
   type BannerEnqueueOutcome,
+  type BannerPayload,
   BannerQueue,
+  type BannerVariant,
   bannerSubtextLines,
+  isBannerStale,
 } from './banner_queue';
+import { treasureMapTooltipLine } from './treasure_map_tooltip_view';
+
+export type { BannerVariant } from './banner_queue';
+
 import { blockLandingLogKey } from './block_landing_feedback_core';
 import { BootcampOverlay } from './bootcamp';
 import { buddyDisplayName, buddyEventLogArgs } from './buddy_event_lines';
@@ -370,7 +378,7 @@ import {
   actionBarRowForSlot,
 } from './hud/action_bar/action_bar_layout_core';
 import { actionBarLayoutProfileForSurface } from './hud/action_bar/action_bar_layout_sync';
-import { isActionBarEditAllowed } from './hud/action_bar/action_bar_lock';
+import { isActionBarEditAllowed, isSlotMoveDragAllowed } from './hud/action_bar/action_bar_lock';
 import { ActionBarPainter } from './hud/action_bar/action_bar_painter';
 import {
   type ActionBarToggleControl,
@@ -408,7 +416,6 @@ import {
   type GroundAimReticleView,
 } from './hud/action_bar/ground_aim_controller';
 import {
-  applyLoadoutBar as applyLoadoutBarActions,
   assignAttackSlotAction,
   attackDragDisposition,
   clearHotbarSlot,
@@ -417,7 +424,6 @@ import {
   type HotbarAction,
   hotbarPetCommand,
   isAbilityActionBarEligible,
-  loadoutKnownAbilityIds,
   placeAbilityOnSlot,
   placeItemOnSlot,
   placePetOnSlot,
@@ -446,6 +452,7 @@ import type { MobileActionRingPainter } from './hud/action_bar/mobile_action_rin
 import { petSlotText } from './hud/action_bar/pet_slot_core';
 import { playerStealthed } from './hud/action_bar/player_stealthed';
 import { RADIAL_DIRECTIONS, type RadialDirection } from './hud/action_bar/radial_action_core';
+import { slotEditHintLines } from './hud/action_bar/slot_edit_hints_core';
 import { AuraTrackFamily } from './hud/aura_tracks';
 import {
   BattlegroundKillFeed,
@@ -654,7 +661,10 @@ import {
 } from './hud/vendor/vendor_view';
 import { renderVendorWindow } from './hud/vendor/vendor_window';
 import { buildWarfareVendorView, warfareShopViewer } from './hud/vendor/warfare_vendor_view';
-import { renderWarfareVendorWindow } from './hud/vendor/warfare_vendor_window';
+import {
+  renderWarfareVendorWindow,
+  warfarePurchaseConfirmBody,
+} from './hud/vendor/warfare_vendor_window';
 import { afflictionFateThreadCount, createDoomMeter, destructionRuinPips } from './hud/warlock';
 import { WocTradeController } from './hud/woc_trade';
 import { HudFrameGroups, refreshHudFrameGroupLabels } from './hud_frame_groups';
@@ -1203,49 +1213,6 @@ const PET_MODE_DESC_KEYS: Record<PetMode, TranslationKey> = {
   aggressive: 'hud.pet.aggressiveDesc',
   assist: 'hud.pet.assistDesc',
 };
-/** The visual language the shared #banner slot paints in. 'default' is the
- *  bare gold celebration text every milestone has always used (level up, zone
- *  crossing, craft masterwork, duel result). 'deed' is the Book of Deeds
- *  plate: a framed, quieter parchment treatment, because a deed accomplishment
- *  firing an identical gold banner to a real level-up is a known cause of
- *  players reading routine gathering progress as leveling. 'skill' is the
- *  gathering skill milestone plate: copper craft framing with the profession
- *  crest, so a Mining 50 plate can never steal the character level-up reading. */
-export type BannerVariant = 'default' | 'deed' | 'skill' | 'worldQuest';
-
-/** Everything one banner paint needs, held whole so a queued banner (R38)
- *  renders later exactly as it would have rendered immediately. */
-interface BannerPayload {
-  text: string;
-  motion: boolean;
-  decorativeIconUrl?: string;
-  variant: BannerVariant;
-  /** The secondary lines stacked under the title, ALREADY normalized by
-   *  `bannerSubtextLines` (never an empty array, never an empty string). Several
-   *  exist for the battleground verdict, whose facts (score plus rating swing,
-   *  why the match ended, the first-win bonus) are INDEPENDENT sentences: each
-   *  stays its own `t()` key on its own line instead of being concatenated. */
-  subtext?: string[];
-  durationMs: number;
-  source: 'unstuck' | null;
-  /** The R38 class, kept on the payload so the advance chain can tell a
-   *  deferred AMBIENT (droppable when stale) from a celebration. */
-  bannerClass: BannerClass;
-  /** performance.now() at enqueue, for the ambient max-defer below. */
-  enqueuedAt: number;
-}
-
-/** The fade gap between a finished banner and the next queued one. */
-const BANNER_ADVANCE_GAP_MS = 250;
-
-/** How long a parked AMBIENT banner stays worth replaying. An ambient is
- *  current-state, not history: behind ONE celebration (2600ms + gap) a zone
- *  name or prompt is still fresh enough to show, but behind a celebration
- *  CHAIN a "starting now" or countdown digit replayed many seconds late
- *  misleads (the phase 14 QA finding), so the advance chain drops anything
- *  parked longer than this. Celebrations never age out: "you leveled" stays
- *  true however late it shows. */
-const AMBIENT_MAX_DEFER_MS = 4000;
 // Classic class colors (CLASSES[cls].color is a 0xRRGGBB number) as a CSS
 // string, used to color-code party members on the minimap and in the frames.
 const classCss = (cls: string): string =>
@@ -2369,6 +2336,7 @@ export class Hud {
       playerName: this.sim.player.name,
       playerLevel: () => this.sim.player.level,
       talentSpec: () => this.sim.talentSpec,
+      talentAllocation: () => this.sim.talents,
       knownAbilityIds: () => this.sim.known.map((known) => known.def.id),
       hasAura: (kind) => this.sim.player.auras.some((aura) => aura.kind === kind),
       showAttackButton: () => this.optionsHooks?.settings.get('showAttackButton') ?? true,
@@ -5711,6 +5679,7 @@ export class Hud {
   private readonly hillBar = new HillBar({
     layer: () => document.getElementById('ui'),
     writers: this.writerFacet,
+    banner: (text) => this.showBanner(text, true, undefined, 'pvp'),
   });
   // Dungeon prompts: the Iron Cage escape (a tap is an interact press), Ossick's chains.
   private readonly dungeonPrompts = new DungeonPrompts({
@@ -6619,7 +6588,7 @@ export class Hud {
     if (requiredClasses) {
       html += `<div class="tt-sub">${esc(t('itemUi.tooltip.classes', { classes: requiredClasses.map(classDisplayName).join(', ') }))}</div>`;
     }
-    html += itemRequiredLevelLine(item, wearer.level);
+    html += itemRequiredLevelLine(item, wearer.level) + treasureMapTooltipLine(item);
     html += this.itemProcBlock(item) + trinketTooltipLines(item, this.sim.player);
     if (compare !== 'noset') html += this.itemSetBlock(item);
     html += materialMakersMarkLines(item, instance, materialSources);
@@ -7612,7 +7581,7 @@ export class Hud {
             return `<div class="tt-title">${esc(t('abilityUi.actionBar.attackName'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackTooltip'))}</div><div class="tt-sub">${esc(t('abilityUi.actionBar.attackRemoveHint'))}</div>`;
           }
           const known = this.abilityForSlot(slot);
-          const clearHint = `<div class="tt-sub">${esc(t('abilityUi.actionBar.clearHint'))}</div>`;
+          const clearHint = slotEditHintLines();
           if (known) return this.abilityTooltip(known) + clearHint;
           const freed = slot === 0 && this.freedAttackSlotAbility();
           if (freed)
@@ -7650,7 +7619,7 @@ export class Hud {
         };
         bindShiftClear(btn, clearSlot);
         btn.addEventListener('dragstart', (e) => {
-          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drag')) {
+          if (!isSlotMoveDragAllowed(this.actionBarsLocked(), e)) {
             e.preventDefault();
             return;
           }
@@ -7751,7 +7720,7 @@ export class Hud {
           handleShiftClearKeydown(e, clearAttackSlotAction);
         });
         btn.addEventListener('dragstart', (e) => {
-          if (!isActionBarEditAllowed(this.actionBarsLocked(), 'drag')) {
+          if (!isSlotMoveDragAllowed(this.actionBarsLocked(), e)) {
             e.preventDefault();
             return;
           }
@@ -8401,7 +8370,6 @@ export class Hud {
   private syncDailyRewardsSurfaceLabels(): void {
     const storeEnabled = this.claudiumHooks !== null;
     const titleKey = storeEnabled ? 'hudChrome.wocStore.title' : 'hudChrome.dailyRewards.title';
-    const labelKey = storeEnabled ? 'hudChrome.wocStore.storeTab' : 'hudChrome.dailyRewards.title';
     const title = t(titleKey);
     for (const button of [this.dailyRewardsButtonEl, this.mobileDailyRewardsButtonEl]) {
       if (!button) continue;
@@ -8412,8 +8380,8 @@ export class Hud {
     }
     const label = this.mobileDailyRewardsButtonEl?.querySelector<HTMLElement>('.mobile-label');
     if (label) {
-      label.setAttribute('data-i18n', labelKey);
-      label.textContent = t(labelKey);
+      label.setAttribute('data-i18n', titleKey);
+      label.textContent = title;
     }
   }
 
@@ -14278,6 +14246,7 @@ export class Hud {
     this.bannerEl.classList.toggle('banner-deed', variant === 'deed');
     this.bannerEl.classList.toggle('banner-skill', variant === 'skill');
     this.bannerEl.classList.toggle('banner-world-quest', variant === 'worldQuest');
+    this.bannerEl.classList.toggle('banner-pvp', variant === 'pvp');
     if (variant === 'worldQuest') this.questBanner.yieldToPlate(durationMs);
     this.bannerEl.classList.toggle('banner-loot', payload.bannerClass === 'loot');
     // Reduced-motion celebrations (craft plan.motion) show and hide the
@@ -14298,15 +14267,12 @@ export class Hud {
 
   /** Advance the banner slot to the next queued payload, dropping any parked
    *  AMBIENT older than AMBIENT_MAX_DEFER_MS (stale current-state; the doc
-   *  above the constant). Celebrations paint however late they surface. */
+   *  in banner_queue.ts). Celebrations paint however late they surface. */
   private advanceBannerSlot(): void {
     for (;;) {
       const next = this.bannerQueue?.advance();
       if (!next) return;
-      if (
-        next.bannerClass === 'ambient' &&
-        performance.now() - next.enqueuedAt > AMBIENT_MAX_DEFER_MS
-      ) {
+      if (isBannerStale(next, performance.now())) {
         continue;
       }
       this.paintBanner(next);
@@ -14727,23 +14693,16 @@ export class Hud {
     this.warfareVendorOpenerFocus = null;
   }
 
-  // Honor purchases debit an unrefundable currency and record no buyback
-  // (gold vendors are the only buyback source), exactly like Heroic Marks, so
-  // the buy command fires ONLY from the confirm callback.
+  // Warfare purchases are soulbound with no sell value (Honor, or gold for
+  // Season 1), so a mis-tap is unrefundable, exactly like Heroic Marks: the buy
+  // command fires ONLY from the confirm callback.
   private requestWarfarePurchase(npcId: number, itemId: string): void {
     const item = buddyVendorOffer(itemId) ?? ITEMS[itemId];
     if (!item) return;
     // Shared Heroic shop title/accept/cancel keys must remain currency-neutral.
     this.confirmDialog(
       t('heroicShop.buyConfirmTitle'),
-      t('hudChrome.warfareShop.buyConfirmBody', {
-        item: item.kind === 'companion' ? buddyDisplayName(item.buddy) : itemDisplayName(item),
-        honor: t('hudChrome.warfare.honorAmount', {
-          amount: formatNumber(Math.max(0, Math.floor(item.priceHonor ?? 0)), {
-            maximumFractionDigits: 0,
-          }),
-        }),
-      }),
+      warfarePurchaseConfirmBody(item),
       t('heroicShop.buyConfirmAccept'),
       t('heroicShop.buyConfirmCancel'),
       () => this.sim.buyItem(npcId, itemId),
@@ -16513,9 +16472,9 @@ export class Hud {
     if (this.dailyRewardsWindow.isOpen) this.dailyRewardsLauncher.refresh(true);
   }
 
-  openWocStore(): void {
+  openWocStore(tab: 'store' | 'memberships' = 'store'): void {
     if (!this.dailyRewardsEnabled()) return;
-    this.dailyRewardsWindow.openStore();
+    this.dailyRewardsWindow.openStore(tab);
     this.dailyRewardsLauncher.refresh(true);
   }
 
@@ -16583,6 +16542,7 @@ export class Hud {
     this.storePromoCard = mountStorePromoCard(host, {
       slides: storePromoSlides({
         openStore: () => this.openWocStore(),
+        openMemberships: () => this.openWocStore('memberships'),
         openReferralCards: () => this.referralCards.open(),
         membershipActive: () => this.sim.player?.membershipActive === true,
       }),
@@ -16653,29 +16613,11 @@ export class Hud {
     this.talentsWindow.open();
   }
 
-  // Restore a saved loadout's action bar into the per-class slot map (reuses the
-  // existing hotbar persistence; only places ids the TARGET build's own allocation
-  // actually grants). A SavedLoadout's bar is ability ids only (currentBar strips
-  // item shortcuts before saving, see the talentsWindow deps below), so this must
-  // not replace the WHOLE bar wholesale: that would also silently clear any
-  // potion/food/drink shortcut the player had placed, since the loadout never
-  // recorded it either way (#1889). applyLoadoutBarActions keeps an existing item
-  // slot wherever the loadout leaves that slot blank.
-  //
-  // The ability predicate is resolved from `alloc` (the loadout's own talent
-  // allocation), not `!!ABILITIES[id]`: two builds on one class can grant disjoint
-  // ability sets (e.g. a shaman's Enhancement vs. Restoration loadout), and
-  // checking global existence let a stale/foreign-spec id survive a switch and
-  // scramble the bar. Resolving from `alloc` also sidesteps switchLoadout's server
-  // round trip, which has not necessarily landed in `this.sim.known` yet when this
-  // runs (see the talentsWindow dropdown handler, which calls switchLoadout and
-  // applyLoadoutBar back to back).
+  // Restore a saved loadout's action bar into the per-class slot map. The rule
+  // (target-allocation ability set, kept item shortcuts, the granted-spell heal)
+  // lives in ActionBarController.applyLoadout; this only persists the result.
   private applyLoadoutBar(bar: (string | null)[], alloc: TalentAllocation): void {
-    const known = loadoutKnownAbilityIds(this.sim.cfg.playerClass, alloc, this.sim.player.level);
-    this.actionBarController.replaceActionsForLoadout(
-      applyLoadoutBarActions(this.hotbarActions, bar, Hud.BAR_ABILITY_SLOTS, (id) => known.has(id)),
-      known,
-    );
+    this.actionBarController.applyLoadout(bar, alloc);
     this.saveSlotMap();
   }
 

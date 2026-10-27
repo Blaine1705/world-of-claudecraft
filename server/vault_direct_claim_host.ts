@@ -135,8 +135,6 @@ export function claimVaultRewardForSession(
             session.pid,
             inst.vault.rarity,
             reward,
-            owner,
-            claim.guestCycle,
             true,
             preparedReward?.items,
           )

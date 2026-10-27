@@ -706,7 +706,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "c9b2430b",
+      "state": "eff3423c",
       "events": "feb7a057",
       "rng": {
         "draws": 0,
@@ -817,6 +817,7 @@
               0
             ],
             "resetAtMs": 604800000,
+            "weeklyBossUnlocks": {},
             "world": 1
           },
           "worldQuestCycle": "wq1_0",
@@ -905,7 +906,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1014,
-      "state": "40bb9609",
+      "state": "92c7f3a6",
       "events": "d41b4889",
       "rng": {
         "draws": 0,
@@ -1030,6 +1031,7 @@
               0
             ],
             "resetAtMs": 604800000,
+            "weeklyBossUnlocks": {},
             "world": 3
           },
           "worldQuestCycle": "wq1_0",
@@ -1134,7 +1136,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1014,
-      "state": "17adbdc0",
+      "state": "5fba77a1",
       "events": "2e968515",
       "rng": {
         "draws": 0,
@@ -1254,6 +1256,7 @@
               0
             ],
             "resetAtMs": 604800000,
+            "weeklyBossUnlocks": {},
             "world": 3
           },
           "worldQuestCycle": "wq1_3",
@@ -1341,7 +1344,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1014,
-      "state": "17adbdc0",
+      "state": "5fba77a1",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1461,6 +1464,7 @@
               0
             ],
             "resetAtMs": 604800000,
+            "weeklyBossUnlocks": {},
             "world": 3
           },
           "worldQuestCycle": "wq1_3",

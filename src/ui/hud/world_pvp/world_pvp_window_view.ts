@@ -17,13 +17,19 @@ import {
   WORLD_PVP_STAKE_FRACTION,
   worldPvpPairMultiplier,
 } from '../../../sim/pvp/world_pvp_rules';
-import type { WorldPvpInfo, WorldPvpZone } from '../../../world_api';
+import type { WorldPvpInfo, WorldPvpRewardPause, WorldPvpZone } from '../../../world_api';
 
 /** What the one action button does. `locked` renders the raise disabled with
  *  the level requirement; `keepUp` cancels a running disarm countdown;
  *  `realmOff` renders it disabled because the realm's kill switch is set (the
  *  sim refuses every raise there, so no press could ever land). */
-export type WorldPvpActionKind = 'enable' | 'disable' | 'keepUp' | 'locked' | 'realmOff';
+export type WorldPvpActionKind =
+  | 'enable'
+  | 'disable'
+  | 'keepUp'
+  | 'locked'
+  | 'realmOff'
+  | 'sanctuary';
 
 export interface WorldPvpStakes {
   stakeCapCopper: number;
@@ -96,7 +102,9 @@ export function worldPvpAction(info: WorldPvpInfo): WorldPvpActionKind {
   // restores a saved flag and auto-raises nobody there, so the flag is always
   // down and the only honest button is a disabled one.
   if (info.enabled === false) return 'realmOff';
-  if (info.flagged) return info.disarmRemaining === null ? 'disable' : 'keepUp';
+  if (info.flagged && info.disarmRemaining === null) return 'disable';
+  if (info.zone === 'sanctuary') return 'sanctuary';
+  if (info.flagged) return 'keepUp';
   return info.levelLocked ? 'locked' : 'enable';
 }
 

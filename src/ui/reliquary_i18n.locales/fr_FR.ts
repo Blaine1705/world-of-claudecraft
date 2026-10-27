@@ -144,7 +144,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_gallery: {
     name: 'Galerie de Guerre',
-    desc: "Les cinq tenues de combat de Guerre, gagnées pièce par pièce avec de l'honneur.",
+    desc: "Les cinq tenues de combat de Guerre de la première saison, désormais vendues pièce par pièce pour de l'or.",
   },
   conquerors_warfare_armory: {
     name: 'Armurerie de Guerre',

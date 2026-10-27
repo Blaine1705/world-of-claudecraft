@@ -14,8 +14,8 @@ function encode(over: Partial<Entity>): Record<string, unknown> {
 }
 
 describe('the entity status wire bits', () => {
-  it('pins the three keys byte for byte', () => {
-    expect(ENTITY_STATUS_KEYS).toEqual(['ak', 'pvp', 'bty']);
+  it('pins the four keys byte for byte', () => {
+    expect(ENTITY_STATUS_KEYS).toEqual(['ak', 'pvp', 'bty', 'hbn']);
   });
 
   it('writes nothing for an entity with no status, so its record is unchanged', () => {
@@ -33,7 +33,11 @@ describe('the entity status wire bits', () => {
     const mirror = { afk: false, pvpFlag: false, bounty: false } as Entity;
     applyEntityStatusWire(mirror, encode({ afk: true, pvpFlag: true, bounty: true }));
     expect([mirror.afk, mirror.pvpFlag, mirror.bounty]).toEqual([true, true, true]);
+    applyEntityStatusWire(mirror, encode({ bounty: true, hillBounty: 23 }));
+    expect(encode({ bounty: true, hillBounty: 23 })).toEqual({ bty: 1, hbn: 23 });
+    expect([mirror.bounty, mirror.hillBounty]).toEqual([true, 23]);
     applyEntityStatusWire(mirror, encode({ pvpFlag: true }));
+    expect(mirror.hillBounty).toBeUndefined();
     expect([mirror.afk, mirror.pvpFlag, mirror.bounty]).toEqual([false, true, false]);
   });
 });

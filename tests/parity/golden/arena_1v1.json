@@ -73,7 +73,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1013,
-      "state": "ffecc162",
+      "state": "60a553a3",
       "events": "d4e598c3",
       "rng": {
         "draws": 781,
@@ -84,7 +84,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 1013,
-      "state": "fef9bbd5",
+      "state": "47b040c2",
       "events": "741638a5",
       "rng": {
         "draws": 965,
@@ -221,7 +221,8 @@
               0,
               0
             ],
-            "resetAtMs": 604805049
+            "resetAtMs": 604805049,
+            "weeklyBossUnlocks": {}
           },
           "worldQuestReplacements": {},
           "wyrmfallDaily": {}

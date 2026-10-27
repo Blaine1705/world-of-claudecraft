@@ -92,6 +92,11 @@ export const MODERATION_ACTIONS = [
   'gm_invisible',
   'gm_visible',
   'announce',
+  // The world quest block (src/sim/world_quest_block.ts): the lighter sanction
+  // for world quest botting, short of a ban. Reason REQUIRED on both arms, for
+  // the same recoverability reason as the Cheater mark.
+  'world_quests_block',
+  'world_quests_unblock',
 ] as const;
 export type ModerationActionKind = (typeof MODERATION_ACTIONS)[number];
 
@@ -113,7 +118,9 @@ export type InGameModerationAction =
 // run inside a caller's transaction or standalone.
 type Queryable = Pick<typeof pool, 'query'>;
 
-function recordModerationAction(
+// Exported for sibling sanction modules (server/world_quest_block_db.ts) whose
+// own transaction must commit the audit row atomically with the account write.
+export function recordModerationAction(
   db: Queryable,
   action: ModerationActionKind,
   params: {

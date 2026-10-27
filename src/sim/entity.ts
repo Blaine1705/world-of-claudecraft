@@ -22,7 +22,7 @@ import {
   membershipWeaponDisplayId,
   membershipWeaponItem,
 } from './membership_weapon';
-import { pvpFractionsFromRatings, pvpVitalityFromRating } from './pvp';
+import { countsWarfareRating, pvpFractionsFromRatings, pvpVitalityFromRating } from './pvp';
 import type {
   Entity,
   EquipSlot,
@@ -386,8 +386,11 @@ export function recalcPlayerStats(
     bonusCritRating += item.critRating ?? 0;
     bonusHasteRating += item.hasteRating ?? 0;
     bonusHitRating += item.hitRating ?? 0;
-    bonusPvpOffenseRating += item.pvpOffenseRating ?? 0;
-    bonusPvpDefenseRating += item.pvpDefenseRating ?? 0;
+    const warfareCounts = countsWarfareRating(slot, item);
+    if (warfareCounts) {
+      bonusPvpOffenseRating += item.pvpOffenseRating ?? 0;
+      bonusPvpDefenseRating += item.pvpDefenseRating ?? 0;
+    }
     if (item.stats) {
       s.str += item.stats.str ?? 0;
       s.agi += item.stats.agi ?? 0;
@@ -414,12 +417,14 @@ export function recalcPlayerStats(
       // healingPower: the permanent loot quality bake (loot_quality/core.ts)
       // and Dawn's Benediction (content/enchants.ts) both write this key.
       bonusHealPower += Number.isFinite(rolled.healingPower) ? rolled.healingPower : 0;
-      bonusPvpOffenseRating += Number.isFinite(rolled.pvpOffenseRating)
-        ? rolled.pvpOffenseRating
-        : 0;
-      bonusPvpDefenseRating += Number.isFinite(rolled.pvpDefenseRating)
-        ? rolled.pvpDefenseRating
-        : 0;
+      if (warfareCounts) {
+        bonusPvpOffenseRating += Number.isFinite(rolled.pvpOffenseRating)
+          ? rolled.pvpOffenseRating
+          : 0;
+        bonusPvpDefenseRating += Number.isFinite(rolled.pvpDefenseRating)
+          ? rolled.pvpDefenseRating
+          : 0;
+      }
       bonusCritRating += Number.isFinite(rolled.critRating) ? rolled.critRating : 0;
       bonusHasteRating += Number.isFinite(rolled.hasteRating) ? rolled.hasteRating : 0;
       // A Riftbound band's verdant gem line (rift/band_ladder.ts); no other

@@ -144,7 +144,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_gallery: {
     name: 'Galerie Válčení',
-    desc: 'Pět bojových sad Válčení, získaných kus po kuse za čest.',
+    desc: 'Pět bojových sad Válčení první sezóny, nyní prodávaných kus po kuse za zlato.',
   },
   conquerors_warfare_armory: {
     name: 'Zbrojnice Válčení',

@@ -36,7 +36,7 @@ export const MEMBERSHIP_ANNUAL_LETTER: LetterDef = {
   letterId: 'membership_annual_reward',
   senderName: 'The Ravenpost',
   subject: 'Your annual membership mount',
-  body: 'Your annual membership payment is complete. Your mount reins are enclosed. Keep the reins in your bags or bank to own this mount. It remains yours after membership expires. Riding skill is required.',
+  body: 'Your annual membership payment is complete. The Nightwing Chimaera is now unlocked for every character on your account, and its reins are enclosed. It stays yours after membership expires. Riding skill is required.',
 };
 
 // The one-time service letter. Sent to every character that has never been

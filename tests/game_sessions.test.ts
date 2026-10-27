@@ -990,6 +990,23 @@ describe('GameServer sessions', () => {
     expect(closePlaySession).toHaveBeenCalledWith(99, 1);
   });
 
+  it('captures friends-mode logout permissions before live account teardown', async () => {
+    const server = new GameServer();
+    const session = expectJoined(server.join(fakeWs(), 22, 202, 'PrivateLogout', 'warrior', null));
+    session.presenceMode = 'friends';
+    const friends = new Set([99]);
+    session.friendAccountIds = friends;
+    const social = (
+      server as unknown as { social: { announcePresence: (...args: unknown[]) => Promise<void> } }
+    ).social;
+    const announce = vi.spyOn(social, 'announcePresence').mockResolvedValue();
+    await server.leave(session, 'test');
+    friends.clear();
+    const logout = announce.mock.calls.find((call) => call[1] === false);
+    expect(logout?.[2]).toMatchObject({ presenceMode: 'friends', friendAccountIds: new Set([99]) });
+    announce.mockRestore();
+  });
+
   it('closes the session with the highest level reached for first-session activation', async () => {
     openPlaySession.mockReset();
     openPlaySession.mockResolvedValue(77);

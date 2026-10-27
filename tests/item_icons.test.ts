@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { validateAcceptedArtManifest } from '../scripts/lib/icon_asset_audit.mjs';
-import { SEASON2_SETS } from '../src/sim/content/pvp_honor_season2';
+import { SEASON2_JEWELRY_IDS, SEASON2_SETS } from '../src/sim/content/pvp_honor_season2';
 import { ITEMS } from '../src/sim/data';
 import type { ItemDef } from '../src/sim/types';
 import {
@@ -353,7 +353,7 @@ describe('item webp icons', () => {
     // Craterglass Stave.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 163.
     // + the membership Staff of Changing (PR 4281): 164.
-    expect(WEAPON_IMAGE_IDS.size).toBe(164);
+    expect(WEAPON_IMAGE_IDS.size).toBe(165); // restored feral Season 2 staff
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {

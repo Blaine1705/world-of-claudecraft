@@ -18,16 +18,26 @@
 // painted into its inner #hill-body and the mover chrome beside it survives
 // every rebuild. A host without the markup (a test layer) gets one minted.
 
+import { WORLD_PVP_MIN_LEVEL } from '../../../sim/pvp';
+import type { HillCalloutInfo } from '../../../world_api';
 import { durationText } from '../../duration_text';
 import { zoneDisplayName } from '../../entity_i18n';
 import { formatNumber, t } from '../../i18n';
 import type { PainterHostWriters } from '../../painter_host';
-import type { HillBarLive, HillBarView } from './hill_bar_view';
+import {
+  type HillBarLive,
+  type HillBarView,
+  hillCalloutToShow,
+  shouldAnnounceHillPvp,
+} from './hill_bar_view';
 
 export interface HillBarDeps {
   /** The HUD layer the strip mounts into (null before the HUD exists). */
   layer: () => HTMLElement | null;
   writers: PainterHostWriters;
+  /** Raise a PvP banner: the entry warning, or the announcer's call (a kill
+   *  streak or a shut down). */
+  banner?: (text: string) => void;
 }
 
 interface Slots {
@@ -50,6 +60,7 @@ export class HillBar {
   private slots: Slots | null = null;
   private lastSig = '';
   private lastView: HillBarLive | null = null;
+  private shownCalloutId: string | null = null;
 
   constructor(private readonly deps: HillBarDeps) {}
 
@@ -63,6 +74,14 @@ export class HillBar {
     }
     const root = this.ensureRoot();
     if (!root || !this.body) return;
+    if (shouldAnnounceHillPvp(this.lastView, view)) {
+      this.deps.banner?.(t('hudChrome.hill.pvpBanner'));
+    }
+    const call = hillCalloutToShow(this.shownCalloutId, view);
+    if (call) {
+      this.shownCalloutId = call.id;
+      this.deps.banner?.(hillCalloutText(call));
+    }
     if (view.sig !== this.lastSig) {
       this.lastSig = view.sig;
       this.build(this.body, view);
@@ -185,9 +204,11 @@ export class HillBar {
   }
 }
 
-/** The note for a viewer who does not count on the hill, or null. */
+/** Explain ineligibility, or warn that entering the active circle raises PvP. */
 function standingNote(view: HillBarLive): string | null {
-  return view.standing === 'raid' ? t('hudChrome.hill.standingRaid') : null;
+  if (view.standing === 'level')
+    return t('hudChrome.worldPvp.levelReq', { level: formatNumber(WORLD_PVP_MIN_LEVEL) });
+  return view.standing === 'raid' ? t('hudChrome.hill.standingRaid') : t('hudChrome.hill.pvpEntry');
 }
 
 function heldText(view: HillBarLive): string {
@@ -219,4 +240,13 @@ function esc(text: string): string {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+/** The announcer's line for one callout (the kill streak names are League of
+ *  Legends' calls, src/sim/pvp/hill_bounty_rules.ts). */
+export function hillCalloutText(call: HillCalloutInfo): string {
+  if (call.kind === 'shutDown') {
+    return t('hudChrome.hill.callout.shutDown', { killer: call.killer, victim: call.victim });
+  }
+  return t(`hudChrome.hill.callout.${call.kind}`, { name: call.killer });
 }
