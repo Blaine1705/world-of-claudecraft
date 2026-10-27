@@ -399,8 +399,8 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   // a being of the first flame in crystal and basalt (the vein is the Hearth,
   // never a forge), half sunk in the first wellspring at the back of the
   // Hearth. "The well of the first flame": Basalt Fist and its Molten Swells,
-  // Hearth Flare, two overflows, Hearthseeds, Wakefire, the Rolling Cinders,
-  // and on heroic its tearing free and the three spirits. Every number a
+  // Hearth Flare, two overflows, Hearthseeds, Wakefire and the Rolling
+  // Cinders (heroic adds the overflows' adds and the Seedflames). Every number a
   // SKETCH (unmeasured): 43,000 base (about 99,000 after the elite factor)
   // for a 4 to 5 minute fight at the bot raid's measured 400 to 460 a second,
   // like the other guardians. Its body reaches the wellspring's lip
@@ -492,9 +492,8 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
     color: 0xfff0b0,
   },
   // The Rolling Cinder: phase 3's great living fireball, walked by the
-  // encounter after its quarry. A ward while it rolls (a strike lands one
-  // point and knocks it back, heat_cinder_ward.ts); frozen on heroic's Quench
-  // Ice it can be killed.
+  // encounter after its quarry. A ward (a strike lands one point and knocks
+  // it back, heat_cinder_ward.ts): it cannot be killed.
   [HEAT_MOBS.cinder]: {
     id: HEAT_MOBS.cinder,
     name: 'Rolling Cinder',

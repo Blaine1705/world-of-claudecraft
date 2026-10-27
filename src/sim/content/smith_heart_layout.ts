@@ -279,7 +279,7 @@ export const GREAT_HEARTH = { x: -263, z: 0, halfWidth: 18 } as const;
 export const GIANT_ANVIL = { x: -236, z: 0, hw: 3.2, hd: 8.5, h: 9 } as const;
 /** The first wellspring (design doc 7.4): the pool of the first flame
  *  before the altar-stone, where the giant Guardian of the Heat stands sunk to
- *  its waist until heroic's last phase tears it free. `r` its burning lip
+ *  its waist the whole fight (it never leaves it). `r` its burning lip
  *  (the guardian's body radius too: melee strikes it from the shore). Its
  *  back lip clears the altar-stone's east face. Instance-local. */
 export const HEARTH_WELL = { x: -224, z: 0, r: 8 } as const;

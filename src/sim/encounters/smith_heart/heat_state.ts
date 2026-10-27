@@ -8,7 +8,6 @@ import type {
   HeatDifficulty,
   HeatPhase,
   HeatRiverState,
-  HeatSpirit,
   HeatStage,
   HeatZoneState,
 } from './heat_ids';
@@ -144,52 +143,6 @@ export interface HeatSprout {
   quarry: number | null;
 }
 
-/** The Quench's ice on the floor. */
-export interface HeatIce {
-  objectId: number;
-  x: number;
-  z: number;
-  life: number;
-}
-
-/** A Creeping Blaze, growing. */
-export interface HeatBlaze {
-  objectId: number;
-  x: number;
-  z: number;
-  r: number;
-  tick: number;
-}
-
-/** A Stone Root (ROOT_SPOTS index), ready or spent and regrowing. */
-export interface HeatRoot {
-  objectId: number;
-  spot: number;
-  ready: boolean;
-  regrow: number;
-}
-
-/** Heroic's phase 4: the three spirits and what they do. */
-export interface HeatSpirits {
-  ids: Record<HeatSpirit, number>;
-  iceIn: number;
-  rainIn: number;
-  blazeIn: number;
-  crushIn: number;
-  /** Salts of the hashed picks. */
-  ices: number;
-  rains: number;
-  blazes: number;
-  crushes: number;
-  ice: HeatIce[];
-  blaze: HeatBlaze[];
-  roots: HeatRoot[];
-  /** The Crushing Fist charging: seconds left and its tank. */
-  crush: { remaining: number; tankId: number | null } | null;
-  /** Seconds a Stone Root still holds the guardian. */
-  rooted: number;
-}
-
 export interface HeatFightState {
   kind: 'heat';
   difficulty: HeatDifficulty;
@@ -199,7 +152,7 @@ export interface HeatFightState {
   clock: number;
   phase: HeatPhase;
   stage: HeatStage;
-  /** Seconds left in a timed stage (sinking, rising, tearing). */
+  /** Seconds left in a timed stage (sinking, rising). */
   stageLeft: number;
   overflow: HeatOverflow | null;
   overflows: number;
@@ -232,7 +185,6 @@ export interface HeatFightState {
   marks: HeatMark[];
   trails: HeatPatch[];
   sprouts: HeatSprout[];
-  spirits: HeatSpirits | null;
   /** Wellspawn that reached the wellspring, and the hits they dealt. */
   feeds: number;
   /** Mechanic casts started (the hashed picks' salt). */

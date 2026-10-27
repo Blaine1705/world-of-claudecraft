@@ -1,7 +1,7 @@
 // The Guardian of the Heat (docs/design/raid/smith_heart.md section 7.4): the
 // Hearth's boss, a being of the first flame in crystal and basalt, "the well
-// of the first flame". It stands half sunk in the wellspring at the back of
-// the Hearth and never moves (until heroic's last phase); the raid fights on
+// of the first flame". A giant sunk to its waist in the wellspring at the
+// back of the Hearth, it never moves on any difficulty; the raid fights on
 // the shore in front of it.
 //
 //   Phase 1 (100-70)   Basalt Fist and its Molten Swells (heat_fist.ts),
@@ -17,20 +17,17 @@
 //                      Seedflames), Wakefire (heat_zones.ts), the fist.
 //   Phase 3 (40-0)     the Rolling Cinders (heat_cinders.ts), Wakefire, the
 //                      fist.
-//   Phase 4 (heroic,   it tears free of the wellspring and can be tanked
-//   10-0)              round the Hearth; the spirits of the other three
-//                      veins come (heat_spirits.ts): the Quench's ice freezes
-//                      the cinders, the Breath's storm-rain puts out the
-//                      blazes, the Hammer's roots stop the Crushing Fist.
 //   One wipe           the fight ends when the guardian stops fighting:
-//                      every bar, footprint, add, spirit and mark gone, the
-//                      wellspring calm, the guardian back in it.
+//                      every bar, footprint, add and mark gone, the
+//                      wellspring calm.
 //   Its fall           lights the Heat vein and the seal's quarter as before
 //                      (seal.ts reads the guardian's death).
 //
 // Difficulty: the claim's, with a dev switch for a run while the raid has no
-// heroic tier of its own; mythic is a prototype behind its own switch and,
-// for now, heroic whole (heat_ids.ts HEAT_DIFFICULTY).
+// heroic tier of its own. Heroic and mythic end with phase 3 like normal;
+// their pressure is the overflows' adds, the Seedflames, faster cinders and a
+// quarter more damage. Mythic is a prototype behind its own switch and, for
+// now, heroic whole (heat_ids.ts HEAT_DIFFICULTY, its mythicRule the seam).
 //
 // Deterministic: every pick is hashed or ordered; the only rng draws are the
 // damage rolls, in claim-player order. Every visible state rides existing
@@ -81,7 +78,6 @@ import {
   raidWarn,
 } from './heat_scope';
 import { clearSeeds, dropSeeds, stepSeeds } from './heat_seeds';
-import { clearSpirits, stepSpirits, summonSpirits } from './heat_spirits';
 import type { HeatFightState } from './heat_state';
 import { heatSay } from './heat_voice';
 import {
@@ -173,7 +169,6 @@ function freshState(difficulty: HeatDifficulty): HeatFightState {
     marks: [],
     trails: [],
     sprouts: [],
-    spirits: null,
     feeds: 0,
     casts: 0,
     said: {},
@@ -211,7 +206,6 @@ function setWell(ctx: SimContext, inst: InstanceSlot, state: HeatWellState): voi
 function stageLength(stage: HeatStage): number {
   if (stage === 'sinking') return T.sinkSeconds;
   if (stage === 'rising') return T.riseSeconds;
-  if (stage === 'tearing') return T.tearFreeCast;
   return 0;
 }
 
@@ -232,8 +226,8 @@ function showState(s: HeatScope): void {
   });
 }
 
-/** Out of reach while it sinks, stays under, rises or tears free: nobody's
- *  target, nothing harms it, no swing. The mob AI re-hostiles it before the
+/** Out of reach while it sinks, stays under or rises: nobody's target,
+ *  nothing harms it, no swing. The mob AI re-hostiles it before the
  *  encounter's pass, so this runs every tick. */
 function holdStance(s: HeatScope): void {
   const b = s.boss;
@@ -246,8 +240,8 @@ function holdStance(s: HeatScope): void {
     b.hostile = true;
     b.damageImmune = false;
   }
-  // Half sunk in the wellspring: it never steps out (phase 4 walks free).
-  if (HEAT_PHASE_KIT[s.st.phase].sunk || s.st.stage !== 'fight') {
+  // Sunk in the wellspring: it never steps out.
+  {
     const o = s.ctx.instanceOriginOf(s.inst);
     const wx = o.x + HEARTH_WELL.x;
     const wz = o.z + HEARTH_WELL.z;
@@ -260,12 +254,12 @@ function holdStance(s: HeatScope): void {
     }
   }
   // The next threshold holds (an overflow is never skipped by a burst).
-  const floor = s.st.stage === 'fight' ? phaseFloor(s.st.phase, s.rules.tearsFree) : null;
+  const floor = s.st.stage === 'fight' ? phaseFloor(s.st.phase) : null;
   const want = floor === null ? undefined : Math.ceil(b.maxHp * floor);
   if (b.damageFloorHp !== want) b.damageFloorHp = want;
 }
 
-// ---- the overflows and the tearing free ---------------------------------------------------
+// ---- the overflows ---------------------------------------------------
 
 /** The guardian sinks and the Hearth overflows (`n` 1 at 70 percent, 2 at
  *  40). Exported for the dev trigger. */
@@ -284,8 +278,7 @@ export function beginOverflow(s: HeatScope, n: 1 | 2): void {
   heatSay(s, s.boss, n === 1 ? 'sink' : 'sinkAgain');
 }
 
-/** The phase after an overflow or the tearing free begins: its clocks
- *  fresh. */
+/** The phase after an overflow begins: its clocks fresh. */
 function enterPhase(s: HeatScope, phase: HeatPhase): void {
   const st = s.st;
   st.phase = phase;
@@ -336,45 +329,16 @@ function stepOverflow(s: HeatScope): void {
   }
 }
 
-/** Heroic at 10 percent: it tears itself free of the wellspring (a planted
- *  bar), and the spirits come. Exported for the dev trigger. */
-export function beginTearFree(s: HeatScope): void {
-  const st = s.st;
-  clearFist(s);
-  clearZones(s);
-  st.bar = null;
-  st.stage = 'tearing';
-  st.stageLeft = T.tearFreeCast;
-  s.st.gap = 0;
-  // A planted bar every client mirrors.
-  st.casts++;
-  st.bar = { castId: HEAT_CASTS.tearFree, at: { ...s.boss.pos }, facing: s.boss.facing };
-  s.boss.castingAbility = HEAT_CASTS.tearFree;
-  s.boss.castTotal = T.tearFreeCast;
-  s.boss.castRemaining = T.tearFreeCast;
-  s.boss.castTargetId = null;
-  summonSpirits(s);
-  raidWarn(s, s.boss, 'tearFree', 'The guardian tears itself free of the wellspring!');
-  heatSay(s, s.boss, 'tearFree');
-}
-
-function landTearFree(s: HeatScope): void {
-  setWell(s.ctx, s.inst, 'torn');
-  cueOnBoss(s, HEAT_CUES.tearFree);
-  enterPhase(s, 4);
-}
-
 // ---- the bar ------------------------------------------------------------------------------
 
 function landBar(s: HeatScope, castId: string): void {
   s.st.bar = null;
   s.st.gap = T.barGap;
   if (castId === HEAT_CASTS.fist) landFist(s);
-  else if (castId === HEAT_CASTS.tearFree) landTearFree(s);
 }
 
 /** The bar in flight: planted, counting down, landing. A bar cut by anything
- *  still lands (the fist's spot never strands, it always tears free). */
+ *  still lands (the fist's spot never strands). */
 function stepBar(s: HeatScope): void {
   s.st.gap = Math.max(0, s.st.gap - DT);
   const bar = s.st.bar;
@@ -392,16 +356,15 @@ function stepBar(s: HeatScope): void {
   landBar(s, bar.castId);
 }
 
-/** The thresholds: an overflow or the tearing free, once each. */
+/** The thresholds: each overflow, once. */
 function watchThresholds(s: HeatScope): void {
   const st = s.st;
   if (st.stage !== 'fight' || st.bar) return;
-  const floor = phaseFloor(st.phase, s.rules.tearsFree);
+  const floor = phaseFloor(st.phase);
   if (floor === null) return;
   if (s.boss.hp > Math.ceil(s.boss.maxHp * floor)) return;
   if (st.phase === 1) beginOverflow(s, 1);
   else if (st.phase === 2) beginOverflow(s, 2);
-  else if (st.phase === 3) beginTearFree(s);
 }
 
 /** The phase's mechanics, each on its clock. */
@@ -409,7 +372,7 @@ function startMechanics(s: HeatScope): void {
   const st = s.st;
   const kit = HEAT_PHASE_KIT[st.phase];
   const live = st.stage === 'fight';
-  stepFlare(s, !live ? 'none' : kit.flare ? 'all' : kit.sunk ? 'target' : 'none');
+  stepFlare(s, !live ? 'none' : kit.flare ? 'all' : 'target');
   if (!live) return;
   if (kit.seeds) {
     st.seedTimer -= DT;
@@ -439,8 +402,6 @@ const PLAYER_MARKS = [
   HEAT_AURAS.kindling,
   HEAT_AURAS.trail,
   HEAT_AURAS.hunted,
-  HEAT_AURAS.stormRain,
-  HEAT_AURAS.crushMark,
 ] as const;
 
 /** Everything the fight put on the floor goes. */
@@ -457,7 +418,6 @@ function clearFight(
     clearSeeds(s);
     clearCinders(s);
     clearOverflowAdds(s);
-    clearSpirits(s);
     clearRivers(s, st.overflow);
   }
   // Every add the fight raised, dead or alive.
@@ -466,10 +426,8 @@ function clearFight(
     if (e && HEAT_ADD_IDS.has(e.templateId)) dropHeatMob({ ctx, inst, boss }, id);
   }
   for (const p of hearthListeners(ctx, inst)) for (const id of PLAYER_MARKS) dropAura(p, id);
-  clearCastIf(boss, HEAT_CASTS.fist, HEAT_CASTS.tearFree);
+  clearCastIf(boss, HEAT_CASTS.fist);
   dropAura(boss, HEAT_AURAS.state);
-  dropAura(boss, HEAT_AURAS.crushing);
-  dropAura(boss, HEAT_AURAS.rooted);
   boss.hostile = true;
   boss.damageImmune = false;
   boss.damageFloorHp = undefined;
@@ -533,7 +491,6 @@ export function tickHeatGuardian(ctx: SimContext, inst: InstanceSlot): void {
   stepKeepers(s);
   stepMarks(s);
   stepTrails(s);
-  stepSpirits(s);
   syncHunted(s);
   watchThresholds(s);
   startMechanics(s);
@@ -555,9 +512,7 @@ export function heatScopeForDev(ctx: SimContext, inst: InstanceSlot): HeatScope 
 /** Jump the fight to phase `phase` (its health at the phase's top), every
  *  footprint of the old one cleared. Returns the reply. */
 function jumpToPhase(s: HeatScope, phase: number): string | null {
-  if (phase !== 1 && phase !== 2 && phase !== 3 && phase !== 4) return null;
-  if (phase === 4 && !s.rules.tearsFree)
-    return 'Phase 4 is heroic only (/dev heart heat heroic first).';
+  if (phase !== 1 && phase !== 2 && phase !== 3) return null;
   const b = s.boss;
   clearFist(s);
   clearZones(s);
@@ -568,14 +523,11 @@ function jumpToPhase(s: HeatScope, phase: number): string | null {
     1: 1,
     2: T.overflowOneAt - 0.01,
     3: T.overflowTwoAt - 0.01,
-    4: T.tearFreeAt - 0.01,
   }[phase];
   b.hp = Math.max(1, Math.floor(b.maxHp * top));
-  setWell(s.ctx, s.inst, phase === 4 ? 'torn' : 'calm');
+  setWell(s.ctx, s.inst, 'calm');
   enterPhase(s, phase);
   s.st.fistTimer = T.fistFirst;
-  if (phase === 4) summonSpirits(s);
-  else clearSpirits(s);
   return `The Guardian of the Heat fights in phase ${phase}.`;
 }
 
@@ -639,10 +591,6 @@ export function heatDevTrigger(
   }
   if (verb === 'ember' || verb === 'cinder')
     return callCinder(s) ? 'A Rolling Cinder falls.' : 'No Rolling Cinder can fall now.';
-  if (verb === 'spirits')
-    return summonSpirits(s)
-      ? 'The spirits of the Quench, the Breath and the Hammer come to the Hearth.'
-      : 'The spirits are already here.';
   return null;
 }
 
@@ -656,5 +604,5 @@ export function heatReadout(ctx: SimContext, inst: InstanceSlot, pid: number): s
   const me = ctx.entities.get(pid);
   const grip = me ? (auraOf(me, HEAT_AURAS.grip)?.stacks ?? 0) : 0;
   const over = st.overflow ? `, overflow ${st.overflow.n} (${st.overflow.clock.toFixed(0)} s)` : '';
-  return `${head}; phase ${st.phase} (${st.stage}${over}), next fist in ${Math.max(0, st.fistTimer).toFixed(0)} s, seeds ${st.seeds.length}, zones ${st.zones.length}, cinders ${st.cinders.length}, Wellspawn ${st.spawn.length}, keepers ${st.keepers.length}, fed ${st.feeds}, spirits ${st.spirits ? 'here' : 'away'}, your Cinder Grip ${grip}.`;
+  return `${head}; phase ${st.phase} (${st.stage}${over}), next fist in ${Math.max(0, st.fistTimer).toFixed(0)} s, seeds ${st.seeds.length}, zones ${st.zones.length}, cinders ${st.cinders.length}, Wellspawn ${st.spawn.length}, keepers ${st.keepers.length}, fed ${st.feeds}, your Cinder Grip ${grip}.`;
 }

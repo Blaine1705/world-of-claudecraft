@@ -62,14 +62,13 @@
 //                                    it), reset (whole again in its
 //                                    wellspring, the Hearth calm), heroic
 //                                    [on|off] or mythic [on|off] (this run's
-//                                    fight), phase <1-4> (jump to a phase; 4
-//                                    is heroic only), intermission (it sinks
-//                                    and the Hearth overflows now), fist
-//                                    (Basalt Fist where I stand), flare
-//                                    (Hearth Flare now), seeds (Hearthseeds
-//                                    fall), zones (a Wakefire run), ember (a
-//                                    Rolling Cinder falls), spirits (the three
-//                                    spirits come now)
+//                                    fight), phase <1-3> (jump to a phase),
+//                                    intermission (it sinks and the Hearth
+//                                    overflows now), fist (Basalt Fist where
+//                                    I stand), flare (Hearth Flare now),
+//                                    seeds (Hearthseeds fall), zones (a
+//                                    Wakefire run), ember (a Rolling Cinder
+//                                    falls)
 //
 // Areas: cleft, gallery, pit (or hammer), balcony, ring, ringse, ringsw,
 // breath, bridge, cornice (or breathboss), quench, ice, lake (or quenchboss),
@@ -163,7 +162,7 @@ const GUARDIAN_IDS: ReadonlySet<string> = new Set([
 const COUNCIL_IDS: ReadonlySet<string> = new Set(COUNCIL_TEMPLATE_IDS);
 
 const HELP =
-  '[dev] /dev heart enter [normal] | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|guardian|slabwright|singer|council|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | arrival | reset | council [pull|reset|heroic [on|off]|mythic [on|off]|energy <n>|wrath|weight|wake|rock|bolt|song|resonance [n]|soul <guardian|slabwright|singer>|soulpip <n>] | breath [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blow [deg|n|e|s|w]|calm|circle|inhale|chain|eye|conductor|tornado|gust [deg]] | quench [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blades|cold <n>|burst|hole|crack|breath|echo [strike]|dance] | heat [pull|reset|heroic [on|off]|mythic [on|off]|phase <1-4>|intermission|fist|flare|seeds|zones|ember|spirits]';
+  '[dev] /dev heart enter [normal] | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|guardian|slabwright|singer|council|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | arrival | reset | council [pull|reset|heroic [on|off]|mythic [on|off]|energy <n>|wrath|weight|wake|rock|bolt|song|resonance [n]|soul <guardian|slabwright|singer>|soulpip <n>] | breath [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blow [deg|n|e|s|w]|calm|circle|inhale|chain|eye|conductor|tornado|gust [deg]] | quench [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blades|cold <n>|burst|hole|crack|breath|echo [strike]|dance] | heat [pull|reset|heroic [on|off]|mythic [on|off]|phase <1-3>|intermission|fist|flare|seeds|zones|ember]';
 
 /** Where `/dev heart breath pull` sets the player down: on the Cornice, a
  *  few strides west of the guardian. */

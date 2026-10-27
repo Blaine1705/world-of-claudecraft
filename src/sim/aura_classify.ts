@@ -100,12 +100,11 @@ const DEBUFF_DISPLAY_AURA_IDS: ReadonlySet<string> = new Set([
   'heart_quench_cold',
   // The Guardian of the Heat's marks (encounters/smith_heart/heat_ids.ts): a
   // Wellkeeper's Kindling Mark and the Cinder Trail it becomes, the Hunted of
-  // a Rolling Cinder's quarry, the tank the Crushing Fist is aimed at, and a
-  // cinder's Cooling Crust (on its frame: it cannot be knocked back yet).
+  // a Rolling Cinder's quarry, and a cinder's Cooling Crust (on its frame: it
+  // cannot be knocked back yet).
   'heart_heat_kindling',
   'heart_heat_trailing',
   'heart_heat_hunted',
-  'heart_heat_crush_mark',
   'heart_heat_crust',
 ]);
 

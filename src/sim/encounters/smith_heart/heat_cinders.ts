@@ -1,5 +1,5 @@
 // The Guardian of the Heat's Rolling Cinders (docs/design/raid/smith_heart.md
-// section 7.4), phase 3 (and heroic's phase 4).
+// section 7.4), phase 3.
 //
 //   The fall       every 45 s (first 8 s into phase 3) a great living
 //                  fireball falls on the shore: 2 s of warning where it will
@@ -13,10 +13,9 @@
 //   Striking it    a cinder is a ward (heat_cinder_ward.ts): any strike lands
 //                  one point and knocks it 6 yd back (straight away from its
 //                  quarry), then Cooling Crust holds it against knockback for
-//                  5 s. The raid assigns who strikes it and when.
-//   Rimelocked     heroic's phase 4: one that rolls onto the Quench's ice
-//                  freezes (8 s, a stun, three times the damage taken) and the
-//                  raid can kill it (heat_spirits.ts lays the ice).
+//                  5 s. The raid assigns who strikes it and when. Nothing
+//                  kills it: it rolls on until it reaches someone or the
+//                  fight ends.
 //
 // Deterministic: the quarry and the landing are hashed; the only rng draws
 // are the damage rolls, in player order.
@@ -46,7 +45,6 @@ import {
   type HeatScope,
   liveEntity,
   livePlayers,
-  local,
   pickPlayers,
   putMarker,
   raidWarn,
@@ -173,7 +171,7 @@ function burstCinder(s: HeatScope, cinder: Entity, quarry: Entity): Entity[] {
 /** A strike knocks the cinder back straight away from its quarry, and its
  *  crust hardens. Exported for the tests. */
 export function knockCinder(s: HeatScope, cinder: Entity, c: HeatCinder): boolean {
-  if (auraOf(cinder, HEAT_AURAS.crust) || auraOf(cinder, HEAT_AURAS.rimelocked)) return false;
+  if (auraOf(cinder, HEAT_AURAS.crust)) return false;
   const q = liveEntity(s, c.quarry);
   let ux = -Math.sin(cinder.facing);
   let uz = -Math.cos(cinder.facing);
@@ -195,38 +193,7 @@ export function knockCinder(s: HeatScope, cinder: Entity, c: HeatCinder): boolea
   return true;
 }
 
-/** Freeze a cinder on the Quench's ice: a stun and three times the damage. */
-export function rimelock(s: HeatScope, cinder: Entity): void {
-  dropAura(cinder, HEAT_AURAS.rimelocked);
-  cinder.auras.push({
-    id: HEAT_AURAS.rimelocked,
-    name: HEAT_NAMES.rimelocked,
-    kind: 'stun',
-    remaining: T.frozenSeconds,
-    duration: T.frozenSeconds,
-    value: 0,
-    sourceId: s.boss.id,
-    school: 'frost',
-    undispellable: true,
-    unbreakableControl: true,
-  });
-  dropAura(cinder, `${HEAT_AURAS.rimelocked}_vuln`);
-  cinder.auras.push({
-    id: `${HEAT_AURAS.rimelocked}_vuln`,
-    name: HEAT_NAMES.rimelocked,
-    kind: 'vulnerability',
-    remaining: T.frozenSeconds,
-    duration: T.frozenSeconds,
-    value: T.frozenVuln,
-    sourceId: s.boss.id,
-    school: 'frost',
-    undispellable: true,
-  });
-  const here = local(s.ctx, s.inst, cinder);
-  cueAt(s, HEAT_CUES.freeze, here.x, here.z, 2.5, 'frost');
-}
-
-/** One cinder's tick: struck back, frozen, hunting, reaching. Returns false
+/** One cinder's tick: struck back, hunting, reaching. Returns false
  *  once it is gone. */
 function stepCinder(s: HeatScope, c: HeatCinder): boolean {
   const e = liveEntity(s, c.id);
@@ -235,7 +202,6 @@ function stepCinder(s: HeatScope, c: HeatCinder): boolean {
   e.swingTimer = Math.max(e.swingTimer, 0.6);
   if (e.hp < c.hpSeen - 1e-9) knockCinder(s, e, c);
   c.hpSeen = e.hp;
-  if (auraOf(e, HEAT_AURAS.rimelocked)) return true;
   const quarry = liveEntity(s, c.quarry);
   if (!quarry || !s.players.includes(quarry)) {
     c.quarry = null;

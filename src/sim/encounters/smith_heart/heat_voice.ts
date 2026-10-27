@@ -1,4 +1,4 @@
-// What the Guardian of the Heat and the three spirits SAY (docs/design/raid/
+// What the Guardian of the Heat SAYS (docs/design/raid/
 // smith_heart.md section 7.4): yells to every player near the Hearth,
 // carrying their catalog key (`hudChrome.heatGuardian.say.<moment>`) so the
 // client renders them through t(), with the English as the fallback and as
@@ -14,10 +14,6 @@
 //   seeds      the Hearthseeds fall (at most once in SAY_EVERY)
 //   zones      Wakefire's first run
 //   cinder     a Rolling Cinder falls (at most once in SAY_EVERY)
-//   tearFree   heroic: it tears free of the wellspring
-//   crush      heroic: the Crushing Fist (at most once in SAY_EVERY)
-//   quench, breath, hammer   the three spirits arrive (each its own line,
-//              said from its own post)
 //   wipe       the raid lies still in the Hearth
 //   death      its fall
 //
@@ -37,11 +33,6 @@ export type HeatMoment =
   | 'seeds'
   | 'zones'
   | 'cinder'
-  | 'tearFree'
-  | 'crush'
-  | 'quench'
-  | 'breath'
-  | 'hammer'
   | 'wipe'
   | 'death';
 
@@ -57,11 +48,6 @@ export const HEAT_LINES: Readonly<Record<HeatMoment, string>> = {
   seeds: 'Every spark I scatter takes root.',
   zones: 'The Hearth wakes beneath your feet.',
   cinder: 'Run, little ember. The flame is hungry.',
-  tearFree: 'No more waiting in the well. I come for you myself!',
-  crush: 'This fist will break the mountain itself.',
-  quench: 'The cold remembers you. Let my ice bind its embers.',
-  breath: 'Take the storm-rain. Put its fire out.',
-  hammer: 'Stand on the stone. The mountain will hold it.',
   wipe: 'Ash, all of you. The Hearth burns on.',
   death: 'The flame... sinks back... into the stone. Carry it well.',
 };
@@ -74,11 +60,11 @@ export function heatLineKey(moment: HeatMoment): string {
 /** Seconds between two of the repeating lines. */
 export const HEAT_SAY_EVERY = 45;
 
-const REPEATING: ReadonlySet<HeatMoment> = new Set(['fist', 'rise', 'seeds', 'cinder', 'crush']);
+const REPEATING: ReadonlySet<HeatMoment> = new Set(['fist', 'rise', 'seeds', 'cinder']);
 
 /**
- * `from` (the guardian, or a spirit's object) says its `moment` line, if it
- * may now. Returns true when it spoke.
+ * The guardian (embodied by `from`) says its `moment` line, if it may now.
+ * Returns true when it spoke.
  */
 export function heatSay(
   s: Pick<HeatScope, 'ctx' | 'inst' | 'st'>,

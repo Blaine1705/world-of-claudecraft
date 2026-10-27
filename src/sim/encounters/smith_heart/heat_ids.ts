@@ -19,16 +19,15 @@
 // existing entity fields):
 //   - the guardian's phase and stage: an aura on it (`value` the phase,
 //     `value2` the stage, its `remaining` and `duration` the stage's clock),
-//     its bars (cast ids below), its Crushing Fist and Rooted in Stone auras;
+//     its bar (the cast id below);
 //   - the wellspring: a claim object whose template carries its state;
 //   - every footprint (the fist's spot, the swell lanes and their waves, the
 //     overflow's rivers, the seeds, the zones, a cinder's fall and scorch,
-//     the trails, the ice, the blazes, the stone roots): objects, a radius or
+//     the trails): objects, a radius or
 //     a half width in `scale`, a direction in `facing`, a state and its
 //     length in the template;
 //   - the adds (the Wellspawn, the Wellkeepers, the Seedflames, the Rolling
 //     Cinders): mobs, and the marks and hunts they lay as auras;
-//   - the spirits: objects at their posts;
 //   - the moments as `spellfx` cues (HEAT_CUES).
 
 /** The guardian (template id, frozen: its death lights the Heat vein). */
@@ -41,13 +40,11 @@ export const HEAT_CASTS = {
   /** Basalt Fist: the crystal-and-basalt fist rises over a spot on the shore
    *  and slams it (planted, its facing locked on the spot). */
   fist: 'heart_heat_fist',
-  /** Heroic's last phase: it tears itself free of the wellspring. */
-  tearFree: 'heart_heat_tear_free',
 } as const;
 
 /** The auras the fight puts on players, adds and the guardian. */
 export const HEAT_AURAS = {
-  /** On the guardian: its phase (`value` 1 to 4) and stage (`value2`, see
+  /** On the guardian: its phase (`value` 1 to 3) and stage (`value2`, see
    *  HEAT_STAGES), the stage's clock in `remaining` and `duration`. */
   state: 'heart_heat_state',
   /** Hearth Flare's mark: more Fire (and other magic) damage taken. */
@@ -63,19 +60,6 @@ export const HEAT_AURAS = {
   hunted: 'heart_heat_hunted',
   /** On a Rolling Cinder: struck back, no knockback moves it for a while. */
   crust: 'heart_heat_crust',
-  /** On a Rolling Cinder: frozen on the Quench's ice (a stun, and more
-   *  damage taken). */
-  rimelocked: 'heart_heat_rimelocked',
-  /** The Breath's spirit's blessing: this player puts out Creeping Blaze and
-   *  takes none of it. */
-  stormRain: 'heart_heat_storm_rain',
-  /** On the guardian (heroic's last phase): its fist is empowered; drag it
-   *  across a Stone Root before it lands. */
-  crushing: 'heart_heat_crushing',
-  /** On the tank the Crushing Fist is aimed at. */
-  crushMark: 'heart_heat_crush_mark',
-  /** On the guardian: a Stone Root holds it (the Crushing Fist misses). */
-  rooted: 'heart_heat_rooted',
 } as const;
 
 /** The guardian's stages (its state aura's `value2`). */
@@ -84,13 +68,12 @@ export const HEAT_STAGES = {
   sinking: 1,
   under: 2,
   rising: 3,
-  tearing: 4,
 } as const;
 export type HeatStage = keyof typeof HEAT_STAGES;
 
 /** The fight's object templates (a radius or a half width rides `scale`). */
 export const HEAT_OBJECTS = {
-  /** The first wellspring, a claim object: `<prefix><calm|over|torn>`. */
+  /** The first wellspring, a claim object: `<prefix><calm|over>`. */
   wellPrefix: 'sh_heat_well_',
   /** Basalt Fist's spot: `<prefix><tenths>` of warning. */
   fistPrefix: 'sh_heat_fist_',
@@ -113,14 +96,6 @@ export const HEAT_OBJECTS = {
   scorchPrefix: 'sh_heat_scorch_',
   /** A Cinder Trail patch: `<prefix><tenths>` of its life. */
   trailPrefix: 'sh_heat_trail_',
-  /** A spirit at its post: `<prefix><quench|breath|hammer>`. */
-  spiritPrefix: 'sh_heat_spirit_',
-  /** The Quench's ice: `<prefix><tenths>` of its life. */
-  icePrefix: 'sh_heat_ice_',
-  /** Creeping Blaze (its radius in `scale`, growing). */
-  blaze: 'sh_heat_blaze',
-  /** A Stone Root: `<prefix><ready|spent>`. */
-  rootPrefix: 'sh_heat_root_',
 } as const;
 
 /** The spellfx ability ids of the fight's moments. */
@@ -159,26 +134,6 @@ export const HEAT_CUES = {
   cinderKnock: 'heart_heat_cinder_knock',
   /** A Rolling Cinder reaches its quarry and bursts (spellfxAt). */
   cinderBurst: 'heart_heat_cinder_burst',
-  /** A Rolling Cinder freezes on the Quench's ice (spellfxAt). */
-  freeze: 'heart_heat_freeze',
-  /** It tears free of the wellspring (spellfx 'nova' on it). */
-  tearFree: 'heart_heat_tear_free',
-  /** The three spirits arrive (spellfx 'nova' on the guardian). */
-  spirits: 'heart_heat_spirits',
-  /** The Quench's spirit lays its ice (spellfxAt). */
-  ice: 'heart_heat_ice',
-  /** The Breath's spirit blesses a player (spellfx 'beam', spirit to them). */
-  rain: 'heart_heat_rain',
-  /** A blessed player puts out a Creeping Blaze (spellfxAt). */
-  douse: 'heart_heat_douse',
-  /** A Stone Root rises (spellfxAt). */
-  root: 'heart_heat_root',
-  /** The fist is empowered (spellfx 'nova' on the guardian). */
-  crush: 'heart_heat_crush',
-  /** A Stone Root catches the guardian: the Crushing Fist misses. */
-  rooted: 'heart_heat_rooted',
-  /** The Crushing Fist lands on the tank (spellfx 'burst' on them). */
-  crushLand: 'heart_heat_crush_land',
   /** The fight is over: the wellspring settles (spellfx 'nova'). */
   settle: 'heart_heat_settle',
 } as const;
@@ -222,16 +177,6 @@ export const HEAT_NAMES = {
   cinderLand: 'Cinder Scorch',
   hunted: 'Hunted',
   crust: 'Cooling Crust',
-  rimelocked: 'Rimelocked',
-  ice: 'Quench Ice',
-  stormRain: 'Storm-Rain',
-  blaze: 'Creeping Blaze',
-  root: 'Stone Root',
-  crushing: 'Crushing Fist',
-  rooted: 'Rooted in Stone',
-  spiritQuench: 'Spirit of the Quench',
-  spiritBreath: 'Spirit of the Breath',
-  spiritHammer: 'Spirit of the Hammer',
 } as const;
 
 // ---- difficulty -----------------------------------------------------------------------
@@ -249,8 +194,6 @@ export interface HeatDifficultyRules {
   overflowAdds: boolean;
   /** A Hearthseed's burst hatches a Seedflame. */
   seedHatch: boolean;
-  /** At 10 percent it tears free: phase 4, the three spirits. */
-  tearsFree: boolean;
   /** Players a Falling Cinder volley strikes. */
   bolts: number;
   /** A Rolling Cinder's speed (yards a second; a player runs 7). */
@@ -264,7 +207,6 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     damageMult: 1,
     overflowAdds: false,
     seedHatch: false,
-    tearsFree: false,
     bolts: 2,
     cinderSpeed: 3.2,
     mythicRule: null,
@@ -273,7 +215,6 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     damageMult: 1.25,
     overflowAdds: true,
     seedHatch: true,
-    tearsFree: true,
     bolts: 3,
     cinderSpeed: 4.4,
     mythicRule: null,
@@ -283,15 +224,15 @@ export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRule
     damageMult: 1.25,
     overflowAdds: true,
     seedHatch: true,
-    tearsFree: true,
     bolts: 3,
     cinderSpeed: 4.4,
     mythicRule: null,
   },
 };
 
-/** The phases (1 to 4) and which of the fight's mechanics run in each. */
-export type HeatPhase = 1 | 2 | 3 | 4;
+/** The phases (1 to 3, on every difficulty: the guardian never leaves the
+ *  wellspring) and which of the fight's mechanics run in each. */
+export type HeatPhase = 1 | 2 | 3;
 
 export interface HeatPhaseKit {
   fist: boolean;
@@ -299,15 +240,12 @@ export interface HeatPhaseKit {
   seeds: boolean;
   zones: boolean;
   cinders: boolean;
-  /** The guardian stands in the wellspring (heroic's phase 4 walks free). */
-  sunk: boolean;
 }
 
 export const HEAT_PHASE_KIT: Readonly<Record<HeatPhase, HeatPhaseKit>> = {
-  1: { fist: true, flare: true, seeds: false, zones: false, cinders: false, sunk: true },
-  2: { fist: true, flare: false, seeds: true, zones: true, cinders: false, sunk: true },
-  3: { fist: true, flare: false, seeds: false, zones: true, cinders: true, sunk: true },
-  4: { fist: false, flare: false, seeds: false, zones: false, cinders: true, sunk: false },
+  1: { fist: true, flare: true, seeds: false, zones: false, cinders: false },
+  2: { fist: true, flare: false, seeds: true, zones: true, cinders: false },
+  3: { fist: true, flare: false, seeds: false, zones: true, cinders: true },
 };
 
 // ---- tuning (SKETCH, unmeasured) ------------------------------------------------------
@@ -316,7 +254,6 @@ export const HEAT_TUNING = {
   // The phases (fractions of its health).
   overflowOneAt: 0.7,
   overflowTwoAt: 0.4,
-  tearFreeAt: 0.1,
   // The overflows.
   sinkSeconds: 2.5,
   riseSeconds: 3,
@@ -426,7 +363,7 @@ export const HEAT_TUNING = {
   zoneMax: 1000,
   zoneBurnMin: 220,
   zoneBurnMax: 260,
-  // Phase 3 (and 4): the Rolling Cinders.
+  // Phase 3: the Rolling Cinders.
   cinderFirst: 8,
   cinderEvery: 45,
   cinderFallWarn: 2,
@@ -449,39 +386,6 @@ export const HEAT_TUNING = {
   cinderCap: 6,
   /** Its quarry gone, it picks another after this pause. */
   cinderRetarget: 1.5,
-  /** Rimelocked: frozen this long, taking (1 + this) times the damage. */
-  frozenSeconds: 8,
-  frozenVuln: 2,
-  // Heroic's phase 4: the tearing free and the three spirits.
-  tearFreeCast: 4,
-  iceFirst: 4,
-  iceEvery: 15,
-  iceCount: 2,
-  iceR: 3.5,
-  iceLife: 40,
-  iceCap: 6,
-  rainFirst: 3,
-  rainEvery: 20,
-  rainCount: 3,
-  rainSeconds: 20,
-  blazeFirst: 6,
-  blazeEvery: 6,
-  blazeStartR: 2,
-  blazeGrow: 0.35,
-  blazeMaxR: 7,
-  blazeCap: 8,
-  blazeTick: 0.5,
-  blazeMin: 110,
-  blazeMax: 130,
-  rootCount: 4,
-  rootR: 3.5,
-  rootRegrow: 10,
-  crushFirst: 12,
-  crushEvery: 50,
-  crushSeconds: 5,
-  rootedSeconds: 4,
-  crushMin: 9000,
-  crushMax: 9500,
   /** Seconds of plain melee after a bar lands before the next begins. */
   barGap: 1.2,
 } as const;
@@ -498,11 +402,10 @@ export function heatHash(a: number, b: number): number {
 
 /** The health share the guardian cannot be pushed past in `phase` (the next
  *  threshold, so an overflow is never skipped), or null when none. */
-export function phaseFloor(phase: HeatPhase, tearsFree: boolean): number | null {
+export function phaseFloor(phase: HeatPhase): number | null {
   const T = HEAT_TUNING;
   if (phase === 1) return T.overflowOneAt;
   if (phase === 2) return T.overflowTwoAt;
-  if (phase === 3) return tearsFree ? T.tearFreeAt : null;
   return null;
 }
 
@@ -555,15 +458,15 @@ export function heatTimedOf(prefix: string, templateId: string): number | null {
 }
 
 /** The wellspring's states: calm (the guardian in it), overflowing (an
- *  overflow), torn (heroic's phase 4: the guardian free of it). */
-export type HeatWellState = 'calm' | 'over' | 'torn';
+ *  overflow). */
+export type HeatWellState = 'calm' | 'over';
 export function wellTemplate(state: HeatWellState): string {
   return `${HEAT_OBJECTS.wellPrefix}${state}`;
 }
 export function wellOf(templateId: string): HeatWellState | null {
   if (!templateId.startsWith(HEAT_OBJECTS.wellPrefix)) return null;
   const s = templateId.slice(HEAT_OBJECTS.wellPrefix.length);
-  return s === 'calm' || s === 'over' || s === 'torn' ? s : null;
+  return s === 'calm' || s === 'over' ? s : null;
 }
 
 /** A two-state timed object (`<prefix><state>_<tenths>`). */
@@ -612,25 +515,4 @@ export function zoneOf(
   if (!Number.isInteger(band) || band < 0 || band >= ZONE_BANDS.length) return null;
   if (state !== 'warn' && state !== 'burn') return null;
   return Number.isInteger(n) && n >= 0 ? { band, state, seconds: n / 10 } : null;
-}
-
-export type HeatSpirit = 'quench' | 'breath' | 'hammer';
-export const HEAT_SPIRITS: readonly HeatSpirit[] = ['quench', 'breath', 'hammer'];
-export function spiritTemplate(spirit: HeatSpirit): string {
-  return `${HEAT_OBJECTS.spiritPrefix}${spirit}`;
-}
-export function spiritOf(templateId: string): HeatSpirit | null {
-  if (!templateId.startsWith(HEAT_OBJECTS.spiritPrefix)) return null;
-  const s = templateId.slice(HEAT_OBJECTS.spiritPrefix.length);
-  return (HEAT_SPIRITS as readonly string[]).includes(s) ? (s as HeatSpirit) : null;
-}
-
-export type HeatRootState = 'ready' | 'spent';
-export function rootTemplate(state: HeatRootState): string {
-  return `${HEAT_OBJECTS.rootPrefix}${state}`;
-}
-export function rootOf(templateId: string): HeatRootState | null {
-  if (!templateId.startsWith(HEAT_OBJECTS.rootPrefix)) return null;
-  const s = templateId.slice(HEAT_OBJECTS.rootPrefix.length);
-  return s === 'ready' || s === 'spent' ? s : null;
 }

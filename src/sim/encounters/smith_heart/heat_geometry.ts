@@ -10,9 +10,8 @@
 //                  reach, Wakefire's bands, the overflow's rivers)
 //   the lanes      Basalt Fist's three Molten Swell lanes and the overflow's
 //                  rivers: who stands in one, and where a wave's wall is
-//   the posts      where the Wellspawn climb out, the Wellkeepers rise, the
-//                  spirits stand, the Stone Roots grow, and the shore points
-//                  the spirits' ice and the blazes pick from
+//   the posts      where the Wellspawn climb out, the Wellkeepers rise, and
+//                  the shore points a Rolling Cinder lands on
 
 import { FORGE_POINTS, HEARTH_WELL } from '../../content/smith_heart_layout';
 import { HEAT_TUNING as T, ZONE_BANDS } from './heat_ids';
@@ -96,6 +95,17 @@ export function inLane(
   return f.along >= 0 && f.along <= length && f.across <= half;
 }
 
+/** How far a lane from (x, z) along `facing` runs over the Hearth's floor
+ *  before it leaves it (at most `max`, a yard at a time): where a river or a
+ *  swell is drawn to (nobody stands past the floor's edge). */
+export function floorReach(x: number, z: number, facing: number, max: number): number {
+  const s = Math.sin(facing);
+  const c = Math.cos(facing);
+  let d = 0;
+  while (d < max && inHearthFloor(x + s * (d + 1), z + c * (d + 1))) d++;
+  return Math.max(1, Math.min(max, d));
+}
+
 /** Basalt Fist's three Molten Swell bearings from its spot: straight away
  *  from the wellspring and to either side of it (the gap toward the
  *  guardian, and the two between, are where the raid stands). */
@@ -153,27 +163,9 @@ export const WELLKEEPER_SPOTS: readonly HPoint[] = [
   { x: -206, z: 16 },
 ];
 
-/** The three spirits' posts (heroic's phase 4): the Quench's north, the
- *  Breath's south, the Hammer's by the door. */
-export const SPIRIT_POSTS: Readonly<Record<'quench' | 'breath' | 'hammer', HPoint>> = {
-  quench: { x: -214, z: 38 },
-  breath: { x: -214, z: -38 },
-  hammer: { x: -180, z: 0 },
-};
-
-/** Where the Hammer's spirit may raise a Stone Root (the tank's ground). */
-export const ROOT_SPOTS: readonly HPoint[] = [
-  { x: -206, z: -18 },
-  { x: -206, z: 18 },
-  { x: -192, z: -6 },
-  { x: -192, z: 6 },
-  { x: -216, z: -28 },
-  { x: -216, z: 28 },
-];
-
 /** The shore's points (a 6-yard lattice on the floor east of the
  *  wellspring's middle, clear of its lip by 4 yd and of the walls by 3):
- *  where the spirits' ice and the blazes are laid. Built once, in a fixed
+ *  where a Rolling Cinder lands. Built once, in a fixed
  *  order. */
 export const SHORE_POINTS: readonly HPoint[] = (() => {
   const out: HPoint[] = [];

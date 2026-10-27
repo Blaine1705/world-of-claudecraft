@@ -4,8 +4,8 @@
 // Swells, Hearth Flare, the overflows at 70 and 40 percent (normal without
 // adds; heroic's Wellspawn walking, slowing, feeding; the Wellkeepers' trails
 // healing them), the Hearthseeds and their Seedflames, Wakefire's bands,
-// the Rolling Cinders (the hunt, the knockback and its crust), heroic's
-// tearing free and the three spirits (the ice, the storm-rain, the roots),
+// the Rolling Cinders (the hunt, the knockback and its crust), no fourth
+// phase on any difficulty (it never leaves the wellspring),
 // the wipe, the fall lighting the Heat vein, and determinism.
 
 import { describe, expect, it } from 'vitest';
@@ -29,16 +29,11 @@ import {
   inWave,
   inWell,
   phaseFloor,
-  ROOT_SPOTS,
-  rootOf,
-  rootTemplate,
   SHORE_POINTS,
   seedFalloff,
   smithHeartProgress,
   smithHeartVeinWon,
   spawnPace,
-  spiritOf,
-  spiritTemplate,
   swellBearings,
   swellLaneOf,
   swellLaneTemplate,
@@ -119,19 +114,16 @@ describe('Guardian of the Heat: the ids and the geometry', () => {
     expect(heatTimedOf(HEAT_OBJECTS.fallPrefix, 'sh_heat_seed_4')).toBeNull();
     expect(swellLaneOf(swellLaneTemplate('roll', 3.2))).toEqual({ state: 'roll', seconds: 3.2 });
     expect(swellLaneOf('sh_heat_lane_x_1')).toBeNull();
-    expect(wellOf(wellTemplate('torn'))).toBe('torn');
+    expect(wellOf(wellTemplate('over'))).toBe('over');
+    expect(wellOf('sh_heat_well_torn')).toBeNull();
     expect(zoneOf(zoneTemplate(2, 'burn', 2))).toEqual({ band: 2, state: 'burn', seconds: 2 });
     expect(zoneOf('sh_heat_zone_3_warn_4')).toBeNull();
-    expect(spiritOf(spiritTemplate('hammer'))).toBe('hammer');
-    expect(rootOf(rootTemplate('spent'))).toBe('spent');
   });
 
   it('holds each threshold, crawls the Wellspawn from half health, and falls the seeds off', () => {
-    expect(phaseFloor(1, false)).toBe(T.overflowOneAt);
-    expect(phaseFloor(2, true)).toBe(T.overflowTwoAt);
-    expect(phaseFloor(3, false)).toBeNull();
-    expect(phaseFloor(3, true)).toBe(T.tearFreeAt);
-    expect(phaseFloor(4, true)).toBeNull();
+    expect(phaseFloor(1)).toBe(T.overflowOneAt);
+    expect(phaseFloor(2)).toBe(T.overflowTwoAt);
+    expect(phaseFloor(3)).toBeNull();
     expect(spawnPace(1)).toBeCloseTo(1, 9);
     expect(spawnPace(0.75)).toBeGreaterThan(spawnPace(0.6));
     expect(spawnPace(0.5)).toBeCloseTo(T.spawnMinFactor, 9);
@@ -163,7 +155,7 @@ describe('Guardian of the Heat: the ids and the geometry', () => {
     expect(inWave(spot.x, 0, away, 10, spot.x + 9, 0)).toBe(true);
     expect(inWave(spot.x, 0, away, 10, spot.x + 6, 0)).toBe(false);
     expect(inWave(spot.x, 0, away, 10, spot.x + 11, 0)).toBe(false);
-    for (const p of [...SHORE_POINTS, ...WELLSPAWN_SPOTS, ...ROOT_SPOTS, ...HEAT_WAIT_SPOTS])
+    for (const p of [...SHORE_POINTS, ...WELLSPAWN_SPOTS, ...HEAT_WAIT_SPOTS])
       expect(inHearthFloor(p.x, p.z)).toBe(true);
     expect(SHORE_POINTS.length).toBeGreaterThan(40);
     for (const p of HEAT_WAIT_SPOTS) {
@@ -616,178 +608,54 @@ describe('Guardian of the Heat: phase 3, the Rolling Cinders', () => {
   });
 });
 
-describe('Guardian of the Heat: heroic phase 4', () => {
-  it('normal never tears free; heroic tears free at 10 percent and the three spirits come', () => {
-    const n = pulled(2);
-    n.dev('/dev heart heat phase 3');
-    hold(n);
-    setHp(n, 0.05);
-    n.tick(ticks(2));
-    expect(n.state()?.phase).toBe(3);
-    expect(n.objects(HEAT_OBJECTS.spiritPrefix)).toEqual([]);
-    expect(n.dev('/dev heart heat phase 4')).toBe(true);
-    expect(n.state()?.phase).toBe(3);
+describe('Guardian of the Heat: no phase 4 on any difficulty', () => {
+  it('heroic and mythic end with phase 3 like normal: it never leaves the wellspring', () => {
+    for (const tier of ['normal', 'heroic', 'mythic'] as const) {
+      const f = pulled(2);
+      if (tier !== 'normal') f.dev(`/dev heart heat ${tier}`);
+      f.dev('/dev heart heat phase 3');
+      hold(f);
+      setHp(f, 0.05);
+      f.tick(ticks(3));
+      const st = f.state();
+      expect(st?.phase).toBe(3);
+      expect(st?.stage).toBe('fight');
+      expect(f.boss().damageFloorHp).toBeUndefined();
+      // The tank backs off: still sunk in its wellspring.
+      f.put(f.players[0], HEARTH_WELL.x + 30, 0);
+      f.tick(ticks(3));
+      const o = f.world(HEARTH_WELL.x, HEARTH_WELL.z);
+      expect(f.boss().pos.x).toBeCloseTo(o.x, 6);
+      expect(f.boss().pos.z).toBeCloseTo(o.z, 6);
+      expect(f.dev('/dev heart heat phase 4')).toBe(true);
+      expect(f.state()?.phase).toBe(3);
+    }
+  });
 
-    const f = pulled(3, 31, true);
+  it('a Rolling Cinder is never killed: every strike lands one point', () => {
+    const f = pulled(2, 31, true);
     f.dev('/dev heart heat phase 3');
     hold(f);
-    setHp(f, 0.09);
-    let ev = f.tick(2);
-    const st = f.state();
-    if (!st) throw new Error('no fight');
-    expect(st.stage).toBe('tearing');
-    expect(f.boss().castingAbility).toBe(HEAT_CASTS.tearFree);
-    expect(f.boss().damageImmune).toBe(true);
-    const spirits = f.objects(HEAT_OBJECTS.spiritPrefix).map((e) => spiritOf(e.templateId));
-    expect(spirits.sort()).toEqual(['breath', 'hammer', 'quench']);
-    for (const s of ['quench', 'breath', 'hammer'])
-      expect(chatKeys(ev)).toContain(`hudChrome.heatGuardian.say.${s}`);
-    ev = f.tick(ticks(T.tearFreeCast + 0.2));
-    expect(st.phase).toBe(4);
-    expect(st.stage).toBe('fight');
-    expect(cues(ev, HEAT_CUES.tearFree).length).toBe(1);
-    expect(f.objects(HEAT_OBJECTS.wellPrefix)[0].templateId).toBe(wellTemplate('torn'));
-    expect(f.boss().damageFloorHp).toBeUndefined();
-    // Free: it follows its tank out of the wellspring.
-    const tank = f.players[0];
-    f.put(tank, HEARTH_WELL.x + 25, 0);
-    f.tick(ticks(3));
-    expect(wellDistance(f.local(f.boss()).x, f.local(f.boss()).z)).toBeGreaterThan(5);
-  });
-
-  it('the spirits come whatever order the guardians fell in (they never depend on it)', () => {
-    const f = pulled(2, 31, true);
-    // Kill every other guardian first: the spirits still come.
-    for (const vein of ['hammer', 'breath', 'quench'] as const) {
-      const id = SMITH_HEART_GUARDIANS[vein];
-      for (const mid of f.inst.mobIds) {
-        const e = f.sim.ctx.entities.get(mid);
-        if (e?.templateId === id && !e.dead) f.sim.ctx.handleDeath(e, f.players[0]);
-      }
-    }
-    f.dev('/dev heart heat phase 4');
-    expect(f.objects(HEAT_OBJECTS.spiritPrefix).length).toBe(3);
-    const g = pulled(2, 31, true);
-    g.dev('/dev heart heat phase 4');
-    expect(g.objects(HEAT_OBJECTS.spiritPrefix).length).toBe(3);
-  });
-
-  it("the Quench's ice freezes a Rolling Cinder, which then takes three times the damage", () => {
-    const f = pulled(3, 31, true);
-    f.dev('/dev heart heat phase 4');
-    hold(f);
-    const st = f.state();
-    const sp = st?.spirits;
-    if (!st || !sp) throw new Error('no spirits');
-    sp.iceIn = 999;
     f.dev('/dev heart heat ember');
     f.tick(ticks(T.cinderFallWarn + 0.1));
     const [cinder] = adds(f, HEAT_MOBS.cinder);
-    // Ice laid under the cinder.
-    sp.iceIn = 0.05;
-    f.tick(2);
-    expect(sp.ice.length).toBeGreaterThan(0);
-    const ice = sp.ice[0];
-    const at = f.world(ice.x, ice.z);
-    cinder.pos.x = at.x;
-    cinder.pos.z = at.z;
-    const ev = f.tick(2);
-    expect(has(cinder, HEAT_AURAS.rimelocked)).toBe(true);
-    expect(aura(cinder, HEAT_AURAS.rimelocked)?.kind).toBe('stun');
-    expect(cues(ev, HEAT_CUES.freeze).length).toBe(1);
-    expect(sp.ice.some((i) => i === ice)).toBe(false);
-    // Frozen it is flesh: a strike lands in full, tripled; it never moves.
-    const striker = f.players[1];
     const hp0 = cinder.hp;
-    const landed = f.sim.ctx.dealDamage(striker, cinder, 100, false, 'fire', 'test', 'hit');
-    expect(landed).toBe(100 * (1 + T.frozenVuln));
-    expect(cinder.hp).toBe(hp0 - landed);
-    const x0 = cinder.pos.x;
-    f.tick(ticks(1));
-    expect(cinder.pos.x).toBe(x0);
-  });
-
-  it("the Breath's storm-rain puts out a Creeping Blaze; the blessed never burn in one", () => {
-    const f = pulled(4, 31, true);
-    f.dev('/dev heart heat phase 4');
-    hold(f);
-    const sp = f.state()?.spirits;
-    if (!sp) throw new Error('no spirits');
-    sp.blazeIn = 999;
-    sp.rainIn = 0.05;
-    const ev = f.tick(2);
-    const blessed = f.players.filter((p) => has(p, HEAT_AURAS.stormRain));
-    expect(blessed.length).toBe(Math.min(T.rainCount, f.players.length - 1));
-    expect(cues(ev, HEAT_CUES.rain).length).toBe(blessed.length);
-    const plain = f.players.find((p) => !has(p, HEAT_AURAS.stormRain)) as Entity;
-    // A blaze under the plain player burns them.
-    sp.blazeIn = 0.05;
-    f.tick(2);
-    const blaze = sp.blaze[0];
-    f.put(plain, blaze.x, blaze.z);
-    const burn = f.tick(ticks(1.2));
-    expect(hitsOf(burn, HEAT_NAMES.blaze, plain.id).length).toBeGreaterThanOrEqual(1);
-    expect(blaze.r).toBeGreaterThan(T.blazeStartR);
-    // A blessed player walks in: it is put out.
-    f.put(blessed[0], blaze.x + 0.5, blaze.z);
-    const out = f.tick(2);
-    expect(hitsOf(out, HEAT_NAMES.blaze, blessed[0].id)).toEqual([]);
-    expect(cues(out, HEAT_CUES.douse).length).toBe(1);
-    expect(sp.blaze.includes(blaze)).toBe(false);
-  });
-
-  it("the Hammer's Stone Root stops the Crushing Fist; without one the tank is struck", () => {
-    const f = pulled(2, 31, true);
-    f.dev('/dev heart heat phase 4');
-    hold(f);
-    f.tick(ticks(T.tearFreeCast + 0.2));
-    const sp = f.state()?.spirits;
-    if (!sp) throw new Error('no spirits');
-    const tank = f.players[0];
-    // Crushing Fist charging, the guardian far from every root.
-    f.put(tank, HEARTH_WELL.x + 8, 40 - 8);
-    sp.crushIn = 0.05;
-    let ev = f.tick(2);
-    expect(has(f.boss(), HEAT_AURAS.crushing)).toBe(true);
-    expect(has(tank, HEAT_AURAS.crushMark)).toBe(true);
-    expect(chatKeys(ev)).toContain('hudChrome.heatGuardian.warn.crush');
-    // Dragged across a ready root: held, the fist misses.
-    const root = sp.roots.find((r) => r.ready);
-    if (!root) throw new Error('no root');
-    const spot = ROOT_SPOTS[root.spot];
-    const w = f.world(spot.x, spot.z);
-    f.boss().pos.x = w.x;
-    f.boss().pos.z = w.z;
-    ev = f.tick(ticks(1));
-    expect(has(f.boss(), HEAT_AURAS.rooted)).toBe(true);
-    expect(aura(f.boss(), HEAT_AURAS.rooted)?.kind).toBe('root');
-    expect(cues(ev, HEAT_CUES.rooted).length).toBe(1);
-    ev = f.tick(ticks(T.crushSeconds));
-    expect(hitsOf(ev, HEAT_NAMES.crushing, tank.id)).toEqual([]);
-    expect(has(f.boss(), HEAT_AURAS.rooted)).toBe(false);
-    expect(root.ready).toBe(false);
-    expect(has(f.boss(), HEAT_AURAS.crushing)).toBe(false);
-    // The next one, no root under it: the tank takes the blow.
-    f.put(tank, -183, 30);
-    f.boss().pos.x = f.world(-187, 30).x;
-    f.boss().pos.z = f.world(-187, 30).z;
-    sp.crushIn = 0.05;
-    ev = f.tick(ticks(T.crushSeconds + 0.6));
-    const blow = hitsOf(ev, HEAT_NAMES.crushing, tank.id);
-    expect(blow.length).toBe(1);
-    expect(blow[0]).toBeGreaterThanOrEqual(T.crushMin);
+    for (let i = 0; i < 5; i++)
+      f.sim.ctx.dealDamage(f.players[1], cinder, 99999, true, 'fire', 'test', 'hit');
+    expect(cinder.hp).toBe(hp0 - 5);
+    expect(cinder.dead).toBe(false);
   });
 });
 
 describe('Guardian of the Heat: the end', () => {
-  it('a wipe puts the Hearth back: every footprint, add, spirit and mark gone', () => {
+  it('a wipe puts the Hearth back: every footprint, add and mark gone', () => {
     const f = pulled(4, 31, true);
-    f.dev('/dev heart heat phase 4');
+    f.dev('/dev heart heat phase 3');
     f.dev('/dev heart heat ember');
     f.dev('/dev heart heat seeds');
     f.dev('/dev heart heat zones');
     f.tick(ticks(4));
-    expect(f.objects(HEAT_OBJECTS.spiritPrefix).length).toBe(3);
+    expect(adds(f, HEAT_MOBS.cinder).length).toBe(1);
     for (const p of f.players) f.sim.ctx.handleDeath(p, f.boss());
     const ev = until(f, () => f.state() === null, 30);
     expect(f.state()).toBeNull();
@@ -799,8 +667,7 @@ describe('Guardian of the Heat: the end', () => {
     }
     for (const id of Object.values(HEAT_MOBS)) expect(adds(f, id)).toEqual([]);
     for (const p of f.players)
-      for (const id of [HEAT_AURAS.hunted, HEAT_AURAS.stormRain, HEAT_AURAS.kindling])
-        expect(has(p, id)).toBe(false);
+      for (const id of [HEAT_AURAS.hunted, HEAT_AURAS.kindling]) expect(has(p, id)).toBe(false);
     expect(has(f.boss(), HEAT_AURAS.state)).toBe(false);
     expect(f.boss().damageImmune).toBe(false);
     expect(f.boss().damageFloorHp).toBeUndefined();

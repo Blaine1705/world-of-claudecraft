@@ -38,7 +38,6 @@ export type { CouncilFightState, CouncilSoul } from './council_state';
 export { SMITH_HEART_CLOSED_TEXT, SMITH_HEART_PLAYABLE, smithHeartEntryOpen } from './entry';
 export {
   beginOverflow,
-  beginTearFree,
   heatDevTrigger,
   heatDifficulty,
   heatGuardian,

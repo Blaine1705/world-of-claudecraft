@@ -42,16 +42,20 @@ Quench's, then the Heat's, then the seal and the arrival, then the portal hops.
 | `quench_rim.ts` | The shore ice: the ring of oriented combat walls that keeps the fight on the lake, rising at the pull, falling at a wipe or the kill. |
 | `quench_voice.ts` | What the guardian SAYS (`hudChrome.quenchGuardian.say.*`, `QUENCH_LINES` the same English). |
 | `quench.ts` | The coordinator: the pull, the half, the wipe's reset, the fall, the dev tier switch (`setQuenchDevTier`) and the `/dev heart quench` triggers and readout. |
-| `heat_ids.ts` | Leaf: the Guardian of the Heat's cast, aura, object and cue ids, the per-difficulty rules (`HEAT_DIFFICULTY`: crystals, burn decay, Knell Embers, Hearthburst; mythic is heroic whole, the seam), the SKETCH tuning (`HEAT_TUNING`: every tunable of the proposal in one table) and the objects' template codecs (`riseTemplate`, `crystalTemplate`, `channelTemplate`, `embersTemplate`). |
-| `heat_geometry.ts` | PURE over the layout (no SimContext, for the bots to reuse): the Hearth's floor (`inHearthFloor`), the channel and its halves (`inChannel`, `channelSide`), the crystals' sockets (`pickSockets`) and a ray's pick (`nearestInReach`). |
+| `heat_ids.ts` | Leaf: the Guardian of the Heat's cast, aura, object, mob and cue ids, the names (`HEAT_NAMES`), the per-difficulty rules (`HEAT_DIFFICULTY`: the overflows' adds, Seedflames, bolts, the cinder's speed, a quarter more damage; mythic is heroic whole, its `mythicRule` the seam), the phases' kits (`HEAT_PHASE_KIT`, 1 to 3 on every tier), the SKETCH tuning (`HEAT_TUNING`) and the objects' template codecs (`heatTimed`, `swellLaneTemplate`, `riverTemplate`, `zoneTemplate`, `wellTemplate`). |
+| `heat_geometry.ts` | PURE over the layout (no SimContext, for the bots and the renderer to reuse): the Hearth's floor (`inHearthFloor`, `floorReach`), the wellspring (`wellDistance`, `inWell`, `beyondFlare`), Wakefire's bands (`inBand`), the lanes and a wave's wall (`inLane`, `inWave`, `swellBearings`), the posts (`WELLSPAWN_SPOTS`, `WELLKEEPER_SPOTS`, `SHORE_POINTS`). |
 | `heat_state.ts` | Type-only: `HeatFightState` (`Entity.smithHeartHeat` on the guardian). |
-| `heat_scope.ts` | The per-tick scope: the players on the Hearth's floor and its listeners, the bar, the planted hold, the rolls, the fire hit, the cues, the raid warnings (`hudChrome.heatGuardian.warn.*`). |
-| `heat_gauge.ts` | The heat (the guardian's resource and every floor player's marker), the Hearth Pulse, the wind-up from 90, Hearthburst at 100, Stoked Hearth (the soft enrage). |
-| `heat_crystals.ts` | Shed Heat's bar and rise spots, the Kindled Crystals and their rays (the nearest player in reach, or back into the guardian), Crystal Burn's stacks and fading. |
-| `heat_channel.ts` | The channel across the Hearth's floor: still, brimming, flowing (its fire splits the floor). |
-| `heat_knell.ts` | Watches the trash kit's Searing Knell land (its stun) and lays heroic's Knell Embers; their burn and burning out. |
+| `heat_scope.ts` | The per-tick scope: the players on the Hearth's floor and its listeners, the bar, the rolls, the fire hit, the cues, the raid warnings (`hudChrome.heatGuardian.warn.*`), the hashed picks, the adds it raises (`spawnHeatMob`). |
+| `heat_fist.ts` | Basalt Fist (its bar, spot and three lanes) and the Molten Swells rolling down them. |
+| `heat_flare.ts` | Hearth Flare (phase 1 on everyone out of reach, then only on the guardian's own target), Flare-Scorched, the wellspring's own fire. |
+| `heat_overflow.ts` | The overflows' rivers and Falling Cinders. |
+| `heat_wellspawn.ts` | Heroic's overflow adds: the Wellspawn walking to the wellspring (slowing with their health, feeding it), the Wellkeepers' Kindling Marks and Cinder Trails. |
+| `heat_seeds.ts` | Phase 2's Hearthseeds and heroic's Seedflames. |
+| `heat_zones.ts` | Wakefire's runs of bands round the wellspring (phases 2 and 3). |
+| `heat_cinders.ts` | Phase 3's Rolling Cinders: the fall, the hunt, the knockback and Cooling Crust, the burst. |
+| `heat_cinder_ward.ts` | Pure leaf: a Rolling Cinder is a ward (a hit lands one point), hooked at `combat/damage.ts`. |
 | `heat_voice.ts` | What the guardian SAYS (`hudChrome.heatGuardian.say.*`, `HEAT_LINES` the same English). |
-| `heat.ts` | The coordinator: the pull, the bar, the wipe's reset, the fall, the dev tier switch (`setHeatDevTier`) and the `/dev heart heat` triggers and readout. |
+| `heat.ts` | The coordinator: the pull, the phases and their damage floors, the overflows' stages (sinking, under, rising: the guardian untargetable), the wipe's reset, the fall, the dev tier switch (`setHeatDevTier`) and the `/dev heart heat` triggers and readout. |
 | `council.ts` | The coordinator: one pull (`keepTogether`), the fallen and their heirs, Memory of Stone, the bars, the wipe's reset (`regrowHead`), the finish, the dev switches for heroic and mythic (`setCouncilDevTier`; a switch mid-fight applies whole through `council_soul.ts` `syncSoulsToTier`) and the `/dev heart council` triggers. |
 
 Rules:
