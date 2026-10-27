@@ -18,6 +18,7 @@
 // pools, no per-frame allocation.
 
 import * as THREE from 'three';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import {
   heartKitLoaded,
@@ -64,13 +65,14 @@ interface Rig {
 const GOUGES = 24;
 
 const GOUGE_VERT = /* glsl */ `
+${CAMERA_RELATIVE_GLSL}
 attribute float aFade;
 varying vec2 vUv;
 varying float vFade;
 void main() {
   vUv = uv;
   vFade = aFade;
-  gl_Position = projectionMatrix * viewMatrix * modelMatrix * instanceMatrix * vec4(position, 1.0);
+  gl_Position = projectionMatrix * wocCamRelView((modelMatrix * instanceMatrix * vec4(position, 1.0)).xyz);
 }
 `;
 /** A groove raked into the stone: a dark scored line with pale chipped lips,

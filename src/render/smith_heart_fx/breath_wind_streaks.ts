@@ -16,12 +16,14 @@
 
 import * as THREE from 'three';
 import { BREATH } from '../../sim/content/smith_heart_layout';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { BREATH_FIGHT_COLORS as C, WIND_STREAKS, windStreakSeed } from './breath_fight_fx_core';
 
 /** Segments along a streak (its waver bends it). */
 const SEGMENTS = 8;
 
 const STREAK_VERT = /* glsl */ `
+${CAMERA_RELATIVE_GLSL}
 uniform float uTime;
 uniform float uFlowT;
 uniform float uSpan;
@@ -56,9 +58,10 @@ void main() {
     p = uCentre + uDir * al + side * (aSeed.x * uSpan * 0.5);
     p += side * sin(al * 0.16 + aSeed.z * 40.0 + uTime * 1.1) * 0.7;
     fwd = uDir;
-    // Only where the gather's front has passed: the wind arriving.
+    // Full where the gather's front has passed (the wind arriving), faint
+    // ahead of it.
     float frontPos = mix(-55.0, 55.0, uFront);
-    vFade = uFront < 0.0 ? 1.0 : smoothstep(frontPos + 2.0, frontPos - 6.0, al);
+    vFade = uFront < 0.0 ? 1.0 : mix(0.3, 1.0, 1.0 - smoothstep(frontPos - 6.0, frontPos + 2.0, al));
     // Born and spent softly at the two ends of its wrap.
     vFade *= smoothstep(-uSpan * 0.5, -uSpan * 0.5 + 10.0, al);
     vFade *= 1.0 - smoothstep(uSpan * 0.5 - 10.0, uSpan * 0.5, head);
@@ -72,11 +75,11 @@ void main() {
   vec3 sideW = cross(f3, normalize(cameraPosition - wp.xyz));
   float sl = length(sideW);
   sideW = sl > 0.0001 ? sideW / sl : vec3(0.0, 1.0, 0.0);
-  float w = mix(0.03, 0.11, t) * (0.7 + 0.6 * aSeed.w);
+  float w = mix(0.015, 0.07, t) * (0.7 + 0.6 * aSeed.w);
   wp.xyz += sideW * position.y * w;
   vT = t;
   vSide = position.y;
-  gl_Position = projectionMatrix * viewMatrix * wp;
+  gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
 const STREAK_FRAG = /* glsl */ `
@@ -89,7 +92,7 @@ varying float vFade;
 void main() {
   float edge = 1.0 - smoothstep(0.3, 1.0, abs(vSide));
   float body = smoothstep(0.0, 0.85, vT) * (1.0 - smoothstep(0.94, 1.0, vT));
-  float a = uStrength * vFade * edge * body * 0.6;
+  float a = uStrength * vFade * edge * body * 0.45;
   if (a < 0.004) discard;
   gl_FragColor = vec4(mix(uTail, uHead, smoothstep(0.4, 1.0, vT)), a);
   #include <colorspace_fragment>

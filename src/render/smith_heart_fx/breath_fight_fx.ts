@@ -55,6 +55,7 @@ import {
 } from '../../sim/encounters/smith_heart/breath_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { type TelegraphFan, TelegraphKit } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
@@ -162,23 +163,31 @@ void main() {
   float u = mod(a + r2 * 53.0, period);
   float head = clamp(u / dash, 0.0, 1.0);
   float body = smoothstep(0.0, 1.0, head) * (1.0 - smoothstep(dash - 0.35, dash, u));
-  float halfW = (0.025 + 0.035 * head) * (0.8 + 0.5 * r2);
-  float line = 1.0 - smoothstep(halfW, halfW * 2.2, abs(lf));
+  float halfW = (0.01 + 0.02 * head) * (0.8 + 0.4 * r2);
+  float line = 1.0 - smoothstep(halfW, halfW * 2.4, abs(lf));
   float stream = line * body * step(0.28, h(vec2(li, 5.3)));
   float hot = smoothstep(0.72, 0.97, head) * stream;
   // Sheets of dust sliding with them (softer, broader; the low tier keeps
   // a lighter veil of them).
-  float sh = n(vec2(a * 0.045, across * 0.16)) * 0.7 + n(vec2(a * 0.11 + 3.0, across * 0.4)) * 0.3;
-  float sheet = smoothstep(0.56, 0.86, sh) * (0.6 + 0.4 * uDetail);
   // The gather's rolling front of dust: a billowing band sweeping over the
-  // plateau toward the bearing; behind it the wind has arrived.
+  // plateau toward the bearing; behind it the wind has arrived, ahead of it
+  // the dust already stirs that way (the direction reads from the gather's
+  // first instant, on every tier).
   float frontPos = mix(-55.0, 55.0, uFront);
-  float billow = 0.55 + 0.45 * n(vec2(across * 0.14, uTime * 0.9));
-  float front = uFront < 0.0 ? 0.0 : exp(-pow((along - frontPos) / 5.0, 2.0)) * billow;
-  float behind = uFront < 0.0 ? 1.0 : smoothstep(frontPos + 4.0, frontPos - 8.0, along);
-  float d = uDust * behind;
-  float aStream = stream * 0.62 * d;
-  float aSheet = sheet * 0.2 * max(d, uStrength * behind);
+  float q = (along - frontPos) / 5.0;
+  float front = 0.0;
+  if (uFront >= 0.0 && abs(q) < 3.0)
+    front = exp(-q * q) * (0.55 + 0.45 * n(vec2(across * 0.14, uTime * 0.9)));
+  float behind = uFront < 0.0 ? 1.0 : 1.0 - smoothstep(frontPos - 8.0, frontPos + 4.0, along);
+  float d = uDust * mix(0.3, 1.0, behind);
+  float veil = max(d, uStrength * behind);
+  float sheet = 0.0;
+  if (veil > 0.0) {
+    float sh = n(vec2(a * 0.045, across * 0.16)) * 0.7 + n(vec2(a * 0.11 + 3.0, across * 0.4)) * 0.3;
+    sheet = smoothstep(0.56, 0.86, sh) * (0.6 + 0.4 * uDetail);
+  }
+  float aStream = stream * 0.5 * d;
+  float aSheet = sheet * 0.2 * veil;
   float aFront = front * 0.42;
   vec3 col = uShade * (aStream + aSheet * 0.6) + uLight * (hot * 0.55 * d + aSheet * 0.4 + aFront);
   float outa = clamp(aStream + hot * 0.3 * d + aSheet + aFront, 0.0, 0.9);
@@ -186,6 +195,7 @@ void main() {
   float flash = uStorm * step(0.985, h(vec2(floor(uTime * 9.0), 3.1))) * 0.35;
   col += uLight * flash;
   outa = clamp(outa + flash * 0.3, 0.0, 0.9);
+  if (outa < 0.004) discard;
   gl_FragColor = vec4(col / max(outa, 0.001), outa);
   #include <colorspace_fragment>
 }
@@ -286,6 +296,7 @@ void main() {
 `;
 /** The calm's dome: a fresnel shell of mint light over the circle. */
 const DOME_VERT = /* glsl */ `
+${CAMERA_RELATIVE_GLSL}
 varying vec3 vN;
 varying vec3 vV;
 varying float vY;
@@ -294,7 +305,7 @@ void main() {
   vN = normalize(mat3(modelMatrix) * normal);
   vV = normalize(cameraPosition - wp.xyz);
   vY = position.y;
-  gl_Position = projectionMatrix * viewMatrix * wp;
+  gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
 const DOME_FRAG = /* glsl */ `
@@ -1467,10 +1478,11 @@ export class BreathFightFx {
       const back = 18 + this.rand() * 24;
       const x = px - d.x * back + d.z * across;
       const z = pz - d.z * back - d.x * across;
-      this.particles.puff(x, py + 1 + this.rand() * 4, z, 1, {
+      // Above head height: a rag of mist never sweeps through the camera.
+      this.particles.puff(x, py + 3.5 + this.rand() * 4, z, 1, {
         speed: 13 + look.speed * 0.3,
         life: 2.8,
-        size: [2.6, 6.5],
+        size: [2.4, 4.5],
         color: C.mist,
         alpha: 0.13,
         dir: [d.x, 0.03, d.z],

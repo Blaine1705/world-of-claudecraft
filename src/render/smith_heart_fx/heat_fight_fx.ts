@@ -51,6 +51,7 @@ import {
 } from '../../sim/encounters/smith_heart/heat_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import {
   type TelegraphFan,
   TelegraphKit,
@@ -367,6 +368,7 @@ void main() {
 /** A ray's beam: a cylinder from the crystal to its target, white at its
  *  heart, gold at its skin, the fire racing along it. */
 const BEAM_VERT = /* glsl */ `
+${CAMERA_RELATIVE_GLSL}
 varying vec2 vUv;
 varying float vFace;
 void main() {
@@ -374,7 +376,7 @@ void main() {
   vec4 wp = modelMatrix * vec4(position, 1.0);
   vec3 nrm = normalize(mat3(modelMatrix) * normal);
   vFace = abs(dot(nrm, normalize(cameraPosition - wp.xyz)));
-  gl_Position = projectionMatrix * viewMatrix * wp;
+  gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
 const BEAM_FRAG = /* glsl */ `
@@ -401,6 +403,7 @@ void main() {
 `;
 /** Crystal Burn's flames climbing a body (vP: cover, heat, seed). */
 const BURN_VERT = /* glsl */ `
+${CAMERA_RELATIVE_GLSL}
 varying vec2 vUv;
 varying vec3 vP;
 varying float vFace;
@@ -410,7 +413,7 @@ void main() {
   vec4 wp = modelMatrix * instanceMatrix * vec4(position, 1.0);
   vec3 nrm = normalize(mat3(modelMatrix) * mat3(instanceMatrix) * normal);
   vFace = abs(dot(nrm, normalize(cameraPosition - wp.xyz)));
-  gl_Position = projectionMatrix * viewMatrix * wp;
+  gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
 const BURN_FRAG = /* glsl */ `

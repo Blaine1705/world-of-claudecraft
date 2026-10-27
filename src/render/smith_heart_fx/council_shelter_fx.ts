@@ -16,6 +16,7 @@
 // allocation.
 
 import * as THREE from 'three';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import {
   type CoverShadow,
@@ -38,6 +39,7 @@ const CURTAIN_SEG = 10;
 const CURTAIN_H = 2.6;
 
 const FLOOR_VERT = /* glsl */ `
+${CAMERA_RELATIVE_GLSL}
 attribute vec2 aUv;
 varying vec2 vUv;
 varying vec2 vXZ;
@@ -45,7 +47,7 @@ void main() {
   vUv = aUv;
   vec4 w = modelMatrix * vec4(position, 1.0);
   vXZ = w.xz;
-  gl_Position = projectionMatrix * viewMatrix * w;
+  gl_Position = projectionMatrix * wocCamRelView(w.xyz);
 }
 `;
 /** The safe floor: dark and still (the blast cannot see here), a pale rim

@@ -52,6 +52,7 @@ import {
 } from '../../sim/encounters/smith_heart/quench_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { CAMERA_RELATIVE_GLSL } from '../camera_relative_glsl';
 import { type TelegraphFan, TelegraphKit, type TelegraphLane } from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
@@ -223,6 +224,7 @@ void main() {
 `;
 /** An instanced body-frame mesh (blocks, collars) with its parameters. */
 const BODY_VERT = /* glsl */ `
+${CAMERA_RELATIVE_GLSL}
 varying vec3 vN;
 varying vec3 vV;
 varying vec3 vL;
@@ -233,7 +235,7 @@ void main() {
   vP = instanceColor;
   vN = normalize(mat3(modelMatrix) * mat3(instanceMatrix) * normal);
   vV = normalize(cameraPosition - wp.xyz);
-  gl_Position = projectionMatrix * viewMatrix * wp;
+  gl_Position = projectionMatrix * wocCamRelView(wp.xyz);
 }
 `;
 /** The block of clear ice round a frozen player (vP: grow, crack, seed). */

@@ -160,7 +160,8 @@ export function windFieldLook(
     case 'break':
       out.dust = 0.55 + 0.45 * smooth(f * 1.4);
       out.strength = 0.4 + 0.6 * smooth(f);
-      out.debris = 0.5 * smooth(f);
+      // Drawn in: the dust and the streaks run to its mouth; no leaves.
+      out.debris = 0;
       out.speed = 9 + 8 * f;
       out.inward = true;
       break;
