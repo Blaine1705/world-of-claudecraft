@@ -61,8 +61,9 @@ Rules:
   fire is white-gold, never volcanic red.
 - The Guardian of the Heat's rise spots, crystal reach rings, rays, the burn on bodies, the
   channel's lane (brimming and flowing), the embers' rims and the wind-up's floor glow and body
-  flash draw on EVERY tier (`HeatFightFx`, `HeatBody`); sparks, embers, haze and smoke thin,
-  the shakes go under reduced motion. Its fire is the Hearth's white-gold, never volcanic red.
+  flash draw on EVERY tier (`HeatFightFx`, `HeatBody`); sparks, embers, haze, smoke and the
+  wind-up's gathering rings (`windupGather`) thin or go on the low tier, the shakes go under
+  reduced motion. Its fire is the Hearth's white-gold, never volcanic red.
 - The Quench guardian's cone is actionable and drawn by `QuenchFx` through the shared floor
   telegraph on EVERY tier (threat colour `danger`, the vein's pale ice as the accent); its
   frost, mist and ice are cosmetic and thin.
