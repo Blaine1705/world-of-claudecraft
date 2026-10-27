@@ -455,7 +455,8 @@ export class QuenchBladesFx {
     if (this.near) {
       // The bar read gone while a blade still shows waking: it has all but
       // risen (the float lands with the next read), so it never sinks back.
-      const waking = this.blades.some((b) => b.state === 'wake');
+      let waking = false;
+      for (const b of this.blades) if (b.state === 'wake') waking = true;
       const read = this.wakeRead > 0 ? this.wakeRead : waking ? 1 : 0;
       this.wakeFill = wakeFillStep(this.wakeFill, read, dt, this.wakeTotal);
       for (const b of this.blades) this.pose(world, b, dt);
