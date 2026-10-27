@@ -253,7 +253,7 @@ export const POUR_CHANNEL = { x: -150, z0: -36, z1: 36, halfWidth: 2.5 } as cons
 /** The Hearth's arena (`smiths_forge`): an eight-sided hall carved in the
  *  mountain's basalt, the Hearth's mouth in its west wall (render: beyond the
  *  floor's edge). */
-const FORGE_POINTS: readonly (readonly [number, number])[] = [
+export const FORGE_POINTS: readonly (readonly [number, number])[] = [
   [-174, -22],
   [-182, -38],
   [-200, -46],
@@ -273,6 +273,23 @@ export const GREAT_HEARTH = { x: -263, z: 0, halfWidth: 18 } as const;
 /** The great altar-stone (once the giant anvil: its footprint and height),
  *  side-on to the arena's door, its crystal crown north. */
 export const GIANT_ANVIL = { x: -236, z: 0, hw: 3.2, hd: 8.5, h: 9 } as const;
+/** The Guardian of the Heat's fight channel (design doc 7.4): a seam of the
+ *  first flame across the Hearth's floor, north wall to south lip, through
+ *  the hall's middle, that splits the floor in two while it flows (the
+ *  wellspring's channel's twin, on the fight's own clock). Instance-local. */
+export const HEARTH_CHANNEL = { x: -215, z0: -46, z1: 46 } as const;
+/** Where the Guardian of the Heat's Kindled Crystals rise from the basalt
+ *  (design doc 7.4): three sockets each side of the channel, clear of the
+ *  altar-stone, the crystal clusters and the walls. `side` -1 the Hearth's
+ *  (west), +1 the door's (east). Instance-local. */
+export const HEARTH_CRYSTAL_SOCKETS: readonly { x: number; z: number; side: -1 | 1 }[] = [
+  { x: -190, z: 0, side: 1 },
+  { x: -196, z: -26, side: 1 },
+  { x: -196, z: 26, side: 1 },
+  { x: -249, z: 0, side: -1 },
+  { x: -232, z: -28, side: -1 },
+  { x: -232, z: 28, side: -1 },
+];
 
 // ---- the Heart: the separate final room ---------------------------------------------
 

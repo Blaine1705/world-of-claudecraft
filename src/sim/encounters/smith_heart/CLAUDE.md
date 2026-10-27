@@ -1,10 +1,10 @@
 # src/sim/encounters/smith_heart: the Smith's Heart raid's sim
 
 The raid's gating, its first boss, the Guardian of the Breath and the Guardian of the
-Quench (`docs/design/raid/smith_heart.md`), ticked once per claim by `tickSmithHeart`
+Quench and the Guardian of the Heat (`docs/design/raid/smith_heart.md`), ticked once per claim by `tickSmithHeart`
 (`seal.ts`), called from `instances/dungeons.ts` `updateInstances`: the Hammer Council first
 (so its fall lights the Hammer vein the same tick), then the Breath's guardian, then the
-Quench's, then the seal and the arrival, then the portal hops.
+Quench's, then the Heat's, then the seal and the arrival, then the portal hops.
 
 | Module | Role |
 |---|---|
@@ -41,6 +41,16 @@ Quench's, then the seal and the arrival, then the portal hops.
 | `quench_rim.ts` | The shore ice: the ring of oriented combat walls that keeps the fight on the lake, rising at the pull, falling at a wipe or the kill. |
 | `quench_voice.ts` | What the guardian SAYS (`hudChrome.quenchGuardian.say.*`, `QUENCH_LINES` the same English). |
 | `quench.ts` | The coordinator: the pull, the half, the wipe's reset, the fall, the dev tier switch (`setQuenchDevTier`) and the `/dev heart quench` triggers and readout. |
+| `heat_ids.ts` | Leaf: the Guardian of the Heat's cast, aura, object and cue ids, the per-difficulty rules (`HEAT_DIFFICULTY`: crystals, burn decay, Knell Embers, Hearthburst; mythic is heroic whole, the seam), the SKETCH tuning (`HEAT_TUNING`: every tunable of the proposal in one table) and the objects' template codecs (`riseTemplate`, `crystalTemplate`, `channelTemplate`, `embersTemplate`). |
+| `heat_geometry.ts` | PURE over the layout (no SimContext, for the bots to reuse): the Hearth's floor (`inHearthFloor`), the channel and its halves (`inChannel`, `channelSide`), the crystals' sockets (`pickSockets`) and a ray's pick (`nearestInReach`). |
+| `heat_state.ts` | Type-only: `HeatFightState` (`Entity.smithHeartHeat` on the guardian). |
+| `heat_scope.ts` | The per-tick scope: the players on the Hearth's floor and its listeners, the bar, the planted hold, the rolls, the fire hit, the cues, the raid warnings (`hudChrome.heatGuardian.warn.*`). |
+| `heat_gauge.ts` | The heat (the guardian's resource and every floor player's marker), the Hearth Pulse, the wind-up from 90, Hearthburst at 100, Stoked Hearth (the soft enrage). |
+| `heat_crystals.ts` | Shed Heat's bar and rise spots, the Kindled Crystals and their rays (the nearest player in reach, or back into the guardian), Crystal Burn's stacks and fading. |
+| `heat_channel.ts` | The channel across the Hearth's floor: still, brimming, flowing (its fire splits the floor). |
+| `heat_knell.ts` | Watches the trash kit's Searing Knell land (its stun) and lays heroic's Knell Embers; their burn and burning out. |
+| `heat_voice.ts` | What the guardian SAYS (`hudChrome.heatGuardian.say.*`, `HEAT_LINES` the same English). |
+| `heat.ts` | The coordinator: the pull, the bar, the wipe's reset, the fall, the dev tier switch (`setHeatDevTier`) and the `/dev heart heat` triggers and readout. |
 | `council.ts` | The coordinator: one pull (`keepTogether`), the fallen and their heirs, Memory of Stone, the bars, the wipe's reset (`regrowHead`), the finish, the dev switches for heroic and mythic (`setCouncilDevTier`; a switch mid-fight applies whole through `council_soul.ts` `syncSoulsToTier`) and the `/dev heart council` triggers. |
 
 Rules:
@@ -70,5 +80,7 @@ Rules:
   `tests/smith_heart_breath_wire.test.ts`, `tests/wind_drift.test.ts`,
   `tests/wind_drift_online.test.ts`; the Quench: `tests/smith_heart_quench.test.ts` (on
   `tests/helpers/quench_fight.ts`), `tests/smith_heart_quench_ui.test.ts`,
-  `tests/smith_heart_quench_wire.test.ts`, `tests/quench_water_online.test.ts`. A live raid of bots fights it over a dev server:
+  `tests/smith_heart_quench_wire.test.ts`, `tests/quench_water_online.test.ts`; the Heat:
+  `tests/smith_heart_heat.test.ts` (on `tests/helpers/heat_fight.ts`),
+  `tests/smith_heart_heat_ui.test.ts`, `tests/smith_heart_heat_wire.test.ts`. A live raid of bots fights it over a dev server:
   `scripts/heart_council_raid.mjs`.

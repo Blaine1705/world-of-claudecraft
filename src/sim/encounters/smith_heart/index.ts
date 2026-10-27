@@ -37,6 +37,19 @@ export {
 export type { CouncilFightState, CouncilSoul } from './council_state';
 export { SMITH_HEART_CLOSED_TEXT, SMITH_HEART_PLAYABLE, smithHeartEntryOpen } from './entry';
 export {
+  heatDevTrigger,
+  heatDifficulty,
+  heatGuardian,
+  heatReadout,
+  heatScopeForDev,
+  setHeatDevTier,
+  tickHeatGuardian,
+} from './heat';
+export * from './heat_geometry';
+export * from './heat_ids';
+export type { HeatFightState } from './heat_state';
+export { HEAT_LINES, heatLineKey } from './heat_voice';
+export {
   SMITH_HEART_PORTAL_HOP_TEXT,
   SMITH_HEART_PORTAL_RETURN_TEXT,
   tickSmithHeartPortal,

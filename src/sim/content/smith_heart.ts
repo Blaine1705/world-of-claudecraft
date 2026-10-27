@@ -19,6 +19,7 @@ import {
   breathWindTemplate,
 } from '../encounters/smith_heart/breath_ids';
 import { COUNCIL_TUNING } from '../encounters/smith_heart/council_ids';
+import { HEAT_TUNING } from '../encounters/smith_heart/heat_ids';
 import { bladeTemplate, QUENCH_NAMES, QUENCH_TUNING } from '../encounters/smith_heart/quench_ids';
 import type {
   DungeonDef,
@@ -389,11 +390,20 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
       },
     },
   },
-  // The Heat: the Hearth's guardian (phase 2I: the vein is the Hearth, never a
-  // forge; the cast's id keeps its old name, its player-facing name is new).
-  // Molten Pour paints a lane; Searing Knell stuns everyone close.
+  // The Guardian of the Heat (design doc 7.4, encounters/smith_heart/heat.ts):
+  // a being of the first flame in crystal and basalt (the vein is the Hearth,
+  // never a forge; the knell's cast id keeps its old name). "The flame that
+  // grows": the heat bar, the Hearth Pulse and Hearthburst, the Kindled
+  // Crystals and their rays, the channel splitting the floor. A PROPOSAL the
+  // designer has not approved yet; every number a SKETCH (unmeasured): 43,000
+  // base (about 99,000 after the elite factor) for a 4 to 5 minute fight at
+  // the bot raid's measured 400 to 460 a second, like the other guardians.
+  // Molten Pour and Searing Knell stay the trash kit's own casts on their own
+  // clocks (heroic's Knell Embers ride the knell's stun, heat_knell.ts).
   heart_heat_guardian: {
-    ...boss('heart_heat_guardian', 'Guardian of the Heat', 30000, 0xffe6a0, 3),
+    ...boss('heart_heat_guardian', 'Guardian of the Heat', 43000, 0xffe6a0, 3),
+    ccImmune: true,
+    slowImmune: true,
     trashKit: {
       line: {
         castId: C.heatPour,
@@ -415,7 +425,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
         first: 12,
         school: 'physical',
         radius: 10,
-        stun: 2,
+        stun: HEAT_TUNING.knellStun,
         min: 140,
         max: 170,
       },
