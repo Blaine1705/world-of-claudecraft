@@ -155,10 +155,18 @@ export function windFieldLook(
 }
 
 /** The unit (x, z) a compass bearing (degrees, toward) points along. */
-export function bearingDir(deg: number): { x: number; z: number } {
+export function bearingDir(
+  deg: number,
+  out: { x: number; z: number } = { x: 0, z: 0 },
+): { x: number; z: number } {
   const a = (deg * Math.PI) / 180;
-  return { x: Math.sin(a), z: Math.cos(a) };
+  out.x = Math.sin(a);
+  out.z = Math.cos(a);
+  return out;
 }
+
+/** gapThreat's scratch (it runs every frame for every lip). */
+const _dir = { x: 0, z: 0 };
 
 /** Is the phase one that pushes players (the floor shows the push)? */
 export function windPushes(phase: BreathWindPhase | null): boolean {
@@ -199,7 +207,7 @@ export function gapThreat(
 ): number {
   const push = windPushes(phase) || phase === 'gather' || phase === 'gustgather';
   if (!push) return phase === 'exhale' ? 0.7 : 0;
-  const d = bearingDir(bearingDeg);
+  const d = bearingDir(bearingDeg, _dir);
   const gx = gap.x - BREATH.cornice.x;
   const gz = gap.z - BREATH.cornice.z;
   const len = Math.hypot(gx, gz) || 1;

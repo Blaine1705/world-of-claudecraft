@@ -20,6 +20,7 @@ import {
   breathSoundClaims,
   windPhaseSound,
 } from '../src/game/smith_heart_breath_audio_core';
+import { breathGapEnds } from '../src/render/smith_heart/breath_kit_plan_core';
 import { BreathFightFx } from '../src/render/smith_heart_fx/breath_fight_fx';
 import {
   BREATH_FIGHT_POOLS,
@@ -81,6 +82,9 @@ describe('breath_fight_fx_core', () => {
     const d = bearingDir(90);
     expect(d.x).toBeCloseTo(1);
     expect(d.z).toBeCloseTo(0);
+    const out = { x: 0, z: 0 };
+    expect(bearingDir(180, out)).toBe(out);
+    expect(out.z).toBeCloseTo(-1);
   });
 
   it('draws the field over the Cornice floor and the lips on its open runs only', () => {
@@ -92,6 +96,28 @@ describe('breath_fight_fx_core', () => {
     for (const lip of lips) {
       expect(lip.segments.length).toBeGreaterThan(0);
       for (const s of lip.segments) expect(Math.hypot(s.nx, s.nz)).toBeCloseTo(1);
+    }
+  });
+
+  it("ends the kit's broken wall exactly where each drawn lip ends (breathGapEnds vs gapLips)", () => {
+    const ends = breathGapEnds();
+    const lips = gapLips();
+    const onLip = (lip: (typeof lips)[number], e: { x: number; z: number }) =>
+      lip.segments.find(
+        (s) =>
+          Math.hypot(s.ax - e.x, s.az - e.z) < 0.05 || Math.hypot(s.bx - e.x, s.bz - e.z) < 0.05,
+      );
+    // Two free ends per gap, every one on exactly one lip, facing out as it does.
+    expect(ends).toHaveLength(lips.length * 2);
+    for (const lip of lips) expect(ends.filter((e) => onLip(lip, e))).toHaveLength(2);
+    for (const e of ends) {
+      const owners = lips.filter((l) => onLip(l, e));
+      expect(owners).toHaveLength(1);
+      const seg = onLip(owners[0], e);
+      expect(seg?.nx).toBeCloseTo(e.nx);
+      expect(seg?.nz).toBeCloseTo(e.nz);
+      // The end runs on past the lip (away from its own run).
+      expect(Math.hypot(e.ux, e.uz)).toBeCloseTo(1);
     }
   });
 
@@ -258,7 +284,12 @@ describe('BreathFightFx', () => {
       vortex,
     ])
       entities.set(e.id, e);
-    const world = { entities, player: me, playerId: me.id } as unknown as IWorld;
+    const world = {
+      entities,
+      entityRosterVersion: 1,
+      player: me,
+      playerId: me.id,
+    } as unknown as IWorld & { entityRosterVersion: number };
     const scene = new THREE.Scene();
     let shaken = 0;
     const fx = new BreathFightFx(
@@ -291,6 +322,19 @@ describe('BreathFightFx', () => {
     expect(shownFans(1.15)).toBe(1);
     expect(shownFans(1.9)).toBe(1);
     expect(root?.getObjectByName('smithHeartBreathBeacon')?.visible).toBe(true);
+    // The circle's seats: P.seats pips per circle (the pool sized and indexed
+    // alike), the one anchored player inside it taking one.
+    const P = BREATH_FIGHT_POOLS;
+    expect(P.seats).toBe(BREATH_TUNING.circleSeats);
+    const pips = (root?.children ?? []).filter(
+      (c) => c instanceof THREE.Sprite && c.name === 'smithHeartBreathSeat',
+    ) as THREE.Sprite[];
+    expect(pips).toHaveLength(P.seats * P.calm);
+    const shown = pips.filter((p) => p.visible);
+    expect(shown).toHaveLength(P.seats);
+    expect(shown.filter((p) => p.material.name === 'smithHeartBreathSeat')).toHaveLength(
+      calmSeatsLeft(1),
+    );
     // The forking bolt's bar shows its jump reach round its target.
     boss.castingAbility = BREATH_CASTS.fork;
     boss.castTargetId = conductor.id;
@@ -325,9 +369,28 @@ describe('BreathFightFx', () => {
     expect(shaken).toBeGreaterThan(0);
     // Gone objects free their slots; out of the raid nothing shows.
     for (const id of [12, 13, 14, 15, 16]) entities.delete(id);
+    world.entityRosterVersion++;
     boss.castingAbility = null;
     fx.update(0.2);
     expect(shownFans(BREATH_TUNING.strikeR)).toBe(0);
+    // The roster is walked on a membership change only: a strike the walk
+    // was not told of waits for the version to move.
+    entities.set(
+      13,
+      entity(
+        13,
+        'object',
+        timedTemplate(BREATH_OBJECTS.strikePrefix, 1.6),
+        10,
+        200,
+        BREATH_TUNING.strikeR,
+      ),
+    );
+    fx.update(0.2);
+    expect(shownFans(BREATH_TUNING.strikeR)).toBe(0);
+    world.entityRosterVersion++;
+    fx.update(0.2);
+    expect(shownFans(BREATH_TUNING.strikeR)).toBe(1);
     me.pos = { x: 0, y: 0, z: 0 };
     fx.update(0.2);
     expect(root?.getObjectByName('smithHeartBreathLocal')?.visible).toBe(false);

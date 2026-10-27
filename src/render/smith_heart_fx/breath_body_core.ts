@@ -31,7 +31,7 @@ import {
   BREATH_GUARDIAN,
   type BreathWindPhase,
 } from '../../sim/encounters/smith_heart/breath_ids';
-import { colossusArmIk, type V3 } from './final_fx_core';
+import type { V3 } from './final_fx_core';
 
 export type { V3 };
 
@@ -319,33 +319,58 @@ export interface BreathBodyInput {
 }
 
 /** The action and its clock (0..1) for the body's input. */
-export function breathBodyAction(input: BreathBodyInput): { action: BreathBodyAction; k: number } {
+export interface BreathBodyActionState {
+  action: BreathBodyAction;
+  k: number;
+}
+
+/** The action and its clock (0..1) for the body's input, written into `out`
+ *  (the painter passes one scratch every frame; no allocation). */
+export function breathBodyAction(
+  input: BreathBodyInput,
+  out: BreathBodyActionState = { action: 'idle', k: 0 },
+): BreathBodyActionState {
   const c = input.castId;
-  if (c === BREATH_CASTS.storm) return { action: 'break', k: input.castFill };
-  if (c === BREATH_CASTS.inhale) return { action: 'inhale', k: input.castFill };
-  if (c === BREATH_CASTS.gust) return { action: 'gust', k: input.castFill };
-  if (
+  let action: BreathBodyAction = 'idle';
+  let k = 0;
+  if (c === BREATH_CASTS.storm) {
+    action = 'break';
+    k = input.castFill;
+  } else if (c === BREATH_CASTS.inhale) {
+    action = 'inhale';
+    k = input.castFill;
+  } else if (c === BREATH_CASTS.gust) {
+    action = 'gust';
+    k = input.castFill;
+  } else if (
     c === BREATH_CASTS.fork ||
     c === BREATH_CASTS.cradle ||
     c === BREATH_CASTS.drawn ||
     c === BREATH_CASTS.lance
-  )
-    return { action: 'cast', k: input.castFill };
-  if (input.stormForm) {
-    if (input.windPhase === 'gust') return { action: 'blow', k: input.windFill };
-    if (input.windPhase === 'gustgather') return { action: 'gather', k: input.windFill };
-    return { action: 'storm', k: 0 };
+  ) {
+    action = 'cast';
+    k = input.castFill;
+  } else if (input.stormForm) {
+    if (input.windPhase === 'gust') {
+      action = 'blow';
+      k = input.windFill;
+    } else if (input.windPhase === 'gustgather') {
+      action = 'gather';
+      k = input.windFill;
+    } else action = 'storm';
+  } else if (input.windPhase === 'gather') {
+    action = 'gather';
+    k = input.windFill;
+  } else if (input.windPhase === 'blow') {
+    action = 'blow';
+    k = input.windFill;
+  } else if (input.windPhase === 'calm') {
+    action = 'calm';
+    k = input.windFill;
   }
-  switch (input.windPhase) {
-    case 'gather':
-      return { action: 'gather', k: input.windFill };
-    case 'blow':
-      return { action: 'blow', k: input.windFill };
-    case 'calm':
-      return { action: 'calm', k: input.windFill };
-    default:
-      return { action: 'idle', k: 0 };
-  }
+  out.action = action;
+  out.k = k;
+  return out;
 }
 
 /** Does the body turn its mouth to the wind's bearing in this action? */
@@ -536,57 +561,99 @@ export function whirlSlot(index: number, t: number, out: V3 = v(0, 0, 0)): V3 {
   return out;
 }
 
+/** `out` set `s` of the way from (ax, ay, az) to (bx, by, bz). */
+function lerpInto(
+  out: V3,
+  ax: number,
+  ay: number,
+  az: number,
+  bx: number,
+  by: number,
+  bz: number,
+  s: number,
+): V3 {
+  out.x = ax + (bx - ax) * s;
+  out.y = ay + (by - ay) * s;
+  out.z = az + (bz - az) * s;
+  return out;
+}
+
 /** Where one wrist (side 1 left, -1 right) wants to be (body frame) for an
- *  action at `k`, and the body's lean. */
+ *  action at `k`, written into `out` (no allocation on the frame path). */
 export function breathWristTarget(
   action: BreathBodyAction,
   side: -1 | 1,
   k: number,
   swingSide: -1 | 1 = 1,
+  out: V3 = v(0, 0, 0),
 ): V3 {
   const I = BREATH_ARM.idle;
   const R = BREATH_ARM.root;
   const reach = BREATH_ARM.upper + BREATH_ARM.fore;
-  const idle = v(side * I.x, I.y, I.z);
+  const ix = side * I.x;
+  const iy = I.y;
+  const iz = I.z;
   const p = clamp01(k);
-  const lerp = (a: V3, b: V3, s: number): V3 =>
-    v(a.x + (b.x - a.x) * s, a.y + (b.y - a.y) * s, a.z + (b.z - a.z) * s);
   switch (action) {
     case 'swing': {
-      if (side !== swingSide) return idle;
-      const back = v(side * (R.x + 0.4), R.y + 0.6, -0.6);
-      const hit = v(side * R.x * 0.4, R.y - reach * 0.55, reach * 0.66);
-      return p < 0.4 ? lerp(idle, back, ease(p / 0.4)) : lerp(back, hit, ease((p - 0.4) / 0.6));
+      if (side !== swingSide) return lerpInto(out, ix, iy, iz, ix, iy, iz, 0);
+      // Back, then down and through.
+      const bx = side * (R.x + 0.4);
+      const by = R.y + 0.6;
+      const bz = -0.6;
+      if (p < 0.4) return lerpInto(out, ix, iy, iz, bx, by, bz, ease(p / 0.4));
+      return lerpInto(
+        out,
+        bx,
+        by,
+        bz,
+        side * R.x * 0.4,
+        R.y - reach * 0.55,
+        reach * 0.66,
+        ease((p - 0.4) / 0.6),
+      );
     }
     case 'inhale':
-    case 'gather': {
+    case 'gather':
       // The arms drawn out and back as the chest fills.
-      const open = v(side * (R.x + reach * 0.55), R.y - 0.4, -0.6);
-      return lerp(idle, open, ease(p));
-    }
-    case 'blow': {
-      const back = v(side * (R.x + reach * 0.4), R.y - 1.0, -0.9);
-      return lerp(idle, back, 0.8);
-    }
+      return lerpInto(out, ix, iy, iz, side * (R.x + reach * 0.55), R.y - 0.4, -0.6, ease(p));
+    case 'blow':
+      return lerpInto(out, ix, iy, iz, side * (R.x + reach * 0.4), R.y - 1.0, -0.9, 0.8);
     case 'gust': {
       // Clasped in before it, thrown wide as it blasts.
-      const clasp = v(side * 0.9, R.y - 1.3, 1.6);
-      const wide = v(side * (R.x + reach * 0.8), R.y + 0.4, 0.4);
-      return p < 0.88
-        ? lerp(idle, clasp, ease(p / 0.88))
-        : lerp(clasp, wide, ease((p - 0.88) / 0.12));
+      const cx = side * 0.9;
+      const cy = R.y - 1.3;
+      const cz = 1.6;
+      if (p < 0.88) return lerpInto(out, ix, iy, iz, cx, cy, cz, ease(p / 0.88));
+      return lerpInto(
+        out,
+        cx,
+        cy,
+        cz,
+        side * (R.x + reach * 0.8),
+        R.y + 0.4,
+        0.4,
+        ease((p - 0.88) / 0.12),
+      );
     }
-    case 'cast': {
+    case 'cast':
       // The left arm raised to the storm, the right thrust at the mark.
-      if (side === 1) return lerp(idle, v(R.x * 0.7, R.y + reach * 0.85, 0.3), ease(p * 1.6));
-      return lerp(idle, v(-R.x * 0.45, R.y - 0.2, reach * 0.9), ease(p));
-    }
-    case 'break': {
-      const wide = v(side * (R.x + reach * 0.7), R.y + reach * 0.45, 0.2);
-      return lerp(idle, wide, ease(p / BREAK_FREEZE_AT));
-    }
+      if (side === 1)
+        return lerpInto(out, ix, iy, iz, R.x * 0.7, R.y + reach * 0.85, 0.3, ease(p * 1.6));
+      return lerpInto(out, ix, iy, iz, -R.x * 0.45, R.y - 0.2, reach * 0.9, ease(p));
+    case 'break':
+      return lerpInto(
+        out,
+        ix,
+        iy,
+        iz,
+        side * (R.x + reach * 0.7),
+        R.y + reach * 0.45,
+        0.2,
+        ease(p / BREAK_FREEZE_AT),
+      );
     default:
-      return idle;
+      return lerpInto(out, ix, iy, iz, ix, iy, iz, 0);
   }
 }
 
@@ -595,16 +662,64 @@ export function breathElbowPole(side: -1 | 1): V3 {
   return v(side * 0.8, -0.2, -0.6);
 }
 
-/** One arm's elbow and wrist (body frame) toward `wrist`. */
-export function breathArm(side: -1 | 1, wrist: V3): { elbow: V3; wrist: V3 } {
+/** One arm's solved joints (body frame). */
+export interface BreathArmJoints {
+  elbow: V3;
+  wrist: V3;
+}
+
+/** One arm's elbow and wrist (body frame) toward `wrist`, written into `out`:
+ *  the same two-bone solve as colossusArmIk (pinned equal in the test), done
+ *  in scalars so the frame path allocates nothing. */
+export function breathArm(
+  side: -1 | 1,
+  wrist: V3,
+  out: BreathArmJoints = { elbow: v(0, 0, 0), wrist: v(0, 0, 0) },
+): BreathArmJoints {
   const R = BREATH_ARM.root;
-  return colossusArmIk(
-    v(side * R.x, R.y, R.z),
-    wrist,
-    BREATH_ARM.upper,
-    BREATH_ARM.fore,
-    breathElbowPole(side),
-  );
+  const l1 = BREATH_ARM.upper;
+  const l2 = BREATH_ARM.fore;
+  const sx = side * R.x;
+  const sy = R.y;
+  const sz = R.z;
+  let dx = wrist.x - sx;
+  let dy = wrist.y - sy;
+  let dz = wrist.z - sz;
+  let d = Math.hypot(dx, dy, dz);
+  const reach = (l1 + l2) * 0.999;
+  const lo = Math.abs(l1 - l2) * 1.001 + 1e-6;
+  const dd = Math.max(lo, Math.min(reach, d || lo));
+  if (d < 1e-9) {
+    dx = 0;
+    dy = -1;
+    dz = 0;
+    d = 1;
+  }
+  const ux = dx / d;
+  const uy = dy / d;
+  const uz = dz / d;
+  out.wrist.x = sx + ux * dd;
+  out.wrist.y = sy + uy * dd;
+  out.wrist.z = sz + uz * dd;
+  // Along the line to the wrist, then out along the pole's part across it
+  // (the pole: out and back, breathElbowPole).
+  const a = (l1 * l1 - l2 * l2 + dd * dd) / (2 * dd);
+  const h = Math.sqrt(Math.max(0, l1 * l1 - a * a));
+  const polX = side * 0.8;
+  const polY = -0.2;
+  const polZ = -0.6;
+  const pd = polX * ux + polY * uy + polZ * uz;
+  let px = polX - ux * pd;
+  let py = polY - uy * pd;
+  let pz = polZ - uz * pd;
+  const pl = Math.hypot(px, py, pz) || 1;
+  px /= pl;
+  py /= pl;
+  pz /= pl;
+  out.elbow.x = sx + ux * a + px * h;
+  out.elbow.y = sy + uy * a + py * h;
+  out.elbow.z = sz + uz * a + pz * h;
+  return out;
 }
 
 /** A small integer hash in [0, 1). */
@@ -634,9 +749,15 @@ export function breathFallRest(index: number, from: V3): { at: V3; tilt: V3; del
 }
 
 /** A piece's fall `t` seconds into the death: 0..1 and whether it landed. */
-export function breathFallProgress(t: number, delay: number): { k: number; landed: boolean } {
+export function breathFallProgress(
+  t: number,
+  delay: number,
+  out: { k: number; landed: boolean } = { k: 0, landed: false },
+): { k: number; landed: boolean } {
   const k = clamp01((t - delay) / 0.75);
-  return { k: k * k, landed: k >= 1 };
+  out.k = k * k;
+  out.landed = k >= 1;
+  return out;
 }
 
 /** Is the guardian in its storm body (the aura on it)? */

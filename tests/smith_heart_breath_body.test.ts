@@ -17,6 +17,7 @@ import { BreathBody } from '../src/render/smith_heart_fx/breath_body';
 import {
   BREAK_FREEZE_AT,
   BREAK_TEAR_AT,
+  BREATH_ARM,
   BREATH_BODY_HEIGHT,
   BREATH_BODY_PIECES,
   BREATH_FALL,
@@ -26,6 +27,7 @@ import {
   breathBodyAction,
   breathBodyLook,
   breathBodyTop,
+  breathElbowPole,
   breathFacesWind,
   breathFallProgress,
   breathFallRest,
@@ -34,6 +36,7 @@ import {
   stormShardSlot,
   stormTearProgress,
 } from '../src/render/smith_heart_fx/breath_body_core';
+import { colossusArmIk } from '../src/render/smith_heart_fx/final_fx_core';
 import { SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
 import {
@@ -180,6 +183,42 @@ describe('breath_body_core: the motion', () => {
         }
   });
 
+  it("solves the arm as the colossus does, into the caller's scratch (no allocation)", () => {
+    const wrist = { x: 0, y: 0, z: 0 };
+    const arm = { elbow: { x: 0, y: 0, z: 0 }, wrist: { x: 0, y: 0, z: 0 } };
+    const act = { action: 'idle' as BreathBodyAction, k: 0 };
+    for (const action of ACTIONS)
+      for (const k of [0, 0.5, 1])
+        for (const side of [1, -1] as const) {
+          // The out-params come back as the very objects passed in.
+          expect(breathWristTarget(action, side, k, 1, wrist)).toBe(wrist);
+          expect(breathArm(side, wrist, arm)).toBe(arm);
+          const ref = colossusArmIk(
+            { x: side * BREATH_ARM.root.x, y: BREATH_ARM.root.y, z: BREATH_ARM.root.z },
+            wrist,
+            BREATH_ARM.upper,
+            BREATH_ARM.fore,
+            breathElbowPole(side),
+          );
+          for (const axis of ['x', 'y', 'z'] as const) {
+            expect(arm.elbow[axis]).toBeCloseTo(ref.elbow[axis], 9);
+            expect(arm.wrist[axis]).toBeCloseTo(ref.wrist[axis], 9);
+          }
+        }
+    const input = {
+      castId: BREATH_CASTS.inhale,
+      castFill: 0.4,
+      windPhase: null,
+      windFill: 0,
+      stormForm: false,
+    };
+    expect(breathBodyAction(input, act)).toBe(act);
+    expect(act).toEqual({ action: 'inhale', k: 0.4 });
+    const fall = { k: 0, landed: false };
+    expect(breathFallProgress(9, 0, fall)).toBe(fall);
+    expect(fall.landed).toBe(true);
+  });
+
   it('tears the shell out to rings of shards round the storm core', () => {
     expect(stormTearProgress(0, 0.25)).toBeCloseTo(0.25);
     expect(stormTearProgress(10, 0.25)).toBeCloseTo(1);
@@ -244,7 +283,12 @@ describe('BreathBody', () => {
     const boss = entity(2, 'mob', BREATH_GUARDIAN, 0, 198);
     const wind = entity(3, 'object', breathWindTemplate('gather', 90, 2.5), 0, 196);
     for (const e of [me, boss, wind]) entities.set(e.id, e);
-    const world = { entities, player: me, playerId: me.id } as unknown as IWorld;
+    const world = {
+      entities,
+      entityRosterVersion: 1,
+      player: me,
+      playerId: me.id,
+    } as unknown as IWorld & { entityRosterVersion: number };
     const scene = new THREE.Scene();
     let shaken = 0;
     const fx = new BreathBody(
@@ -260,6 +304,21 @@ describe('BreathBody', () => {
     const root = scene.getObjectByName('smith-heart-breath-body');
     expect(root).toBeDefined();
     const body = root?.getObjectByName('smithHeartBreathBody');
+    // No kit here: every piece wears its stand-in stone (a kit that never
+    // lands still leaves a body), the crystals casting no shadow.
+    const standIns: THREE.Mesh[] = [];
+    body?.traverse((o) => {
+      if (o instanceof THREE.Mesh && o.name === 'smithHeartBreathStandIn') standIns.push(o);
+    });
+    expect(standIns).toHaveLength(BREATH_BODY_PIECES.length);
+    BREATH_BODY_PIECES.forEach((def) => {
+      const holder = body?.getObjectByName(`breathBody:${def.id}`);
+      const s = holder?.children.find((c) => c.name === 'smithHeartBreathStandIn') as
+        | THREE.Mesh
+        | undefined;
+      expect(s, def.id).toBeDefined();
+      if (def.light === 'crystal') expect(s?.castShadow, def.id).toBe(false);
+    });
     fx.update(0.2);
     expect(body?.visible).toBe(true);
     // As the blow gathers it turns its mouth to the bearing (90: east, +x).
@@ -304,8 +363,18 @@ describe('BreathBody', () => {
     expect(body?.visible).toBe(true);
     // Leaving the world frees it.
     entities.delete(boss.id);
+    world.entityRosterVersion++;
     fx.update(0.2);
     expect(body?.visible).toBe(false);
+    // Discovery walks the roster on a membership change only: a guardian
+    // the walk has not been told of stays undrawn until the version moves.
+    boss.dead = false;
+    entities.set(boss.id, boss);
+    fx.update(0.2);
+    expect(body?.visible).toBe(false);
+    world.entityRosterVersion++;
+    fx.update(0.2);
+    expect(body?.visible).toBe(true);
     fx.dispose();
     expect(scene.getObjectByName('smith-heart-breath-body')).toBeUndefined();
   });
@@ -316,7 +385,12 @@ describe('BreathBody', () => {
     const boss = entity(2, 'mob', BREATH_GUARDIAN, 0, 198);
     boss.auras.push({ id: BREATH_AURAS.stormForm } as Entity['auras'][number]);
     for (const e of [me, boss]) entities.set(e.id, e);
-    const world = { entities, player: me, playerId: me.id } as unknown as IWorld;
+    const world = {
+      entities,
+      entityRosterVersion: 1,
+      player: me,
+      playerId: me.id,
+    } as unknown as IWorld;
     const scene = new THREE.Scene();
     const fx = new BreathBody(scene, () => 60, world);
     fx.update(0.2);

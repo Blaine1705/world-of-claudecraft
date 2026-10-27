@@ -419,6 +419,12 @@ class MarkPool {
   }
 }
 
+/** The first idle one of a pool, else (all live) its oldest slot. */
+function firstIdle<T extends { live: boolean }>(pool: readonly T[]): T {
+  for (let i = 0; i < pool.length; i++) if (!pool[i].live) return pool[i];
+  return pool[0];
+}
+
 function boltRibbon(pts: readonly THREE.Vector3[], width: number): THREE.BufferGeometry {
   const pos: number[] = [];
   const edge: number[] = [];
@@ -490,6 +496,15 @@ export class BreathFightFx {
   private readonly chargedFans: FanSlot[] = [];
   private readonly cradleFans: FanSlot[] = [];
   private readonly barFans: FanSlot[] = [];
+  /** The object footprint pools, in one list (built once, walked by assign). */
+  private readonly footprintPools: readonly FanSlot[][] = [
+    this.calmFans,
+    this.vortexFans,
+    this.galeFans,
+    this.strikeFans,
+    this.chargedFans,
+    this.cradleFans,
+  ];
   // The players' marks.
   private readonly anchorMarks: MarkPool;
   private readonly pinnedMarks: MarkPool;
@@ -520,6 +535,16 @@ export class BreathFightFx {
   private windBearing = 0;
   private windFill = 0;
   private readonly objectIds: number[] = [];
+  /** Every entity the roster walk found the fight could draw (re-read on
+   *  the scan's clock; re-walked on a roster change only). */
+  private readonly candidateIds: number[] = [];
+  /** The roster version the last walk saw (NaN: walk on the next scan). */
+  private rosterSeen = Number.NaN;
+  /** The wind's bearing as a direction (rewritten in place each frame). */
+  private readonly windDir = { x: 0, z: 1 };
+  /** The audio's entity and ground reads, bound once (not per event). */
+  private readonly lookup = (id: number): Entity | undefined => this.world?.entities.get(id);
+  private readonly groundAt = (x: number, z: number): number => this.groundY(x, z);
   private readonly cradledIds: number[] = [];
   private origin: { x: number; z: number } | null = null;
   private floorY = 0;
@@ -662,7 +687,7 @@ export class BreathFightFx {
     fans(P.strikes, 12, this.strikeFans);
     fans(P.charged, 8, this.chargedFans);
     fans(P.cradles, 9, this.cradleFans);
-    fans(2, 11, this.barFans);
+    fans(1, 11, this.barFans);
     for (const s of this.calmFans) this.layOut(s, 360, C.calm, C.calmEdge);
     for (const s of this.vortexFans) this.layOut(s, 360, C.danger, C.accent);
     for (const s of this.galeFans) this.layOut(s, 360, C.control, C.accent);
@@ -991,11 +1016,7 @@ export class BreathFightFx {
   handleEvent(ev: SimEvent): boolean {
     if (!this.world || this.disposed) return false;
     const world = this.world;
-    this.audio.event(
-      ev,
-      (id) => world.entities.get(id),
-      (x, z) => this.groundY(x, z),
-    );
+    this.audio.event(ev, this.lookup, this.groundAt);
     if (ev.type === 'spellfxAt') {
       if (!breathFightClaims(ev.ability)) return false;
       const r = ev.radius ?? 3;
@@ -1106,8 +1127,16 @@ export class BreathFightFx {
       this.floorY = this.groundY(origin.x, origin.z + 196);
       this.local.position.set(origin.x, this.floorY - CORNICE_FLOOR_H, origin.z);
       this.fieldMat.uniforms.uCentre.value.set(0, 196);
+      this.rosterSeen = Number.NaN;
     }
     this.local.visible = true;
+    // The roster walk runs on a membership change only (an entity added or
+    // dropped: src/render/CLAUDE.md "Performance discipline"); the scan's
+    // clock re-reads only the few candidates it found.
+    if (world.entityRosterVersion !== this.rosterSeen) {
+      this.rosterSeen = world.entityRosterVersion;
+      this.discover(world, origin);
+    }
     this.objectIds.length = 0;
     this.cradledIds.length = 0;
     this.guardianId = -1;
@@ -1116,20 +1145,23 @@ export class BreathFightFx {
     this.anchorMarks.begin();
     this.pinnedMarks.begin();
     this.drawnMarks.begin();
-    for (const e of world.entities.values()) {
-      if (Math.abs(e.pos.x - origin.x) > 300 || Math.abs(e.pos.z - origin.z) > 260) continue;
+    for (let i = 0; i < this.candidateIds.length; i++) {
+      const e = world.entities.get(this.candidateIds[i]);
+      if (!e) continue;
       if (e.kind === 'object') {
         const kind = breathObjectKind(e.templateId);
         if (kind === 'wind') this.windId = e.id;
         else if (kind) this.objectIds.push(e.id);
-      } else if (e.kind === 'mob' && e.templateId === BREATH_GUARDIAN) {
+      } else if (e.kind === 'mob') {
         this.guardianId = e.id;
         let stacks = 0;
         for (const a of e.auras) if (a.id === BREATH_AURAS.swell) stacks = a.stacks ?? 1;
         this.swell = e.dead ? 0 : stacks;
-      } else if (e.kind === 'npc' && e.templateId === BREATH_THESSALY_NPC) {
+      } else if (e.kind === 'npc') {
         this.thessalyId = e.id;
       } else if (e.kind === 'player' && !e.dead) {
+        // Players move: the claim's box is checked on every pass.
+        if (Math.abs(e.pos.x - origin.x) > 300 || Math.abs(e.pos.z - origin.z) > 260) continue;
         for (const a of e.auras) {
           if (a.id === BREATH_AURAS.anchor) this.anchorMarks.take(e.id);
           else if (a.id === BREATH_AURAS.pinned) this.pinnedMarks.take(e.id);
@@ -1144,17 +1176,29 @@ export class BreathFightFx {
     this.assign(world);
   }
 
+  /** The roster walk: every entity the fight could draw (the claim's
+   *  objects, its guardian, Thessaly, and every player, who may walk in). */
+  private discover(world: IWorld, origin: { x: number; z: number }): void {
+    const ids = this.candidateIds;
+    ids.length = 0;
+    for (const e of world.entities.values()) {
+      if (e.kind === 'player') {
+        ids.push(e.id);
+        continue;
+      }
+      if (Math.abs(e.pos.x - origin.x) > 300 || Math.abs(e.pos.z - origin.z) > 260) continue;
+      if (
+        e.kind === 'object' ||
+        (e.kind === 'mob' && e.templateId === BREATH_GUARDIAN) ||
+        (e.kind === 'npc' && e.templateId === BREATH_THESSALY_NPC)
+      )
+        ids.push(e.id);
+    }
+  }
+
   /** Every fight object to its footprint slot (released when gone). */
   private assign(world: IWorld): void {
-    const pools = [
-      this.calmFans,
-      this.vortexFans,
-      this.galeFans,
-      this.strikeFans,
-      this.chargedFans,
-      this.cradleFans,
-    ];
-    for (const pool of pools)
+    for (const pool of this.footprintPools)
       for (const s of pool)
         if (s.id >= 0 && !this.objectIds.includes(s.id)) {
           s.id = -1;
@@ -1198,6 +1242,8 @@ export class BreathFightFx {
 
   private leave(): void {
     this.origin = null;
+    this.rosterSeen = Number.NaN;
+    this.candidateIds.length = 0;
     this.local.visible = false;
     for (const pool of [
       this.calmFans,
@@ -1246,7 +1292,7 @@ export class BreathFightFx {
   private paintField(dt: number): void {
     const look = windFieldLook(this.windPhase, this.windFill, this.windLook);
     const u = this.fieldMat.uniforms;
-    const d = bearingDir(this.windBearing);
+    const d = bearingDir(this.windBearing, this.windDir);
     u.uDir.value.set(d.x, d.z);
     u.uInward.value = look.inward ? 1 : 0;
     // The flow integrates its own speed, so a change of speed never jumps.
@@ -1261,16 +1307,18 @@ export class BreathFightFx {
     this.field.visible = u.uChevron.value > 0.01 || u.uStrength.value > 0.01 || look.front >= 0;
     // The gaps' lips flare when the wind blows their way.
     const th = this.lipMat.uniforms.uThreat.value as THREE.Vector4;
-    const val = (i: number) => {
-      const lip = this.lips[i];
-      return lip ? gapThreat(lip, this.windPhase, this.windBearing) : 0;
-    };
-    th.set(val(0), val(1), val(2), val(3));
+    th.set(this.lipThreat(0), this.lipThreat(1), this.lipThreat(2), this.lipThreat(3));
     (this.lipFloorMat.uniforms.uThreat.value as THREE.Vector4).copy(th);
     // The swelling storm's flicker over the floor.
     const stacks = this.swell;
     u.uStorm.value = Math.min(1, stacks / 20);
     this.windDressing(look, d, dt);
+  }
+
+  /** One gap's lip's threat (0 for a lip the field has none of). */
+  private lipThreat(i: number): number {
+    const lip = this.lips[i];
+    return lip ? gapThreat(lip, this.windPhase, this.windBearing) : 0;
   }
 
   /** The air's streaks and grit riding the wind round the player, the
@@ -1374,7 +1422,7 @@ export class BreathFightFx {
       if (!e || !of) {
         beam.mesh.visible = false;
         dome.mesh.visible = false;
-        for (let k = 0; k < 3; k++) this.seatPips[i * 3 + k].visible = false;
+        for (let k = 0; k < P.seats; k++) this.seatPips[i * P.seats + k].visible = false;
         continue;
       }
       const r = e.scale > 0 ? e.scale : T.circleR;
@@ -1406,9 +1454,9 @@ export class BreathFightFx {
         }
       }
       const left = of.state === 'spent' ? 0 : calmSeatsLeft(inside);
-      for (let k = 0; k < 3; k++) {
-        const pip = this.seatPips[i * 3 + k];
-        const a = (k / 3) * Math.PI * 2 + this.clock * 0.4;
+      for (let k = 0; k < P.seats; k++) {
+        const pip = this.seatPips[i * P.seats + k];
+        const a = (k / P.seats) * Math.PI * 2 + this.clock * 0.4;
         pip.visible = of.state !== 'land' || look.fill > 0.6;
         pip.position.set(e.pos.x + Math.sin(a) * r, y + 0.45, e.pos.z + Math.cos(a) * r);
         pip.material = k < left ? this.seatMat : this.seatSpentMat;
@@ -1599,7 +1647,7 @@ export class BreathFightFx {
         });
     }
     // The pinned: an arc at their feet facing the wall they are pressed to.
-    const d = bearingDir(this.windBearing);
+    const d = bearingDir(this.windBearing, this.windDir);
     const yaw = Math.atan2(d.x, d.z);
     for (const m of this.pinnedMarks.marks) {
       if (m.id < 0) continue;
@@ -1659,30 +1707,30 @@ export class BreathFightFx {
     const slot = this.barFans[0];
     const id = g?.castingAbility;
     const target = g && g.castTargetId !== null ? world.entities.get(g.castTargetId) : undefined;
-    const want =
-      !g || g.dead || !target
-        ? null
-        : id === BREATH_CASTS.fork
-          ? { r: FORK_REACH, color: C.danger }
-          : id === BREATH_CASTS.cradle
-            ? { r: T.cradleR, color: C.soak }
-            : id === BREATH_CASTS.drawn
-              ? { r: T.drawnR, color: C.lethal }
-              : null;
-    if (!want || !g || !target) {
+    const r =
+      id === BREATH_CASTS.fork
+        ? FORK_REACH
+        : id === BREATH_CASTS.cradle
+          ? T.cradleR
+          : id === BREATH_CASTS.drawn
+            ? T.drawnR
+            : 0;
+    if (!g || g.dead || !target || r <= 0) {
       slot.fan.group.visible = false;
       slot.id = -1;
       return;
     }
     if (slot.template !== id) {
       slot.template = id ?? '';
-      this.kit.layOutFan(slot.fan, 360, { color: want.color, accent: C.accent });
+      const color =
+        id === BREATH_CASTS.fork ? C.danger : id === BREATH_CASTS.cradle ? C.soak : C.lethal;
+      this.kit.layOutFan(slot.fan, 360, { color, accent: C.accent });
     }
     slot.fan.group.visible = true;
     const fill = g.castTotal > 0 ? Math.max(0, Math.min(1, 1 - g.castRemaining / g.castTotal)) : 1;
     const y = this.groundY(target.pos.x, target.pos.z);
-    this.kit.drapeFan(slot.fan, this.groundY, target.pos.x, y, target.pos.z, 0, want.r);
-    this.kit.paintFan(slot.fan, { fill, clock: this.clock, range: want.r });
+    this.kit.drapeFan(slot.fan, this.groundY, target.pos.x, y, target.pos.z, 0, r);
+    this.kit.paintFan(slot.fan, { fill, clock: this.clock, range: r });
   }
 
   // ---- the strikes, the beams --------------------------------------------------------------
@@ -1691,7 +1739,7 @@ export class BreathFightFx {
     const x = lx;
     const z = lz;
     const y = this.groundY(x, z);
-    const b = this.bolts.find((o) => !o.live) ?? this.bolts[0];
+    const b = firstIdle(this.bolts);
     b.born = this.clock;
     b.live = true;
     b.seconds = STRIKE_BOLT_SECONDS * (size > 1 ? 1.6 : 1);
@@ -1699,7 +1747,7 @@ export class BreathFightFx {
     b.mesh.scale.set(size, size > 1 ? 1.15 : 1, size);
     b.mesh.rotation.y = this.rand() * Math.PI * 2;
     b.mesh.visible = true;
-    const sc = this.scorches.find((o) => !o.live) ?? this.scorches[0];
+    const sc = firstIdle(this.scorches);
     sc.born = this.clock;
     sc.live = true;
     sc.mesh.position.set(x, y + 0.05, z);
@@ -1735,7 +1783,7 @@ export class BreathFightFx {
 
   /** A beam between two bodies (a fork's leg, Thessaly's anchor). */
   private beam(from: Entity, to: Entity, seconds: number, fromLift: number, color?: number): void {
-    const b = this.beams.find((o) => !o.live) ?? this.beams[0];
+    const b = firstIdle(this.beams);
     b.born = this.clock;
     b.seconds = seconds;
     b.live = true;
