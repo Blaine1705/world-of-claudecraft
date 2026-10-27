@@ -87,11 +87,12 @@ const raw = readFileSync('docs/x.md', 'utf8');`);
     expect(requiresAlwaysRun(v.klass)).toBe(true);
   });
 
-  it('does not mistake a static import or importActual for a dynamic import', () => {
+  it('does not mistake a static import, string-literal import(), or importActual for a computed dynamic import', () => {
     const v = classifyTestSource(
-      `import { Sim } from '../src/sim/sim';\nconst real = await vi.importActual('../src/x');`,
+      `import { Sim } from '../src/sim/sim';\nconst m = await import('../src/render/terrain');\nconst real = await vi.importActual('../src/x');`,
     );
     expect(v.reasons).not.toContain('dynamic-import');
+    expect(v.klass).toBe('graph');
   });
 
   it('pins the pattern list so a silent deletion fails here', () => {
