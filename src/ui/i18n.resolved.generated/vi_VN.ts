@@ -15193,6 +15193,7 @@ export const vi_VN: EnTranslations = {
       "accountSuspended": "Tài khoản này bị đình chỉ đến {date}.",
       "alreadyInWorld": "Nhân vật đã ở trong thế giới.",
       "accountSessionLimit": "Quá nhiều nhân vật trên tài khoản này đã ở trong thế giới.",
+      "worldFightHold": "Another character on this account is still in the world after a fight. Try again in a few minutes.",
       "takenOver": "Nhân vật của bạn đã bị một phiên khác chiếm quyền.",
       "vaultMailRecovering": "Khôi phục thư từ hộc.",
       "renameBeforeEntering": "Nhân vật này phải được đổi tên trước khi vào thế giới.",

@@ -15193,6 +15193,7 @@ export const zh_TW: EnTranslations = {
       "accountSuspended": "此帳號停權至 {date}。",
       "alreadyInWorld": "角色已在世界中。",
       "accountSessionLimit": "此帳號已有太多角色在世界中。",
+      "worldFightHold": "此帳號的另一個角色在戰鬥後仍留在世界中。請幾分鐘後再試。",
       "takenOver": "你的角色已被另一個工作階段接管。",
       "vaultMailRecovering": "寶庫獎勵郵件正在恢復中。請稍後再試。",
       "renameBeforeEntering": "此角色必須先更名才能進入世界。",

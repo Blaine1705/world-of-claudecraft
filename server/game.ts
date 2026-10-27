@@ -349,7 +349,7 @@ import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
 import { keepaliveSweepDelayed, shouldReapSession, WS_KEEPALIVE_PING_MS } from './keepalive_sweep';
 import { lanceSelfWire, runLanceVerb } from './lance_wire';
-import { LINKDEAD_GRACE_MS, planJoin } from './linkdead';
+import { LINKDEAD_GRACE_MS, planAccountJoin } from './linkdead';
 import {
   consumeListReadToken,
   createListReadGuard,
@@ -535,7 +535,11 @@ import { holderInfoForPubkey } from './woc_balance';
 import type { CharacterSaveArgs } from './woc_market';
 import { activeWorldBossIdsWireJson, writeWorldBossWireFields } from './world_boss_wire';
 import * as objectCmds from './world_object_commands';
-import { forfeitWorldPvpFightOnSessionDeparture } from './world_pvp_departure';
+import {
+  forfeitWorldPvpFightOnSessionDeparture,
+  worldFightHoldsBody,
+  worldFightHoldsLogout,
+} from './world_pvp_departure';
 import { applyWorldQuestBlockLive as applyWorldQuestBlockLiveRuntime } from './world_quest_block_runtime';
 import { recordWorldQuestScoreEvent } from './world_quest_leaderboard';
 import { isBackpressureExceeded } from './ws_backpressure';
@@ -3143,19 +3147,13 @@ export class GameServer {
   ): ClientSession | { error: string } {
     // Cap live characters per account; planJoin handles GM and linkdead exceptions.
     const sameCharacter = this.sessionsByCharacterId.get(characterId) ?? null;
-    let liveOtherSessions = 0;
-    const linkdeadOthers: ClientSession[] = [];
-    for (const s of this.clients.values()) {
-      if (s.accountId !== accountId || s === sameCharacter) continue;
-      if (s.linkdead) linkdeadOthers.push(s);
-      else liveOtherSessions++;
-    }
-    const plan = planJoin({
+    const { plan, linkdeadOthers } = planAccountJoin({
+      sessions: this.clients.values(),
       accountId,
       isGm,
       sameCharacter,
-      liveOtherSessions,
       maxPerAccount: MAX_ACTIVE_SESSIONS_PER_ACCOUNT,
+      holdsBody: (s) => worldFightHoldsBody(this.sim, s.pid),
     });
     if (plan.action === 'reject') return { error: plan.error };
     if (plan.action === 'resume' && sameCharacter)
@@ -5967,10 +5965,12 @@ export class GameServer {
     const msg = rawMsg as ClientMessage;
     const sim = this.sim;
     const pid = session.pid;
-    // Deliberate logout: a clean leave, not a linkdead grace. leave() sets
-    // session.left at once, so the page reload's close is a socketClosed() no-op.
+    // Deliberate logout: a clean leave, unless a recent world fight holds the body like a closed
+    // tab. Either path marks the session, so the page reload's close is a socketClosed() no-op.
     if (msg.t === 'logout') {
-      void this.leave(session, 'logout');
+      const held = worldFightHoldsLogout(sim, pid, !session.escrowQuarantined);
+      if (held) this.socketClosed(session, session.ws);
+      else void this.leave(session, 'logout');
       return;
     }
     if (msg.t === 'input') {

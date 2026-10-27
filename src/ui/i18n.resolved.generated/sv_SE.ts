@@ -15193,6 +15193,7 @@ export const sv_SE: EnTranslations = {
       "accountSuspended": "Detta konto är avstängt till {date}.",
       "alreadyInWorld": "Karaktären är redan i världen.",
       "accountSessionLimit": "För många karaktärer på detta konto är redan i världen.",
+      "worldFightHold": "Another character on this account is still in the world after a fight. Try again in a few minutes.",
       "takenOver": "Din karaktär togs över av en annan session.",
       "vaultMailRecovering": "Din kassaskatt-belönings-post återställs. Försök igen snart.",
       "renameBeforeEntering": "Denna karaktär måste byta namn innan den går in i världen.",

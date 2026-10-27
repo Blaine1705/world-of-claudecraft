@@ -9388,6 +9388,7 @@ export type TranslationKeyFlat =
   | 'errors.api.vaultMailRecovering'
   | 'errors.api.verificationFailed'
   | 'errors.api.webLoginOnly'
+  | 'errors.api.worldFightHold'
   | 'errors.characterNameInvalid'
   | 'errors.characterNameRequired'
   | 'errors.noEnemyNearby'

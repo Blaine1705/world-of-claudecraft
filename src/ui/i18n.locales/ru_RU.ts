@@ -6589,6 +6589,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'errors.api.alreadyInWorld': 'Персонаж уже находится в мире.',
   'errors.api.accountSessionLimit':
     'Слишком много персонажей этой учетной записи уже находятся в мире.',
+  'errors.api.worldFightHold': 'Другой персонаж этой учётной записи всё ещё в мире после боя. Повторите попытку через несколько минут.',
   'errors.api.takenOver': 'Вашего персонажа перехватила другая сессия.',
   'errors.api.renameBeforeEntering': 'Перед входом в мир этому персонажу нужно сменить имя.',
   'errors.api.renameNotPermitted': 'Переименование этого персонажа не разрешено.',

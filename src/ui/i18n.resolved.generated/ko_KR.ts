@@ -15193,6 +15193,7 @@ export const ko_KR: EnTranslations = {
       "accountSuspended": "이 계정은 {date}까지 정지되었습니다.",
       "alreadyInWorld": "캐릭터가 이미 세계에 있습니다.",
       "accountSessionLimit": "이 계정의 너무 많은 캐릭터가 이미 세계에 있습니다.",
+      "worldFightHold": "이 계정의 다른 캐릭터가 전투 후 아직 세계에 남아 있습니다. 몇 분 후에 다시 시도하세요.",
       "takenOver": "다른 세션이 캐릭터를 넘겨받았습니다.",
       "vaultMailRecovering": "보물고 보상 우편을 복구하고 있습니다. 잠시 후 다시 시도해 주세요.",
       "renameBeforeEntering": "이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다.",

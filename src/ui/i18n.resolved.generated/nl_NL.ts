@@ -15193,6 +15193,7 @@ export const nl_NL: EnTranslations = {
       "accountSuspended": "Dit account is geschorst tot {date}.",
       "alreadyInWorld": "Personage is al in de wereld.",
       "accountSessionLimit": "Te veel personages op dit account zijn al in de wereld.",
+      "worldFightHold": "Another character on this account is still in the world after a fight. Try again in a few minutes.",
       "takenOver": "Je personage is overgenomen door een andere sessie.",
       "vaultMailRecovering": "Je kluis-beloningspost wordt hersteld. Probeer het zo over enkele ogenblikken.",
       "renameBeforeEntering": "Dit personage moet hernoemd worden voordat het de wereld kan betreden.",

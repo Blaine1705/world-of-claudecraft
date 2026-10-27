@@ -10,22 +10,28 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "errors.api.worldFightHold",
     "guide.worldPvpPage.hillBodyTwoHour"
   ],
   "es_ES": [
+    "errors.api.worldFightHold",
     "guide.worldPvpPage.hillBodyTwoHour"
   ],
   "fr_FR": [
+    "errors.api.worldFightHold",
     "guide.worldPvpPage.hillBodyTwoHour"
   ],
   "fr_CA": [
+    "errors.api.worldFightHold",
     "guide.worldPvpPage.hillBodyTwoHour"
   ],
   "en_CA": [],
   "it_IT": [
+    "errors.api.worldFightHold",
     "guide.worldPvpPage.hillBodyTwoHour"
   ],
   "de_DE": [
+    "errors.api.worldFightHold",
     "guide.worldPvpPage.hillBodyTwoHour"
   ],
   "zh_CN": [],
@@ -33,31 +39,40 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "errors.api.worldFightHold",
     "guide.worldPvpPage.hillBodyTwoHour"
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "errors.api.worldFightHold",
     "guide.worldPvpPage.hillBodyTwoHour"
   ],
   "nl_NL": [
+    "errors.api.worldFightHold",
     "guide.worldPvpPage.hillBodyTwoHour"
   ],
   "pl_PL": [
+    "errors.api.worldFightHold",
     "guide.worldPvpPage.hillBodyTwoHour"
   ],
   "id_ID": [
+    "errors.api.worldFightHold",
     "guide.worldPvpPage.hillBodyTwoHour"
   ],
   "tr_TR": [
+    "errors.api.worldFightHold",
     "guide.worldPvpPage.hillBodyTwoHour"
   ],
   "sv_SE": [
+    "errors.api.worldFightHold",
     "guide.worldPvpPage.hillBodyTwoHour"
   ],
   "vi_VN": [
+    "errors.api.worldFightHold",
     "guide.worldPvpPage.hillBodyTwoHour"
   ],
   "da_DK": [
+    "errors.api.worldFightHold",
     "guide.worldPvpPage.hillBodyTwoHour"
   ]
 };

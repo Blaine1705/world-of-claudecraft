@@ -1,4 +1,4 @@
-import { forfeitWorldPvpFightOnDeparture } from '../src/sim/pvp';
+import { forfeitWorldPvpFightOnDeparture, worldPvpHoldsDeparture } from '../src/sim/pvp';
 import type { Sim } from '../src/sim/sim';
 
 /** A session leaving the world mid world fight forfeits it: the leaver dies to
@@ -23,4 +23,22 @@ export function forfeitWorldPvpFightOnSessionDeparture(
 ): boolean {
   if (!canSave) return false;
   return forfeitWorldPvpFightOnDeparture(sim.ctx, pid);
+}
+
+/** A deliberate logout: forfeit a live world fight first, then report whether
+ *  a fight inside WORLD_PVP_DEPARTURE_HOLD_WINDOW still holds the body in the
+ *  world. True means the caller enters the linkdead grace (`socketClosed`), as
+ *  a closed client would, instead of leaving at once; false (no recent fight,
+ *  the forfeit killed them, or a session that can never save again) means a
+ *  clean leave. */
+export function worldFightHoldsLogout(sim: Sim, pid: number, canSave: boolean): boolean {
+  forfeitWorldPvpFightOnSessionDeparture(sim, pid, canSave);
+  return canSave && worldPvpHoldsDeparture(sim.ctx, pid);
+}
+
+/** Is a held (linkdead) body still inside its fight window? While it is, the
+ *  account's other characters stay out of the world (planJoin), so switching
+ *  to an alt cannot pull the fighter out of reach either. */
+export function worldFightHoldsBody(sim: Sim, pid: number): boolean {
+  return worldPvpHoldsDeparture(sim.ctx, pid);
 }

@@ -15193,6 +15193,7 @@ export const da_DK: EnTranslations = {
       "accountSuspended": "Denne konto er suspenderet indtil {date}.",
       "alreadyInWorld": "Karakteren er allerede i verdenen.",
       "accountSessionLimit": "For mange karakterer på denne konto er allerede i verdenen.",
+      "worldFightHold": "Another character on this account is still in the world after a fight. Try again in a few minutes.",
       "takenOver": "Din karakter blev overtaget af en anden session.",
       "vaultMailRecovering": "Din hvælvbelønningspost gendannes. Prøv igen om kort tid.",
       "renameBeforeEntering": "Denne karakter skal omdøbes, før den kan komme ind i verdenen.",
