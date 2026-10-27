@@ -8277,7 +8277,7 @@ export const zh_CN: EnTranslations = {
       "name": "闹鬼南瓜",
       "title": "闹鬼南瓜",
       "world": "世界",
-      "progress": "{label}: {current}/{total}",
+      "progress": "{label}：{current}/{total}",
       "found": "你点亮了{zone}的一只闹鬼南瓜：{count}/{total}。获得南瓜灯糖：{sweets}。",
       "flash": "找到闹鬼南瓜！{count}/{total}"
     },

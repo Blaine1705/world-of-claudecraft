@@ -24368,4 +24368,5 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'seasonal.thatchgrin.poleBound': '縛於木樁',
   'seasonal.thatchgrin.wakeYell': '夜幕降臨南瓜田！誰敢踏進我的田地？',
   'seasonal.thatchgrin.sleepYell': '太陽出來了。回到木樁上，繼續看守。',
+  'seasonal.pumpkins.progress': '{label}：{current}/{total}',
 };

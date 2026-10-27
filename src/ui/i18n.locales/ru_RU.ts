@@ -26142,4 +26142,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'seasonal.thatchgrin.poleBound': 'Привязан к шесту',
   'seasonal.thatchgrin.wakeYell': 'НОЧЬ опускается на поле! Кто бродит по МОЕМУ полю?',
   'seasonal.thatchgrin.sleepYell': 'Солнце встало. Обратно на шест, снова сторожить.',
+  'seasonal.pumpkins.progress': "{label}: {current}/{total}",
+
 };

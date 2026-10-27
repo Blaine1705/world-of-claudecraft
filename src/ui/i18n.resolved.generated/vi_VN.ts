@@ -1038,14 +1038,14 @@ export const vi_VN: EnTranslations = {
       "fateThreadsSentenceReady": "Ba Sợi Định Mệnh: Phán Quyết có thể tiêu thụ chúng để tăng 18% sát thương."
     },
     "priest": {
-      "gloomtitheLabel": "Gloomtithe",
-      "bombLabel": "Tithe Bomb",
-      "gloomtitheStatus": "{value} of {max} Gloomtithe",
-      "bombStatus": "{value} of {max} Tithe Bomb charges",
-      "bombReady": "Ready",
+      "gloomtitheLabel": "Thuế Bóng Tối",
+      "bombLabel": "Bom Thập Phân",
+      "gloomtitheStatus": "{value} trên {max} Thuế Bóng Tối",
+      "bombStatus": "{value} trên {max} điểm Bom Thập Phân",
+      "bombReady": "Sẵn sàng",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
-      "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
+      "gloomtitheTooltip": "Thuế Bóng Tối: tối đa 5 điểm có thể tiêu. Xé Toạc Hư Không tiêu 3; Chạm Hút Máu tiêu 2 để tăng 30% sát thương; Triệu Quỷ Thập Phân tiêu hết số điểm tích trữ. Tạo điểm cũng tích tiến độ Bom Thập Phân, ngay cả khi số điểm tích trữ đã đầy.",
+      "bombTooltip": "Bom Thập Phân: tạo 20 Thuế Bóng Tối để chuẩn bị một quả bom. Tiêu Thuế Bóng Tối không tăng tiến độ. Tiến độ được giữ giữa các trận chiến. Chết hoặc bắt đầu giao chiến với trùm đột kích sẽ đặt lại tiến độ. Hoàn tất niệm phép sẽ tiêu hao bom; hủy niệm phép sẽ giữ lại bom."
     },
     "procOverlay": {
       "soulFragmentsMeter": "Mảnh Linh Hồn",
@@ -2600,7 +2600,7 @@ export const vi_VN: EnTranslations = {
       "name_lantern_hall_destrier": "Chiến Mã Sảnh Đèn Lồng",
       "name_chimeglass_tortoise": "Tolliver chiếc cốc thủy tinh",
       "name_rickshaw_mount": "Xe kéo Buộc Xương",
-      "name_emberbristle_broom": "Emberbristle Broom",
+      "name_emberbristle_broom": "Chổi Lông Than Hồng",
       "name_wobbles_slime": "Slime Lắc Lư",
       "name_nightwing_chimera": "Chimera Cánh Đêm",
       "desc_valorsteed": "Một con tuấn mã khỏe, bước vững, mang yên da.",
@@ -2625,7 +2625,7 @@ export const vi_VN: EnTranslations = {
       "desc_nightwing_chimera": "Phi long chạng vạng hai đầu từ những cành cổ thụ, nghỉ trên đôi chân sau có vuốt và lướt trên mặt đất bằng cánh khắc bí thuật.",
       "desc_chimeglass_tortoise": "Một con rùa bằng muối đã vượt qua ba thế hệ đoàn lữ hành. Những người thợ hàn mài cho anh ta một cặp kính từ kính bão và treo một chiếc chuông đồng vào cổ anh ta, để con đường nghe thấy anh ta từ rất lâu trước khi nó nhìn thấy anh ta.",
       "desc_rickshaw_mount": "Một cỗ xe xương lọc cọc, với một tên lính xương xẩu bị buộc vào càng xe, kéo bạn lao đi hết tốc lực.",
-      "desc_emberbristle_broom": "A harvest broom bound with orange ribbon that hovers a hand above the ground, shedding embers from its bristles. A permanent reward from Gourdlight Eve."
+      "desc_emberbristle_broom": "Cây chổi mùa gặt buộc ruy băng cam, lơ lửng cách mặt đất một gang tay và rải than hồng từ lông chổi. Phần thưởng vĩnh viễn của Đêm Đèn Bí Ngô."
     },
     "mountTraining": {
       "mountPrompt": "Nhấn {key} để cưỡi Valorsteed huấn luyện.",
@@ -4675,9 +4675,9 @@ export const vi_VN: EnTranslations = {
     },
     "auraEffect": {
       "gourdlight": {
-        "thatchbound": "Old Thatchgrin pulls your strings. You cannot act: you are walked to your nearest ally and strike them every {every} sec for {min} to {max} damage (up to {mult} times as much against a level {level} ally). Ends early when you take damage equal to {pct}% of your maximum health, or when an ally dispels it (Magic)."
+        "thatchbound": "Lão Rơm Cười điều khiển bạn như con rối. Bạn không thể hành động: bạn bị đưa đến đồng minh gần nhất và đánh họ mỗi {every} giây, gây từ {min} đến {max} sát thương (tối đa gấp {mult} lần với đồng minh cấp {level}). Kết thúc sớm khi bạn chịu sát thương bằng {pct}% máu tối đa, hoặc khi đồng minh giải trừ hiệu ứng (Phép thuật)."
       },
-      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
+      "stilledMindCrit": "Nứt Vỡ Tâm Trí hoặc Xé Toạc Hư Không tiếp theo chắc chắn gây chí mạng nếu trúng đích. Phép khác không tiêu hao hiệu ứng này. Xé Toạc Hư Không vẫn tiêu hao 3 điểm Thuế Bóng Tối. Phép bị kháng vẫn tiêu hao hiệu ứng.",
       "wildheart": {
         "packBond": "Chịu ít hơn {pct}% sát thương khi bạn đồng hành đứng gần. Kéo Thầy Thú và báo đốm của hắn ra xa nhau để phá.",
         "packBondFury": "Gây thêm {pct}% sát thương khi bạn đồng hành đứng gần.",
@@ -4781,7 +4781,7 @@ export const vi_VN: EnTranslations = {
       "spellHaste": "Tăng tốc độ thi triển phép thêm {pct}%",
       "sated": "Không thể hưởng thêm hiệu ứng tăng tốc nhóm khác",
       "cauterizeFatigue": "Thiêu Đốt không thể ngăn một đòn chí mạng khác",
-      "seasonalCosmetic": "Cosmetic only: no effect on combat",
+      "seasonalCosmetic": "Chỉ thay đổi ngoại hình: không ảnh hưởng chiến đấu",
       "castShield": "Việc niệm chú không thể bị ngắt quãng hoặc làm chậm bởi sát thương",
       "dmgDone": "Tăng sát thương gây ra lên {pct}%",
       "dmgDoneReduce": "Giảm sát thương gây ra đi {pct}%",
@@ -4929,7 +4929,7 @@ export const vi_VN: EnTranslations = {
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "damageReduction": "Giảm {pct}% toàn bộ sát thương nhận vào",
       "slumber": "Ngủ đến bình minh. Không thể bị tấn công và sẽ không thức giấc vì bất kỳ ai.",
-      "slumberNight": "Hangs lifeless on his pole until nightfall. Cannot be attacked.",
+      "slumberNight": "Treo bất động trên cọc đến khi màn đêm buông xuống. Không thể bị tấn công.",
       "guardianWard": "Đòn chí mạng tiếp theo của kẻ địch thay vào đó hồi bạn lên {pct}% máu",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
@@ -5010,7 +5010,7 @@ export const vi_VN: EnTranslations = {
       "spawn": "{name} trỗi dậy trên {zone}!",
       "wake": "{name} thức giấc trên {zone}!",
       "sleep": "{name} ngủ đến bình minh.",
-      "sleepUntilNightfall": "{name} sleeps until nightfall."
+      "sleepUntilNightfall": "{name} ngủ đến khi màn đêm buông xuống."
     },
     "auth": {
       "appleLoginCta": "Tiếp Tục với Apple",
@@ -8274,103 +8274,103 @@ export const vi_VN: EnTranslations = {
   },
   "seasonal": {
     "pumpkins": {
-      "name": "Haunted Pumpkin",
-      "title": "Haunted Pumpkins",
-      "world": "World",
+      "name": "Bí Ngô Ma Ám",
+      "title": "Những Quả Bí Ngô Ma Ám",
+      "world": "Thế giới",
       "progress": "{label}: {current}/{total}",
-      "found": "You light a Haunted Pumpkin in {zone}: {count}/{total}. Gourdlight Sweets received: {sweets}.",
-      "flash": "Haunted Pumpkin found! {count}/{total}"
+      "found": "Bạn thắp sáng một Bí Ngô Ma Ám ở {zone}: {count}/{total}. Kẹo Đèn Bí Ngô nhận được: {sweets}.",
+      "flash": "Đã tìm thấy Bí Ngô Ma Ám! {count}/{total}"
     },
     "event": {
       "gourdlight_eve": {
-        "name": "Gourdlight Eve"
+        "name": "Đêm Đèn Bí Ngô"
       }
     },
     "trickOrTreat": {
-      "row": "Trick or treat!",
-      "rowAria": "Say trick or treat to {name}",
-      "knockedHint": "You already knocked here today. The door opens again after the daily reset.",
-      "treat": "{name} hands you a treat.",
-      "trick": "{name} plays a trick on you: {trick}!",
-      "alreadyKnocked": "You already trick-or-treated {name} today.",
-      "notActive": "Gourdlight Eve is not running right now.",
-      "tooFar": "Step closer to knock.",
+      "row": "Cho kẹo hay bị ghẹo!",
+      "rowAria": "Nói cho kẹo hay bị ghẹo với {name}",
+      "knockedHint": "Hôm nay bạn đã gõ cửa này. Cửa mở lại sau lần đặt lại hằng ngày.",
+      "treat": "{name} đưa bạn một món kẹo.",
+      "trick": "{name} trêu bạn: {trick}!",
+      "alreadyKnocked": "Hôm nay bạn đã xin kẹo hoặc ghẹo {name} rồi.",
+      "notActive": "Đêm Đèn Bí Ngô hiện chưa diễn ra.",
+      "tooFar": "Đến gần hơn để gõ cửa.",
       "treatFlash": {
-        "one": "Treat! {count} Gourdlight Sweet",
-        "few": "Treat! {count} Gourdlight Sweets",
-        "many": "Treat! {count} Gourdlight Sweets",
-        "other": "Treat! {count} Gourdlight Sweets"
+        "one": "Kẹo! {count} Kẹo Đèn Bí Ngô",
+        "few": "Kẹo! {count} Kẹo Đèn Bí Ngô",
+        "many": "Kẹo! {count} Kẹo Đèn Bí Ngô",
+        "other": "Kẹo! {count} Kẹo Đèn Bí Ngô"
       },
-      "trickFlash": "Trick! {trick}"
+      "trickFlash": "Ghẹo! {trick}"
     },
     "tricks": {
-      "gourdlight_trick_bat": "Batty",
-      "gourdlight_trick_skeleton": "Rattled Bones",
-      "gourdlight_trick_fumes": "Green Fumes",
-      "gourdlight_trick_strawling": "Strawling Guise",
-      "gourdlight_costume_skeleton": "Skeleton Costume",
-      "gourdlight_costume_ghost": "Ghost Costume",
-      "gourdlight_costume_bat": "Bat Costume"
+      "gourdlight_trick_bat": "Dơi Tinh Nghịch",
+      "gourdlight_trick_skeleton": "Xương Lạch Cạch",
+      "gourdlight_trick_fumes": "Khói Xanh",
+      "gourdlight_trick_strawling": "Dáng Người Rơm",
+      "gourdlight_costume_skeleton": "Trang Phục Bộ Xương",
+      "gourdlight_costume_ghost": "Trang Phục Ma",
+      "gourdlight_costume_bat": "Trang Phục Dơi"
     },
     "pumpkinHead": {
-      "on": "You put on the Carved Pumpkin Head.",
-      "off": "You take off the Carved Pumpkin Head."
+      "on": "Bạn đội Đầu Bí Ngô Chạm Khắc.",
+      "off": "Bạn tháo Đầu Bí Ngô Chạm Khắc."
     },
-    "jarTrick": "The jar pops open: {trick}!",
-    "guise": "The charm crackles and the straw climbs over you: {trick}!",
-    "costume": "You drink the draught and change: {trick}!",
-    "titleGranted": "You read the writ. New title earned: {title}.",
-    "titleKnown": "You already hold that title, so you keep the writ.",
-    "boundItemGone": "Gourdlight Eve is over, and your {item} crumbles back into straw.",
+    "jarTrick": "Lọ bật mở: {trick}!",
+    "guise": "Bùa nổ lách tách, rơm phủ lên người bạn: {trick}!",
+    "costume": "Bạn uống thuốc và biến hình: {trick}!",
+    "titleGranted": "Bạn đọc chứng thư. Nhận danh hiệu mới: {title}.",
+    "titleKnown": "Bạn đã có danh hiệu đó nên giữ lại chứng thư.",
+    "boundItemGone": "Đêm Đèn Bí Ngô đã kết thúc, {item} của bạn vụn ra thành rơm.",
     "itemUse": {
-      "pumpkinHead": "Use: Put on or take off a carved pumpkin lit from inside, worn over your helmet. Cosmetic.",
-      "trickJar": "Use: Plays a random harmless trick on you for a few seconds. Cosmetic.",
-      "pouch": "Use: Open it to receive {count} Gourdlight Sweets.",
-      "strawlingCharm": "Use: Become one of Old Thatchgrin's strawlings for {seconds} seconds. Not in combat. Never consumed. Cosmetic.",
-      "sweet": "Earned by trick-or-treating during Gourdlight Eve. Hester Gourdwick trades cosmetics for them at her stalls in Eastbrook, Fenbridge and Highwatch.",
-      "costumeSkeleton": "Use: Turn into a rattling skeleton for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Cosmetic.",
-      "costumeGhost": "Use: Turn into a drifting ghost for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Cosmetic.",
-      "costumeBat": "Use: Turn into a flapping bat for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Cosmetic.",
-      "toyPrank": "Use: Throw it at another visible player within {range} yards. Their head becomes a glowing jack-o'-lantern for {seconds} seconds, and they can right-click it off. Neither of you can be in combat, and you cannot be stealthed. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
-      "toyLantern": "Use: Set the lantern down in front of you. A small ghost circles you for {seconds} seconds. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
-      "toyBats": "Use: Open the sack. A squeaking swarm of bats bursts out and scatters around you for {seconds} seconds. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
-      "toyCandleShadows": "Use: Light the candle in front of you. For {seconds} seconds its flames throw dancing shadows of a cat, a bat and a witch onto the ground around it, for everyone nearby to see. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
-      "toyCauldron": "Use: Set a big bubbling cauldron down in front of you. It stands for {standing} seconds, and any player who drinks from it bursts in green bubbles and turns into a goblin for {seconds} seconds, replacing any costume they wear. Neither setting it down nor drinking works in combat or while stealthed, and entering combat ends the goblin form. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
-      "titleWrit": "Use: Earn the title {title} for this character, worn from the Book of Deeds. Consumed. Kept if you already hold the title.",
-      "broomSources": "Bought from Hester Gourdwick for {count} Emberwoven Sheaves, or, rarely, dropped by Old Thatchgrin on a day you loot him. Riding it requires the riding skill. Kept permanently and rideable year-round.",
-      "sheaf": "Old Thatchgrin gives one each day you loot him, until you own the Emberbristle Broom. Hester Gourdwick trades {count} for the broom at her stalls in Eastbrook, Fenbridge and Highwatch. Unspent sheaves are kept for the next Gourdlight Eve."
+      "pumpkinHead": "Dùng: Đội hoặc tháo quả bí chạm khắc được thắp sáng bên trong, đeo bên ngoài mũ giáp. Chỉ thay đổi ngoại hình.",
+      "trickJar": "Dùng: Gây một trò nghịch vô hại ngẫu nhiên lên bạn trong vài giây. Chỉ thay đổi ngoại hình.",
+      "pouch": "Dùng: Mở để nhận {count} Kẹo Đèn Bí Ngô.",
+      "strawlingCharm": "Dùng: Biến thành một người rơm nhỏ của Lão Rơm Cười trong {seconds} giây. Ngoài chiến đấu. Không bao giờ bị tiêu hao. Chỉ thay đổi ngoại hình.",
+      "sweet": "Kiếm được bằng trò cho kẹo hay bị ghẹo trong Đêm Đèn Bí Ngô. Hester Bấc Bí Ngô đổi chúng lấy vật phẩm ngoại hình tại các quầy ở Đông Khê, Cầu Đầm và Vọng Đài Cao.",
+      "costumeSkeleton": "Dùng: Biến thành bộ xương lạch cạch trong {minutes} phút. Bị tiêu hao. Không dùng được trong chiến đấu, vào chiến đấu sẽ kết thúc hiệu ứng. Chỉ thay đổi ngoại hình.",
+      "costumeGhost": "Dùng: Biến thành bóng ma lơ lửng trong {minutes} phút. Bị tiêu hao. Không dùng được trong chiến đấu, vào chiến đấu sẽ kết thúc hiệu ứng. Chỉ thay đổi ngoại hình.",
+      "costumeBat": "Dùng: Biến thành dơi vỗ cánh trong {minutes} phút. Bị tiêu hao. Không dùng được trong chiến đấu, vào chiến đấu sẽ kết thúc hiệu ứng. Chỉ thay đổi ngoại hình.",
+      "toyPrank": "Dùng: Ném vào người chơi khác nhìn thấy được trong {range} thước. Đầu họ biến thành đèn bí ngô phát sáng trong {seconds} giây; họ có thể nhấp chuột phải để bỏ. Cả hai phải ngoài chiến đấu và bạn không được tàng hình. Không bao giờ bị tiêu hao: dùng lại sau {cooldown} giây. Giữ vĩnh viễn và dùng được quanh năm. Chỉ thay đổi ngoại hình.",
+      "toyLantern": "Dùng: Đặt đèn lồng trước mặt. Một bóng ma nhỏ bay quanh bạn trong {seconds} giây. Không dùng được khi chiến đấu hoặc tàng hình. Không bao giờ bị tiêu hao: dùng lại sau {cooldown} giây. Giữ vĩnh viễn và dùng được quanh năm. Chỉ thay đổi ngoại hình.",
+      "toyBats": "Dùng: Mở bao. Đàn dơi kêu chít chít bay ùa ra quanh bạn trong {seconds} giây. Không dùng được khi chiến đấu hoặc tàng hình. Không bao giờ bị tiêu hao: dùng lại sau {cooldown} giây. Giữ vĩnh viễn và dùng được quanh năm. Chỉ thay đổi ngoại hình.",
+      "toyCandleShadows": "Dùng: Thắp nến trước mặt. Trong {seconds} giây, ngọn lửa hắt bóng mèo, dơi và phù thủy nhảy múa trên mặt đất xung quanh, ai ở gần cũng thấy được. Không dùng được khi chiến đấu hoặc tàng hình. Không bao giờ bị tiêu hao: dùng lại sau {cooldown} giây. Giữ vĩnh viễn và dùng được quanh năm. Chỉ thay đổi ngoại hình.",
+      "toyCauldron": "Dùng: Đặt vạc lớn sủi bọt trước mặt. Vạc tồn tại {standing} giây; người chơi uống từ vạc sẽ bùng lên trong bong bóng xanh và biến thành yêu tinh trong {seconds} giây, thay thế bộ hóa trang đang mặc. Không thể đặt vạc hay uống khi chiến đấu hoặc tàng hình; vào chiến đấu sẽ kết thúc dạng yêu tinh. Không bao giờ bị tiêu hao: dùng lại sau {cooldown} giây. Giữ vĩnh viễn và dùng được quanh năm. Chỉ thay đổi ngoại hình.",
+      "titleWrit": "Dùng: Nhận danh hiệu {title} cho nhân vật này, chọn đeo trong Sách Kỳ Công. Bị tiêu hao. Giữ lại nếu đã có danh hiệu.",
+      "broomSources": "Mua từ Hester Bấc Bí Ngô với {count} Bó Lúa Dệt Than Hồng, hoặc hiếm khi rơi từ Lão Rơm Cười vào ngày bạn lấy chiến lợi phẩm từ lão. Cần kỹ năng cưỡi để sử dụng. Giữ vĩnh viễn và cưỡi được quanh năm.",
+      "sheaf": "Lão Rơm Cười cho một bó mỗi ngày bạn lấy chiến lợi phẩm từ lão, cho đến khi bạn có Chổi Lông Than Hồng. Hester Bấc Bí Ngô đổi {count} bó lấy chổi tại các quầy ở Đông Khê, Cầu Đầm và Vọng Đài Cao. Bó chưa tiêu được giữ cho Đêm Đèn Bí Ngô kế tiếp."
     },
     "toy": {
-      "prank": "You throw the pumpkin. It splats onto {name}!",
-      "lantern": "You set the lantern down, and a little ghost drifts out to keep you company.",
-      "bats": "You open the sack, and a swarm of startled bats bursts out!",
-      "candleShadows": "You light the candle, and shadows begin to dance around its flames.",
-      "cauldron": "You set the cauldron down, and it starts to bubble.",
-      "cauldronDrink": "You drink from the cauldron, burst in green bubbles and turn into a goblin!",
-      "pranked": "{name} splats a pumpkin on your head! Right-click it off, or wear it proudly.",
-      "prankedFlash": "Pranked by {name}!",
-      "prankNeedsPlayer": "The pumpkin only splats on another player who is not in combat.",
-      "hidden": "Step out of the shadows first: a toy would give you away."
+      "prank": "Bạn ném quả bí. Nó vỡ bẹt lên {name}!",
+      "lantern": "Bạn đặt đèn lồng xuống, một bóng ma nhỏ bay ra bầu bạn.",
+      "bats": "Bạn mở bao, đàn dơi hoảng hốt ùa ra!",
+      "candleShadows": "Bạn thắp nến, những cái bóng bắt đầu nhảy múa quanh ngọn lửa.",
+      "cauldron": "Bạn đặt vạc xuống, vạc bắt đầu sủi bọt.",
+      "cauldronDrink": "Bạn uống từ vạc, bùng lên trong bong bóng xanh và biến thành yêu tinh!",
+      "pranked": "{name} ném vỡ bí ngô trên đầu bạn! Nhấp chuột phải để bỏ, hoặc đội thật tự hào.",
+      "prankedFlash": "Bị {name} chơi khăm!",
+      "prankNeedsPlayer": "Quả bí chỉ vỡ trên người chơi khác đang ngoài chiến đấu.",
+      "hidden": "Hãy bước ra khỏi bóng tối trước: đồ chơi sẽ làm lộ bạn."
     },
     "itemSource": {
-      "pumpkinHead": "Dropped by Old Thatchgrin, in his pumpkin field past Boar Meadow, the first time you loot him. No vendor sells it."
+      "pumpkinHead": "Rơi từ Lão Rơm Cười ở ruộng bí bên kia Đồng Cỏ Lợn Lòi trong lần đầu bạn lấy chiến lợi phẩm từ lão. Không có người bán nào bán vật này."
     },
     "boo": {
-      "row": "Boo!",
-      "rowAria": "Leap out at {name} and shout boo",
-      "needsCostume": "Put on a costume first: a costume draught, a bat or skeleton trick, the Strawling Charm, the Carved Pumpkin Head or a goblin sip from the Gurglegreen Cauldron.",
-      "frightenedHint": "{name} is still jumpy from your last fright. Find someone else.",
-      "landed": "You leap out at {name} with a BOO! They shriek and nearly drop everything.",
-      "flash": "BOO! {name} is frightened!",
-      "noCostume": "Without a costume, {name} only laughs at you. Put one on first.",
-      "already": "{name} has had enough frights for one day.",
-      "notOnErrand": "Hester has not asked you to frighten anyone today."
+      "row": "Hù!",
+      "rowAria": "Nhảy ra trước {name} và hét hù",
+      "needsCostume": "Hãy hóa trang trước: dùng thuốc hóa trang, trò dơi hoặc bộ xương, Bùa Người Rơm, Đầu Bí Ngô Chạm Khắc, hoặc uống một ngụm biến yêu tinh từ Vạc Xanh Sủi Bọt.",
+      "frightenedHint": "{name} vẫn còn giật mình sau lần dọa trước. Hãy tìm người khác.",
+      "landed": "Bạn nhảy ra trước {name} và hét HÙ! Họ thét lên, suýt làm rơi mọi thứ.",
+      "flash": "HÙ! {name} hoảng sợ!",
+      "noCostume": "Không có hóa trang, {name} chỉ cười bạn. Hãy mặc một bộ trước.",
+      "already": "{name} đã bị dọa đủ hôm nay rồi.",
+      "notOnErrand": "Hester chưa nhờ bạn dọa ai hôm nay."
     },
     "tokenPrice": "{count} {item}",
     "thatchgrin": {
-      "poleBound": "Pole-Bound",
-      "wakeYell": "NIGHT falls on the patch! Who walks in MY field?",
-      "sleepYell": "Sun is up. Back on the post, back to watching."
+      "poleBound": "Buộc Vào Cọc",
+      "wakeYell": "ĐÊM buông xuống ruộng! Ai đi trong ruộng CỦA TA?",
+      "sleepYell": "Mặt trời lên rồi. Về cọc, về canh gác thôi."
     }
   },
   "dungeonGuide": {
@@ -9667,7 +9667,7 @@ export const vi_VN: EnTranslations = {
       "framesGovernedTalkingHead": "Chỉnh sửa Khung cũng nới lỏng bảng Đối thoại, bảng này mang lời thoại của NPC trong khi NPC đó nằm ngoài tầm nhìn của bạn; nó đeo chip tên khi nó bị lỏng.",
       "framesGovernedShardpike": "Sửa Khung cũng mở khóa thanh Thương Mảnh Vỡ, hàng ngắn gồm thao tác công cụ nhiệm vụ cạnh thanh hành động chỉ khi bạn mang thương. Khi mở khóa nó có nhãn tên, để bạn đặt trước trận thay vì trong trận.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
-      "framesGovernedPriest": "Edit Frames also lets you move the Shadow priest's Gloomtithe and Tithe Bomb medallion.",
+      "framesGovernedPriest": "Chỉnh sửa Khung cũng cho phép di chuyển huy hiệu Thuế Bóng Tối và Bom Thập Phân của tư tế Bóng tối.",
       "framesGovernedResourceAndHill": "Bật Tách thanh tài nguyên trong thẻ Khung để Chỉnh Sửa Khung cũng mở khóa thanh tài nguyên, cho phép đặt thanh năng lượng phép, năng lượng hoặc nộ riêng ở bất kỳ đâu. Chiều rộng thanh tài nguyên và Chiều cao thanh tài nguyên trong cùng thẻ sẽ điều chỉnh kích thước của thanh. Chỉnh Sửa Khung cũng mở khóa thanh Vua của Đồi. Độ đục nền Vua của Đồi trong thẻ đó làm mờ nền bảng trong khi chữ vẫn rõ ràng.",
       "barsTitle": "Các thanh, bộ đếm giờ, và chữ chiến đấu",
       "barsBody": "Thanh niệm chú của bạn xuất hiện giữa màn hình, ngay phía trên thanh kỹ năng, bất cứ khi nào bạn niệm hoặc duy trì một phép, và hiển thị tên phép cùng thời gian còn lại. Mục tiêu của bạn cũng có thanh niệm chú riêng trên khung của nó, để bạn biết điều gì sắp xảy ra và đối phó kịp thời.\n\nMột thanh vung đòn mảnh nằm dưới thanh niệm chú và đầy dần giữa hai lần vung vũ khí, để một người đánh cận chiến hay tầm xa biết khi nào đòn đánh tự động tiếp theo sẽ trúng.\n\nThanh kinh nghiệm của bạn chạy suốt chiều rộng bên dưới thanh kỹ năng, chia thành từng đoạn, với một dải sáng hơn cho biết lượng kinh nghiệm nghỉ ngơi bạn đã tích lũy.\n\nBơi xuống dưới nước và một thanh hơi thở màu xanh sẽ xuất hiện ở đầu màn hình. Nó cạn dần khi đầu bạn còn ở dưới nước, chớp đỏ khi cạn hết và bạn bắt đầu chết đuối, rồi đầy lại nhanh chóng ngay khi bạn nổi lên mặt nước. Phím Nhảy đưa bạn bơi lên, còn phím Bơi Xuống, mặc định là Ctrl, đưa bạn xuống sâu hơn.\n\nSát thương và hồi máu bay lên trên bất cứ thứ gì chúng vừa tác động, dưới dạng những con số nhỏ, để bạn có thể đọc hiểu một trận đánh mà không cần đọc chữ. Tab Chiến Đấu trong khung trò chuyện của bạn giữ lại toàn bộ ghi chép bằng văn bản.",
@@ -10572,7 +10572,7 @@ export const vi_VN: EnTranslations = {
       "hillBodyRamp": "Cứ mỗi hai giờ, một ngọn đồi xuất hiện tại Vùng Đất Rồng, Đỉnh Sương Giá hoặc Xứ Thu Hổ Phách. Toàn vương quốc nhận cảnh báo trước mười lăm phút và vòng tròn được đánh dấu trên đất trống. Ngọn đồi hoạt động trong ba mươi phút. Bước vào vòng tròn đang hoạt động sẽ bật cờ PvP Thế Giới theo quy tắc cấp độ thông thường, kể cả với thành viên nhóm đột kích. Tổ đội có nhiều người chơi đủ điều kiện nhất bên trong sẽ chiếm ngọn đồi sau một phút duy trì ưu thế số lượng liên tục; người chơi một mình được tính là tổ đội một người, nhưng thành viên nhóm đột kích và người chơi chưa đạt cấp độ yêu cầu của PvP không thể chiếm đồi hoặc nhận Danh dự từ đồi. Mỗi người thuộc tổ đội kiểm soát đang đứng bên trong nhận Danh dự với tốc độ tăng dần. Phần thưởng được trao thường xuyên hơn và tăng nhanh hơn, giữ nguyên tổng Danh dự của sự kiện bốn mươi lăm phút trước đây. Khi quyền kiểm soát đổi chủ, mức thưởng bắt đầu tăng lại từ đầu. Rời vòng tròn vẫn giữ cờ bật; /pvp off áp dụng thời gian chờ năm phút thông thường và không thể hoàn tất bên trong ngọn đồi đang hoạt động hoặc trong lúc chiến đấu. Thanh ngọn đồi hiển thị quyền kiểm soát, số người và tiến độ chiếm giữ; /hill cho biết vị trí của đồi.",
       "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "hillBodyFlat": "Cứ mỗi ba giờ, vào một thời điểm không thể đoán trước, toàn cõi được thông báo rằng một ngọn đồi sẽ xuất hiện tại một trong các vùng phía bắc sau mười lăm phút, và vòng tròn của nó được đánh dấu trên đất trống. Đồi tồn tại bốn mươi lăm phút rồi biến mất. Trong thời gian đó, cứ năm phút lại thông báo vị trí và các nhóm có tổng thời gian chiếm giữ lâu nhất. Nhóm có nhiều người chơi đứng trong vòng tròn nhất tranh giành đồi và chiếm được sau tổng cộng ba mươi giây hơn quân số. Nhóm đối thủ bước vào chỉ tạm dừng bộ đếm cho đến khi nhóm bạn lại dẫn đầu; bộ đếm chỉ bắt đầu lại nếu không còn thành viên nào của nhóm bạn sống trong vòng tròn. Người chơi đơn lẻ được tính là nhóm một người và giữ nguyên quyền kiểm soát đồi khi lập nhóm, nhưng thành viên tổ đội đột kích hoàn toàn không được tính. Mỗi thành viên của nhóm đang giữ đồi đứng trong vòng tròn nhận cùng một lượng Danh Dự mỗi phút, bất kể đã giữ đồi bao lâu. Một nhóm đủ người giữ đồi không bị tranh chấp suốt thời gian tồn tại nhận xấp xỉ ba trận thắng chiến trường. Khi đồi biến mất, nếu nhóm có tổng thời gian giữ lâu nhất đã giữ ít nhất mười phút, mọi người đã đứng trong vòng tròn ít nhất một phút trong thời gian nhóm đó giữ đồi và vẫn thuộc nhóm đó đều nhận một trận thắng cho hàng PvP của Kho Tuần. Thanh phía trên bãi đấu hiển thị bên đang giữ, quân số hai bên và bộ đếm chiếm giữ; nhập /hill trong trò chuyện để biết vị trí.",
-      "hillBodyTwoHour": "Once every two hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the northern zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for thirty minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns the same Honor every minute, however long they have held it, so a full party holding an uncontested hill for its whole stand earns about as much as two battleground wins. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "hillBodyTwoHour": "Cứ hai giờ một lần, vào thời điểm không ai đoán trước được, toàn cõi được thông báo rằng một ngọn đồi sẽ nổi lên ở một vùng phía bắc sau mười lăm phút; vòng tròn nơi đồi xuất hiện được đánh dấu trên đất trống. Đồi tồn tại ba mươi phút rồi hạ xuống. Mỗi năm phút khi đồi còn đó, toàn cõi được báo vị trí và những nhóm đã giữ đồi lâu nhất. Tổ đội có nhiều người đứng trong vòng nhất sẽ tranh quyền kiểm soát; sau ba mươi giây chiếm ưu thế số lượng, đồi thuộc về họ. Tổ đội đối địch bước vào chỉ tạm dừng đếm giờ cho đến khi đội bạn lại dẫn trước; chỉ đặt lại từ đầu khi không còn ai trong đội bạn sống bên trong. Người chơi đơn được tính là tổ đội một người và vẫn giữ đồi khi lập tổ đội, nhưng thành viên đội đột kích không được tính. Khi tổ đội giữ đồi, mỗi thành viên đứng bên trong nhận cùng lượng Danh dự mỗi phút, bất kể đã giữ bao lâu. Vì thế, tổ đội đủ người giữ đồi không bị tranh chấp suốt thời gian tồn tại sẽ nhận khoảng bằng hai trận thắng chiến trường. Khi đồi hạ xuống, nếu nhóm giữ lâu nhất cộng dồn đã giữ ít nhất mười phút, mọi người từng đứng bên trong cho nhóm đó ít nhất một phút và vẫn còn trong nhóm sẽ nhận một trận thắng cho hàng PvP của Kho Báu Hàng Tuần. Thanh phía trên khu vực cho biết bên giữ đồi, số người hai bên và thời gian tranh chiếm; gõ /hill trong trò chuyện để biết vị trí.",
       "limitsBodyRaids": "Đánh bại cùng một người chơi lại và lại trả ít hơn mỗi lần và sớm không gì cả, và số lượng của bạn chống lại người chơi đó chỉ bắt đầu lại khoảng một giờ sau những vết sưng đầu tiên của những vết sưng đó, vì vậy cắm trại một nạn nhân không bao giờ đáng chờ đợi. Một mục tiêu xa dưới cấp độ của bạn trả không gì cả. Các sân vận động chiến đấu và Arena chạy các quy tắc riêng của họ trong khi bạn ở bên trong chúng, và họ trả nhiều Danh dự hơn thế giới mở, vì vậy chiến tranh thế giới là con đường chậm hơn đến cùng một người bán hàng. Đột kích không kiếm được gì từ vết sưng thế giới: một thành viên đột kích không lấy Danh dự hoặc vàng và không làm nhỏ lại chia sẻ của bất kỳ ai khác, vì vậy hãy chiến đấu như một bên để được trả tiền."
     },
     "thornhollowPage": {
@@ -15314,7 +15314,7 @@ export const vi_VN: EnTranslations = {
       "accountSuspended": "Tài khoản này bị đình chỉ đến {date}.",
       "alreadyInWorld": "Nhân vật đã ở trong thế giới.",
       "accountSessionLimit": "Quá nhiều nhân vật trên tài khoản này đã ở trong thế giới.",
-      "worldFightHold": "Another character on this account is still in the world after a fight. Try again in a few minutes.",
+      "worldFightHold": "Một nhân vật khác trên tài khoản này vẫn còn trong thế giới sau trận chiến. Hãy thử lại sau vài phút.",
       "takenOver": "Nhân vật của bạn đã bị một phiên khác chiếm quyền.",
       "vaultMailRecovering": "Khôi phục thư từ hộc.",
       "renameBeforeEntering": "Nhân vật này phải được đổi tên trước khi vào thế giới.",
@@ -18176,16 +18176,16 @@ export const vi_VN: EnTranslations = {
         "description": "Dồn phép trong 3 giây, gây {damage} sát thương Bóng Tối mỗi giây. Sát thương tăng theo Sức Mạnh Phép Thuật."
       },
       "vampiric_touch": {
-        "name": "Vampiric Touch",
-        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
+        "name": "Chạm Hút Máu",
+        "description": "Gây {damage} sát thương Bóng tối trong 15 giây, mỗi 3 giây một lần. Sát thương tăng theo Sức mạnh Phép thuật và mỗi lần gây sát thương có thể chí mạng. Mỗi lần chia lượng hồi máu bằng 20% máu kẻ địch mất cho bạn và các thành viên tổ đội bị thương trong 30 thước; trong đội đột kích, chỉ nhóm nhỏ của bạn được hồi máu. Nếu có ít nhất 2 điểm Thuế Bóng Tối, áp dụng hiệu ứng này tiêu hao 2 điểm để tăng toàn bộ sát thương của nó thêm 30%."
       },
       "void_rupture": {
-        "name": "Void Rupture",
-        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+        "name": "Xé Toạc Hư Không",
+        "description": "Tiêu hao 3 điểm Thuế Bóng Tối để xé toạc kẻ địch, gây {damage} sát thương Bóng tối. Sát thương tăng theo Sức mạnh Phép thuật và có thể chí mạng. Cần 3 điểm và vẫn tiêu hao khi bị kháng."
       },
       "spirit_bomb": {
-        "name": "Tithe Bomb",
-        "description": "Detonate a spirit bomb on an enemy, dealing {damage} Shadow damage to enemies within 8 yards of that target. Damage increases with Spell Power, can critically strike, and is reduced beyond 5 targets. Generate 20 Gloomtithe to prepare one bomb. Generation counts even while holding the maximum 5 Gloomtithe; spending charges is not required and adds no progress. Progress lasts between fights, up to one prepared bomb. Dying clears your progress and prepared bomb. Completing the cast consumes the prepared bomb, even if resisted. Cancellation or interruption preserves it. Starting a raid boss encounter clears your progress and prepared bomb. Cannot open a raid boss encounter with this spell."
+        "name": "Bom Thập Phân",
+        "description": "Kích nổ bom linh hồn trên một kẻ địch, gây {damage} sát thương Bóng tối lên kẻ địch trong 8 thước quanh mục tiêu. Sát thương tăng theo Sức mạnh Phép thuật, có thể chí mạng và bị giảm khi vượt quá 5 mục tiêu. Tạo 20 Thuế Bóng Tối để chuẩn bị một quả bom. Vẫn tính lượng tạo ra khi đang giữ tối đa 5 Thuế Bóng Tối; không cần tiêu điểm và tiêu điểm không tăng tiến độ. Tiến độ được giữ giữa các trận chiến, tối đa một bom sẵn sàng. Chết sẽ xóa tiến độ và bom sẵn sàng. Hoàn tất niệm phép tiêu hao bom, kể cả khi bị kháng. Hủy hoặc bị ngắt niệm phép sẽ giữ lại bom. Bắt đầu giao chiến với trùm đột kích sẽ xóa tiến độ và bom sẵn sàng. Không thể dùng phép này để mở đầu giao chiến với trùm đột kích."
       },
       "flash_heal": {
         "name": "Lời Nguyện Khẩn Cấp",
@@ -19021,7 +19021,7 @@ export const vi_VN: EnTranslations = {
       "inner_focus": {
         "name": "Tâm Trí Tĩnh",
         "description": "Khiến phép tu sĩ kế tiếp của bạn miễn phí và không thể bị ngắt. Kéo dài 60 giây.",
-        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
+        "specNote_shadow": "Đồng thời bảo đảm Nứt Vỡ Tâm Trí hoặc Xé Toạc Hư Không tiếp theo trong 60 giây sẽ chí mạng nếu trúng đích. Phép khác không tiêu hao hiệu ứng này. Xé Toạc Hư Không vẫn tiêu hao 3 điểm Thuế Bóng Tối. Phép bị kháng vẫn tiêu hao hiệu ứng bảo đảm chí mạng."
       },
       "innervate": {
         "name": "Nhựa Sống",
@@ -19219,7 +19219,7 @@ export const vi_VN: EnTranslations = {
       "choir_of_deliverance": {
         "name": "Hợp Xướng Giải Thoát",
         "description": "Vận phép trong 6 giây, hồi máu cho các thành viên trong nhóm trong phạm vi 30 mét {damage} mỗi 2 giây. Lượng hồi tăng theo sức mạnh phép thuật.",
-        "specNote_shadow": "For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Shadowform. Absorbed damage and overkill do not add healing."
+        "specNote_shadow": "Trong 15 giây, chia lượng hồi máu bằng 20% máu kẻ địch mất do sát thương Bóng tối của bạn cho các thành viên tổ đội bị thương trong 30 thước, gồm cả bạn. Trong đội đột kích, chỉ nhóm nhỏ của bạn được hồi máu. Thi triển tức thì và tiếp tục tấn công trong Màn Chạng Vạng. Sát thương bị hấp thụ và sát thương vượt quá máu còn lại không tạo hồi máu."
       },
       "bear_charge": {
         "name": "Cú Lao Bruin",
@@ -24435,85 +24435,85 @@ export const vi_VN: EnTranslations = {
         "name": "Mặt Dây Tiền Phương Chữa Lành"
       },
       "gourdlight_sweet": {
-        "name": "Gourdlight Sweet"
+        "name": "Kẹo Đèn Bí Ngô"
       },
       "gourdlight_treat_pouch": {
-        "name": "Gourdlight Treat Pouch"
+        "name": "Túi Kẹo Đèn Bí Ngô"
       },
       "carved_pumpkin_head": {
-        "name": "Carved Pumpkin Head"
+        "name": "Đầu Bí Ngô Chạm Khắc"
       },
       "jar_of_mischief": {
-        "name": "Jar of Mischief"
+        "name": "Lọ Nghịch Ngợm"
       },
       "thatchgrin_sweet_sack": {
-        "name": "Thatchgrin's Sweet Sack"
+        "name": "Bao Kẹo Của Lão Rơm Cười"
       },
       "strawling_charm": {
-        "name": "Strawling Charm"
+        "name": "Bùa Người Rơm"
       },
       "rattlebone_draught": {
-        "name": "Rattlebone Draught"
+        "name": "Thuốc Xương Lạch Cạch"
       },
       "haunting_draught": {
-        "name": "Haunting Draught"
+        "name": "Thuốc Ma Ám"
       },
       "batwing_draught": {
-        "name": "Fluttering Draught"
+        "name": "Thuốc Vỗ Cánh"
       },
       "writ_of_the_gourdlit": {
-        "name": "Writ of the Gourdlit"
+        "name": "Chứng Thư Ánh Bí Ngô"
       },
       "writ_of_the_trickster": {
-        "name": "Writ of the Trickster"
+        "name": "Chứng Thư Kẻ Tinh Quái"
       },
       "writ_of_the_hollow_grin": {
-        "name": "Writ of the Hollow Grin"
+        "name": "Chứng Thư Nụ Cười Rỗng"
       },
       "reins_emberbristle_broom": {
-        "name": "Emberbristle Broom"
+        "name": "Chổi Lông Than Hồng"
       },
       "hearthroot_toffee": {
-        "name": "Hearthroot Toffee"
+        "name": "Kẹo Bơ Rễ Bếp"
       },
       "gourdseed_brittle": {
-        "name": "Gourdseed Brittle"
+        "name": "Kẹo Giòn Hạt Bí"
       },
       "crabapple_chew": {
-        "name": "Crabapple Chew"
+        "name": "Kẹo Nhai Táo Dại"
       },
       "owlwatch_fudge": {
-        "name": "Owlwatch Fudge"
+        "name": "Kẹo Mềm Cú Canh Đêm"
       },
       "lantern_mint_drop": {
-        "name": "Lantern Mint Drop"
+        "name": "Kẹo Bạc Hà Đèn Lồng"
       },
       "emberwoven_sheaf": {
-        "name": "Emberwoven Sheaf"
+        "name": "Bó Lúa Dệt Than Hồng"
       },
       "prankers_pumpkin": {
-        "name": "Pranker's Pumpkin"
+        "name": "Bí Ngô Tinh Quái"
       },
       "wanderwisp_lantern": {
-        "name": "Wanderwisp Lantern"
+        "name": "Đèn Lồng Ma Trơi Lang Thang"
       },
       "sack_of_startled_bats": {
-        "name": "Sack of Startled Bats"
+        "name": "Bao Dơi Hoảng Hốt"
       },
       "murmurwick_candle": {
-        "name": "Murmurwick Candle"
+        "name": "Nến Bấc Thì Thầm"
       },
       "gurglegreen_cauldron": {
-        "name": "Gurglegreen Cauldron"
+        "name": "Vạc Xanh Sủi Bọt"
       },
       "thatchgrin_patch_pumpkin": {
-        "name": "Patch Pumpkin"
+        "name": "Bí Ngô Ruộng"
       },
       "cursed_candle_stub": {
-        "name": "Cursed Candle Stub"
+        "name": "Mẩu Nến Nguyền Rủa"
       },
       "gourdlight_crow_feather": {
-        "name": "Gourdlight Crow Feather"
+        "name": "Lông Quạ Đèn Bí Ngô"
       },
       "membership_staff": {
         "name": "Trượng Biến Đổi"
@@ -26072,16 +26072,16 @@ export const vi_VN: EnTranslations = {
         "name": "Đốc Công Rơm"
       },
       "gourdlight_thatchgrin": {
-        "name": "Old Thatchgrin"
+        "name": "Lão Rơm Cười"
       },
       "gourdlight_crow": {
-        "name": "Gourdlight Crow"
+        "name": "Quạ Đèn Bí Ngô"
       },
       "gourdlight_strawling": {
-        "name": "Strawling"
+        "name": "Người Rơm Nhỏ"
       },
       "gourdlight_swelling_gourd": {
-        "name": "Swelling Gourd"
+        "name": "Bí Ngô Phình To"
       },
       "stable_horse": {
         "name": "Ngựa chuồng"
@@ -27161,9 +27161,9 @@ export const vi_VN: EnTranslations = {
         "greeting": "Mọi bản đồ đầm này tôi mua đều sai chỉ sau một mùa. Nước dời lối, lối dời nước. Nên tôi tự vẽ, ngồi đây khô ráo chờ mực khô."
       },
       "gourdlight_keeper": {
-        "name": "Hester Gourdwick",
-        "title": "Gourdlight Keeper",
-        "greeting": "The gourds are lit and the lanterns are up, so it must be Gourdlight Eve. Knock on the doors of the townsfolk in Eastbrook, Fenbridge and Highwatch, and say the words: trick or treat. Most will hand you a sweet. A few will play a trick on you. Bring the sweets to me, at any of my stalls, and I will trade you something to wear."
+        "name": "Hester Bấc Bí Ngô",
+        "title": "Người Giữ Đèn Bí Ngô",
+        "greeting": "Bí ngô đã thắp sáng, đèn lồng đã treo lên, vậy là Đêm Đèn Bí Ngô đến rồi. Hãy gõ cửa người dân Đông Khê, Cầu Đầm và Vọng Đài Cao, rồi nói: cho kẹo hay bị ghẹo. Phần lớn sẽ cho con kẹo. Một vài người sẽ trêu con. Mang kẹo đến cho ta ở bất kỳ quầy nào của ta, ta sẽ đổi cho con thứ để mặc."
       },
       "reeve_ottoline": {
         "name": "Xã Trưởng Ottoline",
@@ -29800,84 +29800,84 @@ export const vi_VN: EnTranslations = {
         }
       },
       "q_gourdlight_rounds": {
-        "title": "Gourdlight Rounds",
-        "text": "Every Gourdlight Eve the children of the Vale make their rounds, and this year you are joining them, {playerName}. Knock on five doors in our towns, say the words, and see what you are given. Come back to me when you are done.",
-        "completion": "Five doors and you still have all your fingers. Here, a pouch of sweets for the walk home. Come back tomorrow, the doors open again.",
+        "title": "Vòng Quanh Đèn Bí Ngô",
+        "text": "Mỗi Đêm Đèn Bí Ngô, trẻ em Thung Lũng lại đi quanh xin kẹo, và năm nay con sẽ đi cùng, {playerName}. Gõ năm cánh cửa trong các thị trấn, nói câu ấy rồi xem con được gì. Xong thì quay về gặp ta.",
+        "completion": "Năm cánh cửa mà các ngón tay vẫn còn nguyên. Đây, túi kẹo ăn trên đường về. Mai quay lại nhé, cửa sẽ mở lần nữa.",
         "objectives": {
           "0": {
-            "label": "Doors knocked on"
+            "label": "Cửa đã gõ"
           }
         }
       },
       "q_gourdlight_daily_patch": {
-        "title": "Pumpkins from the Patch",
-        "text": "Old Thatchgrin's patch past Boar Meadow is fat with pumpkins, and half of them have rolled out past his straw where a careful soul can reach them. Bring me five, {playerName}. Stay wide of the old scarecrow himself. He counts every one.",
-        "completion": "Five round ones, and not a bite out of any. That is pie for the whole Vale. Here, for your trouble.",
+        "title": "Bí Ngô Từ Ruộng",
+        "text": "Ruộng của Lão Rơm Cười bên kia Đồng Cỏ Lợn Lòi đầy bí ngô, một nửa đã lăn ra ngoài đám rơm, nơi người cẩn thận có thể lấy được. Mang cho ta năm quả, {playerName}. Tránh xa lão bù nhìn. Lão đếm từng quả đấy.",
+        "completion": "Năm quả tròn, không quả nào bị cắn. Đủ làm bánh cho cả Thung Lũng. Đây, công của con.",
         "objectives": {
           "0": {
-            "label": "Patch Pumpkins"
+            "label": "Bí Ngô Ruộng"
           }
         }
       },
       "q_gourdlight_daily_boo": {
-        "title": "Boo!",
-        "text": "Nobody in these towns has had a proper fright in a year, {playerName}, and a Gourdlight Eve without one is just a cold night. Put on a costume, any of mine will do, or that pumpkin head if you have earned one. Then creep up on three of the townsfolk and give them a good loud BOO.",
-        "completion": "Three of them? I heard the cook drop a pan from across the square. Well done. Here is your share.",
+        "title": "Hù!",
+        "text": "Cả năm rồi không ai ở các thị trấn này được một phen sợ ra hồn, {playerName}, mà Đêm Đèn Bí Ngô không có trò dọa thì chỉ là đêm lạnh. Mặc bộ hóa trang vào, bộ nào của ta cũng được, hoặc đầu bí ngô nếu con đã kiếm được. Rồi lẻn đến ba người dân và hét thật to HÙ.",
+        "completion": "Ba người ư? Ta nghe tiếng đầu bếp làm rơi chảo từ bên kia quảng trường. Giỏi lắm. Đây là phần của con.",
         "objectives": {
           "0": {
-            "label": "Townsfolk frightened"
+            "label": "Người dân bị dọa"
           }
         }
       },
       "q_gourdlight_daily_wicks": {
-        "title": "Wicked Wicks",
-        "text": "Someone has been setting candles with green flames at the feet of our lamp posts. They burn without melting and they whisper when you turn your back. Snuff six of them for me, {playerName}, in any of the three towns, and bring me the stubs.",
-        "completion": "Six stubs, cold as frost. Whoever lit them will have to try harder than that. Take this, and wash your hands.",
+        "title": "Bấc Nến Hiểm Ác",
+        "text": "Có kẻ đặt nến lửa xanh dưới chân cột đèn của chúng ta. Chúng cháy mà không chảy, lại thì thầm khi con quay lưng. Dập sáu cây giúp ta, {playerName}, ở bất kỳ thị trấn nào trong ba nơi, rồi mang mẩu nến về.",
+        "completion": "Sáu mẩu nến, lạnh như sương giá. Kẻ thắp chúng phải cố hơn thế. Cầm lấy, rồi rửa tay đi.",
         "objectives": {
           "0": {
-            "label": "Cursed candles snuffed"
+            "label": "Nến nguyền rủa đã dập"
           }
         }
       },
       "q_gourdlight_daily_towns": {
-        "title": "A Door in Every Town",
-        "text": "The children say a true Gourdlight walker knocks in every town before the night is out. Prove them right, {playerName}. Trick or treat at one door in Eastbrook, one in Fenbridge and one in Highwatch. The lanterns on the roads will light your way.",
-        "completion": "Three towns in one night! Your boots have earned this more than you have.",
+        "title": "Một Cánh Cửa Mỗi Thị Trấn",
+        "text": "Trẻ con bảo người đi Đèn Bí Ngô đích thực phải gõ cửa ở mọi thị trấn trước khi hết đêm. Chứng minh chúng nói đúng đi, {playerName}. Xin kẹo ở một cửa tại Đông Khê, một ở Cầu Đầm và một ở Vọng Đài Cao. Đèn lồng ven đường sẽ soi lối cho con.",
+        "completion": "Ba thị trấn trong một đêm! Đôi giày của con xứng đáng nhận phần này hơn cả con.",
         "objectives": {
           "0": {
-            "label": "A door knocked in Eastbrook"
+            "label": "Đã gõ cửa ở Đông Khê"
           },
           "1": {
-            "label": "A door knocked in Fenbridge"
+            "label": "Đã gõ cửa ở Cầu Đầm"
           },
           "2": {
-            "label": "A door knocked in Highwatch"
+            "label": "Đã gõ cửa ở Vọng Đài Cao"
           }
         }
       },
       "q_gourdlight_daily_feathers": {
-        "title": "Feathers for the Fire",
-        "text": "When Old Thatchgrin is pressed, he calls his crows down on whoever is beating at his straw. Their feathers burn green in a hearth, and I need three for tonight's bonfire. Find a fight at his patch, {playerName}, and pluck them from his crows.",
-        "completion": "Black as a moonless field, and they smell of smoke already. The bonfire will be a sight. Thank you.",
+        "title": "Lông Cho Đống Lửa",
+        "text": "Khi bị dồn ép, Lão Rơm Cười gọi quạ xuống tấn công kẻ đang đập vào rơm của lão. Lông chúng cháy xanh trong bếp, ta cần ba chiếc cho đống lửa tối nay. Tìm một trận đánh ở ruộng của lão, {playerName}, rồi nhổ lông từ lũ quạ.",
+        "completion": "Đen như cánh đồng không trăng, lại đã có mùi khói. Đống lửa đêm nay sẽ đẹp lắm. Cảm ơn con.",
         "objectives": {
           "0": {
-            "label": "Crow feathers"
+            "label": "Lông quạ"
           }
         }
       },
       "q_gourdlight_daily_baskets": {
-        "title": "Baskets for the Neighbours",
-        "text": "I fill a basket of sweets for an old friend in each town every Gourdlight Eve, and my knees are not what they were. Take them round for me, {playerName}: Cook Marlow in Eastbrook, Yara the herbalist in Fenbridge, and Loremaster Caddis up in Highwatch.",
-        "completion": "All three delivered, and I hear Marlow cried. He always cries. Here is a basket of your own.",
+        "title": "Giỏ Quà Cho Hàng Xóm",
+        "text": "Mỗi Đêm Đèn Bí Ngô, ta chuẩn bị một giỏ kẹo cho người bạn cũ ở mỗi thị trấn, nhưng đầu gối ta không còn như xưa. Giao giúp ta nhé, {playerName}: đầu bếp Marlow ở Đông Khê, thầy thuốc Yara ở Cầu Đầm và Sử Gia Caddis trên Vọng Đài Cao.",
+        "completion": "Cả ba đã giao xong, ta nghe nói Marlow đã khóc. Lúc nào ông ấy cũng khóc. Đây là giỏ cho riêng con.",
         "objectives": {
           "0": {
-            "label": "Basket left with Cook Marlow"
+            "label": "Giỏ đã giao cho đầu bếp Marlow"
           },
           "1": {
-            "label": "Basket left with Yara the herbalist"
+            "label": "Giỏ đã giao cho thầy thuốc Yara"
           },
           "2": {
-            "label": "Basket left with Loremaster Caddis"
+            "label": "Giỏ đã giao cho Sử Gia Caddis"
           }
         }
       },

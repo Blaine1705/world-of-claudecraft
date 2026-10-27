@@ -1038,14 +1038,14 @@ export const pt_BR: EnTranslations = {
       "fateThreadsSentenceReady": "Três Fios do Destino: Sentença pode consumi-los para 18% de dano aumentado."
     },
     "priest": {
-      "gloomtitheLabel": "Gloomtithe",
-      "bombLabel": "Tithe Bomb",
-      "gloomtitheStatus": "{value} of {max} Gloomtithe",
-      "bombStatus": "{value} of {max} Tithe Bomb charges",
-      "bombReady": "Ready",
+      "gloomtitheLabel": "Dízimo sombrio",
+      "bombLabel": "Bomba do dízimo",
+      "gloomtitheStatus": "{value} de {max} Dízimo sombrio",
+      "bombStatus": "{value} de {max} cargas de Bomba do dízimo",
+      "bombReady": "Pronta",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
-      "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
+      "gloomtitheTooltip": "Dízimo sombrio: até 5 cargas para gastar. Ruptura do Vazio consome 3; Toque vampírico consome 2 para causar 30% a mais de dano; Invocar Demônio do Dízimo consome toda a sua reserva. Gerar cargas também preenche a Bomba do dízimo, mesmo com a reserva cheia.",
+      "bombTooltip": "Bomba do dízimo: gere 20 cargas de Dízimo sombrio para preparar uma bomba. Gastar Dízimo sombrio não aumenta o progresso. O progresso persiste entre combates. Morrer ou iniciar um combate contra um chefe de raide o reinicia. Um lançamento concluído consome a bomba; cancelá-lo a preserva."
     },
     "procOverlay": {
       "soulFragmentsMeter": "Fragmentos de Alma",
@@ -2600,7 +2600,7 @@ export const pt_BR: EnTranslations = {
       "name_lantern_hall_destrier": "Corcel do Salão da Lanterna",
       "name_chimeglass_tortoise": "Tolliver o Chimeglass",
       "name_rickshaw_mount": "Riquixá de Ossos Vinculados",
-      "name_emberbristle_broom": "Emberbristle Broom",
+      "name_emberbristle_broom": "Vassoura de cerdas em brasa",
       "name_wobbles_slime": "Balanço, o Limo",
       "name_nightwing_chimera": "Quimera de Asa Noturna",
       "desc_valorsteed": "Um corcel resistente de passos firmes com uma sela de couro.",
@@ -2625,7 +2625,7 @@ export const pt_BR: EnTranslations = {
       "desc_nightwing_chimera": "Uma serpe alada crepuscular de duas cabeças dos galhos antigos, que descansa nas patas traseiras com garras e raspa o chão voando com asas gravadas em magia arcana.",
       "desc_chimeglass_tortoise": "Uma tartaruga das salinas que ultrapassou três gerações de caravanas. Os funileiros moeram-lhe óculos de vidro e penduraram um sino de bronze em sua garganta, para que a estrada o ouça muito antes de vê-lo.",
       "desc_rickshaw_mount": "Uma carroça de ossos rangente, com um serviçal ossudo atrelado às varas, puxando você em disparada.",
-      "desc_emberbristle_broom": "A harvest broom bound with orange ribbon that hovers a hand above the ground, shedding embers from its bristles. A permanent reward from Gourdlight Eve."
+      "desc_emberbristle_broom": "Uma vassoura da colheita amarrada com uma fita laranja, que flutua a um palmo do chão e solta brasas de suas cerdas. Uma recompensa permanente da Noite das Abóboras."
     },
     "mountTraining": {
       "mountPrompt": "Pressione {key} para montar no Valorsteed de treinamento.",
@@ -4675,9 +4675,9 @@ export const pt_BR: EnTranslations = {
     },
     "auraEffect": {
       "gourdlight": {
-        "thatchbound": "Old Thatchgrin pulls your strings. You cannot act: you are walked to your nearest ally and strike them every {every} sec for {min} to {max} damage (up to {mult} times as much against a level {level} ally). Ends early when you take damage equal to {pct}% of your maximum health, or when an ally dispels it (Magic)."
+        "thatchbound": "Velho Thatchgrin puxa suas cordas. Você não pode agir: é levado até o aliado mais próximo e o ataca a cada {every} s, causando de {min} a {max} de dano (até {mult} vezes esse valor contra um aliado de nível {level}). Termina antes se você sofrer dano equivalente a {pct}% da sua vida máxima ou se um aliado dissipar o efeito (Magia)."
       },
-      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
+      "stilledMindCrit": "Sua próxima Fratura Mental ou Ruptura do Vazio será um acerto crítico garantido se atingir o alvo. Outros feitiços não consomem este bônus. Ruptura do Vazio ainda consome 3 cargas de Dízimo sombrio. Um lançamento resistido consome o bônus.",
       "wildheart": {
         "packBond": "Recebe {pct}% menos dano enquanto o parceiro está perto. Separe o Mestre das Feras do jaguar para romper.",
         "packBondFury": "Causa {pct}% mais dano enquanto o parceiro está perto.",
@@ -4781,7 +4781,7 @@ export const pt_BR: EnTranslations = {
       "spellHaste": "Aumenta a velocidade de conjuração em {pct}%",
       "sated": "Não pode se beneficiar de outro efeito de aceleração em grupo",
       "cauterizeFatigue": "Cauterizar não pode evitar outro acerto letal",
-      "seasonalCosmetic": "Cosmetic only: no effect on combat",
+      "seasonalCosmetic": "Apenas cosmético: não afeta o combate",
       "castShield": "A conjuração não pode ser interrompida ou atrasada por dano",
       "dmgDone": "Aumenta o dano causado em {pct}%",
       "dmgDoneReduce": "Reduz o dano causado em {pct}%",
@@ -4929,7 +4929,7 @@ export const pt_BR: EnTranslations = {
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "damageReduction": "Reduz em {pct}% o dano recebido",
       "slumber": "Adormecido até o amanhecer. Não pode ser atacado e não acordará por ninguém.",
-      "slumberNight": "Hangs lifeless on his pole until nightfall. Cannot be attacked.",
+      "slumberNight": "Fica pendurado sem vida em seu poste até anoitecer. Não pode ser atacado.",
       "guardianWard": "O próximo golpe inimigo letal restaura sua vida para {pct}% em vez de matar",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
@@ -5010,7 +5010,7 @@ export const pt_BR: EnTranslations = {
       "spawn": "{name} se ergue sobre {zone}!",
       "wake": "{name} despertou sobre {zone}!",
       "sleep": "{name} dorme até o amanhecer.",
-      "sleepUntilNightfall": "{name} sleeps until nightfall."
+      "sleepUntilNightfall": "{name} dorme até anoitecer."
     },
     "auth": {
       "appleLoginCta": "Continuar com a Apple",
@@ -8274,103 +8274,103 @@ export const pt_BR: EnTranslations = {
   },
   "seasonal": {
     "pumpkins": {
-      "name": "Haunted Pumpkin",
-      "title": "Haunted Pumpkins",
-      "world": "World",
+      "name": "Abóbora assombrada",
+      "title": "Abóboras assombradas",
+      "world": "Mundo",
       "progress": "{label}: {current}/{total}",
-      "found": "You light a Haunted Pumpkin in {zone}: {count}/{total}. Gourdlight Sweets received: {sweets}.",
-      "flash": "Haunted Pumpkin found! {count}/{total}"
+      "found": "Você acende uma Abóbora assombrada em {zone}: {count}/{total}. Doces da Noite das Abóboras recebidos: {sweets}.",
+      "flash": "Abóbora assombrada encontrada! {count}/{total}"
     },
     "event": {
       "gourdlight_eve": {
-        "name": "Gourdlight Eve"
+        "name": "Noite das Abóboras"
       }
     },
     "trickOrTreat": {
-      "row": "Trick or treat!",
-      "rowAria": "Say trick or treat to {name}",
-      "knockedHint": "You already knocked here today. The door opens again after the daily reset.",
-      "treat": "{name} hands you a treat.",
-      "trick": "{name} plays a trick on you: {trick}!",
-      "alreadyKnocked": "You already trick-or-treated {name} today.",
-      "notActive": "Gourdlight Eve is not running right now.",
-      "tooFar": "Step closer to knock.",
+      "row": "Doces ou travessuras!",
+      "rowAria": "Peça doces ou travessuras a {name}",
+      "knockedHint": "Você já bateu aqui hoje. A porta abre novamente após a reinicialização diária.",
+      "treat": "{name} entrega um doce a você.",
+      "trick": "{name} faz uma travessura com você: {trick}!",
+      "alreadyKnocked": "Você já pediu doces ou travessuras a {name} hoje.",
+      "notActive": "A Noite das Abóboras não está acontecendo no momento.",
+      "tooFar": "Chegue mais perto para bater.",
       "treatFlash": {
-        "one": "Treat! {count} Gourdlight Sweet",
-        "few": "Treat! {count} Gourdlight Sweets",
-        "many": "Treat! {count} Gourdlight Sweets",
-        "other": "Treat! {count} Gourdlight Sweets"
+        "one": "Doces! {count} Doce da Noite das Abóboras",
+        "few": "Doces! {count} Doces da Noite das Abóboras",
+        "many": "Doces! {count} Doces da Noite das Abóboras",
+        "other": "Doces! {count} Doces da Noite das Abóboras"
       },
-      "trickFlash": "Trick! {trick}"
+      "trickFlash": "Travessura! {trick}"
     },
     "tricks": {
-      "gourdlight_trick_bat": "Batty",
-      "gourdlight_trick_skeleton": "Rattled Bones",
-      "gourdlight_trick_fumes": "Green Fumes",
-      "gourdlight_trick_strawling": "Strawling Guise",
-      "gourdlight_costume_skeleton": "Skeleton Costume",
-      "gourdlight_costume_ghost": "Ghost Costume",
-      "gourdlight_costume_bat": "Bat Costume"
+      "gourdlight_trick_bat": "Loucura de morcego",
+      "gourdlight_trick_skeleton": "Ossos chocalhantes",
+      "gourdlight_trick_fumes": "Vapores verdes",
+      "gourdlight_trick_strawling": "Disfarce de palhudo",
+      "gourdlight_costume_skeleton": "Fantasia de esqueleto",
+      "gourdlight_costume_ghost": "Fantasia de fantasma",
+      "gourdlight_costume_bat": "Fantasia de morcego"
     },
     "pumpkinHead": {
-      "on": "You put on the Carved Pumpkin Head.",
-      "off": "You take off the Carved Pumpkin Head."
+      "on": "Você coloca a Cabeça de abóbora esculpida.",
+      "off": "Você tira a Cabeça de abóbora esculpida."
     },
-    "jarTrick": "The jar pops open: {trick}!",
-    "guise": "The charm crackles and the straw climbs over you: {trick}!",
-    "costume": "You drink the draught and change: {trick}!",
-    "titleGranted": "You read the writ. New title earned: {title}.",
-    "titleKnown": "You already hold that title, so you keep the writ.",
-    "boundItemGone": "Gourdlight Eve is over, and your {item} crumbles back into straw.",
+    "jarTrick": "O pote se abre de repente: {trick}!",
+    "guise": "O amuleto crepita e a palha cobre você: {trick}!",
+    "costume": "Você bebe a poção e se transforma: {trick}!",
+    "titleGranted": "Você lê o escrito. Novo título obtido: {title}.",
+    "titleKnown": "Você já possui esse título, então mantém o escrito.",
+    "boundItemGone": "A Noite das Abóboras acabou e seu item {item} se desfaz em palha novamente.",
     "itemUse": {
-      "pumpkinHead": "Use: Put on or take off a carved pumpkin lit from inside, worn over your helmet. Cosmetic.",
-      "trickJar": "Use: Plays a random harmless trick on you for a few seconds. Cosmetic.",
-      "pouch": "Use: Open it to receive {count} Gourdlight Sweets.",
-      "strawlingCharm": "Use: Become one of Old Thatchgrin's strawlings for {seconds} seconds. Not in combat. Never consumed. Cosmetic.",
-      "sweet": "Earned by trick-or-treating during Gourdlight Eve. Hester Gourdwick trades cosmetics for them at her stalls in Eastbrook, Fenbridge and Highwatch.",
-      "costumeSkeleton": "Use: Turn into a rattling skeleton for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Cosmetic.",
-      "costumeGhost": "Use: Turn into a drifting ghost for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Cosmetic.",
-      "costumeBat": "Use: Turn into a flapping bat for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Cosmetic.",
-      "toyPrank": "Use: Throw it at another visible player within {range} yards. Their head becomes a glowing jack-o'-lantern for {seconds} seconds, and they can right-click it off. Neither of you can be in combat, and you cannot be stealthed. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
-      "toyLantern": "Use: Set the lantern down in front of you. A small ghost circles you for {seconds} seconds. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
-      "toyBats": "Use: Open the sack. A squeaking swarm of bats bursts out and scatters around you for {seconds} seconds. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
-      "toyCandleShadows": "Use: Light the candle in front of you. For {seconds} seconds its flames throw dancing shadows of a cat, a bat and a witch onto the ground around it, for everyone nearby to see. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
-      "toyCauldron": "Use: Set a big bubbling cauldron down in front of you. It stands for {standing} seconds, and any player who drinks from it bursts in green bubbles and turns into a goblin for {seconds} seconds, replacing any costume they wear. Neither setting it down nor drinking works in combat or while stealthed, and entering combat ends the goblin form. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
-      "titleWrit": "Use: Earn the title {title} for this character, worn from the Book of Deeds. Consumed. Kept if you already hold the title.",
-      "broomSources": "Bought from Hester Gourdwick for {count} Emberwoven Sheaves, or, rarely, dropped by Old Thatchgrin on a day you loot him. Riding it requires the riding skill. Kept permanently and rideable year-round.",
-      "sheaf": "Old Thatchgrin gives one each day you loot him, until you own the Emberbristle Broom. Hester Gourdwick trades {count} for the broom at her stalls in Eastbrook, Fenbridge and Highwatch. Unspent sheaves are kept for the next Gourdlight Eve."
+      "pumpkinHead": "Uso: coloque ou retire uma abóbora esculpida e iluminada por dentro, usada sobre o elmo. Cosmética.",
+      "trickJar": "Uso: faz uma travessura aleatória e inofensiva com você por alguns segundos. Cosmético.",
+      "pouch": "Uso: abra para receber {count} Doces da Noite das Abóboras.",
+      "strawlingCharm": "Uso: transforma você em um dos palhudos do Velho Thatchgrin por {seconds} segundos. Não pode ser usado em combate. Nunca é consumido. Cosmético.",
+      "sweet": "Obtido ao pedir doces ou travessuras durante a Noite das Abóboras. Hester Gourdwick os troca por cosméticos em suas barracas em Eastbrook, Fenbridge e Highwatch.",
+      "costumeSkeleton": "Uso: transforma você em um esqueleto chocalhante por {minutes} minutos. Consumida ao usar. Não pode ser usada em combate; entrar em combate encerra o efeito. Cosmética.",
+      "costumeGhost": "Uso: transforma você em um fantasma flutuante por {minutes} minutos. Consumida ao usar. Não pode ser usada em combate; entrar em combate encerra o efeito. Cosmética.",
+      "costumeBat": "Uso: transforma você em um morcego esvoaçante por {minutes} minutos. Consumida ao usar. Não pode ser usada em combate; entrar em combate encerra o efeito. Cosmética.",
+      "toyPrank": "Uso: jogue em outro jogador visível a até {range} metros. A cabeça dele vira uma abóbora iluminada por {seconds} segundos, e ele pode removê-la com o botão direito. Nenhum dos dois pode estar em combate e você não pode estar em furtividade. Nunca é consumida: pode ser usada novamente após {cooldown} segundos. É mantida permanentemente e pode ser usada o ano inteiro. Cosmética.",
+      "toyLantern": "Uso: coloque a lanterna à sua frente. Um pequeno fantasma circula ao seu redor por {seconds} segundos. Não pode ser usada em combate ou em furtividade. Nunca é consumida: pode ser usada novamente após {cooldown} segundos. É mantida permanentemente e pode ser usada o ano inteiro. Cosmética.",
+      "toyBats": "Uso: abra o saco. Um enxame de morcegos guinchantes sai e se espalha ao seu redor por {seconds} segundos. Não pode ser usado em combate ou em furtividade. Nunca é consumido: pode ser usado novamente após {cooldown} segundos. É mantido permanentemente e pode ser usado o ano inteiro. Cosmético.",
+      "toyCandleShadows": "Uso: acenda a vela à sua frente. Por {seconds} segundos, suas chamas projetam sombras dançantes de um gato, um morcego e uma bruxa no chão ao redor, visíveis para todos por perto. Não pode ser usada em combate ou em furtividade. Nunca é consumida: pode ser usada novamente após {cooldown} segundos. É mantida permanentemente e pode ser usada o ano inteiro. Cosmética.",
+      "toyCauldron": "Uso: coloque um grande caldeirão borbulhante à sua frente. Ele permanece por {standing} segundos, e qualquer jogador que beber dele explode em bolhas verdes e vira um goblin por {seconds} segundos, substituindo qualquer fantasia que esteja usando. Não é possível colocá-lo nem beber dele em combate ou em furtividade; entrar em combate encerra a forma de goblin. Nunca é consumido: pode ser usado novamente após {cooldown} segundos. É mantido permanentemente e pode ser usado o ano inteiro. Cosmético.",
+      "titleWrit": "Uso: concede o título {title} a este personagem, equipado pelo Livro dos Feitos. Consumido ao usar. Mantido se você já tiver o título.",
+      "broomSources": "Comprada de Hester Gourdwick por {count} Feixes entretecidos de brasas ou, raramente, deixada pelo Velho Thatchgrin em um dia em que você o saqueia. Montá-la requer a habilidade de montaria. É mantida permanentemente e pode ser montada o ano inteiro.",
+      "sheaf": "O Velho Thatchgrin dá um a cada dia em que você o saqueia, até você possuir a Vassoura de cerdas em brasa. Hester Gourdwick troca {count} pela vassoura em suas barracas em Eastbrook, Fenbridge e Highwatch. Os feixes não gastos são mantidos para a próxima Noite das Abóboras."
     },
     "toy": {
-      "prank": "You throw the pumpkin. It splats onto {name}!",
-      "lantern": "You set the lantern down, and a little ghost drifts out to keep you company.",
-      "bats": "You open the sack, and a swarm of startled bats bursts out!",
-      "candleShadows": "You light the candle, and shadows begin to dance around its flames.",
-      "cauldron": "You set the cauldron down, and it starts to bubble.",
-      "cauldronDrink": "You drink from the cauldron, burst in green bubbles and turn into a goblin!",
-      "pranked": "{name} splats a pumpkin on your head! Right-click it off, or wear it proudly.",
-      "prankedFlash": "Pranked by {name}!",
-      "prankNeedsPlayer": "The pumpkin only splats on another player who is not in combat.",
-      "hidden": "Step out of the shadows first: a toy would give you away."
+      "prank": "Você joga a abóbora. Ela se espatifa em {name}!",
+      "lantern": "Você coloca a lanterna no chão e um pequeno fantasma sai flutuando para lhe fazer companhia.",
+      "bats": "Você abre o saco e um enxame de morcegos assustados sai voando!",
+      "candleShadows": "Você acende a vela e as sombras começam a dançar ao redor das chamas.",
+      "cauldron": "Você coloca o caldeirão no chão e ele começa a borbulhar.",
+      "cauldronDrink": "Você bebe do caldeirão, explode em bolhas verdes e vira um goblin!",
+      "pranked": "{name} espatifa uma abóbora na sua cabeça! Tire-a com o botão direito ou use com orgulho.",
+      "prankedFlash": "{name} fez uma travessura com você!",
+      "prankNeedsPlayer": "A abóbora só se espatifa em outro jogador que não esteja em combate.",
+      "hidden": "Saia das sombras primeiro: um brinquedo entregaria você."
     },
     "itemSource": {
-      "pumpkinHead": "Dropped by Old Thatchgrin, in his pumpkin field past Boar Meadow, the first time you loot him. No vendor sells it."
+      "pumpkinHead": "Deixada pelo Velho Thatchgrin, em sua plantação de abóboras além do Campo dos javalis, na primeira vez que você o saqueia. Nenhum vendedor a vende."
     },
     "boo": {
-      "row": "Boo!",
-      "rowAria": "Leap out at {name} and shout boo",
-      "needsCostume": "Put on a costume first: a costume draught, a bat or skeleton trick, the Strawling Charm, the Carved Pumpkin Head or a goblin sip from the Gurglegreen Cauldron.",
-      "frightenedHint": "{name} is still jumpy from your last fright. Find someone else.",
-      "landed": "You leap out at {name} with a BOO! They shriek and nearly drop everything.",
-      "flash": "BOO! {name} is frightened!",
-      "noCostume": "Without a costume, {name} only laughs at you. Put one on first.",
-      "already": "{name} has had enough frights for one day.",
-      "notOnErrand": "Hester has not asked you to frighten anyone today."
+      "row": "Bu!",
+      "rowAria": "Salte na frente de {name} e grite bu",
+      "needsCostume": "Vista uma fantasia primeiro: uma poção de fantasia, uma travessura de morcego ou esqueleto, o Amuleto do palhudo, a Cabeça de abóbora esculpida ou um gole de goblin do Caldeirão Borbulhaverde.",
+      "frightenedHint": "{name} ainda está assustado desde seu último susto. Procure outra pessoa.",
+      "landed": "Você salta na frente de {name} com um BU! Um grito ecoa e quase tudo vai ao chão.",
+      "flash": "BU! {name} levou um susto!",
+      "noCostume": "Sem fantasia, {name} só ri de você. Vista uma primeiro.",
+      "already": "{name} já levou sustos suficientes por hoje.",
+      "notOnErrand": "Hester não pediu para você assustar ninguém hoje."
     },
     "tokenPrice": "{count} {item}",
     "thatchgrin": {
-      "poleBound": "Pole-Bound",
-      "wakeYell": "NIGHT falls on the patch! Who walks in MY field?",
-      "sleepYell": "Sun is up. Back on the post, back to watching."
+      "poleBound": "Preso ao poste",
+      "wakeYell": "A NOITE cai sobre a horta! Quem anda pelo MEU campo?",
+      "sleepYell": "O sol nasceu. De volta ao poste, de volta à vigia."
     }
   },
   "dungeonGuide": {
@@ -9667,7 +9667,7 @@ export const pt_BR: EnTranslations = {
       "framesGovernedTalkingHead": "Editar quadros também afrouxa o painel Diálogo, que carrega a linha falada de um NPC enquanto esse NPC está fora de sua vista; ele usa seu chip de nome enquanto está solto.",
       "framesGovernedShardpike": "Editar quadros também permite mover a barra do Pique de Estilhaços, a pequena fileira de ações de ferramenta de missão que aparece ao lado das barras de ações apenas enquanto você carrega o próprio pique. Ela mostra sua etiqueta de nome enquanto está solta para posicioná-la antes do combate, em vez de durante ele.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
-      "framesGovernedPriest": "Edit Frames also lets you move the Shadow priest's Gloomtithe and Tithe Bomb medallion.",
+      "framesGovernedPriest": "Editar quadros também permite mover o medalhão de Dízimo sombrio e Bomba do dízimo do sacerdote de Sombra.",
       "framesGovernedResourceAndHill": "Ative Separar barra de recursos na aba Quadros para que Editar Quadros também libere sua barra de recursos, permitindo posicionar mana, energia ou raiva separadamente onde quiser. Largura da barra de recursos e Altura da barra de recursos, na mesma aba, ajustam seu tamanho. Editar Quadros também libera a barra do Rei da Colina; Opacidade do fundo do Rei da Colina, nessa aba, esmaece o painel sem prejudicar a leitura do texto.",
       "barsTitle": "Barras, temporizadores e texto de combate",
       "barsBody": "Sua barra de conjuração aparece no meio da tela, logo acima das suas barras de ação, sempre que você conjura ou canaliza, e mostra o nome do feitiço e o tempo restante. Seu alvo tem sua própria barra de conjuração no quadro dele, para que você veja o que está por vir e possa reagir.\n\nUma fina barra de ataque fica sob sua barra de conjuração e se enche entre os golpes da sua arma, para que um combatente corpo a corpo ou à distância veja quando o próximo acerto automático vai acontecer.\n\nSua barra de experiência ocupa toda a largura sob suas barras de ação, dividida em segmentos, com um trecho mais claro mostrando a experiência de descanso que você acumulou.\n\nNade debaixo d'água e uma barra azul de fôlego aparece no topo da tela. Ela se esvazia enquanto sua cabeça estiver submersa, pisca em vermelho quando se esgota e você começa a se afogar, e se enche rapidamente assim que você emerge à superfície. Espaço faz você nadar para cima, e a tecla Nadar para Baixo, Ctrl por padrão, leva você mais fundo.\n\nO dano e a cura sobem, em forma de pequenos números, sobre quem os recebeu, para que você acompanhe uma luta sem precisar ler texto. A aba Combate na sua janela de chat mantém o registro escrito completo.",
@@ -10572,7 +10572,7 @@ export const pt_BR: EnTranslations = {
       "hillBodyRamp": "A cada duas horas, uma colina surge em Drakelands, nos Confins de Frostveil ou em Amberfall. O reino recebe um aviso com quinze minutos de antecedência, e o círculo é marcado em terreno aberto. A colina permanece ativa por trinta minutos. Entrar no círculo ativo ativa sua bandeira de PvP Mundial pelas regras normais de nível, inclusive para membros de raide. O grupo com mais jogadores elegíveis dentro do círculo conquista a colina após um minuto de maioria ininterrupta; um jogador sozinho conta como um grupo de um, mas membros de raide e jogadores abaixo do nível exigido para PvP não podem capturar a colina nem ganhar Honra por ela. Cada integrante do grupo que a controla e está dentro do círculo ganha Honra em ritmo crescente. Os pagamentos são mais frequentes e aumentam mais rápido, preservando a Honra total do antigo evento de quarenta e cinco minutos. Uma mudança de controle reinicia o aumento das recompensas. Sair do círculo mantém sua bandeira ligada; /pvp off usa o atraso normal de cinco minutos e não pode terminar dentro de uma colina ativa ou durante o combate. A barra da colina mostra o controle, os números de jogadores e o progresso de captura; /hill informa sua localização.",
       "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "hillBodyFlat": "Uma vez a cada três horas, em um momento imprevisível, todo o reino é avisado de que uma colina surgirá em uma das zonas do norte em quinze minutos, e seu círculo é marcado em terreno aberto. Ela permanece por quarenta e cinco minutos e depois desaparece. Enquanto isso, a cada cinco minutos são anunciados sua localização e os grupos com os maiores tempos totais de controle. O grupo com mais jogadores dentro do círculo disputa a colina e a captura após acumular trinta segundos de superioridade numérica. A entrada de um grupo rival apenas pausa a contagem até o seu voltar à liderança; ela só recomeça do zero se não restar nenhum integrante vivo do seu grupo dentro do círculo. Um jogador sozinho conta como um grupo de uma pessoa e mantém a colina ao formar um grupo, mas integrantes de raide não contam. Cada membro do grupo que controla a colina e está dentro recebe a mesma quantidade de Honra por minuto, independentemente do tempo de controle. Um grupo completo que a mantenha sem oposição durante toda a sua existência ganha aproximadamente o mesmo que por três vitórias em campos de batalha. Quando ela desaparece, se o grupo com o maior tempo total de controle acumulou pelo menos dez minutos, todos que ficaram dentro por pelo menos um minuto durante o controle desse grupo e ainda fazem parte dele recebem uma vitória para a linha de PvP do Cofre Semanal. Uma barra sobre o campo mostra quem a controla, a quantidade de jogadores dos dois lados e a contagem de captura; /hill no chat informa onde ela está.",
-      "hillBodyTwoHour": "Once every two hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the northern zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for thirty minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns the same Honor every minute, however long they have held it, so a full party holding an uncontested hill for its whole stand earns about as much as two battleground wins. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "hillBodyTwoHour": "Uma vez a cada duas horas, em um momento imprevisível, todo o reino é avisado de que uma colina surgirá em uma das zonas do norte em quinze minutos, e o círculo onde ficará é marcado em terreno aberto. Ao surgir, ela permanece por trinta minutos e depois desaparece. Enquanto está presente, o reino recebe a cada cinco minutos sua localização e os grupos que a controlaram por mais tempo. O grupo com mais jogadores dentro do círculo disputa a colina e a conquista após trinta segundos de maioria. A entrada de um grupo rival apenas pausa a contagem até o seu grupo voltar à frente; ela só recomeça se nenhum integrante vivo do seu grupo permanecer dentro. Um jogador sozinho conta como um grupo de uma pessoa e mantém a colina ao formar um grupo, mas integrantes de raides não contam. Enquanto um grupo controla a colina, cada integrante dentro do círculo ganha a mesma quantidade de Honra por minuto, independentemente de há quanto tempo a controla. Assim, um grupo completo que a mantenha sem oposição durante toda a duração ganha aproximadamente o mesmo que em duas vitórias em campos de batalha. Quando a colina desaparece, se o grupo que a controlou por mais tempo no total a manteve por pelo menos dez minutos, todos que ficaram dentro para aquele grupo por pelo menos um minuto e ainda fazem parte dele ganham uma vitória para a linha JxJ do Cofre Semanal. Uma barra sobre o campo mostra quem a controla, seus números contra os adversários e o tempo de disputa; /hill no chat informa a localização.",
       "limitsBodyRaids": "Derrotar o mesmo jogador repetidamente paga cada vez menos e logo nada, e sua contagem contra aquele jogador só recomeça cerca de uma hora depois da primeira dessas mortes, então esperar de tocaia por uma única vítima nunca compensa a espera. Um alvo muito abaixo do seu nível não paga nada. Campos de Batalha e Arenas seguem suas próprias regras enquanto você está dentro deles, e pagam mais Honra que o mundo aberto, então o JcJ mundial é o caminho mais lento até o mesmo vendedor. Raides não ganham nada com mortes no mundo: um membro de raide não recebe Honra nem ouro e não reduz a parte de mais ninguém, então lute em grupo para ser pago."
     },
     "thornhollowPage": {
@@ -15314,7 +15314,7 @@ export const pt_BR: EnTranslations = {
       "accountSuspended": "Esta conta está suspensa até {date}.",
       "alreadyInWorld": "O personagem já está no mundo.",
       "accountSessionLimit": "Personagens demais desta conta já estão no mundo.",
-      "worldFightHold": "Another character on this account is still in the world after a fight. Try again in a few minutes.",
+      "worldFightHold": "Outro personagem desta conta ainda está no mundo após um combate. Tente novamente em alguns minutos.",
       "takenOver": "Seu personagem foi assumido por outra sessão.",
       "vaultMailRecovering": "Seu correio de recompensa do cofre está sendo restaurado. Tente novamente em breve.",
       "renameBeforeEntering": "Este personagem precisa ser renomeado antes de entrar no mundo.",
@@ -18176,16 +18176,16 @@ export const pt_BR: EnTranslations = {
         "description": "Canaliza por 3 s, causando {damage} de dano das Sombras a cada segundo. O dano aumenta com o Poder Mágico."
       },
       "vampiric_touch": {
-        "name": "Vampiric Touch",
-        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
+        "name": "Toque vampírico",
+        "description": "Causa {damage} de dano de Sombra ao longo de 15 s, com um efeito a cada 3 s. O dano aumenta com o poder mágico e os efeitos periódicos podem causar acertos críticos. Cada efeito distribui uma cura equivalente a 20% da vida perdida pelo inimigo entre você e os membros feridos do grupo em um raio de 30 metros; em raides, apenas seu subgrupo recebe essa cura. Se você tiver pelo menos 2 cargas de Dízimo sombrio, aplicar este efeito consome 2 para aumentar todo o dano dele em 30%."
       },
       "void_rupture": {
-        "name": "Void Rupture",
-        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+        "name": "Ruptura do Vazio",
+        "description": "Consome 3 cargas de Dízimo sombrio para dilacerar um inimigo e causar {damage} de dano de Sombra. O dano aumenta com o poder mágico e pode causar acertos críticos. Requer 3 cargas e as consome mesmo se houver resistência."
       },
       "spirit_bomb": {
-        "name": "Tithe Bomb",
-        "description": "Detonate a spirit bomb on an enemy, dealing {damage} Shadow damage to enemies within 8 yards of that target. Damage increases with Spell Power, can critically strike, and is reduced beyond 5 targets. Generate 20 Gloomtithe to prepare one bomb. Generation counts even while holding the maximum 5 Gloomtithe; spending charges is not required and adds no progress. Progress lasts between fights, up to one prepared bomb. Dying clears your progress and prepared bomb. Completing the cast consumes the prepared bomb, even if resisted. Cancellation or interruption preserves it. Starting a raid boss encounter clears your progress and prepared bomb. Cannot open a raid boss encounter with this spell."
+        "name": "Bomba do dízimo",
+        "description": "Detona uma bomba espiritual em um inimigo, causando {damage} de dano de Sombra aos inimigos em um raio de 8 metros desse alvo. O dano aumenta com o poder mágico, pode causar acertos críticos e é reduzido quando há mais de 5 alvos. Gere 20 cargas de Dízimo sombrio para preparar uma bomba. A geração conta mesmo ao manter o máximo de 5 cargas; gastá-las não é necessário e não aumenta o progresso. O progresso persiste entre combates, até uma bomba preparada. Morrer elimina seu progresso e sua bomba preparada. Concluir o lançamento consome a bomba preparada, mesmo se houver resistência. Cancelar ou interromper o lançamento a preserva. Iniciar um confronto com um chefe de raide elimina seu progresso e sua bomba preparada. Não é possível iniciar um confronto com um chefe de raide usando este feitiço."
       },
       "flash_heal": {
         "name": "Prece Urgente",
@@ -19021,7 +19021,7 @@ export const pt_BR: EnTranslations = {
       "inner_focus": {
         "name": "Mente Serena",
         "description": "Torna vossa próxima magia de sacerdote gratuita e ininterrompível. Dura 60 s.",
-        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
+        "specNote_shadow": "Também reserva um acerto crítico garantido para sua próxima Fratura Mental ou Ruptura do Vazio em até 60 s, se atingir o alvo. Outros feitiços não consomem este bônus. Ruptura do Vazio ainda consome 3 cargas de Dízimo sombrio. Um lançamento resistido consome o bônus de acerto crítico."
       },
       "innervate": {
         "name": "Seiva Vital",
@@ -19219,7 +19219,7 @@ export const pt_BR: EnTranslations = {
       "choir_of_deliverance": {
         "name": "Coro da Libertação",
         "description": "Canaliza por 6 s, curando membros do grupo num raio de 30 metros em {damage} a cada 2 s. A cura aumenta com o poder mágico.",
-        "specNote_shadow": "For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Shadowform. Absorbed damage and overkill do not add healing."
+        "specNote_shadow": "Por 15 s, distribui como cura 20% da vida que os inimigos perdem para seu dano de Sombra entre os membros feridos do grupo em um raio de 30 metros, incluindo você. Em raides, apenas seu subgrupo é curado. Lançamento instantâneo, permitindo continuar atacando na forma sombria. Dano absorvido e dano excedente à vida restante não geram cura."
       },
       "bear_charge": {
         "name": "Investida de Bruin",
@@ -24435,85 +24435,85 @@ export const pt_BR: EnTranslations = {
         "name": "Pingente da Vanguarda de Cura"
       },
       "gourdlight_sweet": {
-        "name": "Gourdlight Sweet"
+        "name": "Doce da Noite das Abóboras"
       },
       "gourdlight_treat_pouch": {
-        "name": "Gourdlight Treat Pouch"
+        "name": "Saquinho de doces da Noite das Abóboras"
       },
       "carved_pumpkin_head": {
-        "name": "Carved Pumpkin Head"
+        "name": "Cabeça de abóbora esculpida"
       },
       "jar_of_mischief": {
-        "name": "Jar of Mischief"
+        "name": "Pote de travessuras"
       },
       "thatchgrin_sweet_sack": {
-        "name": "Thatchgrin's Sweet Sack"
+        "name": "Saco de doces de Thatchgrin"
       },
       "strawling_charm": {
-        "name": "Strawling Charm"
+        "name": "Amuleto do palhudo"
       },
       "rattlebone_draught": {
-        "name": "Rattlebone Draught"
+        "name": "Poção de ossos chocalhantes"
       },
       "haunting_draught": {
-        "name": "Haunting Draught"
+        "name": "Poção assombrada"
       },
       "batwing_draught": {
-        "name": "Fluttering Draught"
+        "name": "Poção esvoaçante"
       },
       "writ_of_the_gourdlit": {
-        "name": "Writ of the Gourdlit"
+        "name": "Escrito do Iluminado pelas Abóboras"
       },
       "writ_of_the_trickster": {
-        "name": "Writ of the Trickster"
+        "name": "Escrito do Travesso"
       },
       "writ_of_the_hollow_grin": {
-        "name": "Writ of the Hollow Grin"
+        "name": "Escrito do Sorriso Oco"
       },
       "reins_emberbristle_broom": {
-        "name": "Emberbristle Broom"
+        "name": "Vassoura de cerdas em brasa"
       },
       "hearthroot_toffee": {
-        "name": "Hearthroot Toffee"
+        "name": "Caramelo de raiz da lareira"
       },
       "gourdseed_brittle": {
-        "name": "Gourdseed Brittle"
+        "name": "Crocante de sementes de abóbora"
       },
       "crabapple_chew": {
-        "name": "Crabapple Chew"
+        "name": "Bala mastigável de maçã silvestre"
       },
       "owlwatch_fudge": {
-        "name": "Owlwatch Fudge"
+        "name": "Doce cremoso da coruja vigia"
       },
       "lantern_mint_drop": {
-        "name": "Lantern Mint Drop"
+        "name": "Bala de hortelã da lanterna"
       },
       "emberwoven_sheaf": {
-        "name": "Emberwoven Sheaf"
+        "name": "Feixe entretecido de brasas"
       },
       "prankers_pumpkin": {
-        "name": "Pranker's Pumpkin"
+        "name": "Abóbora do brincalhão"
       },
       "wanderwisp_lantern": {
-        "name": "Wanderwisp Lantern"
+        "name": "Lanterna do fogo-fátuo errante"
       },
       "sack_of_startled_bats": {
-        "name": "Sack of Startled Bats"
+        "name": "Saco de morcegos assustados"
       },
       "murmurwick_candle": {
-        "name": "Murmurwick Candle"
+        "name": "Vela de pavio murmurante"
       },
       "gurglegreen_cauldron": {
-        "name": "Gurglegreen Cauldron"
+        "name": "Caldeirão Borbulhaverde"
       },
       "thatchgrin_patch_pumpkin": {
-        "name": "Patch Pumpkin"
+        "name": "Abóbora da horta"
       },
       "cursed_candle_stub": {
-        "name": "Cursed Candle Stub"
+        "name": "Toco de vela amaldiçoada"
       },
       "gourdlight_crow_feather": {
-        "name": "Gourdlight Crow Feather"
+        "name": "Pena de corvo da Noite das Abóboras"
       },
       "membership_staff": {
         "name": "Cajado da mudança"
@@ -26072,16 +26072,16 @@ export const pt_BR: EnTranslations = {
         "name": "Capataz de Palha"
       },
       "gourdlight_thatchgrin": {
-        "name": "Old Thatchgrin"
+        "name": "Velho Thatchgrin"
       },
       "gourdlight_crow": {
-        "name": "Gourdlight Crow"
+        "name": "Corvo da Noite das Abóboras"
       },
       "gourdlight_strawling": {
-        "name": "Strawling"
+        "name": "Palhudo"
       },
       "gourdlight_swelling_gourd": {
-        "name": "Swelling Gourd"
+        "name": "Abóbora inchada"
       },
       "stable_horse": {
         "name": "Cavalo de estábulo"
@@ -27162,8 +27162,8 @@ export const pt_BR: EnTranslations = {
       },
       "gourdlight_keeper": {
         "name": "Hester Gourdwick",
-        "title": "Gourdlight Keeper",
-        "greeting": "The gourds are lit and the lanterns are up, so it must be Gourdlight Eve. Knock on the doors of the townsfolk in Eastbrook, Fenbridge and Highwatch, and say the words: trick or treat. Most will hand you a sweet. A few will play a trick on you. Bring the sweets to me, at any of my stalls, and I will trade you something to wear."
+        "title": "Guardiã da Noite das Abóboras",
+        "greeting": "As abóboras estão acesas e as lanternas penduradas, então só pode ser a Noite das Abóboras. Bata às portas dos moradores de Eastbrook, Fenbridge e Highwatch e diga as palavras: doces ou travessuras. A maioria dará um doce. Alguns farão uma travessura com você. Traga os doces para mim, em qualquer uma das minhas barracas, e eu os trocarei por algo para vestir."
       },
       "reeve_ottoline": {
         "name": "Prefeita Ottoline",
@@ -29800,84 +29800,84 @@ export const pt_BR: EnTranslations = {
         }
       },
       "q_gourdlight_rounds": {
-        "title": "Gourdlight Rounds",
-        "text": "Every Gourdlight Eve the children of the Vale make their rounds, and this year you are joining them, {playerName}. Knock on five doors in our towns, say the words, and see what you are given. Come back to me when you are done.",
-        "completion": "Five doors and you still have all your fingers. Here, a pouch of sweets for the walk home. Come back tomorrow, the doors open again.",
+        "title": "Ronda da Noite das Abóboras",
+        "text": "Toda Noite das Abóboras as crianças do Vale fazem sua ronda, e este ano você vai com elas, {playerName}. Bata em cinco portas nas nossas cidades, diga as palavras e veja o que recebe. Volte para falar comigo quando terminar.",
+        "completion": "Cinco portas e você ainda tem todos os dedos. Tome, um saquinho de doces para a volta para casa. Volte amanhã, as portas abrirão de novo.",
         "objectives": {
           "0": {
-            "label": "Doors knocked on"
+            "label": "Portas visitadas"
           }
         }
       },
       "q_gourdlight_daily_patch": {
-        "title": "Pumpkins from the Patch",
-        "text": "Old Thatchgrin's patch past Boar Meadow is fat with pumpkins, and half of them have rolled out past his straw where a careful soul can reach them. Bring me five, {playerName}. Stay wide of the old scarecrow himself. He counts every one.",
-        "completion": "Five round ones, and not a bite out of any. That is pie for the whole Vale. Here, for your trouble.",
+        "title": "Abóboras da horta",
+        "text": "A horta do Velho Thatchgrin além do Campo dos javalis está cheia de abóboras, e metade rolou para longe da palha dele, onde alguém cuidadoso pode alcançá-las. Traga cinco para mim, {playerName}. Mantenha distância do velho espantalho. Ele conta uma por uma.",
+        "completion": "Cinco bem redondas, sem uma única mordida. Vai ter torta para todo o Vale. Tome, pelo trabalho.",
         "objectives": {
           "0": {
-            "label": "Patch Pumpkins"
+            "label": "Abóboras da horta"
           }
         }
       },
       "q_gourdlight_daily_boo": {
-        "title": "Boo!",
-        "text": "Nobody in these towns has had a proper fright in a year, {playerName}, and a Gourdlight Eve without one is just a cold night. Put on a costume, any of mine will do, or that pumpkin head if you have earned one. Then creep up on three of the townsfolk and give them a good loud BOO.",
-        "completion": "Three of them? I heard the cook drop a pan from across the square. Well done. Here is your share.",
+        "title": "Bu!",
+        "text": "Ninguém nestas cidades levou um bom susto em um ano, {playerName}, e uma Noite das Abóboras sem sustos é só uma noite fria. Vista uma fantasia, qualquer uma das minhas serve, ou aquela cabeça de abóbora se você ganhou uma. Depois se aproxime de fininho de três moradores e dê um belo BU! bem alto.",
+        "completion": "Três? Ouvi o cozinheiro derrubar uma frigideira do outro lado da praça. Muito bem. Aqui está sua parte.",
         "objectives": {
           "0": {
-            "label": "Townsfolk frightened"
+            "label": "Moradores assustados"
           }
         }
       },
       "q_gourdlight_daily_wicks": {
-        "title": "Wicked Wicks",
-        "text": "Someone has been setting candles with green flames at the feet of our lamp posts. They burn without melting and they whisper when you turn your back. Snuff six of them for me, {playerName}, in any of the three towns, and bring me the stubs.",
-        "completion": "Six stubs, cold as frost. Whoever lit them will have to try harder than that. Take this, and wash your hands.",
+        "title": "Pavios perversos",
+        "text": "Alguém anda colocando velas de chamas verdes aos pés dos nossos postes. Elas queimam sem derreter e sussurram quando você vira as costas. Apague seis para mim, {playerName}, em qualquer uma das três cidades, e traga os tocos.",
+        "completion": "Seis tocos, frios como geada. Quem os acendeu vai ter que se esforçar mais. Pegue isto e lave as mãos.",
         "objectives": {
           "0": {
-            "label": "Cursed candles snuffed"
+            "label": "Velas amaldiçoadas apagadas"
           }
         }
       },
       "q_gourdlight_daily_towns": {
-        "title": "A Door in Every Town",
-        "text": "The children say a true Gourdlight walker knocks in every town before the night is out. Prove them right, {playerName}. Trick or treat at one door in Eastbrook, one in Fenbridge and one in Highwatch. The lanterns on the roads will light your way.",
-        "completion": "Three towns in one night! Your boots have earned this more than you have.",
+        "title": "Uma porta em cada cidade",
+        "text": "As crianças dizem que um verdadeiro andarilho das Abóboras bate às portas de todas as cidades antes do fim da noite. Prove que elas estão certas, {playerName}. Peça doces ou travessuras em uma porta de Eastbrook, uma de Fenbridge e uma de Highwatch. As lanternas nas estradas iluminarão seu caminho.",
+        "completion": "Três cidades em uma noite! Suas botas mereceram isto mais do que você.",
         "objectives": {
           "0": {
-            "label": "A door knocked in Eastbrook"
+            "label": "Uma porta visitada em Eastbrook"
           },
           "1": {
-            "label": "A door knocked in Fenbridge"
+            "label": "Uma porta visitada em Fenbridge"
           },
           "2": {
-            "label": "A door knocked in Highwatch"
+            "label": "Uma porta visitada em Highwatch"
           }
         }
       },
       "q_gourdlight_daily_feathers": {
-        "title": "Feathers for the Fire",
-        "text": "When Old Thatchgrin is pressed, he calls his crows down on whoever is beating at his straw. Their feathers burn green in a hearth, and I need three for tonight's bonfire. Find a fight at his patch, {playerName}, and pluck them from his crows.",
-        "completion": "Black as a moonless field, and they smell of smoke already. The bonfire will be a sight. Thank you.",
+        "title": "Penas para o fogo",
+        "text": "Quando o Velho Thatchgrin fica encurralado, chama seus corvos sobre quem estiver batendo em sua palha. As penas deles queimam com uma chama verde na lareira, e preciso de três para a fogueira desta noite. Encontre uma briga na horta dele, {playerName}, e arranque-as de seus corvos.",
+        "completion": "Negras como um campo sem lua, e já cheiram a fumaça. A fogueira será um espetáculo. Obrigada.",
         "objectives": {
           "0": {
-            "label": "Crow feathers"
+            "label": "Penas de corvo"
           }
         }
       },
       "q_gourdlight_daily_baskets": {
-        "title": "Baskets for the Neighbours",
-        "text": "I fill a basket of sweets for an old friend in each town every Gourdlight Eve, and my knees are not what they were. Take them round for me, {playerName}: Cook Marlow in Eastbrook, Yara the herbalist in Fenbridge, and Loremaster Caddis up in Highwatch.",
-        "completion": "All three delivered, and I hear Marlow cried. He always cries. Here is a basket of your own.",
+        "title": "Cestas para os vizinhos",
+        "text": "Toda Noite das Abóboras eu encho uma cesta de doces para um velho amigo em cada cidade, e meus joelhos já não são os mesmos. Entregue-as por mim, {playerName}: ao cozinheiro Marlow em Eastbrook, à Herbalista Yara em Fenbridge e ao mestre do saber Caddis lá em Highwatch.",
+        "completion": "As três entregues, e ouvi dizer que Marlow chorou. Ele sempre chora. Aqui está uma cesta só sua.",
         "objectives": {
           "0": {
-            "label": "Basket left with Cook Marlow"
+            "label": "Cesta entregue ao cozinheiro Marlow"
           },
           "1": {
-            "label": "Basket left with Yara the herbalist"
+            "label": "Cesta entregue à Herbalista Yara"
           },
           "2": {
-            "label": "Basket left with Loremaster Caddis"
+            "label": "Cesta entregue ao mestre do saber Caddis"
           }
         }
       },
