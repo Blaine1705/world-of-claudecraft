@@ -805,7 +805,7 @@ export class HeatFightFx {
     });
     this.materials.push(burnMat);
     this.burns = instanced(sheathGeo, burnMat, P.bodies, 'smithHeartHeatBurns', 0);
-    this.burns.renderOrder = 0;
+    // The sheaths ride the bodies, not the floor: the default render order.
 
     // ---- the channel's bed and fire ----
     const len = CHANNEL_LINE.length;
