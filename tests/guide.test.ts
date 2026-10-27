@@ -6735,6 +6735,7 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       targetDots: 'the Target dots frame for your debuffs across nearby enemies',
       paladinDevotion: "the paladin's Devotion medallion",
       doomMeter: "the warlock's Affliction Bar",
+      priestCharge: "the Shadow priest's Gloomtithe and Tithe Bomb medallion",
       procOverlay: 'the spell-proc overlay',
       swingBarOffhand: 'the off-hand swing timer for dual-wielders',
       damageMeter: 'the tabbed damage meter window',

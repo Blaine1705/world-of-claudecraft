@@ -235,6 +235,7 @@ import {
 import { benisonAfterAbility } from './priest/benison';
 import { doctrineAfterAbility } from './priest/doctrine';
 import { priestAfterAbility, priestOnGroupHeal } from './priest/talents';
+import { applyVampiricTouch } from './priest/vampiric_touch';
 import { gloomtitheStacksForCast, vespersAfterAbility } from './priest/vespers';
 import { isPullEligible } from './pull_eligibility';
 import { offerResurrection } from './resurrection_offer';
@@ -2177,7 +2178,7 @@ export function runEffects(
         const dotId = eff.auraId ?? ability.id;
         const priorDirge =
           ability.id === 'shadow_word_pain' ? captureDirgeReapplication(target, p.id) : null;
-        ctx.applyAura(target, {
+        const dot: Aura = {
           id: dotId,
           name: ABILITIES[dotId]?.name ?? ability.name,
           kind: 'dot',
@@ -2189,7 +2190,9 @@ export function runEffects(
           sourceId: p.id,
           school: eff.school ?? ability.school,
           leechPct: eff.leechPct,
-        });
+        };
+        if (dotId === 'vampiric_touch') applyVampiricTouch(ctx, p, target, dot);
+        else ctx.applyAura(target, dot);
         if (priorDirge)
           refreshDirgeFieldAfterReapplication(ctx, p, meta, target, priorDirge, ability.range);
         if (dotId === 'rupture') {
@@ -2526,7 +2529,7 @@ export function runEffects(
         // Ground-targeted casts blast where they were aimed; others detonate on
         // the caster. The fx follows the same center (a world-anchored burst for
         // an aimed blast, the entity-anchored nova otherwise).
-        const aoeCenter = p.castAim ?? p.pos;
+        const aoeCenter = (eff.centerOnTarget ? target?.pos : null) ?? p.castAim ?? p.pos;
         if (ability.id === 'corpse_explosion' && !sacrificeDominionForCorpseExplosion(ctx, p)) {
           break;
         }
@@ -2567,7 +2570,7 @@ export function runEffects(
           ctx.emit({
             type: 'spellfx',
             sourceId: p.id,
-            targetId: p.id,
+            targetId: eff.centerOnTarget && target ? target.id : p.id,
             school: ability.school,
             fx: 'nova',
             ability: ability.id,
