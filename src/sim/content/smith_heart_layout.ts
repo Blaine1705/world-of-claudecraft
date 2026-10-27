@@ -934,18 +934,52 @@ export const LAKE_BRAZIERS: FieldProp[] = [40, 140, 220, 320].map((deg) => {
   return { kind: 'sh_brazier', ...p, rot: 0, r: 1.5, h: 2.6 };
 });
 
-/** The Smith's quenched blades, half-sunk in the lake ice (great swords
- *  three to six times a body's height). */
-const SUNK_BLADES: FieldProp[] = [
-  { deg: 20, out: -12, tilt: 0 },
-  { deg: 95, out: -9, tilt: 1 },
-  { deg: 165, out: -14, tilt: 2 },
-  { deg: 250, out: -10, tilt: 3 },
-  { deg: 300, out: -15, tilt: 4 },
+/** The Smith's four great blades of ice, half-sunk point first in the lake
+ *  (great swords twice a body's height and more), round the Guardian of the
+ *  Quench's ice: at half health they tear free, stand upright and float in
+ *  place, each echoing the guardian's attacks (design doc 7.3). The encounter
+ *  owns their bodies (encounters/smith_heart/quench_blades.ts: the claim's
+ *  blade objects are combat walls, and the fight's renderer draws them, sunk
+ *  or risen), so the field builds no collider and the kit no piece for them.
+ *  Order is the blades' index (north-east, south-east, south-west,
+ *  north-west). */
+export const QUENCH_BLADE_SPOTS: readonly { x: number; z: number; rot: number }[] = [
+  { deg: 40, tilt: 0 },
+  { deg: 130, tilt: 1 },
+  { deg: 220, tilt: 3 },
+  { deg: 310, tilt: 4 },
 ].map((b) => {
-  const p = around(QUENCH.lake, b.deg, b.out);
-  return { kind: 'sh_sunk_blade', ...p, rot: 0.6 + b.tilt * 1.3, r: 1.6, h: 12 };
+  const p = around(QUENCH.lake, b.deg, -16);
+  return { ...p, rot: 0.6 + b.tilt * 1.3 };
 });
+/** A sunk blade's footprint radius and height (yards). */
+export const QUENCH_BLADE_R = 1.6;
+export const QUENCH_BLADE_H = 12;
+
+const SUNK_BLADES: FieldProp[] = QUENCH_BLADE_SPOTS.map((p) => ({
+  kind: 'sh_sunk_blade',
+  ...p,
+  r: QUENCH_BLADE_R,
+  h: QUENCH_BLADE_H,
+  encounterOwned: true,
+}));
+
+/** The ring of heaved ice the Guardian of the Quench raises round the Frozen
+ *  Lake when it wakes (design doc 7.3): `segments` slabs of shore ice on an
+ *  ellipse a little inside the lake's ragged edge, each an oriented combat
+ *  wall (encounters/smith_heart/quench_rim.ts), so the whole fight stays on
+ *  the ice (the shelf's rock never cracks). Instance-local yards. */
+export const QUENCH_RIMEWALL = {
+  x: QUENCH.lake.x,
+  z: QUENCH.lake.z,
+  rx: QUENCH.lake.rx - 3,
+  rz: QUENCH.lake.rz - 3,
+  segments: 28,
+  /** A slab's half length along the ring, half thickness, height. */
+  hw: 4.4,
+  hd: 0.7,
+  h: 3.2,
+} as const;
 
 /** The basin's steaming vents (flush on the shelf, steam rising). */
 const STEAM_VENTS: FieldProp[] = [70, 190, 290].map((deg) => {

@@ -44,6 +44,19 @@
 //                                    eye, conductor, tornado, gust [deg] (a
 //                                    phase-2 gust); our names work too: fork,
 //                                    cradle, drawn, gale
+//   /dev heart quench                the Guardian of the Quench's readout
+//   /dev heart quench <what>         pull (onto the Frozen Lake and pull it),
+//                                    reset (whole again, the lake whole),
+//                                    heroic [on|off] or mythic [on|off] (this
+//                                    run's fight), phase2 (the blades wake
+//                                    now, the guardian at half), blades (the
+//                                    blades awake at once, no bar), cold <n>
+//                                    (set my cold bar), burst (freeze me
+//                                    solid now), hole (open a hole under me),
+//                                    crack (crack the ice under me), breath
+//                                    (Quenching Breath now), echo [strike]
+//                                    (a breath, or a strike, echoed by every
+//                                    blade), dance (two blades cross)
 //
 // Areas: cleft, gallery, pit (or hammer), balcony, ring, ringse, ringsw,
 // breath, bridge, cornice (or breathboss), quench, ice, lake (or quenchboss),
@@ -70,6 +83,9 @@ import {
   councilDevTrigger,
   councilReadout,
   councilState,
+  quenchDevTrigger,
+  quenchGuardian,
+  quenchReadout,
   replaySmithHeartArrivalForDev,
   SMITH_HEART_AWAKE_BIT,
   setSmithHeartPortalDevOpen,
@@ -131,11 +147,14 @@ const GUARDIAN_IDS: ReadonlySet<string> = new Set([
 const COUNCIL_IDS: ReadonlySet<string> = new Set(COUNCIL_TEMPLATE_IDS);
 
 const HELP =
-  '[dev] /dev heart enter [normal] | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|guardian|slabwright|singer|council|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | arrival | reset | council [pull|reset|heroic [on|off]|mythic [on|off]|energy <n>|wrath|weight|wake|rock|bolt|song|resonance [n]|soul <guardian|slabwright|singer>|soulpip <n>] | breath [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blow [deg|n|e|s|w]|calm|circle|inhale|chain|eye|conductor|tornado|gust [deg]]';
+  '[dev] /dev heart enter [normal] | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|guardian|slabwright|singer|council|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | arrival | reset | council [pull|reset|heroic [on|off]|mythic [on|off]|energy <n>|wrath|weight|wake|rock|bolt|song|resonance [n]|soul <guardian|slabwright|singer>|soulpip <n>] | breath [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blow [deg|n|e|s|w]|calm|circle|inhale|chain|eye|conductor|tornado|gust [deg]] | quench [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blades|cold <n>|burst|hole|crack|breath|echo [strike]|dance]';
 
 /** Where `/dev heart breath pull` sets the player down: on the Cornice, a
  *  few strides west of the guardian. */
 const BREATH_PULL_SPOT = { x: -14, z: 198 } as const;
+/** Where `/dev heart quench pull` sets the player down: on the Frozen Lake,
+ *  a few strides south of the guardian. */
+const QUENCH_PULL_SPOT = { x: 198, z: -11 } as const;
 
 function log(ctx: SimContext, pid: number, text: string): void {
   ctx.emit({ type: 'log', text, pid });
@@ -382,6 +401,51 @@ export function handleSmithHeartDevChat(ctx: SimContext, raw: string, pid: numbe
     )
       pull();
     const reply = breathDevTrigger(ctx, inst, arg);
+    if (reply === null) {
+      ctx.error(pid, HELP);
+      return true;
+    }
+    log(ctx, pid, `[dev] ${reply}`);
+    return true;
+  }
+  if (verb === 'quench') {
+    const inst = ensureInside(ctx, pid);
+    if (!inst) return true;
+    if (!arg) {
+      log(ctx, pid, quenchReadout(ctx, inst, pid));
+      return true;
+    }
+    const me = ctx.entities.get(pid);
+    const boss = quenchGuardian(ctx, inst);
+    const pull = (): boolean => {
+      if (!me || !boss || boss.dead) return false;
+      return ctx.aggroMob(boss, me, false);
+    };
+    const verbName = arg.split(' ')[0];
+    if (verbName === 'pull') {
+      const o = instanceOrigin(DUNGEONS[SMITH_HEART_DUNGEON].index, inst.slot);
+      if (me) displacePlayerForDev(ctx, me, o.x + QUENCH_PULL_SPOT.x, o.z + QUENCH_PULL_SPOT.z);
+      log(
+        ctx,
+        pid,
+        pull()
+          ? '[dev] The Guardian of the Quench wakes on the Frozen Lake.'
+          : '[dev] The Guardian of the Quench cannot be pulled (fallen, or not in this run).',
+      );
+      return true;
+    }
+    // A mechanic forced on a guardian nobody pulled pulls it first (an
+    // unpulled guardian resets its fight on the next tick).
+    if (
+      verbName !== 'reset' &&
+      verbName !== 'heroic' &&
+      verbName !== 'mythic' &&
+      boss &&
+      !boss.dead &&
+      !boss.inCombat
+    )
+      pull();
+    const reply = quenchDevTrigger(ctx, inst, arg, pid);
     if (reply === null) {
       ctx.error(pid, HELP);
       return true;

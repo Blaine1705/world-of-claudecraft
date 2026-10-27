@@ -42,6 +42,20 @@ export {
   tickSmithHeartPortal,
 } from './portal';
 export {
+  quenchDevTrigger,
+  quenchDifficulty,
+  quenchGuardian,
+  quenchReadout,
+  quenchScopeForDev,
+  setQuenchDevTier,
+  tickQuenchGuardian,
+} from './quench';
+export { claimBlades } from './quench_blades';
+export * from './quench_geometry';
+export * from './quench_ids';
+export type { QuenchFightState } from './quench_state';
+export { QUENCH_LINES, quenchLineKey } from './quench_voice';
+export {
   replaySmithHeartArrivalForDev,
   SMITH_HEART_ARRIVAL_REPLAY_HOLD,
   SMITH_HEART_AWAKE_BIT,

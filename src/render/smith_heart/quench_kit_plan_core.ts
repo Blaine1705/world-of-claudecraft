@@ -85,6 +85,9 @@ export function planQuenchProps(): HeartKitPlacement[] {
   let shelf = 0;
   for (const p of F.props) {
     if (!QUENCH_KIT_KINDS.has(p.kind)) continue;
+    // An encounter-owned body (the Smith's four blades) is drawn by its
+    // fight (smith_heart_fx/quench_blades_fx.ts), sunk or risen.
+    if (p.encounterOwned) continue;
     const y = heartPropBase(p.x, p.z);
     const spin = heartHash(Math.round(p.x * 7), Math.round(p.z * 7)) * Math.PI * 2;
     if (p.kind === 'sh_brazier') {

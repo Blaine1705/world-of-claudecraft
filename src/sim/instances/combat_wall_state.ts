@@ -98,6 +98,17 @@ export const COMBAT_WALL_SHAPES: Readonly<Record<string, CombatWallShape>> = {
   // carved column, r a risen pillar) and pips left; the column's or the
   // risen pillar's own size (pinned by the soul tests).
   ...soulPillarShapes(),
+  // The Smith's Heart's Guardian of the Quench (encounters/smith_heart/
+  // quench_blades.ts, quench_rim.ts): the Smith's four great blades of ice,
+  // sunk in the lake (content/smith_heart_layout.ts QUENCH_BLADE_R and
+  // QUENCH_BLADE_H) or awake and floating upright (a thinner body: the blade
+  // alone, the heaved ice left in the lake); a blade in flight is no wall
+  // (`sh_quench_blade_fly`). The shore ice the guardian raises round the
+  // lake: one slab per segment of QUENCH_RIMEWALL, along the ring.
+  sh_quench_blade_sunk: { hw: 1.6, hd: 1.6, height: 12, round: true, ownLook: true },
+  sh_quench_blade_wake: { hw: 1.3, hd: 1.3, height: 12, round: true, ownLook: true },
+  sh_quench_blade_float: { hw: 1.3, hd: 1.3, height: 12, round: true, ownLook: true },
+  sh_quench_rim: { hw: 4.4, hd: 0.7, height: 3.2, ownLook: true },
 };
 
 /** The soul pillars' rows: `sh_council_soul_<role>_<c|r>_<pips>`. */

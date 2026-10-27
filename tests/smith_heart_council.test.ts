@@ -66,6 +66,14 @@ function plant(f: CouncilFight, e: Entity, x: number, z: number): void {
 
 const MID = { x: HAMMER_PIT.x, z: HAMMER_PIT.z };
 
+/** The claim's round walls in the Quarry (the Frozen Lake's sunk blades
+ *  stand as walls of the same slot, far to the east). */
+function quarryCircles(o: { x: number; z: number }) {
+  return combatWallsAt(o.x, o.z).filter(
+    (w) => w.type === 'circle' && Math.hypot(w.x - MID.x, w.z - MID.z) < 60,
+  );
+}
+
 describe('Hammer Council: one pull', () => {
   it('pulling one wakes all three, and nothing else in the raid', () => {
     const f = councilFight(2);
@@ -120,8 +128,7 @@ describe('Hammer Council: the pillars', () => {
     expect(shape.height).toBe(QUARRY_PILLAR_H);
     expect(shape.round).toBe(true);
     const o = f.world(0, 0);
-    const walls = combatWallsAt(o.x, o.z);
-    expect(walls.filter((w) => w.type === 'circle').length).toBe(5);
+    expect(quarryCircles(o).length).toBe(5);
   });
 
   it('Wake the Stone raises a pillar where the marked player stands, and throws them back', () => {
@@ -254,7 +261,7 @@ describe('Hammer Council: the pillars', () => {
     let ev = f.tick(Math.ceil(T.resonanceCrackSeconds * 20) + 2);
     expect(f.pillars().length).toBe(4);
     const o = f.world(0, 0);
-    expect(combatWallsAt(o.x, o.z).filter((w) => w.type === 'circle').length).toBe(4);
+    expect(quarryCircles(o).length).toBe(4);
     expect(f.st.rubble.length).toBe(1);
     // The victim stands in the rubble now.
     f.put(victim, col.x, col.z);

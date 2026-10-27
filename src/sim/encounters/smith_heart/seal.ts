@@ -52,6 +52,7 @@ import type { SimContext } from '../../sim_context';
 import { tickBreathGuardian } from './breath';
 import { tickHammerCouncil } from './council';
 import { tickSmithHeartPortal } from './portal';
+import { tickQuenchGuardian } from './quench';
 
 /** Each vein's bit in the seal mask (the template id's number). */
 export const SMITH_HEART_VEIN_BITS: Readonly<Record<SmithHeartVein, number>> = {
@@ -291,9 +292,10 @@ export function tickSmithHeart(ctx: SimContext): void {
   for (const inst of ctx.instances) {
     if (inst.partyKey === null || inst.dungeonId !== SMITH_HEART_DUNGEON) continue;
     // The council first, so its fall lights the Hammer vein this same tick;
-    // the Breath's guardian likewise before the seal.
+    // the Breath's and the Quench's guardians likewise before the seal.
     tickHammerCouncil(ctx, inst);
     tickBreathGuardian(ctx, inst);
+    tickQuenchGuardian(ctx, inst);
     const value = tickSmithHeartSeal(ctx, inst);
     if (value !== null) tickSmithHeartPortal(ctx, inst, smithHeartPortalBitSet(value));
   }

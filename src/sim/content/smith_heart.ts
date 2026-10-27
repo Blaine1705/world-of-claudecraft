@@ -19,6 +19,7 @@ import {
   breathWindTemplate,
 } from '../encounters/smith_heart/breath_ids';
 import { COUNCIL_TUNING } from '../encounters/smith_heart/council_ids';
+import { bladeTemplate, QUENCH_NAMES, QUENCH_TUNING } from '../encounters/smith_heart/quench_ids';
 import type {
   DungeonDef,
   DungeonGateDef,
@@ -38,6 +39,7 @@ import {
   HEART_TERRACE,
   QUARRY_PILLAR_SPOTS,
   QUENCH,
+  QUENCH_BLADE_SPOTS,
   RING_PACK_DEGREES,
   ringPoint,
   SLAB,
@@ -350,23 +352,40 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
       },
     },
   },
-  // The Quench: ice and black iron, the tempering armour. A frontal breath
-  // the tank turns away from the raid.
+  // The Guardian of the Quench (design doc 7.3, encounters/smith_heart/
+  // quench.ts): an ice guardian of living stone and the lake's cold, no
+  // metal. "Together, but not for too long": the cold bar, the huddle's
+  // warmth and the ice it breaks, at half health the Smith's four blades
+  // awake and echo its attacks. Every number a SKETCH (unmeasured): 43,000
+  // base (about 99,000 after the elite factor) for a 4 to 5 minute fight at
+  // the bot raid's measured 400 to 460 a second. Tempering Strike stays its
+  // swing cleave (the fight watches for it to raise the echoes); Quenching
+  // Breath is encounter-driven (the fight starts and lands it on its own
+  // clock; the record keeps the look's numbers).
   heart_quench_guardian: {
-    ...boss('heart_quench_guardian', 'Guardian of the Quench', 30000, 0x9ad8ff, 3),
-    arcCleave: { every: 4, arcDeg: 100, range: 8, mult: 0.6, name: 'Tempering Strike' },
+    ...boss('heart_quench_guardian', 'Guardian of the Quench', 43000, 0x9ad8ff, 3),
+    ccImmune: true,
+    slowImmune: true,
+    arcCleave: {
+      every: QUENCH_TUNING.strikeEvery,
+      arcDeg: QUENCH_TUNING.strikeArcDeg,
+      range: QUENCH_TUNING.strikeRange,
+      mult: 0.6,
+      name: 'Tempering Strike',
+    },
     trashKit: {
       cone: {
         castId: C.quenchBreath,
-        name: 'Quenching Breath',
-        castTime: 2.5,
-        every: 14,
-        first: 6,
+        name: QUENCH_NAMES.breath,
+        castTime: QUENCH_TUNING.breathCast,
+        every: QUENCH_TUNING.breathEvery,
+        first: QUENCH_TUNING.breathFirst,
         school: 'frost',
-        range: 22,
-        arcDeg: 70,
-        min: 240,
-        max: 280,
+        range: QUENCH_TUNING.breathRange,
+        arcDeg: QUENCH_TUNING.breathArcDeg,
+        min: QUENCH_TUNING.breathMin,
+        max: QUENCH_TUNING.breathMax,
+        encounterDriven: true,
       },
     },
   },
@@ -726,6 +745,19 @@ export const SMITH_HEART_PILLAR_OBJECTS: DungeonObjectSpawn[] = QUARRY_PILLAR_SP
   lootable: false,
 }));
 
+/** The Smith's four great blades sunk in the Frozen Lake (design doc 7.3):
+ *  spawned with the claim, their state in the template id, each a combat
+ *  wall until it flies (encounters/smith_heart/quench_blades.ts). */
+export const SMITH_HEART_BLADE_OBJECTS: DungeonObjectSpawn[] = QUENCH_BLADE_SPOTS.map((p) => ({
+  itemId: '',
+  name: QUENCH_NAMES.blade,
+  x: p.x,
+  z: p.z,
+  templateId: bladeTemplate('sunk') as 'sh_quench_blade_sunk',
+  dungeonId: SMITH_HEART_DUNGEON,
+  lootable: false,
+}));
+
 // ---- the dungeon -------------------------------------------------------------------
 
 /** The world entrance: a cleft at the foot of the Stormcrag cliffs, past the
@@ -757,6 +789,7 @@ export const SMITH_HEART_DUNGEON_DEFS: Record<string, DungeonDef> = {
       ...SMITH_HEART_SEAL_OBJECTS,
       ...SMITH_HEART_PILLAR_OBJECTS,
       SMITH_HEART_WIND_OBJECT,
+      ...SMITH_HEART_BLADE_OBJECTS,
     ],
     // Captain Thessaly at her post on the Cornice's climb (breath_thessaly.ts),
     // facing the guardian.

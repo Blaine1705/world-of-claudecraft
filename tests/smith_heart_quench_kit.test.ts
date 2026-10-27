@@ -335,11 +335,17 @@ describe('Smith Heart Quench kit: the plan', () => {
     expect(of('Kit_SteamVent')).toBe(kinds('sh_steam_vent'));
     expect(of('Kit_IceShelfA') + of('Kit_IceShelfB')).toBe(kinds('sh_ice_shelf'));
     expect(of('Kit_IceShelfB')).toBeGreaterThan(0);
-    expect(of('Kit_SunkBlade')).toBe(kinds('sh_sunk_blade'));
+    // The Smith's four blades are their fight's (encounter-owned: the
+    // Guardian of the Quench's renderer draws them, sunk or risen).
+    expect(kinds('sh_sunk_blade')).toBe(4);
+    expect(F.props.filter((p) => p.kind === 'sh_sunk_blade').every((p) => p.encounterOwned)).toBe(
+      true,
+    );
+    expect(of('Kit_SunkBlade')).toBe(0);
     expect(of('Kit_IceBlade')).toBe(kinds('sh_ice_blade'));
     expect(of('Kit_FrostStone')).toBe(kinds('sh_frost_stone'));
     expect(of('Kit_FrostStone')).toBe(5);
-    expect(plan.length).toBe(props.length);
+    expect(plan.length).toBe(props.filter((p) => !p.encounterOwned).length);
     // The stones stand on colliders on the Quench's landings.
     for (const p of F.props.filter((q) => q.kind === 'sh_frost_stone')) {
       expect(p.r ?? 0).toBeGreaterThan(1);

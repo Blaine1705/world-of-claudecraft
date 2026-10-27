@@ -22,6 +22,7 @@ import type {
 } from './encounters/hollow_crypt/boss_state';
 import type { BreathFightState } from './encounters/smith_heart/breath_state';
 import type { CouncilFightState } from './encounters/smith_heart/council_state';
+import type { QuenchFightState } from './encounters/smith_heart/quench_state';
 import type { GrassClearCircle } from './grass_clear';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
 import type { MapObjectives } from './map_objectives';
@@ -6089,7 +6090,11 @@ export interface DungeonObjectSpawn {
     | 'sh_council_pillar_2'
     // The Storm Cornice's wind (encounters/smith_heart/breath_gale.ts): its
     // phase, bearing and length ride the template id.
-    | 'sh_breath_wind_still_0_0';
+    | 'sh_breath_wind_still_0_0'
+    // The Smith's four blades sunk in the Frozen Lake (encounters/smith_heart/
+    // quench_blades.ts): sunk, waking, floating or flying rides the template
+    // id, and each (but a flying one) stands as a combat wall.
+    | 'sh_quench_blade_sunk';
   dungeonId?: string;
   /**
    * This object is an encounter mechanic players INTERACT with, never a pickup, even
@@ -8120,6 +8125,10 @@ export interface Entity extends ClientMirroredEntityFields {
    *  breath.ts), on the guardian. Sim authority only; the client reads the
    *  fight from the wind object, the bars, the auras and the fight's objects. */
   smithHeartBreath?: BreathFightState;
+  /** The Smith's Heart's Guardian of the Quench's fight state (on the
+   *  guardian: encounters/smith_heart/quench.ts). Server-local sim state:
+   *  the client reads the fight from auras, bars and the fight's objects. */
+  smithHeartQuench?: QuenchFightState;
   /** A dead trash-kit mob's burst in the making (MobTemplate.trashKit.deathBurst,
    *  mob/trash_kit/death_burst.ts): seconds left, its floor ring, and whether it
    *  has gone off. A death cloud (trashKit.deathCloud, wildheart_kit.ts) rides
