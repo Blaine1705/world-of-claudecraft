@@ -9349,8 +9349,8 @@ export class Renderer {
       this.dnColorScratch.g *= realmTint[1];
       this.dnColorScratch.b *= realmTint[2];
       this.hemi.groundColor.lerp(this.dnColorScratch, k);
-      const baseSun = this.lowGfx ? lowSunIntensity(GFX) : SUN_INTENSITY;
-      const baseHemi = this.lowGfx ? lowHemiIntensity(GFX) : hemiOutdoorIntensity();
+      const baseSun = this.lowGfx ? lowSunIntensity(GFX, g, biome) : SUN_INTENSITY;
+      const baseHemi = this.lowGfx ? lowHemiIntensity(GFX, g, biome) : hemiOutdoorIntensity();
       this.sun.intensity +=
         (baseSun * g.lightScale * (light.sunScale ?? 1) - this.sun.intensity) * k;
       // The ambient half rides its own higher night floor, so terrain shape and

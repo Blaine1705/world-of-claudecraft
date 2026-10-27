@@ -1433,7 +1433,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
   // Re-minted for the one-colour market canopies on the current integration base.
   // No capture was retaken.
-  '4466561ebe777e344dfef52fa751ea69af1b8f973c6dcb1e0e8b6db6ddcf326b';
+  // Re-minted for Low-tier outdoor night light grading in renderer.ts.
+  // No capture was retaken.
+  '1f65aa4dacfbbd7e9aee819ec3969049aa0045310589445a825d39b237964672';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1487,7 +1489,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
   // Re-minted for the one-colour market canopies on the current integration base.
   // No capture was retaken.
-  'a74dec3c70b5e365354324851b7f9e458973b3c964b119b65ff6a1bf45bfa596';
+  // Re-minted for Low-tier outdoor night light grading in renderer.ts.
+  // No capture was retaken.
+  '76a15fc8224d580880cf5777e75808b3ca6294df557fc06beb84290e291af41d';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2892,7 +2896,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // LAST again over the re-swept evidence. No capture was retaken.
       // One-colour market canopies on the current integration base: recomputed
       // from the swept evidence. No capture was retaken.
-    ).toBe('2441702873a5a0fbb302a99c26eed732f5755a667abeded533c38f92efbd32ce');
+      // Low-tier outdoor night light grading in renderer.ts: recomputed from
+      // the swept evidence. No capture was retaken.
+    ).toBe('2cff3341e3612292a9dfd3ae5ba8004c7403083383396afff7cb1ec2cbc208c2');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
