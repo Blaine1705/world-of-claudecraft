@@ -151,6 +151,8 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/ability_vfx/ribbons.ts': 1,
   'src/render/ability_vfx/signature_crests.ts': 4,
   'src/render/ability_vfx/solid_impact_fragments.ts': 2,
+  'src/render/ability_vfx/spirit_bomb.ts': 6,
+  'src/render/ability_vfx/void_rupture.ts': 8,
   'src/render/ability_vfx/warrior_rage_material.ts': 1,
   'src/render/characters/surface_response.ts': 5,
   // Gloamveil's climbing tongues (one templated line for the three

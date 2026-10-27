@@ -1220,6 +1220,10 @@
       "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
       "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
     },
+    "spirit_bomb": {
+      "spec": "6ec3c2af3eb635d47747a637b0891f1c0871698573a97fc2b376e1fa02c287cb",
+      "full": "56a936253c95ea6e01a61a7cdee6e2700b64c2780534e213da748e0479fe258a"
+    },
     "spore_burst": {
       "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
       "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
@@ -1404,6 +1408,10 @@
       "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
       "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
     },
+    "vampiric_touch": {
+      "spec": "9af052b2ef09c569f6cf6f49715426b9a191144cc266cfed434b7fbdef537eb2",
+      "full": "01186a54ff5721803793f6bc535bc3a8afdbde39b556cc4956d7efd60dad37e2"
+    },
     "vanish": {
       "spec": "d9be72240cc1f50a57a41898d99a2f3c29b9f6f33c95c1efb6e3e30c9636c6b0",
       "full": "79aa71d0bfa89a9ea04edd54ee6bad6dc6d0c175223678296a6eff89495dd1c2"
@@ -1431,6 +1439,10 @@
     "vicarious_suffering": {
       "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
       "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
+    "void_rupture": {
+      "spec": "2f4f74169767d8d0483b5a2dd8d5d2cc8fedd721bf2aa5ab9d4e10420b3f5cd9",
+      "full": "057f71f26ae0155f5961aa576098398c35b1bdf10fa5848a0b4ffee1d1c58e8b"
     },
     "voidfeast": {
       "spec": "ca56fd3b282c7d093b23cadc153cc4523b4465a2fdb1d52ca203b7c9282779fe",
