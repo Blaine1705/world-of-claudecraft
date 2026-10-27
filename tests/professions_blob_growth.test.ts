@@ -2045,7 +2045,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // skull 42 + Titan 26 + PvP titles 138 + Hard maze 34 + skull bag 62
     // + vault retune 119 + quiver 66 + quest shields 68. No storage limit changes.
     // Advanced riding adds the sparse ridingTier scalar (+15, PR 4390).
-    expect(baselineBytes).toBe(259346);
+    // The Smith's Heart raid adds +85: its raid lockout (+28), Normal and
+    // Heroic clear counts in deedStats.dungeonClears (+18, +25) and its id in
+    // heroicDaily.marked (+14).
+    expect(baselineBytes).toBe(259431);
     expect(bytes - baselineBytes).toBe(8284);
     // 266,699 -> 266,721 with Wobbles the Slime's reins (+22, kept).
     expect(bytes).toBe(267630);
@@ -2320,7 +2323,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // (`"membership_staff",`, +19, PR 4281), isolated with membership below.
     // 249,984 -> 250,006 with Wobbles the Slime's reins (+22, kept).
     // Advanced riding adds the sparse ridingTier scalar (+15, PR 4390).
-    expect(beforeReferralBytes).toBe(250915);
+    // The Smith's Heart raid adds +85: its raid lockout (+28), Normal and
+    // Heroic clear counts in deedStats.dungeonClears (+18, +25) and its id in
+    // heroicDaily.marked (+14).
+    expect(beforeReferralBytes).toBe(251000);
     expect(bytes - stampCardBytes - beforeReferralBytes).toBe(122);
     expect(
       fieldBytes(beforeStampCards, 'deedStats') - fieldBytes(withoutReferral, 'deedStats'),
