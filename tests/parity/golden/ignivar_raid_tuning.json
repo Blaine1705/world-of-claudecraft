@@ -175,7 +175,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1023,
-      "state": "245499dc",
+      "state": "20aca11b",
       "events": "8e1aa1d8",
       "rng": {
         "draws": 1,
@@ -186,7 +186,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 1023,
-      "state": "fd3a461c",
+      "state": "bafbb0c3",
       "events": "297199ca",
       "rng": {
         "draws": 1,
@@ -197,7 +197,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 1023,
-      "state": "66e60345",
+      "state": "3d570d04",
       "events": "ca032752",
       "rng": {
         "draws": 1,
@@ -208,7 +208,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 1023,
-      "state": "f2fdc53c",
+      "state": "5d4cdb43",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -219,7 +219,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 1023,
-      "state": "f2fdc53c",
+      "state": "5d4cdb43",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -806,6 +806,7 @@
             "x": 116800,
             "z": -1246
           },
+          "spiritBombRaidPullStarted": true,
           "stats": {
             "armor": 1058
           },
@@ -970,7 +971,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1023,
-      "state": "6b838934",
+      "state": "3b2143f9",
       "events": "0ac0528e",
       "rng": {
         "draws": 4,
@@ -981,7 +982,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1023,
-      "state": "6b838934",
+      "state": "3b2143f9",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -1575,6 +1576,7 @@
             "x": 116800,
             "z": -1246
           },
+          "spiritBombRaidPullStarted": true,
           "stats": {
             "armor": 1058
           },
