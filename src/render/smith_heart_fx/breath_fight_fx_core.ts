@@ -9,9 +9,13 @@
 //
 // Readability (binding): every footprint a player acts on draws through the
 // shared floor telegraph at its exact radius on EVERY tier, and the wind's
-// direction (the floor's chevrons and streaks) and the gaps' lips draw on
-// every tier too; only the air's streaks, the grit, the motes, the domes and
-// the shakes thin.
+// direction and the gaps' lips draw on every tier too. The direction is the
+// wind's own look, never a drawn arrow (Jose's playtest: the old chevron
+// field read as a UI graphic): sand snakes and sheets of dust streaming over
+// the floor with their bright heads downwind, and streaks of wind in the air
+// over the whole Cornice. The low tier keeps every stream and fewer streaks;
+// only the streaks' count, the leaves, the torn mist, the grit, the motes,
+// the domes and the shakes thin.
 //
 // Three-free, DOM-free, deterministic (a hash, never rng).
 
@@ -33,11 +37,13 @@ const T = BREATH_TUNING;
  *  rule); the wind is the vein's own teal and white, never a threat colour
  *  (it is not a hit: what it does is push). */
 export const BREATH_FIGHT_COLORS = {
-  /** The wind's chevrons on the floor: a deep teal that reads on the pale
-   *  scoured granite, a white edge. */
-  chevron: 0x1d8fd0,
-  chevronEdge: 0xf2fbff,
-  streak: 0xe8f6ff,
+  /** The dust the wind drags over the floor: a cool slate shade that reads
+   *  on the pale scoured granite, a white light on each stream's head. */
+  dustShade: 0x4f6274,
+  dustLight: 0xf4f9fc,
+  /** The streaks of wind in the air: white heads, slate tails. */
+  streak: 0xf2f8fc,
+  streakTail: 0x7d8fa0,
   /** The gaps' lips: a fall to your death. */
   lip: TELEGRAPH_THREAT_COLORS.lethal,
   lipGlow: 0xff7a4a,
@@ -57,6 +63,9 @@ export const BREATH_FIGHT_COLORS = {
   spark: [0.7, 0.93, 1.0] as const,
   wind: [0.86, 0.93, 0.98] as const,
   grit: [0.42, 0.45, 0.5] as const,
+  /** Dry leaves torn up off the mountain's ledges. */
+  leaf: [0.46, 0.38, 0.22] as const,
+  leafGreen: [0.36, 0.42, 0.24] as const,
   mist: [0.78, 0.84, 0.9] as const,
   scorch: [0.06, 0.08, 0.1] as const,
   calmMote: [0.6, 1.0, 0.85] as const,
@@ -88,14 +97,18 @@ export const CORNICE_FLOOR_H = BREATH.cornice.h;
 
 // ---- the wind --------------------------------------------------------------------------
 
-/** How the wind's field draws in a phase at `fill` (0..1 into it):
- *  `strength` the streaks, `chevron` the arrows (the readable direction),
- *  `speed` their flow (yards a second over the floor), `front` the gather's
- *  sweeping edge (0..1 across the Cornice; -1 none), `inward` the pull
- *  toward the guardian (the indrawn breath, the storm breaking). */
+/** How the wind draws in a phase at `fill` (0..1 into it): `dust` the
+ *  streams of dust over the floor (the readable direction, every tier),
+ *  `strength` the streaks of wind in the air, `debris` the leaves, grit and
+ *  torn mist it flings along, `speed` their flow (yards a second over the
+ *  floor), `front` the gather's rolling front of dust (0..1 across the
+ *  Cornice from upwind; -1 none: only behind it has the wind arrived),
+ *  `inward` the pull toward the guardian (the indrawn breath, the storm
+ *  breaking). */
 export interface WindFieldLook {
+  dust: number;
   strength: number;
-  chevron: number;
+  debris: number;
   speed: number;
   front: number;
   inward: boolean;
@@ -104,54 +117,86 @@ export interface WindFieldLook {
 export function windFieldLook(
   phase: BreathWindPhase | null,
   fill: number,
-  out: WindFieldLook = { strength: 0, chevron: 0, speed: 0, front: -1, inward: false },
+  out: WindFieldLook = { dust: 0, strength: 0, debris: 0, speed: 0, front: -1, inward: false },
 ): WindFieldLook {
   const f = clamp01(fill);
+  const last = smooth((f - 0.85) / 0.15);
+  out.dust = 0;
   out.strength = 0;
-  out.chevron = 0;
+  out.debris = 0;
   out.speed = 0;
   out.front = -1;
   out.inward = false;
   switch (phase) {
     case 'gather':
     case 'gustgather':
-      // The coming wind: arrows building toward its bearing, a leading edge
-      // sweeping across the floor, the streaks stirring.
-      out.chevron = 0.45 + 0.5 * smooth(f);
-      out.strength = 0.15 + 0.35 * smooth(f);
-      out.speed = 4 + 6 * f;
+      // The coming wind: the dust starts to stream toward its bearing behind
+      // a front rolling over the floor from upwind, the first streaks
+      // stirring, gathering speed (with the guardian turning and the gather's
+      // sound, the telegraph).
+      out.dust = 0.3 + 0.6 * smooth(f);
+      out.strength = 0.12 + 0.45 * smooth(f);
+      out.debris = 0.25 * smooth(f);
+      out.speed = 3 + 8 * f;
       out.front = smooth(f);
       break;
     case 'blow':
     case 'gust':
-      // The blow: unmistakable, full arrows racing, heavy streaks; it eases
-      // only in its last breath.
-      out.chevron = 1 - 0.25 * smooth((f - 0.85) / 0.15);
-      out.strength = 1 - 0.3 * smooth((f - 0.85) / 0.15);
+      // The blow: unmistakable, the dust racing, heavy streaks, leaves and
+      // torn mist flung over the rim; it eases only in its last breath.
+      out.dust = 1 - 0.25 * last;
+      out.strength = 1 - 0.3 * last;
+      out.debris = 1 - 0.5 * last;
       out.speed = 14;
       break;
     case 'calm':
       // The wind dying away over the first half of the calm.
-      out.chevron = 0.35 * (1 - smooth(f * 2.5));
+      out.dust = 0.35 * (1 - smooth(f * 2.5));
       out.strength = 0.4 * (1 - smooth(f * 2));
+      out.debris = 0.2 * (1 - smooth(f * 3));
       out.speed = 6 * (1 - f);
       break;
     case 'inhale':
     case 'break':
-      out.chevron = 0.55 + 0.45 * smooth(f * 1.4);
+      out.dust = 0.55 + 0.45 * smooth(f * 1.4);
       out.strength = 0.4 + 0.6 * smooth(f);
+      out.debris = 0.5 * smooth(f);
       out.speed = 9 + 8 * f;
       out.inward = true;
       break;
     case 'exhale':
-      out.chevron = 0.5;
+      out.dust = 0.5;
       out.strength = 0.6;
+      out.debris = 0.8;
       out.speed = 18;
       break;
     default:
       break;
   }
   return out;
+}
+
+/** The streaks of wind in the air over the Cornice: how many on each tier
+ *  (the low tier fewer, never none: the dust on the floor reads the
+ *  direction alone, the streaks agree with it), how far one wraps (yards),
+ *  how much faster than the dust it runs. */
+export const WIND_STREAKS = { detail: 150, low: 56, span: 120, rate: 1.6 } as const;
+
+/** Streak `i`'s seed (deterministic): `across` -1..1 over the span, `lift`
+ *  0..1 (squared into 0.4 to 6.5 yd over the floor: most hug it), `phase`
+ *  0..1 along its wrap, `length` 0..1 (4 to 11 yd). */
+export function windStreakSeed(i: number): {
+  across: number;
+  lift: number;
+  phase: number;
+  length: number;
+} {
+  return {
+    across: fxHash01(i, 11) * 2 - 1,
+    lift: fxHash01(i, 23),
+    phase: fxHash01(i, 37),
+    length: fxHash01(i, 41),
+  };
 }
 
 /** The unit (x, z) a compass bearing (degrees, toward) points along. */
@@ -184,7 +229,7 @@ export interface GapLip {
   segments: { ax: number; az: number; bx: number; bz: number; nx: number; nz: number }[];
 }
 
-/** The four gaps' open lips, read off the field's own cliff runs (the runs
+/** The gaps' open lips, read off the field's own cliff runs (the runs
  *  the field builds no wall for), so the lip drawn IS the lip that kills. */
 export function gapLips(): GapLip[] {
   const runs = authoredFieldCliffRuns(SMITH_HEART_FIELD).filter((r) => r.open);

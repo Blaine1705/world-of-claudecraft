@@ -38,8 +38,10 @@ import {
   gapThreat,
   strikeBoltPath,
   strikeFill,
+  WIND_STREAKS,
   windFieldLook,
   windPushes,
+  windStreakSeed,
 } from '../src/render/smith_heart_fx/breath_fight_fx_core';
 import { BREATH, CORNICE_GAPS, SMITH_HEART_FIELD } from '../src/sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
@@ -59,25 +61,51 @@ import type { Entity, SimEvent } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
 
 describe('breath_fight_fx_core', () => {
+  it('keeps streaks of wind in the air on every tier, fewer on the low, seeded alike', () => {
+    expect(WIND_STREAKS.low).toBeGreaterThan(0);
+    expect(WIND_STREAKS.detail).toBeGreaterThan(WIND_STREAKS.low);
+    // The span covers the whole Cornice, both ways.
+    expect(WIND_STREAKS.span).toBeGreaterThanOrEqual(
+      2 * Math.max(BREATH.cornice.rx, BREATH.cornice.rz),
+    );
+    const a = windStreakSeed(7);
+    expect(windStreakSeed(7)).toEqual(a);
+    for (let i = 0; i < WIND_STREAKS.detail; i++) {
+      const s = windStreakSeed(i);
+      expect(Math.abs(s.across)).toBeLessThanOrEqual(1);
+      for (const k of [s.lift, s.phase, s.length]) {
+        expect(k).toBeGreaterThanOrEqual(0);
+        expect(k).toBeLessThan(1);
+      }
+    }
+  });
+
   it('reads the wind in every pushing phase, inward while it draws breath, quiet when still', () => {
     for (const phase of ['blow', 'gust'] as const) {
       const look = windFieldLook(phase, 0.5);
-      expect(look.chevron).toBeGreaterThan(0.9);
+      expect(look.dust).toBeGreaterThan(0.9);
       expect(look.strength).toBeGreaterThan(0.9);
+      expect(look.debris).toBeGreaterThan(0.9);
+      // The wind is drawn as the wind, never as arrows on the floor.
+      expect('chevron' in look).toBe(false);
       expect(look.inward).toBe(false);
       expect(windPushes(phase)).toBe(true);
     }
-    // The gather builds toward the blow, its edge sweeping across.
+    // The gather builds toward the blow: the dust starting to stream behind
+    // its rolling front, the streaks stirring, gathering speed.
     const g0 = windFieldLook('gather', 0);
     const g1 = windFieldLook('gather', 1);
-    expect(g0.chevron).toBeGreaterThan(0.3);
-    expect(g1.chevron).toBeGreaterThan(g0.chevron);
+    expect(g0.dust).toBeGreaterThan(0.25);
+    expect(g1.dust).toBeGreaterThan(g0.dust);
+    expect(g1.strength).toBeGreaterThan(g0.strength);
+    expect(g1.speed).toBeGreaterThan(g0.speed);
     expect(g0.front).toBe(0);
     expect(g1.front).toBe(1);
     expect(windFieldLook('inhale', 0.5).inward).toBe(true);
     expect(windFieldLook('break', 0.5).inward).toBe(true);
-    expect(windFieldLook('calm', 1).chevron).toBe(0);
-    expect(windFieldLook('still', 0.5).chevron).toBe(0);
+    expect(windFieldLook('calm', 1).dust).toBe(0);
+    expect(windFieldLook('still', 0.5).dust).toBe(0);
+    expect(windFieldLook('still', 0.5).debris).toBe(0);
     expect(windFieldLook(null, 0.5).strength).toBe(0);
     const d = bearingDir(90);
     expect(d.x).toBeCloseTo(1);
@@ -307,6 +335,11 @@ describe('BreathFightFx', () => {
     for (let i = 0; i < 12; i++) fx.update(1 / 20);
     const field = root?.getObjectByName('smithHeartBreathWindField');
     expect(field?.visible).toBe(true);
+    // The streaks of wind over the whole Cornice ride the same blow.
+    const streaks = root?.getObjectByName('smithHeartBreathWindStreaks') as THREE.Mesh | undefined;
+    expect(streaks?.visible).toBe(true);
+    if (!streaks) throw new Error('no streaks');
+    expect((streaks.geometry as THREE.InstancedBufferGeometry).instanceCount).toBeGreaterThan(0);
     expect(root?.getObjectByName('smithHeartBreathGapLip')).toBeDefined();
     // Every footprint at its object's own radius (the fans' horizontal scale).
     const shownFans = (r: number) =>

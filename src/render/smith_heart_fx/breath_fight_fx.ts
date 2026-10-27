@@ -7,11 +7,14 @@
 // bars and the fight's cues, so offline and online look the same.
 //
 // On EVERY graphics tier (actionable):
-//  - the wind's direction: the whole Cornice floor carries chevrons and
-//    streaks racing toward the bearing, building with a sweeping edge as a
-//    blow gathers, full through the blow, dying in the calm, turned inward
-//    to the guardian while it draws breath and as the storm breaks;
-//  - the four gaps' lips, burning the lethal red at all times, flaring when
+//  - the wind's direction, as the wind itself (never a drawn arrow): sand
+//    snakes and sheets of dust streaming over the whole Cornice floor, each
+//    stream's bright head downwind, and the streaks of wind in the air
+//    (breath_wind_streaks.ts; fewer on the low tier); building behind a
+//    rolling front of dust as a blow gathers (with the guardian turning and
+//    the gather's sound), full through the blow, dying in the calm, drawn
+//    inward to the guardian while it draws breath and as the storm breaks;
+//  - the six gaps' lips, burning the lethal red at all times, flaring when
 //    the wind blows their way;
 //  - through the shared floor telegraph, at each object's exact radius:
 //    Thessaly's circle (the calm's mint: filling as it lands, held, its free
@@ -25,7 +28,7 @@
 //    their feet facing the wall, the marked conductor a beacon of lightning
 //    over them, the lifted a crown of storm.
 // Cosmetic (thinned on the low tier, shakes off under reduced motion): the
-// air's streaks and grit, the gaps' updraft and mist, the calm's landing beam
+// air's puffs, the leaves, the torn mist and the grit, the gaps' updraft and mist, the calm's landing beam
 // and dome, the vortex's and the gales' funnels, the bolts' sparks and
 // scorches, the swell's motes.
 //
@@ -90,6 +93,7 @@ import {
   type WindFieldLook,
   windFieldLook,
 } from './breath_fight_fx_core';
+import { BreathWindStreaks } from './breath_wind_streaks';
 
 const SCAN_SEC = 0.1;
 const BEAM_POINTS = 10;
@@ -97,9 +101,10 @@ const T = BREATH_TUNING;
 
 // ---- shaders ---------------------------------------------------------------------------
 
-/** The wind over the Cornice floor: chevrons racing toward the bearing (the
- *  readable direction), streaks of wind, the gather's sweeping edge. Local
- *  instance coords in vLocal (x, z). */
+/** The wind over the Cornice floor, as the wind itself: sand snakes (thin
+ *  wavering streams of dust, long dashes whose bright heads lead downwind)
+ *  and soft sheets of dust sliding with them, behind the gather's rolling
+ *  front of dust. Local instance coords in vLocal (x, z). */
 const FIELD_VERT = /* glsl */ `
 varying vec2 vLocal;
 void main() {
@@ -114,14 +119,13 @@ uniform vec2 uFocus;
 uniform vec2 uCentre;
 uniform float uInward;
 uniform float uStrength;
-uniform float uChevron;
+uniform float uDust;
 uniform float uFlowT;
 uniform float uFront;
 uniform float uDetail;
 uniform float uStorm;
-uniform vec3 uColor;
-uniform vec3 uEdge;
-uniform vec3 uStreak;
+uniform vec3 uShade;
+uniform vec3 uLight;
 varying vec2 vLocal;
 float h(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float n(vec2 p) {
@@ -134,48 +138,61 @@ void main() {
   vec2 side = vec2(uDir.y, -uDir.x);
   float along = dot(vLocal - uCentre, uDir);
   float across = dot(vLocal - uCentre, side);
+  float laneW = 2.3;
   if (uInward > 0.5) {
-    // Drawn in: the arrows run down every radius to the guardian's mouth
-    // (along grows toward it; across is the arc round it).
+    // Drawn in: the dust runs down every radius to the guardian's mouth
+    // (along grows toward it; across is the arc round it, in lanes).
     vec2 off = vLocal - uFocus;
     float r = length(off);
     along = -r;
-    across = atan(off.y, off.x) * 28.0;
+    across = atan(off.y, off.x) * 9.0;
+    laneW = 0.9;
   }
-  // Chevrons: rows of arrows pointing downwind, flowing with it.
   float a = along - uFlowT;
-  vec2 cell = vec2(fract(a / 9.0), fract(across / 7.0) - 0.5);
-  float row = floor(a / 9.0);
-  float col = floor(across / 7.0);
-  float jig = (h(vec2(row, col)) - 0.5) * 0.18;
-  float tip = 0.62 - abs(cell.y) * 0.95 + jig;
-  float dist = abs(cell.x - tip);
-  float body = (1.0 - smoothstep(0.03, 0.07, dist)) * (1.0 - smoothstep(0.32, 0.4, abs(cell.y)));
-  float rim = (1.0 - smoothstep(0.07, 0.1, dist)) * (1.0 - smoothstep(0.34, 0.44, abs(cell.y)));
-  // Streaks: wisps stretched along the wind.
-  float s1 = n(vec2(a * 0.09, across * 0.9));
-  float s2 = n(vec2(a * 0.2 + 7.0, across * 2.3));
-  float streak = smoothstep(0.62, 0.9, s1 * 0.65 + s2 * 0.35) * (0.55 + 0.45 * uDetail);
-  // The gather's leading edge, sweeping across the plateau toward the bearing.
+  // Sand snakes: one wavering stream per lane (some lanes bare), broken into
+  // long dashes; each dash brightens to its head, downwind, and ends there.
+  float lane = across / laneW;
+  float li = floor(lane);
+  float r1 = h(vec2(li, 3.7));
+  float r2 = h(vec2(li, 9.1));
+  float wob = sin(a * (0.07 + r1 * 0.06) + r1 * 6.2831) * 0.22 + (n(vec2(a * 0.04, li)) - 0.5) * 0.3;
+  float lf = fract(lane) - 0.5 + wob;
+  float period = 9.0 + r1 * 13.0;
+  float dash = period * (0.4 + 0.35 * r2);
+  float u = mod(a + r2 * 53.0, period);
+  float head = clamp(u / dash, 0.0, 1.0);
+  float body = smoothstep(0.0, 1.0, head) * (1.0 - smoothstep(dash - 0.35, dash, u));
+  float halfW = (0.025 + 0.035 * head) * (0.8 + 0.5 * r2);
+  float line = 1.0 - smoothstep(halfW, halfW * 2.2, abs(lf));
+  float stream = line * body * step(0.28, h(vec2(li, 5.3)));
+  float hot = smoothstep(0.72, 0.97, head) * stream;
+  // Sheets of dust sliding with them (softer, broader; the low tier keeps
+  // a lighter veil of them).
+  float sh = n(vec2(a * 0.045, across * 0.16)) * 0.7 + n(vec2(a * 0.11 + 3.0, across * 0.4)) * 0.3;
+  float sheet = smoothstep(0.56, 0.86, sh) * (0.6 + 0.4 * uDetail);
+  // The gather's rolling front of dust: a billowing band sweeping over the
+  // plateau toward the bearing; behind it the wind has arrived.
   float frontPos = mix(-55.0, 55.0, uFront);
-  float front = uFront < 0.0 ? 0.0 : exp(-pow((along - frontPos) / 4.5, 2.0)) * 0.8;
-  float behind = uFront < 0.0 ? 1.0 : smoothstep(frontPos + 6.0, frontPos - 6.0, along);
-  float chev = uChevron * mix(0.35, 1.0, behind);
-  vec3 col3 = mix(uColor, uEdge, rim * (1.0 - body) * 0.9);
-  float alpha = max(body * 0.62, rim * 0.42) * chev;
-  vec3 outc = col3 * alpha + uStreak * streak * uStrength * 0.55 + uEdge * front;
-  float outa = clamp(alpha + streak * uStrength * 0.38 + front * 0.6, 0.0, 0.92);
+  float billow = 0.55 + 0.45 * n(vec2(across * 0.14, uTime * 0.9));
+  float front = uFront < 0.0 ? 0.0 : exp(-pow((along - frontPos) / 5.0, 2.0)) * billow;
+  float behind = uFront < 0.0 ? 1.0 : smoothstep(frontPos + 4.0, frontPos - 8.0, along);
+  float d = uDust * behind;
+  float aStream = stream * 0.62 * d;
+  float aSheet = sheet * 0.2 * max(d, uStrength * behind);
+  float aFront = front * 0.42;
+  vec3 col = uShade * (aStream + aSheet * 0.6) + uLight * (hot * 0.55 * d + aSheet * 0.4 + aFront);
+  float outa = clamp(aStream + hot * 0.3 * d + aSheet + aFront, 0.0, 0.9);
   // The swelling storm: a flicker of lightning light over the floor.
   float flash = uStorm * step(0.985, h(vec2(floor(uTime * 9.0), 3.1))) * 0.35;
-  outc += uEdge * flash;
-  outa = clamp(outa + flash * 0.3, 0.0, 0.92);
-  gl_FragColor = vec4(outc / max(outa, 0.001), outa);
+  col += uLight * flash;
+  outa = clamp(outa + flash * 0.3, 0.0, 0.9);
+  gl_FragColor = vec4(col / max(outa, 0.001), outa);
   #include <colorspace_fragment>
 }
 `;
 /** A gap's lethal lip: a curtain of red light standing on the open edge, an
  *  updraft of streaks rising through it. vUv.x along, vUv.y up (0 at the
- *  lip); aThreat per gap via uThreat[gap]. */
+ *  lip); aThreat per gap via uThreat (gaps 0 to 3) and uThreat2 (4 to 7). */
 const LIP_VERT = /* glsl */ `
 attribute float aGap;
 varying vec2 vUv;
@@ -189,6 +206,7 @@ void main() {
 const LIP_FRAG = /* glsl */ `
 uniform float uTime;
 uniform vec4 uThreat;
+uniform vec4 uThreat2;
 uniform vec3 uColor;
 uniform vec3 uGlow;
 uniform float uFloor;
@@ -202,7 +220,9 @@ float n(vec2 p) {
   return mix(mix(h(i), h(i + vec2(1, 0)), f.x), mix(h(i + vec2(0, 1)), h(i + vec2(1, 1)), f.x), f.y);
 }
 void main() {
-  float g = vGap < 0.5 ? uThreat.x : vGap < 1.5 ? uThreat.y : vGap < 2.5 ? uThreat.z : uThreat.w;
+  float g = vGap < 3.5
+    ? (vGap < 0.5 ? uThreat.x : vGap < 1.5 ? uThreat.y : vGap < 2.5 ? uThreat.z : uThreat.w)
+    : (vGap < 4.5 ? uThreat2.x : vGap < 5.5 ? uThreat2.y : vGap < 6.5 ? uThreat2.z : uThreat2.w);
   float pulse = 0.75 + 0.25 * sin(uTime * (3.0 + g * 5.0));
   float k;
   if (uFloor > 0.5) {
@@ -481,12 +501,14 @@ export class BreathFightFx {
   private readonly lipFloorMat: THREE.ShaderMaterial;
   private readonly lips = gapLips();
   private readonly windLook: WindFieldLook = {
+    dust: 0,
     strength: 0,
-    chevron: 0,
+    debris: 0,
     speed: 0,
     front: -1,
     inward: false,
   };
+  private readonly streaks: BreathWindStreaks;
   private flowAt = 0;
   // The objects' footprints.
   private readonly calmFans: FanSlot[] = [];
@@ -608,14 +630,13 @@ export class BreathFightFx {
         uCentre: { value: new THREE.Vector2(0, 196) },
         uInward: { value: 0 },
         uStrength: { value: 0 },
-        uChevron: { value: 0 },
+        uDust: { value: 0 },
         uFlowT: { value: 0 },
         uFront: { value: -1 },
         uDetail: { value: this.detail ? 1 : 0 },
         uStorm: { value: 0 },
-        uColor: { value: new THREE.Color(C.chevron) },
-        uEdge: { value: new THREE.Color(C.chevronEdge) },
-        uStreak: { value: new THREE.Color(C.streak) },
+        uShade: { value: new THREE.Color(C.dustShade) },
+        uLight: { value: new THREE.Color(C.dustLight) },
       },
       vertexShader: FIELD_VERT,
       fragmentShader: FIELD_FRAG,
@@ -631,11 +652,14 @@ export class BreathFightFx {
     this.field.frustumCulled = false;
     this.field.renderOrder = floorVfxRenderOrder('encounter', 2);
     this.local.add(this.field);
+    // The streaks of wind in the air over it (every tier, fewer on the low).
+    this.streaks = new BreathWindStreaks(this.local, this.uTime, this.detail, CORNICE_FLOOR_H);
 
     // ---- the gaps' lethal lips (every tier) ----
     const lipUniforms = (floor: number) => ({
       uTime: this.uTime,
       uThreat: { value: new THREE.Vector4() },
+      uThreat2: { value: new THREE.Vector4() },
       uColor: { value: new THREE.Color(C.lip) },
       uGlow: { value: new THREE.Color(C.lipGlow) },
       uFloor: { value: floor },
@@ -1299,16 +1323,20 @@ export class BreathFightFx {
     this.flowAt = (this.flowAt + look.speed * dt) % 9000;
     u.uFlowT.value = this.flowAt;
     u.uStrength.value += (look.strength - u.uStrength.value) * Math.min(1, dt * 4);
-    u.uChevron.value += (look.chevron - u.uChevron.value) * Math.min(1, dt * 5);
+    u.uDust.value += (look.dust - u.uDust.value) * Math.min(1, dt * 5);
     u.uFront.value = look.front;
     const world = this.world;
     const g = world && this.guardianId >= 0 ? world.entities.get(this.guardianId) : undefined;
     if (g && this.origin) u.uFocus.value.set(g.pos.x - this.origin.x, g.pos.z - this.origin.z);
-    this.field.visible = u.uChevron.value > 0.01 || u.uStrength.value > 0.01 || look.front >= 0;
+    this.field.visible = u.uDust.value > 0.01 || u.uStrength.value > 0.01 || look.front >= 0;
+    this.streaks.paint(u.uStrength.value, d, look.inward, u.uFocus.value, this.flowAt, look.front);
     // The gaps' lips flare when the wind blows their way.
     const th = this.lipMat.uniforms.uThreat.value as THREE.Vector4;
+    const th2 = this.lipMat.uniforms.uThreat2.value as THREE.Vector4;
     th.set(this.lipThreat(0), this.lipThreat(1), this.lipThreat(2), this.lipThreat(3));
+    th2.set(this.lipThreat(4), this.lipThreat(5), this.lipThreat(6), this.lipThreat(7));
     (this.lipFloorMat.uniforms.uThreat.value as THREE.Vector4).copy(th);
+    (this.lipFloorMat.uniforms.uThreat2.value as THREE.Vector4).copy(th2);
     // The swelling storm's flicker over the floor.
     const stacks = this.swell;
     u.uStorm.value = Math.min(1, stacks / 20);
@@ -1321,8 +1349,9 @@ export class BreathFightFx {
     return lip ? gapThreat(lip, this.windPhase, this.windBearing) : 0;
   }
 
-  /** The air's streaks and grit riding the wind round the player, the
-   *  updraft and mist at the gaps (cosmetic). */
+  /** The air's puffs, grit, leaves and torn mist riding the wind round the
+   *  player, the updraft and mist at the gaps (cosmetic: thinned by the
+   *  tier's density; the direction is the floor's and the streaks'). */
   private windDressing(look: WindFieldLook, d: { x: number; z: number }, dt: number): void {
     const world = this.world;
     const me = world?.entities.get(world.playerId);
@@ -1363,6 +1392,7 @@ export class BreathFightFx {
           gravity: 3,
         });
       }
+      this.windDebris(me.pos.x, me.pos.z, me.pos.y, look, d, dt);
     }
     if (look.inward && look.strength > 0.2) {
       const g = this.guardianId >= 0 ? world?.entities.get(this.guardianId) : undefined;
@@ -1400,6 +1430,53 @@ export class BreathFightFx {
           drag: 0.6,
         });
       }
+    }
+  }
+
+  /** Dry leaves torn off the ledges tumbling past, and rags of mist torn
+   *  over the Cornice, both flung downwind upwind of the player. */
+  private windDebris(
+    px: number,
+    pz: number,
+    py: number,
+    look: WindFieldLook,
+    d: { x: number; z: number },
+    dt: number,
+  ): void {
+    if (look.debris < 0.05) return;
+    if (this.rand() < dt * 9 * look.debris * this.density) {
+      const across = (this.rand() - 0.5) * 44;
+      const back = 6 + this.rand() * 26;
+      const x = px - d.x * back + d.z * across;
+      const z = pz - d.z * back - d.x * across;
+      this.particles.puff(x, this.groundY(x, z) + 0.3 + this.rand() * 2.5, z, 1, {
+        speed: 11 + look.speed * 0.4,
+        up: 1.4,
+        life: 2.2,
+        size: [0.26, 0.18],
+        color: this.rand() < 0.6 ? C.leaf : C.leafGreen,
+        alpha: 0.95,
+        dir: [d.x, 0.18, d.z],
+        spread: 0.4,
+        drag: 0.25,
+        gravity: 2.2,
+      });
+    }
+    if (this.rand() < dt * 2.4 * look.debris * this.density) {
+      const across = (this.rand() - 0.5) * 60;
+      const back = 18 + this.rand() * 24;
+      const x = px - d.x * back + d.z * across;
+      const z = pz - d.z * back - d.x * across;
+      this.particles.puff(x, py + 1 + this.rand() * 4, z, 1, {
+        speed: 13 + look.speed * 0.3,
+        life: 2.8,
+        size: [2.6, 6.5],
+        color: C.mist,
+        alpha: 0.13,
+        dir: [d.x, 0.03, d.z],
+        spread: 0.05,
+        drag: 0.04,
+      });
     }
   }
 
@@ -1890,6 +1967,7 @@ export class BreathFightFx {
     this.audio.dispose();
     this.particles.dispose();
     this.kit.dispose();
+    this.streaks.dispose();
     for (const g of this.geometries) g.dispose();
     for (const m of this.materials) m.dispose();
     this.glowTex?.dispose();
