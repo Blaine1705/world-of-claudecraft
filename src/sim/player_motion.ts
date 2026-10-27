@@ -576,22 +576,23 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
         p.vz *= k;
       }
     }
-    const stepX =
-      (slide
-        ? slide.x * STEEP_SLIDE_SPEED
-        : grip > 0
-          ? p.vx
-          : movingOnGround
-            ? wishX * wishSpeed
-            : p.vx) + driftOut.x;
-    const stepZ =
-      (slide
-        ? slide.z * STEEP_SLIDE_SPEED
-        : grip > 0
-          ? p.vz
-          : movingOnGround
-            ? wishZ * wishSpeed
-            : p.vz) + driftOut.z;
+    const baseX = slide
+      ? slide.x * STEEP_SLIDE_SPEED
+      : grip > 0
+        ? p.vx
+        : movingOnGround
+          ? wishX * wishSpeed
+          : p.vx;
+    const baseZ = slide
+      ? slide.z * STEEP_SLIDE_SPEED
+      : grip > 0
+        ? p.vz
+        : movingOnGround
+          ? wishZ * wishSpeed
+          : p.vz;
+    // Off the wind the step is exactly the old one (no +0 for a -0).
+    const stepX = drifting ? baseX + driftOut.x : baseX;
+    const stepZ = drifting ? baseZ + driftOut.z : baseZ;
     // Slide along buildings, trees, crypt walls; but while airborne from a
     // jump, pass through fences for the whole arc. Keying off the jump itself
     // (not a height threshold) makes this independent of slope: an uphill
