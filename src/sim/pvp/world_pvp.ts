@@ -876,7 +876,7 @@ export function worldPvpOnPlayerDeath(
   const honorEarners = contributors.filter((c) => c.honorMult > 0).length;
   const gold = worldPvpSplit(victim.pvpFlag ? worldPvpStake(victimMeta.copper) : 0, goldEarners);
   const honor = worldPvpSplit(
-    hillKill ? hillKill.bounty : worldPvpKillHonorPool(victimHadBounty),
+    worldPvpKillHonorPool(victimHadBounty, hillKill?.bounty),
     honorEarners,
   );
   // A forfeit (the victim left the world mid-fight, world_pvp_forfeit.ts) pays

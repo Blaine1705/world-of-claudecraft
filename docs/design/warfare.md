@@ -840,9 +840,11 @@ killing blow builds a streak (a grey or raid kill does not). Hill Honor ignores 
 kills of one victim on one hill (`HILL_BOUNTY_REPEAT_CAP`), then nothing. The
 gold stake keeps the normal decay.
 
-Hill bounty rules take priority over a victim's world bounty. A 20 Honor hill
-bounty pays 20 Honor even when that victim also carries a world bounty; the
-world-bounty multiplier does not apply to hill kills.
+A victim's world bounty stacks with their hill bounty (owner call 2026-10-27):
+the world-bounty multiplier doubles the hill bounty the same way it doubles the
+plain world kill, so a 20 Honor hill bounty on a world-bounty holder pays 40
+Honor, split like any pool. The killer's own world bounty does not change a
+hill kill: the hill's repeat cap, not the holder curve, sets each share.
 
 A running kill streak of two or more puts the bounty on the player's entity
 (`Entity.hillBounty`, the `hbn` entity wire bit), shown as `<Bounty 23>` on the
