@@ -377,10 +377,15 @@ describe('the long-sims lane (Phase 4)', () => {
       'tests/owned_class_balance_role_bands.test.ts',
       'tests/owned_class_raid_armor_avoidance.test.ts',
       'tests/owned_class_raid_sustain_bands.test.ts',
+      'tests/warlock_anchor_affliction.test.ts',
+      'tests/warlock_anchor_demonology.test.ts',
+      'tests/warlock_anchor_destruction.test.ts',
+      'tests/warlock_five_minute_windows.test.ts',
     ]);
     // The two lane jobs' halves, also literal (the a/b balance is a measured
     // decision, re-balanced 2026-08-13 with the run 31732244215 per-file
-    // duration ledger recorded in the lane-split PRs).
+    // duration ledger recorded in the lane-split PRs and updated 2026-10-27
+    // with full-mode run 40304367651 when the four warlock suites joined).
     expect([...CI_LONG_SUITE_HALVES.a]).toEqual([
       'tests/nythraxis_matrix.test.ts',
       'tests/owned_class_balance_dps_metrics.test.ts',
@@ -389,6 +394,8 @@ describe('the long-sims lane (Phase 4)', () => {
       'tests/owned_class_balance_healer_probes.test.ts',
       'tests/owned_class_balance_role_bands.test.ts',
       'tests/owned_class_raid_armor_avoidance.test.ts',
+      'tests/warlock_anchor_affliction.test.ts',
+      'tests/warlock_five_minute_windows.test.ts',
     ]);
     expect([...CI_LONG_SUITE_HALVES.b]).toEqual([
       'tests/chronomancy_balance_targets.test.ts',
@@ -398,6 +405,8 @@ describe('the long-sims lane (Phase 4)', () => {
       'tests/owned_class_balance_groveheart.test.ts',
       'tests/owned_class_balance_healer_contract.test.ts',
       'tests/owned_class_raid_sustain_bands.test.ts',
+      'tests/warlock_anchor_demonology.test.ts',
+      'tests/warlock_anchor_destruction.test.ts',
     ]);
     // Exact partition of the union the shard legs exclude. Half b is DERIVED
     // (union minus half a), so "in neither half" and "in both halves" are
@@ -981,10 +990,10 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     const runA = await runEntry(['--lane=long-sims-a', '--plan-only'], env);
     expect(runA.exitCode).toBe(0);
     // The exact reason line closes BOTH directions and the cardinality at
-    // once: "1 of 7" fails if a second half-a lane file lands on the floor
+    // once: "1 of 9" fails if a second half-a lane file lands on the floor
     // (whatever its sort position) and if the half's list total drifts.
     expect(runA.log).toContain(
-      'plan: mode=selective (selective: 1 of 7 lane file(s) on the floor or changed)',
+      'plan: mode=selective (selective: 1 of 9 lane file(s) on the floor or changed)',
     );
     expect(runA.log).toContain('lane runs: tests/nythraxis_matrix.test.ts');
     expect(runA.log).not.toContain('tests/owned_class_balance_role_bands.test.ts');
@@ -995,7 +1004,7 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     // ZERO legs here: the documented empty-lane path, exercised on the real
     // tree (the fixture-based cases above cover the non-empty shapes).
     expect(runB.log).toContain(
-      'plan: mode=selective (selective: 0 of 7 lane file(s) on the floor or changed)',
+      'plan: mode=selective (selective: 0 of 9 lane file(s) on the floor or changed)',
     );
     expect(runB.log).toContain('lane runs: nothing');
     // Binding negative: zero legs means no npm test invocation is printed at
