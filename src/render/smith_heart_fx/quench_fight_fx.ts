@@ -459,6 +459,8 @@ export class QuenchFightFx {
       mesh.renderOrder = floorVfxRenderOrder('encounter', order);
       mesh.castShadow = false;
       mesh.receiveShadow = false;
+      // Idle pools draw nothing (shown while they hold an instance).
+      mesh.visible = false;
       this.root.add(mesh);
       return mesh;
     };
@@ -537,6 +539,7 @@ export class QuenchFightFx {
     this.crystals.name = 'smithHeartQuenchFrostCrystals';
     this.crystals.frustumCulled = false;
     this.crystals.castShadow = false;
+    this.crystals.visible = false;
     this.crystals.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     for (let i = 0; i < P.bodies * P.crystalsPer; i++) this.crystals.setMatrixAt(i, _zero);
     this.root.add(this.crystals);
@@ -556,6 +559,7 @@ export class QuenchFightFx {
     this.links = new THREE.InstancedMesh(linkGeo, linkMat, P.links);
     this.links.name = 'smithHeartQuenchWarmThreads';
     this.links.frustumCulled = false;
+    this.links.visible = false;
     this.links.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     for (let i = 0; i < P.links; i++) this.links.setMatrixAt(i, _zero);
     this.root.add(this.links);
@@ -631,6 +635,7 @@ export class QuenchFightFx {
     this.rim.name = 'smithHeartQuenchShoreIce';
     this.rim.frustumCulled = false;
     this.rim.castShadow = true;
+    this.rim.visible = false;
     this.rim.receiveShadow = true;
     this.rim.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     for (let i = 0; i < P.rimSlabs * RIM_SHARDS; i++) this.rim.setMatrixAt(i, _zero);
@@ -844,6 +849,7 @@ export class QuenchFightFx {
           slot.id = id;
           // A ring already standing when first seen (arriving late) is up.
           slot.born = kind === 'rim' ? this.clock - T.rimRise : this.clock;
+          slot.template = '';
           this.rimFalling = -1;
         }
       } else if (kind === 'lane') {
@@ -868,7 +874,10 @@ export class QuenchFightFx {
     this.lane.group.visible = false;
     this.laneId = -1;
     for (const s of this.holeSlots) s.id = -1;
-    for (const s of this.rimSlots) s.id = -1;
+    for (const s of this.rimSlots) {
+      s.id = -1;
+      s.template = '';
+    }
     this.rimFalling = -1;
     for (const mesh of [
       this.holes,
@@ -883,6 +892,7 @@ export class QuenchFightFx {
     ]) {
       for (let i = 0; i < mesh.count; i++) mesh.setMatrixAt(i, _zero);
       mesh.instanceMatrix.needsUpdate = true;
+      mesh.visible = false;
     }
   }
 
@@ -926,6 +936,7 @@ export class QuenchFightFx {
     }
     for (let i = n; i < P.cracks; i++) this.cracks.setMatrixAt(i, _zero);
     this.cracks.instanceMatrix.needsUpdate = true;
+    this.cracks.visible = n > 0;
     if (this.cracks.instanceColor) this.cracks.instanceColor.needsUpdate = true;
     // The holes of freezing water.
     let h = 0;
@@ -942,6 +953,7 @@ export class QuenchFightFx {
     }
     for (let i = h; i < P.holes; i++) this.holes.setMatrixAt(i, _zero);
     this.holes.instanceMatrix.needsUpdate = true;
+    this.holes.visible = h > 0;
     if (this.holes.instanceColor) this.holes.instanceColor.needsUpdate = true;
     // The echoes' footprints, and the lee behind every blade while they wait.
     let leeFacing = Number.NaN;
@@ -1076,8 +1088,10 @@ export class QuenchFightFx {
     for (let i = ri; i < P.bodies; i++) this.rimes.setMatrixAt(i, _zero);
     for (let i = ci; i < P.bodies * P.crystalsPer; i++) this.crystals.setMatrixAt(i, _zero);
     this.rimes.instanceMatrix.needsUpdate = true;
+    this.rimes.visible = ri > 0;
     if (this.rimes.instanceColor) this.rimes.instanceColor.needsUpdate = true;
     this.crystals.instanceMatrix.needsUpdate = true;
+    this.crystals.visible = ci > 0;
     // The huddle's warmth: a glow under each warm body, threads between.
     this.warmBodies.length = 0;
     let wi = 0;
@@ -1111,6 +1125,7 @@ export class QuenchFightFx {
     }
     for (let i = wi; i < P.warm; i++) this.warms.setMatrixAt(i, _zero);
     this.warms.instanceMatrix.needsUpdate = true;
+    this.warms.visible = wi > 0;
     if (this.warms.instanceColor) this.warms.instanceColor.needsUpdate = true;
     const links = warmthLinks(this.warmBodies, this.linkPairs, P.links);
     for (let i = 0; i < links; i++) {
@@ -1128,6 +1143,7 @@ export class QuenchFightFx {
     }
     for (let i = links; i < P.links; i++) this.links.setMatrixAt(i, _zero);
     this.links.instanceMatrix.needsUpdate = true;
+    this.links.visible = links > 0;
     // The freeze: a block of ice round each frozen body, the shatter's ring.
     let bi = 0;
     for (const s of this.splashFans) s.id = -1;
@@ -1161,6 +1177,7 @@ export class QuenchFightFx {
       this.splashFans[i].fan.group.visible = false;
     }
     this.blocks.instanceMatrix.needsUpdate = true;
+    this.blocks.visible = bi > 0;
     if (this.blocks.instanceColor) this.blocks.instanceColor.needsUpdate = true;
     // The water: a churning collar round each trapped body's waist.
     let wa = 0;
@@ -1177,6 +1194,7 @@ export class QuenchFightFx {
     }
     for (let i = wa; i < P.trapped; i++) this.collars.setMatrixAt(i, _zero);
     this.collars.instanceMatrix.needsUpdate = true;
+    this.collars.visible = wa > 0;
     if (this.collars.instanceColor) this.collars.instanceColor.needsUpdate = true;
   }
 
@@ -1201,13 +1219,23 @@ export class QuenchFightFx {
       this.paintRimFall();
       return;
     }
+    // A slab is posed while it rises, then left alone ('up'); a gone slab's
+    // shards are zeroed once ('gone').
+    let dirty = false;
+    let standing = 0;
     for (let i = 0; i < this.rimSlots.length; i++) {
       const slot = this.rimSlots[i];
       const e = slot.id >= 0 ? world.entities.get(slot.id) : undefined;
       if (!e) {
-        for (let k = 0; k < RIM_SHARDS; k++) this.rim.setMatrixAt(i * RIM_SHARDS + k, _zero);
+        if (slot.template !== 'gone') {
+          for (let k = 0; k < RIM_SHARDS; k++) this.rim.setMatrixAt(i * RIM_SHARDS + k, _zero);
+          slot.template = 'gone';
+          dirty = true;
+        }
         continue;
       }
+      standing++;
+      if (slot.template === 'up') continue;
       const rise = rimRise(this.clock - slot.born);
       const floor = this.groundY(e.pos.x, e.pos.z);
       const c = Math.cos(e.facing);
@@ -1223,6 +1251,8 @@ export class QuenchFightFx {
         _s.set(_shard.w, _shard.h, _shard.w * 0.8);
         this.rim.setMatrixAt(i * RIM_SHARDS + k, _m.compose(_v, _q, _s));
       }
+      dirty = true;
+      if (rise >= 1) slot.template = 'up';
       if (rise < 1 && this.rand() < 0.12 * this.density) {
         this.particles.puff(e.pos.x, floor + 0.3, e.pos.z, 2, {
           speed: 2.5,
@@ -1237,7 +1267,8 @@ export class QuenchFightFx {
         });
       }
     }
-    this.rim.instanceMatrix.needsUpdate = true;
+    if (dirty) this.rim.instanceMatrix.needsUpdate = true;
+    this.rim.visible = standing > 0;
   }
 
   /** The ring's slabs went (a wipe, the kill): they sink and break apart. */
@@ -1254,6 +1285,7 @@ export class QuenchFightFx {
     if (t >= 1) {
       for (let i = 0; i < P.rimSlabs * RIM_SHARDS; i++) this.rim.setMatrixAt(i, _zero);
       this.rim.instanceMatrix.needsUpdate = true;
+      this.rim.visible = false;
       this.rimFalling = -1;
       return;
     }

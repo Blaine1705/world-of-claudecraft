@@ -48,6 +48,7 @@ import {
   heartKitMeshes,
   heartKitProgramWarmers,
   heartKitSlotMaterial,
+  SMITH_HEART_QUENCH_KIT_URL as QUENCH_KIT,
 } from '../smith_heart/heart_kit';
 import { heartVeinGlowMaterial } from '../smith_heart/heart_room_kit';
 import { radialGlowTexture } from '../textures';
@@ -64,7 +65,6 @@ import {
 } from './quench_fight_fx_core';
 
 const SCAN_SEC = 0.1;
-const QUENCH_KIT = '/models/props/smith_heart_quench_kit.glb';
 /** The kit piece leans this far toward its +x (quench_pieces.py BLADE_LEAN). */
 const KIT_LEAN = 0.17;
 
@@ -159,7 +159,9 @@ export class QuenchBladesFx {
   private readonly geometries: THREE.BufferGeometry[] = [];
   private readonly materials: THREE.Material[] = [];
   private readonly blades: BladeView[] = [];
-  private readonly glowMat: THREE.ShaderMaterial;
+  /** One fuller glow per blade (one program: the same shader), so a blade
+   *  holding an echo blazes on its own. */
+  private readonly glowMats: THREE.ShaderMaterial[];
   private readonly coreMat: THREE.SpriteMaterial;
   private readonly haloMat: THREE.SpriteMaterial;
   private readonly compileGate?: (target: THREE.Object3D) => Promise<unknown>;
@@ -203,7 +205,9 @@ export class QuenchBladesFx {
       hasDom ? getFlameTex() : null,
     );
     this.glowTex = hasDom ? radialGlowTexture() : null;
-    this.glowMat = heartVeinGlowMaterial(C.bladeLight, 'smithHeartQuenchBladeGlow');
+    this.glowMats = BLADE_HOMES.map((_, i) =>
+      heartVeinGlowMaterial(C.bladeLight, `smithHeartQuenchBladeGlow:${i}`),
+    );
     const sprite = (color: number, opacity: number, name: string) =>
       new THREE.SpriteMaterial({
         map: this.glowTex,
@@ -217,13 +221,13 @@ export class QuenchBladesFx {
       });
     this.coreMat = sprite(C.bladeCore, 0.9, 'smithHeartQuenchBladeCore');
     this.haloMat = sprite(C.bladeLight, 0.5, 'smithHeartQuenchBladeHalo');
-    this.materials.push(this.glowMat, this.coreMat, this.haloMat);
+    this.materials.push(...this.glowMats, this.coreMat, this.haloMat);
     // The glow's carrier: linked by the gate before any kit piece lands.
     const carrierGeo = new THREE.BufferGeometry();
     carrierGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(9), 3));
     carrierGeo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(9).fill(1), 3));
     this.geometries.push(carrierGeo);
-    const carrier = new THREE.Mesh(carrierGeo, this.glowMat);
+    const carrier = new THREE.Mesh(carrierGeo, this.glowMats[0]);
     carrier.visible = false;
     carrier.frustumCulled = false;
     this.root.add(carrier);
@@ -260,7 +264,7 @@ export class QuenchBladesFx {
       holder.name = `quenchBlade:${i}`;
       const frame = new THREE.Group();
       holder.add(frame);
-      const kit = kitsIn ? this.fitKit() : null;
+      const kit = kitsIn ? this.fitKit(i) : null;
       let standIn: THREE.Mesh | null = null;
       if (kit) frame.add(kit);
       else {
@@ -356,11 +360,11 @@ export class QuenchBladesFx {
 
   /** The kit's sunk blade at its own size (origin at its foot on the ice),
    *  its fuller's light on the blades' own glow. */
-  private fitKit(): THREE.Group | null {
+  private fitKit(i: number): THREE.Group | null {
     const kit = heartKitMeshes(QUENCH_KIT, 'Kit_SunkBlade');
     if (!kit) return null;
     for (const m of kit.children)
-      if (m instanceof THREE.Mesh && m.name.endsWith(':glow')) m.material = this.glowMat;
+      if (m instanceof THREE.Mesh && m.name.endsWith(':glow')) m.material = this.glowMats[i];
     return kit;
   }
 
@@ -372,7 +376,7 @@ export class QuenchBladesFx {
     staging.visible = false;
     const fitted: (THREE.Group | null)[] = [];
     for (let i = 0; i < this.blades.length; i++) {
-      const kit = this.fitKit();
+      const kit = this.fitKit(i);
       fitted.push(kit);
       if (kit) staging.add(kit);
     }
@@ -519,7 +523,7 @@ export class QuenchBladesFx {
     b.halo.visible = light > 0.2;
     b.core.scale.set(1.2 + 0.6 * light, 3.6 + 1.6 * light, 1);
     b.halo.scale.set(3.5 + 2.5 * light, 7 + 3 * light, 1);
-    (this.glowMat.uniforms.uColor.value as THREE.Color)
+    (this.glowMats[b.home].uniforms.uColor.value as THREE.Color)
       .setHex(C.bladeLight)
       .multiplyScalar(0.8 + 1.4 * Math.max(look.light, held ? 1.2 : 0));
     // Its chevron before it on the ice (the way its echoes run).
