@@ -1563,7 +1563,7 @@ const baseEnTable = {
   'log.smithHeartQuenchLit':
     'An ice-pale light runs up the Quench toward the heart seal.',
   'log.smithHeartHeatLit':
-    'A white-gold light runs out of the forge toward the heart seal.',
+    'A white-gold light runs out of the Hearth toward the heart seal.',
   'log.smithHeartClosed':
     'The cleft is choked with fallen rock. It is not open yet.',
   // The Smith's Heart's sketch kits (content/smith_heart.ts): cast, swing

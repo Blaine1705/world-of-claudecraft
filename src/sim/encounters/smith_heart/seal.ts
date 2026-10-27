@@ -226,7 +226,7 @@ export const SMITH_HEART_VEIN_LIT_LOG: Readonly<Record<SmithHeartVein, string>> 
   hammer: 'An ochre light runs down from the Quarry toward the heart seal.',
   breath: 'A storm-blue light runs down the Breath toward the heart seal.',
   quench: 'An ice-pale light runs up the Quench toward the heart seal.',
-  heat: 'A white-gold light runs out of the forge toward the heart seal.',
+  heat: 'A white-gold light runs out of the Hearth toward the heart seal.',
 };
 
 /** The English line the raid reads when the seal opens into the portal. */

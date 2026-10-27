@@ -354,4 +354,12 @@ describe("the Smith's Heart gating", () => {
       if (g.openText) expect(localizeSimText(g.openText), g.id).not.toBeNull();
     }
   });
+
+  it("each vein's lit line names its own room (the Heat's is the Hearth, not a forge)", () => {
+    expect(SMITH_HEART_VEIN_LIT_LOG.hammer).toContain('the Quarry');
+    expect(SMITH_HEART_VEIN_LIT_LOG.breath).toContain('the Breath');
+    expect(SMITH_HEART_VEIN_LIT_LOG.quench).toContain('the Quench');
+    expect(SMITH_HEART_VEIN_LIT_LOG.heat).toContain('the Hearth');
+    expect(SMITH_HEART_VEIN_LIT_LOG.heat).not.toMatch(/forge/i);
+  });
 });
