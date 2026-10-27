@@ -805,7 +805,9 @@ export class HeatFightFx {
     });
     this.materials.push(burnMat);
     this.burns = instanced(sheathGeo, burnMat, P.bodies, 'smithHeartHeatBurns', 0);
-    // The sheaths ride the bodies, not the floor: the default render order.
+    // The sheaths ride the bodies, not the floor: back to the default order 0
+    // that instanced() replaced with the encounter band.
+    this.burns.renderOrder = 0;
 
     // ---- the channel's bed and fire ----
     const len = CHANNEL_LINE.length;
