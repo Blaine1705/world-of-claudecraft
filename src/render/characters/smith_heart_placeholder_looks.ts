@@ -51,9 +51,11 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // in its heart) is drawn by smith_heart_fx/quench_body.ts. Final: its own
   // model (the official pipeline), the same joints.
   heart_quench_guardian: 'smith_heart_quench_guardian',
-  // Final: an anvil-bodied forge giant pouring white-gold metal. (The heavy
-  // construct, tinted white-gold by its entity colour, never a lava golem.)
-  heart_heat_guardian: 'skel_golem',
+  // The Guardian of the Heat: a bodyless target; its provisional body (a
+  // being of the first flame in columnar basalt and white-gold crystal, never
+  // a forge) is drawn by smith_heart_fx/heat_body.ts. Final: its own model
+  // (the official pipeline), the same joints.
+  heart_heat_guardian: 'smith_heart_heat_guardian',
   // ---- the final boss -----------------------------------------------------------
   // Phase 2J: the Masterless Strength is a bodyless target; its body (the
   // colossus of the Heart kit's rock pieces round the crystal heart) is drawn

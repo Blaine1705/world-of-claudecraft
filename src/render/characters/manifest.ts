@@ -4060,6 +4060,18 @@ export const VISUALS: Record<string, VisualDef> = {
     bodyless: true,
     clickRadius: 1.6,
   },
+  // The Guardian of the Heat (the Hearth, design doc 7.4): a bodyless target,
+  // its click capsule, nameplate and bars over the provisional being of the
+  // first flame in basalt and crystal the raid's own effects draw
+  // (smith_heart_fx/heat_body.ts) until its own model ships. Height times the
+  // template's scale (3) is the body's crown, about three and a half players.
+  smith_heart_heat_guardian: {
+    url: `${CREATURES}/golelingevolved.glb`,
+    height: 2.4,
+    clips: ELEMENTAL_FLOATING,
+    bodyless: true,
+    clickRadius: 1.7,
+  },
   mob_ignivar: {
     url: `${CREATURES}/ignivar_herald.glb`,
     authoredAtlas: true, // baked Tripo/contributor atlas: low-tier floor rides the map
