@@ -1044,8 +1044,9 @@ jobs:
       # the SAME PR; that scope cannot reach other PRs, merge_group runs,
       # release-gate, or the nightly, and the PR tier holds no secrets and a
       # read-only token. The key pins every node_modules-layout input
-      # (lockfile, vite config, .npmrc for node-linker, package.json for the
-      # packageManager pin) so a re-layout starts clean instead of restoring
+      # (lockfile, vite config, .npmrc for node-linker; package.json is omitted
+      # so release version bumps do not invalidate the store while pnpm-lock.yaml
+      # is unchanged) so a re-layout starts clean instead of restoring
       # a store vitest would discard or mis-resolve; no restore-keys for the
       # same reason. actions/cache saves only when the primary key missed, so
       # entries stay bounded: one 57-73 MB compressed entry per shard per
@@ -1085,7 +1086,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules/.experimental-vitest-cache
-          key: vitest-fsmodule-${{ runner.os }}-shard${{ matrix.shard }}-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc', 'package.json') }}
+          key: vitest-fsmodule-${{ runner.os }}-shard${{ matrix.shard }}-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc') }}
 
       # The shard entry regenerates the artifacts itself, once per job, BY
       # DESIGN (the S3 guard, guide freshness, and the git-subprocess suites
@@ -1346,7 +1347,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules/.experimental-vitest-cache
-          key: vitest-fsmodule-${{ runner.os }}-lane-long-sims-a-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc', 'package.json') }}
+          key: vitest-fsmodule-${{ runner.os }}-lane-long-sims-a-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc') }}
 
       # Same selection relay as the shard step (env, never run-line
       # interpolation); the lane entry regenerates the i18n artifacts once
@@ -1510,7 +1511,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules/.experimental-vitest-cache
-          key: vitest-fsmodule-${{ runner.os }}-lane-long-sims-b-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc', 'package.json') }}
+          key: vitest-fsmodule-${{ runner.os }}-lane-long-sims-b-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc') }}
 
       # Same selection relay as the shard step (env, never run-line
       # interpolation); the lane entry regenerates the i18n artifacts once
@@ -1898,7 +1899,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules/.experimental-vitest-cache
-          key: vitest-fsmodule-${{ runner.os }}-shard${{ matrix.shard }}-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc', 'package.json') }}
+          key: vitest-fsmodule-${{ runner.os }}-shard${{ matrix.shard }}-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc') }}
 
       # `npm test` regenerates the i18n artifacts itself (pretest) in EVERY
       # shard BY DESIGN (the S3 guard, guide freshness, and the git-subprocess
