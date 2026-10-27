@@ -51,7 +51,12 @@ import {
 } from '../../sim/encounters/smith_heart/heat_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
-import { type TelegraphFan, TelegraphKit, type TelegraphLane } from '../floor_telegraph';
+import {
+  type TelegraphFan,
+  TelegraphKit,
+  type TelegraphLane,
+  type TelegraphPaint,
+} from '../floor_telegraph';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { attachSceneGroupGated } from '../gated_scene_attach';
 import { GFX } from '../gfx';
@@ -137,6 +142,13 @@ const EMBER_PUFF = {
   pool: 'glow' as const,
   radius: 0.5,
 };
+/** The per-frame looks and paints, written in place (no allocation a frame). */
+const _rise = { fill: 0, crack: 0 };
+const _ring = { radius: 0, alpha: 0 };
+const FAN_PAINT: TelegraphPaint = { fill: 0, clock: 0, range: 0 };
+const LANE_PAINT: TelegraphPaint = { fill: 0, clock: 0, range: 0 };
+const CHANNEL_STYLE = { color: C.danger, accent: C.accent };
+
 /** The wind-up's embers sucked into the guardian (its direction written in
  *  place: no allocation a frame). */
 const GATHER_DIR: [number, number, number] = [0, 0.15, 0];
@@ -486,6 +498,8 @@ export class HeatFightFx {
   private readonly riseFans: FanSlot[] = [];
   private readonly crystals: CrystalSlot[] = [];
   private readonly lane: TelegraphLane;
+  /** The channel object the lane was last draped for (it never moves). */
+  private lanedFor = -1;
   // The instanced pools.
   private readonly cracks: THREE.InstancedMesh;
   private readonly embers: THREE.InstancedMesh;
@@ -1205,9 +1219,12 @@ void main() {
       const e = s.id >= 0 ? world.entities.get(s.id) : undefined;
       if (!e) continue;
       const seconds = riseOf(e.templateId) ?? T.shedCast;
-      const look = riseLook(this.clock - s.born, seconds);
+      const look = riseLook(this.clock - s.born, seconds, _rise);
       const r = e.scale > 0 ? e.scale : T.crystalR;
-      this.kit.paintFan(s.fan, { fill: look.fill, clock: this.clock, range: r });
+      FAN_PAINT.fill = look.fill;
+      FAN_PAINT.clock = this.clock;
+      FAN_PAINT.range = r;
+      this.kit.paintFan(s.fan, FAN_PAINT);
       _v.set(e.pos.x, this.groundY(e.pos.x, e.pos.z) + 0.06, e.pos.z);
       _s.set(r * 1.7, 1, r * 1.7);
       this.cracks.setMatrixAt(n, _m.compose(_v, _q.identity(), _s));
@@ -1236,8 +1253,8 @@ void main() {
       const grow = 0.6 + 0.4 * look.rise;
       s.holder.scale.setScalar(grow);
       (s.mat.uniforms.uColor.value as THREE.Color)
-        .setRGB(...C.fire)
-        .lerp(_c.setRGB(...C.core), Math.min(1, look.charge * 0.8))
+        .setRGB(C.fire[0], C.fire[1], C.fire[2])
+        .lerp(_c.setRGB(C.core[0], C.core[1], C.core[2]), Math.min(1, look.charge * 0.8))
         .multiplyScalar(0.9 + 1.4 * look.light);
       const haloMat = s.halo.material as THREE.SpriteMaterial;
       haloMat.opacity = Math.min(0.85, 0.2 + 0.45 * look.light);
@@ -1245,11 +1262,10 @@ void main() {
       s.halo.scale.set(hs, hs, 1);
       // The reach: the soak's gold at the ray's exact range, filling to the
       // next ray (every tier).
-      this.kit.paintFan(s.reach.fan, {
-        fill: 0.08 + 0.5 * look.charge,
-        clock: this.clock,
-        range: T.rayRange,
-      });
+      FAN_PAINT.fill = 0.08 + 0.5 * look.charge;
+      FAN_PAINT.clock = this.clock;
+      FAN_PAINT.range = T.rayRange;
+      this.kit.paintFan(s.reach.fan, FAN_PAINT);
       // Sparks and the first flame's tongues off it (cosmetic).
       if (look.rise >= 1 && this.rand() < dt * 9 * this.density)
         this.particles.puff(
@@ -1372,24 +1388,29 @@ void main() {
     const half = e.scale > 0 ? e.scale : T.channelHalf;
     if (look.lane) {
       // From its head (the north wall) down to the south lip.
-      const hz = e.pos.z + CHANNEL_LINE.length / 2;
-      this.kit.drapeLane(
-        this.lane,
-        this.groundY,
-        e.pos.x,
-        this.groundY(e.pos.x, hz),
-        hz,
-        Math.PI,
-        CHANNEL_LINE.length,
-        half,
-        { color: C.danger, accent: C.accent },
-      );
-      this.kit.paintLane(this.lane, {
-        fill: look.fill,
-        clock: this.clock,
-        range: CHANNEL_LINE.length,
-        ...(of.state === 'flow' ? { fade: 0.55 + 0.45 * look.fire, front: 0 } : {}),
-      });
+      // The channel never moves: its lane is draped once per channel.
+      if (this.lanedFor !== e.id) {
+        this.lanedFor = e.id;
+        const hz = e.pos.z + CHANNEL_LINE.length / 2;
+        this.kit.drapeLane(
+          this.lane,
+          this.groundY,
+          e.pos.x,
+          this.groundY(e.pos.x, hz),
+          hz,
+          Math.PI,
+          CHANNEL_LINE.length,
+          half,
+          CHANNEL_STYLE,
+        );
+      }
+      LANE_PAINT.fill = look.fill;
+      LANE_PAINT.clock = this.clock;
+      LANE_PAINT.range = CHANNEL_LINE.length;
+      const flowing = of.state === 'flow';
+      LANE_PAINT.fade = flowing ? 0.55 + 0.45 * look.fire : undefined;
+      LANE_PAINT.front = flowing ? 0 : undefined;
+      this.kit.paintLane(this.lane, LANE_PAINT);
       this.lane.group.visible = true;
     } else this.lane.group.visible = false;
     if (of.state === 'flow' && look.fire > 0.1 && this.rand() < 0.9 * this.density) {
@@ -1470,11 +1491,12 @@ void main() {
       this.burns.setMatrixAt(i, _zero);
       this.scorches.setMatrixAt(i, _zero);
     }
-    for (const mesh of [this.burns, this.scorches]) {
-      mesh.instanceMatrix.needsUpdate = true;
-      if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-      mesh.visible = n > 0;
-    }
+    this.burns.instanceMatrix.needsUpdate = true;
+    if (this.burns.instanceColor) this.burns.instanceColor.needsUpdate = true;
+    this.burns.visible = n > 0;
+    this.scorches.instanceMatrix.needsUpdate = true;
+    if (this.scorches.instanceColor) this.scorches.instanceColor.needsUpdate = true;
+    this.scorches.visible = n > 0;
   }
 
   // ---- the heat over the floor ------------------------------------------------------------
@@ -1537,7 +1559,7 @@ void main() {
     } else this.floor.visible = false;
     const age = this.clock - this.waveAt;
     if (guardian && age >= 0 && age < 1.5) {
-      const w = burstWave(age);
+      const w = burstWave(age, _ring);
       this.wave.position.set(
         guardian.pos.x,
         this.groundY(guardian.pos.x, guardian.pos.z) + 0.1,
@@ -1546,10 +1568,10 @@ void main() {
       this.wave.scale.set(w.radius, 1, w.radius);
       this.waveMat.uniforms.uAlpha.value = w.alpha;
       this.wave.visible = true;
-    } else if (guardian && overheating && guardian.inCombat) {
+    } else if (guardian && overheating && guardian.inCombat && this.detail) {
       // The wind-up: rings of heat drawn in over the floor into the
       // guardian, quicker as the top nears (the wave's own disc, inverted).
-      const g = windupGather(this.clock, heat);
+      const g = windupGather(this.clock, heat, _ring);
       this.wave.position.set(
         guardian.pos.x,
         this.groundY(guardian.pos.x, guardian.pos.z) + 0.1,
@@ -1559,7 +1581,7 @@ void main() {
       this.waveMat.uniforms.uAlpha.value = g.alpha;
       this.wave.visible = g.alpha > 0.01;
       // Embers sucked toward it (cosmetic).
-      if (this.detail && this.rand() < dt * 40) {
+      if (this.rand() < dt * 40) {
         const a = this.rand() * Math.PI * 2;
         const r = 14 + this.rand() * 16;
         GATHER_DIR[0] = -Math.sin(a);

@@ -171,6 +171,16 @@ const HAZE = {
   alpha: 0.08,
   drag: 0.8,
 };
+/** The sparks crackling off it as it strains (the wind-up). */
+const STRAIN_SPARK = {
+  speed: 9,
+  life: 0.4,
+  size: [0.25, 0.05] as [number, number],
+  color: HEAT_BODY_COLORS.spark,
+  alpha: 1,
+  pool: 'glow' as const,
+  radius: 1.5,
+};
 const STREAM_DIR: [number, number, number] = [0, -1, 0];
 const STREAM = {
   speed: 7,
@@ -795,7 +805,12 @@ export class HeatBody {
       const size = action === 'knell' ? 0.6 + 2.6 * k : 3.2 * (1 + 2 * k);
       this.orb.scale.set(size, size, 1);
       this.orbMat.opacity = action === 'knell' ? 0.35 + 0.6 * k : 0.95 * (1 - k);
-    } else this.orbMat.opacity = 0;
+      this.orb.visible = true;
+    } else {
+      // A spent sprite still costs a draw: hide it.
+      this.orbMat.opacity = 0;
+      this.orb.visible = false;
+    }
   }
 
   /** The crystals', seams' and threads' light: gold toward white with heat. */
@@ -884,9 +899,9 @@ export class HeatBody {
     }
     if (action === 'shed' && k > 0.3) {
       // Fire streaming down its arms into the floor.
-      for (const w of [HJ.wristL, HJ.wristR]) {
+      for (let i = 0; i < 2; i++) {
         if (this.rand() > dt * 40 * d) continue;
-        this.worldOf(e, this.joints[w], _a);
+        this.worldOf(e, this.joints[i === 0 ? HJ.wristL : HJ.wristR], _a);
         this.particles.puff(_a.x, _a.y, _a.z, 1, STREAM);
       }
     } else if (action === 'pour' && this.rand() < dt * 30 * d * (0.3 + k)) {
@@ -895,15 +910,7 @@ export class HeatBody {
     } else if (action === 'strain' && this.rand() < dt * 25 * d) {
       // Sparks crackling off it as it strains.
       this.worldOf(e, this.joints[HJ.chest], _a);
-      this.particles.puff(_a.x, _a.y, _a.z, 2, {
-        speed: 9,
-        life: 0.4,
-        size: [0.25, 0.05],
-        color: HEAT_BODY_COLORS.spark,
-        alpha: 1,
-        pool: 'glow',
-        radius: 1.5,
-      });
+      this.particles.puff(_a.x, _a.y, _a.z, 2, STRAIN_SPARK);
     }
   }
 

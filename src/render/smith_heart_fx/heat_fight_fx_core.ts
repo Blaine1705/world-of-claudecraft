@@ -105,9 +105,15 @@ export const CRYSTAL_FAIL_SECONDS = 2.5;
 
 /** A rise spot's warning `age` seconds in (its template's `seconds`): how far
  *  its footprint has filled, how far the cracks in the basalt have run. */
-export function riseLook(age: number, seconds: number): { fill: number; crack: number } {
+export function riseLook(
+  age: number,
+  seconds: number,
+  out: { fill: number; crack: number } = { fill: 0, crack: 0 },
+): { fill: number; crack: number } {
   const f = clamp01(age / Math.max(0.1, seconds));
-  return { fill: f, crack: smooth(f * 1.2) };
+  out.fill = f;
+  out.crack = smooth(f * 1.2);
+  return out;
 }
 
 export interface CrystalLook {
@@ -300,19 +306,30 @@ export function windupUrgency(heat: number): number {
  *  guardian, one a beat, the beat quicker as the heat nears the top. Its
  *  radius (yards) and strength at render time `t`. Cosmetic, the floor glow
  *  and the gauge carry the warning. */
-export function windupGather(t: number, heat: number): { radius: number; alpha: number } {
+export function windupGather(
+  t: number,
+  heat: number,
+  out: { radius: number; alpha: number } = { radius: 0, alpha: 0 },
+): { radius: number; alpha: number } {
   const u = windupUrgency(heat);
   const period = 1.3 - 0.75 * u;
   const k = (((t / period) % 1) + 1) % 1;
-  return { radius: 3 + 33 * (1 - k) ** 1.6, alpha: (0.35 + 0.45 * u) * Math.sin(Math.PI * k) };
+  out.radius = 3 + 33 * (1 - k) ** 1.6;
+  out.alpha = (0.35 + 0.45 * u) * Math.sin(Math.PI * k);
+  return out;
 }
 
 /** Hearthburst's white wave `age` seconds in: its radius (yards) and
  *  strength; gone after a second and a half. */
 export const BURST_WAVE_SECONDS = 1.5;
-export function burstWave(age: number): { radius: number; alpha: number } {
+export function burstWave(
+  age: number,
+  out: { radius: number; alpha: number } = { radius: 0, alpha: 0 },
+): { radius: number; alpha: number } {
   const k = clamp01(age / BURST_WAVE_SECONDS);
-  return { radius: 4 + 48 * (1 - (1 - k) ** 3), alpha: (1 - k) ** 1.4 };
+  out.radius = 4 + 48 * (1 - (1 - k) ** 3);
+  out.alpha = (1 - k) ** 1.4;
+  return out;
 }
 
 /** A small integer hash in [0, 1). */
