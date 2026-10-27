@@ -48,6 +48,7 @@ import {
   updateIgnivarApocalypseAdd,
   updateIgnivarEncounter,
 } from '../encounters/ignivar';
+import { HEAT_WALKERS } from '../encounters/smith_heart/heat_ids';
 import {
   announceVarkhulDeath,
   resetVarkhulEncounter,
@@ -337,6 +338,15 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
   // only runs, and its own tick owns the escape bar and the payout.
   if (isHoardGoblin(mob)) {
     updateHoardGoblinMotion(ctx, mob);
+    return;
+  }
+
+  // The Smith's Heart's Guardian of the Heat walks its own adds (the Wellspawn
+  // to the wellspring, a Rolling Cinder after its quarry; encounters/
+  // smith_heart/heat*.ts): hostile and in combat, never moved, aggroed or
+  // swung by the mob AI.
+  if (HEAT_WALKERS.has(mob.templateId)) {
+    mob.swingTimer = Math.max(mob.swingTimer, 0.6);
     return;
   }
 

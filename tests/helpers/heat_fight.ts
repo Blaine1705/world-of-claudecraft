@@ -1,6 +1,6 @@
 // A Guardian of the Heat fight over a REAL Sim (tests/smith_heart_heat*.
 // test.ts): a claim of the Smith's Heart, a few players placed on the
-// Hearth's floor, and the handles the heat tests read.
+// Hearth's shore, and the handles the heat tests read.
 
 import { SMITH_HEART_DUNGEON } from '../../src/sim/content/smith_heart';
 import { BUILTIN_WORLD, DUNGEONS, instanceOrigin } from '../../src/sim/data';
@@ -14,16 +14,16 @@ import type { Entity, SimEvent, WorldContent } from '../../src/sim/types';
 
 const WORLD: WorldContent = { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] };
 
-/** Where the players wait: along the floor's south edge, far from the
- *  guardian, out of every crystal socket's reach and off the channel. */
+/** Where the players wait: on the shore in front of the wellspring, inside
+ *  the guardian's reach (no Hearth Flare), out of its fire. */
 export const HEAT_WAIT_SPOTS: readonly { x: number; z: number }[] = [
-  { x: -190, z: -40 },
-  { x: -196, z: -41 },
-  { x: -202, z: -41 },
-  { x: -208, z: -41 },
-  { x: -223, z: -41 },
-  { x: -229, z: -40 },
-  { x: -235, z: -40 },
+  { x: -211, z: -8 },
+  { x: -211, z: -4 },
+  { x: -211, z: 0 },
+  { x: -211, z: 4 },
+  { x: -211, z: 8 },
+  { x: -215, z: -12 },
+  { x: -215, z: 12 },
 ];
 
 export interface HeatFight {

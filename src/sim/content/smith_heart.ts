@@ -20,7 +20,12 @@ import {
   breathWindTemplate,
 } from '../encounters/smith_heart/breath_ids';
 import { COUNCIL_TUNING } from '../encounters/smith_heart/council_ids';
-import { HEAT_TUNING } from '../encounters/smith_heart/heat_ids';
+import {
+  HEAT_MOBS,
+  HEAT_NAMES,
+  HEAT_TUNING,
+  wellTemplate,
+} from '../encounters/smith_heart/heat_ids';
 import { bladeTemplate, QUENCH_NAMES, QUENCH_TUNING } from '../encounters/smith_heart/quench_ids';
 import type {
   DungeonDef,
@@ -39,6 +44,7 @@ import {
   HEART_BRIDGE_GATE,
   HEART_ROOM,
   HEART_TERRACE,
+  HEARTH_WELL,
   QUARRY_PILLAR_SPOTS,
   QUENCH,
   QUENCH_BLADE_SPOTS,
@@ -74,8 +80,6 @@ export const SMITH_HEART_CASTS = {
   breathGust: 'heart_bellows_gust',
   breathLance: 'heart_storm_lance',
   quenchBreath: 'heart_quenching_breath',
-  heatPour: 'heart_molten_pour',
-  heatClang: 'heart_anvil_clang',
   finalWrath: 'heart_forge_wrath',
   finalPour: 'heart_forge_pour',
   galeBolt: 'heart_gale_bolt',
@@ -393,44 +397,125 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
   },
   // The Guardian of the Heat (design doc 7.4, encounters/smith_heart/heat.ts):
   // a being of the first flame in crystal and basalt (the vein is the Hearth,
-  // never a forge; the knell's cast id keeps its old name). "The flame that
-  // grows": the heat bar, the Hearth Pulse and Hearthburst, the Kindled
-  // Crystals and their rays, the channel splitting the floor. A PROPOSAL the
-  // designer has not approved yet; every number a SKETCH (unmeasured): 43,000
-  // base (about 99,000 after the elite factor) for a 4 to 5 minute fight at
-  // the bot raid's measured 400 to 460 a second, like the other guardians.
-  // Molten Pour and Searing Knell stay the trash kit's own casts on their own
-  // clocks (heroic's Knell Embers ride the knell's stun, heat_knell.ts).
+  // never a forge), half sunk in the first wellspring at the back of the
+  // Hearth. "The well of the first flame": Basalt Fist and its Molten Swells,
+  // Hearth Flare, two overflows, Hearthseeds, Wakefire, the Rolling Cinders,
+  // and on heroic its tearing free and the three spirits. Every number a
+  // SKETCH (unmeasured): 43,000 base (about 99,000 after the elite factor)
+  // for a 4 to 5 minute fight at the bot raid's measured 400 to 460 a second,
+  // like the other guardians. Its body reaches the wellspring's lip
+  // (bodyRadius: melee strikes it from the shore); Cinder Grip is its own
+  // stacking burn on every landed swing (the stackPoison seam), so the tanks
+  // swap; every other mechanic is the encounter's.
   heart_heat_guardian: {
     ...boss('heart_heat_guardian', 'Guardian of the Heat', 43000, 0xffe6a0, 3),
     ccImmune: true,
     slowImmune: true,
-    trashKit: {
-      line: {
-        castId: C.heatPour,
-        name: 'Molten Pour',
-        castTime: 2,
-        every: 12,
-        first: 5,
-        school: 'fire',
-        length: 30,
-        halfWidth: 3,
-        min: 240,
-        max: 280,
-      },
-      screech: {
-        castId: C.heatClang,
-        name: 'Searing Knell',
-        castTime: 2.5,
-        every: 20,
-        first: 12,
-        school: 'physical',
-        radius: 10,
-        stun: HEAT_TUNING.knellStun,
-        min: 140,
-        max: 170,
-      },
+    bodyRadius: HEARTH_WELL.r,
+    stackPoison: {
+      chance: 1,
+      perTick: HEAT_TUNING.gripPerTick,
+      interval: 1,
+      duration: HEAT_TUNING.gripSeconds,
+      maxStacks: HEAT_TUNING.gripMaxStacks,
+      name: HEAT_NAMES.grip,
+      school: 'fire',
     },
+  },
+  // The Guardian of the Heat's own adds (encounters/smith_heart/heat*.ts).
+  // The Wellspawn: heroic's children of the flame, walked to the wellspring
+  // by the encounter (they never swing; every slow and control works on
+  // them).
+  [HEAT_MOBS.spawn]: {
+    id: HEAT_MOBS.spawn,
+    name: 'Wellspawn',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    elite: true,
+    hpBase: 200,
+    hpPerLevel: 45,
+    dmgBase: 1,
+    dmgPerLevel: 0,
+    attackSpeed: 3,
+    armorPerLevel: 10,
+    moveSpeed: HEAT_TUNING.spawnSpeed,
+    aggroRadius: 0,
+    xpMult: 0,
+    loot: [],
+    scale: 1.4,
+    color: 0xffd27a,
+  },
+  // The Wellkeepers: heroic's second overflow, tanked (they cannot be
+  // controlled); their Kindling Mark is the encounter's.
+  [HEAT_MOBS.keeper]: {
+    id: HEAT_MOBS.keeper,
+    name: 'Wellkeeper',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    elite: true,
+    hpBase: 400,
+    hpPerLevel: 100,
+    dmgBase: 30,
+    dmgPerLevel: 6,
+    attackSpeed: 2.4,
+    armorPerLevel: 35,
+    moveSpeed: 6,
+    aggroRadius: 0,
+    ccImmune: true,
+    slowImmune: true,
+    xpMult: 0,
+    loot: [],
+    scale: 2.2,
+    color: 0xffb04a,
+  },
+  // The Seedflames: heroic, hatched from a Hearthseed's burst, each hunting
+  // one player; small and frail, burned down together.
+  [HEAT_MOBS.seedflame]: {
+    id: HEAT_MOBS.seedflame,
+    name: 'Seedflame',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    hpBase: 100,
+    hpPerLevel: 20,
+    dmgBase: 12,
+    dmgPerLevel: 2,
+    attackSpeed: 1.8,
+    armorPerLevel: 8,
+    moveSpeed: 5,
+    aggroRadius: 0,
+    xpMult: 0,
+    loot: [],
+    scale: 0.9,
+    color: 0xfff0b0,
+  },
+  // The Rolling Cinder: phase 3's great living fireball, walked by the
+  // encounter after its quarry. A ward while it rolls (a strike lands one
+  // point and knocks it back, heat_cinder_ward.ts); frozen on heroic's Quench
+  // Ice it can be killed.
+  [HEAT_MOBS.cinder]: {
+    id: HEAT_MOBS.cinder,
+    name: 'Rolling Cinder',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    elite: true,
+    hpBase: 2000,
+    hpPerLevel: 0,
+    dmgBase: 1,
+    dmgPerLevel: 0,
+    attackSpeed: 3,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    ccImmune: true,
+    slowImmune: true,
+    xpMult: 0,
+    loot: [],
+    scale: 2.4,
+    color: 0xfff2c0,
   },
   // ---- the final boss ------------------------------------------------------------
   // The strength without its master. Phase 1 sketch: one form, a blast to hide
@@ -769,6 +854,20 @@ export const SMITH_HEART_BLADE_OBJECTS: DungeonObjectSpawn[] = QUENCH_BLADE_SPOT
   lootable: false,
 }));
 
+/** The first wellspring at the foot of the Hearth's altar-stone (design doc
+ *  7.4): spawned with the claim, its state in the template id (calm, the
+ *  Hearth overflowing, torn by the guardian's leaving it); the Guardian of the
+ *  Heat stands half sunk in it (encounters/smith_heart/heat.ts). */
+export const SMITH_HEART_WELL_OBJECT: DungeonObjectSpawn = {
+  itemId: '',
+  name: HEAT_NAMES.well,
+  x: HEARTH_WELL.x,
+  z: HEARTH_WELL.z,
+  templateId: wellTemplate('calm') as 'sh_heat_well_calm',
+  dungeonId: SMITH_HEART_DUNGEON,
+  lootable: false,
+};
+
 // ---- the dungeon -------------------------------------------------------------------
 
 /** The world entrance: a cleft at the foot of the Stormcrag cliffs, past the
@@ -801,6 +900,7 @@ export const SMITH_HEART_DUNGEON_DEFS: Record<string, DungeonDef> = {
       ...SMITH_HEART_PILLAR_OBJECTS,
       SMITH_HEART_WIND_OBJECT,
       ...SMITH_HEART_BLADE_OBJECTS,
+      SMITH_HEART_WELL_OBJECT,
     ],
     // Captain Thessaly at her post on the Cornice's climb (breath_thessaly.ts),
     // facing the guardian.

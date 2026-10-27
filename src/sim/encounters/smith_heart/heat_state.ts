@@ -1,10 +1,17 @@
 // The Guardian of the Heat's fight state (encounters/smith_heart/heat.ts), as
 // Entity.smithHeartHeat on the guardian. A type-only leaf so src/sim/types.ts
 // can name it. Sim authority only: the client reads the fight from the
-// guardian's resource and auras, the players' auras, and the fight's objects
-// (heat_ids.ts says which).
+// guardian's bars and auras, the adds, the players' auras and the fight's
+// objects (heat_ids.ts says which).
 
-import type { HeatChannelState, HeatDifficulty } from './heat_ids';
+import type {
+  HeatDifficulty,
+  HeatPhase,
+  HeatRiverState,
+  HeatSpirit,
+  HeatStage,
+  HeatZoneState,
+} from './heat_ids';
 
 /** A bar the guardian runs for the fight. */
 export interface HeatBar {
@@ -14,55 +21,173 @@ export interface HeatBar {
   facing: number;
 }
 
-/** A crystal's rise spot while Shed Heat's bar runs. */
-export interface HeatRise {
-  objectId: number;
-  /** HEARTH_CRYSTAL_SOCKETS index. */
-  socket: number;
-  x: number;
-  z: number;
-}
-
-/** A Kindled Crystal standing on the floor. */
-export interface HeatCrystal {
-  objectId: number;
-  socket: number;
-  x: number;
-  z: number;
-  /** Seconds left before it burns out. */
-  life: number;
-  /** Seconds to its next ray. */
-  rayIn: number;
-  /** The player its last ray struck (null: none, or back into the guardian). */
-  target: number | null;
-}
-
-/** One player's Crystal Burn. */
-export interface HeatBurn {
-  stacks: number;
-  /** Seconds before one stack fades. */
-  decay: number;
-}
-
-/** Heroic: Knell Embers on the floor. */
-export interface HeatEmbers {
+/** Basalt Fist on its bar: its spot and its three lanes' objects. */
+export interface HeatFist {
   objectId: number;
   x: number;
   z: number;
-  life: number;
-  tick: number;
+  lanes: number[];
+  bearings: number[];
 }
 
-/** The channel across the Hearth. */
-export interface HeatChannel {
-  objectId: number | null;
-  state: HeatChannelState;
-  /** Seconds left in this state. */
+/** A Molten Swell rolling down its lane from a fist's spot. */
+export interface HeatSwell {
+  laneId: number;
+  waveId: number | null;
+  x: number;
+  z: number;
+  facing: number;
+  /** Seconds before the wave starts (then null: rolling). */
+  delay: number;
+  /** Yards down the lane the wave's front has rolled. */
+  front: number;
+  /** The players this wave already struck. */
+  struck: number[];
+}
+
+/** An overflow river from the wellspring. */
+export interface HeatRiver {
+  objectId: number;
+  facing: number;
+  state: HeatRiverState;
   remaining: number;
-  /** Seconds to its next damage tick while it flows. */
   tick: number;
-  /** Flows so far. */
-  flows: number;
+}
+
+/** One overflow (at 70 and at 40 percent). */
+export interface HeatOverflow {
+  /** First (70 percent) or second (40 percent). */
+  n: 1 | 2;
+  /** Seconds the Hearth has overflowed (the `under` stage's own clock). */
+  clock: number;
+  riverIn: number;
+  boltIn: number;
+  /** Surges so far (the rivers' hashed salt). */
+  surges: number;
+  /** Volleys so far (the bolts' hashed salt). */
+  volleys: number;
+  rivers: HeatRiver[];
+}
+
+/** A Hearthseed on the floor. */
+export interface HeatSeed {
+  objectId: number;
+  x: number;
+  z: number;
+  life: number;
+}
+
+/** A Wakefire band warning or burning. */
+export interface HeatZone {
+  objectId: number;
+  band: number;
+  state: HeatZoneState;
+  remaining: number;
+  tick: number;
+}
+
+/** A Wakefire run: the bands in their order, the next one's start. */
+export interface HeatZoneRun {
+  order: number[];
+  next: number;
+  stepIn: number;
+}
+
+/** Where a Rolling Cinder will land. */
+export interface HeatFall {
+  objectId: number;
+  x: number;
+  z: number;
+  remaining: number;
+  /** The player it will hunt (picked as it falls). */
+  quarry: number | null;
+}
+
+/** A burning patch on the floor (a cinder's scorch, a Cinder Trail). */
+export interface HeatPatch {
+  objectId: number;
+  x: number;
+  z: number;
+  life: number;
+  tick: number;
+}
+
+/** A Rolling Cinder (a mob the encounter walks). */
+export interface HeatCinder {
+  id: number;
+  quarry: number | null;
+  /** Seconds before it picks a new quarry (its last one gone). */
+  retarget: number;
+  /** Its health a tick ago (a drop is a hit: it is struck back). */
+  hpSeen: number;
+}
+
+/** A Wellkeeper and its Kindling Mark's clock. */
+export interface HeatKeeper {
+  id: number;
+  markIn: number;
+}
+
+/** A player a Wellkeeper marked: the mark, then the trail. */
+export interface HeatMark {
+  pid: number;
+  /** Seconds before the trail catches (then 0). */
+  markIn: number;
+  /** Seconds the trail still runs. */
+  trailLeft: number;
+  dropIn: number;
+}
+
+/** A Seedflame and the player it hunts. */
+export interface HeatSprout {
+  id: number;
+  quarry: number | null;
+}
+
+/** The Quench's ice on the floor. */
+export interface HeatIce {
+  objectId: number;
+  x: number;
+  z: number;
+  life: number;
+}
+
+/** A Creeping Blaze, growing. */
+export interface HeatBlaze {
+  objectId: number;
+  x: number;
+  z: number;
+  r: number;
+  tick: number;
+}
+
+/** A Stone Root (ROOT_SPOTS index), ready or spent and regrowing. */
+export interface HeatRoot {
+  objectId: number;
+  spot: number;
+  ready: boolean;
+  regrow: number;
+}
+
+/** Heroic's phase 4: the three spirits and what they do. */
+export interface HeatSpirits {
+  ids: Record<HeatSpirit, number>;
+  iceIn: number;
+  rainIn: number;
+  blazeIn: number;
+  crushIn: number;
+  /** Salts of the hashed picks. */
+  ices: number;
+  rains: number;
+  blazes: number;
+  crushes: number;
+  ice: HeatIce[];
+  blaze: HeatBlaze[];
+  roots: HeatRoot[];
+  /** The Crushing Fist charging: seconds left and its tank. */
+  crush: { remaining: number; tankId: number | null } | null;
+  /** Seconds a Stone Root still holds the guardian. */
+  rooted: number;
 }
 
 export interface HeatFightState {
@@ -72,38 +197,45 @@ export interface HeatFightState {
   finished: boolean;
   /** Seconds since the pull. */
   clock: number;
-  /** The Hearth's heat (0 to 100; the guardian's resource carries it rounded). */
-  heat: number;
-  /** The heat a second ago, and the trend it gave (1 rising, -1 falling). */
-  heatRef: number;
-  trend: 1 | -1;
-  trendTimer: number;
-  /** The overheat's wind-up is showing (from 90, until it falls back). */
-  windup: boolean;
-  /** Hearthbursts so far. */
-  overheats: number;
-  pulseTimer: number;
-  stokeTimer: number;
-  stokeStacks: number;
+  phase: HeatPhase;
+  stage: HeatStage;
+  /** Seconds left in a timed stage (sinking, rising, tearing). */
+  stageLeft: number;
+  overflow: HeatOverflow | null;
+  overflows: number;
+  /** The wellspring's claim object (found once). */
+  wellId: number | null;
   bar: HeatBar | null;
   /** Breath after a bar before the next begins. */
   gap: number;
-  shedTimer: number;
-  /** Shed Heats begun (the deterministic salt of the sockets' pick). */
-  sheds: number;
-  rises: HeatRise[];
-  crystals: HeatCrystal[];
-  burns: Record<number, HeatBurn>;
-  channel: HeatChannel;
-  embers: HeatEmbers[];
-  /** When each player last took Searing Knell's stun (the fight clock). */
-  knellAt: Record<number, number>;
-  /** Players wearing the heat's marker. */
-  marked: Record<number, true>;
-  /** Rays that struck a player, and rays sent back into the guardian. */
-  rays: number;
-  raysBack: number;
-  /** Mechanic casts started. */
+  fistTimer: number;
+  fists: number;
+  fist: HeatFist | null;
+  swells: HeatSwell[];
+  flareTimer: number;
+  wellTick: number;
+  seedTimer: number;
+  seedWaves: number;
+  seeds: HeatSeed[];
+  zoneTimer: number;
+  zoneRuns: number;
+  zoneRun: HeatZoneRun | null;
+  zones: HeatZone[];
+  cinderTimer: number;
+  cindersCalled: number;
+  falls: HeatFall[];
+  scorches: HeatPatch[];
+  cinders: HeatCinder[];
+  /** Heroic's adds of the overflows. */
+  spawn: number[];
+  keepers: HeatKeeper[];
+  marks: HeatMark[];
+  trails: HeatPatch[];
+  sprouts: HeatSprout[];
+  spirits: HeatSpirits | null;
+  /** Wellspawn that reached the wellspring, and the hits they dealt. */
+  feeds: number;
+  /** Mechanic casts started (the hashed picks' salt). */
   casts: number;
   /** Lines said this pull: `<moment>` to the fight clock. */
   said: Record<string, number>;

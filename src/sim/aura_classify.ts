@@ -98,9 +98,15 @@ const DEBUFF_DISPLAY_AURA_IDS: ReadonlySet<string> = new Set([
   // The Guardian of the Quench's cold bar (encounters/smith_heart/quench_ids.ts):
   // the hazard every player watches, so it sits on the debuff bar.
   'heart_quench_cold',
-  // The Guardian of the Heat's heat (encounters/smith_heart/heat_ids.ts): the
-  // Hearth's heat every player on its floor watches.
-  'heart_heat_hearth',
+  // The Guardian of the Heat's marks (encounters/smith_heart/heat_ids.ts): a
+  // Wellkeeper's Kindling Mark and the Cinder Trail it becomes, the Hunted of
+  // a Rolling Cinder's quarry, the tank the Crushing Fist is aimed at, and a
+  // cinder's Cooling Crust (on its frame: it cannot be knocked back yet).
+  'heart_heat_kindling',
+  'heart_heat_trailing',
+  'heart_heat_hunted',
+  'heart_heat_crush_mark',
+  'heart_heat_crust',
 ]);
 
 export function isDebuffDisplayAura(kind: AuraKind, value: number, id?: string): boolean {

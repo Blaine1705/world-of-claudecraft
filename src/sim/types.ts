@@ -6312,7 +6312,10 @@ export interface DungeonObjectSpawn {
     // The Smith's four blades sunk in the Frozen Lake (encounters/smith_heart/
     // quench_blades.ts): sunk, waking, floating or flying rides the template
     // id, and each (but a flying one) stands as a combat wall.
-    | 'sh_quench_blade_sunk';
+    | 'sh_quench_blade_sunk'
+    // The first wellspring in the Hearth (encounters/smith_heart/heat.ts):
+    // calm, overflowing or torn rides the template id.
+    | 'sh_heat_well_calm';
   dungeonId?: string;
   /**
    * This object is an encounter mechanic players INTERACT with, never a pickup, even

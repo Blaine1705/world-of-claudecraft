@@ -1,17 +1,25 @@
-// What the Guardian of the Heat SAYS (docs/design/raid/smith_heart.md
-// section 7.4): yells to every player near the Hearth, carrying their catalog
-// key (`hudChrome.heatGuardian.say.<moment>`) so the client renders them
-// through t(), with the English as the fallback and as the key a future voice
-// clip is found by. The guardian's voice is an audition still to come.
+// What the Guardian of the Heat and the three spirits SAY (docs/design/raid/
+// smith_heart.md section 7.4): yells to every player near the Hearth,
+// carrying their catalog key (`hudChrome.heatGuardian.say.<moment>`) so the
+// client renders them through t(), with the English as the fallback and as
+// the key a future voice clip is found by. The voices are auditions still to
+// come.
 //
-//   pull      the pull
-//   shed      it pours its heat into the crystals (at most once in SAY_EVERY)
-//   channel   the channel's first flow
-//   windup    the heat passes 90 (at most once in SAY_EVERY)
-//   overheat  Hearthburst
-//   stoke     the Hearth's third stoking
-//   wipe      the raid lies still in the Hearth
-//   death     its fall
+//   pull       the pull
+//   fist       Basalt Fist (at most once in SAY_EVERY)
+//   sink       the first overflow: it sinks into the wellspring
+//   sinkAgain  the second overflow
+//   feed       a Wellspawn reaches the wellspring
+//   rise       it rises from an overflow (at most once in SAY_EVERY)
+//   seeds      the Hearthseeds fall (at most once in SAY_EVERY)
+//   zones      Wakefire's first run
+//   cinder     a Rolling Cinder falls (at most once in SAY_EVERY)
+//   tearFree   heroic: it tears free of the wellspring
+//   crush      heroic: the Crushing Fist (at most once in SAY_EVERY)
+//   quench, breath, hammer   the three spirits arrive (each its own line,
+//              said from its own post)
+//   wipe       the raid lies still in the Hearth
+//   death      its fall
 //
 // Zero rng, no clock but the fight's: every line is ordered and once-gated.
 
@@ -21,11 +29,19 @@ import { hearthListeners } from './heat_scope';
 
 export type HeatMoment =
   | 'pull'
-  | 'shed'
-  | 'channel'
-  | 'windup'
-  | 'overheat'
-  | 'stoke'
+  | 'fist'
+  | 'sink'
+  | 'sinkAgain'
+  | 'feed'
+  | 'rise'
+  | 'seeds'
+  | 'zones'
+  | 'cinder'
+  | 'tearFree'
+  | 'crush'
+  | 'quench'
+  | 'breath'
+  | 'hammer'
   | 'wipe'
   | 'death';
 
@@ -33,11 +49,19 @@ export type HeatMoment =
  *  rows are the same text). */
 export const HEAT_LINES: Readonly<Record<HeatMoment, string>> = {
   pull: 'You walk into the first flame. Nothing leaves it unchanged.',
-  shed: 'Take my heat, if you can hold it.',
-  channel: 'The Hearth overflows. Choose your side.',
-  windup: 'Too much fire for one body... it must go somewhere!',
-  overheat: 'BURN WITH ME!',
-  stoke: 'Every breath you take feeds the flame.',
+  fist: 'Stand where the stone falls, and be part of it.',
+  sink: 'The wellspring rises to meet you!',
+  sinkAgain: 'Again the Hearth overflows. Again you burn.',
+  feed: 'Yes... come home to the flame.',
+  rise: 'I rise with the first fire!',
+  seeds: 'Every spark I scatter takes root.',
+  zones: 'The Hearth wakes beneath your feet.',
+  cinder: 'Run, little ember. The flame is hungry.',
+  tearFree: 'No more waiting in the well. I come for you myself!',
+  crush: 'This fist will break the mountain itself.',
+  quench: 'The cold remembers you. Let my ice bind its embers.',
+  breath: 'Take the storm-rain. Put its fire out.',
+  hammer: 'Stand on the stone. The mountain will hold it.',
   wipe: 'Ash, all of you. The Hearth burns on.',
   death: 'The flame... sinks back... into the stone. Carry it well.',
 };
@@ -50,11 +74,11 @@ export function heatLineKey(moment: HeatMoment): string {
 /** Seconds between two of the repeating lines. */
 export const HEAT_SAY_EVERY = 45;
 
-const REPEATING: ReadonlySet<HeatMoment> = new Set(['shed', 'windup', 'overheat']);
+const REPEATING: ReadonlySet<HeatMoment> = new Set(['fist', 'rise', 'seeds', 'cinder', 'crush']);
 
 /**
- * The guardian (embodied by `from`) says its `moment` line, if it may now.
- * Returns true when it spoke.
+ * `from` (the guardian, or a spirit's object) says its `moment` line, if it
+ * may now. Returns true when it spoke.
  */
 export function heatSay(
   s: Pick<HeatScope, 'ctx' | 'inst' | 'st'>,

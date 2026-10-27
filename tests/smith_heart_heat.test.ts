@@ -1,41 +1,54 @@
-// The Guardian of the Heat (docs/design/raid/smith_heart.md section 7.4) over
-// a REAL Sim: the heat rising and driving the Hearth Pulse, the wind-up and
-// Hearthburst at 100, the Kindled Crystals (the nearest player takes the ray
-// and cools the Hearth; nobody near and the ray heats it), Crystal Burn's
-// stacks and their fading, the crystals burning out, the channel's clock and
-// its fire, heroic's three crystals, slower burns and Knell Embers, the
-// stoking (the soft enrage), the wipe putting the Hearth back, the Heat vein
-// and the seal's quarter lit by the fall, and determinism.
+// The Guardian of the Heat (docs/design/raid/smith_heart.md section 7.4),
+// "the well of the first flame", over a REAL Sim: the guardian half sunk in
+// its wellspring and its Cinder Grip on the tank, Basalt Fist and its Molten
+// Swells, Hearth Flare, the overflows at 70 and 40 percent (normal without
+// adds; heroic's Wellspawn walking, slowing, feeding; the Wellkeepers' trails
+// healing them), the Hearthseeds and their Seedflames, Wakefire's bands,
+// the Rolling Cinders (the hunt, the knockback and its crust), heroic's
+// tearing free and the three spirits (the ice, the storm-rain, the roots),
+// the wipe, the fall lighting the Heat vein, and determinism.
 
 import { describe, expect, it } from 'vitest';
+import { SMITH_HEART_GUARDIANS, SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
+import { HEARTH_WELL } from '../src/sim/content/smith_heart_layout';
 import {
-  SMITH_HEART_CASTS,
-  SMITH_HEART_GUARDIANS,
-  SMITH_HEART_MOBS,
-} from '../src/sim/content/smith_heart';
-import { HEARTH_CHANNEL, HEARTH_CRYSTAL_SOCKETS } from '../src/sim/content/smith_heart_layout';
-import {
-  burnAmp,
-  channelOf,
-  channelSide,
-  crystalOf,
-  embersOf,
+  beyondFlare,
   HEAT_AURAS,
   HEAT_CASTS,
   HEAT_CUES,
   HEAT_DIFFICULTY,
+  HEAT_MOBS,
   HEAT_NAMES,
   HEAT_OBJECTS,
-  inChannel,
+  HEAT_STAGES,
+  heatTimed,
+  heatTimedOf,
+  inBand,
   inHearthFloor,
-  nearestInReach,
-  pickSockets,
-  pulseDamage,
-  riseOf,
+  inLane,
+  inWave,
+  inWell,
+  phaseFloor,
+  ROOT_SPOTS,
+  rootOf,
+  rootTemplate,
+  SHORE_POINTS,
+  seedFalloff,
   smithHeartProgress,
   smithHeartVeinWon,
-  stokeMult,
+  spawnPace,
+  spiritOf,
+  spiritTemplate,
+  swellBearings,
+  swellLaneOf,
+  swellLaneTemplate,
   HEAT_TUNING as T,
+  WELLSPAWN_SPOTS,
+  wellDistance,
+  wellOf,
+  wellTemplate,
+  zoneOf,
+  zoneTemplate,
 } from '../src/sim/encounters/smith_heart';
 import { DT, type Entity, type SimEvent } from '../src/sim/types';
 import { hitsOf } from './helpers/council_fight';
@@ -45,32 +58,27 @@ const has = (e: Entity, id: string) => e.auras.some((a) => a.id === id);
 const aura = (e: Entity, id: string) => e.auras.find((a) => a.id === id);
 const ticks = (s: number) => Math.round(s / DT);
 
-/** A pulled fight with its clocks held off (a test that wants one asks). */
-function pulled(n = 5, seed = 31): HeatFight {
-  const f = heatFight(n, seed);
-  expect(f.dev('/dev heart heat pull')).toBe(true);
-  f.tick(2);
-  const st = f.state();
-  if (!st) throw new Error('no fight');
-  hold(f);
-  return f;
-}
-
-/** Hold every clock but the heat's own (no Shed Heat, channel, stoking). */
+/** Hold every clock of the fight's own (a test that wants one asks). */
 function hold(f: HeatFight): void {
   const st = f.state();
   if (!st) throw new Error('no fight');
-  st.shedTimer = 999;
-  st.channel.remaining = 999;
-  st.stokeTimer = 999;
+  st.fistTimer = 999;
+  st.flareTimer = 999;
+  st.seedTimer = 999;
+  st.zoneTimer = 999;
+  st.cinderTimer = 999;
 }
 
-/** Hold the trash kit's own casts (Molten Pour, Searing Knell) off the tank. */
-function holdKit(f: HeatFight): void {
-  const kit = f.boss().trashKit;
-  if (!kit) throw new Error('no kit state');
-  kit.timers.line = 999;
-  kit.timers.screech = 999;
+/** A pulled fight with its clocks held, the first player its tank (far
+ *  ahead on its threat). */
+function pulled(n = 5, seed = 31, heroic = false): HeatFight {
+  const f = heatFight(n, seed);
+  if (heroic) f.dev('/dev heart heat heroic');
+  expect(f.dev('/dev heart heat pull')).toBe(true);
+  f.boss().threat.set(f.players[0].id, 1e6);
+  f.tick(2);
+  hold(f);
+  return f;
 }
 
 function until(f: HeatFight, pred: () => boolean, seconds: number): SimEvent[] {
@@ -86,439 +94,733 @@ const cues = (ev: readonly SimEvent[], ability: string) =>
       (e as { ability?: string }).ability === ability,
   );
 
-const warnKeys = (ev: readonly SimEvent[]) =>
+const chatKeys = (ev: readonly SimEvent[]) =>
   ev
     .filter((e) => e.type === 'chat')
     .map((e) => (e as { textKey?: string }).textKey ?? '')
     .filter((k) => k.startsWith('hudChrome.heatGuardian.'));
 
-/** Put every player back on their waiting spot (out of every reach). */
-function parkAll(f: HeatFight): void {
-  f.players.forEach((p, i) => {
-    const s = HEAT_WAIT_SPOTS[i];
-    f.put(p, s.x, s.z);
-  });
+/** The adds of a template in the claim (alive). */
+function adds(f: HeatFight, templateId: string): Entity[] {
+  return f.inst.mobIds
+    .map((id) => f.sim.ctx.entities.get(id))
+    .filter((e): e is Entity => !!e && e.templateId === templateId && !e.dead);
 }
 
-describe('Guardian of the Heat: the ids', () => {
-  it("keeps the trash kit's cast ids (the knell's embers key on its stun)", () => {
-    expect(HEAT_CASTS.knell).toBe(SMITH_HEART_CASTS.heatClang);
-    expect(HEAT_CASTS.pour).toBe(SMITH_HEART_CASTS.heatPour);
-    const kit = SMITH_HEART_MOBS[SMITH_HEART_GUARDIANS.heat].trashKit;
-    expect(kit?.screech?.castId).toBe(HEAT_CASTS.knell);
-    expect(kit?.screech?.stun).toBe(T.knellStun);
-    expect(kit?.line?.castId).toBe(HEAT_CASTS.pour);
-  });
-});
+/** Put the guardian's health at `frac` of its pool. */
+function setHp(f: HeatFight, frac: number): void {
+  const b = f.boss();
+  b.hp = Math.max(1, Math.floor(b.maxHp * frac));
+}
 
-describe('Guardian of the Heat: the geometry', () => {
-  it('knows the floor, the channel and its halves, and the nearest body in reach', () => {
-    expect(inHearthFloor(-214, 0)).toBe(true);
-    expect(inHearthFloor(-150, 0)).toBe(false);
-    for (const s of HEARTH_CRYSTAL_SOCKETS) expect(inHearthFloor(s.x, s.z)).toBe(true);
-    for (const s of HEAT_WAIT_SPOTS) expect(inHearthFloor(s.x, s.z)).toBe(true);
-    expect(inChannel(HEARTH_CHANNEL.x + 2.9, 10, T.channelHalf)).toBe(true);
-    expect(inChannel(HEARTH_CHANNEL.x + 3.1, 10, T.channelHalf)).toBe(false);
-    for (const s of HEARTH_CRYSTAL_SOCKETS) expect(channelSide(s.x)).toBe(s.side);
-    const from = { x: 0, z: 0 };
-    expect(
-      nearestInReach(
-        from,
-        [
-          { id: 3, x: 4, z: 0 },
-          { id: 1, x: 0, z: 4 },
-          { id: 2, x: 2, z: 0 },
-        ],
-        10,
-      )?.id,
-    ).toBe(2);
-    // A tie goes to the lower id; nobody within reach is nobody.
-    expect(
-      nearestInReach(
-        from,
-        [
-          { id: 7, x: 3, z: 0 },
-          { id: 4, x: 0, z: 3 },
-        ],
-        10,
-      )?.id,
-    ).toBe(4);
-    expect(nearestInReach(from, [{ id: 1, x: 11, z: 0 }], 10)).toBeNull();
+describe('Guardian of the Heat: the ids and the geometry', () => {
+  it('round-trips every object template', () => {
+    expect(heatTimedOf(HEAT_OBJECTS.seedPrefix, heatTimed(HEAT_OBJECTS.seedPrefix, 10))).toBe(10);
+    expect(heatTimedOf(HEAT_OBJECTS.fallPrefix, 'sh_heat_seed_4')).toBeNull();
+    expect(swellLaneOf(swellLaneTemplate('roll', 3.2))).toEqual({ state: 'roll', seconds: 3.2 });
+    expect(swellLaneOf('sh_heat_lane_x_1')).toBeNull();
+    expect(wellOf(wellTemplate('torn'))).toBe('torn');
+    expect(zoneOf(zoneTemplate(2, 'burn', 2))).toEqual({ band: 2, state: 'burn', seconds: 2 });
+    expect(zoneOf('sh_heat_zone_3_warn_4')).toBeNull();
+    expect(spiritOf(spiritTemplate('hammer'))).toBe('hammer');
+    expect(rootOf(rootTemplate('spent'))).toBe('spent');
   });
 
-  it('raises one crystal each side of the channel, heroic a third alternating sides, never twice', () => {
-    for (let w = 0; w < 12; w++) {
-      const two = pickSockets(w, 2);
-      expect(two.map((i) => HEARTH_CRYSTAL_SOCKETS[i].side).sort()).toEqual([-1, 1]);
-      const three = pickSockets(w, 3);
-      expect(new Set(three).size).toBe(3);
-      expect(three.slice(0, 2)).toEqual(two);
-      const third = HEARTH_CRYSTAL_SOCKETS[three[2]].side;
-      expect(third).toBe(w % 2 === 0 ? 1 : -1);
+  it('holds each threshold, crawls the Wellspawn from half health, and falls the seeds off', () => {
+    expect(phaseFloor(1, false)).toBe(T.overflowOneAt);
+    expect(phaseFloor(2, true)).toBe(T.overflowTwoAt);
+    expect(phaseFloor(3, false)).toBeNull();
+    expect(phaseFloor(3, true)).toBe(T.tearFreeAt);
+    expect(phaseFloor(4, true)).toBeNull();
+    expect(spawnPace(1)).toBeCloseTo(1, 9);
+    expect(spawnPace(0.75)).toBeGreaterThan(spawnPace(0.6));
+    expect(spawnPace(0.5)).toBeCloseTo(T.spawnMinFactor, 9);
+    expect(spawnPace(0.1)).toBeCloseTo(T.spawnMinFactor, 9);
+    expect(seedFalloff(0)).toBe(T.seedMax);
+    expect(seedFalloff(11)).toBeCloseTo(T.seedMax / 4, 6);
+    expect(seedFalloff(T.seedReach)).toBe(0);
+  });
+
+  it('knows the wellspring, the reach, the bands, the lanes and the waves', () => {
+    expect(inWell(HEARTH_WELL.x + HEARTH_WELL.r - 0.1, 0)).toBe(true);
+    expect(inWell(HEARTH_WELL.x + HEARTH_WELL.r + 0.1, 0)).toBe(false);
+    expect(beyondFlare(HEARTH_WELL.x + T.flareReach - 0.1, 0)).toBe(false);
+    expect(beyondFlare(HEARTH_WELL.x + T.flareReach + 0.1, 0)).toBe(true);
+    expect(inBand(0, HEARTH_WELL.x + 10, 0)).toBe(true);
+    expect(inBand(1, HEARTH_WELL.x + 20, 0)).toBe(true);
+    expect(inBand(2, HEARTH_WELL.x + 40, 0)).toBe(true);
+    expect(inBand(0, HEARTH_WELL.x + 20, 0)).toBe(false);
+    // The swells: away from the wellspring first, then either side.
+    const spot = { x: HEARTH_WELL.x + 15, z: 0 };
+    const [away, left, right] = swellBearings(spot);
+    expect(away).toBeCloseTo(Math.PI / 2, 9);
+    expect(Math.abs(left - away)).toBeCloseTo(Math.PI / 2, 9);
+    expect(Math.abs(right - away)).toBeCloseTo(Math.PI / 2, 9);
+    expect(inLane(spot.x, 0, away, T.laneLength, T.laneHalf, spot.x + 10, 2)).toBe(true);
+    expect(inLane(spot.x, 0, away, T.laneLength, T.laneHalf, spot.x + 10, 3)).toBe(false);
+    expect(inLane(spot.x, 0, away, T.laneLength, T.laneHalf, spot.x - 2, 0)).toBe(false);
+    // A wave's wall: its front and waveDepth behind it.
+    expect(inWave(spot.x, 0, away, 10, spot.x + 9, 0)).toBe(true);
+    expect(inWave(spot.x, 0, away, 10, spot.x + 6, 0)).toBe(false);
+    expect(inWave(spot.x, 0, away, 10, spot.x + 11, 0)).toBe(false);
+    for (const p of [...SHORE_POINTS, ...WELLSPAWN_SPOTS, ...ROOT_SPOTS, ...HEAT_WAIT_SPOTS])
+      expect(inHearthFloor(p.x, p.z)).toBe(true);
+    expect(SHORE_POINTS.length).toBeGreaterThan(40);
+    for (const p of HEAT_WAIT_SPOTS) {
+      expect(beyondFlare(p.x, p.z)).toBe(false);
+      expect(inWell(p.x, p.z)).toBe(false);
     }
   });
 });
 
-describe('Guardian of the Heat: the heat', () => {
-  it('rises about a point a second, on the guardian and on every player, and drives the Hearth Pulse', () => {
+describe('Guardian of the Heat: the guardian', () => {
+  it('stands half sunk in its wellspring and never steps out of it', () => {
+    const t = SMITH_HEART_MOBS[SMITH_HEART_GUARDIANS.heat];
+    expect(t.trashKit).toBeUndefined();
+    expect(t.bodyRadius).toBe(HEARTH_WELL.r);
+    expect(t.stackPoison?.name).toBe(HEAT_NAMES.grip);
     const f = pulled();
-    holdKit(f);
-    const st = f.state();
-    if (!st) throw new Error('no fight');
-    const before = st.heat;
-    const ev = f.tick(ticks(10));
-    expect(st.heat - before).toBeCloseTo(10, 0);
-    expect(f.boss().resource).toBe(Math.round(st.heat));
-    expect(f.boss().maxResource).toBe(T.heatMax);
-    for (const p of f.players) {
-      expect(aura(p, HEAT_AURAS.heat)?.value).toBe(Math.round(st.heat));
-      expect(aura(p, HEAT_AURAS.heat)?.value2).toBe(1);
-    }
-    // A pulse every 3 s on everyone, its weight the heat's.
-    const p0 = hitsOf(ev, HEAT_NAMES.pulse, f.players[3].id);
-    expect(p0.length).toBe(3);
-    expect(cues(ev, HEAT_CUES.pulse).length).toBe(3);
-    // Hot, the same pulse is far heavier.
-    st.heat = 80;
-    const hot = hitsOf(f.tick(ticks(3)), HEAT_NAMES.pulse, f.players[3].id);
-    expect(hot.length).toBe(1);
-    expect(hot[0]).toBeGreaterThan(Math.max(...p0) * 3);
-    expect(hot[0]).toBeGreaterThanOrEqual(Math.floor(pulseDamage(80) * (1 - T.pulseSpread)));
-    expect(hot[0]).toBeLessThanOrEqual(Math.ceil(pulseDamage(80) * (1 + T.pulseSpread)));
+    const o = f.world(HEARTH_WELL.x, HEARTH_WELL.z);
+    // The tank backs off: the guardian stays in the wellspring.
+    f.put(f.players[0], -205, 0);
+    f.tick(ticks(4));
+    expect(f.boss().pos.x).toBeCloseTo(o.x, 6);
+    expect(f.boss().pos.z).toBeCloseTo(o.z, 6);
+    const st = aura(f.boss(), HEAT_AURAS.state);
+    expect(st?.value).toBe(1);
+    expect(st?.value2).toBe(HEAT_STAGES.fight);
+    expect(f.objects(HEAT_OBJECTS.wellPrefix).map((e) => e.templateId)).toEqual([
+      wellTemplate('calm'),
+    ]);
   });
 
-  it('winds up from 90 and overheats at 100: Hearthburst on everyone, then the Hearth has vented', () => {
-    const f = pulled();
-    holdKit(f);
-    const st = f.state();
-    if (!st) throw new Error('no fight');
-    f.dev('/dev heart heat heat 89.5');
-    let ev = f.tick(ticks(1));
-    expect(st.windup).toBe(true);
-    expect(has(f.boss(), HEAT_AURAS.overheating)).toBe(true);
-    expect(warnKeys(ev)).toContain('hudChrome.heatGuardian.warn.windup');
-    expect(cues(ev, HEAT_CUES.windup).length).toBe(1);
-    ev = until(f, () => st.overheats > 0, 15);
-    ev.push(...f.tick(1));
-    expect(st.overheats).toBe(1);
-    expect(st.heat).toBeLessThan(2);
-    expect(has(f.boss(), HEAT_AURAS.overheating)).toBe(false);
-    for (const p of f.players) {
-      const hit = hitsOf(ev, HEAT_NAMES.overheat, p.id);
-      expect(hit.length).toBe(1);
-      expect(hit[0]).toBeGreaterThanOrEqual(HEAT_DIFFICULTY.normal.overheatMin);
-    }
-    expect(warnKeys(ev)).toContain('hudChrome.heatGuardian.warn.overheat');
+  it('Cinder Grip stacks on its tank with every landed swing', () => {
+    const f = pulled(2);
+    const tank = f.players[0];
+    f.put(tank, HEARTH_WELL.x + 8, 0);
+    f.tick(ticks(14));
+    const grip = aura(tank, HEAT_AURAS.grip);
+    expect(grip?.name).toBe(HEAT_NAMES.grip);
+    expect(grip?.stacks ?? 0).toBeGreaterThanOrEqual(3);
+    expect(has(f.players[1], HEAT_AURAS.grip)).toBe(false);
+  });
+});
+
+describe('Guardian of the Heat: phase 1', () => {
+  it('Basalt Fist shows its spot and three lanes, slams the spot, then three swells roll out', () => {
+    const f = pulled(4);
+    const [, victim, inLaneP, inGap] = f.players;
+    const spot = { x: HEARTH_WELL.x + 16, z: 0 };
+    f.put(victim, spot.x, spot.z);
+    expect(f.dev('/dev heart heat fist', victim.id)).toBe(true);
+    expect(f.objects(HEAT_OBJECTS.fistPrefix).length).toBe(1);
+    const lanes = f.objects(HEAT_OBJECTS.lanePrefix);
+    expect(lanes.length).toBe(3);
+    for (const l of lanes) expect(swellLaneOf(l.templateId)?.state).toBe('warn');
+    expect(f.boss().castingAbility).toBe(HEAT_CASTS.fist);
+    // One stands down the lane away from the wellspring, one in a gap.
+    f.put(inLaneP, spot.x + 14, 0.5);
+    f.put(inGap, spot.x + 10, 10);
+    const ev = f.tick(ticks(T.fistCast + 0.2));
+    const slam = hitsOf(ev, HEAT_NAMES.fist, victim.id);
+    expect(slam.length).toBe(1);
+    expect(slam[0]).toBeGreaterThanOrEqual(T.fistMin);
+    expect(hitsOf(ev, HEAT_NAMES.fist, inLaneP.id)).toEqual([]);
+    expect(cues(ev, HEAT_CUES.fist).length).toBe(1);
+    const roll = f.tick(ticks(5));
+    expect(hitsOf(roll, HEAT_NAMES.swell, inLaneP.id).length).toBe(1);
+    expect(hitsOf(roll, HEAT_NAMES.swell, inGap.id)).toEqual([]);
+    expect(cues(roll, HEAT_CUES.swell).length).toBe(3);
+    // Rolled out: every lane and wave gone.
+    f.tick(ticks(1));
+    expect(f.objects(HEAT_OBJECTS.lanePrefix)).toEqual([]);
+    expect(f.objects(HEAT_OBJECTS.wave)).toEqual([]);
   });
 
-  it('a normal Hearthburst is a near wipe; a heroic one a wipe', () => {
-    for (const tier of ['normal', 'heroic'] as const) {
-      const f = pulled(5, 33);
-      holdKit(f);
-      if (tier === 'heroic') f.dev('/dev heart heat heroic');
-      for (const p of f.players) {
-        p.maxHp = 1300;
-        p.hp = 1300;
+  it('Hearth Flare strikes only those out of reach, and scorches them', () => {
+    const f = pulled(3);
+    const [, near, far] = f.players;
+    f.put(far, HEARTH_WELL.x + T.flareReach + 6, 0);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    st.flareTimer = 0.05;
+    const ev = f.tick(2);
+    expect(hitsOf(ev, HEAT_NAMES.flare, far.id).length).toBe(1);
+    expect(hitsOf(ev, HEAT_NAMES.flare, near.id)).toEqual([]);
+    expect(aura(far, HEAT_AURAS.scorched)?.kind).toBe('spellvuln');
+    expect(has(near, HEAT_AURAS.scorched)).toBe(false);
+  });
+
+  it('through phases 2 and 3 it flares only its own target, and only when out of reach', () => {
+    const f = pulled(3);
+    f.dev('/dev heart heat phase 2');
+    hold(f);
+    const [tank, , far] = f.players;
+    f.put(far, HEARTH_WELL.x + T.flareReach + 6, 0);
+    f.put(tank, HEARTH_WELL.x + T.flareReach + 6, 6);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    st.flareTimer = 0.05;
+    const ev = f.tick(2);
+    expect(f.boss().aggroTargetId).toBe(tank.id);
+    expect(hitsOf(ev, HEAT_NAMES.flare, tank.id).length).toBe(1);
+    expect(hitsOf(ev, HEAT_NAMES.flare, far.id)).toEqual([]);
+  });
+
+  it('the wellspring burns whoever steps into it', () => {
+    const f = pulled(2);
+    const p = f.players[1];
+    f.put(p, HEARTH_WELL.x + 3, 1);
+    const ev = f.tick(ticks(1.1));
+    expect(hitsOf(ev, HEAT_NAMES.wellFire, p.id).length).toBeGreaterThanOrEqual(2);
+  });
+});
+
+describe('Guardian of the Heat: the overflows', () => {
+  it('normal: holds at 70 percent, sinks out of reach, overflows 20 s with no adds, rises into phase 2', () => {
+    const f = pulled(4);
+    const b = f.boss();
+    // A burst cannot skip the threshold.
+    f.sim.ctx.dealDamage(f.players[0], b, b.maxHp, false, 'physical', 'test', 'hit');
+    expect(b.hp).toBe(Math.ceil(b.maxHp * T.overflowOneAt));
+    let ev = f.tick(2);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    expect(st.stage).toBe('sinking');
+    expect(b.hostile).toBe(false);
+    expect(b.damageImmune).toBe(true);
+    expect(cues(ev, HEAT_CUES.sink).length).toBe(1);
+    expect(chatKeys(ev)).toContain('hudChrome.heatGuardian.say.sink');
+    expect(f.objects(HEAT_OBJECTS.wellPrefix)[0].templateId).toBe(wellTemplate('over'));
+    ev = f.tick(ticks(10));
+    expect(st.stage).toBe('under');
+    expect(adds(f, HEAT_MOBS.spawn)).toEqual([]);
+    expect(cues(ev, HEAT_CUES.river).length).toBeGreaterThan(0);
+    expect(cues(ev, HEAT_CUES.bolt).length).toBeGreaterThanOrEqual(HEAT_DIFFICULTY.normal.bolts);
+    // The guardian itself takes nothing while under.
+    const hp = b.hp;
+    f.sim.ctx.dealDamage(f.players[0], b, 500, false, 'physical', 'test', 'hit');
+    expect(b.hp).toBe(hp);
+    until(f, () => st.phase === 2, 20);
+    expect(st.phase).toBe(2);
+    expect(st.stage).toBe('fight');
+    expect(st.overflow).toBeNull();
+    expect(b.hostile).toBe(true);
+    expect(b.damageImmune).toBe(false);
+    expect(st.clock).toBeGreaterThan(T.sinkSeconds + T.overflowSeconds + T.riseSeconds);
+    expect(f.objects(HEAT_OBJECTS.riverPrefix)).toEqual([]);
+    expect(b.damageFloorHp).toBe(Math.ceil(b.maxHp * T.overflowTwoAt));
+  });
+
+  it('a river strikes those on its lane while it flows', () => {
+    const f = pulled(2);
+    setHp(f, 0.69);
+    f.tick(ticks(T.sinkSeconds + 0.1));
+    const st = f.state();
+    if (!st?.overflow) throw new Error('no overflow');
+    // The next surge, and a player stood down its first river.
+    st.overflow.riverIn = 0.05;
+    f.tick(2);
+    const r = st.overflow.rivers[0];
+    const p = f.players[1];
+    f.put(p, HEARTH_WELL.x + Math.sin(r.facing) * 14, HEARTH_WELL.z + Math.cos(r.facing) * 14);
+    const ev = f.tick(ticks(T.riverWarn + 1));
+    expect(hitsOf(ev, HEAT_NAMES.river, p.id).length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('heroic: the Wellspawn walk to the wellspring, slowing as they lose health', () => {
+    const f = pulled(3, 31, true);
+    setHp(f, 0.69);
+    f.tick(ticks(T.sinkSeconds + 0.2));
+    const kids = adds(f, HEAT_MOBS.spawn);
+    expect(kids.length).toBe(4);
+    for (const k of kids) {
+      expect(k.hostile).toBe(true);
+      expect(k.inCombat).toBe(true);
+    }
+    const [whole, hurt] = kids;
+    hurt.hp = Math.floor(hurt.maxHp * 0.5);
+    const d0 = (e: Entity) => wellDistance(f.local(e).x, f.local(e).z);
+    const w0 = d0(whole);
+    const h0 = d0(hurt);
+    f.tick(ticks(2));
+    const wStep = w0 - d0(whole);
+    const hStep = h0 - d0(hurt);
+    expect(wStep).toBeCloseTo(T.spawnSpeed * 2, 0);
+    expect(hStep).toBeGreaterThan(0);
+    expect(hStep).toBeLessThan(wStep * 0.25);
+    // A root holds one still.
+    hurt.auras.push({
+      id: 'test_root',
+      name: 'Root',
+      kind: 'root',
+      remaining: 5,
+      duration: 5,
+      value: 0,
+      sourceId: f.players[0].id,
+      school: 'nature',
+    });
+    const h1 = d0(hurt);
+    f.tick(ticks(1));
+    expect(d0(hurt)).toBeCloseTo(h1, 6);
+  });
+
+  it('heroic: a Wellspawn that reaches the wellspring feeds the guardian and blasts the raid', () => {
+    const f = pulled(3, 31, true);
+    setHp(f, 0.69);
+    f.tick(ticks(T.sinkSeconds + 0.2));
+    const [kid] = adds(f, HEAT_MOBS.spawn);
+    const b = f.boss();
+    const before = b.hp;
+    const at = f.world(HEARTH_WELL.x + T.spawnReach + 0.5, 0);
+    kid.pos.x = at.x;
+    kid.pos.z = at.z;
+    const ev = f.tick(ticks(1));
+    expect(f.state()?.feeds).toBe(1);
+    expect(b.hp).toBeGreaterThan(before);
+    for (const p of f.players) expect(hitsOf(ev, HEAT_NAMES.feed, p.id).length).toBe(1);
+    expect(cues(ev, HEAT_CUES.feed).length).toBe(1);
+    expect(f.sim.ctx.entities.has(kid.id)).toBe(false);
+  });
+
+  it('heroic: the overflow ends once the adds are dead (never before 8 s), or at 45 s', () => {
+    const f = pulled(3, 31, true);
+    setHp(f, 0.69);
+    f.tick(ticks(T.sinkSeconds + 0.2));
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    for (const k of adds(f, HEAT_MOBS.spawn)) f.sim.ctx.handleDeath(k, f.players[0]);
+    f.tick(ticks(2));
+    expect(st.stage).toBe('under');
+    until(f, () => st.stage !== 'under', 10);
+    expect(st.stage).toBe('rising');
+    expect(st.overflow?.clock ?? 0).toBeGreaterThanOrEqual(T.overflowMin - 0.05);
+    expect(st.overflow?.clock ?? 99).toBeLessThan(T.overflowMin + 0.5);
+
+    // Left alone, the survivors dive in at the cap.
+    const g = pulled(3, 31, true);
+    setHp(g, 0.69);
+    g.tick(ticks(T.sinkSeconds + 0.2));
+    const kids = adds(g, HEAT_MOBS.spawn);
+    for (const k of kids) {
+      k.auras.push({
+        id: 'test_stun',
+        name: 'Stun',
+        kind: 'stun',
+        remaining: 999,
+        duration: 999,
+        value: 0,
+        sourceId: g.players[0].id,
+        school: 'physical',
+      });
+    }
+    const gst = g.state();
+    if (!gst) throw new Error('no fight');
+    until(g, () => gst.stage !== 'under', T.overflowMax + 2);
+    expect(gst.overflow?.clock ?? 0).toBeGreaterThanOrEqual(T.overflowMax - 0.05);
+    expect(gst.feeds).toBe(kids.length);
+  });
+
+  it("heroic's second overflow: two Wellkeepers mark a player whose trail heals the Wellspawn", () => {
+    const f = pulled(4, 31, true);
+    f.dev('/dev heart heat phase 2');
+    hold(f);
+    setHp(f, 0.39);
+    f.tick(ticks(T.sinkSeconds + 0.2));
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    expect(st.overflow?.n).toBe(2);
+    expect(adds(f, HEAT_MOBS.keeper).length).toBe(2);
+    expect(adds(f, HEAT_MOBS.spawn).length).toBe(4);
+    const ev = f.tick(ticks(T.markFirst + 0.2));
+    const marked = f.players.filter((p) => has(p, HEAT_AURAS.kindling));
+    expect(marked.length).toBeGreaterThanOrEqual(1);
+    expect(cues(ev, HEAT_CUES.kindling).length).toBeGreaterThanOrEqual(1);
+    const p = marked[0];
+    f.tick(ticks(T.markSeconds + 0.1));
+    expect(has(p, HEAT_AURAS.kindling)).toBe(false);
+    expect(has(p, HEAT_AURAS.trail)).toBe(true);
+    f.tick(ticks(1.5));
+    const trails = f.objects(HEAT_OBJECTS.trailPrefix);
+    expect(trails.length).toBeGreaterThanOrEqual(2);
+    // A hurt Wellspawn set in a trail heals.
+    const [kid] = adds(f, HEAT_MOBS.spawn);
+    kid.hp = Math.floor(kid.maxHp * 0.4);
+    const before = kid.hp;
+    kid.auras.push({
+      id: 'test_root',
+      name: 'Root',
+      kind: 'root',
+      remaining: 9,
+      duration: 9,
+      value: 0,
+      sourceId: f.players[0].id,
+      school: 'nature',
+    });
+    const t0 = trails[0];
+    kid.pos.x = t0.pos.x;
+    kid.pos.z = t0.pos.z;
+    f.tick(ticks(1));
+    expect(kid.hp).toBeGreaterThan(before + kid.maxHp * T.trailHealPct * 0.8);
+  });
+});
+
+describe('Guardian of the Heat: phase 2', () => {
+  it('Hearthseeds fall under every player, throb 10 s, then burst less the farther away', () => {
+    const f = pulled(3);
+    f.dev('/dev heart heat phase 2');
+    hold(f);
+    const [a, b2, c] = f.players;
+    f.put(a, HEARTH_WELL.x + 12, -10);
+    f.put(b2, HEARTH_WELL.x + 12, 10);
+    f.put(c, HEARTH_WELL.x + 12, 0);
+    f.dev('/dev heart heat seeds');
+    expect(f.objects(HEAT_OBJECTS.seedPrefix).length).toBe(3);
+    // Two run far, one stays on its seed.
+    f.put(a, HEARTH_WELL.x + 40, -30);
+    f.put(b2, HEARTH_WELL.x + 22, 8);
+    const ev = f.tick(ticks(T.seedLife + 0.2));
+    const stay = hitsOf(ev, HEAT_NAMES.seed, c.id).reduce((x, y) => x + y, 0);
+    const near = hitsOf(ev, HEAT_NAMES.seed, b2.id).reduce((x, y) => x + y, 0);
+    const far = hitsOf(ev, HEAT_NAMES.seed, a.id).reduce((x, y) => x + y, 0);
+    expect(stay).toBeGreaterThan(near);
+    expect(near).toBeGreaterThanOrEqual(far);
+    expect(far).toBe(0);
+    expect(cues(ev, HEAT_CUES.seedBurst).length).toBe(3);
+    expect(f.objects(HEAT_OBJECTS.seedPrefix)).toEqual([]);
+    // Normal hatches nothing.
+    expect(adds(f, HEAT_MOBS.seedflame)).toEqual([]);
+  });
+
+  it('heroic: every burst hatches a Seedflame hunting one player', () => {
+    const f = pulled(3, 31, true);
+    f.dev('/dev heart heat phase 2');
+    hold(f);
+    f.dev('/dev heart heat seeds');
+    f.tick(ticks(T.seedLife + 0.3));
+    const flames = adds(f, HEAT_MOBS.seedflame);
+    expect(flames.length).toBe(3);
+    for (const e of flames) {
+      expect(e.forcedTargetId).not.toBeNull();
+      const quarry = f.sim.ctx.entities.get(e.forcedTargetId ?? -1);
+      expect(quarry && has(quarry, HEAT_AURAS.hunted)).toBe(true);
+    }
+  });
+
+  it('Wakefire ignites its three bands one after another, striking only who stands in each', () => {
+    const f = pulled(3);
+    f.dev('/dev heart heat phase 2');
+    hold(f);
+    const [p0, p1, p2] = f.players;
+    f.put(p0, HEARTH_WELL.x + 10, 0);
+    f.put(p1, HEARTH_WELL.x + 22, 0);
+    f.put(p2, HEARTH_WELL.x + 40, 0);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    f.dev('/dev heart heat zones');
+    const order = st.zoneRun?.order ?? [];
+    expect([...order].sort()).toEqual([0, 1, 2]);
+    expect(order[1]).toBe(1);
+    const ev = f.tick(ticks(T.zoneWarn + 0.1));
+    // Only the first band has ignited.
+    const first = [p0, p1, p2][order[0]];
+    expect(hitsOf(ev, HEAT_NAMES.zone, first.id).length).toBeGreaterThanOrEqual(1);
+    for (const p of [p0, p1, p2].filter((x) => x !== first))
+      expect(hitsOf(ev, HEAT_NAMES.zone, p.id)).toEqual([]);
+    const rest = f.tick(ticks(T.zoneStep * 2 + T.zoneBurn + 0.5));
+    for (const p of [p0, p1, p2]) {
+      if (p === first) continue;
+      expect(hitsOf(rest, HEAT_NAMES.zone, p.id).length).toBeGreaterThanOrEqual(1);
+    }
+    expect(f.objects(HEAT_OBJECTS.zonePrefix)).toEqual([]);
+  });
+});
+
+describe('Guardian of the Heat: phase 3, the Rolling Cinders', () => {
+  /** Phase 3 with a cinder rolling after `quarry`. */
+  function rolling(heroic = false) {
+    const f = pulled(3, 31, heroic);
+    f.dev('/dev heart heat phase 3');
+    hold(f);
+    f.dev('/dev heart heat ember');
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    expect(st.falls.length).toBe(1);
+    expect(f.objects(HEAT_OBJECTS.fallPrefix).length).toBe(1);
+    const ev = f.tick(ticks(T.cinderFallWarn + 0.1));
+    expect(cues(ev, HEAT_CUES.cinderLand).length).toBe(1);
+    const [cinder] = adds(f, HEAT_MOBS.cinder);
+    const c = st.cinders[0];
+    const quarry = f.sim.ctx.entities.get(c.quarry ?? -1) as Entity;
+    return { f, st, cinder, c, quarry };
+  }
+
+  it('lands, burns its spot, and hunts its quarry until it reaches them', () => {
+    const { f, cinder, quarry } = rolling();
+    expect(cinder).toBeDefined();
+    expect(has(quarry, HEAT_AURAS.hunted)).toBe(true);
+    expect(f.objects(HEAT_OBJECTS.scorchPrefix).length).toBe(1);
+    const d = () => Math.hypot(cinder.pos.x - quarry.pos.x, cinder.pos.z - quarry.pos.z);
+    const d0 = d();
+    f.tick(ticks(1));
+    expect(d0 - d()).toBeCloseTo(HEAT_DIFFICULTY.normal.cinderSpeed, 0);
+    // Reaching its quarry kills them and spends the cinder.
+    cinder.pos.x = quarry.pos.x + 3;
+    cinder.pos.z = quarry.pos.z;
+    const ev = f.tick(ticks(1), false);
+    expect(hitsOf(ev, HEAT_NAMES.cinder, quarry.id)[0]).toBeGreaterThanOrEqual(T.cinderKill / 2);
+    expect(quarry.dead).toBe(true);
+    expect(cues(ev, HEAT_CUES.cinderBurst).length).toBe(1);
+    expect(adds(f, HEAT_MOBS.cinder)).toEqual([]);
+  });
+
+  it('a strike knocks it back 6 yd, then Cooling Crust holds it 5 s', () => {
+    const { f, cinder, quarry } = rolling();
+    const striker = f.players.find((p) => p.id !== quarry.id) as Entity;
+    const d = () => Math.hypot(cinder.pos.x - quarry.pos.x, cinder.pos.z - quarry.pos.z);
+    // A strike lands one point (a ward) and knocks it back.
+    const hp0 = cinder.hp;
+    const landed = f.sim.ctx.dealDamage(striker, cinder, 900, false, 'physical', 'test', 'hit');
+    expect(landed).toBe(1);
+    expect(cinder.hp).toBe(hp0 - 1);
+    const before = d();
+    let ev = f.tick(1);
+    expect(d()).toBeGreaterThan(before + T.cinderKnock - 1);
+    expect(has(cinder, HEAT_AURAS.crust)).toBe(true);
+    expect(cues(ev, HEAT_CUES.cinderKnock).length).toBe(1);
+    // Struck again under its crust: no knockback.
+    f.sim.ctx.dealDamage(striker, cinder, 900, false, 'physical', 'test', 'hit');
+    const d1 = d();
+    ev = f.tick(1);
+    expect(cues(ev, HEAT_CUES.cinderKnock)).toEqual([]);
+    expect(d()).toBeLessThan(d1);
+    // The crust gone, a strike knocks it back again.
+    f.tick(ticks(T.crustSeconds));
+    expect(has(cinder, HEAT_AURAS.crust)).toBe(false);
+    f.sim.ctx.dealDamage(striker, cinder, 900, false, 'physical', 'test', 'hit');
+    ev = f.tick(1);
+    expect(cues(ev, HEAT_CUES.cinderKnock).length).toBe(1);
+    // A damage-over-time tick lands nothing and knocks nothing.
+    f.tick(ticks(T.crustSeconds + 0.1));
+    const hp1 = cinder.hp;
+    f.sim.ctx.dealDamage(striker, cinder, 50, false, 'fire', 'dot', 'hit', true, undefined, false);
+    expect(cinder.hp).toBe(hp1);
+  });
+
+  it('falls on its own clock through phase 3', () => {
+    const f = pulled(3);
+    f.dev('/dev heart heat phase 3');
+    const ev = f.tick(ticks(T.cinderFirst + T.cinderFallWarn + 0.5));
+    expect(cues(ev, HEAT_CUES.cinderLand).length).toBe(1);
+    expect(chatKeys(ev)).toContain('hudChrome.heatGuardian.warn.cinder');
+  });
+});
+
+describe('Guardian of the Heat: heroic phase 4', () => {
+  it('normal never tears free; heroic tears free at 10 percent and the three spirits come', () => {
+    const n = pulled(2);
+    n.dev('/dev heart heat phase 3');
+    hold(n);
+    setHp(n, 0.05);
+    n.tick(ticks(2));
+    expect(n.state()?.phase).toBe(3);
+    expect(n.objects(HEAT_OBJECTS.spiritPrefix)).toEqual([]);
+    expect(n.dev('/dev heart heat phase 4')).toBe(true);
+    expect(n.state()?.phase).toBe(3);
+
+    const f = pulled(3, 31, true);
+    f.dev('/dev heart heat phase 3');
+    hold(f);
+    setHp(f, 0.09);
+    let ev = f.tick(2);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    expect(st.stage).toBe('tearing');
+    expect(f.boss().castingAbility).toBe(HEAT_CASTS.tearFree);
+    expect(f.boss().damageImmune).toBe(true);
+    const spirits = f.objects(HEAT_OBJECTS.spiritPrefix).map((e) => spiritOf(e.templateId));
+    expect(spirits.sort()).toEqual(['breath', 'hammer', 'quench']);
+    for (const s of ['quench', 'breath', 'hammer'])
+      expect(chatKeys(ev)).toContain(`hudChrome.heatGuardian.say.${s}`);
+    ev = f.tick(ticks(T.tearFreeCast + 0.2));
+    expect(st.phase).toBe(4);
+    expect(st.stage).toBe('fight');
+    expect(cues(ev, HEAT_CUES.tearFree).length).toBe(1);
+    expect(f.objects(HEAT_OBJECTS.wellPrefix)[0].templateId).toBe(wellTemplate('torn'));
+    expect(f.boss().damageFloorHp).toBeUndefined();
+    // Free: it follows its tank out of the wellspring.
+    const tank = f.players[0];
+    f.put(tank, HEARTH_WELL.x + 25, 0);
+    f.tick(ticks(3));
+    expect(wellDistance(f.local(f.boss()).x, f.local(f.boss()).z)).toBeGreaterThan(5);
+  });
+
+  it('the spirits come whatever order the guardians fell in (they never depend on it)', () => {
+    const f = pulled(2, 31, true);
+    // Kill every other guardian first: the spirits still come.
+    for (const vein of ['hammer', 'breath', 'quench'] as const) {
+      const id = SMITH_HEART_GUARDIANS[vein];
+      for (const mid of f.inst.mobIds) {
+        const e = f.sim.ctx.entities.get(mid);
+        if (e?.templateId === id && !e.dead) f.sim.ctx.handleDeath(e, f.players[0]);
       }
-      f.dev('/dev heart heat overheat');
-      const dead = f.players.filter((p) => p.dead).length;
-      if (tier === 'heroic') expect(dead).toBe(f.players.length);
-      else for (const p of f.players) expect(p.dead || p.hp < 1300 * 0.35).toBe(true);
     }
+    f.dev('/dev heart heat phase 4');
+    expect(f.objects(HEAT_OBJECTS.spiritPrefix).length).toBe(3);
+    const g = pulled(2, 31, true);
+    g.dev('/dev heart heat phase 4');
+    expect(g.objects(HEAT_OBJECTS.spiritPrefix).length).toBe(3);
   });
 
-  it('the Hearth is stoked hotter every 40 s, without end (the soft enrage)', () => {
-    const f = pulled();
-    holdKit(f);
+  it("the Quench's ice freezes a Rolling Cinder, which then takes three times the damage", () => {
+    const f = pulled(3, 31, true);
+    f.dev('/dev heart heat phase 4');
+    hold(f);
     const st = f.state();
-    if (!st) throw new Error('no fight');
-    st.stokeTimer = T.stokeEvery;
-    f.tick(ticks(T.stokeEvery) + 1);
-    expect(st.stokeStacks).toBe(1);
-    expect(aura(f.boss(), HEAT_AURAS.stoked)?.stacks).toBe(1);
-    st.heat = 0;
-    f.tick(ticks(10));
-    expect(st.heat).toBeCloseTo(10 * stokeMult(1), 0);
-    f.tick(ticks(T.stokeEvery * 2));
-    expect(st.stokeStacks).toBe(3);
+    const sp = st?.spirits;
+    if (!st || !sp) throw new Error('no spirits');
+    sp.iceIn = 999;
+    f.dev('/dev heart heat ember');
+    f.tick(ticks(T.cinderFallWarn + 0.1));
+    const [cinder] = adds(f, HEAT_MOBS.cinder);
+    // Ice laid under the cinder.
+    sp.iceIn = 0.05;
+    f.tick(2);
+    expect(sp.ice.length).toBeGreaterThan(0);
+    const ice = sp.ice[0];
+    const at = f.world(ice.x, ice.z);
+    cinder.pos.x = at.x;
+    cinder.pos.z = at.z;
+    const ev = f.tick(2);
+    expect(has(cinder, HEAT_AURAS.rimelocked)).toBe(true);
+    expect(aura(cinder, HEAT_AURAS.rimelocked)?.kind).toBe('stun');
+    expect(cues(ev, HEAT_CUES.freeze).length).toBe(1);
+    expect(sp.ice.some((i) => i === ice)).toBe(false);
+    // Frozen it is flesh: a strike lands in full, tripled; it never moves.
+    const striker = f.players[1];
+    const hp0 = cinder.hp;
+    const landed = f.sim.ctx.dealDamage(striker, cinder, 100, false, 'fire', 'test', 'hit');
+    expect(landed).toBe(100 * (1 + T.frozenVuln));
+    expect(cinder.hp).toBe(hp0 - landed);
+    const x0 = cinder.pos.x;
+    f.tick(ticks(1));
+    expect(cinder.pos.x).toBe(x0);
+  });
+
+  it("the Breath's storm-rain puts out a Creeping Blaze; the blessed never burn in one", () => {
+    const f = pulled(4, 31, true);
+    f.dev('/dev heart heat phase 4');
+    hold(f);
+    const sp = f.state()?.spirits;
+    if (!sp) throw new Error('no spirits');
+    sp.blazeIn = 999;
+    sp.rainIn = 0.05;
+    const ev = f.tick(2);
+    const blessed = f.players.filter((p) => has(p, HEAT_AURAS.stormRain));
+    expect(blessed.length).toBe(Math.min(T.rainCount, f.players.length - 1));
+    expect(cues(ev, HEAT_CUES.rain).length).toBe(blessed.length);
+    const plain = f.players.find((p) => !has(p, HEAT_AURAS.stormRain)) as Entity;
+    // A blaze under the plain player burns them.
+    sp.blazeIn = 0.05;
+    f.tick(2);
+    const blaze = sp.blaze[0];
+    f.put(plain, blaze.x, blaze.z);
+    const burn = f.tick(ticks(1.2));
+    expect(hitsOf(burn, HEAT_NAMES.blaze, plain.id).length).toBeGreaterThanOrEqual(1);
+    expect(blaze.r).toBeGreaterThan(T.blazeStartR);
+    // A blessed player walks in: it is put out.
+    f.put(blessed[0], blaze.x + 0.5, blaze.z);
+    const out = f.tick(2);
+    expect(hitsOf(out, HEAT_NAMES.blaze, blessed[0].id)).toEqual([]);
+    expect(cues(out, HEAT_CUES.douse).length).toBe(1);
+    expect(sp.blaze.includes(blaze)).toBe(false);
+  });
+
+  it("the Hammer's Stone Root stops the Crushing Fist; without one the tank is struck", () => {
+    const f = pulled(2, 31, true);
+    f.dev('/dev heart heat phase 4');
+    hold(f);
+    f.tick(ticks(T.tearFreeCast + 0.2));
+    const sp = f.state()?.spirits;
+    if (!sp) throw new Error('no spirits');
+    const tank = f.players[0];
+    // Crushing Fist charging, the guardian far from every root.
+    f.put(tank, HEARTH_WELL.x + 8, 40 - 8);
+    sp.crushIn = 0.05;
+    let ev = f.tick(2);
+    expect(has(f.boss(), HEAT_AURAS.crushing)).toBe(true);
+    expect(has(tank, HEAT_AURAS.crushMark)).toBe(true);
+    expect(chatKeys(ev)).toContain('hudChrome.heatGuardian.warn.crush');
+    // Dragged across a ready root: held, the fist misses.
+    const root = sp.roots.find((r) => r.ready);
+    if (!root) throw new Error('no root');
+    const spot = ROOT_SPOTS[root.spot];
+    const w = f.world(spot.x, spot.z);
+    f.boss().pos.x = w.x;
+    f.boss().pos.z = w.z;
+    ev = f.tick(ticks(1));
+    expect(has(f.boss(), HEAT_AURAS.rooted)).toBe(true);
+    expect(aura(f.boss(), HEAT_AURAS.rooted)?.kind).toBe('root');
+    expect(cues(ev, HEAT_CUES.rooted).length).toBe(1);
+    ev = f.tick(ticks(T.crushSeconds));
+    expect(hitsOf(ev, HEAT_NAMES.crushing, tank.id)).toEqual([]);
+    expect(has(f.boss(), HEAT_AURAS.rooted)).toBe(false);
+    expect(root.ready).toBe(false);
+    expect(has(f.boss(), HEAT_AURAS.crushing)).toBe(false);
+    // The next one, no root under it: the tank takes the blow.
+    f.put(tank, -183, 30);
+    f.boss().pos.x = f.world(-187, 30).x;
+    f.boss().pos.z = f.world(-187, 30).z;
+    sp.crushIn = 0.05;
+    ev = f.tick(ticks(T.crushSeconds + 0.6));
+    const blow = hitsOf(ev, HEAT_NAMES.crushing, tank.id);
+    expect(blow.length).toBe(1);
+    expect(blow[0]).toBeGreaterThanOrEqual(T.crushMin);
   });
 });
 
-describe('Guardian of the Heat: the Kindled Crystals', () => {
-  it('Shed Heat at 14 s shows the rise spots through its bar, then raises two crystals, one each side', () => {
-    const f = heatFight();
-    f.dev('/dev heart heat pull');
-    f.tick(1);
-    holdKit(f);
-    const st = f.state();
-    if (!st) throw new Error('no fight');
-    st.channel.remaining = 999;
-    let ev = until(f, () => f.boss().castingAbility === HEAT_CASTS.shed, 16);
-    expect(st.clock).toBeGreaterThan(T.shedFirst - 0.2);
-    const rises = f.objects(HEAT_OBJECTS.risePrefix);
-    expect(rises.length).toBe(2);
-    for (const r of rises) expect(riseOf(r.templateId)).toBeCloseTo(T.shedCast, 5);
-    expect(warnKeys(ev)).toContain('hudChrome.heatGuardian.warn.crystals');
-    ev = f.tick(ticks(T.shedCast) + 2);
-    expect(f.objects(HEAT_OBJECTS.risePrefix)).toEqual([]);
-    const crystals = f.objects(HEAT_OBJECTS.crystalPrefix);
-    expect(crystals.length).toBe(2);
-    for (const c of crystals) expect(crystalOf(c.templateId)).toBeCloseTo(T.crystalLife, 5);
-    expect(st.crystals.map((c) => HEARTH_CRYSTAL_SOCKETS[c.socket].side).sort()).toEqual([-1, 1]);
-    expect(cues(ev, HEAT_CUES.rise).length).toBe(2);
-  });
-
-  it('a ray strikes the NEAREST player in reach: a burn, a hit, and the Hearth cooled', () => {
-    const f = pulled();
-    holdKit(f);
-    f.dev('/dev heart heat crystals');
-    const st = f.state();
-    if (!st) throw new Error('no fight');
-    const [c] = st.crystals;
-    // Two players near the first crystal: the nearer takes every ray.
-    f.put(f.players[1], c.x + 3, c.z);
-    f.put(f.players[2], c.x + 6, c.z);
-    st.heat = 50;
-    const ev = f.tick(ticks(T.rayFirst) + 1);
-    const beams = cues(ev, HEAT_CUES.beam);
-    expect(beams.length).toBe(1);
-    expect((beams[0] as { sourceId: number }).sourceId).toBe(c.objectId);
-    expect((beams[0] as { targetId: number }).targetId).toBe(f.players[1].id);
-    expect(aura(f.players[1], HEAT_AURAS.burn)?.stacks).toBe(1);
-    expect(has(f.players[2], HEAT_AURAS.burn)).toBe(false);
-    expect(hitsOf(ev, HEAT_NAMES.ray, f.players[1].id).length).toBe(1);
-    // The heat moved by the ray's cool, the other crystal's ray sent back
-    // (nobody near it) and the rise of those ticks.
-    const rise = (ticks(T.rayFirst) + 1) * DT * T.heatRise;
-    expect(st.raysBack).toBe(1);
-    expect(st.heat).toBeCloseTo(50 + rise - T.rayCool + T.rayBack, 5);
-    expect(st.rays).toBe(1);
-    expect(c.target).toBe(f.players[1].id);
-    // The nearer steps away: the next ray takes the other.
-    f.put(f.players[1], -190, -40);
-    const ev2 = f.tick(ticks(T.rayEvery));
-    expect((cues(ev2, HEAT_CUES.beam)[0] as { targetId: number }).targetId).toBe(f.players[2].id);
-  });
-
-  it('with nobody near enough the ray goes back into the guardian and heats the Hearth', () => {
-    const f = pulled();
-    holdKit(f);
-    parkAll(f);
-    f.dev('/dev heart heat crystals');
-    const st = f.state();
-    if (!st) throw new Error('no fight');
-    // The tank too: nobody within reach of either crystal.
-    for (const c of st.crystals)
-      for (const p of f.players)
-        expect(Math.hypot(f.local(p).x - c.x, f.local(p).z - c.z)).toBeGreaterThan(T.rayRange);
-    st.heat = 40;
-    const ev = f.tick(ticks(T.rayFirst) + 1);
-    const back = cues(ev, HEAT_CUES.beamBack);
-    expect(back.length).toBe(2);
-    for (const b of back) expect((b as { targetId: number }).targetId).toBe(f.boss().id);
-    expect(st.raysBack).toBe(2);
-    expect(st.heat).toBeGreaterThan(40 + 2 * T.rayBack - 0.01);
-  });
-
-  it('Crystal Burn stacks, makes spell damage hurt more, and fades a stack every 6 s (10 s heroic)', () => {
-    for (const tier of ['normal', 'heroic'] as const) {
-      const f = pulled();
-      holdKit(f);
-      if (tier === 'heroic') f.dev('/dev heart heat heroic');
-      const p = f.players[3];
-      f.dev('/dev heart heat burn 4', p.id);
-      const a = aura(p, HEAT_AURAS.burn);
-      expect(a?.stacks).toBe(4);
-      expect(a?.kind).toBe('spellvuln');
-      expect(a?.value).toBeCloseTo(burnAmp(4), 6);
-      const decay = HEAT_DIFFICULTY[tier].burnDecay;
-      f.tick(ticks(decay) - 4);
-      expect(aura(p, HEAT_AURAS.burn)?.stacks).toBe(4);
-      f.tick(6);
-      expect(aura(p, HEAT_AURAS.burn)?.stacks).toBe(3);
-      f.tick(ticks(decay * 3) + 4);
-      expect(has(p, HEAT_AURAS.burn)).toBe(false);
-    }
-  });
-
-  it('a burned player takes more from the Hearth Pulse', () => {
-    const f = pulled();
-    holdKit(f);
-    const st = f.state();
-    if (!st) throw new Error('no fight');
-    const burned = f.players[3];
-    const plain = f.players[4];
-    f.dev('/dev heart heat burn 10', burned.id);
-    st.heat = 60;
-    const ev = f.tick(ticks(T.pulseEvery * 4));
-    const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
-    const b = sum(hitsOf(ev, HEAT_NAMES.pulse, burned.id));
-    const n = sum(hitsOf(ev, HEAT_NAMES.pulse, plain.id));
-    expect(b / n).toBeGreaterThan(1.35);
-  });
-
-  it('a crystal burns out after 20 s and stops firing', () => {
-    const f = pulled();
-    holdKit(f);
-    f.dev('/dev heart heat crystals');
-    const st = f.state();
-    if (!st) throw new Error('no fight');
-    let ev = f.tick(ticks(T.crystalLife) + 2);
-    expect(st.crystals).toEqual([]);
-    expect(f.objects(HEAT_OBJECTS.crystalPrefix)).toEqual([]);
-    expect(cues(ev, HEAT_CUES.fade).length).toBe(2);
-    // Ten rays each (one every 2 s from 1.5 s on), no more.
-    expect(st.rays + st.raysBack).toBe(20);
-    ev = f.tick(ticks(4));
-    expect(cues(ev, HEAT_CUES.beam).length + cues(ev, HEAT_CUES.beamBack).length).toBe(0);
-  });
-});
-
-describe('Guardian of the Heat: the channel', () => {
-  it('lies still, brims 4 s (a raid warning), then flows 6 s, burning whoever stands in it, every 26 s', () => {
-    const f = heatFight();
-    f.dev('/dev heart heat pull');
-    f.tick(1);
-    holdKit(f);
-    const st = f.state();
-    if (!st) throw new Error('no fight');
-    st.shedTimer = 999;
-    const [obj] = f.objects(HEAT_OBJECTS.channelPrefix);
-    expect(channelOf(obj.templateId)?.state).toBe('still');
-    // One player in the channel's line, one beside it.
-    const inIt = f.players[2];
-    const beside = f.players[3];
-    f.put(inIt, HEARTH_CHANNEL.x + 1, -20);
-    f.put(beside, HEARTH_CHANNEL.x + 5, -20);
-    let ev = until(f, () => st.channel.state === 'warn', 30);
-    expect(st.clock).toBeCloseTo(T.channelFirst - T.channelWarn, 0);
-    ev.push(...f.tick(1));
-    expect(channelOf(obj.templateId)).toEqual({ state: 'warn', seconds: T.channelWarn });
-    expect(warnKeys(ev)).toContain('hudChrome.heatGuardian.warn.channel');
-    ev = until(f, () => st.channel.state === 'flow', 6);
-    expect(st.clock).toBeCloseTo(T.channelFirst, 0);
-    ev.push(...f.tick(ticks(T.channelFlow) + 2));
-    expect(cues(ev, HEAT_CUES.flow).length).toBe(1);
-    const burns = hitsOf(ev, HEAT_NAMES.channel, inIt.id);
-    expect(burns.length).toBe(Math.round(T.channelFlow / T.channelTick));
-    expect(hitsOf(ev, HEAT_NAMES.channel, beside.id)).toEqual([]);
-    expect(st.channel.state).toBe('still');
-    // The next brimming 26 s after the first.
-    until(f, () => st.channel.state === 'warn', 30);
-    expect(st.clock).toBeCloseTo(T.channelFirst - T.channelWarn + T.channelEvery, 0);
-  });
-});
-
-describe('Guardian of the Heat: heroic', () => {
-  it('raises three crystals', () => {
-    const f = pulled();
-    holdKit(f);
-    f.dev('/dev heart heat heroic');
-    expect(f.dev('/dev heart heat crystals')).toBe(true);
-    expect(f.state()?.crystals.length).toBe(3);
-    expect(f.objects(HEAT_OBJECTS.crystalPrefix).length).toBe(3);
-  });
-
-  it('Searing Knell leaves Knell Embers where each stunned player stood; never on normal', () => {
-    for (const tier of ['normal', 'heroic'] as const) {
-      const f = pulled();
-      if (tier === 'heroic') f.dev('/dev heart heat heroic');
-      const tank = f.players[0];
-      const b = f.boss();
-      // Everyone close to the guardian, then let the kit's knell land.
-      f.put(f.players[1], f.local(b).x + 3, f.local(b).z + 1);
-      f.put(tank, f.local(b).x + 2, f.local(b).z - 1);
-      const st = f.state();
-      if (!st) throw new Error('no fight');
-      const ev = until(f, () => Object.keys(st.knellAt).length > 0, 30);
-      ev.push(...f.tick(ticks(3)));
-      expect(Object.keys(st.knellAt).length).toBeGreaterThan(0);
-      const embers = f.objects(HEAT_OBJECTS.embersPrefix);
-      if (tier === 'normal') {
-        expect(embers).toEqual([]);
-        continue;
-      }
-      expect(embers.length).toBe(Object.keys(st.knellAt).length);
-      for (const e of embers) expect(embersOf(e.templateId)).toBeCloseTo(T.embersLife, 5);
-      expect(cues(ev, HEAT_CUES.embers).length).toBe(embers.length);
-    }
-  });
-
-  it('Knell Embers burn whoever stands in them every second, and burn out', () => {
-    const f = pulled();
-    holdKit(f);
-    f.dev('/dev heart heat heroic');
-    const p = f.players[3];
-    f.dev('/dev heart heat embers', p.id);
-    const ev = f.tick(ticks(3) + 1);
-    expect(hitsOf(ev, HEAT_NAMES.embers, p.id).length).toBe(3);
-    f.tick(ticks(T.embersLife));
-    expect(f.objects(HEAT_OBJECTS.embersPrefix)).toEqual([]);
-  });
-
-  it('mythic is heroic whole behind its own switch', () => {
-    expect(HEAT_DIFFICULTY.mythic).toEqual(HEAT_DIFFICULTY.heroic);
-    const f = pulled();
-    f.dev('/dev heart heat mythic');
-    expect(f.state()?.difficulty).toBe('mythic');
-    f.dev('/dev heart heat mythic off');
-    expect(f.state()?.difficulty).toBe('normal');
-  });
-});
-
-describe('Guardian of the Heat: the wipe and the fall', () => {
-  it('a wipe puts the Hearth back: no heat, bar, crystal, burn, ember or marker, the channel gone', () => {
-    const f = pulled();
-    holdKit(f);
-    f.dev('/dev heart heat heroic');
-    f.dev('/dev heart heat crystals');
-    f.dev('/dev heart heat burn 3', f.players[2].id);
-    f.dev('/dev heart heat embers', f.players[2].id);
-    f.dev('/dev heart heat heat 70');
-    f.tick(4);
-    expect(f.objects(HEAT_OBJECTS.crystalPrefix).length).toBe(3);
-    // Everyone dies: the guardian walks home.
+describe('Guardian of the Heat: the end', () => {
+  it('a wipe puts the Hearth back: every footprint, add, spirit and mark gone', () => {
+    const f = pulled(4, 31, true);
+    f.dev('/dev heart heat phase 4');
+    f.dev('/dev heart heat ember');
+    f.dev('/dev heart heat seeds');
+    f.dev('/dev heart heat zones');
+    f.tick(ticks(4));
+    expect(f.objects(HEAT_OBJECTS.spiritPrefix).length).toBe(3);
     for (const p of f.players) f.sim.ctx.handleDeath(p, f.boss());
     const ev = until(f, () => f.state() === null, 30);
     expect(f.state()).toBeNull();
-    expect(warnKeys(ev)).toContain('hudChrome.heatGuardian.say.wipe');
-    for (const prefix of Object.values(HEAT_OBJECTS)) expect(f.objects(prefix)).toEqual([]);
-    for (const p of f.players) {
-      expect(has(p, HEAT_AURAS.heat)).toBe(false);
-      expect(has(p, HEAT_AURAS.burn)).toBe(false);
+    expect(chatKeys(ev)).toContain('hudChrome.heatGuardian.say.wipe');
+    for (const [k, prefix] of Object.entries(HEAT_OBJECTS)) {
+      const left = f.objects(prefix);
+      if (k === 'wellPrefix') expect(left.map((e) => e.templateId)).toEqual([wellTemplate('calm')]);
+      else expect(left).toEqual([]);
     }
-    expect(f.boss().resource).toBe(0);
-    expect(has(f.boss(), HEAT_AURAS.stoked)).toBe(false);
-    expect(has(f.boss(), HEAT_AURAS.overheating)).toBe(false);
+    for (const id of Object.values(HEAT_MOBS)) expect(adds(f, id)).toEqual([]);
+    for (const p of f.players)
+      for (const id of [HEAT_AURAS.hunted, HEAT_AURAS.stormRain, HEAT_AURAS.kindling])
+        expect(has(p, id)).toBe(false);
+    expect(has(f.boss(), HEAT_AURAS.state)).toBe(false);
+    expect(f.boss().damageImmune).toBe(false);
+    expect(f.boss().damageFloorHp).toBeUndefined();
   });
 
-  it("its fall lights the Heat vein and the seal's quarter; the Hearth settles", () => {
+  it("its fall lights the Heat vein and the seal's quarter; the wellspring settles", () => {
     const f = pulled(2);
-    f.dev('/dev heart heat crystals');
-    f.dev('/dev heart heat burn 2', f.players[1].id);
+    f.dev('/dev heart heat phase 3');
+    f.dev('/dev heart heat ember');
+    f.tick(ticks(3));
     expect(smithHeartVeinWon(f.sim.ctx, f.inst, 'heat')).toBe(false);
     f.sim.ctx.handleDeath(f.boss(), f.players[0]);
     const ev = f.tick(3);
     expect(smithHeartVeinWon(f.sim.ctx, f.inst, 'heat')).toBe(true);
     expect(smithHeartProgress(f.sim.ctx, f.inst).mask & 8).toBe(8);
-    expect(warnKeys(ev)).toContain('hudChrome.heatGuardian.say.death');
+    expect(chatKeys(ev)).toContain('hudChrome.heatGuardian.say.death');
     expect(cues(ev, HEAT_CUES.settle).length).toBe(1);
     expect(f.state()?.finished).toBe(true);
-    for (const prefix of Object.values(HEAT_OBJECTS)) expect(f.objects(prefix)).toEqual([]);
-    expect(has(f.players[1], HEAT_AURAS.burn)).toBe(false);
-  });
-
-  it('a player who leaves the floor loses the heat marker and the burn', () => {
-    const f = pulled();
-    holdKit(f);
-    const p = f.players[3];
-    f.dev('/dev heart heat burn 2', p.id);
-    f.tick(2);
-    expect(has(p, HEAT_AURAS.heat)).toBe(true);
-    f.put(p, -150, 0);
-    f.tick(2);
-    expect(has(p, HEAT_AURAS.heat)).toBe(false);
-    expect(has(p, HEAT_AURAS.burn)).toBe(false);
+    expect(adds(f, HEAT_MOBS.cinder)).toEqual([]);
+    expect(f.objects(HEAT_OBJECTS.fallPrefix)).toEqual([]);
   });
 });
 
@@ -526,23 +828,26 @@ describe('Guardian of the Heat: determinism', () => {
   it('the same seed and the same raid fight the same fight', () => {
     const run = () => {
       const f = heatFight(6, 43);
-      f.dev('/dev heart heat pull');
       f.dev('/dev heart heat heroic');
-      // A soaker at one socket, the rest waiting.
-      f.put(f.players[2], -192, 2);
-      f.put(f.players[3], -230, 26);
-      const ev = f.tick(ticks(70));
+      f.dev('/dev heart heat pull');
+      const evs: SimEvent[] = [];
+      evs.push(...f.tick(ticks(30)));
+      setHp(f, 0.69);
+      evs.push(...f.tick(ticks(20)));
+      f.dev('/dev heart heat phase 2');
+      evs.push(...f.tick(ticks(40)));
+      f.dev('/dev heart heat phase 3');
+      evs.push(...f.tick(ticks(30)));
       const st = f.state();
       return JSON.stringify({
-        heat: Math.round((st?.heat ?? 0) * 1000),
-        sheds: st?.sheds,
-        rays: [st?.rays, st?.raysBack],
-        burns: f.players.map((p) => aura(p, HEAT_AURAS.burn)?.stacks ?? 0),
-        crystals: st?.crystals.map((c) => c.socket),
-        hits: ev
+        phase: st?.phase,
+        fists: st?.fists,
+        feeds: st?.feeds,
+        cinders: st?.cinders.map((c) => c.quarry),
+        hits: evs
           .filter((e) => e.type === 'damage')
           .map((e) => [(e as { ability?: string }).ability, (e as { amount?: number }).amount])
-          .slice(0, 400),
+          .slice(0, 600),
       });
     };
     expect(run()).toBe(run());

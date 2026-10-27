@@ -277,23 +277,12 @@ export const GREAT_HEARTH = { x: -263, z: 0, halfWidth: 18 } as const;
 /** The great altar-stone (once the giant anvil: its footprint and height),
  *  side-on to the arena's door, its crystal crown north. */
 export const GIANT_ANVIL = { x: -236, z: 0, hw: 3.2, hd: 8.5, h: 9 } as const;
-/** The Guardian of the Heat's fight channel (design doc 7.4): a seam of the
- *  first flame across the Hearth's floor, north wall to south lip, through
- *  the hall's middle, that splits the floor in two while it flows (the
- *  wellspring's channel's twin, on the fight's own clock). Instance-local. */
-export const HEARTH_CHANNEL = { x: -215, z0: -46, z1: 46 } as const;
-/** Where the Guardian of the Heat's Kindled Crystals rise from the basalt
- *  (design doc 7.4): three sockets each side of the channel, clear of the
- *  altar-stone, the crystal clusters and the walls. `side` -1 the Hearth's
- *  (west), +1 the door's (east). Instance-local. */
-export const HEARTH_CRYSTAL_SOCKETS: readonly { x: number; z: number; side: -1 | 1 }[] = [
-  { x: -190, z: 0, side: 1 },
-  { x: -196, z: -26, side: 1 },
-  { x: -196, z: 26, side: 1 },
-  { x: -249, z: 0, side: -1 },
-  { x: -232, z: -28, side: -1 },
-  { x: -232, z: 28, side: -1 },
-];
+/** The first wellspring (design doc 7.4): the pool of the first flame
+ *  before the altar-stone, where the giant Guardian of the Heat stands sunk to
+ *  its waist until heroic's last phase tears it free. `r` its burning lip
+ *  (the guardian's body radius too: melee strikes it from the shore). Its
+ *  back lip clears the altar-stone's east face. Instance-local. */
+export const HEARTH_WELL = { x: -224, z: 0, r: 8 } as const;
 
 // ---- the Heart: the separate final room ---------------------------------------------
 
@@ -363,7 +352,7 @@ export const SMITH_HEART_BOSS_SPOTS = {
   hammer: { x: HAMMER_PIT.x, z: HAMMER_PIT.z },
   breath: { x: BREATH.cornice.x, z: BREATH.cornice.z + 2 },
   quench: { x: QUENCH.lake.x, z: QUENCH.lake.z },
-  heat: { x: -210, z: 0 },
+  heat: { x: HEARTH_WELL.x, z: HEARTH_WELL.z },
   final: { x: HEART_ROOM.x, z: HEART_ROOM.z },
   /** The Hammer Council's other two (section 7.1): the Slabwright and the
    *  Seam Singer flank the Guardian a little behind it, well inside the

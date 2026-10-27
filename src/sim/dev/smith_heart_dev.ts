@@ -58,16 +58,18 @@
 //                                    (a breath, or a strike, echoed by every
 //                                    blade), dance (two blades cross)
 //   /dev heart heat                  the Guardian of the Heat's readout
-//   /dev heart heat <what>           pull (into the Hearth and pull it),
-//                                    reset (whole again, the Hearth calm),
-//                                    heroic [on|off] or mythic [on|off] (this
-//                                    run's fight), heat <n> (set the Hearth's
-//                                    heat), crystals (Kindled Crystals rise
-//                                    now; shed: through Shed Heat's bar),
-//                                    channel (the channel brims and flows),
-//                                    overheat (Hearthburst now), burn [n]
-//                                    (n stacks of Crystal Burn on me, 5 if
-//                                    none), embers (Knell Embers under me)
+//   /dev heart heat <what>           pull (onto the Hearth's shore and pull
+//                                    it), reset (whole again in its
+//                                    wellspring, the Hearth calm), heroic
+//                                    [on|off] or mythic [on|off] (this run's
+//                                    fight), phase <1-4> (jump to a phase; 4
+//                                    is heroic only), intermission (it sinks
+//                                    and the Hearth overflows now), fist
+//                                    (Basalt Fist where I stand), flare
+//                                    (Hearth Flare now), seeds (Hearthseeds
+//                                    fall), zones (a Wakefire run), ember (a
+//                                    Rolling Cinder falls), spirits (the three
+//                                    spirits come now)
 //
 // Areas: cleft, gallery, pit (or hammer), balcony, ring, ringse, ringsw,
 // breath, bridge, cornice (or breathboss), quench, ice, lake (or quenchboss),
@@ -161,7 +163,7 @@ const GUARDIAN_IDS: ReadonlySet<string> = new Set([
 const COUNCIL_IDS: ReadonlySet<string> = new Set(COUNCIL_TEMPLATE_IDS);
 
 const HELP =
-  '[dev] /dev heart enter [normal] | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|guardian|slabwright|singer|council|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | arrival | reset | council [pull|reset|heroic [on|off]|mythic [on|off]|energy <n>|wrath|weight|wake|rock|bolt|song|resonance [n]|soul <guardian|slabwright|singer>|soulpip <n>] | breath [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blow [deg|n|e|s|w]|calm|circle|inhale|chain|eye|conductor|tornado|gust [deg]] | quench [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blades|cold <n>|burst|hole|crack|breath|echo [strike]|dance] | heat [pull|reset|heroic [on|off]|mythic [on|off]|heat <n>|crystals|shed|channel|overheat|burn [n]|embers]';
+  '[dev] /dev heart enter [normal] | tp <cleft|gallery|pit|hammer|balcony|ring|ringse|ringsw|breath|bridge|cornice|breathboss|quench|ice|lake|quenchboss|heat|forge|anvil|heatboss|heart|portal|heartroom|final> | kill <hammer|guardian|slabwright|singer|council|breath|quench|heat|final|guardians|pack <id>|trash|all> | gates | portal | seal | arrival | reset | council [pull|reset|heroic [on|off]|mythic [on|off]|energy <n>|wrath|weight|wake|rock|bolt|song|resonance [n]|soul <guardian|slabwright|singer>|soulpip <n>] | breath [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blow [deg|n|e|s|w]|calm|circle|inhale|chain|eye|conductor|tornado|gust [deg]] | quench [pull|reset|heroic [on|off]|mythic [on|off]|phase2|blades|cold <n>|burst|hole|crack|breath|echo [strike]|dance] | heat [pull|reset|heroic [on|off]|mythic [on|off]|phase <1-4>|intermission|fist|flare|seeds|zones|ember|spirits]';
 
 /** Where `/dev heart breath pull` sets the player down: on the Cornice, a
  *  few strides west of the guardian. */
@@ -169,9 +171,9 @@ const BREATH_PULL_SPOT = { x: -14, z: 198 } as const;
 /** Where `/dev heart quench pull` sets the player down: on the Frozen Lake,
  *  a few strides south of the guardian. */
 const QUENCH_PULL_SPOT = { x: 198, z: -11 } as const;
-/** Where `/dev heart heat pull` sets the player down: on the Hearth's floor,
- *  a few strides east of the guardian (the door's side of the channel). */
-const HEAT_PULL_SPOT = { x: -202, z: 8 } as const;
+/** Where `/dev heart heat pull` sets the player down: on the Hearth's shore,
+ *  in front of the guardian's wellspring and inside its reach. */
+const HEAT_PULL_SPOT = { x: -214.5, z: 2 } as const;
 
 function log(ctx: SimContext, pid: number, text: string): void {
   ctx.emit({ type: 'log', text, pid });

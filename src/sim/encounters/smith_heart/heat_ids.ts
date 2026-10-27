@@ -3,28 +3,32 @@
 // its tests key on, the per-difficulty rules, the tuning, and the pure
 // template-id helpers of its encounter objects. No SimContext, no rng.
 //
-// The fight is a PROPOSAL built as a playable prototype (the designer has not
-// approved it yet), and EVERY number here is a SKETCH, unmeasured (the design
-// doc's 7.4 table says so too): anchored to the other guardians' (level 20
-// elite, ten players, a measured bot raid of about 400 to 460 damage a
-// second) and the level-20 cloth reference (about 1,135 to 1,345 health), to
-// be calibrated with the meters harness before the raid ships. Every tunable
-// lives in HEAT_TUNING and HEAT_DIFFICULTY, so a change is one number.
+// "The well of the first flame": the guardian stands half sunk in the
+// wellspring at the back of the Hearth and the raid fights on the shore in
+// front of it (inspired by Ragnaros in Firelands as a CONCEPT only: every
+// name here is our own and was IP-checked, design doc 7.4).
 //
-// What every client reads (no wire or IWorld change; all of it rides existing
-// entity fields):
-//   - the heat: the guardian's resource (0 to 100, the target frame's bar)
-//     and a quiet marker on every player in the Hearth (`value` the heat,
-//     `value2` its trend: 1 rising, -1 falling), which the HUD's heat gauge
-//     reads; the stoking (its stacks) and the overheating (from 90) are
-//     auras on the guardian;
-//   - each player's Crystal Burn: a spell-vulnerability debuff, its stacks;
-//   - the crystals: their rise spots and the crystals themselves (objects,
-//     their life in the template), every beam a `spellfx` beam from the
-//     crystal to the player it struck (or back into the guardian);
-//   - the channel: one object at its middle, its state and that state's
-//     length in the template, its half width in `scale`;
-//   - heroic's Knell Embers: objects, their radius in `scale`;
+// EVERY number here is a SKETCH, unmeasured (the design doc's 7.4 table says
+// so too): anchored to the other guardians' (level 20 elite, ten players, a
+// measured bot raid of about 400 to 460 damage a second) and the level-20
+// cloth reference (about 1,135 to 1,345 health), to be calibrated with the
+// meters harness before the raid ships. Every tunable lives in HEAT_TUNING
+// and HEAT_DIFFICULTY, so a change is one number.
+//
+// What every client reads (no wire or IWorld change; all of it rides
+// existing entity fields):
+//   - the guardian's phase and stage: an aura on it (`value` the phase,
+//     `value2` the stage, its `remaining` and `duration` the stage's clock),
+//     its bars (cast ids below), its Crushing Fist and Rooted in Stone auras;
+//   - the wellspring: a claim object whose template carries its state;
+//   - every footprint (the fist's spot, the swell lanes and their waves, the
+//     overflow's rivers, the seeds, the zones, a cinder's fall and scorch,
+//     the trails, the ice, the blazes, the stone roots): objects, a radius or
+//     a half width in `scale`, a direction in `facing`, a state and its
+//     length in the template;
+//   - the adds (the Wellspawn, the Wellkeepers, the Seedflames, the Rolling
+//     Cinders): mobs, and the marks and hunts they lay as auras;
+//   - the spirits: objects at their posts;
 //   - the moments as `spellfx` cues (HEAT_CUES).
 
 /** The guardian (template id, frozen: its death lights the Heat vein). */
@@ -32,225 +36,457 @@ export const HEAT_GUARDIAN = 'heart_heat_guardian';
 
 // ---- casts, auras, objects, cues --------------------------------------------------
 
-/** The guardian's bars. Molten Pour stays the trash kit's own line on its own
- *  clock; Searing Knell stays the trash kit's screech (the fight watches it
- *  land for heroic's embers). */
+/** The guardian's bars. */
 export const HEAT_CASTS = {
-  /** Shed Heat: it pours its heat into the crystals rising from the floor. */
-  shed: 'heart_heat_shed',
-  /** The trash kit's casts (content/smith_heart.ts SMITH_HEART_CASTS). */
-  pour: 'heart_molten_pour',
-  knell: 'heart_anvil_clang',
+  /** Basalt Fist: the crystal-and-basalt fist rises over a spot on the shore
+   *  and slams it (planted, its facing locked on the spot). */
+  fist: 'heart_heat_fist',
+  /** Heroic's last phase: it tears itself free of the wellspring. */
+  tearFree: 'heart_heat_tear_free',
 } as const;
 
-/** The auras the fight puts on players and on the guardian. */
+/** The auras the fight puts on players, adds and the guardian. */
 export const HEAT_AURAS = {
-  /** On every player in the Hearth: the heat (`value` 0 to 100, `value2`
-   *  the trend), a quiet marker the HUD's gauge reads. */
-  heat: 'heart_heat_hearth',
-  /** Crystal Burn: more spell damage taken per stack (a `spellvuln`). */
-  burn: 'heart_heat_burn',
-  /** On the guardian: one stack per stoking of the Hearth (the soft enrage). */
-  stoked: 'heart_heat_stoked',
-  /** On the guardian from 90 heat: the overheat is coming. */
-  overheating: 'heart_heat_overheating',
+  /** On the guardian: its phase (`value` 1 to 4) and stage (`value2`, see
+   *  HEAT_STAGES), the stage's clock in `remaining` and `duration`. */
+  state: 'heart_heat_state',
+  /** Hearth Flare's mark: more Fire (and other magic) damage taken. */
+  scorched: 'heart_heat_scorched',
+  /** Cinder Grip: the template's stacking burn on the tank (mob_swing.ts
+   *  `stackPoison`; its aura id is the seam's own). */
+  grip: 'stackpoison_heart_heat_guardian',
+  /** A Wellkeeper's Kindling Mark: in 5 s this player trails fire. */
+  kindling: 'heart_heat_kindling',
+  /** The mark has caught: this player leaves a Cinder Trail. */
+  trail: 'heart_heat_trailing',
+  /** A Rolling Cinder or a Seedflame hunts this player. */
+  hunted: 'heart_heat_hunted',
+  /** On a Rolling Cinder: struck back, no knockback moves it for a while. */
+  crust: 'heart_heat_crust',
+  /** On a Rolling Cinder: frozen on the Quench's ice (a stun, and more
+   *  damage taken). */
+  rimelocked: 'heart_heat_rimelocked',
+  /** The Breath's spirit's blessing: this player puts out Creeping Blaze and
+   *  takes none of it. */
+  stormRain: 'heart_heat_storm_rain',
+  /** On the guardian (heroic's last phase): its fist is empowered; drag it
+   *  across a Stone Root before it lands. */
+  crushing: 'heart_heat_crushing',
+  /** On the tank the Crushing Fist is aimed at. */
+  crushMark: 'heart_heat_crush_mark',
+  /** On the guardian: a Stone Root holds it (the Crushing Fist misses). */
+  rooted: 'heart_heat_rooted',
 } as const;
+
+/** The guardian's stages (its state aura's `value2`). */
+export const HEAT_STAGES = {
+  fight: 0,
+  sinking: 1,
+  under: 2,
+  rising: 3,
+  tearing: 4,
+} as const;
+export type HeatStage = keyof typeof HEAT_STAGES;
 
 /** The fight's object templates (a radius or a half width rides `scale`). */
 export const HEAT_OBJECTS = {
-  /** A crystal's rise spot while Shed Heat's bar runs: `<prefix><tenths>`
-   *  of warning. */
-  risePrefix: 'sh_heat_rise_',
-  /** A Kindled Crystal: `<prefix><tenths>` of its life. */
-  crystalPrefix: 'sh_heat_crystal_',
-  /** The channel across the Hearth: `<prefix><state>_<tenths>`. */
-  channelPrefix: 'sh_heat_channel_',
-  /** Heroic: Knell Embers where a stunned player stood: `<prefix><tenths>`
-   *  of their life. */
-  embersPrefix: 'sh_heat_embers_',
+  /** The first wellspring, a claim object: `<prefix><calm|over|torn>`. */
+  wellPrefix: 'sh_heat_well_',
+  /** Basalt Fist's spot: `<prefix><tenths>` of warning. */
+  fistPrefix: 'sh_heat_fist_',
+  /** A Molten Swell's lane from the fist's spot: `<prefix><warn|roll>_<tenths>`,
+   *  along `facing`, its half width in `scale`, HEAT_TUNING.laneLength long. */
+  lanePrefix: 'sh_heat_lane_',
+  /** A Molten Swell's wave rolling down its lane (it moves; along `facing`,
+   *  its half width in `scale`). */
+  wave: 'sh_heat_wave',
+  /** An overflow river from the wellspring: `<prefix><warn|flow>_<tenths>`,
+   *  along `facing`, its half width in `scale`, HEAT_TUNING.riverLength long. */
+  riverPrefix: 'sh_heat_river_',
+  /** A Hearthseed: `<prefix><tenths>` to its burst, its burst reach in `scale`. */
+  seedPrefix: 'sh_heat_seed_',
+  /** Wakefire: `<prefix><band>_<warn|burn>_<tenths>` (bands round the well). */
+  zonePrefix: 'sh_heat_zone_',
+  /** Where a Rolling Cinder will land: `<prefix><tenths>`. */
+  fallPrefix: 'sh_heat_fall_',
+  /** A cinder's burning landing spot: `<prefix><tenths>` of its life. */
+  scorchPrefix: 'sh_heat_scorch_',
+  /** A Cinder Trail patch: `<prefix><tenths>` of its life. */
+  trailPrefix: 'sh_heat_trail_',
+  /** A spirit at its post: `<prefix><quench|breath|hammer>`. */
+  spiritPrefix: 'sh_heat_spirit_',
+  /** The Quench's ice: `<prefix><tenths>` of its life. */
+  icePrefix: 'sh_heat_ice_',
+  /** Creeping Blaze (its radius in `scale`, growing). */
+  blaze: 'sh_heat_blaze',
+  /** A Stone Root: `<prefix><ready|spent>`. */
+  rootPrefix: 'sh_heat_root_',
 } as const;
 
 /** The spellfx ability ids of the fight's moments. */
 export const HEAT_CUES = {
-  /** A crystal's ray strikes a player (spellfx 'beam', crystal to player). */
-  beam: 'heart_heat_beam',
-  /** Nobody near: the ray goes back into the guardian (spellfx 'beam',
-   *  crystal to guardian). */
-  beamBack: 'heart_heat_beam_back',
-  /** The Hearth Pulse rolls out over the raid (spellfx 'nova' on the
-   *  guardian). */
-  pulse: 'heart_heat_pulse',
-  /** The overheat's blast (spellfx 'nova' on the guardian). */
-  overheat: 'heart_heat_overheat',
-  /** The guardian crosses 90 heat: the wind-up begins (spellfx 'nova'). */
-  windup: 'heart_heat_windup',
-  /** A crystal tears up out of the basalt (spellfxAt 'burst' at it). */
+  /** Basalt Fist lands (spellfxAt 'burst' at its spot). */
+  fist: 'heart_heat_fist_land',
+  /** A Molten Swell starts to roll (spellfxAt at its lane's start). */
+  swell: 'heart_heat_swell',
+  /** Hearth Flare strikes a far player (spellfx 'beam', guardian to them). */
+  flare: 'heart_heat_flare',
+  /** The guardian sinks into the wellspring (spellfx 'nova' on it). */
+  sink: 'heart_heat_sink',
+  /** It rises again (spellfx 'nova' on it). */
   rise: 'heart_heat_rise',
-  /** A crystal burns out (spellfxAt 'burst' at it). */
-  fade: 'heart_heat_fade',
-  /** The channel's fire starts to flow (spellfxAt 'burst' at its head). */
-  flow: 'heart_heat_flow',
-  /** Heroic: embers left where a stunned player stood (spellfxAt). */
-  embers: 'heart_heat_embers',
-  /** The Hearth is stoked hotter (spellfx 'nova' on the guardian). */
-  stoke: 'heart_heat_stoke',
-  /** The fight is over: the Hearth settles (spellfx 'nova' on the guardian). */
+  /** An overflow river starts to flow (spellfxAt at its head). */
+  river: 'heart_heat_river',
+  /** A Falling Cinder strikes a player (spellfx 'burst' on them). */
+  bolt: 'heart_heat_bolt',
+  /** A Wellspawn climbs out at the room's edge (spellfxAt). */
+  spawn: 'heart_heat_spawn',
+  /** A Wellspawn reaches the wellspring and feeds it (spellfxAt). */
+  feed: 'heart_heat_feed',
+  /** A Wellkeeper marks a player (spellfx 'beam', keeper to them). */
+  kindling: 'heart_heat_kindling',
+  /** A Hearthseed lands (spellfxAt). */
+  seed: 'heart_heat_seed',
+  /** A Hearthseed bursts (spellfxAt, its reach as the radius). */
+  seedBurst: 'heart_heat_seed_burst',
+  /** A Seedflame hatches from a burst (spellfxAt). */
+  hatch: 'heart_heat_hatch',
+  /** A Wakefire band ignites (spellfx 'nova' on the guardian). */
+  ignite: 'heart_heat_ignite',
+  /** A Rolling Cinder lands (spellfxAt). */
+  cinderLand: 'heart_heat_cinder_land',
+  /** A Rolling Cinder is struck back (spellfx 'burst' on it). */
+  cinderKnock: 'heart_heat_cinder_knock',
+  /** A Rolling Cinder reaches its quarry and bursts (spellfxAt). */
+  cinderBurst: 'heart_heat_cinder_burst',
+  /** A Rolling Cinder freezes on the Quench's ice (spellfxAt). */
+  freeze: 'heart_heat_freeze',
+  /** It tears free of the wellspring (spellfx 'nova' on it). */
+  tearFree: 'heart_heat_tear_free',
+  /** The three spirits arrive (spellfx 'nova' on the guardian). */
+  spirits: 'heart_heat_spirits',
+  /** The Quench's spirit lays its ice (spellfxAt). */
+  ice: 'heart_heat_ice',
+  /** The Breath's spirit blesses a player (spellfx 'beam', spirit to them). */
+  rain: 'heart_heat_rain',
+  /** A blessed player puts out a Creeping Blaze (spellfxAt). */
+  douse: 'heart_heat_douse',
+  /** A Stone Root rises (spellfxAt). */
+  root: 'heart_heat_root',
+  /** The fist is empowered (spellfx 'nova' on the guardian). */
+  crush: 'heart_heat_crush',
+  /** A Stone Root catches the guardian: the Crushing Fist misses. */
+  rooted: 'heart_heat_rooted',
+  /** The Crushing Fist lands on the tank (spellfx 'burst' on them). */
+  crushLand: 'heart_heat_crush_land',
+  /** The fight is over: the wellspring settles (spellfx 'nova'). */
   settle: 'heart_heat_settle',
 } as const;
 
-/** The damage and aura names (combat log, floating text, the buff bar;
- *  re-localized by src/ui/sim_i18n.ts through the mechanic reverse map).
- *  Every one was IP-checked (design doc 7.4). */
+/** The fight's own mob templates (content/smith_heart.ts). */
+export const HEAT_MOBS = {
+  /** Heroic's children of the flame: they walk to the wellspring. */
+  spawn: 'heart_heat_wellspawn',
+  /** Heroic's second overflow: tanked, they mark a player who trails fire. */
+  keeper: 'heart_heat_wellkeeper',
+  /** Heroic: hatched from a Hearthseed's burst, fixed on one player. */
+  seedflame: 'heart_heat_seedflame',
+  /** Phase 3: the great living fireball that hunts a player. */
+  cinder: 'heart_heat_rolling_cinder',
+} as const;
+
+/** The mobs the encounter walks itself (the mob AI leaves them be: hostile,
+ *  in combat, never moved, aggroed or swung by it; mob/locomotion.ts). */
+export const HEAT_WALKERS: ReadonlySet<string> = new Set([HEAT_MOBS.spawn, HEAT_MOBS.cinder]);
+
+/** The damage, aura and object names (combat log, floating text, the buff
+ *  bar; re-localized by src/ui/sim_i18n.ts through the mechanic reverse
+ *  map). Every coined one was IP-checked (design doc 7.4). */
 export const HEAT_NAMES = {
-  heat: "The Hearth's Heat",
-  pulse: 'Hearth Pulse',
-  overheat: 'Hearthburst',
-  overheating: 'Overheating',
-  shed: 'Shed Heat',
-  crystal: 'Kindled Crystal',
-  ray: 'Kindled Ray',
-  burn: 'Crystal Burn',
-  channel: 'Flowing Fire',
-  embers: 'Knell Embers',
-  stoked: 'Stoked Hearth',
+  well: 'The First Wellspring',
+  wellFire: 'Wellspring Fire',
+  state: 'The First Flame',
+  fist: 'Basalt Fist',
+  swell: 'Molten Swell',
+  flare: 'Hearth Flare',
+  scorched: 'Flare-Scorched',
+  grip: 'Cinder Grip',
+  river: 'Wellspring Overflow',
+  bolt: 'Falling Cinder',
+  feed: 'Fed Flame',
+  kindling: 'Kindling Mark',
+  trail: 'Cinder Trail',
+  seed: 'Hearthseed',
+  zone: 'Wakefire',
+  cinder: 'Rolling Cinder',
+  cinderLand: 'Cinder Scorch',
+  hunted: 'Hunted',
+  crust: 'Cooling Crust',
+  rimelocked: 'Rimelocked',
+  ice: 'Quench Ice',
+  stormRain: 'Storm-Rain',
+  blaze: 'Creeping Blaze',
+  root: 'Stone Root',
+  crushing: 'Crushing Fist',
+  rooted: 'Rooted in Stone',
+  spiritQuench: 'Spirit of the Quench',
+  spiritBreath: 'Spirit of the Breath',
+  spiritHammer: 'Spirit of the Hammer',
 } as const;
 
 // ---- difficulty -----------------------------------------------------------------------
 
 /** The fight's difficulty. Each tier is one HEAT_DIFFICULTY row; mythic is a
  *  dev-switched prototype (heat.ts setHeatDevTier) and, for now, the heroic
- *  row whole: a later mythic-only mechanic is one more field here and its
+ *  row whole: a later mythic-only mechanic is the `mythicRule` field and its
  *  own module, never a branch on a tier's name. */
 export type HeatDifficulty = 'normal' | 'heroic' | 'mythic';
 
 export interface HeatDifficultyRules {
   /** Every mechanic's damage, on top of the claim's own multiplier. */
   damageMult: number;
-  /** Kindled Crystals a Shed Heat raises. */
-  crystals: number;
-  /** Seconds for one stack of Crystal Burn to fade. */
-  burnDecay: number;
-  /** Searing Knell leaves Knell Embers where each stunned player stood. */
-  knellEmbers: boolean;
-  /** Hearthburst's damage (a near wipe on normal, a wipe on heroic). */
-  overheatMin: number;
-  overheatMax: number;
+  /** The overflows bring the Wellspawn (and the second, two Wellkeepers). */
+  overflowAdds: boolean;
+  /** A Hearthseed's burst hatches a Seedflame. */
+  seedHatch: boolean;
+  /** At 10 percent it tears free: phase 4, the three spirits. */
+  tearsFree: boolean;
+  /** Players a Falling Cinder volley strikes. */
+  bolts: number;
+  /** A Rolling Cinder's speed (yards a second; a player runs 7). */
+  cinderSpeed: number;
+  /** The seam for one later mythic-only mechanic (none yet). */
+  mythicRule: null;
 }
 
 export const HEAT_DIFFICULTY: Readonly<Record<HeatDifficulty, HeatDifficultyRules>> = {
   normal: {
     damageMult: 1,
-    crystals: 2,
-    burnDecay: 6,
-    knellEmbers: false,
-    overheatMin: 900,
-    overheatMax: 1000,
+    overflowAdds: false,
+    seedHatch: false,
+    tearsFree: false,
+    bolts: 2,
+    cinderSpeed: 3.2,
+    mythicRule: null,
   },
   heroic: {
     damageMult: 1.25,
-    crystals: 3,
-    burnDecay: 10,
-    knellEmbers: true,
-    overheatMin: 2400,
-    overheatMax: 2600,
+    overflowAdds: true,
+    seedHatch: true,
+    tearsFree: true,
+    bolts: 3,
+    cinderSpeed: 4.4,
+    mythicRule: null,
   },
   // Exactly heroic for now: the seam for one later mythic-only mechanic.
   mythic: {
     damageMult: 1.25,
-    crystals: 3,
-    burnDecay: 10,
-    knellEmbers: true,
-    overheatMin: 2400,
-    overheatMax: 2600,
+    overflowAdds: true,
+    seedHatch: true,
+    tearsFree: true,
+    bolts: 3,
+    cinderSpeed: 4.4,
+    mythicRule: null,
   },
+};
+
+/** The phases (1 to 4) and which of the fight's mechanics run in each. */
+export type HeatPhase = 1 | 2 | 3 | 4;
+
+export interface HeatPhaseKit {
+  fist: boolean;
+  flare: boolean;
+  seeds: boolean;
+  zones: boolean;
+  cinders: boolean;
+  /** The guardian stands in the wellspring (heroic's phase 4 walks free). */
+  sunk: boolean;
+}
+
+export const HEAT_PHASE_KIT: Readonly<Record<HeatPhase, HeatPhaseKit>> = {
+  1: { fist: true, flare: true, seeds: false, zones: false, cinders: false, sunk: true },
+  2: { fist: true, flare: false, seeds: true, zones: true, cinders: false, sunk: true },
+  3: { fist: true, flare: false, seeds: false, zones: true, cinders: true, sunk: true },
+  4: { fist: false, flare: false, seeds: false, zones: false, cinders: true, sunk: false },
 };
 
 // ---- tuning (SKETCH, unmeasured) ------------------------------------------------------
 
 export const HEAT_TUNING = {
-  // The heat.
-  heatMax: 100,
-  heatStart: 0,
-  /** Points a second, before the stoking. */
-  heatRise: 1,
-  /** The Hearth Pulse: every `pulseEvery` s, fire on everyone in the Hearth,
-   *  `pulseBase + pulsePerHeat * heat` (a tenth either way). */
-  pulseEvery: 3,
-  pulseBase: 12,
-  pulsePerHeat: 1.3,
-  pulseSpread: 0.1,
-  /** From here the overheat winds up (the gauge flashes, the body whitens,
-   *  a raid warning). */
-  windupAt: 90,
-  /** After Hearthburst the Hearth has vented to this. */
-  ventTo: 0,
-  // The stoking (the soft enrage): the heat rises this much faster every
-  // stokeEvery seconds, without end.
-  stokeEvery: 40,
-  stokeStep: 0.2,
-  // Shed Heat and the Kindled Crystals.
-  shedFirst: 14,
-  shedEvery: 30,
-  shedCast: 2.5,
-  crystalLife: 20,
-  /** Its first ray this long after it rises, then every rayEvery. */
-  rayFirst: 1.5,
-  rayEvery: 2,
-  /** A ray strikes the nearest living player within this; nobody that near,
-   *  it goes back into the guardian. */
-  rayRange: 10,
-  /** Heat a struck ray takes off the guardian, and one sent back adds. */
-  rayCool: 3,
-  rayBack: 3,
-  rayMin: 50,
-  rayMax: 65,
-  /** A crystal stands this wide (its body; nothing collides). */
-  crystalR: 1.6,
-  // Crystal Burn.
-  burnPct: 0.06,
-  burnMax: 20,
-  // The channel.
-  channelFirst: 20,
-  channelEvery: 26,
-  channelWarn: 4,
-  channelFlow: 6,
-  channelHalf: 3,
-  channelTick: 0.5,
-  channelMin: 90,
-  channelMax: 110,
-  // Heroic: Knell Embers.
-  embersR: 2.5,
-  embersLife: 25,
-  embersTick: 1,
-  embersMin: 70,
-  embersMax: 85,
-  /** At most this many embers stand; past it the oldest goes. */
-  embersCap: 30,
-  // Searing Knell: the trash kit's stun (its record holds the numbers; the
-  // fight only reads its length to know a fresh one).
-  knellStun: 2,
+  // The phases (fractions of its health).
+  overflowOneAt: 0.7,
+  overflowTwoAt: 0.4,
+  tearFreeAt: 0.1,
+  // The overflows.
+  sinkSeconds: 2.5,
+  riseSeconds: 3,
+  /** Normal: the Hearth overflows this long. */
+  overflowSeconds: 20,
+  /** Heroic: until the adds are gone, at least this long, at most overflowMax. */
+  overflowMin: 8,
+  overflowMax: 45,
+  // The wellspring: whoever stands in it burns.
+  wellTick: 0.5,
+  wellMin: 120,
+  wellMax: 140,
+  // Basalt Fist and its Molten Swells.
+  fistFirst: 8,
+  fistEvery: 22,
+  fistCast: 3,
+  fistR: 6,
+  fistMin: 2500,
+  fistMax: 2700,
+  /** Three lanes from the spot: away from the wellspring and to either side. */
+  laneLength: 32,
+  laneHalf: 2.5,
+  /** The waves start rolling this long after the fist lands. */
+  waveDelay: 0.6,
+  waveSpeed: 10,
+  /** A wave's wall is this deep along its lane. */
+  waveDepth: 2.5,
+  waveMin: 380,
+  waveMax: 440,
+  // Hearth Flare (phase 1): everyone farther than flareReach from the
+  // wellspring's middle (12 yd past its lip, the giant's reach) is struck.
+  flareEvery: 4,
+  flareReach: 20,
+  flareMin: 260,
+  flareMax: 300,
+  scorchedPct: 0.25,
+  scorchedSeconds: 8,
+  // Cinder Grip (the template's stackPoison): per stack a second.
+  gripPerTick: 18,
+  gripSeconds: 15,
+  gripMaxStacks: 10,
+  // The overflow's rivers and Falling Cinders.
+  riverEvery: 4.5,
+  riverFirst: 1,
+  riverCount: 3,
+  riverWarn: 2.5,
+  riverFlow: 3,
+  riverHalf: 3,
+  riverLength: 60,
+  riverTick: 0.5,
+  riverMin: 180,
+  riverMax: 220,
+  /** The rivers' bearings: this many, evenly from riverFrom to riverTo
+   *  degrees (sim facing: 0 is +z, 90 east toward the door). */
+  riverBearings: 9,
+  riverFrom: 15,
+  riverTo: 165,
+  boltEvery: 3,
+  boltFirst: 2,
+  boltMin: 140,
+  boltMax: 170,
+  // Heroic: the Wellspawn.
+  spawnSpeed: 3,
+  /** Their speed factor at full health, falling to spawnMinFactor at
+   *  spawnSlowAt of their health and below ("fully slowed"). */
+  spawnMinFactor: 0.15,
+  spawnSlowAt: 0.5,
+  /** One reaching this far from the wellspring's middle feeds it (a yard and
+   *  a half past its lip). */
+  spawnReach: 9.5,
+  feedHealPct: 0.03,
+  feedMin: 380,
+  feedMax: 420,
+  // Heroic's second overflow: the Wellkeepers and their Kindling Mark.
+  markFirst: 4,
+  markEvery: 10,
+  markSeconds: 5,
+  trailSeconds: 8,
+  trailEvery: 0.6,
+  trailR: 2.5,
+  trailLife: 15,
+  trailCap: 40,
+  trailTick: 1,
+  trailMin: 80,
+  trailMax: 95,
+  /** A Wellspawn standing in a trail heals this share of its health a
+   *  second. */
+  trailHealPct: 0.08,
+  // Phase 2: Hearthseeds.
+  seedFirst: 6,
+  seedEvery: 30,
+  seedLife: 10,
+  seedCap: 10,
+  /** A burst's reach and its damage at the seed (falling off with the
+   *  square of the distance to nothing at the reach). */
+  seedReach: 22,
+  seedMax: 520,
+  // Wakefire (phases 2 and 3).
+  zoneFirst: 16,
+  zoneEvery: 34,
+  zoneWarn: 4,
+  /** The next band begins its warning this long after the last began. */
+  zoneStep: 2.5,
+  zoneBurn: 2,
+  zoneTick: 0.5,
+  zoneMin: 900,
+  zoneMax: 1000,
+  zoneBurnMin: 220,
+  zoneBurnMax: 260,
+  // Phase 3 (and 4): the Rolling Cinders.
+  cinderFirst: 8,
+  cinderEvery: 45,
+  cinderFallWarn: 2,
+  cinderLandR: 4,
+  cinderLandMin: 300,
+  cinderLandMax: 340,
+  scorchLife: 8,
+  scorchTick: 0.5,
+  scorchMin: 110,
+  scorchMax: 130,
+  /** It reaches its quarry this near: the quarry dies, those close burn. */
+  cinderContact: 2.2,
+  cinderKill: 99999,
+  cinderSplashR: 3,
+  cinderSplashMin: 600,
+  cinderSplashMax: 700,
+  /** A hit pushes it this far back, then Cooling Crust holds it. */
+  cinderKnock: 6,
+  crustSeconds: 5,
+  cinderCap: 6,
+  /** Its quarry gone, it picks another after this pause. */
+  cinderRetarget: 1.5,
+  /** Rimelocked: frozen this long, taking (1 + this) times the damage. */
+  frozenSeconds: 8,
+  frozenVuln: 2,
+  // Heroic's phase 4: the tearing free and the three spirits.
+  tearFreeCast: 4,
+  iceFirst: 4,
+  iceEvery: 15,
+  iceCount: 2,
+  iceR: 3.5,
+  iceLife: 40,
+  iceCap: 6,
+  rainFirst: 3,
+  rainEvery: 20,
+  rainCount: 3,
+  rainSeconds: 20,
+  blazeFirst: 6,
+  blazeEvery: 6,
+  blazeStartR: 2,
+  blazeGrow: 0.35,
+  blazeMaxR: 7,
+  blazeCap: 8,
+  blazeTick: 0.5,
+  blazeMin: 110,
+  blazeMax: 130,
+  rootCount: 4,
+  rootR: 3.5,
+  rootRegrow: 10,
+  crushFirst: 12,
+  crushEvery: 50,
+  crushSeconds: 5,
+  rootedSeconds: 4,
+  crushMin: 9000,
+  crushMax: 9500,
   /** Seconds of plain melee after a bar lands before the next begins. */
   barGap: 1.2,
 } as const;
 
 // ---- pure helpers ---------------------------------------------------------------------
-
-/** The heat's rise multiplier with `stacks` of the stoking. */
-export function stokeMult(stacks: number): number {
-  return 1 + HEAT_TUNING.stokeStep * Math.max(0, stacks);
-}
-
-/** The Hearth Pulse's middle damage at `heat` (before the roll's spread and
- *  the difficulty's multiplier). */
-export function pulseDamage(heat: number): number {
-  const T = HEAT_TUNING;
-  return T.pulseBase + T.pulsePerHeat * Math.max(0, Math.min(T.heatMax, heat));
-}
-
-/** Crystal Burn's spell damage taken at `stacks` (a fraction). */
-export function burnAmp(stacks: number): number {
-  return HEAT_TUNING.burnPct * Math.max(0, Math.min(HEAT_TUNING.burnMax, stacks));
-}
 
 /** A small integer hash (no rng in a pick). */
 export function heatHash(a: number, b: number): number {
@@ -260,52 +496,141 @@ export function heatHash(a: number, b: number): number {
   return (h ^ (h >>> 16)) >>> 0;
 }
 
+/** The health share the guardian cannot be pushed past in `phase` (the next
+ *  threshold, so an overflow is never skipped), or null when none. */
+export function phaseFloor(phase: HeatPhase, tearsFree: boolean): number | null {
+  const T = HEAT_TUNING;
+  if (phase === 1) return T.overflowOneAt;
+  if (phase === 2) return T.overflowTwoAt;
+  if (phase === 3) return tearsFree ? T.tearFreeAt : null;
+  return null;
+}
+
+/** A Wellspawn's speed factor at `hpFrac` of its health: whole at full,
+ *  falling to the floor at spawnSlowAt and below. */
+export function spawnPace(hpFrac: number): number {
+  const T = HEAT_TUNING;
+  const k = Math.max(0, Math.min(1, (hpFrac - T.spawnSlowAt) / (1 - T.spawnSlowAt)));
+  return T.spawnMinFactor + (1 - T.spawnMinFactor) * k;
+}
+
+/** A Hearthseed's burst at `d` yards (before the roll and the multiplier). */
+export function seedFalloff(d: number): number {
+  const T = HEAT_TUNING;
+  if (d >= T.seedReach) return 0;
+  const k = 1 - Math.max(0, d) / T.seedReach;
+  return T.seedMax * k * k;
+}
+
+/** Wakefire's three bands round the wellspring's middle: [inner, outer)
+ *  yards. 0 near the guardian, 1 the middle, 2 the back. */
+export const ZONE_BANDS: readonly (readonly [number, number])[] = [
+  [8, 19],
+  [19, 31],
+  [31, 70],
+];
+
+/** The overflow rivers' bearing `i` (sim facing, radians). */
+export function riverBearing(i: number): number {
+  const T = HEAT_TUNING;
+  const n = T.riverBearings;
+  const deg = T.riverFrom + ((T.riverTo - T.riverFrom) * i) / Math.max(1, n - 1);
+  return (deg * Math.PI) / 180;
+}
+
 // ---- object templates (pure) ----------------------------------------------------------
 
 const tenthsOf = (seconds: number): number => Math.max(0, Math.round(seconds * 10));
 
-function timedOf(prefix: string, templateId: string): number | null {
+/** A timed object's template (`<prefix><tenths>`). */
+export function heatTimed(prefix: string, seconds: number): string {
+  return `${prefix}${tenthsOf(seconds)}`;
+}
+
+/** A timed object's seconds, or null when the template is not one. */
+export function heatTimedOf(prefix: string, templateId: string): number | null {
   if (!templateId.startsWith(prefix)) return null;
   const t = Number(templateId.slice(prefix.length));
   return Number.isInteger(t) && t >= 0 ? t / 10 : null;
 }
 
-/** A rise spot's template: its warning's length. */
-export function riseTemplate(seconds: number): string {
-  return `${HEAT_OBJECTS.risePrefix}${tenthsOf(seconds)}`;
+/** The wellspring's states: calm (the guardian in it), overflowing (an
+ *  overflow), torn (heroic's phase 4: the guardian free of it). */
+export type HeatWellState = 'calm' | 'over' | 'torn';
+export function wellTemplate(state: HeatWellState): string {
+  return `${HEAT_OBJECTS.wellPrefix}${state}`;
 }
-export function riseOf(templateId: string): number | null {
-  return timedOf(HEAT_OBJECTS.risePrefix, templateId);
-}
-
-/** A crystal's template: its life. */
-export function crystalTemplate(seconds: number): string {
-  return `${HEAT_OBJECTS.crystalPrefix}${tenthsOf(seconds)}`;
-}
-export function crystalOf(templateId: string): number | null {
-  return timedOf(HEAT_OBJECTS.crystalPrefix, templateId);
+export function wellOf(templateId: string): HeatWellState | null {
+  if (!templateId.startsWith(HEAT_OBJECTS.wellPrefix)) return null;
+  const s = templateId.slice(HEAT_OBJECTS.wellPrefix.length);
+  return s === 'calm' || s === 'over' || s === 'torn' ? s : null;
 }
 
-/** Knell Embers' template: their life. */
-export function embersTemplate(seconds: number): string {
-  return `${HEAT_OBJECTS.embersPrefix}${tenthsOf(seconds)}`;
+/** A two-state timed object (`<prefix><state>_<tenths>`). */
+function stateTemplate(prefix: string, state: string, seconds: number): string {
+  return `${prefix}${state}_${tenthsOf(seconds)}`;
 }
-export function embersOf(templateId: string): number | null {
-  return timedOf(HEAT_OBJECTS.embersPrefix, templateId);
-}
-
-/** The channel's states: still (a dull seam), brimming (the warning), flowing
- *  (it burns, the floor split in two). */
-export type HeatChannelState = 'still' | 'warn' | 'flow';
-
-export function channelTemplate(state: HeatChannelState, seconds: number): string {
-  return `${HEAT_OBJECTS.channelPrefix}${state}_${tenthsOf(seconds)}`;
-}
-
-export function channelOf(templateId: string): { state: HeatChannelState; seconds: number } | null {
-  if (!templateId.startsWith(HEAT_OBJECTS.channelPrefix)) return null;
-  const [state, t] = templateId.slice(HEAT_OBJECTS.channelPrefix.length).split('_');
-  if (state !== 'still' && state !== 'warn' && state !== 'flow') return null;
+function stateOf<S extends string>(
+  prefix: string,
+  states: readonly S[],
+  templateId: string,
+): { state: S; seconds: number } | null {
+  if (!templateId.startsWith(prefix)) return null;
+  const [state, t] = templateId.slice(prefix.length).split('_');
+  if (!(states as readonly string[]).includes(state)) return null;
   const n = Number(t);
-  return Number.isInteger(n) && n >= 0 ? { state, seconds: n / 10 } : null;
+  return Number.isInteger(n) && n >= 0 ? { state: state as S, seconds: n / 10 } : null;
+}
+
+export type HeatLaneState = 'warn' | 'roll';
+export function swellLaneTemplate(state: HeatLaneState, seconds: number): string {
+  return stateTemplate(HEAT_OBJECTS.lanePrefix, state, seconds);
+}
+export function swellLaneOf(templateId: string): { state: HeatLaneState; seconds: number } | null {
+  return stateOf(HEAT_OBJECTS.lanePrefix, ['warn', 'roll'] as const, templateId);
+}
+
+export type HeatRiverState = 'warn' | 'flow';
+export function riverTemplate(state: HeatRiverState, seconds: number): string {
+  return stateTemplate(HEAT_OBJECTS.riverPrefix, state, seconds);
+}
+export function riverOf(templateId: string): { state: HeatRiverState; seconds: number } | null {
+  return stateOf(HEAT_OBJECTS.riverPrefix, ['warn', 'flow'] as const, templateId);
+}
+
+export type HeatZoneState = 'warn' | 'burn';
+export function zoneTemplate(band: number, state: HeatZoneState, seconds: number): string {
+  return `${HEAT_OBJECTS.zonePrefix}${band}_${state}_${tenthsOf(seconds)}`;
+}
+export function zoneOf(
+  templateId: string,
+): { band: number; state: HeatZoneState; seconds: number } | null {
+  if (!templateId.startsWith(HEAT_OBJECTS.zonePrefix)) return null;
+  const [b, state, t] = templateId.slice(HEAT_OBJECTS.zonePrefix.length).split('_');
+  const band = Number(b);
+  const n = Number(t);
+  if (!Number.isInteger(band) || band < 0 || band >= ZONE_BANDS.length) return null;
+  if (state !== 'warn' && state !== 'burn') return null;
+  return Number.isInteger(n) && n >= 0 ? { band, state, seconds: n / 10 } : null;
+}
+
+export type HeatSpirit = 'quench' | 'breath' | 'hammer';
+export const HEAT_SPIRITS: readonly HeatSpirit[] = ['quench', 'breath', 'hammer'];
+export function spiritTemplate(spirit: HeatSpirit): string {
+  return `${HEAT_OBJECTS.spiritPrefix}${spirit}`;
+}
+export function spiritOf(templateId: string): HeatSpirit | null {
+  if (!templateId.startsWith(HEAT_OBJECTS.spiritPrefix)) return null;
+  const s = templateId.slice(HEAT_OBJECTS.spiritPrefix.length);
+  return (HEAT_SPIRITS as readonly string[]).includes(s) ? (s as HeatSpirit) : null;
+}
+
+export type HeatRootState = 'ready' | 'spent';
+export function rootTemplate(state: HeatRootState): string {
+  return `${HEAT_OBJECTS.rootPrefix}${state}`;
+}
+export function rootOf(templateId: string): HeatRootState | null {
+  if (!templateId.startsWith(HEAT_OBJECTS.rootPrefix)) return null;
+  const s = templateId.slice(HEAT_OBJECTS.rootPrefix.length);
+  return s === 'ready' || s === 'spent' ? s : null;
 }
