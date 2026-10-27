@@ -45,7 +45,10 @@ describe('HUD_FRAME_SPECS', () => {
       'petFrame',
       'petBar',
       'targetOfTarget',
+      // The detachable resource bar, live only while Detach Resource Bar is on.
+      'playerResource',
       'stanceBar',
+      'shardpikeBar',
       'xpBar',
       'buffBar',
       'debuffBar',
@@ -63,6 +66,7 @@ describe('HUD_FRAME_SPECS', () => {
       'delveTracker',
       'riftTracker',
       'gatheringGoalTracker',
+      'dungeonTracker',
       'swingBarOffhand',
       // The six aura tracks, appended by generating one spec per descriptor.
       'auraTrack_defensives',
@@ -71,6 +75,8 @@ describe('HUD_FRAME_SPECS', () => {
       'auraTrack_utility',
       'auraTrack_friendly',
       'auraTrack_shields',
+      // The King of the Hill bar, now static markup.
+      'hillBar',
       // The mouseover tooltip's movable seat, appended after the tracks.
       'unitTooltip',
     ]);
@@ -93,7 +99,9 @@ describe('HUD_FRAME_SPECS', () => {
       'pet-frame',
       'petbar',
       'totarget-frame',
+      'pf-resource-frame',
       'stancebar',
+      'shardpike-bar',
       'xpbar',
       'buff-bar',
       'debuff-bar',
@@ -111,6 +119,7 @@ describe('HUD_FRAME_SPECS', () => {
       'delve-tracker',
       'rift-tracker',
       'gathering-goal-tracker',
+      'dungeon-tracker',
       'swingbar-offhand',
       'aura-track-defensives',
       'aura-track-self',
@@ -118,6 +127,7 @@ describe('HUD_FRAME_SPECS', () => {
       'aura-track-utility',
       'aura-track-friendly',
       'aura-track-shields',
+      'hill-bar',
       'unit-tooltip-anchor',
     ]);
     // A duplicated storage key would make two frames overwrite each other's
@@ -161,7 +171,9 @@ describe('HUD_FRAME_SPECS', () => {
       'woc_hud_frame_pet',
       'woc_hud_frame_petbar',
       'woc_hud_frame_target_of_target',
+      'woc_hud_frame_player_resource',
       'woc_hud_frame_stancebar',
+      'woc_hud_frame_shardpike_bar',
       'woc_hud_frame_xpbar',
       'woc_hud_frame_buffbar',
       'woc_hud_frame_debuffbar',
@@ -182,6 +194,7 @@ describe('HUD_FRAME_SPECS', () => {
       'woc_hud_frame_delve_tracker',
       'woc_hud_frame_rift_tracker',
       'woc_hud_frame_gathering_goal_tracker',
+      'woc_hud_frame_dungeon_tracker',
       'woc_hud_frame_swingbar_offhand',
       'woc_hud_frame_track_defensives',
       'woc_hud_frame_track_self',
@@ -189,6 +202,7 @@ describe('HUD_FRAME_SPECS', () => {
       'woc_hud_frame_track_utility',
       'woc_hud_frame_track_friendly',
       'woc_hud_frame_track_shields',
+      'woc_hud_frame_hill_bar',
       'woc_hud_frame_unit_tooltip',
     ]);
     expect(HUD_FRAME_SPECS.find((s) => s.id === 'targetOfTarget')?.legacyStorageKeys).toEqual([
@@ -218,7 +232,9 @@ describe('HUD_FRAME_SPECS', () => {
       'petFrame',
       'petBar',
       'targetOfTarget',
+      'playerResource',
       'stanceBar',
+      'shardpikeBar',
       'xpBar',
       'buffBar',
       'debuffBar',
@@ -231,6 +247,7 @@ describe('HUD_FRAME_SPECS', () => {
       'delveTracker',
       'riftTracker',
       'gatheringGoalTracker',
+      'dungeonTracker',
     ]);
   });
 
@@ -298,6 +315,9 @@ describe('HUD_FRAME_SPECS', () => {
     const declared = HUD_FRAME_SPECS.filter((s) => s.stockHome).map((s) => [s.id, s.stockHome]);
     expect(declared).toEqual([
       ['targetOfTarget', { parentId: 'target-frame', slot: 'last' }],
+      // The resource bar's stock slot is the end of the player frame's bars
+      // column; its remembered sibling would be nothing (it is the last child).
+      ['playerResource', { parentId: 'pf-bars', slot: 'last' }],
       ['buffBar', { parentId: 'aura-stack', slot: 'first' }],
       ['debuffBar', { parentId: 'aura-stack', slot: 'last' }],
     ]);

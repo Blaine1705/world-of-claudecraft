@@ -38,6 +38,7 @@
 
 import { shouldFireConsumeTickSfx } from '../consume_sfx';
 import { updateDawnBattleStandards } from '../content/faction_rewards';
+import { TRINKET_AURA } from '../content/trinkets';
 import { pctValue, recalcPlayerStats } from '../entity';
 import { manaRegenPer2s } from '../mana_regen';
 import { CHEATER_MARK_AURA_ID } from '../moderation';
@@ -47,6 +48,7 @@ import type { DamageResolution, SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
 import { applyWellFedOnMealComplete } from '../wellfed';
 import { tickAfflictionAura, tickHexOfViolence, tickMaledictGaze } from './affliction';
+import { releaseStoneStatue, tickGutteredGlare } from './balgath_trinkets';
 import { regenParkedCatEnergy } from './cat_form_energy';
 import { isStunned } from './cc';
 import {
@@ -61,6 +63,7 @@ import { sporemenderHealingDoneMult } from './druid_sporemender';
 import { applyGreaterInvisibilityAftereffect } from './greater_invisibility';
 import { consumeHealAbsorb } from './heal';
 import { isColdsightInternalMarkerAuraId } from './hunter_coldsight_read';
+import { hunterFocusRegenMult } from './hunter_fieldcraft';
 import {
   detonateOssuaryMark,
   OSSUARY_MARK_ABILITY_ID,
@@ -147,8 +150,9 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
     for (const a of p.auras) if (a.kind === 'buff_energyregen') regen *= 1 + a.value;
     p.resource = Math.min(p.maxResource, p.resource + Math.round(regen));
   } else if (p.resourceType === 'focus') {
-    // Hunter Focus returns at 5 per second on the classic two-second tick.
-    p.resource = Math.min(p.maxResource, p.resource + 10);
+    // Hunter Focus returns at 5 per second on the classic two-second tick
+    // (doubled by a petless Bloodtrail Assault, combat/hunter_fieldcraft.ts).
+    p.resource = Math.min(p.maxResource, p.resource + 10 * hunterFocusRegenMult(ctx, p));
   } else if (p.resourceType === 'rage' && !p.inCombat) {
     p.resource = Math.max(0, p.resource - 2);
   }
@@ -223,6 +227,9 @@ export function updateTimers(p: Entity): void {
   p.gcdRemaining = Math.max(0, p.gcdRemaining - DT);
   p.potionCdRemaining = Math.max(0, p.potionCdRemaining - DT);
   p.firebottleCdRemaining = Math.max(0, p.firebottleCdRemaining - DT);
+  // The PvP Resurrect wait (pvp/pvp_resurrect.ts) runs on a corpse, and this lap
+  // visits the dead too.
+  if (p.pvpResurrectWait) p.pvpResurrectWait = Math.max(0, p.pvpResurrectWait - DT);
   p.fiveSecondRule += DT;
   p.combatTimer += DT;
   for (const [k, v] of p.cooldowns) {
@@ -354,6 +361,10 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           tickTemporalHourglassHealing(ctx, e, a);
         } else if (a.id === 'sacrilegious_march' && a.kind === 'buff_speed') {
           tickSacrilegiousMarch(ctx, e, a);
+        } else if (a.id === TRINKET_AURA.gutteredGlare) {
+          tickGutteredGlare(ctx, e, a);
+        } else if (a.id === TRINKET_AURA.stoneStatue) {
+          releaseStoneStatue(ctx, e, a);
         } else if (
           (a.kind === 'dot' || a.kind === 'affliction_eye' || a.kind === 'affliction_violence') &&
           !periodicHarmStands(ctx, ctx.entities.get(a.sourceId) ?? null, e)

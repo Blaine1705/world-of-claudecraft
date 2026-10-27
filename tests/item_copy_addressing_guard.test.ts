@@ -22,6 +22,7 @@
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { bagSocketPayload } from '../src/net/material_storage_command';
 import { perfectingCommand } from '../src/net/perfecting_command';
 import type { PerfectingCopyReads } from '../src/sim/professions/perfecting_copy';
 
@@ -41,6 +42,8 @@ const ADDRESSED_COMMANDS: ReadonlyArray<{
   cmd: string;
   field: string;
   why?: string;
+  /** The bag socket twins spread their shared exact-copy payload helper. */
+  bagSocketSender?: true;
   /** Repo-relative module holding the command's dispatch arm, for commands
    *  whose game.ts case is a delegating label group (the vault_wire.ts /
    *  bank_wire.ts seam). Defaults to server/game.ts. */
@@ -60,13 +63,14 @@ const ADDRESSED_COMMANDS: ReadonlyArray<{
   { cmd: 'sell', field: 'slot' },
   { cmd: 'use', field: 'slot' },
   { cmd: 'pet_feed', field: 'slot' },
-  { cmd: 'equip_bag', field: 'slot' },
+  { cmd: 'equip_bag', field: 'slot', bagSocketSender: true },
   // The bank-aimed twin of equip_bag (Bank Storage phase 07): the bags-side
   // socket click always names the exact carried copy. Its parse arm lives in
   // the delegated dispatch module, not game.ts's label group.
   {
     cmd: 'bank_socket_bag',
     field: 'slot',
+    bagSocketSender: true,
     dispatchIn: 'server/bank_wire.ts',
     dispatchVia: { module: 'server/bank_storage_command.ts', symbol: 'dispatchBankStorageCommand' },
   },
@@ -217,6 +221,9 @@ const MATERIAL_STACK_WIRE_SRC = stripComments(
   readFileSync(new URL('../server/material_stack_wire.ts', import.meta.url), 'utf8'),
 );
 const SERVER_STRIPPED = stripComments(SERVER);
+const BAG_SOCKET_SOURCE = stripComments(
+  readFileSync(new URL('../src/net/material_storage_command.ts', import.meta.url), 'utf8'),
+);
 
 /** The body of a top-level `export function <name>(` declaration, bounded to
  *  the next top-level `export function` (or end of file if it is the last one). */
@@ -254,17 +261,43 @@ function senderWindowsFor(cmd: string): string[] {
   return windows;
 }
 
+/** Follow the same exact-body discipline as the Perfecting sender below.
+ * A helper name in a comment, a dropped argument, or a slot override after the
+ * spread must not count as carrying the selected copy. */
+function assertBagSocketSender(cmd: string, body: string, online: string, helper: string): void {
+  const source = stripComments(online).replace(/\s+/g, ' ');
+  const imported = source.match(/import \{([^{}]+)\} from '\.\/material_storage_command';/);
+  expect(imported?.[1].split(',').map((name) => name.trim())).toContain('bagSocketPayload');
+  expect(stripComments(body).replace(/\s+/g, ' ').trim()).toBe(
+    `cmd: '${cmd}', ...bagSocketPayload(itemId, socket, target) });`,
+  );
+  const helperBody = exportedFnBody(stripComments(helper), 'bagSocketPayload');
+  const returnAt = helperBody.indexOf('return ');
+  expect(returnAt, 'bagSocketPayload must return its selected-copy shape').toBeGreaterThan(-1);
+  expect(helperBody.slice(returnAt).replace(/\s+/g, ' ').trim()).toBe(
+    'return target === undefined ? { item: itemId, socket } ' +
+      ': { item: itemId, socket, slot: target.slotIndex }; }',
+  );
+}
+
 describe('every item command can name the copy it acts on', () => {
-  it.each(ADDRESSED_COMMANDS)('$cmd carries a $field selection on the wire', ({ cmd, field }) => {
-    const windows = senderWindowsFor(cmd);
-    expect(windows.length, `no ClientWorld sender found for ${cmd}`).toBeGreaterThan(0);
-    // PER OCCURRENCE, never the concatenation: each window is bounded by its
-    // owning method, so every METHOD that sends this token must carry the
-    // field, and deleting it from one of two sender methods reds here.
-    for (const [i, body] of windows.entries()) {
-      expect(body, `${cmd} occurrence ${i + 1} must be able to send a ${field}`).toContain(field);
-    }
-  });
+  it.each(ADDRESSED_COMMANDS)(
+    '$cmd carries a $field selection on the wire',
+    ({ cmd, field, bagSocketSender }) => {
+      const windows = senderWindowsFor(cmd);
+      expect(windows.length, `no ClientWorld sender found for ${cmd}`).toBeGreaterThan(0);
+      // PER OCCURRENCE, never the concatenation: each window is bounded by its
+      // owning method, so every METHOD that sends this token must carry the
+      // field, and deleting it from one of two sender methods reds here.
+      for (const [i, body] of windows.entries()) {
+        if (bagSocketSender) assertBagSocketSender(cmd, body, ONLINE, BAG_SOCKET_SOURCE);
+        else
+          expect(body, `${cmd} occurrence ${i + 1} must be able to send a ${field}`).toContain(
+            field,
+          );
+      }
+    },
+  );
 
   it.each(ADDRESSED_COMMANDS)(
     '$cmd is parsed and forwarded server-side',
@@ -471,6 +504,46 @@ describe('every item command can name the copy it acts on', () => {
         'sim.combineMaterialStacks(intent.itemId, intent.target, pid); } }',
     );
   });
+
+  it('the actual bag socket helper preserves omission and the selected index, including zero', () => {
+    expect(bagSocketPayload('linen_bag')).toStrictEqual({ item: 'linen_bag', socket: undefined });
+    expect(bagSocketPayload('linen_bag', 2, { slotIndex: 4 })).toStrictEqual({
+      item: 'linen_bag',
+      socket: 2,
+      slot: 4,
+    });
+    expect(bagSocketPayload('silk_bag', 0, { slotIndex: 0 })).toStrictEqual({
+      item: 'silk_bag',
+      socket: 0,
+      slot: 0,
+    });
+  });
+
+  it.each(['equip_bag', 'bank_socket_bag'])(
+    '%s helper guard rejects losing or replacing the exact-copy selection',
+    (cmd) => {
+      const body = senderWindowsFor(cmd)[0];
+      assertBagSocketSender(cmd, body, ONLINE, BAG_SOCKET_SOURCE);
+      for (const wrongBody of [
+        body.replace('itemId, socket, target', 'itemId, socket'),
+        body.replace('itemId, socket, target', 'itemId, socket, undefined'),
+        body.replace(') });', '), slot: 0 });'),
+      ]) {
+        expect(() => assertBagSocketSender(cmd, wrongBody, ONLINE, BAG_SOCKET_SOURCE)).toThrow();
+      }
+      for (const wrongHelper of [
+        BAG_SOCKET_SOURCE.replace(', slot: target.slotIndex', ''),
+        BAG_SOCKET_SOURCE.replace('slot: target.slotIndex', 'slot: 0'),
+      ]) {
+        expect(() => assertBagSocketSender(cmd, body, ONLINE, wrongHelper)).toThrow();
+      }
+      const wrongImport = ONLINE.replace(
+        '{ bagSocketPayload, materialStorageTransferPayload }',
+        '{ materialStorageTransferPayload }',
+      );
+      expect(() => assertBagSocketSender(cmd, body, wrongImport, BAG_SOCKET_SOURCE)).toThrow();
+    },
+  );
 
   it('the actual Perfecting sender helper emits both copy-addressed shapes and preserves a capture', () => {
     const itemId = 'wyrmfall_pendant';

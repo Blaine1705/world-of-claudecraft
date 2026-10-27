@@ -16,10 +16,19 @@ import {
 } from '../src/sim/weekly_rewards';
 
 // Explicit item expectations keep the regression independent of effect classification.
-const healing = ['menders_hourglass', 'wellspring_seed', 'last_flame_lantern'];
-const physical = ['paired_talons', 'hunters_tally', 'forgefathers_temper', 'molten_fletching'];
-const casting = ['stormjar', 'echoing_lens', 'kindling_orb'];
+const healing = ['menders_hourglass', 'wellspring_seed', 'last_flame_lantern', 'muster_grapnel'];
+const physical = [
+  'paired_talons',
+  'hunters_tally',
+  'forgefathers_temper',
+  'molten_fletching',
+  'fanglords_whistle',
+  'quenchwater_flask',
+  'muster_standard',
+];
+const casting = ['stormjar', 'echoing_lens', 'kindling_orb', 'gorgebloom_seedpod', 'guttered_eye'];
 const utility = [
+  'knucklebone_of_balgath',
   'bastion_sigil',
   'mooring_stone',
   'gamblers_die',
@@ -28,6 +37,10 @@ const utility = [
   'medallion_of_defiance',
   'duelists_brand',
   'heart_of_the_crucible',
+  'gaolers_iron_key',
+  'foremans_last_link',
+  'barrowstone_heart',
+  'phial_of_the_tithe',
 ];
 const casterUtility = [
   'bastion_sigil',
@@ -35,11 +48,15 @@ const casterUtility = [
   'wayfarers_lodestone',
   'medallion_of_defiance',
   'heart_of_the_crucible',
+  'gaolers_iron_key',
+  'foremans_last_link',
+  'barrowstone_heart',
+  'phial_of_the_tithe',
 ];
 const expected: Record<PlayerClass, string[]> = {
-  warrior: [...physical, ...utility],
-  rogue: [...physical, ...utility],
-  hunter: [...physical, ...utility],
+  warrior: [...physical, ...utility.filter((id) => id !== 'phial_of_the_tithe')],
+  rogue: [...physical, ...utility.filter((id) => id !== 'phial_of_the_tithe')],
+  hunter: [...physical, ...utility.filter((id) => id !== 'phial_of_the_tithe')],
   mage: [...healing, ...casting, ...casterUtility],
   priest: [...healing, ...casting, ...casterUtility],
   warlock: [...casting, ...casterUtility],

@@ -65,7 +65,22 @@ const INVENTORY: Record<string, Answer> = {
     site: 'src/render/spirit_veil_prewarm.ts',
   },
   'src/render/characters/form_adornments.ts:moonwingLinked': { reset: 'form-adornments' },
-  'src/render/characters/form_adornments.ts:veilLinked': { reset: 'form-adornments' },
+  'src/render/characters/woc_atlas_swap.ts:prepared': {
+    reset: 'character-visual',
+    site: 'src/render/characters/visual.ts',
+  },
+  'src/render/characters/woc_armor_packs.ts:readyListeners': {
+    exempt: 'CPU: asset-load subscriptions',
+  },
+  'src/render/characters/woc_head_packs.ts:readyListeners': {
+    exempt: 'CPU: asset-load subscriptions',
+  },
+  'src/render/characters/woc_sit_pose.ts:preparedSitCache': {
+    exempt: 'CPU: rewritten animation clips',
+  },
+  'src/render/scenery_detail_batches.ts:ready': {
+    exempt: 'mounted scene content, relinked by visible and resident scene restoration',
+  },
   'src/render/post_shed.ts:twinReady': { reset: 'post-shed' },
   'src/render/interior_encounter_prewarm_pass.ts:startedByHost': {
     exempt:

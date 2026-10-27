@@ -6,12 +6,12 @@
 // (server/game.ts); src/net/entity_status_wire.ts is the decode side. Keep the
 // keys byte-identical on both sides.
 import type { Entity } from '../src/sim/types';
+import { writeEntityPresenceBits } from './entity_presence_wire';
 
 /** Every key this emitter may write, for the unit pin. */
-export const ENTITY_STATUS_KEYS = ['ak', 'pvp', 'bty'] as const;
+export const ENTITY_STATUS_KEYS = ['ak', 'pvp', 'bty', 'hbn'] as const;
 
 export function writeEntityStatusWire(e: Entity, out: Record<string, unknown>): void {
-  if (e.afk) out.ak = 1; // /afk display bit: other clients tag the nameplate + presence dot
-  if (e.pvpFlag) out.pvp = 1; // /pvp flag bit: nameplate + target-frame hostility colour
+  writeEntityPresenceBits(out, e);
   if (e.bounty) out.bty = 1; // World PvP bounty bit: the blood-red name tag
 }

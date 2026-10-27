@@ -113,12 +113,12 @@ describe('spiritVeilTupleKey', () => {
 });
 
 describe('the pinned family', () => {
-  it('is 14 colour programs (one of them the decal variant) and 10 depth programs', () => {
+  it('is 34 colour programs (one decal variant) and 17 depth programs including WOC layers', () => {
     const count = (pass: SpiritVeilPass) =>
       SPIRIT_VEIL_FAMILY.filter((t) => t.pass === pass).length;
-    expect(count('color')).toBe(13);
+    expect(count('color')).toBe(33);
     expect(count('decal')).toBe(1);
-    expect(count('depth')).toBe(10);
+    expect(count('depth')).toBe(17);
     expect(SPIRIT_VEIL_FAMILY_KEYS.size).toBe(SPIRIT_VEIL_FAMILY.length);
   });
 

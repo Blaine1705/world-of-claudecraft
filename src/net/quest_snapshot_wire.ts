@@ -52,6 +52,7 @@ export function applyQuestSelfWire(
     wkexp?: unknown;
     cluh?: unknown;
     tmap?: unknown;
+    ahs?: unknown;
   },
   simTime?: unknown,
 ): void {
@@ -85,13 +86,15 @@ export function applyQuestSelfWire(
   }
   if (Array.isArray(self.wqlog) && !malformedExplicitCycle) {
     const rawRows = self.wqlog;
-    // A rerolled-in quest is off the base board, so its row is admitted through
-    // the replacements: this snapshot's own, else the mirror's for the same day.
+    // A rerolled quest is on this character's board but not the shared rotation:
+    // filter against the personal replacements too, as the save boundary does
+    // (src/sim/world_quest_state.ts). The same snapshot's `wqrep` wins; otherwise
+    // the retained mirror applies only while the cycle is unchanged.
     const replacements =
       self.wqrep !== undefined
         ? sanitizeWorldQuestReplacements(self.wqrep, incomingCycle)
         : incomingCycle === target.worldQuestCycle
-          ? target.worldQuestReplacements
+          ? { ...(target.worldQuestReplacements ?? {}) }
           : undefined;
     target.worldQuestLog = new Map(
       sanitizeWorldQuestProgress(rawRows, incomingCycle, true, replacements).map((progress) => {

@@ -44,47 +44,53 @@ export function nextTreasureMapRarity(rarity: TreasureMapRarity): TreasureMapRar
 }
 
 /** Cartographer's Ink: sold by every faction quartermaster for their own
- *  currency (src/sim/content/faction_vendors.ts); using it redraws the READ map
- *  one rarity finer. A higher-band world quest pays 10 currency, so a full day
- *  is about 140: two inks. */
+ *  currency (src/sim/content/faction_vendors.ts); using it redraws a held map
+ *  the player picks one rarity finer. A higher-band world quest pays 10
+ *  currency, so a full day is about 140: two inks. */
 export const CARTOGRAPHERS_INK_ITEM_ID = 'cartographers_ink';
 export const CARTOGRAPHERS_INK_CURRENCY_COST = 60;
 /** Inks one redraw spends, by the map's CURRENT rarity. Epic to legendary is the
- *  steep one (15 inks, about a week of full world-quest days): a legendary hoard
- *  pays a guaranteed piece above everything outside a raid. */
+ *  steep one (8 inks, about three and a half full world-quest days): a legendary
+ *  hoard pays a guaranteed piece above everything outside a raid. */
 export const TREASURE_MAP_UPGRADE_INKS: Readonly<Record<TreasureMapRarity, number>> = Object.freeze(
-  { common: 1, rare: 3, epic: 15, legendary: 0 },
+  { common: 1, rare: 3, epic: 8, legendary: 0 },
 );
 
 /** The lowest level a Buried Hoard admits (the daily board's higher bracket). */
 export const HOARD_MIN_LEVEL = 16;
 /** How close (yards) the reader must stand to the X to dig. */
 export const TREASURE_DIG_RADIUS = 12;
-/** A vault portal nobody entered closes after this long (seconds). */
-export const VAULT_PORTAL_LIFETIME = 600;
-/** Vaults a character may be paid for as a GUEST (not the map's owner) per
- *  world-quest cycle. The owner's own maps are never capped. */
-export const VAULT_GUEST_PAYOUTS_PER_CYCLE = 3;
+/** Maximum vault lifetime from digging (seconds), regardless of occupancy. */
+export const VAULT_PORTAL_LIFETIME = 6 * 60 * 60;
 /** Copper bonus the map's owner earns on top of the shared payout. */
 export const VAULT_OWNER_COPPER_BONUS = 0.5;
 
-/** Mob scaling by head count (1 to 5), applied on top of the Rift rank tuning,
- *  which is balanced for a full party: a solo reader fights roughly open-world
- *  strength, a full party the rank as authored. */
-export function vaultHealthFactor(headCount: number): number {
-  return 0.4 + 0.15 * (clampHeadCount(headCount) - 1);
+/** Fixed encounter sizes, independent of the players who enter or remain alive. */
+export const HOARD_SUGGESTED_PLAYERS: Readonly<Record<TreasureMapRarity, 1 | 5>> = Object.freeze({
+  common: 1,
+  rare: 5,
+  epic: 5,
+  legendary: 5,
+});
+
+/** Common keeps the former solo baseline; group tiers keep full-party health. */
+export function vaultHealthFactor(rarity: TreasureMapRarity): number {
+  return rarity === 'common' ? 0.4 : 1;
 }
-export function vaultDamageFactor(headCount: number): number {
-  return 0.3 + 0.175 * (clampHeadCount(headCount) - 1);
+
+/** Group reductions apply to weapon attacks and scripted mechanics alike. */
+export function hoardDamageReduction(rarity: TreasureMapRarity, role: 'boss' | 'add'): number {
+  return rarity === 'common' ? 1 : role === 'boss' ? 0.7 : 0.5;
 }
-function clampHeadCount(headCount: number): number {
-  return Math.max(1, Math.min(5, Math.floor(headCount) || 1));
+
+export function vaultDamageFactor(rarity: TreasureMapRarity, role: 'boss' | 'add'): number {
+  return rarity === 'common' ? 0.3 : hoardDamageReduction(rarity, role);
 }
 
 export interface VaultPayoutDef {
   /** Multiplier on the level-scaled casket copper (src/sim/clue_casket.ts). */
   copperMult: number;
-  /** Units of one top-tier gathered material. */
+  /** Units of one corpse-harvest specimen (VAULT_MATERIAL_POOL). */
   materials: number;
   /** Odds the map's OWNER takes one piece off the fallen boss's own table
    *  (content/hoard_loot.ts), at the tier the map's rarity buys. */
@@ -99,7 +105,7 @@ export interface VaultPayoutDef {
 }
 
 /** What a cleared vault pays each entrant, by the map's rarity. The mount odds
- *  average about 1.3% across the drop weights above. */
+ *  average 0.475% across the drop weights above. */
 export const VAULT_PAYOUTS: Readonly<Record<TreasureMapRarity, VaultPayoutDef>> = Object.freeze({
   common: {
     copperMult: 0.3,
@@ -107,7 +113,7 @@ export const VAULT_PAYOUTS: Readonly<Record<TreasureMapRarity, VaultPayoutDef>> 
     gearChance: 0.1,
     markChance: 0.05,
     marks: 2,
-    mountChance: 0.01,
+    mountChance: 0.0025,
     nextMapChance: 0.15,
   },
   rare: {
@@ -116,7 +122,7 @@ export const VAULT_PAYOUTS: Readonly<Record<TreasureMapRarity, VaultPayoutDef>> 
     gearChance: 0.3,
     markChance: 0.1,
     marks: 2,
-    mountChance: 0.015,
+    mountChance: 0.005,
     nextMapChance: 0.1,
   },
   epic: {
@@ -125,7 +131,7 @@ export const VAULT_PAYOUTS: Readonly<Record<TreasureMapRarity, VaultPayoutDef>> 
     gearChance: 0.5,
     markChance: 0.25,
     marks: 3,
-    mountChance: 0.025,
+    mountChance: 0.0075,
     nextMapChance: 0.05,
   },
   legendary: {
@@ -134,10 +140,24 @@ export const VAULT_PAYOUTS: Readonly<Record<TreasureMapRarity, VaultPayoutDef>> 
     gearChance: 1,
     markChance: 1,
     marks: 5,
-    mountChance: 0.05,
+    mountChance: 0.01,
     nextMapChance: 0,
   },
 });
+
+/** The material stack every vault payout carries: one of the corpse-harvest
+ *  specimens (HARVEST_COMPONENT_SPECIMENS in content/professions.ts, item
+ *  records in content/profession_items.ts), the four Pristine ones plus the
+ *  meat family's Prime Cut. Their sell values are comparable to the top-tier
+ *  node yields this pool replaced, so VAULT_PAYOUTS[r].materials keeps its
+ *  counts. */
+export const VAULT_MATERIAL_POOL: readonly string[] = Object.freeze([
+  'pristine_hide',
+  'pristine_silk',
+  'pristine_venom_gland',
+  'pristine_claw',
+  'prime_cut',
+]);
 
 /** The same roll for a GUEST (anyone in the hoard who did not read the map):
  *  the owner paid for the map, so the owner's odds are the map's headline. */
@@ -191,11 +211,11 @@ export const TREASURE_SITES: readonly TreasureSiteDef[] = Object.freeze([
   { id: 'site_mirefen_west_road', zoneId: 'mirefen_marsh', x: -58, z: 371 },
   { id: 'site_mirefen_north_road', zoneId: 'mirefen_marsh', x: 102, z: 418 },
   { id: 'site_thornpeak_west_road', zoneId: 'thornpeak_heights', x: -76, z: 699 },
-  { id: 'site_thornpeak_north_road', zoneId: 'thornpeak_heights', x: 20, z: 840 },
+  { id: 'site_thornpeak_north_road', zoneId: 'thornpeak_heights', x: 20, z: 839 },
   { id: 'site_hollow_west_road', zoneId: 'veiled_hollow', x: -116, z: 1006 },
   { id: 'site_hollow_north_road', zoneId: 'veiled_hollow', x: -45, z: 1089 },
   { id: 'site_hollow_east_road', zoneId: 'veiled_hollow', x: 12, z: 1058 },
-  { id: 'site_evergarden_south_road', zoneId: 'evergarden', x: 324, z: 851 },
+  { id: 'site_evergarden_south_road', zoneId: 'evergarden', x: 324, z: 852 },
   { id: 'site_evergarden_east_road', zoneId: 'evergarden', x: 374, z: 899 },
   { id: 'site_evergarden_north_road', zoneId: 'evergarden', x: 497, z: 798 },
   { id: 'site_farshore_east_road', zoneId: 'farshore_isle', x: 367, z: 25 },
@@ -213,4 +233,13 @@ export interface TreasureMapProgress {
   /** The vault's Rift seed, fixed when the map is read (and re-picked on an
    *  upgrade, since the floor count depends on the rank). */
   seed: number;
+}
+
+/** The map one Cartographer's Ink use redraws, as the client's picker names it:
+ *  the READ map (it keeps its dig site and re-seeds its vault) or an unread copy
+ *  in the bags (a plain item swap). Maps of one rarity stack, so the rarity plus
+ *  the read flag is the whole address. */
+export interface InkMapTarget {
+  rarity: TreasureMapRarity;
+  read: boolean;
 }

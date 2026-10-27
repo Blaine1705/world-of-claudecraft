@@ -9,14 +9,16 @@
 
 import { seatGroundedAt } from './colliders';
 import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
-import { isMoored } from './combat/trinkets';
+import { isPlantedPracticeDummy } from './combat/pull_eligibility';
+import { trinketRefusesKnockback } from './combat/trinkets';
+import { forcedMoveGroundHeight } from './forced_move_ground';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from './pathfind';
 import { SKIN_WIDTH } from './physics';
 import { platformSupportAt } from './physics/platform';
 import { rideSteepnessAt, stepWaterLevel } from './ride_height';
 import type { SimContext } from './sim_context';
 import type { Entity } from './types';
-import { groundHeight, waterLevelAt } from './world';
+import { onUnderSheet, sheetWallBlocksStep, waterLevelAt } from './world';
 
 const BODY_RADIUS = PLAYER_BODY_RADIUS;
 const MAX_CLIMB_SLOPE = PLAYER_MAX_CLIMB_SLOPE;
@@ -33,10 +35,14 @@ export function knockbackDistanceAfterGuards(
   target: Entity,
   distance: number,
 ): number {
+  // A practice dummy stays planted on its marker (Typhoon used to blow one
+  // yards off its spot); guarded here so every knockback caller inherits it.
+  if (isPlantedPracticeDummy(target)) return 0;
   if (source.id !== target.id && ctx.isIceBlocked(target)) return 0;
   if (source.id !== target.id && isVeilboundMarchActive(target)) return 0;
-  // The Mooring Stone holds its wearer where they stand (combat/trinkets.ts).
-  if (source.id !== target.id && isMoored(target)) return 0;
+  // The Mooring Stone and the Shape of the Foreman hold their wearer where they stand
+  // (combat/trinkets.ts trinketRefusesKnockback).
+  if (source.id !== target.id && trinketRefusesKnockback(target)) return 0;
   if (ctx.cfg.devCommands && ctx.players.get(target.id)?.devAnchored) return 0;
   // Knockback resistance (the caster tier-set 2-piece grants 100%) is applied
   // centrally here so no caller can bypass it: a fully-resisted shove moves 0 yards
@@ -61,8 +67,24 @@ export function applyKnockback(
     dz = Math.cos(source.facing);
     len = 1;
   }
-  const ux = dx / len,
-    uz = dz / len;
+  return displaceAlong(ctx, target, dx / len, dz / len, distance);
+}
+
+/**
+ * Move `target` up to `distance` yards along the unit direction (ux, uz), with
+ * the knockback's terrain clamp and collider sweep (the shared walker of every
+ * forced displacement: a shove away, or a drag toward a point such as an
+ * undertow). The caller has already applied its own immunity rules. Returns
+ * the yards actually moved.
+ */
+export function displaceAlong(
+  ctx: SimContext,
+  target: Entity,
+  ux: number,
+  uz: number,
+  distance: number,
+): number {
+  if (distance <= 0) return 0;
   const STEP = 0.5;
   let moved = 0;
   let cx = target.pos.x,
@@ -70,7 +92,7 @@ export function applyKnockback(
   const platform = ctx.platformFor?.(target) ?? null;
   const platformMaxY = target.pos.y + 3;
   const footingAt = (x: number, z: number) => {
-    const terrain = groundHeight(x, z, ctx.cfg.seed);
+    const terrain = forcedMoveGroundHeight(x, z, ctx.cfg.seed, target.pos.y);
     const platformTop = platformSupportAt(platform, x, z, BODY_RADIUS, platformMaxY);
     return { terrain, platformTop, floor: Math.max(terrain, platformTop) };
   };
@@ -88,13 +110,15 @@ export function applyKnockback(
     const r0 = Math.max(current.floor, wls);
     const r1 = Math.max(next.floor, wls);
     if (
-      r1 > r0 &&
-      ((r1 - r0) / adv > MAX_CLIMB_SLOPE ||
-        (next.platformTop === -Infinity &&
-          next.terrain >= wls &&
-          rideSteepnessAt(nx, nz, ctx.cfg.seed) > MAX_CLIMB_SLOPE))
+      (r1 > r0 &&
+        ((r1 - r0) / adv > MAX_CLIMB_SLOPE ||
+          (next.platformTop === -Infinity &&
+            next.terrain >= wls &&
+            !onUnderSheet(nx, nz, ctx.cfg.seed, target.pos.y) &&
+            rideSteepnessAt(nx, nz, ctx.cfg.seed) > MAX_CLIMB_SLOPE))) ||
+      sheetWallBlocksStep(ctx.cfg.seed, cx, cz, target.pos.y, nx, nz)
     ) {
-      break; // would slam into a cliff
+      break; // would slam into a cliff (or the tunnel's rock wall)
     }
     // resolveMove sweeps cx,cz -> nx,nz against static colliders (walls,
     // pillars, delve module bounds/doors) in small sub-steps, so a thin wall
@@ -122,12 +146,17 @@ export function applyKnockback(
   // of being embedded at terrain height inside it.
   const platformTop = platformSupportAt(platform, cx, cz, BODY_RADIUS, platformMaxY);
   const seat =
-    platformTop > groundHeight(cx, cz, ctx.cfg.seed)
+    platformTop > forcedMoveGroundHeight(cx, cz, ctx.cfg.seed, target.pos.y)
       ? { x: cx, y: platformTop, z: cz }
       : seatGroundedAt(ctx.cfg.seed, cx, cz, BODY_RADIUS, target.pos.y);
   target.pos.x = seat.x;
   target.pos.z = seat.z;
-  target.pos.y = seat.y;
+  // A victim shoved along a tube or carve floor stays on THAT sheet: the
+  // seat helper reads the surface heightfield, which sits a hill above an
+  // underground body. (Never true on the built-in world, which has no sheets.)
+  target.pos.y = onUnderSheet(seat.x, seat.z, ctx.cfg.seed, target.pos.y)
+    ? forcedMoveGroundHeight(seat.x, seat.z, ctx.cfg.seed, target.pos.y)
+    : seat.y;
   target.vy = 0;
   target.onGround = true;
   target.fallStartY = target.pos.y;

@@ -42,6 +42,7 @@ import {
   spiritVeilLedgerSize,
 } from '../src/render/characters/ghost_veil';
 import { CharacterVisual, type FarBakeGate } from '../src/render/characters/visual';
+import { WocAtlasSwap } from '../src/render/characters/woc_atlas_swap';
 import { disposeRendererContextGeneration } from '../src/render/context_generation';
 import { ContextRestoreHost, type ContextRestoreSurface } from '../src/render/context_restore';
 import {
@@ -403,8 +404,11 @@ const RESET_FIXTURES: Record<ContextRestoreResetId, Fixture> = {
       farWrap: THREE.Group | null;
       farBakeGate: FarBakeGate | null;
       farCompilePending: boolean;
+      wocAtlas: WocAtlasSwap;
     };
     probe.disposed = false;
+    probe.wocAtlas = new WocAtlasSwap();
+    const restartAtlas = vi.spyOn(probe.wocAtlas, 'restart');
     probe.linkedEffectMaterials = new WeakSet([material]);
     probe.farWrap = new THREE.Group();
     probe.farBakeGate = gate as unknown as FarBakeGate;
@@ -413,6 +417,7 @@ const RESET_FIXTURES: Record<ContextRestoreResetId, Fixture> = {
     registerContextRestoreReset('character-visual', visual, (owner) => owner.forgetContext());
     resetFor('character-visual');
     expect(probe.linkedEffectMaterials.has(material)).toBe(false);
+    expect(restartAtlas).toHaveBeenCalledOnce();
     // The baked far mesh goes back behind the gate, the rig standing in.
     expect(probe.farCompilePending).toBe(true);
     expect(gate).toHaveBeenCalledWith(probe.farWrap, expect.any(Function));
@@ -430,16 +435,16 @@ const RESET_FIXTURES: Record<ContextRestoreResetId, Fixture> = {
       settles.push(onSettled);
     };
     const owner = new FormAdornments(model, 'composed', () => gate);
-    owner.sync(true, false, false);
+    owner.sync(true, false);
     for (const settle of settles.splice(0)) settle();
     owner.update(0.01, false, false, false, true);
-    owner.sync(false, false, false);
-    owner.sync(true, false, false);
+    owner.sync(false, false);
+    owner.sync(true, false);
     // Linked once on this rig: the second mount skips the gate.
     expect(settles).toHaveLength(0);
-    owner.sync(false, false, false);
+    owner.sync(false, false);
     resetFor('form-adornments');
-    owner.sync(true, false, false);
+    owner.sync(true, false);
     expect(settles.length).toBeGreaterThan(0);
   },
   'interior-encounter-prewarm': () => {
@@ -569,32 +574,6 @@ describe('every context-restore record has its proof', () => {
 });
 
 describe('the other arms of the restore resets', () => {
-  it('form adornments: the veil set holds behind the gate again after a restore', () => {
-    const model = new THREE.Group();
-    const chest = new THREE.Bone();
-    chest.name = 'chest';
-    const head = new THREE.Bone();
-    head.name = 'head';
-    chest.add(head);
-    model.add(chest);
-    const settles: (() => void)[] = [];
-    const gate: FarBakeGate = (_root, onSettled) => {
-      settles.push(onSettled);
-    };
-    const owner = new FormAdornments(model, 'composed', () => gate);
-    owner.sync(false, true, false);
-    expect(settles.length).toBeGreaterThan(0);
-    for (const settle of settles.splice(0)) settle();
-    owner.update(0.01, false, false, false, true);
-    owner.sync(false, false, false);
-    owner.sync(false, true, false);
-    expect(settles).toHaveLength(0);
-    owner.sync(false, false, false);
-    resetFor('form-adornments');
-    owner.sync(false, true, false);
-    expect(settles.length).toBeGreaterThan(0);
-  });
-
   it('grass bake: a superseded bake is never drawn again, only the active one', () => {
     const renderer = {
       capabilities: { getMaxAnisotropy: () => 4 },

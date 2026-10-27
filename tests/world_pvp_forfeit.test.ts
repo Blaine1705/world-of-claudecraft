@@ -7,7 +7,7 @@
 // per-pair diminishing returns, the flagged-only stake); a player in no live
 // fight, in a sanctuary, or whose opponent already fell leaves freely.
 import { describe, expect, it } from 'vitest';
-import { BUILTIN_WORLD, PLAYER_START, ZONES } from '../src/sim/data';
+import { BUILTIN_WORLD, ZONES } from '../src/sim/data';
 import {
   forfeitWorldPvpFightOnDeparture,
   loadWorldPvpPayouts,
@@ -20,6 +20,7 @@ import {
   worldPvpForfeitPayoutLine,
 } from '../src/sim/pvp';
 import { WORLD_PVP_TOGGLE_COOLDOWN } from '../src/sim/pvp/world_pvp';
+import { worldPvpZonePolicyOf } from '../src/sim/pvp/world_pvp_zones';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent, WorldContent } from '../src/sim/types';
 import { DT } from '../src/sim/types';
@@ -234,22 +235,30 @@ describe('a player who leaves mid-fight forfeits it', () => {
   });
 
   it('an unflagged leaver on free-for-all ground stakes no gold, but the kill and honor stand', () => {
-    const sim = world();
-    const a = addFighter(sim, 'Aleph', 1);
-    const b = addFighter(sim, 'Bet', 2, 2);
-    place(sim, a, FFA);
-    place(sim, b, FFA, 2);
-    sim.tick();
-    sim.meta(b)!.copper = 50_000;
-    hit(sim, b, a); // b opens: b is marked, a stays unflagged
-    hit(sim, a, b);
-    expect(ent(sim, a).pvpFlag).toBeFalsy();
-    sim.events = [];
-    expect(forfeitWorldPvpFightOnDeparture(sim.ctx, a)).toBe(true);
-    expect(ent(sim, a).dead).toBe(true);
-    expect(sim.meta(b)!.honor).toBe(WORLD_PVP_KILL_HONOR);
-    expect(sim.meta(b)!.worldPvp!.pending).toBeUndefined();
-    expect(logLines(sim.events, b)).toContain('Aleph left the fight and is defeated.');
+    // Shipped zones are opt-in; exercise the generic FFA rule with an explicit fixture.
+    const zone = ZONES.find((candidate) => candidate.id === 'drakelands')!;
+    const previous = zone.worldPvp;
+    zone.worldPvp = 'ffa';
+    try {
+      const sim = world();
+      const a = addFighter(sim, 'Aleph', 1);
+      const b = addFighter(sim, 'Bet', 2, 2);
+      place(sim, a, FFA);
+      place(sim, b, FFA, 2);
+      sim.tick();
+      sim.meta(b)!.copper = 50_000;
+      hit(sim, b, a); // b opens: b is marked, a stays unflagged
+      hit(sim, a, b);
+      expect(ent(sim, a).pvpFlag).toBeFalsy();
+      sim.events = [];
+      expect(forfeitWorldPvpFightOnDeparture(sim.ctx, a)).toBe(true);
+      expect(ent(sim, a).dead).toBe(true);
+      expect(sim.meta(b)!.honor).toBe(WORLD_PVP_KILL_HONOR);
+      expect(sim.meta(b)!.worldPvp!.pending).toBeUndefined();
+      expect(logLines(sim.events, b)).toContain('Aleph left the fight and is defeated.');
+    } finally {
+      zone.worldPvp = previous;
+    }
   });
 });
 
@@ -351,7 +360,7 @@ describe('a departure that is not a forfeit', () => {
   it('a leaver who reached a sanctuary, or whose opponent already fell, leaves freely', () => {
     const { sim, a, b } = fight();
     hit(sim, a, b);
-    place(sim, b, { x: PLAYER_START.x, z: PLAYER_START.z });
+    place(sim, b, ZONES.find((zone) => zone.id === 'proving_shore')!.graveyard);
     expect(forfeitWorldPvpFightOnDeparture(sim.ctx, b)).toBe(false);
     expect(ent(sim, b).dead).toBe(false);
 
@@ -488,8 +497,12 @@ describe('determinism', () => {
   });
 });
 
-// The zone table must still carry the two grounds this suite stands on.
-it('stands on contested ground and on free-for-all ground', () => {
-  expect(ZONES.some((z) => z.id === 'thornpeak_heights')).toBe(true);
-  expect(ZONES.some((z) => z.id === 'drakelands')).toBe(true);
+// Pin the shipping policies separately from the synthetic FFA fixture.
+it('uses opt-in overworld zones and the tutorial sanctuary', () => {
+  for (const id of ['thornpeak_heights', 'drakelands']) {
+    const zone = ZONES.find((candidate) => candidate.id === id);
+    expect(zone).toBeDefined();
+    expect(worldPvpZonePolicyOf(zone)).toBe('contested');
+  }
+  expect(ZONES.find((zone) => zone.id === 'proving_shore')?.worldPvp).toBe('sanctuary');
 });

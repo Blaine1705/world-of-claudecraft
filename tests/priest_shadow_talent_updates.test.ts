@@ -645,24 +645,35 @@ describe('Shadow talent choices with Vampiric Touch and Tithe Bomb', () => {
     },
   );
 
-  it('keeps the residual region after an immune initial explosion, with no extra critical roll', () => {
-    const f = fixture({ 20: 'pri_r20_incarnate_spirit' });
-    f.ctx.spellCrit = () => 1;
-    f.target.damageImmune = true;
-    recordGloomtitheGeneration(f.ctx, f.p, 20);
-    f.sim.castAbility('spirit_bomb');
-    f.p.castRemaining = DT;
-    updateCasting(f.ctx, f.p, f.ctx.players.get(f.p.id)!);
-    expect(spiritBombProgress(f.p)).toBe(0);
-    expect(f.ctx.groundAoEs).toHaveLength(1);
-    const rng = vi.spyOn(f.ctx.rng, 'chance');
-    f.target.damageImmune = false;
-    const hp = f.target.hp;
-    for (let i = 0; i < 121; i++) tickGroundAoEs(f.ctx);
-    expect(hp - f.target.hp).toBeGreaterThan(0);
-    expect(rng).not.toHaveBeenCalled();
-    rng.mockRestore();
-  });
+  it.each(['immune', 'resisted'] as const)(
+    'keeps the residual region after an %s initial explosion, with no extra critical roll',
+    (outcome) => {
+      const f = fixture({ 20: 'pri_r20_incarnate_spirit' });
+      f.ctx.spellCrit = () => 1;
+      f.target.damageImmune = outcome === 'immune';
+      const resist =
+        outcome === 'resisted' ? vi.spyOn(f.ctx.rng, 'chance').mockReturnValue(false) : null;
+      recordGloomtitheGeneration(f.ctx, f.p, 20);
+      f.sim.castAbility('spirit_bomb');
+      f.p.castRemaining = DT;
+      updateCasting(f.ctx, f.p, f.ctx.players.get(f.p.id)!);
+      resist?.mockRestore();
+      if (outcome === 'resisted') {
+        expect(hits(f.sim.drainEvents(), 'Tithe Bomb').some((hit) => hit.kind === 'resist')).toBe(
+          true,
+        );
+      }
+      expect(spiritBombProgress(f.p)).toBe(0);
+      expect(f.ctx.groundAoEs).toHaveLength(1);
+      const rng = vi.spyOn(f.ctx.rng, 'chance');
+      f.target.damageImmune = false;
+      const hp = f.target.hp;
+      for (let i = 0; i < 121; i++) tickGroundAoEs(f.ctx);
+      expect(hp - f.target.hp).toBeGreaterThan(0);
+      expect(rng).not.toHaveBeenCalled();
+      rng.mockRestore();
+    },
+  );
 
   it.each(['death', 'respec', 'depart'] as const)(
     'deactivates the region on source %s',

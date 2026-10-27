@@ -15,6 +15,7 @@ import { VANGUARD_ITEM_SETS } from '../src/sim/content/vanguard_item_sets';
 import * as V from '../src/sim/content/vanguard_set_bonuses_a';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { isPersistentEngineAura } from '../src/sim/persistent_aura';
 import { computeCharacterModifiers } from '../src/sim/set_bonus_mods';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
@@ -474,14 +475,14 @@ describe('Hunter Season 2 sets', () => {
     expect(run(4)).toBe(60 - V.VANGUARD_BM_4PC_HOWLING_RAGE_REFUND_SEC);
   });
 
-  it('Farsight 2pc: Trailbreak cooldown 20 to 16, only at 2 pieces', () => {
+  it('Farsight 2pc: Trailbreak cooldown 15 to 11, only at 2 pieces', () => {
     expectCooldownCut(
       'hunter',
       'marksmanship',
       'vanguard_hunter_marksmanship',
       2,
       'trailbreak',
-      20,
+      15,
       V.VANGUARD_MM_2PC_TRAILBREAK_COOLDOWN_CUT_SEC,
     );
   });
@@ -505,14 +506,14 @@ describe('Hunter Season 2 sets', () => {
     expect(p.procState?.icds.set_vanguard_hunter_marksmanship_4pc).toBe(V.VANGUARD_MM_4PC_ICD_SEC);
   });
 
-  it('Snaretooth 2pc: Bloodhook cooldown 15 to 12, only at 2 pieces', () => {
+  it('Snaretooth 2pc: Bloodhook cooldown 10 to 7, only at 2 pieces', () => {
     expectCooldownCut(
       'hunter',
       'survival',
       'vanguard_hunter_survival',
       2,
       'bloodhook',
-      15,
+      10,
       V.VANGUARD_SURVIVAL_2PC_BLOODHOOK_COOLDOWN_CUT_SEC,
     );
   });
@@ -535,7 +536,8 @@ describe('Hunter Season 2 sets', () => {
     expect(hook(3)).toBeUndefined();
     const momentum = expectDefined(hook(4));
     expect(momentum.stacks).toBe(V.VANGUARD_SURVIVAL_4PC_MOMENTUM_STACKS);
-    expect(momentum.duration).toBe(8);
+    // A persistent bank since the Fieldcraft rework (persistent_aura.ts).
+    expect(isPersistentEngineAura(momentum.id)).toBe(true);
   });
 });
 
@@ -612,14 +614,14 @@ describe('Rogue Season 2 sets', () => {
     expect(crit.duration).toBe(V.VANGUARD_ASSASSINATION_4PC_CRIT_WINDOW_SEC);
   });
 
-  it('Brawlmark 2pc: Swift Heels cooldown 300 to 240, only at 2 pieces', () => {
+  it('Brawlmark 2pc: Swift Heels cooldown 60 to 45, only at 2 pieces', () => {
     expectCooldownCut(
       'rogue',
       'combat',
       'vanguard_rogue_combat',
       2,
       'sprint',
-      300,
+      60,
       V.VANGUARD_COMBAT_2PC_SWIFT_HEELS_COOLDOWN_CUT_SEC,
     );
   });
@@ -980,9 +982,9 @@ describe('Season 2 group A tooltips match the engine constants', () => {
       ['paladin', 'protection', 'vanguard_paladin_protection', 'oath_chain', 18],
       ['paladin', 'retribution', 'vanguard_paladin_retribution', 'valkyrs_calling', 60],
       ['hunter', 'beast_mastery', 'vanguard_hunter_beast_mastery', 'concussive_shot', 12],
-      ['hunter', 'marksmanship', 'vanguard_hunter_marksmanship', 'trailbreak', 20],
-      ['hunter', 'survival', 'vanguard_hunter_survival', 'bloodhook', 15],
-      ['rogue', 'combat', 'vanguard_rogue_combat', 'sprint', 300],
+      ['hunter', 'marksmanship', 'vanguard_hunter_marksmanship', 'trailbreak', 15],
+      ['hunter', 'survival', 'vanguard_hunter_survival', 'bloodhook', 10],
+      ['rogue', 'combat', 'vanguard_rogue_combat', 'sprint', 60],
       ['rogue', 'subtlety', 'vanguard_rogue_subtlety', 'vanish', 300],
       ['priest', 'discipline', 'vanguard_priest_discipline', 'psychic_scream', 30],
       ['priest', 'holy', 'vanguard_priest_holy', 'veilstep', 18],

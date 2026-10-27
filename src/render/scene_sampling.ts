@@ -83,6 +83,7 @@ export class OpaqueSceneCapture {
   private readonly group = new THREE.Group();
   private readonly sentinel: THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
   private disposed = false;
+  private suppressed = false;
 
   reinitialize(): void {
     if (!this.disposed) this.renderer.initRenderTarget(this.target);
@@ -136,6 +137,14 @@ export class OpaqueSceneCapture {
   begin(): void {
     this.service.uniforms.uSceneReady.value = 0;
   }
+  /**
+   * The render budget's deepest post-shed rung stops the copy (post.ts): every
+   * consumer reads uSceneReady 0 and takes the unsampled arm it already has,
+   * a uniform flip, never a relink.
+   */
+  setSuppressed(suppressed: boolean): void {
+    this.suppressed = suppressed;
+  }
   /** Driven from post.ts's own resize path, which owns target sizing. The
    *  reallocation happens here, outside any draw, for the same reason the
    *  first one does. */
@@ -150,7 +159,7 @@ export class OpaqueSceneCapture {
   }
   private capture(camera: THREE.Camera): void {
     this.begin();
-    if (this.disposed) return;
+    if (this.disposed || this.suppressed) return;
     let active = false;
     for (const mesh of this.service.consumers) {
       // A visible flag below a hidden or detached pool root is not a draw.

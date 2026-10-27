@@ -231,9 +231,7 @@ describe('the HUD wiring of the Release input hold', () => {
   });
 
   it('starts the hold when the overlay opens and on every own death', () => {
-    expect(hudTs).toContain(
-      'noteReleaseOverlayShown(this.deathScreenInput, death.releaseOverlay, now);',
-    );
+    expect(hudTs).toContain('noteReleaseOverlayShown(this.deathScreenInput, death.overlay, now);');
     const deathCase = hudTs.slice(hudTs.indexOf("case 'playerDeath': {"));
     expect(deathCase.slice(0, deathCase.indexOf('break;'))).toContain(
       'holdDeathScreenInput(this.deathScreenInput, now);',

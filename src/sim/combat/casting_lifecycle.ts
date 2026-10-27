@@ -1,9 +1,11 @@
 import { BENISON_4PC_WHISPER_HEAL_BONUS } from '../content/ignivar_set_bonuses';
+import { courierSummon } from '../courier';
 import { gliderActionsLocked } from '../glider_action_lock';
 import { shadowActionsLocked } from '../shadow_action_lock';
 import { BENISON_WHISPER_AURA_ID } from './priest/benison_dawnweave';
 import { shadowPeriodicHit } from './priest/periodic_crit';
 import { spiritBombCastError } from './priest/spirit_bomb_cast';
+import { completeSpiritBomb } from './priest/spirit_bomb_completion';
 import { consumeRequiredAura, hasRequiredAura } from './required_aura';
 // Player cast lifecycle, extracted from the Sim monolith (C4a).
 //
@@ -40,8 +42,10 @@ import { completeAlliedHearthstoneCast } from '../content/faction_rewards';
 import { ITEMS, isDelvePos, MOBS, zoneAt } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { instanceInfoAt } from '../instances/dungeons';
+import { completeKitUse, validateKitUse } from '../mob/trash_kit/encounter_use';
 import { forceDismount } from '../mounts';
 import { canActivateDivineAscension, hasDevotion, spendDevotion } from '../paladin_devotion';
+import { notePetAssistCast } from '../pet/pet_assist';
 import { scalePrimaryHealing } from '../primary_healing';
 import {
   completeCorpseHarvestCast,
@@ -78,6 +82,7 @@ import {
   FISHING_CAST_ID,
   GATHER_CAST_ID,
   isFormAuraKind,
+  isKitUseCast,
   isNonSpellCast,
   MELEE_ARC,
   MELEE_RANGE,
@@ -188,6 +193,8 @@ import {
 } from './hunter_coldsight_read';
 import { bloodhookStartError } from './hunter_fieldcraft';
 import { packCommandError } from './hunter_packlord';
+import { applyPatchUp } from './hunter_patch_up';
+import { playDeadOnCastAttempt } from './hunter_play_dead';
 import { cancelRecedingShell, noteHunterFocusSpend } from './hunter_shared';
 import {
   hasDeadGroupMember,
@@ -280,6 +287,15 @@ export const COLOSSAL_MIGHT_COOLDOWNS = new Set([
   'shield_slam',
 ]);
 
+// Position spells whose no-aim press (a bare keybind, the RL env) lands on the
+// selected hostile instead of the caster's feet.
+const SELECTED_HOSTILE_AIM_FALLBACK = new Set([
+  'earthquake',
+  'earthbind',
+  'frostjaw_trap',
+  'bear_trap',
+]);
+
 function isStasisToggle(ability: AbilityDef): boolean {
   return ability.effects.some((effect) => effect.type === 'selfBuff' && effect.kind === 'stasis');
 }
@@ -300,6 +316,10 @@ function shellskinBlocksAbility(entity: Entity, meta: PlayerMeta, ability: Abili
       'hunterBloodhook',
       'hunterShrapnel',
       'frostjawTrap',
+      // Volley and Phosphor Flask are instant ground zones since PR 4488.
+      'groundAoE',
+      'hunterBearTrap',
+      'hunterScatterbolt',
     ].includes(effect.type),
   );
 }
@@ -583,6 +603,12 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
     cancelCast(ctx, p);
     return;
   }
+  // A trash-engine use (mob/trash_kit/encounter_use.ts, G3): the same full
+  // per-tick recheck (the body still standing, still in reach).
+  if (isKitUseCast(p.castingAbility) && !validateKitUse(ctx, p)) {
+    cancelCast(ctx, p);
+    return;
+  }
   if (activeCast && p.channeling) syncPaladinAegisProtection(ctx, p, activeCast);
   p.castRemaining -= DT;
 
@@ -689,6 +715,11 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
     // arms' own comment on the pattern).
     if (castId === CORPSE_HARVEST_CAST_ID) {
       completeCorpseHarvestCast(ctx, p, meta);
+      return;
+    }
+    // A trash-engine use (G3): same route-then-return shape.
+    if (isKitUseCast(castId)) {
+      completeKitUse(ctx, p, castId ?? '', p.castTargetId);
       return;
     }
     // Craft cast completion: same non-spell route as gather. castStop success
@@ -951,13 +982,14 @@ export function castAbilityBySlot(
 // else-self rule, byte-identical to the pre-override behavior when null.
 //
 // One refusal, returned as null for the caller to voice (WORLD_PVP_AID_REFUSED_LINE):
-// a live PLAYER the open world has made an enemy (src/sim/pvp/world_pvp.ts
-// isWorldPvpHostile). The aid rule flags a helper who keeps a flagged stranger
-// standing, and from that moment the two are flagged strangers whom the self
-// fallback would otherwise lock apart in silence: every later heal, shield or
-// buff would land on the helper instead, with no word about why. Only the WORLD
-// arm refuses: a duel, arena or battleground opponent on the target still self-casts,
-// the classic habit those modes' healers rely on.
+// an explicitly NAMED unit (the hover override at the press, or the locked cast
+// target at a timed cast's finish) that is a live PLAYER the open world has made
+// an enemy (src/sim/pvp/world_pvp.ts isWorldPvpHostile). Naming one is a
+// deliberate attempt to aid them, so it is said out loud; a target that turns
+// into an enemy mid-cast fails the finish rather than landing on the caster.
+// An enemy merely SELECTED is the classic self-cast: a healer fighting a flagged
+// player presses a heal with that player still targeted to heal themselves,
+// exactly as a duel, arena or battleground healer does.
 function resolveFriendlyTarget(
   ctx: SimContext,
   p: Entity,
@@ -970,7 +1002,6 @@ function resolveFriendlyTarget(
   }
   const cur = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;
   if (cur && !cur.dead && ctx.isFriendlyTo(p, cur)) return cur;
-  if (cur && !cur.dead && cur.kind === 'player' && isWorldPvpHostile(ctx, p, cur)) return null;
   return p;
 }
 
@@ -1071,6 +1102,7 @@ export function castAbility(
     return;
   }
   if (cancelStasisToggle(ctx, p, ability)) return;
+  if (playDeadOnCastAttempt(ctx, p, ability.id)) return;
   if (shellskinBlocksAbility(p, meta, ability)) {
     ctx.error(p.id, 'Shellskin prevents attacks.');
     return;
@@ -1170,6 +1202,10 @@ export function castAbility(
       p.queuedCastTargetId = castTargetId;
     }
     return; // an earlier press stays silent, classic spams this
+  }
+  if (abilityId === 'courier') {
+    courierSummon(ctx, p.id);
+    return;
   }
   const togglingOff = isToggleBuff(ability) && p.auras.some((a) => a.id === ability.id);
   // sharedCooldownIds generalizes the release's shaman-shock special case (it
@@ -1474,7 +1510,7 @@ export function castAbility(
     target = dead;
   } else if (ability.requiresTarget && ability.targetType === 'friendly') {
     // heals/buffs: the mouseover override when given, else the current
-    // friendly target, else yourself; a World PvP enemy on the target refuses
+    // friendly target, else yourself; a hovered World PvP enemy refuses
     const friendly = resolveFriendlyTarget(ctx, p, castTargetId);
     if (!friendly) {
       ctx.error(p.id, WORLD_PVP_AID_REFUSED_LINE);
@@ -1759,11 +1795,12 @@ export function castAbility(
         return;
       }
     } else {
-      // Faultwake's keybind default is the selected hostile; other position
-      // spells retain the canonical at-feet fallback. Clamp the selected point
-      // through the same authoritative range rule as explicit ground input.
+      // Faultwake's (and the hunter traps') keybind default is the selected
+      // hostile; other position spells retain the canonical at-feet fallback.
+      // Clamp the selected point through the same authoritative range rule as
+      // explicit ground input.
       const selected =
-        (ability.id === 'earthquake' || ability.id === 'earthbind') && p.targetId !== null
+        SELECTED_HOSTILE_AIM_FALLBACK.has(ability.id) && p.targetId !== null
           ? (ctx.entities.get(p.targetId) ?? null)
           : null;
       const fallback =
@@ -1874,6 +1911,10 @@ export function castAbility(
   // BEFORE this cast's own effects resolve, so the stealth lands on a cat and
   // the rush leaves as a bear.
   applyDruidFormEntry(ctx, p, meta, ability.id);
+  // An Assist-stance pet attacks the enemy this cast is aimed at (pet/pet_assist.ts).
+  // Recorded here, where the cast is certain and before every commit branch,
+  // including the on-swing one below.
+  notePetAssistCast(ctx, p, meta, target);
   // Auto-dismount when the player is mounted or mid-summon-channel and casts any
   // ability. The one exception is a mount-safe form toggle (combat/forms.ts:
   // Moonwing, Gloamveil): it only adorns the rider, so it neither dismounts nor
@@ -2796,31 +2837,15 @@ function applyAbility(
     if (!pet) {
       ctx.error(
         p.id,
-        isDelvePos(p.pos.x) ? 'Pets are not allowed inside the delves.' : 'You have no pet.',
+        isDelvePos(p.pos.x) && ctx.delvePetStash.has(p.id)
+          ? 'Pets are not allowed inside the delves.'
+          : 'You have no pet.',
       );
       return;
     }
     spendResource(p, billableCost());
     armAbilityCooldownWithReflection(ctx, p, meta, res);
-    if (pet.dead) {
-      ctx.revivePet(p.id);
-    } else {
-      const hot = res.effects.find((effect) => effect.type === 'hot');
-      if (hot) {
-        ctx.applyAura(pet, {
-          id: ability.id,
-          name: ability.name,
-          kind: 'hot',
-          remaining: hot.duration,
-          duration: hot.duration,
-          value: Math.max(1, Math.round(hot.total / (hot.duration / hot.interval))),
-          tickInterval: hot.interval,
-          tickTimer: hot.interval,
-          sourceId: p.id,
-          school: ability.school,
-        });
-      }
-    }
+    applyPatchUp(ctx, p, pet, ability);
     if (p.kind === 'player') onCastCompleted(ctx, p, ability.id, pet);
     return;
   }
@@ -2866,7 +2891,7 @@ function applyAbility(
   } else if (ability.requiresTarget && ability.targetType === 'friendly') {
     // Keep the branch's mouseover-cast resolution (Clique-style): the explicit
     // override wins while valid, else current-friendly-target-else-self; a
-    // target the open world made an enemy during the cast refuses the finish.
+    // locked target the open world made an enemy during the cast refuses the finish.
     const friendly = resolveFriendlyTarget(ctx, p, castTarget);
     if (!friendly) {
       ctx.error(p.id, WORLD_PVP_AID_REFUSED_LINE);
@@ -3199,6 +3224,7 @@ function applyAbility(
   // An instant hostile spell (`projectile: false`) rolls the SAME resist a bolt
   // rolls on impact; only the delivery differs. Taunts are exempt here for the
   // reason they are exempt there: a resisted taunt silently breaks tanking.
+  completeSpiritBomb(ctx, p, meta, target, res);
   const instantResisted =
     target !== null &&
     ability.school !== 'physical' &&

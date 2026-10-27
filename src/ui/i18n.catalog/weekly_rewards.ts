@@ -36,8 +36,8 @@ export const weeklyRewardStrings = {
   heroicUpgradeOne: '{count} more Heroic dungeon clear to upgrade',
   heroicUpgradeMany: '{count} more Heroic dungeon clears to upgrade',
   completedTask: {
-    raidOne: '{count} Raid Encounter Cleared',
-    raidMany: '{count} Raid Encounters Cleared',
+    raidOne: '{count} Raid Clear',
+    raidMany: '{count} Raid Clears',
     dungeonOne: '{count} Dungeon Cleared',
     dungeonMany: '{count} Dungeons Cleared',
     worldOne: '{count} World Quest Completed',
@@ -50,8 +50,8 @@ export const weeklyRewardStrings = {
     pvpWinMany: '{count} PvP Wins',
   },
   requiredTask: {
-    raidOne: 'Clear {count} Raid Encounter',
-    raidMany: 'Clear {count} Raid Encounters',
+    raidOne: 'Complete {count} Raid Clear',
+    raidMany: 'Complete {count} Raid Clears',
     dungeonOne: 'Clear {count} Dungeon',
     dungeonMany: 'Clear {count} Dungeons',
     worldOne: 'Complete {count} World Quest',
@@ -94,13 +94,15 @@ export const weeklyRewardStrings = {
     'Every listed item has an equal chance. Items match your class restrictions. Defeated raids unlock their loot at that difficulty. Legendary items are excluded.',
   selectionPoolRule:
     'For raids and dungeons, select one or more tables before opening. Dungeon tables combine bosses you have cleared at this difficulty. Rolls exclude duplicates, legendary items and equipment requiring more than {maxLevelOffset} levels above your level.',
+  previewPoolRule:
+    'All tables these vaults can roll from. Defeating a boss permanently unlocks its loot for future vaults. A dungeon table holds only the bosses you defeated, and a Heroic kill also unlocks Normal. Rolls exclude items already rolled. Equipment requiring more than {maxLevelOffset} levels above your level is not shown.',
   rare: 'Rare',
   epic: 'Epic',
   unavailable: 'Not yet available',
   worldUnavailable: 'World quest rewards will become available when rotating world quests arrive.',
   category: { raid: 'Raids', dungeon: 'Dungeons', world: 'World Quests', pvp: 'PvP' },
   task: {
-    raid: 'Defeat different raid encounters. Each encounter counts once; a Heroic clear upgrades its credit.',
+    raid: 'Every raid clear counts, including repeat encounters. Your best clears set each reward difficulty.',
     dungeon:
       'Complete dungeons. Your best clears determine the reward difficulty at each milestone.',
     world: 'Complete rotating world quests. Story quests do not count.',
@@ -114,4 +116,5 @@ export const weeklyRewardStrings = {
     world: 'World quest loot',
     pvp: 'WARFARE equipment',
   },
+  previewClaimNotice: 'Rewards are waiting. Visit the Vault Keeper in Eastbrook to open and claim.',
 };

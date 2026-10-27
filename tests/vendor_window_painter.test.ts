@@ -95,6 +95,36 @@ function heroicDeps(overrides: Partial<Parameters<typeof renderHeroicVendorWindo
 }
 
 describe('renderVendorWindow / renderHeroicVendorWindow: dialog root (accessible name, #2808)', () => {
+  it('keeps repeated riding purchases bound to the rank displayed on their row', () => {
+    const calls: (VendorBuyOptions | undefined)[] = [];
+    const el = document.createElement('div');
+    const goods: VendorGoodsRow = {
+      itemId: 'riding_training',
+      item: item('riding_training'),
+      ridingRank: 1,
+      price: { copper: 800_000, honor: 0 },
+      quantity: 1,
+      affordable: true,
+      requirementUnmet: false,
+    };
+    const view: VendorView = {
+      goods: [goods],
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1,
+    };
+    renderVendorWindow(el, 'Trainer', view, deps({ onBuy: (_id, opts) => calls.push(opts) }));
+    const row = requireElement<HTMLButtonElement>(el, '.vendor-item');
+    row.click();
+    row.dispatchEvent(new MouseEvent('click', { bubbles: true, ctrlKey: true }));
+    expect(calls).toEqual([{ expectedRidingTier: 0 }, { expectedRidingTier: 0 }]);
+    goods.ridingRank = 2;
+    goods.price.copper = 10_000_000;
+    renderVendorWindow(el, 'Trainer', view, deps({ onBuy: (_id, opts) => calls.push(opts) }));
+    requireElement<HTMLButtonElement>(el, '.vendor-item').click();
+    expect(calls[2]).toEqual({ expectedRidingTier: 1 });
+  });
   it('renderVendorWindow marks #vendor-window as a labeled dialog', () => {
     const view: VendorView = {
       goods: [],
@@ -1226,9 +1256,11 @@ describe('vendor window family: hud.ts focus-management wiring (WCAG 2.4.3)', ()
     // Anchored to itemTooltip's own body like the renderVendor pin above: an
     // unscoped whole-file toContain is satisfied by the same expression in an
     // unrelated method, and the slice is comment-stripped so a line of prose
-    // quoting the call cannot stand in for the call itself.
+    // quoting the call cannot stand in for the call itself. The signature
+    // gained inspectedWearer with the membership account benefits
+    // (6ffc9e3e3ca, PR 4281); the guarded slot line is unchanged.
     const itemTooltipStart = anchor(
-      "private itemTooltip(\n    item: ItemDef,\n    compare: boolean | 'embedded' | 'noset' = true,\n    instance?: ItemInstancePayload,\n    materialSources?: MaterialComposition,\n  ): string {",
+      "private itemTooltip(\n    item: ItemDef,\n    compare: boolean | 'embedded' | 'noset' = true,\n    instance?: ItemInstancePayload,\n    materialSources?: MaterialComposition,\n    inspectedWearer?: MembershipTooltipWearer,\n  ): string {",
     );
     const itemProcBlockStart = anchor('private itemProcBlock(item: ItemDef): string {');
     expect(itemProcBlockStart).toBeGreaterThan(itemTooltipStart);

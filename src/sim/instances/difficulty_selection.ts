@@ -5,6 +5,7 @@
 import type { InstanceSlot } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type DungeonDifficulty, isDungeonDifficulty } from '../types';
+import { claimDifficultyForDungeon } from './difficulty';
 import { instanceClaimContains, resetDungeonInstances } from './dungeons';
 
 export interface PendingDifficultyChange {
@@ -20,6 +21,45 @@ function applied(ctx: SimContext, pid: number, difficulty: DungeonDifficulty): v
       ? 'Dungeon difficulty set to Heroic.'
       : 'Dungeon difficulty set to Normal.',
   );
+}
+
+/** The group's live claims keyed by owner key, built in ONE pass over the
+ * fixed slot list. The server builds it once per broadcast pass so each
+ * viewer's unappliedDungeonDifficulty read is a map lookup, not a slot scan. */
+export function claimsByOwnerKey(instances: readonly InstanceSlot[]): Map<string, InstanceSlot[]> {
+  const out = new Map<string, InstanceSlot[]>();
+  for (const inst of instances) {
+    if (inst.partyKey === null) continue;
+    const list = out.get(inst.partyKey);
+    if (list) list.push(inst);
+    else out.set(inst.partyKey, [inst]);
+  }
+  return out;
+}
+
+/** The tier the group's existing instances still run on when the selection has
+ * not reached them, else null. A refused or queued change keeps the selection
+ * (it applies to new claims and to a later Reset), so the menu needs this to
+ * avoid showing a tier the live instances are not on. Compares against the
+ * per-dungeon clamped tier, the same rule Reset All uses. */
+export function unappliedDungeonDifficulty(
+  ctx: SimContext,
+  pid: number,
+  claims?: ReadonlyMap<string, readonly InstanceSlot[]>,
+): DungeonDifficulty | null {
+  const key = ctx.instanceKeyFor(pid);
+  const owned = claims ? claims.get(key) : ctx.instances;
+  if (!owned) return null;
+  const selected = ctx.dungeonDifficulty(pid);
+  for (const inst of owned) {
+    // Re-checked even on the shared index: a command between a tick's index
+    // build and a later broadcast can free or rekey a slot it listed.
+    if (inst.partyKey !== key) continue;
+    if (inst.difficulty !== claimDifficultyForDungeon(inst.dungeonId, selected)) {
+      return inst.difficulty;
+    }
+  }
+  return null;
 }
 
 export function cancelPendingDifficultyChange(ctx: SimContext, pid: number): void {
@@ -51,7 +91,7 @@ export function setDungeonDifficulty(
   }
   // Retry even when the preference already matches: an earlier reset may have
   // failed while the old claim stayed live.
-  const result = resetDungeonInstances(ctx, id, { quiet: true });
+  const result = resetDungeonInstances(ctx, id, { quiet: true, transitionOnly: true });
   if (result.status !== 'blocked') {
     applied(ctx, id, difficulty);
     return;
@@ -107,7 +147,11 @@ export function retryPendingDifficultyChanges(ctx: SimContext): void {
     }
   }
   for (const [pid, request] of ctx.pendingDifficultyChanges) {
-    const result = resetDungeonInstances(ctx, pid, { quiet: true, occupied });
+    const result = resetDungeonInstances(ctx, pid, {
+      quiet: true,
+      occupied,
+      transitionOnly: true,
+    });
     if (result.status !== 'blocked') {
       ctx.pendingDifficultyChanges.delete(pid);
       applied(ctx, pid, request.difficulty);

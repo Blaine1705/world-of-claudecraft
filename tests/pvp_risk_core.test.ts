@@ -53,20 +53,22 @@ describe('self PvP risk', () => {
     expect(zones.worldPvpZonePolicyAt).toHaveBeenLastCalledWith(w.player.pos.x, w.player.pos.z);
   });
 
-  it('updates at real sanctuary and free-for-all borders', () => {
+  it('updates at the tutorial sanctuary and keeps northern borders opt-in', () => {
     const w = world();
     vi.restoreAllMocks();
     w.player.pvpFlag = true;
-    w.player.pos.x = 0;
-    w.player.pos.z = 179;
+    w.player.pos.x = -181;
+    w.player.pos.z = 0;
     expect(playerPvpRisk(w)).toBe(false);
-    w.player.pos.z = 181;
+    w.player.pos.x = -179;
     expect(playerPvpRisk(w)).toBe(true);
     w.player.pvpFlag = false;
     w.player.pos.x = 404;
     w.player.pos.z = 1819;
     expect(playerPvpRisk(w)).toBe(false);
     w.player.pos.z = 1821;
+    expect(playerPvpRisk(w)).toBe(false);
+    w.player.pvpFlag = true;
     expect(playerPvpRisk(w)).toBe(true);
   });
 

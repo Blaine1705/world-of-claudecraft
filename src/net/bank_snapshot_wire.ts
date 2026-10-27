@@ -8,7 +8,8 @@ import { MAX_INSTANCE_STRING_LENGTH } from '../sim/item_instance_load';
 import type { BankBonusSource, BankInfo, GuildBankInfo, VaultInfo } from '../world_api';
 // isRecord is the ONE record predicate both snapshot wire decoders share (the
 // strict prototype-checking form; see its comment in vault_snapshot_wire.ts).
-import { decodeVaultInfoWire, isRecord, isWireBankSlot } from './vault_snapshot_wire';
+import { isRecord, isWireBankSlot } from './vault_snapshot_wire';
+import { applyVaultTransferWire, type VaultTransferMirror } from './vault_transfer_receiver';
 import { decodeWeeklyRewardInfo, type WeeklyRewardInfo } from './weekly_rewards_wire';
 
 export { BANK_PURCHASED_SLOTS_MAX };
@@ -105,8 +106,15 @@ function isBonusSource(value: unknown): value is BankBonusSource {
  *  field by field. Explicit null is the away-from-banker gate closure and
  *  passes through; undefined means malformed and tells the caller to RETAIN
  *  its prior mirror (the cvault/bpsl policy). A valid record is adopted by
- *  reference so an own `__proto__` row anywhere inside it stays inert data. */
-export function decodeBankInfoWire(value: unknown): BankInfo | null | undefined {
+ *  reference so an own `__proto__` row anywhere inside it stays inert data.
+ *
+ *  `unpriced` decodes another character's bank (membershipBankView): nothing
+ *  can be bought from that view, so both prices must be null instead of
+ *  following the purchase ladder. */
+export function decodeBankInfoWire(
+  value: unknown,
+  { unpriced = false }: { unpriced?: boolean } = {},
+): BankInfo | null | undefined {
   if (value === null) return null;
   if (!isRecord(value)) return rejectBankFrame('not a plain record');
   const unknownKey = Object.keys(value).find((key) => !BANK_KEYS.has(key));
@@ -122,7 +130,7 @@ export function decodeBankInfoWire(value: unknown): BankInfo | null | undefined 
   if (!isSafeCount(value.bonusSlots, true)) return rejectBankFrame('bonusSlots');
   // Null exactly at the top of the ladder, a price below it (bankInfoFor's
   // resolved table is length-stable under overrides by construction).
-  if (purchased >= BANK_PURCHASED_SLOTS_MAX) {
+  if (purchased >= BANK_PURCHASED_SLOTS_MAX || unpriced) {
     if (value.nextExpansionCost !== null) return rejectBankFrame('nextExpansionCost');
   } else if (!isSafeCount(value.nextExpansionCost, true)) {
     return rejectBankFrame('nextExpansionCost');
@@ -139,7 +147,7 @@ export function decodeBankInfoWire(value: unknown): BankInfo | null | undefined 
   ) {
     return rejectBankFrame('socketsUnlocked/socketBags');
   }
-  if (value.socketsUnlocked >= BANK_BAG_SOCKETS) {
+  if (value.socketsUnlocked >= BANK_BAG_SOCKETS || unpriced) {
     if (value.nextSocketCost !== null) return rejectBankFrame('nextSocketCost');
   } else if (!isSafeCount(value.nextSocketCost, true)) {
     return rejectBankFrame('nextSocketCost');
@@ -226,7 +234,7 @@ export function decodeBankPurchasedSlotsWire(value: unknown): number | null | un
 
 /** The four owner-only bank/vault mirrors ClientWorld keeps; the concrete
  *  ClientWorld satisfies this structurally. */
-export interface BankSelfMirrors {
+export interface BankSelfMirrors extends VaultTransferMirror {
   bankInfo: BankInfo | null;
   vaultInfo: VaultInfo | null;
   craftVaultStock: Record<string, number> | null;
@@ -255,7 +263,7 @@ export function applyBankSelfWire(
   // `vault`: malformed CLEARS to null, dropping the whole unsafe row rather
   // than rendering a partial or internally inconsistent snapshot (the one
   // deliberate divergence from the retain policy; see decodeVaultInfoWire).
-  if (s.vault !== undefined) target.vaultInfo = decodeVaultInfoWire(s.vault);
+  if (s.vault !== undefined) applyVaultTransferWire(target, s.vault);
   // `cvault`: malformed RETAINS the last valid mirror.
   if (s.cvault !== undefined) {
     const decoded = decodeCraftVaultStockWire(s.cvault);

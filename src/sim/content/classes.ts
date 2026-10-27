@@ -24,6 +24,7 @@ import {
   TEMPORAL_ECHO_DURATION_SECONDS,
   TEMPORAL_ECHO_SINGLE_CONVERSION,
 } from './chronomancy_tuning';
+import { COURIER_ABILITY } from './courier';
 import {
   CHRONOWEAVE_2PC_ECHO_CONVERT_SINGLE,
   GROVESPRING_2PC_SWIFTMEND_HEAL_MULT,
@@ -382,6 +383,8 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'wildheart',
       'shellskin',
       'frostjaw_trap',
+      'bear_trap',
+      'scatterbolt',
       'tame_beast',
       'dismiss_pet',
       'revive_pet',
@@ -391,7 +394,10 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'rapid_fire',
       'shrapnel_charge',
       'bloodtrail_assault',
+      'tactical_camo',
+      'play_dead',
       'volley',
+      'phosphor_flask',
       'counter_shot',
     ],
     color: 0xa6d84f,
@@ -639,8 +645,15 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
 
 const MAGE_PERSONAL_BARRIER_SPELL_POWER_COEFF = 0.5;
 const MAGE_TEMPORAL_BARRIER_SPELL_POWER_COEFF = 0.25;
+// Psalm of Warding: the classic 0.10 shield coefficient on every rank, read off
+// the caster's healPower (Spell Power + Healing Power) through absorbBonus.
+export const PRIEST_PSALM_OF_WARDING_SPELL_POWER_COEFF = 0.1;
+// Mass Barrier (mage row-17 raid cooldown): the same per-target coefficient as
+// Temporal Barrier, applied to every shielded ally from the caster's healPower.
+export const MAGE_MASS_BARRIER_SPELL_POWER_COEFF = 0.25;
 
 export const ABILITIES: Record<string, AbilityDef> = {
+  courier: COURIER_ABILITY,
   ...PALADIN_CORE_ABILITIES,
   // ====================== WARRIOR ======================
   heroic_strike: {
@@ -1098,11 +1111,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description:
       'Brace behind your shield: you take 50% reduced Physical damage for 6 sec. Stores up to 2 charges. (Protection)',
   },
-  // Protection's rage-dump survival wall (operator design, Ignorar Dolor): the
-  // FIRST spendsAllResource ability. `cost` is the 20-rage minimum gate; casting
-  // spends up to spendResourceCap (40) rage from the bar and grants a damage-absorb
-  // shield (the priest-style 'absorb' aura kind, drained by dealDamage and read by
-  // the HUD absorb bar) soaking 4 damage per rage actually spent, up to 10 sec.
+  // Protection's survival wall (operator design, Ignorar Dolor): a flat 20 rage
+  // buys a damage-absorb shield (the priest-style 'absorb' aura kind, drained by
+  // dealDamage and read by the HUD absorb bar) worth 20% of the warrior's max
+  // health at cast time, up to 10 sec. It scales with the health pool, so it
+  // keeps pace with gear instead of capping at a fixed rage-bought amount.
   iron_resolve: {
     id: 'iron_resolve',
     name: 'Iron Resolve',
@@ -1110,16 +1123,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 14,
     specs: ['prot'],
     cost: 20,
-    spendsAllResource: true,
-    spendResourceCap: 40,
     castTime: 0,
     cooldown: 15,
     range: 0,
     school: 'physical',
     requiresTarget: false,
-    effects: [{ type: 'absorbSpentResource', mult: 4, duration: 10 }],
+    effects: [{ type: 'absorb', amount: 0, casterMaxHpPct: 0.2, duration: 10 }],
     description:
-      'Grit your teeth and ignore the pain: spends up to 40 rage (20 minimum) to absorb 4 damage per rage spent, lasting up to 10 sec. (Protection)',
+      'Grit your teeth and ignore the pain: a shield absorbs damage equal to 20% of your maximum health when cast, lasting up to 10 sec. (Protection)',
   },
   // Protection's frontal control slam (operator design, Ola de Choque): modest
   // aoe damage plus a 3 sec stun, restricted to enemies in the MELEE_ARC
@@ -2280,18 +2291,41 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Volley',
     class: 'hunter',
     learnLevel: 11,
+    // Fieldcraft throws Phosphor Flask in this slot instead.
+    excludeSpecs: ['survival'],
     cost: 60,
     castTime: 0,
-    cooldown: 8,
+    cooldown: 10,
     range: 35,
     school: 'physical',
     scalesWith: 'ranged',
     requiresTarget: false,
     targetMode: 'position',
-    channel: { duration: 3, ticks: 6 },
-    effects: [{ type: 'aoeDamage', min: 12, max: 16, radius: 8 }],
+    // Instant: the arrows keep falling for the full 3 sec after the hunter moves on
+    // (combat/hunter_ground_zone.ts keeps the armor mitigation the channel had).
+    effects: [{ type: 'groundAoE', min: 12, max: 16, radius: 8, duration: 3, interval: 0.5 }],
     description:
       'Rain arrows over an 8-yard area for 3 sec. Enemies in the area take $d Physical damage every 0.5 sec. Damage increases with Ranged Attack Power.',
+  },
+  phosphor_flask: {
+    id: 'phosphor_flask',
+    name: 'Phosphor Flask',
+    class: 'hunter',
+    specs: ['survival'],
+    learnLevel: 11,
+    cost: 60,
+    castTime: 0,
+    cooldown: 10,
+    range: 35,
+    school: 'fire',
+    scalesWith: 'ranged',
+    requiresTarget: false,
+    targetMode: 'position',
+    // Fieldcraft's Volley: the same zone, burning instead of raining arrows. Only
+    // enemies standing in the flames take damage; nothing lingers once they leave.
+    effects: [{ type: 'groundAoE', min: 12, max: 16, radius: 8, duration: 3, interval: 0.5 }],
+    description:
+      'A sealed vessel carrying a reactive chemical mix that bursts into white-hot flame over an 8 yard area for 3 sec. Enemies standing in the flames take $d Fire damage every 0.5 sec. Damage increases with Ranged Attack Power.',
   },
   hurricane: {
     id: 'hurricane',
@@ -3006,7 +3040,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Craven Thrust',
     class: 'rogue',
     learnLevel: 3,
-    cost: 60,
+    cost: 50,
     castTime: 0,
     cooldown: 0,
     range: 0,
@@ -3025,7 +3059,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       {
         rank: 2,
         level: 12,
-        cost: 60,
+        cost: 50,
         effects: [
           {
             type: 'weaponStrike',
@@ -3038,7 +3072,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       {
         rank: 3,
         level: 18,
-        cost: 60,
+        cost: 50,
         effects: [
           {
             type: 'weaponStrike',
@@ -3094,7 +3128,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 6,
     cost: 0,
     castTime: 0,
-    cooldown: 300,
+    cooldown: 90,
     range: 0,
     school: 'physical',
     requiresTarget: false,
@@ -3107,12 +3141,13 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Cutthroat Tempo',
     class: 'rogue',
     learnLevel: 10,
-    cost: 25,
+    cost: 0,
     castTime: 0,
     cooldown: 0,
     range: 0,
     school: 'physical',
     requiresTarget: true,
+    offGcd: true,
     spendsCombo: true,
     // Engines feel pass (owner playtest): at real energy cadence a 24 sec max
     // uptime meant the buff was down every build cycle; 12 + 4 per combo
@@ -3129,7 +3164,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 10,
     cost: 0,
     castTime: 0,
-    cooldown: 300,
+    cooldown: 60,
     range: 0,
     school: 'physical',
     requiresTarget: false,
@@ -3149,16 +3184,16 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     spendsCombo: true,
-    effects: [{ type: 'finisherStun', base: 1, perCombo: 1 }],
+    effects: [{ type: 'finisherStun', base: 2, perCombo: 1 }],
     description:
-      'Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec).',
+      'Finishing move that stuns the target for 2 sec plus 1 sec per combo point (5 combo points: 7 sec).',
   },
   ambush: {
     id: 'ambush',
     name: "Lurker's Strike",
     class: 'rogue',
     learnLevel: 4,
-    cost: 60,
+    cost: 50,
     castTime: 0,
     cooldown: 0,
     range: 0,
@@ -3189,15 +3224,15 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 2,
     cost: 0,
     castTime: 0,
-    cooldown: 10,
+    cooldown: 0,
     range: 0,
     school: 'physical',
     requiresTarget: false,
     offGcd: true,
     requiresOutOfCombat: true,
-    effects: [{ type: 'selfBuff', kind: 'stealth', value: 0.5, duration: 3600 }],
+    effects: [{ type: 'selfBuff', kind: 'stealth', value: 1.0, duration: 3600 }],
     description:
-      'Conceals you in the shadows: enemies barely notice you, but you move 50% slower. Attacking or taking damage breaks Duskveil. Cast again to step out.',
+      'Conceals you in the shadows: enemies barely notice you, and you move at full speed. Attacking or taking damage breaks Duskveil. Cast again to step out.',
     specNotes: {
       subtlety: 'Each opener you use from Duskveil adds 1 Gloam (max 3).',
     },
@@ -3209,7 +3244,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 20,
     cost: 0,
     castTime: 0,
-    cooldown: 180,
+    cooldown: 90,
     range: 0,
     school: 'physical',
     requiresTarget: false,
@@ -3257,7 +3292,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Gut Punch',
     class: 'rogue',
     learnLevel: 8,
-    cost: 60,
+    cost: 50,
     castTime: 0,
     cooldown: 0,
     range: 0,
@@ -3281,10 +3316,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Sap',
     class: 'rogue',
     learnLevel: 10,
-    cost: 65,
+    cost: 0,
     castTime: 0,
     cooldown: 0,
-    range: 0,
+    range: 10,
     school: 'physical',
     requiresTarget: true,
     requiresStealth: true,
@@ -3303,7 +3338,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Leaden Venom',
     class: 'rogue',
     learnLevel: 12,
-    cost: 40,
+    cost: 35,
     castTime: 0,
     cooldown: 0,
     range: 0,
@@ -3365,9 +3400,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: false,
     offGcd: true,
-    effects: [{ type: 'selfBuff', kind: 'stealth', value: 0.5, duration: 10 }],
+    effects: [{ type: 'selfBuff', kind: 'stealth', value: 1.0, duration: 10 }],
     description:
-      'Melt from sight, entering Duskveil even in combat. You move 50% slower while hidden. Lasts up to 10 sec.',
+      'Melt from sight, entering Duskveil even in combat. You move at full speed while hidden. Lasts up to 10 sec.',
   },
   instant_poison: {
     id: 'instant_poison',
@@ -3475,7 +3510,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 20,
     cost: 50,
     castTime: 0,
-    cooldown: 120,
+    cooldown: 60,
     range: 5,
     school: 'physical',
     requiresTarget: true,
@@ -3786,6 +3821,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 10,
     cost: 0,
     castTime: 6,
+    // Every hunter cast is mobile (Fieldcraft rework, PR 4488).
+    castWhileMoving: true,
     cooldown: 0,
     range: 20,
     school: 'nature',
@@ -3813,15 +3850,18 @@ export const ABILITIES: Record<string, AbilityDef> = {
     name: 'Patch Up',
     class: 'hunter',
     learnLevel: 10,
-    cost: 45,
+    cost: 0,
     castTime: 3,
+    castWhileMoving: true,
     cooldown: 0,
     range: 0,
     school: 'nature',
     requiresTarget: false,
-    effects: [{ type: 'hot', total: 240, duration: 12, interval: 3 }],
+    // The heal is a share of the companion's own pool, not a flat total, so the
+    // numbers live in combat/hunter_patch_up.ts and the effect list stays empty.
+    effects: [],
     description:
-      'Restore $o health to your living companion over 12 sec. Healing increases with Spell Power. If your companion is dead, revive it with 35% health instead.',
+      "Restore 10% of your living companion's maximum health every sec for 8 sec. If your companion is dead, revive it with 50% health instead.",
   },
   raptor_strike: {
     id: 'raptor_strike',
@@ -3942,6 +3982,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 5,
     cost: 0,
     castTime: 1.5,
+    castWhileMoving: true,
     cooldown: 0,
     range: 35,
     school: 'physical',
@@ -4099,7 +4140,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Passive: Gutting Strike grants 1 Hunting Momentum for 8 sec, up to 3. At 3 stacks, Woundrend deals 45% more strike damage and consumes the stacks. (Fieldcraft)',
+      'Passive: Gutting Strike and a Shrapnel Charge that hits an enemy each grant 1 Hunting Momentum, up to 3. Momentum lasts until spent or until you leave combat, and each stack increases your movement speed by 15%. At 3 stacks, Woundrend deals 60% more strike damage and consumes the stacks. (Fieldcraft)',
   },
   fieldcraft_reentry: {
     id: 'fieldcraft_reentry',
@@ -4116,7 +4157,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Passive: Trailbreak refreshes Hunting Momentum and arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% more damage per stack. Bloodhook deals 18 to 24 extra Physical damage, increased by 15% per stack and by Ranged Attack Power. At 3 stacks, either attack consumes Hunting Momentum. (Fieldcraft)',
+      'Passive: With Hunting Momentum, Trailbreak arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% more damage per stack. Bloodhook deals 18 to 24 extra Physical damage, increased by 15% per stack and by Ranged Attack Power. At 3 stacks, either attack consumes Hunting Momentum. (Fieldcraft)',
   },
   wing_clip: {
     id: 'wing_clip',
@@ -4194,6 +4235,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 11,
     cost: 35,
     castTime: 2.5,
+    castWhileMoving: true,
     cooldown: 0,
     range: 35,
     school: 'physical',
@@ -4232,27 +4274,28 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 11,
     cost: 0,
     castTime: 0,
-    cooldown: 12,
-    range: 25,
+    // Fieldcraft rework: an uncapped cone fired from the hunter on a 10 sec cooldown.
+    cooldown: 10,
+    range: 0,
     school: 'physical',
     scalesWith: 'ranged',
-    requiresTarget: true,
+    requiresTarget: false,
     effects: [
       {
         type: 'hunterShrapnel',
         primaryMin: 24,
         primaryMax: 30,
-        splashMin: 13,
-        splashMax: 17,
-        radius: 6,
-        maxTargets: 5,
+        splashMin: 7,
+        splashMax: 9,
+        coneRange: 10,
+        coneAngleDeg: 90,
         spreadTotal: 12,
         spreadDuration: 6,
         spreadInterval: 2,
       },
     ],
     description:
-      'Hit the target for 24 to 30 Physical damage and up to 4 other enemies within 6 yards for 13 to 17. Other targets also bleed for 12 damage over 6 sec. If the main target has your Bloodhook Wound, deal 1 wound tick immediately. Direct damage increases with Ranged Attack Power.',
+      'Blast a 10-yard cone in front of you. Your target, or the nearest enemy hit if your target is outside the cone, takes 24 to 30 Physical damage. Every other enemy in the cone takes 7 to 9 and bleeds for 12 damage over 6 sec. If the main target has your Bloodhook Wound, deal 1 wound tick immediately. Hitting an enemy grants 1 Hunting Momentum. Direct damage increases with Ranged Attack Power.',
   },
   bloodtrail_assault: {
     id: 'bloodtrail_assault',
@@ -4269,7 +4312,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'hunter_bloodtrail', value: 1, duration: 12 }],
     description:
-      'For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 enemies within 5 yards, Woundrend commands an 18-damage pet attack, and Shrapnel Charge gains 2 yards of radius, deals 25% more base damage to its main target, and triggers 50% more wound damage.',
+      'For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 enemies within 5 yards, Woundrend commands an 18-damage pet attack, and Shrapnel Charge reaches 2 yards farther, deals 25% more base damage to its main target, and triggers 50% more wound damage. While you have no living pet, your Focus also regenerates 100% faster.',
   },
   trailbreak: {
     id: 'trailbreak',
@@ -4278,14 +4321,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 4,
     cost: 0,
     castTime: 0,
-    cooldown: 20,
+    cooldown: 15,
     range: 0,
     school: 'physical',
     requiresTarget: false,
     offGcd: true,
     effects: [{ type: 'hunterTrailbreak', distance: 25 }],
     description:
-      'Leap 25 yards backward and break free of roots and movement slows. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec.',
+      'Leap 25 yards backward and break free of roots and movement slows. Landing grants 50% movement speed for 3 sec. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec.',
   },
   wildheart: {
     id: 'wildheart',
@@ -4294,7 +4337,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 6,
     cost: 0,
     castTime: 0,
-    cooldown: 120,
+    cooldown: 45,
     range: 0,
     school: 'nature',
     requiresTarget: false,
@@ -4309,13 +4352,51 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 8,
     cost: 0,
     castTime: 0,
-    cooldown: 180,
+    cooldown: 60,
     range: 0,
     school: 'physical',
     requiresTarget: false,
     offGcd: true,
     effects: [{ type: 'selfBuff', kind: 'shield_wall', value: 0.6, duration: 8 }],
     description: 'Reduce damage taken by 60% for 8 sec, but prevent attacks while active.',
+  },
+  play_dead: {
+    id: 'play_dead',
+    tooltipOmitEffectLines: true,
+    name: 'Play Dead',
+    class: 'hunter',
+    learnLevel: 10,
+    cost: 0,
+    castTime: 0,
+    cooldown: 30,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    offGcd: true,
+    // Display-only death (combat/hunter_play_dead.ts): the hunter never dies.
+    effects: [{ type: 'hunterPlayDead', movingGrace: 1 }],
+    description:
+      'Fall to the ground and appear dead: your health and Focus show as empty to everyone. Enemies forget you, and enemy players targeting you lose their target. Moving, attacking, or using another ability ends it. Cast while moving, you have 1 sec to stop before moving ends it. Cast again to get up.',
+  },
+  tactical_camo: {
+    id: 'tactical_camo',
+    tooltipOmitEffectLines: true,
+    name: 'Tactical Camo',
+    class: 'hunter',
+    specs: ['survival'],
+    learnLevel: 10,
+    cost: 0,
+    castTime: 0,
+    cooldown: 10,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    offGcd: true,
+    requiresOutOfCombat: true,
+    // Duskveil's stealth at 80% movement speed: attacking or taking damage breaks it.
+    effects: [{ type: 'selfBuff', kind: 'stealth', value: 0.8, duration: 3600 }],
+    description:
+      'Blend into your surroundings: enemies barely notice you, and you move at 80% speed. Attacking or taking damage breaks Tactical Camo. Cast again to step out. (Fieldcraft)',
   },
   frostjaw_trap: {
     id: 'frostjaw_trap',
@@ -4328,19 +4409,71 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'frost',
     requiresTarget: false,
+    // Thrown at a chosen ground point like the Hourglass of Suspension; enemy
+    // players never see the armed trap (combat/hunter_trap.ts).
+    targetMode: 'position',
     effects: [
       {
         type: 'frostjawTrap',
         radius: 4,
         armTime: 0.75,
-        lifetime: 30,
+        lifetime: 60,
         rootDuration: 3,
         slowMult: 0.5,
         slowDuration: 4,
       },
     ],
     description:
-      'Place a trap at the selected enemy or at your feet. It arms after 0.75 sec and lasts 30 sec. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec.',
+      'Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec.',
+  },
+  bear_trap: {
+    id: 'bear_trap',
+    name: 'Bear Trap',
+    class: 'hunter',
+    learnLevel: 16,
+    cost: 0,
+    castTime: 0,
+    cooldown: 30,
+    range: 30,
+    school: 'physical',
+    scalesWith: 'ranged',
+    requiresTarget: false,
+    targetMode: 'position',
+    // Frostjaw's placement and trigger rules. The jaws bleed the victim for 1.5x
+    // Venom Barb's top rank (55 base plus 15% Ranged AP over 15 sec) and slow it.
+    effects: [
+      {
+        type: 'hunterBearTrap',
+        radius: 4,
+        armTime: 0.75,
+        lifetime: 60,
+        bleedTotal: 83,
+        bleedDuration: 15,
+        bleedInterval: 3,
+        rangedPowerCoeff: 0.225,
+        slowMult: 0.5,
+        slowDuration: 4,
+      },
+    ],
+    description:
+      'Place a trap at the selected location. It arms after 0.75 sec and lasts 1 min, and only you and your group can see it. The first enemy to trigger it bleeds for $d Physical damage over 15 sec and is slowed by 50% for 4 sec. Damage increases with Ranged Attack Power. Only one Bear Trap can be active at a time. Placing another replaces it. It can coexist with your Frostjaw Trap.',
+  },
+  scatterbolt: {
+    id: 'scatterbolt',
+    name: 'Scatterbolt',
+    class: 'hunter',
+    learnLevel: 12,
+    cost: 0,
+    castTime: 0,
+    cooldown: 15,
+    range: 0,
+    school: 'physical',
+    requiresTarget: false,
+    offGcd: true,
+    // Shrapnel Charge's 90 degree cone at 8 yards: no damage, only displacement.
+    effects: [{ type: 'hunterScatterbolt', coneRange: 8, coneAngleDeg: 90, pushTo: 20 }],
+    description:
+      'Fire a spray of bolts in an 8-yard cone (90 degrees) in front of you, knocking enemies back up to 20 yards from you. Knockback-immune enemies are unaffected. Deals no damage.',
   },
 
   // ====================== PRIEST ======================
@@ -4472,25 +4605,53 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'holy',
     requiresTarget: true,
     targetType: 'friendly',
-    effects: [{ type: 'absorb', amount: 48, duration: 30 }],
+    effects: [
+      {
+        type: 'absorb',
+        amount: 48,
+        duration: 30,
+        spellPowerCoeff: PRIEST_PSALM_OF_WARDING_SPELL_POWER_COEFF,
+      },
+    ],
     ranks: [
       {
         rank: 2,
         level: 12,
         cost: 70,
-        effects: [{ type: 'absorb', amount: 90, duration: 30 }],
+        effects: [
+          {
+            type: 'absorb',
+            amount: 90,
+            duration: 30,
+            spellPowerCoeff: PRIEST_PSALM_OF_WARDING_SPELL_POWER_COEFF,
+          },
+        ],
       },
       {
         rank: 3,
         level: 18,
         cost: 100,
-        effects: [{ type: 'absorb', amount: 145, duration: 30 }],
+        effects: [
+          {
+            type: 'absorb',
+            amount: 145,
+            duration: 30,
+            spellPowerCoeff: PRIEST_PSALM_OF_WARDING_SPELL_POWER_COEFF,
+          },
+        ],
       },
       {
         rank: 4,
         level: 20,
         cost: 130,
-        effects: [{ type: 'absorb', amount: 210, duration: 30 }],
+        effects: [
+          {
+            type: 'absorb',
+            amount: 210,
+            duration: 30,
+            spellPowerCoeff: PRIEST_PSALM_OF_WARDING_SPELL_POWER_COEFF,
+          },
+        ],
       },
     ],
     description:
@@ -6654,8 +6815,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     usableInForm: true,
     requiresOutOfCombat: true,
     // 1.0: feral stealth moves at full speed (Wildfang kit pass 2; it was a
-    // 0.95 near-full crawl before), the feral scouting identity. The rogue
-    // Duskveil family deliberately keeps its slower 0.5 crawl.
+    // 0.95 near-full crawl before), the feral scouting identity. Rogue Duskveil
+    // now matches it (1.0), with Skulduggery at 1.15.
     effects: [{ type: 'selfBuff', kind: 'stealth', value: 1.0, duration: 3600 }],
     description:
       'Shift into Cat Form if you are not already, and enter stealth. Usable in any form. Cannot be used in combat.',
@@ -7076,8 +7237,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: true,
     spendsCombo: true,
     requiresForm: 'cat',
-    // The Low Blow shape and numbers (finisherStun): 2 sec at 1 combo point up
-    // to 6 sec at 5, retuned on review from 0.5 + 0.5 per point (a 3 sec cap
+    // Low Blow's former shape and numbers (finisherStun): 2 sec at 1 combo
+    // point up to 6 sec at 5 (Low Blow itself now runs 3 to 7), retuned on
+    // review from 0.5 + 0.5 per point (a 3 sec cap
     // was one GCD of control); the controlled-stun diminishing category
     // beside Concuss (stun_dr.ts).
     effects: [{ type: 'finisherStun', base: 1, perCombo: 1 }],
@@ -7704,7 +7866,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 5,
     cost: 0,
     castTime: 0,
-    cooldown: 15,
+    cooldown: 10,
     range: 25,
     school: 'physical',
     requiresTarget: true,
@@ -7715,10 +7877,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
         bleedDuration: 12,
         bleedInterval: 3,
         rangedPowerCoeff: 0.26,
+        slowMult: 0.7,
+        slowDuration: 3,
       },
     ],
     description:
-      'Charge to an enemy and apply Bloodhook Wound, dealing 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)',
+      'Charge to an enemy and apply Bloodhook Wound, dealing 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. On arrival, slow the target by 30% for 3 sec. (Fieldcraft signature)',
   },
   trueshot_aura: {
     id: 'trueshot_aura',
@@ -7838,9 +8002,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'physical',
     requiresTarget: false,
-    effects: [{ type: 'selfBuff', kind: 'next_attack_crit', value: 1, duration: 60 }],
+    effects: [{ type: 'selfBuff', kind: 'next_attack_crit', value: 1, duration: 60, charges: 5 }],
     description:
-      'Focuses your killing intent so your next attack is a critical strike. (Knifework signature)',
+      'Focuses your killing intent so your next 5 attacks are critical strikes. (Knifework signature)',
   },
   blade_flurry: {
     id: 'blade_flurry',
@@ -7854,9 +8018,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'physical',
     requiresTarget: false,
-    effects: [{ type: 'selfBuff', kind: 'buff_haste', value: 1.2, duration: 12 }],
+    effects: [{ type: 'selfBuff', kind: 'buff_haste', value: 1.2, duration: 30 }],
     description:
-      'Unleashes a flurry of blades, increasing attack speed by 20% for 12 sec. (Thuggery signature)',
+      'Unleashes a flurry of blades, increasing attack speed by 20% for 30 sec. (Thuggery signature)',
   },
   hemorrhage: {
     id: 'hemorrhage',
@@ -8352,11 +8516,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 10,
     cost: 35,
     castTime: 0,
-    cooldown: 20,
+    cooldown: 15,
     range: 35,
     school: 'physical',
     scalesWith: 'ranged',
     requiresTarget: true,
+    offGcd: true,
     effects: [{ type: 'interrupt', lockout: 4 }],
     description: 'Interrupt the target and prevent spells from that school for 4 sec.',
   },
@@ -8615,14 +8780,17 @@ export const ABILITIES: Record<string, AbilityDef> = {
     effects: [
       {
         type: 'aoeAllyAbsorb',
-        amount: 130,
-        duration: 60,
+        // Raid cooldown (owner 2026-10-20): a short, large shield sized to cover
+        // one normal boss hit, scaling with healPower like Temporal Barrier.
+        amount: 250,
+        duration: 15,
         radius: 30,
         maxTargets: 5,
+        spellPowerCoeff: MAGE_MASS_BARRIER_SPELL_POWER_COEFF,
       },
     ],
     description:
-      'Shields you and up to 4 nearby allies within 30 yd, each absorbing 130 damage for 60 sec. (Mage talent)',
+      'Shields you and up to 4 nearby allies within 30 yd, each absorbing $d damage for 15 sec. (Mage talent)',
   },
   overload: {
     id: 'overload',
@@ -9125,6 +9293,11 @@ function scaleEffect(
             ? undefined
             : Math.round(eff.casterMaxHpPct * healMult * absorbMult * 10_000) / 10_000,
       };
+    case 'aoeAllyAbsorb':
+      // Mass Barrier's per-target base takes the same talent heal and global
+      // absorb multipliers as a single-target shield; the healPower rider the
+      // dispatch adds uses the identical product (effect_dispatch.ts).
+      return { ...eff, amount: Math.round(eff.amount * healMult * absorbMult + flat) };
     // Only the buff kinds whose value is a flat MAGNITUDE (armor, attack power, a flat
     // primary stat, spell power, thorns damage) scale with a damage-power mod. Every
     // other selfBuff/buffTarget kind is a rate, multiplier, percent, or a locked
@@ -9280,14 +9453,27 @@ export function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): voi
                   bonus: Math.round(e.bonus * mul),
                   coat: scalePoisonCoatDamage(e.coat, mul),
                 }
-              : // Forgewall 2pc (the Crucible set doc's scaleEffect
-                // extension): Iron Resolve's rage-to-absorb rate is the
+              : // A spend-all shield's rage-to-absorb rate is the
                 // buff-shaped value on absorbSpentResource, so the generic
                 // per-ability knob reaches it and the tooltip splice reads
                 // the same resolved rate the dispatch consumes.
                 e.type === 'absorbSpentResource'
                 ? { ...e, mult: Math.round(e.mult * mul) }
-                : e,
+                : // Forgewall 2pc (Iron Resolve 20% to 25% of max health): a
+                  // shield's flat amount and its max-health fraction are both
+                  // buff-shaped, so the per-ability knob scales them and the
+                  // {damage} splice reads the same resolved fraction the
+                  // dispatch consumes.
+                  e.type === 'absorb'
+                  ? {
+                      ...e,
+                      amount: Math.round(e.amount * mul),
+                      casterMaxHpPct:
+                        e.casterMaxHpPct === undefined
+                          ? undefined
+                          : Math.round(e.casterMaxHpPct * mul * 10_000) / 10_000,
+                    }
+                  : e,
       );
     }
   }

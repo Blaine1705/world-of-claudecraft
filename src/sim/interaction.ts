@@ -1,3 +1,4 @@
+import { tryStartKitUse } from './mob/trash_kit/encounter_use';
 import { isHoardRewardChestTemplate, openHoardRewardChest } from './rift/hoard_reward_chest';
 import { isRiftEntranceTemplate } from './rift/vault_seed';
 import { vehicleStationByEntityId } from './vehicle_stations';
@@ -40,11 +41,14 @@ import {
   interactObjectForQuests,
   tryStartNythraxisWardChannel,
 } from './encounters/nythraxis';
+import { tryCageStruggle } from './encounters/sunken_bastion/turnkey';
+import { trySpearWrench } from './encounters/wildheart_basin/zulgar_spear';
 import { tryStartEscort } from './escort';
 import { interactIgnivarRaidLore } from './ignivar_raid_lore';
 import { isInRaidInstance } from './instances/dungeons';
 import { FERRY_BELL_OBJECT_ID, tryRingFerryBell } from './interactions/ferry_bell';
 import { HUT_OBJECT_ID, tryBurnHut } from './interactions/firebottle_hut';
+import { mobLootSource } from './loot/awarded_loot_hold';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
   awardSharedLootItem,
@@ -54,7 +58,9 @@ import {
   lootSlotVisibleTo,
   pruneCorpseLoot,
 } from './loot/loot_roll';
+import { isMusterRack, useMusterRack } from './mirefen_muster';
 import { startCorpseHarvest } from './professions/corpse_harvest_session';
+import { storeLootedSkulls } from './pvp/skull_bag';
 import { isQuestGatedGroundObjectHidden } from './quest_gated_entity';
 import { corpseHasDecayed } from './respawn_policy';
 import { isRiftForgeNpc } from './rift/forge_gate';
@@ -69,6 +75,7 @@ import {
   OBJECT_RESPAWN,
   REALM_BUILDER_MONUMENT_INTERACT_RADIUS,
   REALM_BUILDER_MONUMENT_TEMPLATE_ID,
+  type Vec3,
 } from './types';
 import { talkToWeeklyKeeper } from './weekly_rewards';
 import { markWorldBossLooted } from './world_boss';
@@ -112,12 +119,19 @@ function corpseLootRights(
 // `quiet` (default false) suppresses the full-bags toast: the walk-by pass retries
 // every couple of seconds while the player stands near a corpse, so a full-bags
 // player would otherwise get the toast on loop; a deliberate click keeps it.
+// `reachFrom` (default the looting player's own position) is the point the
+// INTERACT_RANGE check is measured from. The ONE caller that passes it is the buddy
+// autoloot errand (src/sim/pet/buddy_autoloot.ts): the owner stays put and sends the
+// buddy, so it is the BUDDY that has to be standing on the corpse. Everything else
+// about the loot is still the owner's (their rights, their bags, their money), so
+// only the range origin moves, never the identity.
 export function lootCorpse(
   ctx: SimContext,
   mobId: number,
   pid?: number,
   honorFfa = true,
   quiet = false,
+  reachFrom?: Vec3,
 ): boolean {
   const r = ctx.resolve(pid);
   if (!r) return false;
@@ -142,7 +156,7 @@ export function lootCorpse(
     ctx.error(meta.entityId, "You don't have permission to loot that.");
     return false;
   }
-  if (dist2d(p.pos, mob.pos) > INTERACT_RANGE) {
+  if (dist2d(reachFrom ?? p.pos, mob.pos) > INTERACT_RANGE) {
     ctx.error(meta.entityId, 'Too far away.');
     return false;
   }
@@ -170,6 +184,7 @@ export function lootCorpse(
           meta.entityId,
           killSnapshotEligibility(ctx, mob),
           s.instance,
+          mobLootSource(mob),
         );
         s.count--;
         didLoot = true;
@@ -178,6 +193,16 @@ export function lootCorpse(
       continue;
     }
     if (s.personalFor) {
+      // A trophy skull goes straight into a carried Skull Bag, which has no
+      // room limit (pvp/skull_bag.ts); anything else takes the bag check.
+      const bagged =
+        !s.instance && storeLootedSkulls(ctx, meta, s.itemId, s.count, s.materialSources);
+      if (bagged) {
+        s.personalFor = s.personalFor.filter((id) => id !== meta.entityId);
+        tookPersonal = true;
+        didLoot = true;
+        continue;
+      }
       if (
         s.instance
           ? !canGrantItemInstance(
@@ -192,8 +217,15 @@ export function lootCorpse(
         bagsFull = true;
         continue;
       }
+      const lootOpts = { source: mobLootSource(mob) };
       if (s.instance) {
-        ctx.addItemInstance(s.itemId, cloneItemInstancePayload(s.instance), meta.entityId, s.count);
+        ctx.addItemInstance(
+          s.itemId,
+          cloneItemInstancePayload(s.instance),
+          meta.entityId,
+          s.count,
+          lootOpts,
+        );
       } else {
         // A provenance-tracked slot (a World PvP skull naming its victim) keeps
         // its per-unit source buckets on the way into the bag.
@@ -201,7 +233,7 @@ export function lootCorpse(
           s.itemId,
           s.count,
           meta.entityId,
-          s.materialSources ? { materialSources: s.materialSources } : undefined,
+          s.materialSources ? { ...lootOpts, materialSources: s.materialSources } : lootOpts,
         );
       }
       s.personalFor = s.personalFor.filter((id) => id !== meta.entityId);
@@ -302,6 +334,17 @@ export function pickUpObject(
   if (isHoardRewardChestTemplate(obj.templateId)) {
     openHoardRewardChest(ctx, obj.id, p.id);
     return true;
+  }
+  // The muster's weapon rack lends a pike, it is never looted. Both client entry points
+  // (the rack click and the interact key's object arm) send THIS command, not interact,
+  // so the rack is answered here, ahead of the item-payload gate below that it would
+  // otherwise fail silently (a rack carries no objectItemId).
+  if (isMusterRack(obj)) {
+    if (dist2d(p.pos, obj.pos) > INTERACT_RANGE) {
+      ctx.error(meta.entityId, 'Too far away.');
+      return false;
+    }
+    return useMusterRack(ctx, ctx.musterArmy, meta.entityId);
   }
   const vehicleStation = vehicleStationByEntityId(obj.id);
   if (vehicleStation) return enterVehicle(ctx, vehicleStation.id, p.id);
@@ -469,6 +512,12 @@ export function interact(
     ctx.error(r.meta.entityId, "You can't do that while dead.");
     return;
   }
+  // Locked in the Gaol Turnkey's Iron Cage: the interact press is an escape
+  // press (rate-limited and counted by the encounter), never anything else.
+  if (tryCageStruggle(ctx, p)) return;
+  // Pinned by Zulgar's Hunting Spear: the press is the victim's own pull on
+  // it (only while nobody stands free to help), never anything else.
+  if (trySpearWrench(ctx, p)) return;
   if (p.targetId !== null) {
     const target = ctx.entities.get(p.targetId);
     if (
@@ -476,6 +525,9 @@ export function interact(
       dist2d(p.pos, target.pos) <=
         (forgeStationForEntity(target) ? FORGE_INTERACT_RANGE : INTERACT_RANGE + 2)
     ) {
+      // A usable encounter body (the trash engine's G3: the Soul Brazier):
+      // the press starts its use, validated here on the authoritative sim.
+      if (tryStartKitUse(ctx, target, p)) return;
       if (isLootableBody(target) || (target.kind === 'mob' && target.lootable)) {
         const availability = corpseInteractionAvailability(ctx, target, p.id, true);
         if (availability.hasLoot) {
@@ -520,6 +572,10 @@ export function interact(
         }
         if (target.templateId === 'mailbox') {
           ctx.emit({ type: 'mailbox', pid: p.id });
+          return;
+        }
+        if (isMusterRack(target)) {
+          useMusterRack(ctx, ctx.musterArmy, p.id);
           return;
         }
         if (tryStartNythraxisWardChannel(ctx, target, p)) return;
@@ -639,6 +695,10 @@ export function interact(
     }
     if (obj.templateId === 'mailbox') {
       ctx.emit({ type: 'mailbox', pid: p.id });
+      return;
+    }
+    if (isMusterRack(obj)) {
+      useMusterRack(ctx, ctx.musterArmy, p.id);
       return;
     }
     if (tryStartNythraxisWardChannel(ctx, obj, p)) return;

@@ -1,5 +1,6 @@
 import type { PlayerClass } from '../sim/types';
 import { weeklyRewardAvailability } from '../sim/weekly_reward_availability';
+import { WEEKLY_BOSS_TABLES, type WeeklyBossUnlocks } from '../sim/weekly_reward_tables';
 import {
   earnedWeeklyRolls,
   WEEKLY_POOL_IDS,
@@ -18,20 +19,37 @@ export function weeklyCountdown(resetAtMs: number, nowMs: number): string {
     seconds: n(total % 60),
   });
 }
-export function buildWeeklyRewardsView(info: WeeklyRewardInfo, playerClass: PlayerClass) {
+/** Heroic unlocks include Normal; used only for the read-only loot catalog. */
+const EVERY_WEEKLY_BOSS_UNLOCK: WeeklyBossUnlocks = Object.freeze(
+  Object.fromEntries(WEEKLY_BOSS_TABLES.map(({ bossId }) => [bossId, 2])),
+);
+
+export type WeeklyLootCatalog = 'eligible' | 'all';
+
+export function buildWeeklyRewardsView(
+  info: WeeklyRewardInfo,
+  playerClass: PlayerClass,
+  options: { catalog?: WeeklyLootCatalog } = {},
+) {
+  const catalog = options.catalog ?? 'eligible';
+  const bossUnlocks =
+    catalog === 'all'
+      ? EVERY_WEEKLY_BOSS_UNLOCK
+      : (info.state.weeklyBossUnlocks ?? info.state.bossUnlocks);
   const earned = earnedWeeklyRolls(info.state);
   const progress = [
-    info.state.raids.filter(Boolean).length,
+    info.state.raidClears.length,
     info.state.dungeons.length,
     info.state.world,
     info.state.pvp,
   ];
   const tiers = {
-    raid: info.state.raids.filter(Boolean).sort((a, b) => b - a),
+    raid: info.state.raidClears,
     dungeon: info.state.dungeons,
   };
   return (['raid', 'dungeon', 'world', 'pvp'] as const).map((category, index) => ({
     category,
+    catalog,
     progress: progress[index],
     thresholds: WEEKLY_THRESHOLDS[category],
     available: category !== 'world' || info.worldQuestsAvailable,
@@ -53,7 +71,7 @@ export function buildWeeklyRewardsView(info: WeeklyRewardInfo, playerClass: Play
         {
           resetAtMs: 0,
           choices: [],
-          bossUnlocks: info.state.bossUnlocks,
+          bossUnlocks,
           raidUnlocks: info.state.raidUnlocks,
         },
         { pool },

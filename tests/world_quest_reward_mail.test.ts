@@ -4,7 +4,7 @@
 // forced past the bag capacity, and one event names every mailed item so the
 // HUD can pop the banner. Driven through the real Sim, PostOffice and the
 // awardWorldQuest bundle for the fixed-extra arm.
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { bagPools, canAddItem } from '../src/sim/bags';
 import { WORLD_QUEST_REWARD_LETTER } from '../src/sim/content/letters';
 import { WORLD_QUESTS_BY_ID } from '../src/sim/content/world_quests';
@@ -99,6 +99,78 @@ describe('grantWorldQuestRewardItems', () => {
     expect(sim.countItem(first.id)).toBe(1);
     expect(sim.countItem(second.id)).toBe(0);
     expect(rewardLetters(sim).map((m) => m.items.map((s) => s.itemId))).toEqual([[second.id]]);
+  });
+
+  it('mails a whole multi-copy reward when only one of its copies would fit', () => {
+    const sim = makeSim();
+    const meta = metaOf(sim);
+    meta.autoEquip = false;
+    const gear = 'slagbreaker_helmet';
+    fillBags(meta, gear);
+    meta.inventory.pop();
+    const mailed = grantWorldQuestRewardItems(sim.ctx, meta, [{ itemId: gear, count: 2 }]);
+    expect(mailed).toEqual([gear]);
+    expect(sim.countItem(gear)).toBe(0);
+    expect(
+      rewardLetters(sim)
+        .flatMap((letter) => letter.items)
+        .reduce((n, slot) => n + slot.count, 0),
+    ).toBe(2);
+    expect(mailedEvents(sim.drainEvents())).toEqual([
+      { type: 'worldQuestRewardMailed', itemIds: [gear], pid: sim.playerId },
+    ]);
+  });
+
+  it('preserves the same fresh quality in bags and persisted reward mail without capacity-dependent draws', () => {
+    const gear = 'slagbreaker_helmet';
+    const results = [false, true].map((full) => {
+      const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: false });
+      const meta = metaOf(sim);
+      meta.autoEquip = false;
+      meta.inventory = [];
+      if (full) fillBags(meta, gear);
+      const real = sim.rng.int.bind(sim.rng);
+      const int = vi
+        .spyOn(sim.rng, 'int')
+        .mockImplementation((min, max) => (min === 0 && max === 9999 ? 9999 : real(min, max)));
+      try {
+        grantWorldQuestRewardItems(sim.ctx, meta, [{ itemId: gear, count: 1 }]);
+        expect(int.mock.calls.filter(([min, max]) => min === 0 && max === 9999)).toHaveLength(1);
+        if (full) {
+          expect(sim.countItem(gear)).toBe(0);
+          sim.postOffice.loadMail(JSON.parse(JSON.stringify(sim.postOffice.serializeMail())));
+        }
+        const copy = full
+          ? rewardLetters(sim)[0].items[0]
+          : meta.inventory.find((slot) => slot.itemId === gear);
+        expect(copy?.instance?.lootQuality?.tier).toBe(4);
+        if (full) {
+          const box = sim.entities.get(sim.postOffice.mailboxIds[0]);
+          if (!box) throw new Error('Missing mailbox');
+          sim.player.pos = { ...box.pos };
+          sim.player.prevPos = { ...box.pos };
+          sim.rebucket(sim.player);
+          meta.inventory.pop();
+          sim.mailTake(rewardLetters(sim)[0].id, sim.playerId);
+          const taken = meta.inventory.find((slot) => slot.itemId === gear)?.instance;
+          expect(taken?.lootQuality).toEqual(copy?.instance?.lootQuality);
+          // The authored parcel first reaches the inventory hub on withdrawal:
+          // quality is already rolled, while tracking identity is minted here.
+          expect(taken?.guid).toEqual(expect.any(String));
+          expect(taken?.provenance?.source).toBe('legacy');
+          expect(copy?.instance?.guid).toBeUndefined();
+          expect(rewardLetters(sim)[0].items).toEqual([]);
+          expect(int.mock.calls.filter(([min, max]) => min === 0 && max === 9999)).toHaveLength(1);
+        } else {
+          expect(copy?.instance?.guid).toEqual(expect.any(String));
+          expect(copy?.instance?.provenance?.source).toBe('world');
+        }
+        return { lootQuality: copy?.instance?.lootQuality, next: sim.rng.next() };
+      } finally {
+        int.mockRestore();
+      }
+    });
+    expect(results[0]).toEqual(results[1]);
   });
 
   it('splits a large overflow across letters of at most MAIL_MAX_ATTACHMENTS, under one event', () => {

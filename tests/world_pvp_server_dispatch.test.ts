@@ -47,7 +47,7 @@ vi.mock('../server/db', () => ({
 }));
 
 import { GameServer, wireEntity } from '../server/game';
-import { WORLD_PVP_SKULL_ITEM_ID } from '../src/sim/pvp';
+import { WORLD_PVP_SKULL_BAG_ITEM_ID, WORLD_PVP_SKULL_ITEM_ID } from '../src/sim/pvp';
 import { WORLD_PVP_TOGGLE_COOLDOWN } from '../src/sim/pvp/world_pvp';
 import type { Entity } from '../src/sim/types';
 
@@ -178,5 +178,40 @@ describe('world pvp spoils over the wire', () => {
       { source: { gatherer: { kind: 'character', id: 202, name: 'Bet' } }, count: 1 },
     ]);
     expect(wireEntity(victim.p).lootList).toBeUndefined();
+  });
+});
+
+// The online half of the World PvP Skull Bag (src/sim/pvp/skull_bag.ts): the
+// skull_bag command reaches the sim through the real dispatch switch, a looted
+// skull goes into a carried bag on the server, and the readout rides the wpvp
+// self key the client mirrors.
+describe('world pvp skull bag over the wire', () => {
+  it('stores and takes skulls through skull_bag, ignoring a malformed frame', () => {
+    const { server, session, sim } = joined();
+    expect(COMMAND_NAMES).toContain('skull_bag');
+    const meta = sim.meta(session.pid)!;
+    meta.inventory.push(
+      { itemId: WORLD_PVP_SKULL_BAG_ITEM_ID, count: 1 },
+      {
+        itemId: WORLD_PVP_SKULL_ITEM_ID,
+        count: 2,
+        materialSources: [
+          { source: { gatherer: { kind: 'character', id: 202, name: 'Bet' } }, count: 2 },
+        ],
+      },
+    );
+    const bet = { source: { gatherer: { kind: 'character', id: 202, name: 'Bet' } }, count: 1 };
+    dispatch(server, session, { cmd: 'skull_bag', op: 'store' });
+    expect(meta.skullBag).toEqual([{ ...bet, count: 2 }]);
+    expect(meta.inventory.some((s) => s.itemId === WORLD_PVP_SKULL_ITEM_ID)).toBe(false);
+    // The bag never rides the 2 Hz wpvp readout: it has its own skb key.
+    expect(sim.worldPvpInfoFor(session.pid)!.skullBag).toBeUndefined();
+    dispatch(server, session, { cmd: 'skull_bag', op: 'take', sources: 'all' });
+    expect(meta.skullBag).toEqual([{ ...bet, count: 2 }]);
+    dispatch(server, session, { cmd: 'skull_bag', op: 'take', sources: [bet] });
+    expect(meta.skullBag).toEqual([bet]);
+    expect(
+      meta.inventory.find((s) => s.itemId === WORLD_PVP_SKULL_ITEM_ID)?.materialSources,
+    ).toEqual([bet]);
   });
 });

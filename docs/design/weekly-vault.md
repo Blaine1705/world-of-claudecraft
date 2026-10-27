@@ -7,6 +7,11 @@ slate pavilion roofs, a carved portal and gold trim frame the large steel door.
 Bursar Fernando and all bank storage remain at the Gilded Strongbox. The vault
 occupies most of the screen and closes bags; opening bags closes the vault.
 
+Groups also links to a read-only Weekly Vault preview, available anywhere in the
+world. It shows current progress and the possible-loot catalog without opening
+rewards, claiming items, or changing loot focus. Ready rewards direct the player
+to the Vault Keeper; every reward mutation still requires the living player nearby.
+
 ## Weekly choices
 
 Activities unlock candidate items, not additional item grants. At the Crucible's
@@ -24,10 +29,9 @@ Modern WoW replaced PvP with world activities, as described in its
 This implementation retains the owner's four requested rows, with WoC's own
 content and equipment tiers:
 
-- Raids: 1, 2 and 3 unique final encounters. This release has only three raid
-  bosses, so WoW's 2/4/6 thresholds would be unreachable. Normal and Heroic share
-  credit; a Heroic kill upgrades its encounter. Defeating a raid unlocks its loot
-  at that difficulty for future vaults.
+- Raids: 1, 2 and 3 final-boss clears, including repeats of the same encounter.
+  The first, second and third best clears determine each choice's difficulty.
+  Defeating a boss separately unlocks its loot at that difficulty for future vaults.
 - Dungeons: 1, 4 and 8 clears. The first, fourth and eighth best clears determine
   each choice's difficulty. WoC supports Normal and Heroic tiers.
 - World quests: 2, 4 and 8 completions. Every rotating world quest turn-in counts
@@ -42,6 +46,10 @@ content and equipment tiers:
   minutes in total, and is still in that group when it falls
   (`docs/design/warfare.md`, King of the Hill). The row reads "PvP Wins" for
   that reason.
+  The row pays Warfare Season 2 ("Vanguard") and nothing else: the
+  character's own three spec sets and the season weapons it can wield. The
+  Warfare entry tier is not in the row; it stays an honor purchase, and Season 2
+  is sold for honor too (`docs/design/warfare-season-2.md`).
 
 The window shows actual candidates with quality, item level and tooltips; current
 progress and exact eligible loot pools remain below. New rolls exclude every item
@@ -117,6 +125,9 @@ The server saves the item and its actual source in the existing `tableId` field
 before revealing it. The multi-selection is transient, not stored. Retries retain
 both the original item and source. View possible loot groups collapsible tables
 under content categories and difficulty, with item icons, counts and tooltips.
+At the Vault Keeper it lists only tables unlocked by permanent boss-clear history. The
+read-only Dungeon Finder preview lists every class-eligible table instead, so
+players can plan runs before any boss dies; both apply the same level and loot-focus filters.
 
 Older records can prove final-boss kills from lifetime dungeon deeds and legacy
 raid unlocks; they cannot prove intermediate kills. Legacy weeks without a boss
@@ -196,7 +207,12 @@ Tuesday at 03:00 realm time, with DST. The countdown uses that exact stored boun
 No additional scheduler or database queries are introduced.
 
 `weekly_rewards.ts` owns current progress, persistent boss unlocks and completed
-weekly batches. A claim validates proximity, life state, the active batch's choice
+weekly batches. `raidClears` retains only the three best difficulties for the
+current week; per-boss `raids` and `raidUnlocks` remain separate. Older saves
+without `raidClears` recover one known clear per recorded boss, since their
+repeat clears were not stored. A rollback to an older build followed by a save
+loses the new repeat-clear record. A claim validates proximity, life state, the
+active batch's choice
 key, the echoed sequence and bag capacity before consuming a batch and granting its
 fixed item. Inventory and the ledger share the existing character save. An unclean
 crash can roll back unsaved gameplay, like other inventory operations.

@@ -85,6 +85,7 @@ export interface ContinentMapModel {
   ports: FerryPortMapMarker[];
   /** The zone id the player currently stands in (the on-canvas subtitle). */
   currentZoneId: string;
+  hill: { mx: number; my: number; phase: 'warning' | 'active' } | null;
 }
 
 export interface ContinentMapInput {
@@ -138,6 +139,7 @@ export function buildContinentMapModel(input: ContinentMapInput): ContinentMapMo
   });
 
   const p = world.player;
+  const hill = world.hillInfo;
   const currentZoneId = zoneAt(p.pos.x, p.pos.z).id;
 
   const regions: ContinentZoneRegion[] = ZONES.map((zone) => {
@@ -201,6 +203,7 @@ export function buildContinentMapModel(input: ContinentMapInput): ContinentMapMo
     party,
     ports,
     currentZoneId,
+    hill: hill && inWorld(hill.x, hill.z) ? { ...toMap(hill.x, hill.z), phase: hill.phase } : null,
   };
 }
 

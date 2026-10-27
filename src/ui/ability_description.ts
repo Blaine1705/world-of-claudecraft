@@ -21,6 +21,7 @@ import {
 } from '../sim/types';
 import {
   type AbilityScaling,
+  abilityBearTrapBleedTotal,
   abilityBuffValue,
   abilityDamageBonus,
   abilityDurationValue,
@@ -138,6 +139,8 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
             perCombo: formatAbilityNumber(primary.perCombo),
           }) + suffix(primary)
         );
+      case 'hunterBearTrap':
+        return formatAbilityNumber(abilityBearTrapBleedTotal(primary, scaling));
       case 'hunterBloodhook':
         return (
           formatAbilityNumber(primary.bleedTotal * (primary.damageMult ?? 1)) + suffix(primary)
@@ -173,6 +176,8 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
       return secondary.casterMaxHpPct === undefined
         ? formatAbilityNumber(secondary.amount) + suffix(secondary)
         : formatAbilityNumber(secondary.casterMaxHpPct * 100);
+    case 'aoeAllyAbsorb':
+      return formatAbilityNumber(secondary.amount) + suffix(secondary);
     case 'imbue':
       return formatAbilityImbueDamage(secondary);
     default:
@@ -321,9 +326,9 @@ export function abilityDisplayDescription(
     0,
   );
   const rageText = rageGained > 0 ? formatAbilityNumber(rageGained) : '';
-  // {absorbPerRage} splices the RESOLVED absorbSpentResource rate (Iron
-  // Resolve), so the Forgewall 2pc's 5-per-rage shows live for wearers the
-  // same way a talent-upgraded value would.
+  // {absorbPerRage} splices the RESOLVED absorbSpentResource rate of a
+  // spend-all shield, so a buffPct upgrade shows live the same way a
+  // talent-upgraded value would.
   const absorbPerRage = res.effects.find(
     (eff): eff is Extract<AbilityEffect, { type: 'absorbSpentResource' }> =>
       eff.type === 'absorbSpentResource',

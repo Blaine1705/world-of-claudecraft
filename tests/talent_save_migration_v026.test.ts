@@ -293,9 +293,10 @@ describe('talent production save migrations', () => {
     expect(first.copper).toBe(9876);
     // wolf_fang is a gathering material: the legacy `instance.signer` legacy
     // stack now loads as a `materialSources` composition, source-keyed on the
-    // same signer, rather than an `instance` payload.
+    // same signer, rather than an `instance` payload. Crafted food uses the
+    // same source custody, with an explicit unknown bucket for unsigned bread.
     expect(first.inventory).toEqual([
-      { itemId: 'baked_bread', count: 4 },
+      { itemId: 'baked_bread', count: 4, materialSources: [{ source: {}, count: 4 }] },
       {
         itemId: 'wolf_fang',
         count: 9,

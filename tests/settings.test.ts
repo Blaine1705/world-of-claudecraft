@@ -102,6 +102,14 @@ describe('Settings', () => {
     expect(settings.set('gamepadGlyphStyle', 99)).toBe(3);
   });
 
+  it('defaults Raw Mouse Input on and persists turning it off', () => {
+    const settings = new Settings();
+
+    expect(settings.get('rawMouseInput')).toBe(true);
+    expect(settings.set('rawMouseInput', false)).toBe(false);
+    expect(new Settings().get('rawMouseInput')).toBe(false);
+  });
+
   it('defaults and clamps controller reticle speed to its slider range', () => {
     const settings = new Settings();
 
@@ -162,6 +170,27 @@ describe('Settings', () => {
     expect(new Settings().get('graphicsDefaultApplied')).toBe(true);
     s.reset();
     expect(s.get('graphicsDefaultApplied')).toBe(false);
+  });
+
+  it('asks the first-login graphics prompt on a fresh store only, never for a returning player', () => {
+    // A brand new browser: nothing stored, so the prompt is unanswered.
+    expect(new Settings().get('graphicsPromptAnswered')).toBe(false);
+    // A store written by THIS build before the prompt is answered (the landing contrast
+    // toggle, say) def-fills the key as an explicit false, so the prompt still asks.
+    new Settings().set('showFps', true);
+    expect(JSON.parse(localStorage.getItem('woc_settings') ?? '{}').graphicsPromptAnswered).toBe(
+      false,
+    );
+    expect(new Settings().get('graphicsPromptAnswered')).toBe(false);
+    // A store persisted before the key existed is a player who has already played: answered.
+    localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 3, showFps: true }));
+    expect(new Settings().get('graphicsPromptAnswered')).toBe(true);
+    // Answering persists; reset() returns it to false so Reset to Defaults asks again.
+    const s = new Settings();
+    s.set('graphicsPromptAnswered', true);
+    expect(new Settings().get('graphicsPromptAnswered')).toBe(true);
+    s.reset();
+    expect(new Settings().get('graphicsPromptAnswered')).toBe(false);
   });
 
   it('starts at the documented defaults (camera calmer than the old 1.0)', () => {

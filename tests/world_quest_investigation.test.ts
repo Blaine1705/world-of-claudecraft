@@ -18,11 +18,13 @@ import {
   INVESTIGATION_NPCS,
   INVESTIGATION_VARIANTS,
 } from '../src/sim/content/world_quest_investigation';
-import { BUILTIN_WORLD } from '../src/sim/data';
+import { BUILTIN_WORLD, WORLD_QUESTS_BY_ID } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
+import { applyWorldQuestReroll } from '../src/sim/world_quest_reroll';
 import {
   activeWorldQuestsForCycle,
+  worldQuestCycleOfferingQuest,
   worldQuestPuzzleVariantForCycle,
 } from '../src/sim/world_quest_rotation';
 import { WORLD_SEED } from '../src/sim/world_seed';
@@ -208,6 +210,31 @@ describe('A Borrowed Face', () => {
     accuse(sim);
     expect(sim.player.mountKey).toBe('valorsteed');
     expect(sim.worldQuestLog.get(ID)?.investigation?.mobId).toBeUndefined();
+  });
+
+  it('accepts testimony and a mounted accusation after the daily reroll', () => {
+    const sim = setup();
+    const meta = sim.meta(sim.playerId)!;
+    // A Mirefen day that rotates a different quest; the reroll swaps this one in.
+    const rotatingId = 'wq_mirefen_gravecallers';
+    meta.devWorldQuestCycle = worldQuestCycleOfferingQuest('wq3_0', rotatingId);
+    sim.tick();
+    expect(activeWorldQuestsForCycle(meta.worldQuestCycle).some((quest) => quest.id === ID)).toBe(
+      false,
+    );
+    applyWorldQuestReroll(meta, rotatingId, WORLD_QUESTS_BY_ID[ID], meta.worldQuestCycle);
+    near(sim, INVESTIGATION_NPC_IDS[1]);
+    sim.tick();
+    expect(sim.worldQuestLog.get(ID)?.state).toBe('active');
+    sim.talkToNpc(INVESTIGATION_NPC_IDS[1]);
+    expect(sim.worldQuestLog.get(ID)?.investigation?.heard).toBeGreaterThan(0);
+    investigate(sim);
+    expect(sim.worldQuestLog.get(ID)?.investigation).toEqual({ heard: 15, clues: 3, cleared: 0 });
+    sim.player.mountKey = 'valorsteed';
+    accuse(sim);
+    expect(sim.player.mountKey).toBe('');
+    const mob = sim.entities.get(sim.worldQuestLog.get(ID)!.investigation!.mobId!)!;
+    expect(mob.templateId).toBe(INVESTIGATION_MOB_ID);
   });
 
   it('keeps clues after wrong accusations and prevents duplicate summons even after movement', () => {

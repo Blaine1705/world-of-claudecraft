@@ -1,4 +1,7 @@
+import { endPlayDead } from './combat/hunter_play_dead';
+import { MEMBERSHIP_TOKEN_ID } from './content/membership';
 import { gliderActionsLocked } from './glider_action_lock';
+import { membershipWeaponShape } from './membership_weapon';
 import { shadowActionsLocked } from './shadow_action_lock';
 import { useCartographersInk, useTreasureMap } from './treasure_vault';
 // Inventory items + vendor: the player-facing equip/use/discard and buy/sell/buyback
@@ -85,8 +88,9 @@ import {
 import { canStackInstancePayloads, itemInstancePayloadsEqual } from './item_instance_merge';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
 import { isItemLocked } from './item_lock';
+import { recordTrackedChange, recordTrackedConsumed } from './item_tracking';
+import { type ItemUseConsumption, planItemUseConsumption } from './item_use_consumption';
 import { withoutPartyTradeMarker } from './loot/bop_trade_window';
-import { isMaterialItemId } from './material_ids';
 import {
   buybackCompositionAfter,
   commitMaterialUnitWithdrawal,
@@ -106,6 +110,7 @@ import { refreshModsForEquipmentChange } from './progression/talents';
 import { useForgebreakerEmber } from './quests/forgebreaker_ember';
 import type { ItemUseResult, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { isStackProvenanceItemId } from './stack_provenance_ids';
 import { usePassingStone } from './tutorial/death_lesson';
 import {
   ALL_EQUIP_SLOTS,
@@ -121,6 +126,7 @@ import {
   isNonSpellCast,
   POTION_COOLDOWN,
 } from './types';
+import { buyBuddyOffer } from './vendor_buddy_purchase';
 import {
   bulkBuyQuantity,
   buyPurchaseTotals,
@@ -241,7 +247,8 @@ function canReturnEquippedItemToBags(
  *  routed between hands from the committed spec. Exported so auto_equip.ts
  *  compares a grant against the copy this resolver would actually displace. */
 export function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | null {
-  const def = ITEMS[itemId];
+  const base = ITEMS[itemId];
+  const def = base ? membershipWeaponShape(base, meta.cls, meta.talents.spec) : undefined;
   if (!def?.slot) return null;
   if (def.kind !== 'weapon') return resolveEquipSlot(def, meta.equipment);
 
@@ -250,7 +257,8 @@ export function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | 
   if (hand === 'mainhand') return 'mainhand';
   if (hand === 'twohand') {
     if (!canDualWieldTwoHand(meta.cls, spec)) return 'mainhand';
-    const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+    const baseMainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+    const mainhand = baseMainhand ? membershipWeaponShape(baseMainhand, meta.cls, spec) : undefined;
     if (
       mainhand?.kind === 'weapon' &&
       weaponHand(mainhand) === 'twohand' &&
@@ -265,7 +273,8 @@ export function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | 
   if (!canDualWield(meta.cls, spec)) return 'mainhand';
   if (!canEquipItemInSlot(meta.cls, def, 'offhand', spec)) return 'mainhand';
 
-  const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+  const baseMainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+  const mainhand = baseMainhand ? membershipWeaponShape(baseMainhand, meta.cls, spec) : undefined;
   if (
     !canDualWieldTwoHand(meta.cls, spec) &&
     mainhand?.kind === 'weapon' &&
@@ -313,7 +322,7 @@ export function removePreferFungible(
   // beside it. Absent, the walk is byte-identical to before.
   deprioritize?: (instance: ItemInstancePayload) => boolean,
 ): ItemInstancePayload[] {
-  if (isMaterialItemId(itemId)) {
+  if (isStackProvenanceItemId(itemId)) {
     const held = ctx.resolve(pid);
     if (!held) return [];
     const payloads = consumeMaterialUnitPayloads(held.meta.inventory, itemId, count, {
@@ -416,7 +425,7 @@ export function removeSellUnitsFromInventory(
   // predicates (read on each unit's effective payload), but the source rides
   // along on every unit, so a sale, a trade preview and the real swap move the
   // units they said they would. `skipPlainStacks` reads as payload-only here.
-  if (isMaterialItemId(itemId)) {
+  if (isStackProvenanceItemId(itemId)) {
     return takeMaterialUnits(inventory, itemId, count, {
       skip,
       deprioritize,
@@ -525,11 +534,13 @@ export function discardItem(
       return;
     }
     ctx.onInventoryChangedForQuests?.(meta);
+    // Destroying a tracked copy ends it: its final ledger row.
+    recordTrackedChange(ctx, meta, itemId, taken?.instance, 'consume', 'discard');
   } else {
     // The copy-choice rule on the discard arm (the phase 18 whole-branch
     // review): with a plain and a self-signed charm copy in the bags, the
     // discard consumes the plain one and the recharge discount survives.
-    removePreferFungible(
+    const destroyed = removePreferFungible(
       ctx,
       itemId,
       discardCount,
@@ -537,6 +548,7 @@ export function discardItem(
       undefined,
       sellerSignedCharmDeprioritize(meta.name, itemId),
     );
+    recordTrackedConsumed(ctx, meta, itemId, destroyed, 'discard');
   }
   ctx.emit({
     type: 'log',
@@ -812,7 +824,18 @@ export function revalidateOffhandForSpec(ctx: SimContext, pid?: number): void {
   if (!offhandId) return;
   const def = ITEMS[offhandId];
   if (!def) return;
-  if (canEquipItemInSlot(meta.cls, def, 'offhand', meta.talents.spec)) return;
+  const mainhand = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand] : undefined;
+  const conflict =
+    mainhand &&
+    displacedSlotForEquip(
+      mainhand,
+      'mainhand',
+      meta.equipment,
+      (id) => ITEMS[id],
+      meta.cls,
+      meta.talents.spec,
+    );
+  if (!conflict && canEquipItemInSlot(meta.cls, def, 'offhand', meta.talents.spec)) return;
 
   const instance = meta.equipmentInstance?.offhand;
   delete meta.equipment.offhand;
@@ -903,11 +926,16 @@ export function useItem(
   pid?: number,
   slotIndex?: number,
   aimPoint?: { x: number; z: number },
+  inkMapTarget?: unknown,
 ): ItemUseResult | undefined {
   const r = ctx.resolve(pid);
   if (!r) return;
+  // Using an item is acting: a hunter playing dead stands up first.
+  endPlayDead(ctx, r.e);
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
+  // Redemption is a durable account operation owned by the online host.
+  if (itemId === MEMBERSHIP_TOKEN_ID) return;
   if (
     meta.vehicle ||
     wispMazeActionsLocked(meta.worldQuestLog) ||
@@ -923,7 +951,13 @@ export function useItem(
   // Consumables of one id are interchangeable in effect, so this matters less
   // than it does for gear; it is threaded anyway so the family has no id-only
   // holes left for a new command to copy.
+  let sourceUse: ItemUseConsumption | null | undefined;
   const consumeOneUnit = (): ItemInstancePayload | undefined => {
+    if (sourceUse) {
+      const payload = sourceUse.consume();
+      ctx.onInventoryChangedForQuests?.(meta);
+      return payload;
+    }
     if (slotIndex === undefined) {
       const [unit] = ctx.removeItem(itemId, 1, meta.entityId);
       return unit;
@@ -953,6 +987,13 @@ export function useItem(
   ) {
     ctx.error(meta.entityId, "You don't have that item.");
     return;
+  }
+  if (isStackProvenanceItemId(itemId)) {
+    sourceUse = planItemUseConsumption(meta.inventory, itemId, slotIndex);
+    if (!sourceUse) {
+      ctx.error(meta.entityId, "You don't have that item.");
+      return;
+    }
   }
   if (def.use?.type === 'fishing') {
     ctx.startFishing(p, meta);
@@ -1076,7 +1117,7 @@ export function useItem(
     return;
   }
   if (def.use?.type === 'cartographersInk') {
-    useCartographersInk(ctx, meta);
+    useCartographersInk(ctx, meta, inkMapTarget);
     return;
   }
   if (def.use?.type === 'treasureMap') {
@@ -1379,6 +1420,7 @@ export function buyItem(
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
+  if (buyBuddyOffer(ctx, meta.entityId, npcId, itemId, opts)) return;
   const npc = ctx.entities.get(npcId);
   const def = ITEMS[itemId];
   if (npc?.kind !== 'npc' || npc.vendorItems.length === 0) {
@@ -1475,7 +1517,7 @@ export function buyItem(
   // learnRiding, which owns every gate (already trained, level 20, the 80g fee,
   // trainer identity, range) and never puts an item in the bags.
   if (def.teachesRiding) {
-    learnRiding(ctx, npcId, pid);
+    learnRiding(ctx, npcId, pid, opts?.expectedRidingTier);
     return;
   }
   // Mount purchase gates (the stablemaster's reins): a riding-skill requirement
@@ -1583,7 +1625,7 @@ export function buyItem(
   }
   meta.copper -= copperCost;
   meta.honor -= honorCost;
-  ctx.addItem(itemId, qty, meta.entityId);
+  ctx.addItem(itemId, qty, meta.entityId, { source: 'vendor' });
   ctx.emit({ type: 'vendor', action: 'buy', itemId, pid: meta.entityId });
 }
 
@@ -1632,7 +1674,12 @@ export function skipsVendorBuyback(
 //
 // Plain gray junk never takes a row (see skipsVendorBuyback), so a Sell Junk
 // sweep cannot push the player's real sales off the end of the list.
+// A sold copy is still the seller's while it sits on the list (buying it back
+// is the same holder), so the sale writes no ledger row. A row that falls off
+// the end is destroyed, and THAT is where a tracked copy's final `consume`
+// row is written (source 'vendor', detail 'buybackExpired').
 function recordVendorBuyback(
+  ctx: SimContext,
   meta: PlayerMeta,
   itemId: string,
   count: number,
@@ -1665,7 +1712,20 @@ function recordVendorBuyback(
         : { materialSources: buybackCompositionAfter(undefined, materialSources) }),
     });
   }
-  while (meta.vendorBuyback.length > VENDOR_BUYBACK_LIMIT) meta.vendorBuyback.pop();
+  while (meta.vendorBuyback.length > VENDOR_BUYBACK_LIMIT) {
+    const expired = meta.vendorBuyback.pop();
+    if (expired) {
+      recordTrackedChange(
+        ctx,
+        meta,
+        expired.itemId,
+        expired.instance,
+        'consume',
+        'vendor',
+        'buybackExpired',
+      );
+    }
+  }
 }
 
 export function sellItem(
@@ -1795,7 +1855,15 @@ export function sellItem(
     );
   }
   for (const unit of consumedUnits) {
-    recordVendorBuyback(meta, itemId, 1, unit.instance, unit.craftedRecipeId, unit.materialSources);
+    recordVendorBuyback(
+      ctx,
+      meta,
+      itemId,
+      1,
+      unit.instance,
+      unit.craftedRecipeId,
+      unit.materialSources,
+    );
   }
   const payout = def.sellValue * sellableCount;
   meta.copper += payout;
@@ -1909,6 +1977,7 @@ export function sellAllJunk(ctx: SimContext, pid?: number): void {
     );
     for (const unit of consumedUnits) {
       recordVendorBuyback(
+        ctx,
         meta,
         itemId,
         1,
@@ -1999,7 +2068,7 @@ export function buyBackItem(
   // row that cannot give a unit reads as unavailable rather than half-spent.
   const rowIndex = meta.vendorBuyback.indexOf(slot);
   const withdrawal = planMaterialUnitWithdrawal(meta.vendorBuyback, itemId, rowIndex);
-  if (isMaterialItemId(itemId) && withdrawal === null) {
+  if (isStackProvenanceItemId(itemId) && withdrawal === null) {
     ctx.error(meta.entityId, 'That item is not available for buyback.');
     return;
   }

@@ -2656,6 +2656,9 @@ describe('Varkhul forge pillars and add intermission', () => {
         sim.player.auras.find((aura) => aura.id === VARKHUL_FORGE_BEAM_EXPOSURE_AURA_ID),
       ).toMatchObject({ stacks: 1, remaining: resetSeconds });
     },
+    // The heroic case simulates the whole 60-second reset tick by tick: about 7 s
+    // on a workstation, but past the 20 s default on a loaded 2-worker CI shard.
+    60_000,
   );
 
   it('cools idle Normal heat, preserves Heroic heat, and announces both danger thresholds once', () => {

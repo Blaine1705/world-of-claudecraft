@@ -300,6 +300,7 @@ describe('the lock, threaded through save/load', () => {
       count: 5,
       instance: { locked: true },
       slot: 0,
+      materialSources: [{ source: {}, count: 5 }],
     });
 
     const sim2 = new Sim({ seed: 11, playerClass: 'warrior', noPlayer: true });
@@ -312,6 +313,7 @@ describe('the lock, threaded through save/load', () => {
       slot: 0,
       materialSources: [{ source: {}, count: 5 }],
     });
+    expect(loaded).toEqual(saved);
   });
 });
 

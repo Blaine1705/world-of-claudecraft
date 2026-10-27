@@ -11,6 +11,9 @@ export const CHARACTER_EFFECT_SPORE_FORM = 1 << 4;
 /** Rising spores, worn by anyone carrying the Sporemending (`rejuvenation`)
  *  heal-over-time, so the healed target reads the healer's mushroom motif. */
 export const CHARACTER_EFFECT_SPORE_HOT = 1 << 5;
+/** Hunter Play Dead (feign death): the living body takes the same held death
+ *  pose as Impaled, for every viewer, until the aura clears. */
+export const CHARACTER_EFFECT_FEIGN_DEATH = 1 << 6;
 
 export interface CharacterEffectAura {
   id: string;
@@ -21,6 +24,7 @@ export function addCharacterEffectAura(flags: number, aura: CharacterEffectAura)
   let next = flags;
   if (aura.id === 'nythraxis_soul_rend') next |= CHARACTER_EFFECT_SOUL_REND;
   if (aura.id === NYTHRAXIS_IMPALED_AURA_ID) next |= CHARACTER_EFFECT_IMPALED;
+  if (aura.kind === 'feign_death') next |= CHARACTER_EFFECT_FEIGN_DEATH;
   if (aura.id === 'sanguine_aura') next |= CHARACTER_EFFECT_SANGUINE;
   if (aura.kind === 'buff_reckless') next |= CHARACTER_EFFECT_RECKLESSNESS;
   if (aura.kind === 'form_sporemender') next |= CHARACTER_EFFECT_SPORE_FORM;

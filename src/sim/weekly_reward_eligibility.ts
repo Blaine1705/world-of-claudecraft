@@ -45,5 +45,9 @@ export function weeklyRewardFitsClass(cls: PlayerClass, item: ItemDef): boolean 
   if (cls === 'mage' || cls === 'priest' || cls === 'warlock') {
     if ((item.stats?.str ?? 0) > 0 || (item.stats?.agi ?? 0) > 0) return false;
   }
-  return cls !== 'warlock' || (item.healPower ?? 0) <= 0;
+  return (
+    cls !== 'warlock' ||
+    (item.healPower ?? 0) <= 0 ||
+    (item.kind === 'weapon' && (item.spellPower ?? 0) > 0)
+  );
 }

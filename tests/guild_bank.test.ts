@@ -35,6 +35,7 @@ import {
   type GuildRank,
   guildBankCapacity,
   guildBankDeltaIdentityKey,
+  guildBankMemberWireView,
   guildBankNextExpansionPrice,
   guildBankPipeRefusal,
   guildBankRungsBought,
@@ -47,6 +48,7 @@ import { materialPayloadKey } from '../src/sim/material_payload_identity';
 import { materialSourceKey } from '../src/sim/material_sources';
 import { normalizeMaterialStack } from '../src/sim/material_stack';
 import { Sim } from '../src/sim/sim';
+import { isStackProvenanceItemId } from '../src/sim/stack_provenance_ids';
 import type { Entity, InvSlot, WorldContent } from '../src/sim/types';
 import { META_EXCLUDE, samplePlayerMeta } from './parity/trace';
 
@@ -60,11 +62,9 @@ const EXPANSION_TOTAL = 1925000; // 192g50s across the six treasury expansions (
 
 const EMPTY: GuildBankState = { treasury: 0, inventory: [], purchasedSlots: 0 };
 
-// The one NON-material fixture id this suite uses, the same one the personal
-// bank's twin arms use (tests/bank.test.ts): kind 'food', so the junk-kind
-// material set excludes it. It is what keeps the indivisibility and flooring
-// controls on an item whose units really are inseparable from their payload.
-const NON_MATERIAL_SIM = 'roasted_boar';
+// Non-reagent junk keeps the indivisibility and fractional-flooring controls
+// outside both material and crafted-consumable source accounting.
+const NON_MATERIAL_SIM = 'tangled_weed';
 
 function freshSim(): Sim {
   return new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
@@ -1228,6 +1228,7 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     // always applied.
     const sim = makeOfficerSim();
     expect(isMaterialItemId(NON_MATERIAL_SIM)).toBe(false);
+    expect(isStackProvenanceItemId(NON_MATERIAL_SIM)).toBe(false);
     // Premise: the anonymous-pipe policy passes it, so the capacity/count arm
     // is what answers rather than a refusal upstream of it.
     expect(guildBankPipeRefusal({ itemId: NON_MATERIAL_SIM, count: 1 })).toBeNull();
@@ -1371,6 +1372,7 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     // the wrong contract.
     const sim = makeOfficerSim();
     expect(isMaterialItemId(NON_MATERIAL_SIM)).toBe(false);
+    expect(isStackProvenanceItemId(NON_MATERIAL_SIM)).toBe(false);
     for (let i = 0; i < GUILD_BANK_RUNG_SLOTS[0] - 1; i++) {
       book(sim).inventory.push({ itemId: 'wolf_fang', count: 1, instance: { signer: `S${i}` } });
     }
@@ -1531,6 +1533,7 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     const sim = makeOfficerSim();
     const payload = { signer: 'Ana' };
     expect(isMaterialItemId(NON_MATERIAL_SIM)).toBe(false);
+    expect(isStackProvenanceItemId(NON_MATERIAL_SIM)).toBe(false);
     meta(sim).inventory.push({ itemId: NON_MATERIAL_SIM, count: 3, instance: { ...payload } });
     const idx = meta(sim).inventory.findIndex((s) => s.instance?.signer === 'Ana');
     sim.guildBankDepositFor(sim.playerId, idx, 1); // partial request: still all 3
@@ -1727,6 +1730,67 @@ describe('guildBankInfoFor (the maybe(guildBank) stream read)', () => {
     if (info.slots[0].instance) info.slots[0].instance.signer = 'Tampered';
     expect(book(sim).inventory[0].count).toBe(2);
     expect(book(sim).inventory[0].instance?.signer).toBe('Ana');
+  });
+
+  it('keeps a tracked copy at full fidelity in the read the guild bank ledger diffs', () => {
+    // server/guild_bank_op_coordinator.ts diffs guildBankInfoFor before and
+    // after every op and replays the deltas onto the durable book by
+    // whole-payload equality: a projected read here would refuse every
+    // tracked withdraw and persist guid-less deposits.
+    const sim = makeOfficerSim();
+    const instance = {
+      guid: '0f8fad5b-d9cb-469f-a165-70867728950e',
+      provenance: { at: 1_000, by: 'Ana', byId: 11, source: 'mob:forest_wolf' },
+    };
+    book(sim).inventory.push({ itemId: 'wolf_fang', count: 1, instance });
+    expect(sim.guildBankInfoFor(sim.playerId)?.slots[0].instance).toEqual(instance);
+  });
+
+  it('ships a tracked copy over the member wire with its public history only', () => {
+    const sim = makeOfficerSim();
+    const guid = '0f8fad5b-d9cb-469f-a165-70867728950e';
+    const parent = '7c9e6679-7425-40de-944b-e07fc1f90ae7';
+    book(sim).inventory.push({
+      itemId: 'wolf_fang',
+      count: 1,
+      instance: {
+        guid,
+        signer: 'Ana',
+        provenance: {
+          at: 1_000,
+          by: 'Ana',
+          byId: 11,
+          source: 'mob:forest_wolf',
+          zone: 'elwynn',
+          derivedFrom: parent,
+          owners: [{ at: 2_000, by: 'Bram', byId: 22 }],
+          transfers: 1,
+        },
+      },
+    });
+    const slot = guildBankMemberWireView(sim.guildBankInfoFor(sim.playerId))?.slots[0];
+    expect(slot?.instance).toEqual({
+      signer: 'Ana',
+      provenance: {
+        at: 1_000,
+        by: 'Ana',
+        source: 'mob:forest_wolf',
+        zone: 'elwynn',
+        owners: [{ at: 2_000, by: 'Bram' }],
+        transfers: 1,
+      },
+    });
+    // The live book keeps the full record for the next withdrawer.
+    expect(book(sim).inventory[0].instance?.guid).toBe(guid);
+    expect(book(sim).inventory[0].instance?.provenance?.byId).toBe(11);
+  });
+
+  it('passes a snapshot with no tracked copy through the member wire untouched', () => {
+    const sim = makeOfficerSim();
+    book(sim).inventory.push({ itemId: 'wolf_fang', count: 2, instance: { signer: 'Ana' } });
+    const info = sim.guildBankInfoFor(sim.playerId);
+    expect(guildBankMemberWireView(info)).toBe(info);
+    expect(guildBankMemberWireView(null)).toBeNull();
   });
 
   it('reports a null nextExpansionPrice once the ladder is exhausted', () => {

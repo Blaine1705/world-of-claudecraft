@@ -41,6 +41,8 @@ import {
 } from './item_instance_load';
 import { isTransferLockedInstance, publicInstanceView } from './item_instance_transfer';
 import { isItemLocked } from './item_lock_flag';
+import { publicProvenanceView } from './item_provenance';
+import { recordTrackedWithdrawal } from './item_tracking';
 import { materialItemIds } from './material_ids';
 import type { MaterialPayloadIdentity } from './material_payload_identity';
 import {
@@ -55,6 +57,7 @@ import {
 import type { MaterialComposition, MaterialSourceDelta } from './material_sources';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
+import { stackProvenanceItemIds } from './stack_provenance_ids';
 import { cloneInvSlot, type InvSlot } from './types';
 
 /** One-time fee the founder pays when a guild is created (1 gold).
@@ -684,10 +687,10 @@ export function applyGuildBankDeltasTo(
     // are applied to the book's own normalized stock, so a mixed stack can never
     // be edited by a source-blind slot count and a count-0 re-attribution
     // replays as the move it really was.
-    const move = guildMaterialMoveFor(d, materialItemIds());
+    const move = guildMaterialMoveFor(d, stackProvenanceItemIds());
     if (!move.ok) return sourceUnreadable(d);
     if (move.value !== null) {
-      const applied = applyGuildMaterialMove(book.inventory, move.value, materialItemIds());
+      const applied = applyGuildMaterialMove(book.inventory, move.value, stackProvenanceItemIds());
       if (applied.ok) continue;
       if (applied.reason === 'unreadable') return sourceUnreadable(d);
       return {
@@ -767,9 +770,9 @@ export function revertGuildBankDeltasTo(
     // same way the legacy arm below does. A delta this arm cannot read is
     // SKIPPED rather than undone source-blind: the forward replay refused it
     // too, so there is nothing of its to undo.
-    const move = guildMaterialMoveFor(d, materialItemIds());
+    const move = guildMaterialMoveFor(d, stackProvenanceItemIds());
     if (move.ok && move.value !== null) {
-      revertGuildMaterialMove(book.inventory, move.value, materialItemIds());
+      revertGuildMaterialMove(book.inventory, move.value, stackProvenanceItemIds());
       continue;
     }
     if (!move.ok) continue;
@@ -860,7 +863,7 @@ export function netGuildBankOpLogForReplay(log: readonly GuildBankOpDelta[]): Gu
     // divergence the ordered replay exists to refuse.
     if (d.op !== 'deposit' && d.op !== 'withdraw' && d.op !== 'admin_purge') continue;
     if (typeof d.itemId !== 'string' || d.itemId === '') continue;
-    const move = guildMaterialMoveFor(d, materialItemIds());
+    const move = guildMaterialMoveFor(d, stackProvenanceItemIds());
     if (!move.ok) {
       // Unreadable provenance is carried through VERBATIM and unnetted, so the
       // netted rescue replay meets exactly the same refusal the ordered one
@@ -1253,6 +1256,7 @@ export function guildBankWithdraw(
   // Captured before the move: a whole-stack success splices the source slot out.
   const itemName =
     ITEMS[book.inventory[slotIndex].itemId]?.name ?? book.inventory[slotIndex].itemId;
+  const withdrawnGuid = book.inventory[slotIndex].instance?.guid;
   const result = moveBetweenContainers(
     book.inventory,
     slotIndex,
@@ -1274,6 +1278,10 @@ export function guildBankWithdraw(
   }
   if (result.refusal) return; // 'invalid': malformed input (cheat/desync), no player line
   ctx.onInventoryChangedForQuests(meta);
+  // A tracked copy leaving the guild's custody changes hands: record the
+  // withdrawing character on its owner chain (item_tracking.ts). The move
+  // bypasses the inventory hub, so the stamp lands here.
+  if (withdrawnGuid !== undefined) recordTrackedWithdrawal(ctx, meta, withdrawnGuid, 'guildBank');
   ctx.notice(meta.entityId, `You withdraw ${itemName} from the guild bank.`);
 }
 
@@ -1333,6 +1341,38 @@ function guildBankSlotView(slot: InvSlot): InvSlot {
     view.instance = publicInstanceView(view.instance);
   }
   return view;
+}
+
+/**
+ * The guild-wide WIRE view of a member snapshot (server/bank_wire.ts emits
+ * this, never guildBankInfoFor's own result): a tracked copy's history is
+ * readable by every member (the Item history door,
+ * docs/design/item-tracking.md), but only its public view (names, dates,
+ * sources), and the copy's guid and every character id stay off the
+ * guild-wide wire. Applied at the wire seam ONLY: guildBankInfoFor stays at
+ * full fidelity because the server's guild bank ledger diffs it
+ * (server/guild_bank_op_coordinator.ts, bank_ledger.ts diffGuildBankOp) and
+ * replays the deltas onto the durable book by whole-payload equality, so a
+ * projected read there would refuse every tracked withdraw and persist
+ * guid-less deposits. Withdraw is by slot index and never reads either field.
+ * Returns the input unchanged when no slot carries a tracked identity.
+ */
+export function guildBankMemberWireView(info: GuildBankInfo | null): GuildBankInfo | null {
+  if (!info?.slots.some((s) => s.instance?.guid !== undefined || s.instance?.provenance)) {
+    return info;
+  }
+  return {
+    ...info,
+    slots: info.slots.map((slot) => {
+      if (!slot.instance) return slot;
+      const { guid: _guid, provenance, ...rest } = slot.instance;
+      if (_guid === undefined && provenance === undefined) return slot;
+      return {
+        ...slot,
+        instance: provenance ? { ...rest, provenance: publicProvenanceView(provenance) } : rest,
+      };
+    }),
+  };
 }
 
 /** The proximity + membership gated guild bank snapshot the server's

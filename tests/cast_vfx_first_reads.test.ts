@@ -318,7 +318,7 @@ describe('the renderer wiring (source pin)', () => {
     // The roots are one helper, shared with the context restore's cast relink.
     expect(renderer).toContain(
       '  private castVfxFirstReadRoots(): (THREE.Object3D | undefined)[] {\n' +
-        '    const rings = this.aoeRings;\n' +
+        '    const rings = this.groundFeedback.aoeRings;\n' +
         '    return [...this.abilityVfx.firstReadDrawables(), rings[0]?.ring, this.vfx.cloudDrawable()];\n' +
         '  }',
     );
@@ -379,8 +379,8 @@ describe('the renderer wiring (source pin)', () => {
 
   it('builds every ring slot with the shared builder the fixture uses', () => {
     expect(renderer).toContain('const ring = buildAoeRingMesh(aoeRingGeo);');
-    expect(renderer).toContain(
-      'this.aoeRings.push({ ring, mat: ring.material, radius: 1, elapsed: AOE_RING_LIFETIME });',
+    expect(renderer).toMatch(
+      /this\.groundFeedback\.aoeRings\.push\(\{\s*ring,\s*mat: ring\.material,\s*radius: 1,\s*elapsed: AOE_RING_LIFETIME,?\s*\}\);/,
     );
   });
 });

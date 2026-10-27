@@ -126,6 +126,18 @@ const TRINKET_ROLES: Record<TrinketUse['kind'], readonly LootRole[]> = {
   pierce: ['physical'],
   lantern: ['healer'],
   heartNova: ['tank'],
+  friendship: ['utility'],
+  shackle: ['utility'],
+  spiritPack: ['physical'],
+  seedburst: ['caster'],
+  tether: ['tank'],
+  harvest: ['utility'],
+  quench: ['physical'],
+  foremanShape: ['tank'],
+  musterStandard: ['physical'],
+  gutteredGlare: ['caster'],
+  grapnel: ['healer'],
+  passiveOnly: ['tank'],
 };
 
 const KNOWN_SPEC_IDS: ReadonlySet<string> = new Set(

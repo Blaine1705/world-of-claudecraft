@@ -115,10 +115,11 @@ const HUNTER_SPECS: SpecDef[] = [
     'A melee-first skirmisher who tears one wound and controls re-entry.',
     'bloodhook',
     // Balance pass: was +15% Agility / +15% physical damage, a straight Iron
-    // Aim rival with no niche. Now the evasive-skirmisher identity.
+    // Aim rival with no niche. Now the evasive-skirmisher identity (Agility
+    // raised 15% to 20% in the Fieldcraft rework).
     'Quickblood',
-    'Increases your Agility by 15% and your dodge chance by 4%.',
-    { stats: { agiPct: 0.15, dodge: 0.04 } },
+    'Increases your Agility by 20% and your dodge chance by 4%.',
+    { stats: { agiPct: 0.2, dodge: 0.04 } },
   ),
 ];
 
@@ -234,16 +235,17 @@ const ROGUE_SPECS: SpecDef[] = [
     'hemorrhage',
     // Balance pass (maintainer sheet): tuned down from +40% crit damage and
     // +10% Agility; the stealth-speed identity comes in instead. The buffPct
-    // scales the Duskveil aura's own move-speed multiplier (0.5 = half speed),
-    // so 1.0 lifts it to 1.0: the mastery removes the stealth slow outright
-    // rather than easing it to 75%.
+    // scales the Duskveil aura's own move-speed multiplier. Duskveil and
+    // Smokefade now move at full speed for every rogue (1.0), so 0.15 lifts
+    // Skulduggery to 1.15: a stealth value above 1 counts as a speed buff
+    // (player_motion.ts moveSpeedMult).
     'False Face',
-    'Increases the damage of your critical strikes by 25%, and you move at 100% speed while in Duskveil.',
+    'Increases the damage of your critical strikes by 25%, and you move 15% faster while in Duskveil.',
     {
       global: { critDmgPhysPct: 0.25 },
       ability: [
-        { ability: 'stealth', buffPct: 1 },
-        { ability: 'vanish', buffPct: 1 },
+        { ability: 'stealth', buffPct: 0.15 },
+        { ability: 'vanish', buffPct: 0.15 },
       ],
     },
   ),

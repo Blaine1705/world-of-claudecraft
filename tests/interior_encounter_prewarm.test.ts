@@ -58,7 +58,9 @@ describe('interior encounter prewarm spec', () => {
     expect([...ENCOUNTER_PREWARM_SETS].sort()).toEqual([
       'ignivarVisuals',
       'nythraxisGraveVisuals',
+      'vaelShadeGhost',
       'varkhulVisuals',
+      'wildheartToadForm',
     ]);
     const depths = INTERIOR_ENCOUNTER_PREWARM.ignivar_depths;
     const onlyIgnivar = encounterPrewarmSpecForSets(depths, ['ignivarVisuals']);
@@ -97,6 +99,18 @@ describe('interior encounter prewarm spec', () => {
     expect([...flags].sort()).toEqual([...ENCOUNTER_PREWARM_SETS].sort());
   });
 
+  it('warms the Toad Hex form at the Wildheart Basin attach, and only there', () => {
+    const spec = INTERIOR_ENCOUNTER_PREWARM.wildheart;
+    expect(spec).toEqual({
+      wildheartToadForm: true,
+    });
+    expect(DUNGEONS.wildheart_basin.interior).toBe('wildheart');
+    expect(encounterPrewarmForInterior('wildheart')).toEqual(spec);
+    for (const [interior, row] of Object.entries(INTERIOR_ENCOUNTER_PREWARM)) {
+      if (interior !== 'wildheart') expect(row.wildheartToadForm, interior).toBeUndefined();
+    }
+  });
+
   it('warms the Ignivar mechanic visuals in the Crucible arena, without the Varkhul set', () => {
     const spec = INTERIOR_ENCOUNTER_PREWARM.ignivar;
     expect(spec).toEqual({ ignivarVisuals: true });
@@ -127,7 +141,7 @@ describe('interior encounter prewarm spec', () => {
     const build = renderer.slice(buildStart, buildEnd);
     expect(build).toContain('encounterPrewarm.startInteriorEncounterPrewarm(interior, this)');
     const kickAt = build.indexOf('encounterPrewarm.startInteriorEncounterPrewarm(interior, this)');
-    const kitAt = build.indexOf('this.ensureDungeons().buildInterior(interior, x, z)');
+    const kitAt = build.indexOf('.buildInterior(interior, x, z, ');
     expect(kickAt).toBeGreaterThan(-1);
     expect(kitAt).toBeGreaterThan(kickAt);
 
@@ -169,7 +183,7 @@ describe('interior encounter prewarm spec', () => {
     // The mark draws the spirit veil, one program family the boot manifest
     // links for every rig, so warming class rigs or live bodies in the crypt
     // would link nothing new; neither the catalog nor the live arm may return.
-    // The one character rig the pass builds is Varkhul's (a mob).
+    // The pass builds Varkhul, a Fog Shade and the Toad Hex form.
     const pass = readSource('../src/render/interior_encounter_prewarm_pass.ts');
     for (const gone of [
       'setSoulRend',
@@ -180,8 +194,8 @@ describe('interior encounter prewarm spec', () => {
     ]) {
       expect(pass, gone).not.toContain(gone);
     }
-    expect(pass.match(/createCharacterVisual\(/g)).toHaveLength(1);
-    expect(pass.match(/prewarmEntity\(/g)).toHaveLength(1);
+    expect(pass.match(/createCharacterVisual\(/g)).toHaveLength(3);
+    expect(pass.match(/prewarmEntity\(/g)).toHaveLength(3);
     expect(pass).toContain("host.prewarmEntity('mob', template.id");
     const spec = readSource('../src/render/interior_encounter_prewarm.ts');
     expect(spec).not.toMatch(/soulRend/);

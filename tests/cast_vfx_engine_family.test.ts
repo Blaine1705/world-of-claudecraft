@@ -376,8 +376,10 @@ describe('the rest of the renderer cast VFX', () => {
       // One unit per program none of the gated pools already draws: the class
       // pools' own counts (tests/class_vfx_prewarm_homes.test.ts), plus the
       // lazy ability-material stand-ins, minus the programs they share with
-      // the engine and the kit.
-      expect(collectAbilityVfxCompileTargets(scene).length - unitsBefore).toBe(lowDetail ? 13 : 15);
+      // the engine and the kit. The weapon aura's two RGBA-geometry stand-ins
+      // (vfx_basic_materials.ts, for held models with their own RGBA vertex
+      // colour) are two of them.
+      expect(collectAbilityVfxCompileTargets(scene).length - unitsBefore).toBe(lowDetail ? 15 : 17);
     });
   }
 });

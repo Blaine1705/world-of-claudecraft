@@ -75,6 +75,23 @@ ratings.
   before the content they derive from); the room check is `ctx.canAddItem`.
   `world_pvp_trophy.ts` is a dependency-free leaf for the same reason: the
   material registry evaluates it before most of the sim loads.
+- `skull_bag.ts` owns the Skull Bag, the honor-vendor sub-inventory for trophy
+  skulls (`WORLD_PVP_SKULL_BAG_ITEM_ID`, declared in the trophy leaf; the stock
+  row is `WORLD_PVP_GOODS_STOCK` in `content/pvp_honor.ts`). Its contents are
+  `PlayerMeta.skullBag`, ONE material-source composition with no cap, absent
+  when empty. `storeLootedSkulls` is the loot hook (the corpse take in
+  `interaction.ts` and the spoils settlement both call it before their bag-room
+  check), `skullBagAction` the one command entry (IWorld `skullBagAction`, wire
+  `skull_bag`, dispatched by `server/world_pvp_wire.ts`; the action is
+  untrusted here and every selection is read through the canonical
+  composition validator), `skullBagInfoFor` the readout (folded into the
+  IWorld readout by `worldPvpReadoutFor`, but never into the server's 2 Hz
+  `worldPvpInfoFor`: online it rides its own change-gated `skb` key), and
+  `savedSkullBag` / `loadSkullBag` the persisted form `savedWorldPvpFields` /
+  `loadWorldPvpState` carry (`skullBagLoadValid` is the load guard
+  `material_slot_load.ts` runs, refusing a corrupt bag like any skull stack). Like the spoils module it
+  must not import `bags.ts`; the room check is `ctx.canAddItem`. Tests:
+  `tests/skull_bag.test.ts`, the client half in `tests/skull_bag_view.test.ts`.
 - `world_pvp.ts` owns the World PvP SYSTEM behind the `SimContext` seam: the
   flag state (`PlayerMeta.worldPvp`, absent until first raised; `Entity.pvpFlag`
   is its display mirror and the ONLY writer is this module, the away.ts
@@ -165,7 +182,10 @@ ratings.
   (`tests/warfare_vendor_npc.test.ts` asserts both). His stock is the one
   canonical `content/pvp_honor.ts` table, shared with FURY.
 - `world_pvp_rewards_rules.ts` owns the five literal played-time thresholds,
-  the seven-day counter cap and saved-tick sanitization.
+  the seven-day counter cap, saved-tick sanitization and the pure 10% XP bonus.
+  `grantXp` imports the leaf directly and applies the bonus before rested XP and
+  lifetime accounting; pending disarm and the realm kill switch stop it. The
+  multiplier is XP-only and does not change faction reputation.
 - `world_pvp_rewards.ts` advances one bounded scalar per connected, armed
   player per tick and grants permanent deeds only at five threshold crossings.
   Dead players, disconnect grace, leaving players, sanctuaries and PvE
@@ -176,6 +196,24 @@ ratings.
   as seconds, while saves retain precise ticks. Reward leaf imports are direct
   because exporting the system through the barrel would introduce a runtime
   cycle through entity/deed initialization.
+- `pvp_resurrect.ts` owns the PvP Resurrect RULE (owner rule 2026-10-02): a
+  player death outside the instance plane, not jailed, whose killing blow came
+  from a hostile player or that took a hostile player's hit within
+  `PVP_RESURRECT_WINDOW_SECONDS` (10), offers a raise at the graveyard Release
+  picks at full health and mana with no Keeper's Toll. `worldPvpOnPlayerDeath`
+  stamps `Entity.pvpResurrect` at every player death from the same hostile-hit
+  books the kill credit reads; the raise is `spirit.ts` `pvpResurrect` (refused
+  to a ghost). A living player's death resets the stamp before deciding it
+  (`combat/damage.ts` `handleDeath`), so a revive that skips `reviveAt`
+  (battleground seating, the delve respawn) can never carry an offer into a
+  later death; `reviveAt` clears it too. The raise waits
+  `PVP_RESURRECT_WAIT_SECONDS` (15) from the death (`Entity.pvpResurrectWait`,
+  counted down in `combat/auras.ts` `updateTimers`, which visits corpses; a
+  second death-hook pass never restarts it), shipped on the self record as whole
+  seconds `pvrw`. The self record carries the offer as `pvr`,
+  lit only when the raise would be honored (`server/self_scalar_wire.ts`); the death screen's button is
+  `src/ui/hud/death`. Imported by path from `world_pvp.ts` and `spirit.ts` (it
+  imports neither, so no cycle). Pinned by `tests/pvp_resurrect.test.ts`.
 - Import the directory's public API through `src/sim/pvp/index.ts`, with ONE
   deliberate exception: `warfare_quartermaster.ts` is NOT re-exported there
   (see the comment in `index.ts`). It needs `createNpc` from `../entity` at
@@ -194,14 +232,16 @@ ratings.
   only, so a raid member does not; any level does), the group key (`hillGroupKey`: a party, or a lone
   player as a group of one; null for a raid), the strict-maximum leader
   (`hillLeader`, null on a tie), the majority verdict (`hillChallengeStands`),
-  the contest clock (`hillContestStep`), the spot probe (`hillSpotIsOpen` over a
+  the per-group contest clocks (`hillProgressStep`: a rival only pauses a clock,
+  nobody counted inside drops it), the key a hold or a clock follows across a
+  group change (`hillSuccessorKey`), the spot probe (`hillSpotIsOpen` over a
   `HillSpotProbe` the sim binds to the terrain, the water bodies, the collider
   grid and the static zones), the three-hour schedule (`hillWindowAt`,
   `hillTimes` from a window and a warning offset, `hillMinutesUntil`) and the
   circle test. No ctx, no rng, no clock. Every tuning literal (`HILL_RADIUS`,
   `HILL_WINDOW_SECONDS`, `HILL_WARNING_SECONDS`, `HILL_DURATION_SECONDS`,
   `HILL_NOTICE_SECONDS`, `HILL_VAULT_MIN_INSIDE_SECONDS`, `HILL_VAULT_MIN_HOLD_SECONDS`,
-  `HILL_CAPTURE_SECONDS`, `HILL_ACCRUAL_SECONDS`, the payout ramp `hillHonorPerPayout` with `HILL_RAMP_STEP_SECONDS` and `HILL_RAMP_MAX_HONOR`) lives
+  `HILL_CAPTURE_SECONDS`, `HILL_ACCRUAL_SECONDS`, the flat payout `HILL_HONOR_PER_PAYOUT`) lives
   here and the copy resolves from it.
 - `hill.ts` owns the SYSTEM behind the `SimContext` seam: the session state as
   ONE live view (`Sim.hillState`, `ctx.hillState`: the announced or standing
@@ -215,8 +255,9 @@ ratings.
   argument grammar is the pure `hill_dev.ts`), the once-a-second `updateHill` pass (the
   phases warning, risen, fallen, each announced to the realm, with the server-only
   `hillAnnounced` twin for the Discord PvP channel beside each line: no text, no pid,
-  times relative to the announcement; then, only while
-  risen, presence by party, contest, payouts through `grantHonor` with reason
+  times relative to the announcement; then, only while risen, presence by party,
+  the holder following its roster across a group change (`reconcileHolder`) and
+  clocks following theirs (`carryProgress`), contest, payouts through `grantHonor` with reason
   `hill_hold`), the readout (`hillInfoFor`, live fields only for a viewer in the
   hill's zone while it is risen, so the self wire elides it elsewhere), the
   `/hill` readout line, and the notice lines the client matcher re-localizes

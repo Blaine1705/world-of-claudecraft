@@ -315,9 +315,10 @@ export const TALENT_ABILITIES_V2_A = {
     name: 'Shadeslip',
     class: 'rogue',
     learnLevel: 10,
-    cost: 20,
+    cost: 0,
     castTime: 0,
     cooldown: 24,
+    maxCharges: 2,
     range: 24,
     school: 'physical',
     requiresTarget: true,
@@ -328,7 +329,7 @@ export const TALENT_ABILITIES_V2_A = {
     targetType: 'any',
     effects: [{ type: 'blinkForward', distance: 24 }],
     description:
-      'Steps through the shadows to your target, friend or foe, without breaking Duskveil. (Rogue talent)',
+      'Steps through the shadows to your target, friend or foe, without breaking Duskveil. Stores up to 2 charges. (Rogue talent)',
   },
 
   silence: {

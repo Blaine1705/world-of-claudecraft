@@ -114,6 +114,11 @@ export const SETTING_RANGES = {
   // distance. Set by the wheel/pinch zoom (persisted debounced from main.ts), applied back
   // to Input on boot via the startup apply-all loop and on Reset (issue 1657).
   cameraZoom: { min: 3, max: 22, def: 12 },
+  // First person at the closest zoom (render/first_person_core.ts): 0 off (the
+  // shipped chase camera), 1 first person showing the body below the head, 2
+  // first person with the whole model hidden. Display-only framing; the closest
+  // zoom stays third person unless the player opts in.
+  firstPersonMode: { min: 0, max: 2, def: 0 },
   renderScale: { min: 0.5, max: 1, def: 1 },
   fullscreen: { min: 0, max: 1, def: 1 },
   // Desktop-shell window mode: 1 = borderless fullscreen (what the shell opens
@@ -209,6 +214,10 @@ export const SETTING_RANGES = {
   // size measured too small to read at a glance (owner feedback). The renderer
   // sees this multiplied by the showNameplateDots toggle, so 0 means off.
   nameplateDotScale: { min: 1, max: 3, def: 1.5 },
+  // How large the enemy cooldown row draws above a hostile player's name, on the
+  // dot row's scale and for the same reason (a countdown read mid-fight): 100%
+  // is the floor and 150% the default. Folded with showNameplateCooldowns.
+  nameplateCooldownScale: { min: 1, max: 3, def: 1.5 },
   // Fades the HUD panels & windows as a whole; lets players see more of the
   // world behind their frames without hiding them entirely.
   hudOpacity: { min: 0.5, max: 1, def: 1 },
@@ -247,6 +256,17 @@ export const SETTING_RANGES = {
   focusTarget2Height: { min: 8, max: 30, def: 15 },
   focusTarget3Width: { min: 120, max: 460, def: 240 },
   focusTarget3Height: { min: 8, max: 30, def: 15 },
+  // The player's resource bar (mana / energy / rage) once it is detached from
+  // the player frame (playerFrameResourceDetached): its own width and bar
+  // thickness in px (--player-resource-width / --player-resource-height). Read
+  // only while detached; docked, the bar keeps the player frame's geometry.
+  // Stock = the docked bar (the 232px bars panel, the 11px --bar-h-res).
+  playerFrameResourceWidth: { min: 60, max: 460, def: 232 },
+  playerFrameResourceHeight: { min: 8, max: 40, def: 11 },
+  // The King of the Hill bar's BACKDROP opacity (--hill-bar-opacity): the
+  // panel fill, border and shadow fade, the text never does (it is what the
+  // player reads the contest from). 1 = the stock solid panel, 0 = text only.
+  hillBarOpacity: { min: 0, max: 1, def: 1 },
   // Health text on the player frame and on the target (plus target-of-target)
   // frame, same mode table as partyFrameHealthText below; both default to the
   // historical always-on "current / max".
@@ -278,6 +298,14 @@ export const SETTING_RANGES = {
 export const BOOL_SETTINGS = {
   // Optional mainland directions, independent of quest tracking and graphics quality.
   eastbrookGuidance: { def: true },
+  // on by default: the ADVISORY dungeon alerts, the tip panel over the action
+  // bar that names a mechanic and says what to do about it (the encounter
+  // alert family, src/ui/hud/dungeon/dungeon_prompt_policy_core.ts). Off hides only
+  // those tips. The prompts a player presses or steers by (the Iron Cage
+  // escape, Gaoler Ossick's chain alert, the use prompt) are not governed by
+  // it. A player-chosen interface preference, never a graphics-tier knob: no
+  // preset, effects profile or governor reads or writes it.
+  showDungeonHints: { def: true },
   // Icon flow of the standalone buff/debuff rows (the Frames Settings menu in
   // edit mode). Off = the stock right-to-left growth (the rows anchor beside
   // the minimap and fill toward the screen centre); on = left to right, via
@@ -311,6 +339,11 @@ export const BOOL_SETTINGS = {
   // OS cursor cannot leave the window during rotation (otherwise it hits the
   // screen edge and the camera freezes, or slips onto a second monitor).
   lockCursorOnRotate: { def: true },
+  // on by default: request that camera-drag lock with raw (unadjusted) mouse
+  // input, skipping the OS pointer speed and acceleration and the cursor
+  // recentering behind sudden jumps on high polling-rate mice. Off uses the
+  // OS-adjusted movement. Only acts while lockCursorOnRotate takes the lock.
+  rawMouseInput: { def: true },
   // on by default: poll a connected controller for input. Off ignores the pad
   // entirely (keyboard/mouse/touch unaffected).
   gamepadEnabled: { def: true },
@@ -514,6 +547,13 @@ export const BOOL_SETTINGS = {
   // decluttering crowded hubs on short mobile viewports. Purely a local display
   // preference; mob nameplates and unit frames are unaffected.
   showPlayerNameplates: { def: true },
+  // off by default: a cosmetic buddy follower (src/sim/content/buddy_mobs.ts)
+  // has no health worth bar-ing (1 hp) and cannot be attacked, so its plate
+  // stays hidden regardless of the general mob nameplate toggle above unless
+  // this is on, in which case it shows the buddy's name only, never a health
+  // bar (src/render/nameplate_view.ts's isBuddyPet branch,
+  // nameplate_painter.ts's hpVisible suppression).
+  showPetNames: { def: false },
   // on by default: draw the LOCAL player's own debuffs as a small icon row on an
   // enemy's overhead nameplate, between the name row and the health bar, each with
   // a cooldown swipe and a countdown. Only YOUR debuffs, on mobs only; the group's
@@ -521,6 +561,12 @@ export const BOOL_SETTINGS = {
   // Class-agnostic (ownership plus isDebuffAura, never an ability list) and never
   // graphics-tier gated: these are timers a player acts on.
   showNameplateDots: { def: true },
+  // on by default: a hostile PLAYER's tracked cooldowns (src/sim/major_cooldowns.ts:
+  // the PvP medallion once used, then defensives, then offensives) as an icon row
+  // ABOVE their name, active buffs glowing and spent ones dimmed (never timed). PvP
+  // information a player acts on (when to burst, when to save a defensive), so it
+  // is never graphics-tier gated.
+  showNameplateCooldowns: { def: true },
   // on by default: the Target dots frame (#target-dots), the multi-target tracker
   // listing every debuff YOU have out across every enemy in interest range, one
   // bar row each with a live countdown. Hidden entirely while you have no dots
@@ -638,14 +684,9 @@ export const BOOL_SETTINGS = {
   // disturbs the deliberate slot layout the extra rows exist for (arranging buffs
   // and consumables); the slots stay in place and keybind-reachable either way.
   hideUnusedActionSlots: { def: false },
-  // OFF by default: the interactive water wake/ripple height-field
+  // ON by default: the interactive water wake/ripple height-field
   // (render/water_simulation.ts) that swimmers, waders and splashes disturb.
-  // Purely decorative — bubbles, splash particles and the scrolling water
-  // normal maps are all independent of it — and measured-cheap (2 passes over
-  // a <=128x128 field), but it is the one water effect that runs extra GPU
-  // passes per frame, so the player who wants the quietest water gets it as
-  // an opt-in rather than an opt-out.
-  waterRipples: { def: false },
+  waterRipples: { def: true },
   // on by default: the spell visual effects players and their pets cast in
   // the 3D world (cast glows, projectiles, impacts, lingers, buff orbits and
   // shells). Off is a preference for a calmer or cheaper screen that never
@@ -671,6 +712,18 @@ export const BOOL_SETTINGS = {
   // the wire (server/game.ts dynamicFields), and both bars hide themselves
   // when the target (or its own target) is unknown or not auto-attacking.
   showTargetSwingTimer: { def: false },
+  // off by default (the classic reticle alone, unchanged out of the box): the
+  // four "Style of Enemy Highlight" checkboxes in Options > Interface > Combat.
+  // Each one independently adds a cue for a HOSTILE current target and any mix
+  // works together: an arrow pinned to the screen edge while the target is off
+  // camera, a larger gold-framed nameplate, a chevron above the target's head,
+  // and a heavier ground reticle (wider band, tinted disc, outer dashed ring).
+  // Pure display preferences; render/target_highlight_core.ts maps each key to
+  // the renderer flag it drives.
+  targetHighlightEdgeArrow: { def: false },
+  targetHighlightNameplate: { def: false },
+  targetHighlightOverhead: { def: false },
+  targetHighlightReticle: { def: false },
   // on by default: the pet health strip under the player frame (hunter / warlock /
   // mage). It paints only while the player actually HAS a pet, so the six petless
   // classes never see it and the default costs them nothing. Purely a display
@@ -678,6 +731,10 @@ export const BOOL_SETTINGS = {
   // as an ordinary owned mob entity.
   showPetFrame: { def: true },
   showEmptyFocusFrames: { def: false },
+  // off by default: lift the resource bar (mana / energy / rage) out of the
+  // player frame into a frame of its own, placed and sized through the
+  // interface editor and the frame options (playerFrameResourceWidth/Height).
+  playerFrameResourceDetached: { def: false },
   // on by default: keep the Daily Rewards chest launcher visible on the HUD. Hiding
   // it only removes the shortcut; rewards, eligibility, and the panel remain available.
   showDailyRewardsChest: { def: true },
@@ -712,6 +769,13 @@ export const BOOL_SETTINGS = {
   // non-false def would fake "applied" and defeat detection. reset() clears it back to false,
   // so Reset to Defaults re-detects the device default on the next reload.
   graphicsDefaultApplied: { def: false },
+  // internal, never shown in the options UI: set true once the player has answered the
+  // first-login graphics prompt (src/ui/graphics_choice_prompt.ts) or picked an explicit
+  // preset on the landing page, so the prompt asks at most once per browser. def is false for
+  // a fresh store; a store persisted before this key existed loads it as TRUE instead
+  // (loadedBoolDefault), so a returning player is never stopped to re-pick a preset they
+  // already play on. reset() returns it to false, so Reset to Defaults asks again.
+  graphicsPromptAnswered: { def: false },
 } as const;
 
 export type NumericSettingKey = keyof typeof SETTING_RANGES;
@@ -765,6 +829,19 @@ function defaultTouchInterface(): boolean {
   }
 }
 
+// Keys whose MISSING value in an already-persisted store means "answered" rather than def:
+// a one-shot first-run marker added after players already had a store must not re-fire for them.
+const LEGACY_STORE_ANSWERED_KEYS: readonly BoolSettingKey[] = ['graphicsPromptAnswered'];
+
+function loadedBoolDefault(
+  key: BoolSettingKey,
+  values: Pick<GameSettings, 'interfaceMode'>,
+  hadStore: boolean,
+): boolean {
+  if (hadStore && LEGACY_STORE_ANSWERED_KEYS.includes(key)) return true;
+  return defaultBoolSetting(key, values);
+}
+
 function defaultBoolSetting(
   key: BoolSettingKey,
   values: Pick<GameSettings, 'interfaceMode'>,
@@ -801,7 +878,8 @@ export class Settings {
 
   private load(): GameSettings {
     const stored = parseStoredJson(STORE_KEY);
-    const raw = stored && typeof stored === 'object' ? (stored as Record<string, unknown>) : {};
+    const hadStore = !!stored && typeof stored === 'object';
+    const raw = hadStore ? (stored as Record<string, unknown>) : {};
     const out = {} as GameSettings;
     for (const key of NUMERIC_KEYS) {
       const v = raw[key];
@@ -818,7 +896,7 @@ export class Settings {
     }
     for (const key of BOOL_KEYS) {
       const v = raw[key];
-      out[key] = typeof v === 'boolean' ? v : defaultBoolSetting(key, out);
+      out[key] = typeof v === 'boolean' ? v : loadedBoolDefault(key, out, hadStore);
     }
     return out;
   }
@@ -857,6 +935,12 @@ export class Settings {
    */
   nameplateDotRenderScale(): number {
     return this.values.showNameplateDots ? this.values.nameplateDotScale : 0;
+  }
+
+  /** The enemy cooldown row's drawn SIZE, folded the way nameplateDotRenderScale
+   *  folds the dot row: 0 means "draw no row at all". */
+  nameplateCooldownRenderScale(): number {
+    return this.values.showNameplateCooldowns ? this.values.nameplateCooldownScale : 0;
   }
 
   /** Validate every value, apply the whole patch, then persist the settings blob once. */

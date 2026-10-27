@@ -164,6 +164,7 @@ import {
   startBloodhook,
   trailbreak,
 } from './hunter_fieldcraft';
+import { pulseArmoredGroundAoE } from './hunter_ground_zone';
 import {
   applyHowlingRage,
   runFrenzyFellShotCleave,
@@ -171,16 +172,19 @@ import {
   runStampede,
   runUnleashBeast,
 } from './hunter_packlord';
+import { startPlayDead } from './hunter_play_dead';
+import { runScatterbolt } from './hunter_scatterbolt';
 import {
   activateHunterMajorWindow,
   cripplingPursuit,
   grantHunterFocus,
   onHunterGuiseActivated,
   onHunterPrimaryDamage,
+  onHunterVenomBarbLanded,
   runHunterPackRally,
   runHunterWildheart,
 } from './hunter_shared';
-import { spawnFrostjawTrap, spawnHunterTrap } from './hunter_trap';
+import { spawnBearTrap, spawnFrostjawTrap, spawnHunterTrap } from './hunter_trap';
 import { applyLaunchKnockback } from './knockback_launch';
 import { resurrectDeadGroupMembers } from './mass_resurrection';
 import {
@@ -230,7 +234,6 @@ import {
 } from './priest';
 import { benisonAfterAbility } from './priest/benison';
 import { doctrineAfterAbility } from './priest/doctrine';
-import { spawnSpiritBombResidual } from './priest/spirit_bomb_residual';
 import { priestAfterAbility, priestOnGroupHeal } from './priest/talents';
 import { applyVampiricTouch } from './priest/vampiric_touch';
 import { gloomtitheStacksForCast, vespersAfterAbility } from './priest/vespers';
@@ -328,7 +331,7 @@ function dropsCombatOnStealth(ability: AbilityDef): boolean {
  * return the extra ids the live-target sweep must clear. Ordinary stealth uses
  * only that live-target sweep, so it never becomes a full threat dump.
  */
-function dropSelfFromHostileFocus(ctx: SimContext, p: Entity): readonly number[] {
+export function dropSelfFromHostileFocus(ctx: SimContext, p: Entity): readonly number[] {
   p.combatTimer = 5;
   p.inCombat = false;
   p.autoAttack = false;
@@ -2204,6 +2207,7 @@ export function runEffects(
         }
         if (ability.id === 'rip') druidEngineOnLandedStrike(ctx, p, ability.id);
         ctx.enterCombat(p, target);
+        if (ability.id === 'serpent_sting') onHunterVenomBarbLanded(ctx, p, target);
         break;
       }
       case 'extendDot': {
@@ -2579,18 +2583,6 @@ export function runEffects(
           true,
           talentDmgMult,
         );
-        if (ability.id === 'spirit_bomb') {
-          spawnSpiritBombResidual(
-            ctx,
-            p,
-            { ...aoeCenter },
-            eff.radius,
-            ((eff.min + eff.max) / 2 + aoeSpBonus) *
-              (isSpell ? spellDamageMultFromAuras(p) : 1) *
-              primaryDamageMult,
-            threatOpts,
-          );
-        }
         // Collect the eligible targets FIRST (LoS + frontal gate) so a soft
         // target cap can know the count before any hit lands. The skips draw no
         // rng (they happen before the damage roll), so the stream position is
@@ -3005,6 +2997,7 @@ export function runEffects(
           orbCdr: eff.orbCdr,
           threat: threatOpts,
           devotionOnFirstHit: eff.devotionOnFirstHit,
+          armorMitigated: ability.school === 'physical' || undefined,
           consecration:
             ability.id === 'consecration'
               ? {
@@ -3098,7 +3091,9 @@ export function runEffects(
         }
         // A delayed zone (Meteor's fall) skips the on-cast pulse: its first
         // hit lands one interval later, exactly the fall time.
-        if (!eff.delayed) ctx.pulseGroundAoE(groundEffect, threatOpts, true);
+        if (!eff.delayed && groundEffect.armorMitigated) {
+          pulseArmoredGroundAoE(ctx, groundEffect, threatOpts, true);
+        } else if (!eff.delayed) ctx.pulseGroundAoE(groundEffect, threatOpts, true);
         ctx.groundAoEs.push(groundEffect);
         if (echoThunderVent) {
           // Faultwake's full vent is the whole zone, so mirror each pulse one
@@ -3406,6 +3401,16 @@ export function runEffects(
             : ability.id === 'mass_barrier' && spec === 'fire'
               ? 'fire'
               : ability.school;
+        // The healPower rider is computed once per cast from the CASTER, with the
+        // same talent heal and global absorb multipliers as the single-target
+        // 'absorb' arm, then added to every recipient's shield.
+        const shieldValue =
+          eff.amount +
+          absorbBonus(
+            p.healPower,
+            eff.spellPowerCoeff ?? 0,
+            talentHealMult * (1 + mods.global.absorbPct),
+          );
         for (const mE of recipients) {
           ctx.applyAura(mE, {
             id: ability.id,
@@ -3413,7 +3418,7 @@ export function runEffects(
             kind: 'absorb',
             remaining: eff.duration,
             duration: eff.duration,
-            value: eff.amount,
+            value: shieldValue,
             sourceId: p.id,
             school: barrierSchool,
           });
@@ -4005,7 +4010,11 @@ export function runEffects(
         break;
       }
       case 'hunterShrapnel': {
-        runShrapnelCharge(ctx, p, target, eff, ability.name);
+        runShrapnelCharge(ctx, p, eff, ability.name, ability.id);
+        break;
+      }
+      case 'hunterPlayDead': {
+        startPlayDead(ctx, p, ability.name, dropSelfFromHostileFocus(ctx, p), eff.movingGrace);
         break;
       }
       case 'hunterTrailbreak': {
@@ -4017,7 +4026,15 @@ export function runEffects(
         break;
       }
       case 'frostjawTrap': {
-        spawnFrostjawTrap(ctx, p, eff, ability.name, ability.id, ability.range);
+        spawnFrostjawTrap(ctx, p, eff, ability.name, ability.id);
+        break;
+      }
+      case 'hunterBearTrap': {
+        spawnBearTrap(ctx, p, eff, ability.name, ability.id);
+        break;
+      }
+      case 'hunterScatterbolt': {
+        runScatterbolt(ctx, p, eff, ability.id);
         break;
       }
       case 'aoeAllyMaxHp': {
@@ -4375,9 +4392,9 @@ export function runEffects(
         break;
       }
       case 'absorbSpentResource': {
-        // Forgewall 2pc lives UPSTREAM: a buffPct row rewrites the RESOLVED
-        // mult (applyTalentMods' scaleEffect extension), so eff.mult already
-        // carries the wearer's 5-per-rage and the tooltip reads the same.
+        // A buffPct upgrade lives UPSTREAM: the row rewrites the RESOLVED
+        // mult (applyTalentMods' buffPct arm), so eff.mult already carries
+        // the upgraded rate and the tooltip reads the same.
         const amount = Math.round(res.cost * eff.mult);
         if (amount <= 0) break;
         ctx.applyAura(p, {
@@ -4416,7 +4433,9 @@ export function runEffects(
         if (!pet) {
           ctx.error(
             p.id,
-            isDelvePos(p.pos.x) ? 'Pets are not allowed inside the delves.' : 'You have no pet.',
+            isDelvePos(p.pos.x) && ctx.delvePetStash.has(p.id)
+              ? 'Pets are not allowed inside the delves.'
+              : 'You have no pet.',
           );
           break;
         }

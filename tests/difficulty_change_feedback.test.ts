@@ -32,7 +32,7 @@ function rig() {
       craftSkills: {},
       gatheringProficiency: {},
     },
-    renderer: { handleEvent: vi.fn() },
+    renderer: { handleEvent: vi.fn(), atContact: vi.fn() },
     playEventSfx: vi.fn(),
     meters: { onEvent: vi.fn() },
     isNythraxisEvent: vi.fn(() => false),

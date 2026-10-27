@@ -44,6 +44,7 @@ import { ITEMS, MOBS, QUESTS } from '../data';
 import { formatMoney } from '../format_money';
 import { publicInstanceView } from '../item_instance_transfer';
 import { effectiveMasterLooter, meetsMasterThreshold } from '../loot_master';
+import { corpseKeepsBody } from '../mob/boss_corpse_sink';
 import { isHarvestableCorpse } from '../professions/gathering';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -63,7 +64,8 @@ import type {
   MasterLootThreshold,
 } from '../types';
 import { cloneItemInstancePayload, dist2d, PARTY_XP_RANGE } from '../types';
-import { grantAwardedLootItem, grantOrHoldAwardedLoot } from './awarded_loot_hold';
+import { grantAwardedLootItem, grantOrHoldAwardedLoot, mobLootSource } from './awarded_loot_hold';
+import { announceBossDrops } from './boss_drop_announce';
 import { lootItemUsableByClasses, usableRollGroup } from './class_locked_drop';
 import { rollEnemyLootQuality } from './enemy_quality';
 import { heroicLootItemId } from './heroic_item';
@@ -383,6 +385,9 @@ export function rollLoot(
       }
     }
   }
+  // Buddies are deliberately NOT corpse loot: the per-player companion roll
+  // rides the boss death site instead (src/sim/buddy_drops.ts, content/
+  // buddy_sources.ts), so no kill anywhere draws for one here.
   if (copper > 0 || items.length > 0) {
     // A soulbound drop pins its bind-on-pickup trade group NOW, from the
     // kill-time `eligible` set, so a member who disconnects before the roll
@@ -397,6 +402,8 @@ export function rollLoot(
     }
     mob.loot = { copper, items: rollEnemyLootQuality(ctx.rng, mob, items, questSlots) };
     mob.lootable = true;
+    // After the quality roll, so each line links the exact copy on the corpse.
+    announceBossDrops(ctx, mob, meta.entityId);
     // start the owner-lock countdown: after LOOT_FFA_DELAY the tap opens to all.
     mob.lootFfaTimer = LOOT_FFA_DELAY;
   } else if (isHarvestableCorpse(template.componentTags)) {
@@ -644,7 +651,14 @@ export function awardSharedLootItem(
       : !ctx.canAddItem(itemId, 1, looter.entityId)
   )
     return false;
-  grantAwardedLootItem(ctx, itemId, looter.entityId, killSnapshotEligibility(ctx, mob), instance);
+  grantAwardedLootItem(
+    ctx,
+    itemId,
+    looter.entityId,
+    killSnapshotEligibility(ctx, mob),
+    instance,
+    mobLootSource(mob),
+  );
   return true;
 }
 
@@ -1171,6 +1185,10 @@ export function pruneCorpseLoot(ctx: SimContext, mob: Entity): void {
       return;
     }
     mob.lootable = false;
+    // A body that sinks out at the end of its window (mob/boss_corpse_sink.ts) keeps
+    // lying for the whole of it: nothing left to take, but no four-second vanish either.
+    // After the harvest arm above, so a sinking body that still owes a harvest keeps it.
+    if (corpseKeepsBody(MOBS[mob.templateId])) return;
     mob.corpseTimer = Math.min(mob.corpseTimer, 4);
   }
 }

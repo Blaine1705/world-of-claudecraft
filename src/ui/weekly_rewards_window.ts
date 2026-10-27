@@ -21,13 +21,17 @@ export function createWeeklyRewardsTab(
     onInventoryChanged(): void;
     hideTooltip(): void;
   },
+  options?: { readOnly?: boolean },
 ): WeeklyRewardsTab {
-  return new WeeklyRewardsTab({
-    world: () => host.world(),
-    presentation: host,
-    onInventoryChanged: () => host.onInventoryChanged(),
-    hideTooltip: () => host.hideTooltip(),
-  });
+  return new WeeklyRewardsTab(
+    {
+      world: () => host.world(),
+      presentation: host,
+      onInventoryChanged: () => host.onInventoryChanged(),
+      hideTooltip: () => host.hideTooltip(),
+    },
+    options,
+  );
 }
 export class WeeklyRewardsTab {
   private timer: HTMLElement | null = null;
@@ -42,8 +46,9 @@ export class WeeklyRewardsTab {
       onInventoryChanged(): void;
       hideTooltip?(): void;
     },
+    private readonly options?: { readOnly?: boolean },
   ) {
-    this.claimFlow = new WeeklyRewardClaimController(deps);
+    this.claimFlow = new WeeklyRewardClaimController(deps, options);
   }
   close(): void {
     this.claimFlow.close();
@@ -80,17 +85,19 @@ export class WeeklyRewardsTab {
   }
   renderInto(parent: HTMLElement): void {
     this.claimFlow.pause();
-    // Discard a previously dragged bank's inline insets before using the large sheet.
-    for (const property of ['left', 'top', 'right', 'bottom', 'transform'])
-      parent.style.removeProperty(property);
-    delete parent.dataset.windowMoved;
+    if (!this.options?.readOnly) {
+      // Discard a previously dragged bank's inline insets before using the large sheet.
+      for (const property of ['left', 'top', 'right', 'bottom', 'transform'])
+        parent.style.removeProperty(property);
+      delete parent.dataset.windowMoved;
+    }
     const world = this.deps.world();
     const info = world.weeklyRewardInfo;
     this.timer = null;
     this.timerText = '';
     const panel = document.createElement('section');
     panel.id = WEEKLY_PANEL_ID;
-    panel.className = 'weekly-rewards bank-scroll';
+    panel.className = `weekly-rewards bank-scroll${this.options?.readOnly ? ' weekly-rewards--readonly' : ''}`;
     panel.setAttribute('role', 'region');
     panel.setAttribute('aria-label', t('hudChrome.weeklyRewards.title'));
     if (!info) {
@@ -108,7 +115,9 @@ export class WeeklyRewardsTab {
       info.playerLevel,
       !!info.state.vaults[0] && info.state.vaults[0].resetAtMs <= info.nowMs,
     ]);
-    const rows = buildWeeklyRewardsView(info, world.cfg.playerClass);
+    const rows = buildWeeklyRewardsView(info, world.cfg.playerClass, {
+      catalog: this.options?.readOnly ? 'all' : 'eligible',
+    });
     panel.innerHTML = `<header class="weekly-rewards-header"><div class="weekly-vault-crest" aria-hidden="true"><img src="${chromeIconUrl('chest')}" alt="" draggable="false"></div><div class="weekly-vault-intro"><h2>${esc(t('hudChrome.weeklyRewards.title'))}</h2><p>${esc(t('hudChrome.weeklyRewards.intro'))}</p></div><div class="weekly-reset"><span>${esc(t('hudChrome.weeklyRewards.nextReset'))}</span><strong data-weekly-countdown role="timer"></strong></div></header>`;
     this.timer = panel.querySelector('[data-weekly-countdown]');
     this.refreshCountdown();
@@ -144,7 +153,7 @@ export class WeeklyRewardsTab {
     const toolbar = document.createElement('div');
     toolbar.className = 'weekly-vault-toolbar';
     toolbar.appendChild(status);
-    appendWeeklyLootFocus(toolbar, world);
+    if (!this.options?.readOnly) appendWeeklyLootFocus(toolbar, world);
     toolbar.appendChild(lootButton);
     panel.append(toolbar, allPools);
     if (info.state.overflowed || info.readyWeeks >= WEEKLY_BACKLOG_LIMIT) {
@@ -196,6 +205,14 @@ export class WeeklyRewardsTab {
     const claimHost = document.createElement('div');
     panel.append(claimHost, tracks);
     parent.appendChild(panel);
-    this.claimFlow.renderInto(claimHost, tracks);
+    if (this.options?.readOnly) {
+      this.claimFlow.close();
+      if (info.readyWeeks) {
+        const notice = document.createElement('p');
+        notice.className = 'weekly-preview-notice ui-card';
+        notice.textContent = t('hudChrome.weeklyRewards.previewClaimNotice');
+        claimHost.append(notice);
+      }
+    } else this.claimFlow.renderInto(claimHost, tracks);
   }
 }

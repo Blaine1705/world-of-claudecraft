@@ -26,6 +26,80 @@
  * so this list can never be used to silence a key that a page really does try to render.
  */
 export const RETIRED_KEYS = [
+  // Removed expedition recruitment panels and paused reward shop have no live UI.
+  'hudChrome.expeditions.sections',
+  'hudChrome.expeditions.noAlerts',
+  'hudChrome.expeditions.recruitPlayers',
+  'hudChrome.expeditions.recruitIntro',
+  'hudChrome.expeditions.recruitDungeon',
+  'hudChrome.expeditions.recruitDifficulty',
+  'hudChrome.expeditions.recruitPreview',
+  'hudChrome.expeditions.recruitPublish',
+  'hudChrome.expeditions.recruitPublishing',
+  'hudChrome.expeditions.recruitBeforeEntry',
+  'hudChrome.expeditions.recruitUnconfirmed',
+  'hudChrome.expeditions.recruitLoading',
+  'hudChrome.expeditions.recruitAlreadyOpen',
+  'hudChrome.expeditions.recruitExistingRun',
+  'hudChrome.expeditions.recruitLeaveQueue',
+  'hudChrome.expeditions.recruitFinishProposal',
+  'hudChrome.expeditions.recruitCancelRequests',
+  'hudChrome.expeditions.recruitNoActivities',
+  'hudChrome.expeditions.recruitNoRoles',
+  'hudChrome.expeditions.recruitInvalidNote',
+  'hudChrome.expeditions.manageRecruitment',
+  'hudChrome.expeditions.formingGroup',
+  'hudChrome.expeditions.groupGathering',
+  'hudChrome.expeditions.groupChooseDungeon',
+  'hudChrome.expeditions.waitForLeader',
+  'hudChrome.expeditions.recruitmentNext',
+  'hudChrome.expeditions.findGroupNext',
+  'hudChrome.expeditions.awaitingReply',
+  'hudChrome.expeditions.requestSent',
+  'hudChrome.expeditions.readyToTravel',
+  'hudChrome.expeditions.groupRecruiting',
+  'hudChrome.expeditions.groupInProgress',
+  'hudChrome.expeditions.entryTitle',
+  'hudChrome.expeditions.entryBody',
+  'hudChrome.expeditions.acceptPlayer',
+  'hudChrome.expeditions.declinePlayer',
+  'hudChrome.expeditions.chooseRole',
+  'hudChrome.expeditions.confirmRequest',
+  'hudChrome.expeditions.chooseRoleAction',
+  'hudChrome.expeditions.groupsCount',
+  'hudChrome.expeditions.requestsCount',
+  'hudChrome.expeditions.manageGroup',
+  'hudChrome.expeditions.browseGroups',
+  'hudChrome.expeditions.noCurrentGroup',
+  'hudChrome.expeditions.noCurrentGroupHint',
+  'hudChrome.expeditions.noRequests',
+  'hudChrome.expeditions.requestsCombat',
+  'hudChrome.expeditions.expires',
+  'hudChrome.expeditions.stopHelping',
+  'hudChrome.expeditions.helperRoles',
+  'hudChrome.expeditions.helperOn',
+  'hudChrome.expeditions.helperFound',
+  'hudChrome.expeditions.viewGroups',
+  'hudChrome.expeditions.backToGroups',
+  'hudChrome.expeditions.shopIntro',
+  'hudChrome.expeditions.shopDescription',
+  'hudChrome.expeditions.shopCollection',
+  'hudChrome.expeditions.shopOwned',
+  'hudChrome.expeditions.shopLocked',
+  'hudChrome.expeditions.shopRules',
+  'hudChrome.expeditions.pendingRequests',
+  'hudChrome.expeditions.multiApplyHint',
+  'hudChrome.expeditions.multiApplyLimit',
+  'hudChrome.expeditions.dailyPoints',
+  'hudChrome.expeditions.rewardRules',
+  'hudChrome.expeditions.rewardScope',
+  'hudChrome.expeditions.bronze',
+  'hudChrome.expeditions.silver',
+  'hudChrome.expeditions.defaultBell',
+  // Replaced by plural-aware labels; retain reviewed legacy translations.
+  'hudChrome.expeditions.bell',
+  'hudChrome.adventureGuide.catalogueCount',
+
   // Crucible collections add a raid-funded route beside the original ladder.
   'guide.professions.endgameBody',
   'guide.professions.endgamePatternsBody',
@@ -64,7 +138,8 @@ export const RETIRED_KEYS = [
   'guide.worldPvpPage.limitsBody', // -> guide.worldPvpPage.limitsBodyHour
   'guide.worldPvpPage.limitsBodyHour', // -> guide.worldPvpPage.limitsBodyRaids (the raid rule)
   'guide.worldPvpPage.hillBody', // -> guide.worldPvpPage.hillBodyRamp (the hold ramp)
-  'guide.worldPvpPage.hillBodyRamp', // -> guide.worldPvpPage.hillBodyRanked (2 h, 30 min, ranking)
+  'guide.worldPvpPage.hillBodyRamp', // -> guide.worldPvpPage.hillBodyPause (30 s capture, a rival pauses it)
+  'guide.worldPvpPage.hillBodyPause', // -> guide.worldPvpPage.hillBodyFlat (flat Honor, capture rules retained)
   'guide.commandsPage.pvp', // -> guide.commandsPage.pvpZones
 
   // -- Content the game no longer has, so the wiki must not define it.

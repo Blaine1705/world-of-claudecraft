@@ -1,6 +1,6 @@
 import { isFerryPassenger } from '../sim/ferry_passenger';
 import type { Entity, ZoneDef } from '../sim/types';
-import { nearestSubzone } from './subzone';
+import { currentSubzone, type NamedArea } from './subzone';
 
 /** Keep announcement history separate from the map's current zone. */
 export class ZoneAnnouncementCore {
@@ -21,8 +21,18 @@ export class ZoneAnnouncementCore {
   }
 
   subzone(player: Entity, inDungeon: boolean, pois: ZoneDef['pois'], current: string | null) {
+    return this.subzoneHit(player, inDungeon, pois, [], current)?.label ?? null;
+  }
+
+  subzoneHit(
+    player: Entity,
+    inDungeon: boolean,
+    pois: ZoneDef['pois'],
+    areas: readonly NamedArea[],
+    current: string | null,
+  ) {
     return inDungeon || isFerryPassenger(player)
       ? null
-      : nearestSubzone(player.pos.x, player.pos.z, pois, current);
+      : currentSubzone(player.pos.x, player.pos.z, pois, areas, current);
   }
 }
