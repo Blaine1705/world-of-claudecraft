@@ -24,6 +24,7 @@ import {
   bladeStateOf,
   crackOf,
   echoOf,
+  echoReach,
   laneOf,
   QUENCH_CUES,
   QUENCH_OBJECTS,
@@ -35,15 +36,15 @@ import { TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core'
 export { breathClaimOrigin as quenchClaimOrigin } from './breath_fight_fx_core';
 
 /** The palette. A footprint's rim is a threat colour (the floor telegraph's
- *  rule); the safe lee is a sanctuary's mint (the Breath's calm), the warmth
- *  the one warm gold on the lake, the cold the vein's own pale blue. */
+ *  rule), the warmth the one warm gold on the lake, the cold the vein's own
+ *  pale blue. */
 export const QUENCH_FIGHT_COLORS = {
   danger: TELEGRAPH_THREAT_COLORS.danger,
   lethal: TELEGRAPH_THREAT_COLORS.lethal,
   control: TELEGRAPH_THREAT_COLORS.control,
-  /** Behind a blade: always safe. */
-  safe: 0x7af2c8,
-  safeEdge: 0xe8fff4,
+  /** An echo's footprint's accent: the danger's own hot light, never the
+   *  ice's blue (it must read as a hit at a glance). */
+  dangerHot: 0xffc08a,
   /** The ice's accent on the telegraphs. */
   accent: 0xbfeaff,
   /** The huddle's warmth. */
@@ -264,16 +265,13 @@ export const BLADE_HEIGHT = QUENCH_BLADE_H;
 
 // ---- the echoes and the lee ----------------------------------------------------------
 
-/** An echo's footprint: its arc and reach (the attack it repeats). */
+/** An echo's footprint: the sim's own arc and reach for it (`echoReach`,
+ *  wider than the attack it repeats). The lee behind a blade is not drawn
+ *  (Jose's playtest: two rings at a blade read alike); only this danger
+ *  footprint is, so its edge is where the hit ends. */
 export function echoShape(kind: 'breath' | 'strike'): { arcDeg: number; range: number } {
-  return kind === 'breath'
-    ? { arcDeg: T.breathArcDeg, range: T.breathRange }
-    : { arcDeg: T.strikeArcDeg, range: T.strikeRange };
+  return echoReach(kind);
 }
-
-/** The lee's footprint behind a blade: a half disc of the sim's radius,
- *  turned away from the attack (`facing` + pi). */
-export const LEE_SHAPE = { arcDeg: 180, range: T.leeR } as const;
 
 /** An echo's telegraph `elapsed` seconds after it showed, `total` to its
  *  landing: the fill (0..1). */
@@ -365,7 +363,6 @@ export const QUENCH_FIGHT_POOLS = {
   cracks: 16,
   holes: T.holeMax,
   echoes: 8,
-  lees: 4,
   rimSlabs: QUENCH_RIMEWALL.segments,
   splashRings: 10,
 } as const;

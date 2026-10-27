@@ -20,8 +20,10 @@ import {
   crackOf,
   echoDelay,
   echoOf,
+  echoReach,
   huddlesOf,
   inBladeLee,
+  inEchoReach,
   insideRimewall,
   laneHoleSpots,
   laneOf,
@@ -361,7 +363,7 @@ describe('Guardian of the Quench: the blades and their echoes', () => {
           seconds: Math.round((T.breathCast + delay) * 10) / 10,
           hit: false,
         });
-        expect(e.scale).toBe(T.breathRange);
+        expect(e.scale).toBe(T.echoBreathRange);
       }
       // A raider in front of a blade, down the breath's line.
       const blade = blades(f)[0];
@@ -452,7 +454,44 @@ describe('Guardian of the Quench: the blades and their echoes', () => {
     ).toBe(true);
     expect(echoOf(echoes[0].templateId)?.seconds).toBe(T.echoDelay);
     expect(echoes[0].facing).toBeCloseTo(f.boss().facing, 1);
-    expect(echoes[0].scale).toBe(T.strikeRange);
+    expect(echoes[0].scale).toBe(T.echoStrikeRange);
+  });
+
+  it("an echo strikes wider than the attack it repeats (Jose's playtest), the lee unchanged", () => {
+    // The pure reach: 40 degrees off the line at 12 yd is outside the
+    // guardian's own breath (70 degrees: 35 each side) but inside its echo
+    // (90: 45 each side); 25 yd down the line is past the breath's 22 and
+    // inside the echo's 28.
+    const o = { x: 0, z: 0 };
+    const off = (deg: number, d: number) => ({
+      x: Math.sin((deg * Math.PI) / 180) * d,
+      z: Math.cos((deg * Math.PI) / 180) * d,
+    });
+    const own = { range: T.breathRange, arcDeg: T.breathArcDeg };
+    const echo = echoReach('breath');
+    expect(inEchoReach(o, 0, off(40, 12), own.range, own.arcDeg)).toBe(false);
+    expect(inEchoReach(o, 0, off(40, 12), echo.range, echo.arcDeg)).toBe(true);
+    expect(inEchoReach(o, 0, off(0, 25), own.range, own.arcDeg)).toBe(false);
+    expect(inEchoReach(o, 0, off(0, 25), echo.range, echo.arcDeg)).toBe(true);
+    expect(inEchoReach(o, 0, off(50, 12), echo.range, echo.arcDeg)).toBe(false);
+    const strike = echoReach('strike');
+    expect(inEchoReach(o, 0, off(60, 10), T.strikeRange, T.strikeArcDeg)).toBe(false);
+    expect(inEchoReach(o, 0, off(60, 10), strike.range, strike.arcDeg)).toBe(true);
+    // Over the real sim: a raider 40 degrees off a blade's line, 12 yd out,
+    // is struck by its echo; one in that blade's lee is not.
+    const f = pulled(5);
+    awake(f);
+    f.dev('/dev heart quench breath');
+    const facing = f.state()?.bar?.facing ?? Number.NaN;
+    const blade = blades(f)[0];
+    const [, , , wide, lee] = f.players;
+    const a = facing + (40 * Math.PI) / 180;
+    f.put(wide, blade.x + Math.sin(a) * 12, blade.z + Math.cos(a) * 12);
+    f.put(lee, blade.x - Math.sin(facing) * 3, blade.z - Math.cos(facing) * 3);
+    expect(T.leeR).toBe(5);
+    const ev = f.tick(ticks(T.breathCast + T.echoDelay) + 4);
+    expect(hitsOf(ev, QUENCH_NAMES.echoBreath, wide.id).length).toBeGreaterThan(0);
+    expect(hitsOf(ev, QUENCH_NAMES.echoBreath, lee.id)).toEqual([]);
   });
 
   it('the cold deepens every 20 s once the blades wake (the soft enrage)', () => {

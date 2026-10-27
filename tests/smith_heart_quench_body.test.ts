@@ -41,7 +41,6 @@ import {
   echoShape,
   frostLook,
   frozenLook,
-  LEE_SHAPE,
   QUENCH_FIGHT_POOLS,
   quenchFightClaims,
   quenchObjectKind,
@@ -55,6 +54,7 @@ import { QUENCH_RIMEWALL } from '../src/sim/content/smith_heart_layout';
 import {
   bladeTemplate,
   crackTemplate,
+  echoReach,
   echoTemplate,
   laneTemplate,
   QUENCH_AURAS,
@@ -274,10 +274,19 @@ describe('quench_fight_fx_core: the fight on the ice', () => {
     }
   });
 
-  it("draws each echo at the attack's exact arc and reach, the lee at the sim's", () => {
-    expect(echoShape('breath')).toEqual({ arcDeg: T.breathArcDeg, range: T.breathRange });
-    expect(echoShape('strike')).toEqual({ arcDeg: T.strikeArcDeg, range: T.strikeRange });
-    expect(LEE_SHAPE.range).toBe(T.leeR);
+  it("draws each echo at the sim's own echo reach, clearly wider than the attack's", () => {
+    // The painter and the sim read one table (quench_ids.ts echoReach).
+    expect(echoShape('breath')).toEqual({ arcDeg: T.echoBreathArcDeg, range: T.echoBreathRange });
+    expect(echoShape('strike')).toEqual({ arcDeg: T.echoStrikeArcDeg, range: T.echoStrikeRange });
+    expect(echoShape('breath')).toEqual(echoReach('breath'));
+    expect(echoShape('strike')).toEqual(echoReach('strike'));
+    // Jose's playtest: bigger than before (the guardian's own 22 yd 70 deg,
+    // 8 yd 100 deg), and the lee stays 5.
+    expect(T.echoBreathRange).toBe(28);
+    expect(T.echoBreathArcDeg).toBe(90);
+    expect(T.echoStrikeRange).toBe(12);
+    expect(T.echoStrikeArcDeg).toBe(130);
+    expect(T.leeR).toBe(5);
   });
 
   it("threads warmth only between bodies within the sim's reach, capped", () => {

@@ -160,7 +160,7 @@ describe('the Guardian of the Quench over the wire', () => {
     expect(echoes.length).toBe(4);
     for (const e of echoes) {
       expect(e.facing).toBeCloseTo(facing, 1);
-      expect(e.scale).toBe(T.breathRange);
+      expect(e.scale).toBe(T.echoBreathRange);
     }
     run(T.breathCast + T.echoDelay + 0.2);
     expect(

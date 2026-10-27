@@ -45,6 +45,7 @@ import {
   bladeStateOf,
   bladeTemplate,
   echoDelay,
+  echoReach,
   echoTemplate,
   laneTemplate,
   QUENCH_AURAS,
@@ -252,7 +253,7 @@ export function spawnEchoes(
   seconds: number,
   ofBar = false,
 ): number {
-  const range = kind === 'breath' ? T.breathRange : T.strikeRange;
+  const { range } = echoReach(kind);
   let n = 0;
   for (const b of standing(s)) {
     const e = spawnFightObject(
@@ -313,8 +314,7 @@ export function inLee(s: QuenchScope, p: QPoint, facing: number): boolean {
  *  Returns who (the tests read it). */
 export function landEcho(s: QuenchScope, echo: QuenchFightState['echoes'][number]): Entity[] {
   const breath = echo.kind === 'breath';
-  const range = breath ? T.breathRange : T.strikeRange;
-  const arc = breath ? T.breathArcDeg : T.strikeArcDeg;
+  const { range, arcDeg: arc } = echoReach(echo.kind);
   const o = s.ctx.instanceOriginOf(s.inst);
   s.ctx.emit({
     type: 'spellfxAt',

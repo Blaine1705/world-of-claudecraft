@@ -224,6 +224,16 @@ export const QUENCH_TUNING = {
   echoBreathMax: 300,
   echoStrikeMin: 200,
   echoStrikeMax: 240,
+  /** An echo strikes wider and further than the guardian's own attack
+   *  (Jose's playtest: the blades' footprints were too small to fear; the
+   *  lee behind a blade stays `leeR`). Its breath's echo: 28 yd and 90
+   *  degrees (the guardian's own breath 22 and 70); its strike's echo: 12
+   *  yd and 130 degrees (the strike's own 8 and 100). `echoReach` reads
+   *  them for the sim and the painter alike. */
+  echoBreathRange: 28,
+  echoBreathArcDeg: 90,
+  echoStrikeRange: 12,
+  echoStrikeArcDeg: 130,
   /** Tempering Strike: the template's swing cleave (every 4th landed swing,
    *  its arc and reach; content/smith_heart.ts reads these), and its echo. */
   strikeEvery: 4,
@@ -254,6 +264,16 @@ export const QUENCH_TUNING = {
 } as const;
 
 // ---- pure helpers ---------------------------------------------------------------------
+
+/** An echo's footprint at its blade: the reach and arc it strikes (wider
+ *  than the attack it repeats). The sim's hit and the painter's footprint
+ *  both read this. */
+export function echoReach(kind: QuenchEchoKind): { arcDeg: number; range: number } {
+  const T = QUENCH_TUNING;
+  return kind === 'breath'
+    ? { arcDeg: T.echoBreathArcDeg, range: T.echoBreathRange }
+    : { arcDeg: T.echoStrikeArcDeg, range: T.echoStrikeRange };
+}
 
 /** Seconds between the guardian's attack and its echoes at `hpFrac`. */
 export function echoDelay(hpFrac: number): number {

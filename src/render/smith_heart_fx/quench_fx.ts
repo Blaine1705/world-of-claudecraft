@@ -24,6 +24,7 @@
 
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
+import { echoReach } from '../../sim/encounters/smith_heart/quench_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import {
@@ -197,6 +198,9 @@ interface Frost {
   creeping: boolean;
 }
 
+/** A footprint other than the guardian's own attack (an echo's). */
+type EchoShape = { arcDeg: number; range: number };
+
 interface SpikeSet {
   mesh: THREE.InstancedMesh;
   spikes: StrikeSpike[];
@@ -209,7 +213,26 @@ interface SpikeSet {
   /** Breath: the spikes rise as the gust's front passes them. */
   sweep: boolean;
   shattered: boolean;
+  /** An echo's wider footprint: the laid-out spikes' reach and arc
+   *  stretched by these (1: the guardian's own attack). */
+  reachK: number;
+  arcK: number;
 }
+
+/** One spike's spot in its set's frame, stretched to the set's footprint. */
+function spikeLocal(set: SpikeSet, sp: { x: number; z: number }, out: { x: number; z: number }) {
+  if (set.reachK === 1 && set.arcK === 1) {
+    out.x = sp.x;
+    out.z = sp.z;
+    return out;
+  }
+  const r = Math.hypot(sp.x, sp.z) * set.reachK;
+  const a = Math.atan2(sp.x, sp.z) * set.arcK;
+  out.x = Math.sin(a) * r;
+  out.z = Math.cos(a) * r;
+  return out;
+}
+const _sp = { x: 0, z: 0 };
 
 export class QuenchFx {
   readonly readyForEntry: Promise<void>;
@@ -333,6 +356,8 @@ export class QuenchFx {
         live: false,
         sweep: breath,
         shattered: false,
+        reachK: 1,
+        arcK: 1,
       });
     }
     this.readyForEntry = attachSceneGroupGated(scene, this.root, compileGate, () => this.disposed)
@@ -394,8 +419,10 @@ export class QuenchFx {
    *  own (quench_fight_fx.ts calls this when an echo lands). */
   echoAt(kind: 'breath' | 'strike', x: number, z: number, yaw: number): void {
     if (this.disposed) return;
-    if (kind === 'breath') this.breathAt(x, z, yaw);
-    else this.strikeAt(x, z, yaw);
+    // Over the echo's own (wider) reach, the sim's (quench_ids.ts echoReach).
+    const shape = echoReach(kind);
+    if (kind === 'breath') this.breathAt(x, z, yaw, shape);
+    else this.strikeAt(x, z, yaw, shape);
   }
 
   update(dt: number): void {
@@ -514,12 +541,13 @@ export class QuenchFx {
 
   // ---- Quenching Breath lands -----------------------------------------------------------
 
-  private breathAt(x: number, z: number, yaw: number): void {
+  private breathAt(x: number, z: number, yaw: number, shape?: EchoShape): void {
     const y = this.groundY(x, z);
-    const R = this.sim.breathRange;
-    const half = (this.sim.breathArcDeg * Math.PI) / 360;
+    const R = shape?.range ?? this.sim.breathRange;
+    const arcDeg = shape?.arcDeg ?? this.sim.breathArcDeg;
+    const half = (arcDeg * Math.PI) / 360;
     // The frost: the whole cone frosted, staying a while.
-    this.layFrost(x, z, yaw, 'breath', 1, BREATH_FROST_SECONDS);
+    this.layFrost(x, z, yaw, 'breath', 1, BREATH_FROST_SECONDS, shape);
     // The freezing gust: mist billowing out along the cone.
     const n = Math.round(30 * this.density * (this.reducedMotion() ? 0.5 : 1));
     for (let i = 0; i < n; i++) {
@@ -558,7 +586,15 @@ export class QuenchFx {
       });
     }
     // The ice ripping up behind the front.
-    this.liftSpikes(this.freeSet(QUENCH_FX_POOLS.spikes, QUENCH_FX_POOLS.breaths), x, y, z, yaw);
+    this.liftSpikes(
+      this.freeSet(QUENCH_FX_POOLS.spikes, QUENCH_FX_POOLS.breaths),
+      x,
+      y,
+      z,
+      yaw,
+      R / Math.max(1, this.sim.breathRange),
+      arcDeg / Math.max(1, this.sim.breathArcDeg),
+    );
     this.particles.shockRing(x, z, C.ringCold, 7, 0.45);
     this.shakeNear(x, z, 0.35, R + 20);
   }
@@ -571,14 +607,24 @@ export class QuenchFx {
     return this.spikeSets[from];
   }
 
-  private strikeAt(x: number, z: number, yaw: number): void {
+  private strikeAt(x: number, z: number, yaw: number, shape?: EchoShape): void {
     const y = this.groundY(x, z);
-    this.liftSpikes(this.freeSet(0, QUENCH_FX_POOLS.spikes), x, y, z, yaw);
-    this.layFrost(x, z, yaw, 'strike', 1, STRIKE_FROST_SECONDS);
-    const half = (this.sim.strikeArcDeg * Math.PI) / 360;
+    const range = shape?.range ?? this.sim.strikeRange;
+    const arcDeg = shape?.arcDeg ?? this.sim.strikeArcDeg;
+    this.liftSpikes(
+      this.freeSet(0, QUENCH_FX_POOLS.spikes),
+      x,
+      y,
+      z,
+      yaw,
+      range / Math.max(1, this.sim.strikeRange),
+      arcDeg / Math.max(1, this.sim.strikeArcDeg),
+    );
+    this.layFrost(x, z, yaw, 'strike', 1, STRIKE_FROST_SECONDS, shape);
+    const half = (arcDeg * Math.PI) / 360;
     for (let k = 0; k < Math.round(10 * this.density); k++) {
       const a = yaw + (this.rand() * 2 - 1) * half;
-      const r = this.sim.strikeRange * (0.3 + this.rand() * 0.6);
+      const r = range * (0.3 + this.rand() * 0.6);
       this.particles.puff(x + Math.sin(a) * r, y + 0.5, z + Math.cos(a) * r, 2, {
         speed: 3,
         up: 2,
@@ -590,17 +636,21 @@ export class QuenchFx {
         spread: 0.5,
       });
     }
-    this.particles.shockRing(
-      x + Math.sin(yaw) * 3,
-      z + Math.cos(yaw) * 3,
-      C.ring,
-      this.sim.strikeRange,
-      0.35,
-    );
+    this.particles.shockRing(x + Math.sin(yaw) * 3, z + Math.cos(yaw) * 3, C.ring, range, 0.35);
     this.shakeNear(x, z, 0.3, 30);
   }
 
-  private liftSpikes(set: SpikeSet, x: number, y: number, z: number, yaw: number): void {
+  private liftSpikes(
+    set: SpikeSet,
+    x: number,
+    y: number,
+    z: number,
+    yaw: number,
+    reachK = 1,
+    arcK = 1,
+  ): void {
+    set.reachK = reachK;
+    set.arcK = arcK;
     set.x = x;
     set.y = y;
     set.z = z;
@@ -636,8 +686,9 @@ export class QuenchFx {
           continue;
         }
         any = true;
-        const wx = set.x + sp.x * cy + sp.z * sy;
-        const wz = set.z - sp.x * sy + sp.z * cy;
+        const l = spikeLocal(set, sp, _sp);
+        const wx = set.x + l.x * cy + l.z * sy;
+        const wz = set.z - l.x * sy + l.z * cy;
         this.v.set(wx, this.groundY(wx, wz) - 0.2, wz);
         // Leaning out from the guardian, along its line.
         this.e.set(sp.lean, set.yaw + sp.yaw, 0, 'YXZ');
@@ -667,8 +718,9 @@ export class QuenchFx {
     const every = set.sweep ? 3 : 1;
     for (let k = 0; k < set.spikes.length; k += every) {
       const sp = set.spikes[k];
-      const wx = set.x + sp.x * cy + sp.z * sy;
-      const wz = set.z - sp.x * sy + sp.z * cy;
+      const l = spikeLocal(set, sp, _sp);
+      const wx = set.x + l.x * cy + l.z * sy;
+      const wz = set.z - l.x * sy + l.z * cy;
       const y = this.groundY(wx, wz);
       this.particles.puff(wx, y + sp.height * 0.5, wz, 3, {
         speed: 5,
@@ -703,6 +755,7 @@ export class QuenchFx {
     kind: 'breath' | 'strike',
     reach: number,
     span: number,
+    shape?: EchoShape,
   ): Frost {
     const f = this.frosts.find((o) => !o.live) ?? this.frosts[0];
     f.live = true;
@@ -712,8 +765,9 @@ export class QuenchFx {
     f.span = span;
     f.mesh.position.set(x, this.groundY(x, z) + 0.06, z);
     f.mesh.rotation.y = yaw;
-    const arc = kind === 'breath' ? this.sim.breathArcDeg : this.sim.strikeArcDeg;
-    const range = kind === 'breath' ? this.sim.breathRange : this.sim.strikeRange;
+    const arc =
+      shape?.arcDeg ?? (kind === 'breath' ? this.sim.breathArcDeg : this.sim.strikeArcDeg);
+    const range = shape?.range ?? (kind === 'breath' ? this.sim.breathRange : this.sim.strikeRange);
     f.mat.uniforms.uHalfArc.value = (arc * Math.PI) / 360;
     f.mat.uniforms.uReach.value = reach;
     f.mesh.scale.set(range, 1, range);

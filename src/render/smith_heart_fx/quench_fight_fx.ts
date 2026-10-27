@@ -18,10 +18,11 @@
 //    hole of freezing water (dark deep water, a churn, a rim of broken white
 //    ice); a trapped player held to the waist in churning water; the
 //    plunge's and the climb's splashes;
-//  - the echoes: each footprint at the attack's exact arc and reach at its
-//    blade (the shared floor telegraph, filling to its landing), the safe
-//    lee behind every blade in a sanctuary's mint while they wait; landing,
-//    the guardian's own freezing gust or ice (QuenchFx through `echoLook`);
+//  - the echoes: each footprint at the sim's own echo reach and arc at its
+//    blade (the shared floor telegraph in danger with a hot edge, filling to
+//    its landing; no safe ring is drawn, Jose's playtest: only the danger);
+//    landing, the guardian's own freezing gust or ice over the echo's whole
+//    reach (QuenchFx through `echoLook`);
 //  - heroic's crossing: the lane between the two blades (the shared floor
 //    telegraph), the flight's wake;
 //  - the shore ice: slabs of jagged ice heaving up round the lake at the
@@ -70,7 +71,6 @@ import {
   frostLook,
   frozenLook,
   holeLook,
-  LEE_SHAPE,
   QUENCH_FIGHT_POOLS as P,
   QUENCH_FIGHT_REACH,
   QUENCH_LAKE_CENTRE,
@@ -328,7 +328,6 @@ export class QuenchFightFx {
   // The footprints (every tier).
   private readonly crackFans: FanSlot[] = [];
   private readonly echoFans: FanSlot[] = [];
-  private readonly leeFans: TelegraphFan[] = [];
   private readonly splashFans: FanSlot[] = [];
   private readonly lane: TelegraphLane;
   private laneId = -1;
@@ -407,13 +406,12 @@ export class QuenchFightFx {
     };
     fans(P.cracks, 8, this.crackFans, 360, C.danger);
     fans(P.echoes, 12, this.echoFans, echoShape('breath').arcDeg, C.danger);
+    for (const s of this.echoFans)
+      this.kit.layOutFan(s.fan, echoShape('breath').arcDeg, {
+        color: C.danger,
+        accent: C.dangerHot,
+      });
     fans(P.frozen, 10, this.splashFans, 360, C.danger);
-    for (let i = 0; i < P.lees; i++) {
-      const fan = this.kit.fan(14);
-      this.kit.layOutFan(fan, LEE_SHAPE.arcDeg, { color: C.safe, accent: C.safeEdge });
-      fan.group.visible = false;
-      this.leeFans.push(fan);
-    }
     this.lane = this.kit.lane(11);
 
     // ---- the instanced floor discs ----
@@ -831,7 +829,7 @@ export class QuenchFightFx {
           if (kind === 'echo') {
             const of = echoOf(e.templateId);
             const shape = echoShape(of?.kind ?? 'breath');
-            this.kit.layOutFan(slot.fan, shape.arcDeg, { color: C.danger, accent: C.accent });
+            this.kit.layOutFan(slot.fan, shape.arcDeg, { color: C.danger, accent: C.dangerHot });
           } else this.audio.crack(e.pos.x, this.groundY(e.pos.x, e.pos.z), e.pos.z);
         } else if (slot.template !== e.templateId) {
           slot.template = e.templateId;
@@ -870,7 +868,6 @@ export class QuenchFightFx {
       s.id = -1;
       s.fan.group.visible = false;
     }
-    for (const f of this.leeFans) f.group.visible = false;
     this.lane.group.visible = false;
     this.laneId = -1;
     for (const s of this.holeSlots) s.id = -1;
@@ -955,8 +952,7 @@ export class QuenchFightFx {
     this.holes.instanceMatrix.needsUpdate = true;
     this.holes.visible = h > 0;
     if (this.holes.instanceColor) this.holes.instanceColor.needsUpdate = true;
-    // The echoes' footprints, and the lee behind every blade while they wait.
-    let leeFacing = Number.NaN;
+    // The echoes' footprints (danger only: no safe ring is drawn).
     for (const s of this.echoFans) {
       const e = s.id >= 0 ? world.entities.get(s.id) : undefined;
       if (!e) continue;
@@ -977,10 +973,8 @@ export class QuenchFightFx {
       } else {
         const fill = echoFill(this.clock - s.born, of.seconds ?? 1);
         this.kit.paintFan(s.fan, { fill, clock: this.clock, range: shape.range });
-        if (Number.isNaN(leeFacing)) leeFacing = e.facing;
       }
     }
-    this.paintLees(world, leeFacing);
     // Heroic's crossing lane.
     const lane = this.laneId >= 0 ? world.entities.get(this.laneId) : undefined;
     const lof = lane ? laneOf(lane.templateId) : null;
@@ -1003,39 +997,6 @@ export class QuenchFightFx {
       this.kit.paintLane(this.lane, { fill, clock: this.clock, range: half * 2 });
       this.lane.group.visible = true;
     } else this.lane.group.visible = false;
-  }
-
-  /** The lee: a half disc of mint behind each standing blade, away from the
-   *  attack the echoes repeat (NaN: none waiting). */
-  private paintLees(world: IWorld, facing: number): void {
-    let n = 0;
-    if (!Number.isNaN(facing)) {
-      for (const id of this.objectIds) {
-        if (n >= P.lees) break;
-        const e = world.entities.get(id);
-        if (!e || quenchObjectKind(e.templateId) !== 'blade') continue;
-        if (e.templateId.endsWith('_fly') || e.templateId.endsWith('_sunk')) continue;
-        const fan = this.leeFans[n++];
-        const y = this.groundY(e.pos.x, e.pos.z);
-        this.kit.drapeFan(
-          fan,
-          this.groundY,
-          e.pos.x,
-          y,
-          e.pos.z,
-          facing + Math.PI,
-          LEE_SHAPE.range,
-        );
-        this.kit.paintFan(fan, {
-          fill: 0.6 + 0.2 * Math.sin(this.clock * 4),
-          clock: this.clock,
-          range: LEE_SHAPE.range,
-          front: 0,
-        });
-        fan.group.visible = true;
-      }
-    }
-    for (let i = n; i < P.lees; i++) this.leeFans[i].group.visible = false;
   }
 
   // ---- the bodies: cold, warmth, the freeze, the water ----------------------------------
