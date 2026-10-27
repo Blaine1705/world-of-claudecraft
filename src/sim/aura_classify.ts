@@ -98,6 +98,9 @@ const DEBUFF_DISPLAY_AURA_IDS: ReadonlySet<string> = new Set([
   // The Guardian of the Quench's cold bar (encounters/smith_heart/quench_ids.ts):
   // the hazard every player watches, so it sits on the debuff bar.
   'heart_quench_cold',
+  // The Guardian of the Heat's heat (encounters/smith_heart/heat_ids.ts): the
+  // Hearth's heat every player on its floor watches.
+  'heart_heat_hearth',
 ]);
 
 export function isDebuffDisplayAura(kind: AuraKind, value: number, id?: string): boolean {

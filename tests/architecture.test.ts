@@ -663,6 +663,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/dungeon/wildheart_alert_view.ts',
   'src/ui/hud/dungeon/council_alert_view.ts',
   'src/ui/hud/dungeon/quench_alert_view.ts',
+  'src/ui/hud/dungeon/heat_alert_view.ts',
   // The Sunken Bastion's alert on the Beacon Crown (the scythe, the Fog Veil).
   'src/ui/hud/dungeon/bastion_alert_view.ts',
   // The Gravewyrm Sanctum's alert (the chains, the meltwater, the lake) and its

@@ -4255,6 +4255,12 @@ export const zh_CN: EnTranslations = {
         "awake": "铁匠的四把刃已苏醒。每次淬火吐息与回火打击命中后{delay}秒（生命值低于{lowPct}%时为{low}秒），每把刃都会在漂浮之处朝同一方向重复它。站在刃后、背对攻击的一侧，永远安全。",
         "deepening": "湖的寒意上升快了{total}%：自刃苏醒后每{every}秒再快{step}%（目前{stacks}次）。"
       },
+      "heatGuardian": {
+        "heat": "炉心热度：{heat}/{max}。它每秒自行上升{rise}。每{every}秒，炉心脉动对炉心地面上的所有人造成{min}到{most}点火焰伤害（按当前热度），越热伤害越高。玩家每承受一道燃焰光束，热度下降{cool}；{range}码内无人时，光束会回到守护者体内，使热度上升{back}。达到{max}时炉心过热。",
+        "burn": "受到的火焰、冰霜、自然、暗影和奥术伤害提高{pct}%：你的{stacks}层每层{per}%，最多{most}层。每被一道燃焰光束击中叠加一层；最后一次变化{decay}秒后消退一层（英雄难度为{heroicDecay}秒）。",
+        "stoked": "炉心热度上升快了{total}%：战斗中每{every}秒再快{step}%（目前{stacks}次）。",
+        "overheating": "热度已达到{at}。达到{max}时炉心过热：炉心爆裂对地面上的所有人造成{min}到{most}点火焰伤害（英雄难度为{heroicMin}到{heroicMost}），之后热度从{vent}重新上升。用水晶的光束降温，否则就做好准备。"
+      },
       "sharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。",
       "varkhulSharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。每缺少一名玩家，还会对整个团队（包括圈内玩家）造成最大生命值 {missingPenalty}% 的伤害。",
       "makersBrand": "持续 {duration} 秒，每层使你受到瓦尔库尔的伤害提高 {pct}%。最多叠加 {max} 层。坦克应在 {swap} 层时换坦。",
@@ -6809,6 +6815,36 @@ export const zh_CN: EnTranslations = {
       "coldBar": "寒意 {cold} / {max}",
       "coldAria": "寒意 {cold}/{max}",
       "timeAria": "剩余{seconds}秒"
+    },
+    "heatGuardian": {
+      "warn": {
+        "crystals": "燃焰水晶升起了！站进它们的光束为炉心降温！",
+        "channel": "炉心满溢了！流槽将把地面一分为二！",
+        "windup": "炉心即将过热！用水晶降温，否则就做好准备！",
+        "overheat": "炉心过热了！"
+      },
+      "say": {
+        "pull": "你们走进了最初的火焰。没有什么能毫无改变地离开。",
+        "shed": "接下我的热量吧，如果你们承受得住。",
+        "channel": "炉心满溢了。选好你们站的那一边。",
+        "windup": "一个躯体装不下这么多火焰……它必须找到出口！",
+        "overheat": "与我一同燃烧！",
+        "stoke": "你们的每一次呼吸都在喂养火焰。",
+        "wipe": "都化为灰烬吧。炉心依旧燃烧。",
+        "death": "火焰……沉回……岩石之中。好好带着它。"
+      }
+    },
+    "heatAlert": {
+      "heatTitle": "炉心升温",
+      "coolingTitle": "炉心降温",
+      "burningTitle": "水晶灼伤 x{stacks}",
+      "overheatTitle": "即将过热！",
+      "heatLine": "站在燃焰水晶{range}码内承受光束，为炉心降温",
+      "coolingLine": "水晶的光束正在为炉心降温：每道光束都要有人站着",
+      "burningLine": "受到的法术伤害提高{pct}%：离开光束，换别人来承受",
+      "overheatLine": "达到{max}时炉心会烧向所有人：使用减伤技能",
+      "heatBar": "热度 {heat} / {max}",
+      "heatAria": "热度 {heat}/{max}"
     },
     "sanctumAlert": {
       "quenchTitle": "身陷淬火之水！",
@@ -15299,6 +15335,7 @@ export const zh_CN: EnTranslations = {
       "heart_breath_thunders_cradle": "雷霆摇篮",
       "heart_breath_drawn_lightning": "引雷",
       "heart_quench_blades_wake": "诸刃苏醒",
+      "heart_heat_shed": "泄放热量",
       "kituse_sanctum_topple_brazier": "推倒火盆",
       "trash_demo_nova": "Test Nova",
       "trash_demo_nova_unstoppable": "Test Nova",

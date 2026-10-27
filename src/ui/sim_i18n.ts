@@ -1585,6 +1585,19 @@ const baseEnTable = {
   'mechanic.heartEchoOfTheStrike': 'Echo of the Strike',
   'mechanic.heartCrossingBlade': 'Crossing Blade',
   'aura.heartDeepeningCold': 'Deepening Cold',
+  // The Guardian of the Heat (encounters/smith_heart/heat_ids.ts HEAT_NAMES):
+  // its damage, aura and object names. EXACT through the mechanic reverse map
+  // (Molten Pour and Searing Knell keep their keys).
+  'aura.heartHearthsHeat': "The Hearth's Heat",
+  'mechanic.heartHearthPulse': 'Hearth Pulse',
+  'mechanic.heartHearthburst': 'Hearthburst',
+  'aura.heartOverheating': 'Overheating',
+  'mechanic.heartKindledCrystal': 'Kindled Crystal',
+  'mechanic.heartKindledRay': 'Kindled Ray',
+  'aura.heartCrystalBurn': 'Crystal Burn',
+  'mechanic.heartFlowingFire': 'Flowing Fire',
+  'mechanic.heartKnellEmbers': 'Knell Embers',
+  'aura.heartStokedHearth': 'Stoked Hearth',
   'log.sanctumTuskerSpill':
     'The sledge tips over! Burning soul braziers spill across the Sledge Road.',
   // The rune wall's lore line (encounters/gravewyrm_sanctum/rune_wall.ts
@@ -18326,6 +18339,16 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Echo of the Strike': 'mechanic.heartEchoOfTheStrike',
   'Crossing Blade': 'mechanic.heartCrossingBlade',
   'Deepening Cold': 'aura.heartDeepeningCold',
+  "The Hearth's Heat": 'aura.heartHearthsHeat',
+  'Hearth Pulse': 'mechanic.heartHearthPulse',
+  Hearthburst: 'mechanic.heartHearthburst',
+  Overheating: 'aura.heartOverheating',
+  'Kindled Crystal': 'mechanic.heartKindledCrystal',
+  'Kindled Ray': 'mechanic.heartKindledRay',
+  'Crystal Burn': 'aura.heartCrystalBurn',
+  'Flowing Fire': 'mechanic.heartFlowingFire',
+  'Knell Embers': 'mechanic.heartKnellEmbers',
+  'Stoked Hearth': 'aura.heartStokedHearth',
   'Creeping Rime': 'aura.sanctumCreepingRime',
   'Iced Over': 'aura.sanctumIcedOver',
   'Ice Slab': 'mechanic.sanctumIceSlab',

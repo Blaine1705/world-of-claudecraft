@@ -4255,6 +4255,12 @@ export const ja_JP: EnTranslations = {
         "awake": "鍛冶師の四本の剣が目覚めている。焼き入れの吐息と焼き戻しの一撃が決まるたび、{delay}秒後（体力{lowPct}%未満では{low}秒後）に、すべての剣が浮かぶ場所から同じ向きでそれを繰り返す。剣の陰、攻撃と反対側は常に安全だ。",
         "deepening": "湖の冷気の上昇が{total}%速くなっている：剣が目覚めてから{every}秒ごとに{step}%ずつ（これまでに{stacks}回）。"
       },
+      "heatGuardian": {
+        "heat": "炉床の熱：{max}中{heat}。毎秒{rise}ずつ自然に上がる。{every}秒ごとに炉床の脈動が炉床の床にいる全員に{min}～{most}の火炎ダメージを与え（この熱の場合）、熱いほど強くなる。プレイヤーが燃え立つ光線を1本受けるごとに{cool}下がり、{range}ヤード以内に誰もいない光線は守護者に戻り{back}上がる。{max}で炉床は過熱する。",
+        "burn": "受ける火炎・冷気・自然・闇・秘術ダメージが{pct}%増加：スタック{stacks}個それぞれ{per}%、最大{most}個。燃え立つ光線を受けるたびに1スタック増え、最後の変化から{decay}秒後に1スタック消える（ヒロイックでは{heroicDecay}秒）。",
+        "stoked": "炉床の熱の上昇が{total}%速くなっている：戦闘中{every}秒ごとに{step}%ずつ（これまでに{stacks}回）。",
+        "overheating": "熱が{at}に達した。{max}で炉床は過熱し、炉床爆発が床にいる全員に{min}～{most}の火炎ダメージを与える（ヒロイックでは{heroicMin}～{heroicMost}）。その後、熱は{vent}から再び上がる。結晶の光線で冷ますか、身構えよ。"
+      },
       "sharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。",
       "varkhulSharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。不足しているプレイヤー1人につき、サークル内を含むレイド全体が最大体力の{missingPenalty}%のダメージを受ける。",
       "makersBrand": "{duration}秒間、1スタックごとにヴァルクルから受けるダメージが{pct}%増加する。最大{max}スタック。タンクは{swap}スタックで交代すること。",
@@ -6809,6 +6815,36 @@ export const ja_JP: EnTranslations = {
       "coldBar": "冷気 {cold} / {max}",
       "coldAria": "冷気 {max}中{cold}",
       "timeAria": "残り{seconds}秒"
+    },
+    "heatGuardian": {
+      "warn": {
+        "crystals": "燃え立つ結晶が現れた！その光線を浴びて炉床を冷ませ！",
+        "channel": "炉床があふれる！流路が床を二つに分けるぞ！",
+        "windup": "炉床が過熱寸前だ！結晶で冷ますか、身構えろ！",
+        "overheat": "炉床が過熱した！"
+      },
+      "say": {
+        "pull": "お前たちは最初の炎へ踏み込んだ。何ものも変わらずには出られぬ。",
+        "shed": "我が熱を受け取れ、抱えきれるものならな。",
+        "channel": "炉床があふれる。どちら側に立つか選べ。",
+        "windup": "一つの体には多すぎる炎だ……どこかへ向かわねばならぬ！",
+        "overheat": "我と共に燃えよ！",
+        "stoke": "お前たちの吐く息のすべてが炎を育てる。",
+        "wipe": "灰だ、一人残らず。炉床は燃え続ける。",
+        "death": "炎が……石の中へ……沈んでいく。大切に運べ。"
+      }
+    },
+    "heatAlert": {
+      "heatTitle": "炉床が熱くなる",
+      "coolingTitle": "炉床が冷えていく",
+      "burningTitle": "結晶の火傷 x{stacks}",
+      "overheatTitle": "過熱が迫る！",
+      "heatLine": "燃え立つ結晶から{range}ヤード以内に立ち、光線を受けて炉床を冷ませ",
+      "coolingLine": "結晶の光線が炉床を冷ましている：すべての光線に誰かを立たせ続けよ",
+      "burningLine": "受ける呪文ダメージが{pct}%増加：離れて、光線を他の者に任せよ",
+      "overheatLine": "{max}で炉床が全員を焼き尽くす：防御技を使え",
+      "heatBar": "熱 {heat} / {max}",
+      "heatAria": "熱 {max}中{heat}"
     },
     "sanctumAlert": {
       "quenchTitle": "焼き入れの水の中だ！",
@@ -15299,6 +15335,7 @@ export const ja_JP: EnTranslations = {
       "heart_breath_thunders_cradle": "雷のゆりかご",
       "heart_breath_drawn_lightning": "招雷",
       "heart_quench_blades_wake": "剣の目覚め",
+      "heart_heat_shed": "熱を流す",
       "kituse_sanctum_topple_brazier": "火鉢倒し",
       "trash_demo_nova": "Test Nova",
       "trash_demo_nova_unstoppable": "Test Nova",

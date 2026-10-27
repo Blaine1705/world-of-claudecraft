@@ -4255,6 +4255,12 @@ export const fr_CA: EnTranslations = {
         "awake": "The Smith's four blades are awake. {delay} sec after each Quenching Breath and Tempering Strike lands ({low} sec below {lowPct}% health), every blade repeats it from where it floats, facing the same way. Behind a blade, on the side away from the attack, is always safe.",
         "deepening": "The lake's cold rises {total}% faster: {step}% more every {every} sec since the blades woke ({stacks} so far)."
       },
+      "heatGuardian": {
+        "heat": "The Hearth's heat: {heat} of {max}. It rises by {rise} every second on its own. Every {every} sec the Hearth Pulse deals {min} to {most} Fire damage to everyone on the Hearth's floor at this heat, more the hotter it is. Each Kindled Ray a player takes lowers it by {cool}; a ray with nobody within {range} yd goes back into the guardian and raises it by {back}. At {max} the Hearth overheats.",
+        "burn": "Takes {pct}% more Fire, Frost, Nature, Shadow and Arcane damage: {per}% for each of your {stacks} stacks, at most {most}. Each Kindled Ray that strikes you adds a stack; one stack fades {decay} sec after the last change ({heroicDecay} sec on Heroic).",
+        "stoked": "The Hearth's heat rises {total}% faster: {step}% more every {every} sec of the fight ({stacks} so far).",
+        "overheating": "The heat has reached {at}. At {max} the Hearth overheats: Hearthburst deals {min} to {most} Fire damage to everyone on the floor ({heroicMin} to {heroicMost} on Heroic), then the heat starts again from {vent}. Cool it with the crystals' rays or brace."
+      },
       "sharedPyre": "Inflige {total}% des points de vie maximum de chaque joueur, divisé par le nombre de joueurs à l'intérieur du cercle ({perPlayer}% chacun avec {players} joueurs).",
       "varkhulSharedPyre": "Inflige {total}% des points de vie maximum de chaque joueur, réparti entre les joueurs à l'intérieur du cercle ({perPlayer}% chacun avec {players} joueurs). Chaque joueur manquant inflige aussi {missingPenalty}% des points de vie maximum à tout le raid, y compris les joueurs à l'intérieur du cercle.",
       "makersBrand": "Pendant {duration} s, chaque cumul accroît les dégâts subis de la part de Varkhul de {pct}%. Cumul jusqu'à {max} fois. Les tanks doivent échanger à {swap} cumuls.",
@@ -6809,6 +6815,36 @@ export const fr_CA: EnTranslations = {
       "coldBar": "Cold {cold} / {max}",
       "coldAria": "Cold {cold} of {max}",
       "timeAria": "{seconds} seconds left"
+    },
+    "heatGuardian": {
+      "warn": {
+        "crystals": "Kindled Crystals rise! Stand in their rays to cool the Hearth!",
+        "channel": "The Hearth overflows! The channel will split the floor!",
+        "windup": "The Hearth is about to overheat! Cool it with the crystals or brace!",
+        "overheat": "The Hearth overheats!"
+      },
+      "say": {
+        "pull": "You walk into the first flame. Nothing leaves it unchanged.",
+        "shed": "Take my heat, if you can hold it.",
+        "channel": "The Hearth overflows. Choose your side.",
+        "windup": "Too much fire for one body... it must go somewhere!",
+        "overheat": "BURN WITH ME!",
+        "stoke": "Every breath you take feeds the flame.",
+        "wipe": "Ash, all of you. The Hearth burns on.",
+        "death": "The flame... sinks back... into the stone. Carry it well."
+      }
+    },
+    "heatAlert": {
+      "heatTitle": "The Hearth heats",
+      "coolingTitle": "The Hearth cools",
+      "burningTitle": "Crystal Burn x{stacks}",
+      "overheatTitle": "Overheat coming!",
+      "heatLine": "Stand within {range} yd of a Kindled Crystal to take its ray and cool the Hearth",
+      "coolingLine": "The crystals' rays are cooling the Hearth: keep someone in every ray",
+      "burningLine": "You take {pct}% more spell damage: step out and let another take the ray",
+      "overheatLine": "At {max} the Hearth bursts over everyone: use your defences",
+      "heatBar": "Heat {heat} / {max}",
+      "heatAria": "Heat {heat} of {max}"
     },
     "sanctumAlert": {
       "quenchTitle": "In the quench-water!",
@@ -15299,6 +15335,7 @@ export const fr_CA: EnTranslations = {
       "heart_breath_thunders_cradle": "Thunder's Cradle",
       "heart_breath_drawn_lightning": "Drawn Lightning",
       "heart_quench_blades_wake": "The Blades Wake",
+      "heart_heat_shed": "Shed Heat",
       "kituse_sanctum_topple_brazier": "Topple Brazier",
       "trash_demo_nova": "Test Nova",
       "trash_demo_nova_unstoppable": "Test Nova",

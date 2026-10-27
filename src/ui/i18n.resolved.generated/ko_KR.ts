@@ -4255,6 +4255,12 @@ export const ko_KR: EnTranslations = {
         "awake": "대장장이의 네 자루 검이 깨어났습니다. 담금질 숨결과 담금질 일격이 적중할 때마다 {delay}초 뒤(생명력 {lowPct}% 미만에서는 {low}초 뒤) 모든 검이 떠 있는 자리에서 같은 방향으로 그것을 되풀이합니다. 검 뒤, 공격 반대편은 언제나 안전합니다.",
         "deepening": "호수의 냉기가 {total}% 더 빠르게 오릅니다: 검이 깨어난 뒤 {every}초마다 {step}%씩(지금까지 {stacks}회)."
       },
+      "heatGuardian": {
+        "heat": "화로의 열기: {heat}/{max}. 매초 저절로 {rise}씩 오릅니다. {every}초마다 화로 맥동이 화로 바닥의 모두에게 화염 피해를 {min}~{most} 줍니다(현재 열기 기준). 뜨거울수록 강해집니다. 플레이어가 타오르는 광선을 맞을 때마다 {cool} 내려가고, {range}미터 안에 아무도 없는 광선은 수호자에게 돌아가 {back} 올립니다. {max}에서 화로가 과열됩니다.",
+        "burn": "받는 화염, 냉기, 자연, 암흑, 비전 피해가 {pct}% 증가합니다: 중첩 {stacks}개마다 {per}%, 최대 {most}개. 타오르는 광선에 맞을 때마다 1중첩이 쌓이고, 마지막 변화 후 {decay}초가 지나면 1중첩이 사라집니다(영웅 난이도는 {heroicDecay}초).",
+        "stoked": "화로의 열기가 {total}% 더 빠르게 오릅니다: 전투 중 {every}초마다 {step}%씩(지금까지 {stacks}회).",
+        "overheating": "열기가 {at}에 도달했습니다. {max}에서 화로가 과열되어 화로 폭발이 바닥의 모두에게 화염 피해를 {min}~{most} 줍니다(영웅 난이도는 {heroicMin}~{heroicMost}). 그 뒤 열기는 {vent}부터 다시 오릅니다. 수정의 광선으로 식히거나 대비하세요."
+      },
       "sharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).",
       "varkhulSharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%). 부족한 플레이어 1명당 원 안의 플레이어를 포함한 공격대 전체가 최대 생명력의 {missingPenalty}%에 해당하는 피해를 추가로 받습니다.",
       "makersBrand": "{duration}초 동안 중첩당 발쿨에게 받는 피해가 {pct}% 증가합니다. 최대 {max}회 중첩됩니다. 탱커는 {swap}중첩에서 교대하세요.",
@@ -6809,6 +6815,36 @@ export const ko_KR: EnTranslations = {
       "coldBar": "냉기 {cold} / {max}",
       "coldAria": "냉기 {max} 중 {cold}",
       "timeAria": "{seconds}초 남음"
+    },
+    "heatGuardian": {
+      "warn": {
+        "crystals": "타오르는 수정이 솟아오른다! 광선 안에 서서 화로를 식혀라!",
+        "channel": "화로가 넘쳐흐른다! 수로가 바닥을 둘로 가른다!",
+        "windup": "화로가 곧 과열된다! 수정으로 식히거나 대비하라!",
+        "overheat": "화로가 과열되었다!"
+      },
+      "say": {
+        "pull": "너희는 최초의 불꽃 속으로 걸어 들어왔다. 그 무엇도 변하지 않고는 나가지 못한다.",
+        "shed": "내 열기를 받아라, 견딜 수 있다면.",
+        "channel": "화로가 넘쳐흐른다. 어느 편에 설지 골라라.",
+        "windup": "한 몸에 담기엔 너무 많은 불꽃이다... 어딘가로 가야만 한다!",
+        "overheat": "나와 함께 불타라!",
+        "stoke": "너희가 내쉬는 숨 하나하나가 불꽃을 키운다.",
+        "wipe": "재다, 너희 모두. 화로는 계속 타오른다.",
+        "death": "불꽃이... 돌 속으로... 가라앉는다. 잘 지니고 가라."
+      }
+    },
+    "heatAlert": {
+      "heatTitle": "화로가 달아오른다",
+      "coolingTitle": "화로가 식어 간다",
+      "burningTitle": "수정 화상 x{stacks}",
+      "overheatTitle": "과열 임박!",
+      "heatLine": "타오르는 수정 {range}미터 안에 서서 광선을 맞아 화로를 식히세요",
+      "coolingLine": "수정의 광선이 화로를 식히고 있습니다: 모든 광선에 누군가를 세워 두세요",
+      "burningLine": "받는 주문 피해가 {pct}% 증가합니다: 물러나서 다른 사람에게 광선을 넘기세요",
+      "overheatLine": "{max}에서 화로가 모두를 덮칩니다: 방어 기술을 쓰세요",
+      "heatBar": "열기 {heat} / {max}",
+      "heatAria": "열기 {heat}/{max}"
     },
     "sanctumAlert": {
       "quenchTitle": "담금질 물속이다!",
@@ -15299,6 +15335,7 @@ export const ko_KR: EnTranslations = {
       "heart_breath_thunders_cradle": "천둥의 요람",
       "heart_breath_drawn_lightning": "끌려오는 번개",
       "heart_quench_blades_wake": "검의 각성",
+      "heart_heat_shed": "열기 방출",
       "kituse_sanctum_topple_brazier": "화로 넘어뜨리기",
       "trash_demo_nova": "Test Nova",
       "trash_demo_nova_unstoppable": "Test Nova",
