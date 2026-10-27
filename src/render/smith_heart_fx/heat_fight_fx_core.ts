@@ -1,56 +1,57 @@
-// Pure plan of the Guardian of the Heat's fight effects (heat_fight_fx.ts
-// paints them; docs/design/raid/smith_heart.md section 7.4): the Kindled
-// Crystals tearing up out of the basalt and burning out, their reach, their
-// rays (who is being struck held in a beam until the next ray), a ray sent
-// back into the guardian, Crystal Burn climbing a body with its stacks, the
-// channel across the Hearth (still, brimming, flowing), heroic's Knell
-// Embers, the Hearth Pulse, the overheat's wind-up over the floor and
-// Hearthburst's white wave. The sim's numbers are read (heat_ids.ts, the
-// layout), never tuned here.
+// Pure plan of the Guardian of the Heat's fight effects (heat_fight_fx.ts and
+// its parts paint them; docs/design/raid/smith_heart.md section 7.4, "the
+// well of the first flame"): the first wellspring (calm, overflowing),
+// the overflow's rivers of the first flame, the Hearthseeds throbbing toward
+// their burst, Wakefire's bands building and igniting, a Rolling Cinder's
+// fall, and the burning patches (a cinder's scorch, a Cinder Trail).
+// The sim's numbers are read (heat_ids.ts, the layout), never tuned here.
 //
-// Readability (binding): every rise spot, crystal reach, ray, the channel's
-// lane while it brims and flows, every ember patch, the burn on a body and the
-// wind-up's floor glow draw at their exact sizes on EVERY tier; only the
-// sparks, embers, haze and smoke thin, the shakes go under reduced motion.
+// Readability (binding): every footprint (a river's lane, a seed's core and
+// its reach, every Wakefire band, a cinder's landing, every burning patch)
+// draws at its exact size on EVERY tier; only sparks, embers, haze, smoke
+// and spray thin, the shakes go under reduced motion.
 //
-// The Heat is the Hearth: white-gold fire, never volcanic red; a footprint's
-// rim is the floor telegraph's threat colour, never these. Three-free,
-// DOM-free, deterministic (a hash, never rng).
+// The Heat is the Hearth: white-gold fire and molten gold, never volcanic red;
+// a footprint's rim is the floor telegraph's threat colour, never these.
+// Three-free, DOM-free, deterministic (a hash, never rng).
 
-import { HEARTH_CHANNEL } from '../../sim/content/smith_heart_layout';
+import { HEARTH_WELL } from '../../sim/content/smith_heart_layout';
 import {
-  channelOf,
-  crystalOf,
-  embersOf,
   HEAT_CUES,
-  type HeatChannelState,
-  riseOf,
+  HEAT_OBJECTS,
+  type HeatRiverState,
+  type HeatWellState,
+  type HeatZoneState,
+  heatTimedOf,
+  riverOf,
+  swellLaneOf,
   HEAT_TUNING as T,
+  wellOf,
+  ZONE_BANDS,
+  zoneOf,
 } from '../../sim/encounters/smith_heart/heat_ids';
 import { TELEGRAPH_THREAT_COLORS } from '../floor_telegraph/telegraph_look_core';
 
 export { breathClaimOrigin as heatClaimOrigin } from './breath_fight_fx_core';
 
-/** The palette. The crystals' reach is the soak's gold (the Falling Rock's
- *  precedent: stand in it); the first flame white-gold. */
+/** The palette: the first flame's molten gold (linear 0..1, hex for the
+ *  sprites), the threat colours for the rims. */
 export const HEAT_FIGHT_COLORS = {
   danger: TELEGRAPH_THREAT_COLORS.danger,
   lethal: TELEGRAPH_THREAT_COLORS.lethal,
-  /** A crystal's reach: a gold to stand in. */
-  soak: 0xffc94a,
-  soakEdge: 0xfff2c4,
+  control: TELEGRAPH_THREAT_COLORS.control,
   /** The telegraphs' element accent. */
   accent: 0xffe6a0,
-  core: [1.0, 0.96, 0.84] as const,
-  fire: [1.0, 0.74, 0.32] as const,
-  deep: [0.78, 0.42, 0.12] as const,
-  crust: [0.09, 0.075, 0.065] as const,
-  spark: [1.0, 0.86, 0.52] as const,
-  ember: [1.0, 0.62, 0.24] as const,
-  smoke: [0.3, 0.27, 0.25] as const,
+  /** Molten: white-hot core, gold, amber, a deep umber glow, basalt crust. */
+  core: [1.0, 0.97, 0.86] as const,
+  gold: [1.0, 0.78, 0.36] as const,
+  amber: [0.98, 0.55, 0.16] as const,
+  deep: [0.55, 0.22, 0.05] as const,
+  crust: [0.075, 0.062, 0.055] as const,
+  spark: [1.0, 0.88, 0.55] as const,
+  ember: [1.0, 0.64, 0.24] as const,
+  smoke: [0.27, 0.24, 0.22] as const,
   haze: [0.95, 0.85, 0.66] as const,
-  /** A ray sent back into the guardian burns deeper gold. */
-  back: [1.0, 0.56, 0.16] as const,
   ring: 0xffe6b0,
   ringGold: 0xffb848,
   white: 0xfff8ec,
@@ -62,33 +63,45 @@ const smooth = (v: number) => {
   return c * c * (3 - 2 * c);
 };
 
-/** The Hearth's floor height and middle (instance-local), and how far the
- *  fight reaches from it. */
-export const HEAT_FLOOR_H = 0;
-export const HEARTH_CENTRE = { x: -215, z: 0 } as const;
+/** The wellspring (instance-local), the Hearth's middle for the scan, and how
+ *  far the fight reaches from it. */
+export const HEAT_WELL = { x: HEARTH_WELL.x, z: HEARTH_WELL.z, r: HEARTH_WELL.r } as const;
+export const HEARTH_CENTRE = { x: -212, z: 0 } as const;
 export const HEAT_FIGHT_REACH = 70;
-/** The channel's line (instance-local) and its length. */
-export const CHANNEL_LINE = {
-  x: HEARTH_CHANNEL.x,
-  z0: HEARTH_CHANNEL.z0,
-  z1: HEARTH_CHANNEL.z1,
-  length: HEARTH_CHANNEL.z1 - HEARTH_CHANNEL.z0,
-} as const;
 
 // ---- the objects ---------------------------------------------------------------------
 
-export type HeatObjectKind = 'rise' | 'crystal' | 'channel' | 'embers';
+export type HeatObjectKind =
+  | 'well'
+  | 'fist'
+  | 'lane'
+  | 'wave'
+  | 'river'
+  | 'seed'
+  | 'zone'
+  | 'fall'
+  | 'scorch'
+  | 'trail';
+
+const O = HEAT_OBJECTS;
 
 /** Which of the fight's objects a template is, or null. */
 export function heatObjectKind(templateId: string): HeatObjectKind | null {
-  if (riseOf(templateId) !== null) return 'rise';
-  if (crystalOf(templateId) !== null) return 'crystal';
-  if (channelOf(templateId) !== null) return 'channel';
-  if (embersOf(templateId) !== null) return 'embers';
+  if (!templateId.startsWith('sh_heat_')) return null;
+  if (wellOf(templateId) !== null) return 'well';
+  if (templateId === O.wave) return 'wave';
+  if (swellLaneOf(templateId) !== null) return 'lane';
+  if (riverOf(templateId) !== null) return 'river';
+  if (zoneOf(templateId) !== null) return 'zone';
+  if (heatTimedOf(O.fistPrefix, templateId) !== null) return 'fist';
+  if (heatTimedOf(O.seedPrefix, templateId) !== null) return 'seed';
+  if (heatTimedOf(O.fallPrefix, templateId) !== null) return 'fall';
+  if (heatTimedOf(O.scorchPrefix, templateId) !== null) return 'scorch';
+  if (heatTimedOf(O.trailPrefix, templateId) !== null) return 'trail';
   return null;
 }
 
-/** The cues the fight's painter draws itself (no generic burst, nova or
+/** The cues the fight's painters draw themselves (no generic burst, nova or
  *  beam doubles them). */
 const CLAIMED: ReadonlySet<string> = new Set(Object.values(HEAT_CUES));
 
@@ -96,240 +109,161 @@ export function heatFightClaims(ability: string | null | undefined): boolean {
   return ability !== null && ability !== undefined && CLAIMED.has(ability);
 }
 
-// ---- the crystals --------------------------------------------------------------------
+// ---- the wellspring --------------------------------------------------------------------
 
-/** Seconds a crystal takes to tear up out of the basalt. */
-export const CRYSTAL_RISE_SECONDS = 0.7;
-/** The last seconds of its life it flickers, failing. */
-export const CRYSTAL_FAIL_SECONDS = 2.5;
+export interface WellLook {
+  /** The molten pool's heat (its brightness), its surge (it swells up over
+   *  its lip, 0..1) and how fast it boils. */
+  heat: number;
+  surge: number;
+  boil: number;
+}
 
-/** A rise spot's warning `age` seconds in (its template's `seconds`): how far
- *  its footprint has filled, how far the cracks in the basalt have run. */
-export function riseLook(
-  age: number,
-  seconds: number,
-  out: { fill: number; crack: number } = { fill: 0, crack: 0 },
-): { fill: number; crack: number } {
-  const f = clamp01(age / Math.max(0.1, seconds));
-  out.fill = f;
-  out.crack = smooth(f * 1.2);
+/** The wellspring in `state` with the guardian in `phase` (0 out of the
+ *  fight), render time `t`, written into `out`. */
+export function wellLook(
+  state: HeatWellState,
+  phase: number,
+  t: number,
+  out: WellLook = { heat: 0, surge: 0, boil: 0 },
+): WellLook {
+  const deep = clamp01((Math.max(1, phase) - 1) / 3);
+  out.heat = phase > 0 ? 0.85 + 0.35 * deep : 0.7;
+  out.surge = 0;
+  out.boil = 0.35 + 0.4 * deep;
+  if (state === 'over') {
+    // The Hearth overflows: it heaves over its lip in slow swells.
+    out.heat = 1.45;
+    out.surge = 0.6 + 0.4 * (0.5 + 0.5 * Math.sin(t * 1.7));
+    out.boil = 1;
+  }
   return out;
 }
 
-export interface CrystalLook {
-  /** 0 sunk under the floor, 1 standing. */
-  rise: number;
-  /** The light's strength (a swell before each ray, a flicker as it fails). */
-  light: number;
-  /** 0..1 of the way to its next ray (the reach ring fills to it). */
-  charge: number;
-  /** 0..1 of its life left. */
-  left: number;
+// ---- the overflow's rivers ---------------------------------------------------------------
+
+export interface RiverLook {
+  /** The lane telegraph's fill (warn), whether it shows. */
+  fill: number;
+  lane: boolean;
+  /** How far down its length the fire has run (0..1), and its heat. */
+  front: number;
+  heat: number;
 }
 
-/** A crystal `age` seconds after it was first seen, `life` its template's
- *  life, written into `out`. Its rays fall `rayFirst` after it rises, then
- *  every `rayEvery` (the sim's own clock: what the charge fills to). */
-export function crystalLook(
+/** A river in `state`, `age` seconds into it (that state's `seconds`). */
+export function riverLook(
+  state: HeatRiverState,
+  age: number,
+  seconds: number,
+  out: RiverLook = { fill: 0, lane: false, front: 0, heat: 0 },
+): RiverLook {
+  const span = Math.max(0.1, seconds);
+  if (state === 'warn') {
+    out.fill = clamp01(age / span);
+    out.lane = true;
+    out.front = 0;
+    // The pool's lip lights toward it as it brims.
+    out.heat = 0.3 * out.fill;
+    return out;
+  }
+  out.fill = 1;
+  out.front = smooth(age / 0.7);
+  out.heat = clamp01((span - age) / 0.6);
+  out.lane = out.heat > 0;
+  return out;
+}
+
+// ---- the Hearthseeds ---------------------------------------------------------------------
+
+export interface SeedLook {
+  /** 0..1 of its life spent (the telegraph's fill). */
+  fill: number;
+  /** Its throb (0..1 on the beat; the beat quickens to the burst). */
+  beat: number;
+  /** Its glow, and how big the seed burns. */
+  glow: number;
+  size: number;
+}
+
+/** A seed `age` seconds after it fell, `life` its template's life. */
+export function seedLook(
   age: number,
   life: number,
-  out: CrystalLook = { rise: 0, light: 0, charge: 0, left: 1 },
-): CrystalLook {
-  out.rise = smooth(age / CRYSTAL_RISE_SECONDS);
-  const left = Math.max(0, life - age);
-  out.left = life > 0 ? clamp01(left / life) : 0;
-  let charge: number;
-  if (age < T.rayFirst) charge = age / T.rayFirst;
-  else charge = ((age - T.rayFirst) % T.rayEvery) / T.rayEvery;
-  out.charge = clamp01(charge);
-  // A swell toward each ray, a flash just past it.
-  const swell = 0.75 + 0.6 * out.charge * out.charge;
-  let light = swell;
-  if (left < CRYSTAL_FAIL_SECONDS) {
-    const k = left / CRYSTAL_FAIL_SECONDS;
-    light *= 0.45 + 0.55 * k * (0.6 + 0.4 * Math.abs(Math.sin(age * 23)));
-  }
-  out.light = light * (0.3 + 0.7 * out.rise);
+  out: SeedLook = { fill: 0, beat: 0, glow: 0, size: 0 },
+): SeedLook {
+  const f = clamp01(age / Math.max(0.1, life));
+  out.fill = f;
+  // From a slow pulse to a frantic one: the phase is the integral of a rate
+  // rising from 1 to 7 beats a second.
+  const phase = age * (1 + 3 * f * f);
+  const b = 0.5 + 0.5 * Math.sin(phase * Math.PI * 2);
+  out.beat = b * b;
+  const land = smooth(age / 0.3);
+  out.glow = land * (0.6 + 0.9 * f + 0.6 * out.beat);
+  out.size = land * (0.55 + 0.45 * f) * (1 + 0.18 * out.beat);
   return out;
 }
 
-export interface BeamLook {
-  /** The beam's width (yards) and strength, `since` seconds after the ray. */
-  width: number;
-  alpha: number;
+/** The ring a seed draws at its reach: faint at first, brighter to the burst
+ *  (the falloff's whole reach, every tier), and the hot core's radius (where
+ *  the burst nearly kills). */
+export const SEED_CORE_R = 7;
+
+// ---- Wakefire ------------------------------------------------------------------------------
+
+export interface ZoneLook {
+  /** 0..1 of the warning built (the telegraph's fill), its burn (0..1). */
+  build: number;
+  burn: number;
 }
 
-/** Seconds a ray's beam stays on its target: until the next ray. */
-export const BEAM_HOLD = T.rayEvery;
-
-/** A ray's beam `since` seconds after it struck: a fat flash at the hit, a
- *  steady held beam to the next ray (who is struck stays obvious), fading at
- *  the very end; a ray sent back flashes and goes. */
-export function beamLook(
-  since: number,
-  back: boolean,
-  out: BeamLook = { width: 0, alpha: 0 },
-): BeamLook {
-  if (since < 0) {
-    out.width = 0;
-    out.alpha = 0;
-    return out;
-  }
-  if (back) {
-    const k = clamp01(since / 0.7);
-    out.width = 0.7 * (1 - k * 0.6);
-    out.alpha = 1 - k;
-    return out;
-  }
-  const flash = 1 - clamp01(since / 0.25);
-  const end = clamp01((BEAM_HOLD - since) / 0.3);
-  out.width = 0.5 + 0.6 * flash;
-  out.alpha = (0.8 + 0.2 * flash) * end;
-  return out;
-}
-
-// ---- Crystal Burn on a body ------------------------------------------------------------
-
-export interface BurnLook {
-  /** How far up the body the burn has climbed (0..1 of its height). */
-  cover: number;
-  /** The flames' strength. */
-  heat: number;
-  /** A hard pulse past half the cap (0..1). */
-  pulse: number;
-}
-
-/** How Crystal Burn dresses a body at `stacks`, render time `t`. */
-export function burnLook(
-  stacks: number,
-  t: number,
-  out: BurnLook = { cover: 0, heat: 0, pulse: 0 },
-): BurnLook {
-  const s = Math.max(0, Math.min(T.burnMax, stacks));
-  if (s <= 0) {
-    out.cover = 0;
-    out.heat = 0;
-    out.pulse = 0;
-    return out;
-  }
-  // Ten stacks reach the shoulders; past it the flames burn hotter.
-  out.cover = clamp01(0.18 + (s / 10) * 0.72);
-  out.heat = clamp01(0.35 + s / 12);
-  const urgent = s >= 8;
-  out.pulse = urgent ? 0.5 + 0.5 * Math.sin(t * 9) : 0;
-  return out;
-}
-
-// ---- the channel -----------------------------------------------------------------------
-
-export interface ChannelLook {
-  /** The bed's own dull glow (0..1). */
-  bed: number;
-  /** While it brims, how far down from its head the bed has lit (0..1). */
-  lit: number;
-  /** While it flows, how far down the fire has run (0..1), and its heat. */
-  front: number;
-  fire: number;
-  /** The lane telegraph: shown, and its fill. */
-  lane: boolean;
-  fill: number;
-}
-
-/** The channel in `state` `age` seconds into it (that state's `seconds`). */
-export function channelLook(
-  state: HeatChannelState,
+/** A band in `state`, `age` seconds into it (that state's `seconds`). */
+export function zoneLook(
+  state: HeatZoneState,
   age: number,
   seconds: number,
-  out: ChannelLook = { bed: 0, lit: 0, front: 0, fire: 0, lane: false, fill: 0 },
-): ChannelLook {
+  out: ZoneLook = { build: 0, burn: 0 },
+): ZoneLook {
   const span = Math.max(0.1, seconds);
-  const k = clamp01(age / span);
-  out.bed = 0.3;
-  out.lit = 0;
-  out.front = 0;
-  out.fire = 0;
-  out.lane = false;
-  out.fill = 0;
   if (state === 'warn') {
-    out.lit = smooth(k * 1.1);
-    out.bed = 0.3 + 0.7 * out.lit;
-    out.lane = true;
-    out.fill = k;
-  } else if (state === 'flow') {
-    // The fire runs the channel's length in its first second, then burns,
-    // dying down in its last.
-    out.front = smooth(age / 0.9);
-    out.fire = clamp01((span - age) / 0.8);
-    out.bed = 1;
-    out.lit = 1;
-    out.lane = out.fire > 0;
-    out.fill = 1;
+    out.build = clamp01(age / span);
+    out.burn = 0;
+    return out;
   }
+  out.build = 1;
+  // It erupts at once, then dies down over its burn.
+  out.burn = smooth(age / 0.12) * (0.45 + 0.55 * clamp01((span - age) / span));
   return out;
 }
 
-// ---- Knell Embers ------------------------------------------------------------------------
+/** A band's inner and outer radius (yards). */
+export function zoneRadii(band: number): readonly [number, number] {
+  return ZONE_BANDS[Math.max(0, Math.min(ZONE_BANDS.length - 1, band))];
+}
 
-/** Embers `age` seconds into their `life`: their burn (0..1, catching, then
- *  dying in the last two seconds). */
-export function embersLook(age: number, life: number): number {
+// ---- a Rolling Cinder's fall, the burning patches ------------------------------------------
+
+/** A fall `age` seconds into its `seconds` of warning: the fireball's height
+ *  over the floor (yards), the telegraph's fill. */
+export function fallLook(
+  age: number,
+  seconds: number,
+  out: { height: number; fill: number } = { height: 0, fill: 0 },
+): { height: number; fill: number } {
+  const k = clamp01(age / Math.max(0.1, seconds));
+  out.fill = k;
+  // Accelerating down out of the smoke overhead.
+  out.height = 40 * (1 - k * k);
+  return out;
+}
+
+/** A burning patch `age` seconds into its `life`: its burn (0..1, catching,
+ *  then dying in its last two seconds). */
+export function patchLook(age: number, life: number): number {
   const catchUp = smooth(age / 0.4);
   const die = clamp01((life - age) / 2);
   return catchUp * die;
-}
-
-// ---- the heat over the floor ---------------------------------------------------------------
-
-/** The Hearth Pulse's ring at `heat` (0..1): its reach and its strength. */
-export function pulseRing(heat: number): { radius: number; strength: number } {
-  const h = clamp01(heat);
-  return { radius: 9 + 13 * h, strength: 0.25 + 0.75 * h };
-}
-
-/** The floor's heat glow under the wind-up: `overheating` and the heat
- *  (0..1), render time `t`: its strength (0..1). Never brighter than a
- *  telegraph's rim. */
-export function windupGlow(overheating: boolean, heat: number, t: number): number {
-  if (!overheating) return 0.12 * clamp01((heat - 0.6) / 0.4);
-  // Harder and faster the nearer the heat is to the top (90 to 100).
-  const u = windupUrgency(heat);
-  const beat = 0.5 + 0.5 * Math.sin(t * (9 + 9 * u));
-  return 0.3 + 0.15 * u + 0.3 * beat * beat;
-}
-
-/** How near the overheat is through the wind-up: 0 at 90 heat, 1 at 100. */
-export function windupUrgency(heat: number): number {
-  return clamp01((clamp01(heat) - 0.9) / 0.1);
-}
-
-/** The wind-up's gathering: rings of heat drawn in over the floor into the
- *  guardian, one a beat, the beat quicker as the heat nears the top. Its
- *  radius (yards) and strength at render time `t`. Cosmetic, the floor glow
- *  and the gauge carry the warning. */
-export function windupGather(
-  t: number,
-  heat: number,
-  out: { radius: number; alpha: number } = { radius: 0, alpha: 0 },
-): { radius: number; alpha: number } {
-  const u = windupUrgency(heat);
-  const period = 1.3 - 0.75 * u;
-  const k = (((t / period) % 1) + 1) % 1;
-  out.radius = 3 + 33 * (1 - k) ** 1.6;
-  out.alpha = (0.35 + 0.45 * u) * Math.sin(Math.PI * k);
-  return out;
-}
-
-/** Hearthburst's white wave `age` seconds in: its radius (yards) and
- *  strength; gone after a second and a half. */
-export const BURST_WAVE_SECONDS = 1.5;
-export function burstWave(
-  age: number,
-  out: { radius: number; alpha: number } = { radius: 0, alpha: 0 },
-): { radius: number; alpha: number } {
-  const k = clamp01(age / BURST_WAVE_SECONDS);
-  out.radius = 4 + 48 * (1 - (1 - k) ** 3);
-  out.alpha = (1 - k) ** 1.4;
-  return out;
 }
 
 /** A small integer hash in [0, 1). */
@@ -340,12 +274,14 @@ export function heatFightHash(a: number, b: number): number {
   return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
 }
 
-/** Pools at full density (heroic raises three crystals; a ray per crystal;
- *  every ember the sim may keep; ten raiders). */
+/** Pools at full density (the sim's own caps; ten raiders). */
 export const HEAT_FIGHT_POOLS = {
-  crystals: 4,
-  rises: 4,
-  beams: 4,
-  embers: T.embersCap,
+  rivers: T.riverCount * 2,
+  seeds: T.seedCap,
+  zones: 3,
+  falls: T.cinderCap,
+  patches: T.trailCap + T.cinderCap + 8,
+  cinders: T.cinderCap,
+  adds: 16,
   bodies: 12,
 } as const;

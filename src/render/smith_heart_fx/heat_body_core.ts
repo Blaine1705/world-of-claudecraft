@@ -11,10 +11,11 @@
 // stumps, crystal breaking out of its chest round a white-gold heart, threads
 // of the first flame between its joints. About three and a half players tall.
 //
-// Its heat is the fight's (the guardian's mirrored resource, 0 to 100): the
-// whole body brightens from gold toward white as the Hearth climbs, a haze of
-// heat rising off it; from 90 (the overheating marker) it strains, flashing
-// white, trembling, until Hearthburst throws its arms wide.
+// It stands sunk to its waist in the first wellspring the whole fight, all
+// the way under while the Hearth overflows, and climbs back as it rises (the
+// guardian's state aura and its bar, mirrored entity state); it never leaves
+// the wellspring, on any difficulty. Its fire burns whiter as the fight deepens; molten rock sheets off
+// it where it meets the wellspring and pours off it as it climbs out.
 //
 // The JOINTS and the TIMELINES (the rig, the arms' solve, the poses) are kept
 // apart from the PIECES (which kit node sits on which joint, at what size), so
@@ -23,7 +24,12 @@
 // Sizes in yards in the body's frame: x to its left, y up from its feet, z
 // forward (0 = +z). Three-free, DOM-free, deterministic (a hash, never rng).
 
-import { HEAT_AURAS, HEAT_CASTS, HEAT_GUARDIAN } from '../../sim/encounters/smith_heart/heat_ids';
+import {
+  HEAT_AURAS,
+  HEAT_CASTS,
+  HEAT_GUARDIAN,
+  HEAT_STAGES,
+} from '../../sim/encounters/smith_heart/heat_ids';
 import type { V3 } from './final_fx_core';
 
 export type { V3 };
@@ -36,9 +42,17 @@ export const HEAT_BODY_KITS = {
 } as const;
 export type HeatBodyKit = keyof typeof HEAT_BODY_KITS;
 
-/** Feet to crown (yards): the manifest height (smith_heart_heat_guardian 2.4)
- *  times the template's scale (content/smith_heart.ts 3). */
+/** Feet to crown in the body's own frame (every joint, piece and pose below
+ *  is in it). */
 export const HEAT_BODY_HEIGHT = 2.4 * 3;
+
+/** The body is a giant (Jose's direction, the Ragnaros scale): the whole frame
+ *  drawn this many times larger, so its crown stands about twenty yards up,
+ *  and sunk to its waist in the wellspring it still towers some thirteen yards
+ *  (seven players) over the shore; its shoulders span about fifteen. The sim's
+ *  body radius (HEARTH_WELL.r) is the pool's, so melee reaches it from the
+ *  shore. */
+export const HEAT_BODY_SCALE = 2.8;
 
 /** The rig's joints, by index. */
 export const HJ = {
@@ -332,35 +346,22 @@ export const HEAT_BODY_COLORS = {
 // ---- the motion -----------------------------------------------------------------------
 
 /** What the body is doing. */
-export type HeatBodyAction =
-  | 'idle'
-  | 'swing'
-  | 'shed'
-  | 'rise'
-  | 'pour'
-  | 'knell'
-  | 'toll'
-  | 'strain'
-  | 'burst'
-  | 'stoke';
+export type HeatBodyAction = 'idle' | 'swing' | 'fist' | 'slam' | 'sink' | 'under' | 'rise';
 
 /** The fight's state as the body reads it (all mirrored entity state, plus
  *  the painter's own clocks of the cues it saw). */
 export interface HeatBodyInput {
   castId: string | null;
   castFill: number;
-  /** Seconds since Shed Heat's bar ended (the crystals tear up). */
-  sinceShed: number;
-  /** Seconds since Searing Knell landed (its toll). */
-  sinceToll: number;
-  /** Seconds since Hearthburst. */
-  sinceBurst: number;
-  /** Seconds since the Hearth was stoked. */
-  sinceStoke: number;
+  /** The guardian's phase (its state aura's value, 1 to 3; 0 out of the
+   *  fight) and stage (HEAT_STAGES), and how far into a timed stage. */
+  phase: number;
+  stage: number;
+  stageFill: number;
+  /** Seconds since Basalt Fist landed. */
+  sinceSlam: number;
   /** Seconds since a plain melee swing. */
   sinceSwing: number;
-  /** The overheat is winding up (the marker on the guardian). */
-  overheating: boolean;
 }
 
 export interface HeatBodyActionState {
@@ -370,10 +371,13 @@ export interface HeatBodyActionState {
 
 /** Seconds of each one-shot motion. */
 export const HEAT_SWING_SECONDS = 0.85;
-export const HEAT_RISE_SECONDS = 0.9;
-export const HEAT_TOLL_SECONDS = 0.9;
-export const HEAT_BURST_SECONDS = 1.6;
-export const HEAT_STOKE_SECONDS = 1.1;
+export const HEAT_SLAM_SECONDS = 0.9;
+
+/** How deep it stands in the wellspring (in the body's frame, under its
+ *  feet's rest): sunk to its waist (the lava at its hips) the whole fight,
+ *  all the way under through an overflow. */
+export const HEAT_HALF_SUNK = 2.6;
+export const HEAT_FULL_SUNK = 9.5;
 
 const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
 const ease = (t: number) => {
@@ -382,39 +386,30 @@ const ease = (t: number) => {
 };
 
 /** The action and its clock (0..1) for the body's input, written into `out`
- *  (no allocation on the frame path). Hearthburst first (it outranks every
- *  bar), then the bars, then the one-shots, then the strain of the wind-up. */
+ *  (no allocation on the frame path). The stages first (they own the body),
+ *  then the bar, then the one-shots. */
 export function heatBodyAction(
   input: HeatBodyInput,
   out: HeatBodyActionState = { action: 'idle', k: 0 },
 ): HeatBodyActionState {
-  if (input.sinceBurst < HEAT_BURST_SECONDS) {
-    out.action = 'burst';
-    out.k = input.sinceBurst / HEAT_BURST_SECONDS;
-  } else if (input.castId === HEAT_CASTS.shed) {
-    out.action = 'shed';
-    out.k = clamp01(input.castFill);
-  } else if (input.castId === HEAT_CASTS.pour) {
-    out.action = 'pour';
-    out.k = clamp01(input.castFill);
-  } else if (input.castId === HEAT_CASTS.knell) {
-    out.action = 'knell';
-    out.k = clamp01(input.castFill);
-  } else if (input.sinceShed < HEAT_RISE_SECONDS) {
+  if (input.stage === HEAT_STAGES.sinking) {
+    out.action = 'sink';
+    out.k = clamp01(input.stageFill);
+  } else if (input.stage === HEAT_STAGES.under) {
+    out.action = 'under';
+    out.k = 0;
+  } else if (input.stage === HEAT_STAGES.rising) {
     out.action = 'rise';
-    out.k = input.sinceShed / HEAT_RISE_SECONDS;
-  } else if (input.sinceToll < HEAT_TOLL_SECONDS) {
-    out.action = 'toll';
-    out.k = input.sinceToll / HEAT_TOLL_SECONDS;
-  } else if (input.sinceStoke < HEAT_STOKE_SECONDS) {
-    out.action = 'stoke';
-    out.k = input.sinceStoke / HEAT_STOKE_SECONDS;
+    out.k = clamp01(input.stageFill);
+  } else if (input.castId === HEAT_CASTS.fist) {
+    out.action = 'fist';
+    out.k = clamp01(input.castFill);
+  } else if (input.sinceSlam < HEAT_SLAM_SECONDS) {
+    out.action = 'slam';
+    out.k = input.sinceSlam / HEAT_SLAM_SECONDS;
   } else if (input.sinceSwing < HEAT_SWING_SECONDS) {
     out.action = 'swing';
     out.k = input.sinceSwing / HEAT_SWING_SECONDS;
-  } else if (input.overheating) {
-    out.action = 'strain';
-    out.k = 0;
   } else {
     out.action = 'idle';
     out.k = 0;
@@ -422,10 +417,27 @@ export function heatBodyAction(
   return out;
 }
 
+/** How deep the body stands for `action` at `k` (in its own frame, down):
+ *  sunk to its waist, all the way under while the Hearth overflows, climbing
+ *  back as it rises. */
+export function heatSink(action: HeatBodyAction, k: number): number {
+  const p = clamp01(k);
+  switch (action) {
+    case 'sink':
+      return HEAT_HALF_SUNK + (HEAT_FULL_SUNK - HEAT_HALF_SUNK) * ease(p);
+    case 'under':
+      return HEAT_FULL_SUNK;
+    case 'rise':
+      return HEAT_FULL_SUNK + (HEAT_HALF_SUNK - HEAT_FULL_SUNK) * ease(p);
+    default:
+      return HEAT_HALF_SUNK;
+  }
+}
+
 /** The body's look: the chest's swell, the head's lift (radians back), the
  *  lean (forward), the fire's strength (its heart, seams and threads), how
- *  white the fire burns (0 gold, 1 white), the wind-up's flash (0..1), the
- *  tremble (yards of jitter), the haze rising off it (0..1). */
+ *  white the fire burns (0 gold, 1 white), the slam's flash (0..1), the tremble (yards of jitter), the haze rising off it (0..1), how
+ *  deep it stands (yards) and the lava sheeting off it (0..1). */
 export interface HeatBodyLook {
   swell: number;
   lift: number;
@@ -435,22 +447,24 @@ export interface HeatBodyLook {
   flash: number;
   tremble: number;
   haze: number;
+  sink: number;
+  pour: number;
 }
 
-/** How white the first flame burns at `heat` (0..1 of the bar). */
-export function heatWhiteness(heat: number): number {
-  const h = clamp01(heat);
-  return clamp01((h - 0.3) / 0.7) ** 1.2;
+/** How white the first flame burns in `phase` (1 to 3): gold early, whiter
+ *  as the fight deepens. */
+export function heatWhiteness(phase: number): number {
+  const p = Math.max(1, Math.min(3, phase));
+  return 0.1 + 0.32 * (p - 1);
 }
 
-/** The look of `action` at `k` with the Hearth at `heat` (0..1), the slow
- *  idle breath on render time `t`. */
+/** The look of `action` at `k` in `phase`, the slow idle breath on render
+ *  time `t`. */
 export function heatBodyLook(
   action: HeatBodyAction,
   k: number,
   t: number,
-  heat: number,
-  overheating: boolean,
+  phase: number,
   out: HeatBodyLook = {
     swell: 0,
     lift: 0,
@@ -460,84 +474,56 @@ export function heatBodyLook(
     flash: 0,
     tremble: 0,
     haze: 0,
+    sink: 0,
+    pour: 0,
   },
 ): HeatBodyLook {
-  const h = clamp01(heat);
-  // The flame's own breath: slower and deeper when cool, quick when hot.
-  const period = 4.6 - 2.2 * h;
+  const h = clamp01((Math.max(1, phase) - 1) / 2);
+  // The flame's own breath: slower and deeper early, quicker as it deepens.
+  const period = 4.6 - 1.8 * h;
   const idle = 0.5 + 0.2 * Math.sin((t * Math.PI * 2) / period);
   out.swell = idle;
   out.lift = 0.03 * Math.sin((t * Math.PI * 2) / period);
   out.lean = 0.04;
-  out.glow = 0.9 + 1.3 * h + 0.15 * idle;
-  out.white = heatWhiteness(h);
+  out.glow = 0.55 + 0.9 * h + 0.15 * idle;
+  out.white = heatWhiteness(phase);
   out.flash = 0;
   out.tremble = 0;
-  out.haze = 0.15 + 0.85 * h;
-  if (overheating) {
-    // The wind-up: a hard white flash, a tremble, the haze thick.
-    const beat = 0.5 + 0.5 * Math.sin(t * 11);
-    out.flash = 0.35 + 0.65 * beat * beat;
-    out.white = Math.max(out.white, 0.85);
-    out.tremble = 0.05;
-    out.haze = 1;
-    out.glow += 0.6 * out.flash;
-  }
+  out.haze = 0.4 + 0.6 * h;
+  out.sink = heatSink(action, k);
+  // Lava sheets off it where it meets the wellspring.
+  out.pour = out.sink > 0.2 ? 0.35 : 0;
   const p = clamp01(k);
   switch (action) {
-    case 'shed':
-      // Leans over and pours its heat down its arms into the floor.
-      out.lean = 0.04 + 0.32 * ease(p);
-      out.lift = -0.15 * ease(p);
-      out.swell = idle + (1.25 - idle) * ease(p);
-      out.glow += 1.4 * ease(p);
+    case 'fist':
+      // It rears and lifts its fist of crystal high, then drives it down.
+      out.lean = 0.04 - 0.14 * ease(p / 0.75) + 0.42 * ease((p - 0.8) / 0.2);
+      out.lift = 0.22 * ease(p / 0.75) - 0.3 * ease((p - 0.8) / 0.2);
+      out.swell = idle + (1.2 - idle) * ease(p);
+      out.glow += 1.6 * ease(p);
+      break;
+    case 'slam':
+      out.lean = 0.46 - 0.42 * ease(p);
+      out.lift = -0.3 + 0.33 * ease(p);
+      out.glow += 2.2 * (1 - p);
+      out.flash = 0.6 * (1 - ease(p * 2));
+      break;
+    case 'sink':
+      // Arms flung up as the wellspring takes it.
+      out.lift = 0.35 * ease(p);
+      out.glow += 1.5 * ease(p);
+      out.pour = 0.6;
+      break;
+    case 'under':
+      out.glow += 1.2;
+      out.pour = 0;
       break;
     case 'rise':
-      // The crystals tear up: it straightens, arms flung up.
-      out.lean = 0.36 - 0.5 * ease(p * 1.8) + 0.1 * ease((p - 0.6) * 2.5);
-      out.lift = -0.15 + 0.45 * ease(p * 1.8) - 0.3 * ease((p - 0.5) * 2);
-      out.glow += 1.6 * (1 - p);
-      break;
-    case 'pour':
-      // One arm out over the lane, the fire running down it.
-      out.lean = 0.04 + 0.16 * ease(p);
-      out.lift = -0.08 * ease(p);
-      out.glow += 0.8 * ease(p);
-      break;
-    case 'knell':
-      // Draws the fire into its hands before its chest, rearing a little.
-      out.swell = idle + (1.3 - idle) * ease(p);
-      out.lift = 0.22 * ease(p);
-      out.lean = -0.12 * ease(p);
-      out.glow += 1.8 * ease(p);
-      break;
-    case 'toll':
-      // The knell rings out: the hands thrown apart, the fire flaring.
-      out.lift = 0.22 - 0.3 * ease(p * 2);
-      out.lean = -0.12 + 0.2 * ease(p * 2);
-      out.glow += 2.2 * (1 - p);
-      break;
-    case 'strain':
-      // Holding more fire than one body can: hunched, fists clenched low.
-      out.lean = 0.14;
-      out.lift = -0.1 + 0.06 * Math.sin(t * 13);
-      out.swell = 1.15 + 0.15 * Math.sin(t * 11);
-      break;
-    case 'burst':
-      // Hearthburst: arms and head thrown back, the whole body white.
-      out.lift = 0.5 * ease(p * 4) - 0.35 * ease((p - 0.5) * 2);
-      out.lean = -0.3 * ease(p * 4) + 0.3 * ease((p - 0.5) * 2);
-      out.swell = 1.4 - 0.9 * ease(p);
-      out.white = Math.max(out.white, 1 - ease((p - 0.3) / 0.7));
-      out.glow = 4.2 - 3.0 * ease(p);
-      out.flash = Math.max(out.flash, 1 - ease(p * 2.5));
-      out.haze = 1;
-      break;
-    case 'stoke':
-      // The Hearth stoked hotter: it draws a deep breath, fists to its chest.
-      out.swell = idle + 0.7 * Math.sin(p * Math.PI);
-      out.lift = 0.15 * Math.sin(p * Math.PI);
-      out.glow += 1.2 * Math.sin(p * Math.PI);
+      // Out of the lava, head back, molten rock sheeting off it.
+      out.lift = 0.4 * (1 - ease(p));
+      out.lean = -0.1 * (1 - p);
+      out.glow += 2.2 * (1 - p * 0.6);
+      out.pour = 1;
       break;
     case 'swing':
       out.lean = 0.04 + 0.1 * Math.sin(p * Math.PI);
@@ -566,7 +552,7 @@ function lerpInto(
 
 /** Where one wrist (side 1 left, -1 right) wants to be (body frame) for an
  *  action at `k`, written into `out` (no allocation on the frame path). The
- *  pour is poured by its right arm (side -1). */
+ *  fist it slams with is its right (side -1). */
 export function heatWristTarget(
   action: HeatBodyAction,
   side: -1 | 1,
@@ -599,61 +585,42 @@ export function heatWristTarget(
         ease((p - 0.4) / 0.6),
       );
     }
-    case 'shed':
-      // Both hands reach down before it, palms on the floor.
-      return lerpInto(out, ix, iy, iz, side * 1.5, 0.7, 2.4, ease(p * 1.3));
-    case 'rise':
-      // Up off the floor and flung over its head as the crystals tear up.
-      if (p < 0.45)
-        return lerpInto(
-          out,
-          side * 1.5,
-          0.7,
-          2.4,
-          side * (R.x + 0.2),
-          R.y + reach * 0.85,
-          0.6,
-          ease(p / 0.45),
-        );
+    case 'fist': {
+      if (side === 1) return lerpInto(out, ix, iy, iz, side * (R.x + 0.9), R.y - 1.2, 0.9, ease(p));
+      // Up over its head, then driven down before it.
+      const hx = -0.8;
+      const hy = R.y + reach * 0.92;
+      const hz = -0.3;
+      if (p < 0.8) return lerpInto(out, ix, iy, iz, hx, hy, hz, ease(p / 0.8));
       return lerpInto(
         out,
-        side * (R.x + 0.2),
-        R.y + reach * 0.85,
-        0.6,
+        hx,
+        hy,
+        hz,
+        -0.7,
+        R.y - reach * 0.75,
+        reach * 0.65,
+        ease((p - 0.8) / 0.2),
+      );
+    }
+    case 'slam':
+      if (side === 1) return lerpInto(out, side * (R.x + 0.9), R.y - 1.2, 0.9, ix, iy, iz, ease(p));
+      return lerpInto(
+        out,
+        -0.7,
+        R.y - reach * 0.75,
+        reach * 0.65,
         ix,
         iy,
         iz,
-        ease((p - 0.45) / 0.55),
+        ease((p - 0.3) / 0.7),
       );
-    case 'pour':
-      if (side === -1)
-        return lerpInto(out, ix, iy, iz, -0.9, R.y - 0.5, reach * 0.92, ease(p * 1.6));
-      return lerpInto(out, ix, iy, iz, side * (R.x + 0.6), R.y - 1.4, -1.0, ease(p * 1.6));
-    case 'knell':
-      // Both hands cupped before its chest round a gathering sphere.
-      return lerpInto(out, ix, iy, iz, side * 0.6, R.y - 0.9, 1.7, ease(p * 1.4));
-    case 'toll':
-      return lerpInto(
-        out,
-        side * 0.6,
-        R.y - 0.9,
-        1.7,
-        side * (R.x + reach * 0.8),
-        R.y - 0.4,
-        0.7,
-        ease(p * 2.2),
-      );
-    case 'strain':
-      return lerpInto(out, ix, iy, iz, side * (R.x + 1.3), R.y - 1.7, 0.7, 1);
-    case 'burst': {
-      const wx = side * (R.x + reach * 0.75);
-      const wy = R.y + reach * 0.45;
-      if (p < 0.2)
-        return lerpInto(out, side * (R.x + 1.3), R.y - 1.7, 0.7, wx, wy, -0.3, ease(p / 0.2));
-      return lerpInto(out, wx, wy, -0.3, ix, iy, iz, ease((p - 0.45) / 0.55));
-    }
-    case 'stoke':
-      return lerpInto(out, ix, iy, iz, side * 0.9, R.y - 0.6, 1.1, Math.sin(p * Math.PI));
+    case 'sink':
+    case 'under':
+      // Both arms up, clawing at the air as it goes down.
+      return lerpInto(out, ix, iy, iz, side * (R.x + 0.6), R.y + reach * 0.8, 0.4, ease(p * 1.5));
+    case 'rise':
+      return lerpInto(out, side * (R.x + 0.6), R.y + reach * 0.8, 0.4, ix, iy, iz, ease(p));
     default:
       return lerpInto(out, ix, iy, iz, ix, iy, iz, 0);
   }
@@ -755,10 +722,38 @@ export function heatFallProgress(
   return out;
 }
 
-/** Is the overheat winding up (the marker on the guardian)? */
-export function overheatingOn(auras: readonly { id: string }[]): boolean {
-  for (const a of auras) if (a.id === HEAT_AURAS.overheating) return true;
-  return false;
+/** What the body reads off the guardian's state aura: its phase (0 out of
+ *  the fight), its stage and how far into a timed one. */
+export interface HeatBodyState {
+  phase: number;
+  stage: number;
+  fill: number;
+}
+
+/** The guardian's state off its auras, written into `out` (no allocation on
+ *  the frame path). */
+export function heatBodyState(
+  auras: readonly {
+    id: string;
+    value?: number;
+    value2?: number;
+    remaining?: number;
+    duration?: number;
+  }[],
+  out: HeatBodyState = { phase: 0, stage: 0, fill: 0 },
+): HeatBodyState {
+  out.phase = 0;
+  out.stage = 0;
+  out.fill = 0;
+  for (const a of auras) {
+    if (a.id === HEAT_AURAS.state) {
+      out.phase = Math.round(a.value ?? 0);
+      out.stage = Math.round(a.value2 ?? 0);
+      const d = a.duration ?? 0;
+      out.fill = d > 0 && d < 1000 ? clamp01(1 - (a.remaining ?? 0) / d) : 0;
+    }
+  }
+  return out;
 }
 
 /** The tallest point of the body at rest (its mane's and crown's tips). */

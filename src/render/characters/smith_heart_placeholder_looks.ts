@@ -56,6 +56,17 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // a forge) is drawn by smith_heart_fx/heat_body.ts. Final: its own model
   // (the official pipeline), the same joints.
   heart_heat_guardian: 'smith_heart_heat_guardian',
+  // Its adds (encounters/smith_heart/heat*.ts). Final: their own models.
+  // The Wellspawn: a child of the first flame, the stone goleling tinted
+  // white-gold by its entity colour (its fire is heat_cinder_fx.ts's glow).
+  heart_heat_wellspawn: 'mob_elemental',
+  // The Wellkeeper: the same, bigger (scale 2.2), its fire the same glow.
+  heart_heat_wellkeeper: 'mob_elemental',
+  // The Seedflame: a small pale light hatched from a seed.
+  heart_heat_seedflame: 'mob_glimmerwisp',
+  // The Rolling Cinder: a bodyless target under the ball of the first flame
+  // smith_heart_fx/heat_cinder_fx.ts draws.
+  heart_heat_rolling_cinder: 'smith_heart_rolling_cinder',
   // ---- the final boss -----------------------------------------------------------
   // Phase 2J: the Masterless Strength is a bodyless target; its body (the
   // colossus of the Heart kit's rock pieces round the crystal heart) is drawn

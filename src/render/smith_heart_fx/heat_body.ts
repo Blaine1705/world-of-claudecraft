@@ -11,24 +11,19 @@
 //    white-gold crystal prisms, pauldrons of fire-split boulders, fists of
 //    crystal on beds of column stumps, crystal breaking out of its chest
 //    round a white-gold heart, threads of the first flame between its joints;
-//  - the heat: the whole body's fire brightens from gold toward white as the
-//    Hearth climbs, a haze rising off it, tongues of flame licking up from
-//    its joints; from 90 it strains, hunched and trembling, flashing white
-//    (a glow round the whole body), until Hearthburst throws it back with
-//    its arms flung wide;
-//  - the motion: its breathing flame (deeper when cool, quick when hot), a
-//    swipe on each melee hit, Shed Heat's lean down pouring fire down its
-//    arms into the floor, then its arms flung up as the crystals tear free,
-//    Molten Pour's arm out over the lane with fire running off its fist,
-//    Searing Knell's sphere of fire gathered in its hands then thrown wide,
-//    the stoking's deep breath;
+//  - the wellspring: a giant, it stands sunk to its waist in the first
+//    wellspring the whole fight (molten rock sheeting off it where it meets
+//    the pool), sinks all the way under as the Hearth overflows and rises
+//    again with lava pouring off it; its fire burns whiter as the fight
+//    deepens;
+//  - the motion: its breathing flame, a swipe on each melee hit, Basalt
+//    Fist's fist of crystal lifted high and driven down;
 //  - the death: the threads flare and go out, every piece falls and tumbles
 //    to the floor, the flame sinking out of them in smoke.
 // Presentation only: the fight's telegraphs are heat_fx.ts's and
-// heat_fight_fx.ts's, on every tier. The body, its poses, its heat colour and
-// the wind-up's flash never thin (the flash is the overheat's warning on the
-// body itself); the embers, the haze, the smoke and the shakes thin on the low
-// tier and under reduced motion.
+// heat_fight_fx.ts's, on every tier. The body, its poses and its depth in the
+// wellspring never thin; the embers, the haze, the lava's drips,
+// the smoke and the shakes thin on the low tier and under reduced motion.
 //
 // Rules (src/render/CLAUDE.md): every material is built in the constructor
 // under the root before its gated attach (the kits' pieces, which land later,
@@ -38,7 +33,7 @@
 
 import * as THREE from 'three';
 import { resolveUiEffectsProfile } from '../../game/ui_effects_profile';
-import { HEAT_CASTS, HEAT_CUES } from '../../sim/encounters/smith_heart/heat_ids';
+import { HEAT_CUES } from '../../sim/encounters/smith_heart/heat_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
 import { wrapAngle } from '../facing_smooth';
@@ -62,6 +57,7 @@ import {
   HEAT_BODY_KITS,
   HEAT_BODY_PIECES,
   HEAT_BODY_POOLS,
+  HEAT_BODY_SCALE,
   HEAT_FALL,
   HEAT_FLAME_JOINTS,
   HEAT_GUARDIAN,
@@ -79,18 +75,33 @@ import {
   heatBodyAction,
   heatBodyHash,
   heatBodyLook,
+  heatBodyState,
   heatFallProgress,
   heatFallRest,
   heatWristTarget,
-  overheatingOn,
   restJoint,
   type V3,
 } from './heat_body_core';
 
 const SCAN_SEC = 0.1;
+/** The giant's scale (the body's frame to the world). */
+const BS = HEAT_BODY_SCALE;
 /** A thread colour change smaller than this is not re-uploaded. */
 const THREAD_COLOR_EPS = 1 / 512;
 const HEAD_JOINTS = [HJ.head, HJ.mouth] as const;
+/** Where molten rock drips off it. */
+const LAVA_JOINTS = [
+  HJ.hip,
+  HJ.hipL,
+  HJ.hipR,
+  HJ.chest,
+  HJ.shoulderL,
+  HJ.shoulderR,
+  HJ.elbowL,
+  HJ.elbowR,
+  HJ.wristL,
+  HJ.wristR,
+] as const;
 const LEAN_JOINTS = [
   HJ.chest,
   HJ.head,
@@ -122,13 +133,13 @@ const _act: HeatBodyActionState = { action: 'idle', k: 0 };
 const _actIn: HeatBodyInput = {
   castId: null,
   castFill: 0,
-  sinceShed: Number.POSITIVE_INFINITY,
-  sinceToll: Number.POSITIVE_INFINITY,
-  sinceBurst: Number.POSITIVE_INFINITY,
-  sinceStoke: Number.POSITIVE_INFINITY,
+  phase: 0,
+  stage: 0,
+  stageFill: 0,
+  sinceSlam: Number.POSITIVE_INFINITY,
   sinceSwing: Number.POSITIVE_INFINITY,
-  overheating: false,
 };
+const _state = { phase: 0, stage: 0, fill: 0 };
 const _fall = { k: 0, landed: false };
 const _look: HeatBodyLook = {
   swell: 0,
@@ -139,6 +150,8 @@ const _look: HeatBodyLook = {
   flash: 0,
   tremble: 0,
   haze: 0,
+  sink: 0,
+  pour: 0,
 };
 /** The per-frame puffs' options, written in place (no allocation a frame). */
 const EMBER_DIR: [number, number, number] = [0, 1, 0];
@@ -146,7 +159,7 @@ const EMBER = {
   speed: 1.2,
   up: 3,
   life: 0.9,
-  size: [0.24, 0.05] as [number, number],
+  size: [0.42, 0.08] as [number, number],
   color: HEAT_BODY_COLORS.ember as readonly [number, number, number],
   alpha: 1,
   pool: 'glow' as const,
@@ -157,7 +170,7 @@ const FLAME = {
   speed: 0.6,
   up: 2.6,
   life: 0.5,
-  size: [0.9, 0.2] as [number, number],
+  size: [1.8, 0.4] as [number, number],
   color: HEAT_BODY_COLORS.ember as readonly [number, number, number],
   alpha: 0.85,
   pool: 'glow' as const,
@@ -166,26 +179,29 @@ const HAZE = {
   speed: 0.4,
   up: 1.8,
   life: 1.6,
-  size: [1.6, 3.4] as [number, number],
+  size: [3.6, 7.5] as [number, number],
   color: HEAT_BODY_COLORS.haze as readonly [number, number, number],
   alpha: 0.08,
   drag: 0.8,
 };
-/** The sparks crackling off it as it strains (the wind-up). */
-const STRAIN_SPARK = {
-  speed: 9,
-  life: 0.4,
-  size: [0.25, 0.05] as [number, number],
-  color: HEAT_BODY_COLORS.spark,
+/** Molten rock dripping and sheeting off it (gold, falling). */
+const LAVA_DIR: [number, number, number] = [0, -1, 0];
+const LAVA = {
+  speed: 2.5,
+  life: 0.7,
+  size: [1.1, 0.35] as [number, number],
+  color: HEAT_BODY_COLORS.ember as readonly [number, number, number],
   alpha: 1,
   pool: 'glow' as const,
-  radius: 1.5,
+  dir: LAVA_DIR,
+  spread: 0.25,
+  gravity: 9,
 };
 const STREAM_DIR: [number, number, number] = [0, -1, 0];
 const STREAM = {
   speed: 7,
   life: 0.35,
-  size: [0.5, 0.15] as [number, number],
+  size: [1.0, 0.3] as [number, number],
   color: HEAT_BODY_COLORS.spark as readonly [number, number, number],
   alpha: 1,
   pool: 'glow' as const,
@@ -243,11 +259,9 @@ export class HeatBody {
   private yaw = 0;
   private swingAt = -99;
   private swingSide: -1 | 1 = 1;
-  private shedAt = -99;
-  private tollAt = -99;
-  private burstAt = -99;
-  private stokeAt = -99;
-  private lastCast: string | null = null;
+  private slamAt = -99;
+  /** Its stage a frame ago (a change is a splash: it sinks, rises, tears free). */
+  private stageSeen = -1;
   private deadAt = -1;
   private seenAlive = false;
   private scanTimer = 0;
@@ -352,6 +366,7 @@ export class HeatBody {
       this.root.add(carrier);
     }
     this.group.name = 'smithHeartHeatBody';
+    this.group.scale.setScalar(BS);
     this.group.visible = false;
     this.root.add(this.group);
     const threadGeo = new THREE.CylinderGeometry(1, 1, 1, 6, 1, true).translate(0, 0.5, 0);
@@ -378,8 +393,9 @@ export class HeatBody {
     this.heartGlow.scale.set(2.8, 2.8, 1);
     this.heartGlow.name = 'smithHeartHeatHeartGlow';
     this.group.add(this.heartGlow);
-    // The wind-up's white glow round the whole body (every tier: the body's
-    // own overheat warning), and the knell's sphere of fire in its hands.
+    // The Crushing Fist's white glow round the whole body (every tier: the
+    // tank's warning on the body itself), and the white-hot fist it draws
+    // back and the slam's flash in its hand.
     this.aura = new THREE.Sprite(this.auraMat);
     this.aura.scale.set(10, 10, 1);
     this.aura.position.set(0, 4, 0.4);
@@ -554,14 +570,7 @@ export class HeatBody {
     if (ev.type === 'damage' && ev.ability === null && ev.sourceId === this.entityId) {
       this.swingAt = this.clock;
       this.swingSide = this.swingSide === 1 ? -1 : 1;
-    } else if (ev.type === 'spellfx' && ev.sourceId === this.entityId) {
-      const e = this.world.entities.get(this.entityId);
-      if (ev.ability === HEAT_CUES.overheat) {
-        this.burstAt = this.clock;
-        if (e) this.burstFx(e);
-      } else if (ev.ability === HEAT_CUES.stoke) this.stokeAt = this.clock;
-      else if (ev.ability === HEAT_CASTS.knell && ev.fx === 'nova') this.tollAt = this.clock;
-    }
+    } else if (ev.type === 'spellfxAt' && ev.ability === HEAT_CUES.fist) this.slamAt = this.clock;
     return false;
   }
 
@@ -603,11 +612,8 @@ export class HeatBody {
       this.deadAt = -1;
       this.seenAlive = false;
       this.swingAt = -99;
-      this.shedAt = -99;
-      this.tollAt = -99;
-      this.burstAt = -99;
-      this.stokeAt = -99;
-      this.lastCast = null;
+      this.slamAt = -99;
+      this.stageSeen = -1;
       this.group.visible = true;
       break;
     }
@@ -635,23 +641,24 @@ export class HeatBody {
       }
     }
     this.seenAlive = true;
-    // Shed Heat's bar ending: its crystals tear up (its arms fling up).
+    const st = heatBodyState(e.auras, _state);
     const cast = e.castingAbility;
-    if (this.lastCast === HEAT_CASTS.shed && cast !== HEAT_CASTS.shed) this.shedAt = this.clock;
-    this.lastCast = cast;
-    const overheating = overheatingOn(e.auras);
-    const heat = e.maxResource > 0 ? Math.max(0, Math.min(1, e.resource / e.maxResource)) : 0;
     const fill = e.castTotal > 0 ? Math.max(0, Math.min(1, 1 - e.castRemaining / e.castTotal)) : 1;
     _actIn.castId = cast;
     _actIn.castFill = fill;
-    _actIn.sinceShed = this.clock - this.shedAt;
-    _actIn.sinceToll = this.clock - this.tollAt;
-    _actIn.sinceBurst = this.clock - this.burstAt;
-    _actIn.sinceStoke = this.clock - this.stokeAt;
+    _actIn.phase = st.phase;
+    _actIn.stage = st.stage;
+    _actIn.stageFill = st.fill;
+    _actIn.sinceSlam = this.clock - this.slamAt;
     _actIn.sinceSwing = this.clock - this.swingAt;
-    _actIn.overheating = overheating;
     heatBodyAction(_actIn, _act);
-    const look = heatBodyLook(_act.action, _act.k, this.clock, heat, overheating, _look);
+    const look = heatBodyLook(_act.action, _act.k, this.clock, Math.max(1, st.phase), _look);
+    if (st.stage !== this.stageSeen) {
+      // It plunges into the wellspring or heaves up out of it: a splash.
+      if (this.stageSeen >= 0 && st.stage !== 0) this.splash(e, st.stage);
+      this.stageSeen = st.stage;
+    }
+    this.group.position.y = e.pos.y - look.sink * BS;
     this.yaw += wrapAngle(e.facing - this.yaw) * Math.min(1, dt * 5);
     this.group.rotation.y = this.yaw;
     if (look.tremble > 0 && !this.reducedMotion()) {
@@ -663,7 +670,7 @@ export class HeatBody {
     this.poseThreads(1, look);
     this.poseLights(_act.action, _act.k, look);
     this.glow(look);
-    this.cosmetics(e, _act.action, _act.k, look, heat, dt);
+    this.cosmetics(e, _act.action, _act.k, look, dt);
   }
 
   private poseJoints(action: HeatBodyAction, k: number, look: HeatBodyLook): void {
@@ -702,7 +709,7 @@ export class HeatBody {
     const cl = Math.cos(look.lean);
     const sl = Math.sin(look.lean);
     for (const i of LEAN_JOINTS) {
-      // The hands on the floor (Shed Heat) stay down there.
+      // The hands braced on the wellspring's lip stay down there.
       if ((i === HJ.wristL || i === HJ.wristR) && J[i].y < hipY) continue;
       const y = J[i].y - hipY;
       const z = J[i].z;
@@ -792,19 +799,18 @@ export class HeatBody {
     this.heartGlow.position.copy(chest).add(_a);
     const s = 2.4 + 0.8 * Math.min(4, look.glow);
     this.heartGlow.scale.set(s, s, 1);
-    // The wind-up's flash: a white glow round the whole body.
+    // The slam's flash: a white glow round the whole body.
     const as = 9 + 4 * look.flash;
     this.aura.scale.set(as, as * 1.15, 1);
-    // A halo of heat round it at every heat, white and beating in the wind-up.
+    // A halo of heat round it, whiter as the fight deepens.
     this.auraMat.opacity = Math.min(0.8, 0.08 + look.haze * 0.14 + look.flash * 0.55);
-    // The knell's sphere between its hands.
-    if (action === 'knell' || action === 'toll') {
-      const l = this.joints[HJ.wristL];
-      const r = this.joints[HJ.wristR];
-      this.orb.position.set((l.x + r.x) / 2, (l.y + r.y) / 2 + 0.2, (l.z + r.z) / 2 + 0.3);
-      const size = action === 'knell' ? 0.6 + 2.6 * k : 3.2 * (1 + 2 * k);
+    // The white-hot fist, flaring as Basalt Fist comes down.
+    if (action === 'fist' || action === 'slam') {
+      const w = this.joints[HJ.wristR];
+      this.orb.position.set(w.x, w.y, w.z);
+      const size = action === 'fist' ? 1 + 2.4 * k : 3.4 * (1 - k) + 0.4;
       this.orb.scale.set(size, size, 1);
-      this.orbMat.opacity = action === 'knell' ? 0.35 + 0.6 * k : 0.95 * (1 - k);
+      this.orbMat.opacity = action === 'fist' ? 0.3 + 0.6 * k : 1 - k;
       this.orb.visible = true;
     } else {
       // A spent sprite still costs a draw: hide it.
@@ -822,11 +828,11 @@ export class HeatBody {
     _s.set(this.glowColor.r, this.glowColor.g, this.glowColor.b);
     (this.crystalMat.uniforms.uColor.value as THREE.Color)
       .copy(this.glowColor)
-      .multiplyScalar(Math.min(3.4, 0.9 + g * 0.65));
+      .multiplyScalar(Math.min(2.6, 0.6 + g * 0.5));
     (this.fireMat.uniforms.uColor.value as THREE.Color)
       .copy(this.glowColor)
       .multiplyScalar(Math.min(3, 0.7 + g * 0.55));
-    this.haloMat.opacity = Math.min(0.85, 0.18 + g * 0.16);
+    this.haloMat.opacity = Math.min(0.5, 0.08 + g * 0.09);
     this.heartGlowMat.opacity = Math.min(0.95, 0.3 + g * 0.18);
     this.heartGlowMat.color.copy(this.glowColor);
     this.eyeMat.opacity = Math.min(1, 0.65 + g * 0.12);
@@ -850,34 +856,36 @@ export class HeatBody {
     const sinY = Math.sin(this.yaw);
     const cosY = Math.cos(this.yaw);
     return out.set(
-      e.pos.x + j.x * cosY + j.z * sinY,
-      e.pos.y + j.y,
-      e.pos.z - j.x * sinY + j.z * cosY,
+      e.pos.x + (j.x * cosY + j.z * sinY) * BS,
+      this.group.position.y + j.y * BS,
+      e.pos.z + (-j.x * sinY + j.z * cosY) * BS,
     );
   }
 
-  /** The flames, embers and haze off it, the fire it pours (cosmetic,
+  /** The flames, embers and haze off it, the lava sheeting off it (cosmetic,
    *  thinned on the low tier). */
   private cosmetics(
     e: Entity,
     action: HeatBodyAction,
     k: number,
     look: HeatBodyLook,
-    heat: number,
     dt: number,
   ): void {
     const d = this.density;
-    // Tongues of the first flame licking up from its joints, more and whiter
-    // as the Hearth climbs.
-    const flameRate = dt * (16 + 34 * heat + 24 * look.flash) * d;
-    if (this.rand() < flameRate) {
+    const heat = Math.min(1, look.white + 0.2);
+    // Tongues of the first flame licking up from its joints (the ones above
+    // the lava), whiter as the fight deepens.
+    const flameRate = dt * (18 + 30 * heat + 24 * look.flash) * d;
+    if (action !== 'under' && this.rand() < flameRate) {
       const j = this.joints[HEAT_FLAME_JOINTS[Math.floor(this.rand() * HEAT_FLAME_JOINTS.length)]];
-      this.worldOf(e, j, _a);
-      FLAME.color = look.white > 0.6 ? HEAT_BODY_COLORS.spark : HEAT_BODY_COLORS.ember;
-      FLAME.size[0] = 1.0 + 0.9 * heat;
-      this.particles.puff(_a.x, _a.y, _a.z, 1, FLAME);
+      if (j.y > look.sink) {
+        this.worldOf(e, j, _a);
+        FLAME.color = look.white > 0.6 ? HEAT_BODY_COLORS.spark : HEAT_BODY_COLORS.ember;
+        FLAME.size[0] = 2.0 + 1.8 * heat;
+        this.particles.puff(_a.x, _a.y, _a.z, 1, FLAME);
+      }
     }
-    if (this.rand() < dt * (4 + 10 * heat) * d) {
+    if (action !== 'under' && this.rand() < dt * (4 + 10 * heat) * d) {
       this.worldOf(e, this.joints[HJ.back], _a);
       this.particles.puff(
         _a.x + (this.rand() - 0.5) * 2,
@@ -890,45 +898,46 @@ export class HeatBody {
     // The heat's haze rising off it (thin, shed on the low tier).
     if (d >= 1 && this.rand() < dt * 5 * look.haze) {
       this.particles.puff(
-        e.pos.x + (this.rand() - 0.5) * 3,
-        e.pos.y + 3 + this.rand() * 3,
+        e.pos.x + (this.rand() - 0.5) * 3 * BS,
+        this.group.position.y + (3 + this.rand() * 3) * BS,
         e.pos.z + (this.rand() - 0.5) * 3,
         1,
         HAZE,
       );
     }
-    if (action === 'shed' && k > 0.3) {
-      // Fire streaming down its arms into the floor.
-      for (let i = 0; i < 2; i++) {
-        if (this.rand() > dt * 40 * d) continue;
-        this.worldOf(e, this.joints[i === 0 ? HJ.wristL : HJ.wristR], _a);
-        this.particles.puff(_a.x, _a.y, _a.z, 1, STREAM);
+    // Molten rock sheeting off it: drips at the wellspring's line, and off
+    // its arms and shoulders as it climbs out.
+    if (look.pour > 0 && this.rand() < dt * 50 * look.pour * d) {
+      const j = this.joints[LAVA_JOINTS[Math.floor(this.rand() * LAVA_JOINTS.length)]];
+      if (j.y > look.sink) {
+        this.worldOf(e, j, _a);
+        this.particles.puff(_a.x, _a.y, _a.z, 1, LAVA);
       }
-    } else if (action === 'pour' && this.rand() < dt * 30 * d * (0.3 + k)) {
+    }
+    if (action === 'fist' && k > 0.2 && this.rand() < dt * 30 * d) {
       this.worldOf(e, this.joints[HJ.wristR], _a);
-      this.particles.puff(_a.x, _a.y - 0.3, _a.z, 1, STREAM);
-    } else if (action === 'strain' && this.rand() < dt * 25 * d) {
-      // Sparks crackling off it as it strains.
-      this.worldOf(e, this.joints[HJ.chest], _a);
-      this.particles.puff(_a.x, _a.y, _a.z, 2, STRAIN_SPARK);
+      this.particles.puff(_a.x, _a.y, _a.z, 1, STREAM);
     }
   }
 
-  /** Hearthburst: the fire flung off it, a white ring over the floor. */
-  private burstFx(e: Entity): void {
-    const y = e.pos.y + 4;
-    this.particles.puff(e.pos.x, y, e.pos.z, 48, {
-      speed: 16,
-      up: 4,
+  /** It plunges into the wellspring, or heaves up out of it: the lava thrown
+   *  up round it, a ring over the pool. */
+  private splash(e: Entity, stage: number): void {
+    const y = this.groundY(e.pos.x, e.pos.z) + 0.4;
+    const big = stage === 1 ? 1.2 : 1;
+    this.particles.puff(e.pos.x, y, e.pos.z, Math.round(36 * big), {
+      speed: 8 * big,
+      up: 7,
       life: 1.1,
-      size: [0.6, 0.12],
-      color: HEAT_BODY_COLORS.spark,
+      size: [0.7, 0.18],
+      color: HEAT_BODY_COLORS.ember,
       alpha: 1,
       pool: 'glow',
-      radius: 2,
+      gravity: 14,
+      radius: 7,
     });
-    this.particles.shockRing(e.pos.x, e.pos.z, HEAT_BODY_COLORS.white, 50, 1.2);
-    this.shakeNear(e.pos.x, e.pos.z, 1.1, 90);
+    this.particles.shockRing(e.pos.x, e.pos.z, HEAT_BODY_COLORS.fire, 16 * big, 1);
+    this.shakeNear(e.pos.x, e.pos.z, 0.5 * big, 60);
   }
 
   // ---- the death -----------------------------------------------------------------------------
@@ -937,7 +946,7 @@ export class HeatBody {
     if (this.deadAt < 0) {
       this.deadAt = this.seenAlive ? this.clock : this.clock - HEAT_FALL.end - 1;
       if (!this.seenAlive) {
-        const rest = heatBodyLook('idle', 0, 0, 0, false);
+        const rest = heatBodyLook('idle', 0, 0, 1);
         this.poseJoints('idle', 0, rest);
         for (const p of this.pieces) this.posePiece(p, rest);
       }
@@ -986,7 +995,7 @@ export class HeatBody {
       p.holder.quaternion.copy(p.quat);
       if (fall.landed && !p.landed) {
         p.landed = true;
-        _a.copy(p.pos).applyAxisAngle(_up, this.yaw);
+        _a.copy(p.pos).multiplyScalar(BS).applyAxisAngle(_up, this.yaw);
         const x = e.pos.x + _a.x;
         const z = e.pos.z + _a.z;
         const size = Math.max(p.def.size.x, p.def.size.z);

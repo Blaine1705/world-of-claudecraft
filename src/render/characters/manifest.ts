@@ -4233,17 +4233,29 @@ export const VISUALS: Record<string, VisualDef> = {
     clickRadius: 1.6,
   },
   // The Guardian of the Heat (the Hearth, design doc 7.4): a bodyless target,
-  // its click capsule, nameplate and bars over the provisional being of the
+  // its click capsule, nameplate and bars over the provisional giant of the
   // first flame in basalt and crystal the raid's own effects draw
-  // (smith_heart_fx/heat_body.ts) until its own model ships. Height times the
-  // template's scale (3) is the body's crown, about three and a half players.
+  // (smith_heart_fx/heat_body.ts) until its own model ships. It stands sunk
+  // to its waist in the first wellspring: height times the template's scale
+  // (3) is its crown over the lava, about seven players.
   smith_heart_heat_guardian: {
     url: `${CREATURES}/golelingevolved.glb`,
-    height: 2.4,
+    height: 4.3,
     clips: ELEMENTAL_FLOATING,
     animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
     bodyless: true,
-    clickRadius: 1.7,
+    clickRadius: 3.2,
+  },
+  // The Guardian of the Heat's Rolling Cinder (design doc 7.4): a bodyless
+  // target, its click capsule, nameplate and bars round the great ball of the
+  // first flame the raid's own effects draw (smith_heart_fx/heat_cinder_fx.ts).
+  smith_heart_rolling_cinder: {
+    url: `${CREATURES}/golelingevolved.glb`,
+    height: 1.9,
+    clips: ELEMENTAL_FLOATING,
+    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
+    bodyless: true,
+    clickRadius: 2.2,
   },
   mob_ignivar: {
     url: `${CREATURES}/ignivar_herald.glb`,

@@ -170,11 +170,11 @@ export class RiftDeathZoneVisuals {
   private readonly quenchFight: QuenchFightFx;
   private readonly quenchBlades: QuenchBladesFx;
   private readonly quenchBody: QuenchBody;
-  // Its Heat guardian (Molten Pour's lane and Searing Knell's ring
-  // telegraphs, and the first flame's fire).
+  // Its Heat guardian (Basalt Fist's spot and lanes, the falling fist and
+  // the rolling Molten Swells).
   private readonly heatFx: HeatFx;
-  /** The Guardian of the Heat's fight in the Hearth (crystals, rays, burns,
-   *  the channel, the embers, the heat), and its body. */
+  /** The Guardian of the Heat's fight in the Hearth (the wellspring and its
+   *  rivers, the seeds, Wakefire, the cinders, the marks), and its body. */
   private readonly heatFight: HeatFightFx;
   private readonly heatBody: HeatBody;
   private readonly finalFx: FinalFx;

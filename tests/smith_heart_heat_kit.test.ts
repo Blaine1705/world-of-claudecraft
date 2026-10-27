@@ -15,8 +15,8 @@
 //     past the lips, walls every Heat lip over the void (never over a walk,
 //     never across the spill), lays the seams flat on the floors (never
 //     across the channel);
-//   - nothing player-facing names a forge object: the guardian's knell has a
-//     new English name (its id frozen).
+//   - nothing player-facing names a forge object: the guardian's strikes are
+//     the first flame's (Basalt Fist, Molten Swell), never a smith's tool.
 // The glTF frame is the kit's Blender frame turned y up: (x, z, -y), so a
 // piece's front (Blender -Y) is +Z here, as in the game.
 
@@ -60,7 +60,7 @@ import {
   planHeatWalls,
   HEAT_KIT_SHALLOW as ROCK_SEES_SHALLOW,
 } from '../src/render/smith_heart/heat_kit_plan_core';
-import { SMITH_HEART_CASTS, SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
+import { SMITH_HEART_MOBS } from '../src/sim/content/smith_heart';
 import {
   GIANT_ANVIL,
   GREAT_HEARTH,
@@ -68,6 +68,7 @@ import {
   POUR_CHANNEL,
   SMITH_HEART_FIELD,
 } from '../src/sim/content/smith_heart_layout';
+import { HEAT_NAMES } from '../src/sim/encounters/smith_heart/heat_ids';
 import { authoredFieldHeight, authoredFieldSurfaceAt } from '../src/sim/instances/authored_field';
 
 const F = SMITH_HEART_FIELD;
@@ -507,11 +508,13 @@ describe('Smith Heart Heat kit: the plan', () => {
 });
 
 describe('the Heat names no forge object to the player', () => {
-  it("gives the guardian's knell its new English name, its id frozen", () => {
-    const kit = SMITH_HEART_MOBS.heart_heat_guardian.trashKit;
-    expect(kit?.screech?.castId).toBe(SMITH_HEART_CASTS.heatClang);
-    expect(SMITH_HEART_CASTS.heatClang).toBe('heart_anvil_clang');
-    expect(kit?.screech?.name).toBe('Searing Knell');
-    expect(kit?.line?.name).toBe('Molten Pour');
+  it('names every strike of the first flame, none of them a forge tool', () => {
+    // The guardian has no trash kit of its own any more: its strikes are the
+    // fight's (heat_fist.ts, heat_flare.ts), named in HEAT_NAMES.
+    expect(SMITH_HEART_MOBS.heart_heat_guardian.trashKit).toBeUndefined();
+    expect(HEAT_NAMES.fist).toBe('Basalt Fist');
+    expect(HEAT_NAMES.swell).toBe('Molten Swell');
+    for (const name of Object.values(HEAT_NAMES))
+      expect(name).not.toMatch(/anvil|hammer|forge|bellows|tongs|smith/i);
   });
 });

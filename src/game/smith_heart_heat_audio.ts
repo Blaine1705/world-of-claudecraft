@@ -1,20 +1,18 @@
 // Plays the Guardian of the Heat's sounds (WHICH and WHEN: the pure core
 // beside this file). Fed by the fight's painter (render/smith_heart_fx/
-// heat_fight_fx.ts): its cue events, the channel's state as it changes, the
-// guardian (its bar and its heat) and the local player (their own burn) each
-// frame. Bounded and allocation-free in the frame: no timers, a handful of
-// fields. Local presentation: a sound never decides anything.
+// heat_fight_fx.ts): its cue events, a Wakefire band beginning to build, the
+// guardian (its bar) and the local player (the marks on them) each frame.
+// Bounded and allocation-free in the frame: no timers, a handful of fields.
+// Local presentation: a sound never decides anything.
 
 import type { Entity, SimEvent } from '../sim/types';
 import {
   HEAT_BAR_SOUNDS,
-  HEAT_BRIM_SOUND,
-  HEAT_BURN_SOUND,
   HEAT_CUE_SOUNDS,
-  HEAT_RISING_SOUND,
+  HEAT_MARK_SOUNDS,
   HEAT_SFX_KEYS,
+  HEAT_ZONE_BUILD_SOUND,
   heatBarRate,
-  heatWarningDue,
 } from './smith_heart_heat_audio_core';
 
 export interface HeatAudioSink {
@@ -28,12 +26,15 @@ export interface HeatAudioSink {
   preload?(key: string): void;
 }
 
+/** The marks' ids, in a fixed order (one bit each in `marks`). */
+const MARK_IDS = Object.keys(HEAT_MARK_SOUNDS);
+
 export class HeatAudio {
   private preloaded = false;
   private bar = '';
   private barTotal = 0;
-  private heat = 0;
-  private burn = 0;
+  /** Which marks the local player wore a frame ago (a bit each). */
+  private marks = 0;
 
   constructor(private readonly sink: HeatAudioSink) {}
 
@@ -77,23 +78,22 @@ export class HeatAudio {
     return true;
   }
 
-  /** The channel began to brim at (x, y, z). */
-  brim(x: number, y: number, z: number): void {
+  /** A Wakefire band began to build at (x, y, z). */
+  zoneBuild(x: number, y: number, z: number): void {
     this.preload();
-    this.sink.playAt(HEAT_BRIM_SOUND.key, x, y + 0.5, z, {
-      gain: HEAT_BRIM_SOUND.gain,
-      rate: HEAT_BRIM_SOUND.rate,
-      cooldown: 2,
+    this.sink.playAt(HEAT_ZONE_BUILD_SOUND.key, x, y + 0.5, z, {
+      gain: HEAT_ZONE_BUILD_SOUND.gain,
+      rate: HEAT_ZONE_BUILD_SOUND.rate,
+      cooldown: 1.5,
       jitter: false,
     });
   }
 
   /**
-   * One frame of the fight: the guardian (its bar and its heat, the
-   * resource; null out of the fight) and the local player with their own
-   * burn stacks (null when not in it).
+   * One frame of the fight: the guardian (its bar; null out of the fight) and
+   * the local player (the marks on them; null when not in it).
    */
-  update(guardian: Entity | null, me: Entity | null, burn: number): void {
+  update(guardian: Entity | null, me: Entity | null): void {
     if (guardian !== null) this.preload();
     const bar = guardian && !guardian.dead ? (guardian.castingAbility ?? '') : '';
     const total = guardian?.castTotal ?? 0;
@@ -109,21 +109,24 @@ export class HeatAudio {
           jitter: false,
         });
     }
-    const heat = guardian && !guardian.dead ? guardian.resource : 0;
-    if (me && heatWarningDue(this.heat, heat))
-      this.sink.playAt(HEAT_RISING_SOUND.key, me.pos.x, me.pos.y + 1.6, me.pos.z, {
-        gain: HEAT_RISING_SOUND.gain,
-        rate: HEAT_RISING_SOUND.rate,
-        cooldown: 2,
+    let marks = 0;
+    if (me && !me.dead)
+      for (const a of me.auras) {
+        const i = MARK_IDS.indexOf(a.id);
+        if (i >= 0) marks |= 1 << i;
+      }
+    const fresh = marks & ~this.marks;
+    this.marks = marks;
+    if (!me || fresh === 0) return;
+    for (let i = 0; i < MARK_IDS.length; i++) {
+      if ((fresh & (1 << i)) === 0) continue;
+      const s = HEAT_MARK_SOUNDS[MARK_IDS[i]];
+      this.sink.playAt(s.key, me.pos.x, me.pos.y + 1.6, me.pos.z, {
+        gain: s.gain,
+        rate: s.rate,
+        cooldown: 0.5,
         jitter: false,
       });
-    this.heat = heat;
-    if (me && burn > this.burn)
-      this.sink.playAt(HEAT_BURN_SOUND.key, me.pos.x, me.pos.y + 1.2, me.pos.z, {
-        gain: HEAT_BURN_SOUND.gain,
-        rate: HEAT_BURN_SOUND.rate,
-        cooldown: 0.3,
-      });
-    this.burn = me ? burn : 0;
+    }
   }
 }
