@@ -236,7 +236,7 @@ ratings.
   nobody counted inside drops it), the key a hold or a clock follows across a
   group change (`hillSuccessorKey`), the spot probe (`hillSpotIsOpen` over a
   `HillSpotProbe` the sim binds to the terrain, the water bodies, the collider
-  grid and the static zones), the three-hour schedule (`hillWindowAt`,
+  grid and the static zones), the two-hour schedule (`hillWindowAt`,
   `hillTimes` from a window and a warning offset, `hillMinutesUntil`) and the
   circle test. No ctx, no rng, no clock. Every tuning literal (`HILL_RADIUS`,
   `HILL_WINDOW_SECONDS`, `HILL_WARNING_SECONDS`, `HILL_DURATION_SECONDS`,

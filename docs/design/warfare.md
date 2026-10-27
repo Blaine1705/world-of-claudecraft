@@ -704,7 +704,7 @@ players who do.
 
 ## King of the Hill
 
-Once per `HILL_WINDOW_SECONDS` (three hours), a hill is scheduled in one of
+Once per `HILL_WINDOW_SECONDS` (two hours), a hill is scheduled in one of
 the three northern zones (`hillZones`). Ordinary ground there is contested;
 entering a risen hill enables PvP for eligible players. Each window draws its
 own deterministic warning offset from a private RNG. The first window opens
@@ -722,7 +722,7 @@ A hill has three moments, each announced to the whole realm:
    window whose planned stand passes before any spot is found is skipped.
 2. **The rise** (`hillRiseLine`), `HILL_WARNING_SECONDS` (15 minutes) after the
    warning. The contest and the payouts run from here.
-3. **The fall** (`hillFallenLine`), `HILL_DURATION_SECONDS` (45 minutes) after
+3. **The fall** (`hillFallenLine`), `HILL_DURATION_SECONDS` (30 minutes) after
    the rise. Banked seconds short of a payout are lost with it. The final
    standings follow (see below).
 
@@ -760,11 +760,12 @@ ramp paid 388 over the 44 paid minutes of a full stand, 8.8 a minute, and Honor 
 an integer, so 9 is the nearest whole rate (pinned in `tests/hill_rules.test.ts`).
 A party's size (five) is the payee cap. A holder who steps
 out banks nothing but keeps what they banked; leaving the party or the realm
-forfeits it, and a capture clears the books. A full party holding an uncontested
-hill for its whole stand earns about 390 each, about three Thornhollow Fields wins
-at the doubled award; two held hills a day is about 780, so 10,000 Honor is about
-13 days, level with a committed battleground day at the live result floor. No
-diminishing returns: the cap and the pace are the limit.
+forfeits it, and a capture clears the books. The v0.44.1 schedule (a hill every
+two hours standing 30 minutes, restored 2026-10-27 after the v0.45 merge lost it)
+keeps the flat rate, so a full party holding an uncontested hill for its whole
+stand earns 261 each (29 paid minutes), about two Thornhollow Fields wins at the
+doubled award; two held hills a day is about 520, so 10,000 Honor is about
+19 days. No diminishing returns: the cap and the pace are the limit.
 
 The hold ranking (`src/sim/pvp/hill_ranking.ts`, owner spec 2026-09-29): every
 group that takes the hill opens a record (`ActiveHill.holds`) that banks each
