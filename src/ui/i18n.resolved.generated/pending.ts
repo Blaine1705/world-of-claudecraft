@@ -28,24 +28,14 @@ export const pending: Record<string, readonly string[]> = {
   "de_DE": [
     "errors.api.worldFightHold"
   ],
-  "zh_CN": [
-    "errors.api.worldFightHold"
-  ],
-  "zh_TW": [
-    "errors.api.worldFightHold"
-  ],
-  "ko_KR": [
-    "errors.api.worldFightHold"
-  ],
-  "ja_JP": [
-    "errors.api.worldFightHold"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "errors.api.worldFightHold"
   ],
-  "ru_RU": [
-    "errors.api.worldFightHold"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "errors.api.worldFightHold"
   ],

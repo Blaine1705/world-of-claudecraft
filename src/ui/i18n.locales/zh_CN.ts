@@ -6204,6 +6204,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'errors.api.accountSuspended': '此账号被停用至 {date}。',
   'errors.api.alreadyInWorld': '角色已在世界中。',
   'errors.api.accountSessionLimit': '此账号已有太多角色在世界中。',
+  'errors.api.worldFightHold': '此账号的另一个角色在战斗后仍留在世界中。请几分钟后再试。',
   'errors.api.takenOver': '你的角色已被另一个会话接管。',
   'errors.api.renameBeforeEntering': '此角色必须先改名才能进入世界。',
   'errors.api.renameNotPermitted': '不允许为此角色改名。',

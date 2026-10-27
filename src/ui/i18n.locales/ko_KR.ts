@@ -4737,6 +4737,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'errors.api.accountSuspended': '이 계정은 {date}까지 정지되었습니다.',
   'errors.api.alreadyInWorld': '캐릭터가 이미 세계에 있습니다.',
   'errors.api.accountSessionLimit': '이 계정의 너무 많은 캐릭터가 이미 세계에 있습니다.',
+  'errors.api.worldFightHold':
+    '이 계정의 다른 캐릭터가 전투 후 아직 세계에 남아 있습니다. 몇 분 후에 다시 시도하세요.',
   'errors.api.takenOver': '다른 세션이 캐릭터를 넘겨받았습니다.',
   'errors.api.renameBeforeEntering': '이 캐릭터는 세계에 들어가기 전에 이름을 변경해야 합니다.',
   'errors.api.renameNotPermitted': '이 캐릭터의 이름을 변경할 수 없습니다.',

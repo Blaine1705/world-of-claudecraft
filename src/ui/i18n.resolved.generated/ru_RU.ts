@@ -15192,7 +15192,7 @@ export const ru_RU: EnTranslations = {
       "accountSuspended": "Эта учетная запись заблокирована до {date}.",
       "alreadyInWorld": "Персонаж уже находится в мире.",
       "accountSessionLimit": "Слишком много персонажей этой учетной записи уже находятся в мире.",
-      "worldFightHold": "Another character on this account is still in the world after a fight. Try again in a few minutes.",
+      "worldFightHold": "Другой персонаж этой учётной записи всё ещё в мире после боя. Повторите попытку через несколько минут.",
       "takenOver": "Вашего персонажа перехватила другая сессия.",
       "vaultMailRecovering": "Письмо с наградой хранилища восстанавливается. Повторите попытку чуть позже.",
       "renameBeforeEntering": "Перед входом в мир этому персонажу нужно сменить имя.",
