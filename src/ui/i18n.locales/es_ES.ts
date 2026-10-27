@@ -531,9 +531,6 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.capacityPools':
     'Artículos {generalUsed}/{generalTotal}, materiales {materialsUsed}/{materialsTotal}',
   'hudChrome.bags.emptyMaterialsOnly': 'Solo para materiales',
-  'entities.abilities.vampiric_touch.name': 'Toque vampírico',
-  'entities.abilities.vampiric_touch.description':
-    'Inflige {damage} de daño de Sombras durante 15 s, una vez cada 3 s. El daño aumenta con el poder con hechizos y los pulsos pueden ser críticos. Cada pulso reparte una sanación equivalente al 20% de la vida perdida por el enemigo entre tú y los miembros heridos de tu grupo a 30 yardas o menos; en una banda, solo recibe esta sanación tu subgrupo. Si tienes al menos 2 cargas de Diezmo sombrío, aplicar el efecto consume 2 para aumentar todo su daño un 30%.',
   // PR 4488 hunter follow-up.
   'entities.abilities.bear_trap.description':
     'Coloca una trampa en la ubicación seleccionada. Se arma tras 0,75 s y dura 1 min; solo tú y tu grupo podéis verla. El primer enemigo que la active sangra por {damage} de daño Físico durante 15 s y queda ralentizado un 50% durante 4 s. El daño aumenta con el poder de ataque a distancia. Solo puede haber una Trampa para Osos activa a la vez. Puede coexistir con tu Trampa Fauces de Escarcha. Colocar otra Trampa para Osos reemplaza la anterior.',

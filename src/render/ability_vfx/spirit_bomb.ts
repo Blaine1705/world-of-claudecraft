@@ -63,7 +63,7 @@ const CORE = `
     vec3 col = mix(vec3(0.009,0.003,0.024), vec3(0.11,0.012,0.24), n * n);
     col += vec3(0.52,0.065,1.1) * heat;
     col += vec3(0.38,0.08,0.9) * rim * (1.4 + n);
-    col += vec3(1.0,0.68,1.4) * pow(veins, 4.0) * fracture * 1.1;
+    col += vec3(1.0,0.68,1.4) * pow(max(0.0, veins), 4.0) * fracture * 1.1;
     gl_FragColor = vec4(col, uAlpha);
   }`;
 
@@ -82,13 +82,13 @@ const HALO = `
     float angle = atan(vLocal.z, vLocal.x);
     if (uMode > 0.5) {
       float r = length(vLocal.xz);
-      float edge = exp(-pow((r - 0.88) * 32.0, 2.0));
-      float inner = exp(-pow((r - 0.69) * 45.0, 2.0)) * 0.32;
+      float edge = exp(-pow(abs((r - 0.88) * 32.0), 2.0));
+      float inner = exp(-pow(abs((r - 0.69) * 45.0), 2.0)) * 0.32;
       a = (edge + inner) * (0.7 + 0.3 * sin(angle * 19.0 + uTime * 2.0));
     } else {
       float f = max(0.0, 1.0 - abs(dot(normalize(vNormal), normalize(vView))));
       float storm = noise3(vLocal * 12.0 + vec3(0.0, -uTime * 0.4, uTime * 0.2));
-      a = pow(f, 4.5) * smoothstep(0.22, 0.8, storm);
+      a = pow(max(0.0, f), 4.5) * smoothstep(0.22, 0.8, storm);
     }
     a *= uAlpha;
     if (a < 0.005) discard;
