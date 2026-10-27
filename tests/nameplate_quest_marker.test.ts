@@ -459,20 +459,24 @@ describe('nameplate quest marker beyond the close NPC plate range', () => {
     const { painter, world } = harness({ ...order, state: 'available', viewerZ: 30 });
     painter.update(true);
     expectMarker(painter, '!', 'quest');
-    expect(stateOf(painter, 2).name).toBe('');
-    expect(stateOf(painter, 2).guild).toBe('');
+    const far = stateOf(painter, 2);
+    expect([far.name, far.guild, far.guildLabel, far.title]).toEqual(['', '', '', '']);
     expect(plated(painter)).toBe(1);
 
-    // Walking inside NPC_NAMEPLATE_RANGE re-resolves on a throttled pass too.
+    // Up close the full plate is back: the name and this trainer's role or title line.
     world.player.pos.z = 3;
     painter.update(false);
     expectMarker(painter, '!', 'quest');
-    expect(stateOf(painter, 2).name).not.toBe('');
+    const near = stateOf(painter, 2);
+    expect(near.name).not.toBe('');
+    expect(near.guild + near.title).not.toBe('');
 
-    // And walking back out drops the name on the next pass.
+    // Walking back out drops them on a throttled pass: 30 yd is outside
+    // NAMEPLATE_URGENT_RANGE, so only the markerOnly flip re-resolves it.
     world.player.pos.z = 30;
     painter.update(false);
-    expect(stateOf(painter, 2).name).toBe('');
+    expect([near.name, near.guild, near.guildLabel, near.title]).toEqual(['', '', '', '']);
+    expectMarker(painter, '!', 'quest');
   });
 
   it('draws nothing for a far NPC with no marker', () => {
