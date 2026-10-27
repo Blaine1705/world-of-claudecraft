@@ -285,8 +285,26 @@ export function pulseRing(heat: number): { radius: number; strength: number } {
  *  telegraph's rim. */
 export function windupGlow(overheating: boolean, heat: number, t: number): number {
   if (!overheating) return 0.12 * clamp01((heat - 0.6) / 0.4);
-  const beat = 0.5 + 0.5 * Math.sin(t * 11);
-  return 0.3 + 0.35 * beat * beat;
+  // Harder and faster the nearer the heat is to the top (90 to 100).
+  const u = windupUrgency(heat);
+  const beat = 0.5 + 0.5 * Math.sin(t * (9 + 9 * u));
+  return 0.3 + 0.15 * u + 0.3 * beat * beat;
+}
+
+/** How near the overheat is through the wind-up: 0 at 90 heat, 1 at 100. */
+export function windupUrgency(heat: number): number {
+  return clamp01((clamp01(heat) - 0.9) / 0.1);
+}
+
+/** The wind-up's gathering: rings of heat drawn in over the floor into the
+ *  guardian, one a beat, the beat quicker as the heat nears the top. Its
+ *  radius (yards) and strength at render time `t`. Cosmetic, the floor glow
+ *  and the gauge carry the warning. */
+export function windupGather(t: number, heat: number): { radius: number; alpha: number } {
+  const u = windupUrgency(heat);
+  const period = 1.3 - 0.75 * u;
+  const k = (((t / period) % 1) + 1) % 1;
+  return { radius: 3 + 33 * (1 - k) ** 1.6, alpha: (0.35 + 0.45 * u) * Math.sin(Math.PI * k) };
 }
 
 /** Hearthburst's white wave `age` seconds in: its radius (yards) and

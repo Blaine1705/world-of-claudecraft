@@ -25,7 +25,9 @@ import {
   heatObjectKind,
   pulseRing,
   riseLook,
+  windupGather,
   windupGlow,
+  windupUrgency,
 } from '../src/render/smith_heart_fx/heat_fight_fx_core';
 import { HEARTH_CHANNEL } from '../src/sim/content/smith_heart_layout';
 import { DUNGEONS, instanceOrigin } from '../src/sim/data';
@@ -131,6 +133,18 @@ describe('heat_fight_fx_core: the fight in the Hearth', () => {
     }
     expect(lo).toBeGreaterThanOrEqual(0.3);
     expect(hi).toBeGreaterThan(0.6);
+    // Harder the nearer the top, and the gathering rings close in faster.
+    let lo90 = 1;
+    let lo99 = 1;
+    for (let t = 0; t < 2; t += 0.01) {
+      lo90 = Math.min(lo90, windupGlow(true, 0.9, t));
+      lo99 = Math.min(lo99, windupGlow(true, 0.99, t));
+    }
+    expect(lo99).toBeGreaterThan(lo90);
+    expect(windupUrgency(0.9)).toBe(0);
+    expect(windupUrgency(1)).toBeCloseTo(1, 9);
+    expect(windupGather(0.3, 0.9).radius).toBeGreaterThan(windupGather(0.9, 0.9).radius);
+    expect(windupGather(0, 1).alpha).toBeCloseTo(0, 5);
     expect(burstWave(0).radius).toBeLessThan(burstWave(1).radius);
     expect(burstWave(1.5).alpha).toBe(0);
     expect(pulseRing(1).radius).toBeGreaterThan(pulseRing(0).radius);

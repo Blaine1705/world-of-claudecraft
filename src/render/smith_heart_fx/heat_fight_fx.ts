@@ -90,6 +90,7 @@ import {
   HEAT_FIGHT_POOLS as P,
   pulseRing,
   riseLook,
+  windupGather,
   windupGlow,
 } from './heat_fight_fx_core';
 
@@ -135,6 +136,21 @@ const EMBER_PUFF = {
   alpha: 1,
   pool: 'glow' as const,
   radius: 0.5,
+};
+/** The wind-up's embers sucked into the guardian (its direction written in
+ *  place: no allocation a frame). */
+const GATHER_DIR: [number, number, number] = [0, 0.15, 0];
+const GATHER_PUFF = {
+  speed: 11,
+  up: 0.4,
+  life: 1.3,
+  size: [0.35, 0.1] as [number, number],
+  color: C.spark,
+  alpha: 1,
+  pool: 'glow' as const,
+  dir: GATHER_DIR,
+  spread: 0.08,
+  radius: 0.6,
 };
 const HAZE_PUFF = {
   speed: 0.3,
@@ -1530,6 +1546,32 @@ void main() {
       this.wave.scale.set(w.radius, 1, w.radius);
       this.waveMat.uniforms.uAlpha.value = w.alpha;
       this.wave.visible = true;
+    } else if (guardian && overheating && guardian.inCombat) {
+      // The wind-up: rings of heat drawn in over the floor into the
+      // guardian, quicker as the top nears (the wave's own disc, inverted).
+      const g = windupGather(this.clock, heat);
+      this.wave.position.set(
+        guardian.pos.x,
+        this.groundY(guardian.pos.x, guardian.pos.z) + 0.1,
+        guardian.pos.z,
+      );
+      this.wave.scale.set(g.radius, 1, g.radius);
+      this.waveMat.uniforms.uAlpha.value = g.alpha;
+      this.wave.visible = g.alpha > 0.01;
+      // Embers sucked toward it (cosmetic).
+      if (this.detail && this.rand() < dt * 40) {
+        const a = this.rand() * Math.PI * 2;
+        const r = 14 + this.rand() * 16;
+        GATHER_DIR[0] = -Math.sin(a);
+        GATHER_DIR[2] = -Math.cos(a);
+        this.particles.puff(
+          guardian.pos.x + Math.sin(a) * r,
+          this.groundY(guardian.pos.x, guardian.pos.z) + 0.6 + this.rand() * 2.5,
+          guardian.pos.z + Math.cos(a) * r,
+          1,
+          GATHER_PUFF,
+        );
+      }
     } else this.wave.visible = false;
   }
 

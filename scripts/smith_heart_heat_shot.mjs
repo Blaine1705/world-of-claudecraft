@@ -9,7 +9,8 @@
 //   node scripts/smith_heart_heat_shot.mjs <outDir>
 //
 // Env: SHOT_URL (http://127.0.0.1:5191/), SHOT_W / SHOT_H (1600x900),
-// SHOT_PRESET (4), SHOT_ONLY (comma list of shot names).
+// SHOT_PRESET (4), SHOT_ONLY (comma list of shot names), SHOT_HUD (1: keep the
+// HUD, for the heat gauge's shot 07_medidor).
 import fs from 'node:fs';
 import path from 'node:path';
 import puppeteer from 'puppeteer-core';
@@ -21,6 +22,7 @@ const OUT = process.argv[2] ?? path.join('tmp', 'smith_heart_heat');
 const W = Number(process.env.SHOT_W ?? 1600);
 const H = Number(process.env.SHOT_H ?? 900);
 const PRESET = Number(process.env.SHOT_PRESET ?? 4);
+const HUD = process.env.SHOT_HUD === '1';
 const ONLY = process.env.SHOT_ONLY ? new Set(process.env.SHOT_ONLY.split(',')) : null;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -80,7 +82,9 @@ try {
     },
     { timeout: 180000, polling: 1000 },
   );
-  await page.addStyleTag({ content: '#ui { display: none !important; }' });
+  // The HUD hidden for the scenes, unless SHOT_HUD asks for it (the heat
+  // gauge over the action bar is part of what a shot shows).
+  if (!HUD) await page.addStyleTag({ content: '#ui { display: none !important; }' });
   const O = await page.evaluate(
     ([ex, ez]) => {
       const p = window.__game.world.player;
@@ -233,6 +237,15 @@ try {
         await raider(i, BOSS.x + 9 + (i % 3) * 2.5, BOSS.z - 10 + i * 2.6);
       await place([BOSS.x + 20, BOSS.z - 6], [BOSS.x, BOSS.z], 0.2, 0.38, 18);
       await chat('/dev heart heat heat 96', 2200);
+    },
+    // The heat gauge over the action bar in the wind-up (run with SHOT_HUD=1):
+    // the raid's shared heat, flashing, and the body white with the rings of
+    // heat drawn into it.
+    async '07_medidor'() {
+      await pull();
+      for (let i = 1; i < 8; i++) await raider(i, BOSS.x + 8 + (i % 3) * 2.5, BOSS.z - 9 + i * 2.6);
+      await place([BOSS.x + 15, BOSS.z - 3], [BOSS.x, BOSS.z], 0.2, 0.3, 13);
+      await chat('/dev heart heat heat 97', 1500);
     },
     // Heroic: three crystals, the knell's embers under the melee.
     async '06_brasas'() {
