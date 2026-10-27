@@ -128,11 +128,13 @@ function setBladeObject(e: Entity, state: QuenchBladeState): void {
  *  Returns true when any was new. */
 export function ensureBladeWalls(ctx: SimContext, inst: InstanceSlot): boolean {
   let fresh = false;
-  for (const e of claimBlades(ctx, inst)) {
-    if (!e || e.kitObject || bladeStateOf(e.templateId) === 'fly') continue;
+  claimBlades(ctx, inst).forEach((e, i) => {
+    if (!e || e.kitObject || bladeStateOf(e.templateId) === 'fly') return;
     e.kitObject = { kind: 'wall', remaining: BLADE_WALL_LIFE };
+    // Faced as its home is (as a reset sinks it), from the claim's first tick.
+    e.facing = QUENCH_BLADE_SPOTS[i].rot;
     fresh = true;
-  }
+  });
   if (fresh) syncQuenchWalls(ctx, inst);
   return fresh;
 }
@@ -248,6 +250,7 @@ export function spawnEchoes(
   kind: QuenchEchoKind,
   facing: number,
   seconds: number,
+  ofBar = false,
 ): number {
   const range = kind === 'breath' ? T.breathRange : T.strikeRange;
   let n = 0;
@@ -270,10 +273,26 @@ export function spawnEchoes(
       facing,
       remaining: seconds,
       shown: 0,
+      ...(ofBar ? { ofBar: true as const } : {}),
     });
     n++;
   }
   if (n > 0) quenchSay(s, s.boss, 'echo');
+  return n;
+}
+
+/** The guardian's breath bar was cut: the echoes it raised never come
+ *  (their footprints go). Returns how many were dropped. */
+export function dropBarEchoes(s: QuenchScope): number {
+  let n = 0;
+  const keep = [];
+  for (const ec of s.st.echoes) {
+    if (ec.ofBar && ec.shown <= 0) {
+      dropFightObject(s.ctx, s.inst, ec.objectId);
+      n++;
+    } else keep.push(ec);
+  }
+  s.st.echoes = keep;
   return n;
 }
 

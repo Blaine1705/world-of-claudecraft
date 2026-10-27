@@ -77,6 +77,8 @@ export interface QuenchEcho {
   remaining: number;
   /** Seconds its blast still shows after landing (0: not landed yet). */
   shown: number;
+  /** It repeats the guardian's breath bar now running (a cut bar drops it). */
+  ofBar?: true;
 }
 
 /** Heroic: two blades crossing the lake. */

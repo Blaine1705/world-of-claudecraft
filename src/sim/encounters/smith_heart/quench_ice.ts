@@ -148,7 +148,8 @@ export function openHole(s: QuenchScope, x: number, z: number, r: number = T.hol
     ability: QUENCH_CUES.hole,
   });
   quenchSay(s, s.boss, 'hole');
-  // Past the cap the oldest skins over (never one a body is held in).
+  // Past the cap the oldest skins over (a body held in it keeps its own
+  // trap: the hole's place rides on the trap, so it still climbs out).
   while (st.holes.length > T.holeMax) {
     const old = st.holes.shift() as QuenchHoleState;
     dropFightObject(s.ctx, s.inst, old.objectId);

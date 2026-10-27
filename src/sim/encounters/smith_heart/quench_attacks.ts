@@ -35,7 +35,7 @@ export function startBreath(s: QuenchScope): boolean {
   const facing = towardTank(s);
   beginBar(s, QUENCH_CASTS.breath, T.breathCast, facing);
   s.st.breathTimer = T.breathEvery;
-  if (s.st.half === 'echoes') spawnEchoes(s, 'breath', facing, echoSeconds(s, T.breathCast));
+  if (s.st.half === 'echoes') spawnEchoes(s, 'breath', facing, echoSeconds(s, T.breathCast), true);
   return true;
 }
 

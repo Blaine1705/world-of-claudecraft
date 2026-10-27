@@ -49,6 +49,7 @@ import {
   claimBlades,
   clearBladeMarks,
   clearBlades,
+  dropBarEchoes,
   ensureBladeWalls,
   landWake,
   spawnEchoes,
@@ -187,8 +188,11 @@ function landBar(s: QuenchScope): void {
   if (!bar) return;
   s.st.bar = null;
   s.st.gap = T.barGap;
-  if (bar.castId === QUENCH_CASTS.breath) landBreath(s, bar.facing);
-  else if (bar.castId === QUENCH_CASTS.wake) landWake(s);
+  if (bar.castId === QUENCH_CASTS.breath) {
+    landBreath(s, bar.facing);
+    // Its echoes are past the bar now: nothing can take them back.
+    for (const ec of s.st.echoes) delete ec.ofBar;
+  } else if (bar.castId === QUENCH_CASTS.wake) landWake(s);
 }
 
 /** The bar in flight: planted, counting down, landing. A bar cut by
@@ -201,8 +205,10 @@ function stepBar(s: QuenchScope): void {
   if (b.castingAbility !== bar.castId) {
     s.st.bar = null;
     s.st.gap = T.barGap;
-    // The awakening always completes (a cut bar never strands the blades).
+    // The awakening always completes (a cut bar never strands the blades);
+    // a cut breath takes its echoes with it.
     if (bar.castId === QUENCH_CASTS.wake) landWake(s);
+    else if (bar.castId === QUENCH_CASTS.breath) dropBarEchoes(s);
     return;
   }
   holdPlanted(s);
@@ -238,6 +244,14 @@ function clearFight(
   st: QuenchFightState | null,
 ): void {
   if (st) {
+    // Everyone the fight marked, wherever they went (a player who left the
+    // lake as it ended keeps no cold, warmth or trap in the open world).
+    for (const key of [...Object.keys(st.chill), ...Object.keys(st.trapped)]) {
+      const p = ctx.entities.get(Number(key));
+      if (!p) continue;
+      clearColdMarks(p);
+      dropAura(p, QUENCH_AURAS.trapped);
+    }
     clearIce({ ctx, inst, st });
     clearBlades(ctx, inst, st);
     dropRim(ctx, inst, st);
@@ -293,12 +307,19 @@ function beginQuench(ctx: SimContext, inst: InstanceSlot, boss: Entity): QuenchF
   return st;
 }
 
+/** The claim's object count when its blades' walls were last ensured. */
+const bladeWallsSeen = new WeakMap<InstanceSlot, number>();
+
 /** One tick of the claim's Guardian of the Quench. */
 export function tickQuenchGuardian(ctx: SimContext, inst: InstanceSlot): void {
   const boss = quenchGuardian(ctx, inst);
   if (!boss) return;
-  // The blades the claim spawned with stand as walls from its first tick.
-  ensureBladeWalls(ctx, inst);
+  // The blades the claim spawned with stand as walls from its first tick
+  // (looked at again only when the claim's object list changes).
+  if (bladeWallsSeen.get(inst) !== inst.objectIds.length) {
+    bladeWallsSeen.set(inst, inst.objectIds.length);
+    ensureBladeWalls(ctx, inst);
+  }
   const st0 = boss.smithHeartQuench ?? null;
   if (!living(boss)) {
     if (st0 && !st0.finished) finishQuench(ctx, inst, boss, st0);

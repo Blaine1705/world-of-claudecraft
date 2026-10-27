@@ -563,6 +563,37 @@ describe('Guardian of the Quench: the wipe and the fall', () => {
       const at = f.local(e);
       expect(QUENCH_BLADE_SPOTS.some((s) => dist(s, at) < 0.01)).toBe(true);
     }
+    // The crossing was in flight at the wipe: still one blade per home.
+    const homes = bl.map((e) => QUENCH_BLADE_SPOTS.findIndex((s) => dist(s, f.local(e)) < 0.01));
+    expect(new Set(homes).size).toBe(4);
+  });
+
+  it('a player who left the lake as the fight ended keeps no cold or warmth', () => {
+    const f = pulled(3);
+    f.tick(ticks(2));
+    const gone = f.players[2];
+    expect(f.cold(gone)).toBeDefined();
+    // Far off the lake (past the listeners' reach) on the tick it ends.
+    f.put(gone, 0, -400);
+    f.dev('/dev heart quench reset');
+    for (const id of [QUENCH_AURAS.cold, QUENCH_AURAS.warmth, QUENCH_AURAS.trapped])
+      expect(has(gone, id), id).toBe(false);
+  });
+
+  it('a cut breath takes its echoes with it; a landed one keeps them', () => {
+    const f = pulled(3);
+    awake(f);
+    // Breath echoes only (the template's `b_`; a strike's swing raises its own).
+    f.dev('/dev heart quench breath');
+    expect(f.objects(`${QUENCH_OBJECTS.echoPrefix}b_`).length).toBe(4);
+    f.boss().castingAbility = null;
+    const ev = f.tick(ticks(T.breathCast + 4));
+    expect(f.objects(`${QUENCH_OBJECTS.echoPrefix}b_`)).toEqual([]);
+    for (const p of f.players) expect(hitsOf(ev, QUENCH_NAMES.echoBreath, p.id)).toEqual([]);
+    f.tick(ticks(T.barGap + 1));
+    f.dev('/dev heart quench breath');
+    f.tick(ticks(T.breathCast) + 2);
+    expect(f.objects(`${QUENCH_OBJECTS.echoPrefix}b_`).length).toBe(4);
   });
 
   it("its fall lights the Quench vein and the seal's quarter; the shore ice falls and the lake refreezes", () => {
