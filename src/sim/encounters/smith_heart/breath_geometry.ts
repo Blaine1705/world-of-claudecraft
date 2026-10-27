@@ -32,6 +32,40 @@ export function inBreathArena(x: number, z: number): boolean {
   return s.id === CORNICE_CLIMB && x > CLIMB_ARENA_X;
 }
 
+/** Is (x, z) on the way up to the fight (the Cornice's floor, or anywhere on
+ *  its climb): where a target the guardian may keep stands. */
+export function onCorniceApproach(x: number, z: number): boolean {
+  if (inBreathArena(x, z)) return true;
+  return authoredFieldSurfaceAt(F, x, z)?.id === CORNICE_CLIMB;
+}
+
+/** Half a claim's slot band in z (slots are 500 yd apart): a local z past
+ *  it is the next claim's ground, never this one's. */
+export const CLAIM_HALF_Z = 250;
+
+/** Is local z inside this claim's own band (not the next slot's south end,
+ *  which lies within the Cornice's reach)? */
+export function inClaimBand(z: number): boolean {
+  return Math.abs(z) < CLAIM_HALF_Z;
+}
+
+/** Where a body that fell from (x, z) is laid back on the Cornice: the first
+ *  spot of its floor clear of every gap, walking in from (x, z) toward the
+ *  Cornice's middle (so a corpse is never left in the void, where a
+ *  resurrection would drop it straight back into it). */
+export function voidCorpseSpot(x: number, z: number): { x: number; z: number } {
+  const dx = C.x - x;
+  const dz = C.z - z;
+  const d = Math.hypot(dx, dz);
+  if (d < 1e-6) return { x: C.x, z: C.z };
+  for (let t = 0; t <= d; t += 1) {
+    const px = x + (dx / d) * t;
+    const pz = z + (dz / d) * t;
+    if (inBreathArena(px, pz) && !gapAt(px, pz)) return { x: px, z: pz };
+  }
+  return { x: C.x, z: C.z };
+}
+
 /** Is (x, z) near the Cornice at all (its floor, its gaps, the void past
  *  its rim as far as a fall's momentum carries a body): where a body that
  *  fell is the fight's to count. */
@@ -63,7 +97,9 @@ export function pinnedAgainstRim(x: number, z: number, heading: number): boolean
  *  wherever it walked to once it landed. */
 export function fellFromCornice(x: number, z: number, y: number, onGround: boolean): boolean {
   if (y < F.voidHeight + 3) return true;
-  return nearCornice(x, z) && onGround && y < C.h - T.voidDepth;
+  // Landed short of the void, but far below the Cornice: only in this
+  // claim's own band (the next slot's floors lie within this reach).
+  return inClaimBand(z) && nearCornice(x, z) && onGround && y < C.h - T.voidDepth;
 }
 
 /** Where Thessaly's circle lands: `reach` yards upwind of the guardian (the

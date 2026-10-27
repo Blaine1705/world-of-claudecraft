@@ -163,7 +163,9 @@ describe('Guardian of the Breath: the push, the rim and the gaps', () => {
     f.dev('/dev heart breath blow 180');
     const ev = until(f, () => victim.dead, 12);
     expect(victim.dead).toBe(true);
-    expect(victim.pos.y).toBeLessThan(SMITH_HEART_FIELD.voidHeight + 3);
+    // Its body is laid back on the floor by the gap (breath_void.ts), so a
+    // resurrection never lands it in the void again.
+    expect(victim.pos.y).toBeGreaterThan(BREATH.cornice.h - 1);
     // Said once, with the place it went over.
     const warn = ev.filter(
       (e) =>
@@ -195,8 +197,10 @@ describe('Guardian of the Breath: the push, the rim and the gaps', () => {
   // through a gap, did not die on the void's floor, and the guardian walked
   // down after him. Invulnerability swallowed the fall's damage, and nothing
   // held the guardian to its Cornice.
-  it('the void kills whatever shields the body: god mode, a GM, in the fight and out of it', () => {
-    for (const shield of ['devGod', 'gm', 'none'] as const) {
+  it('the void kills whatever shields the body: god mode or none, in the fight and out of it', () => {
+    // (A real game master is set back on the floor instead:
+    // tests/smith_heart_breath_void.test.ts.)
+    for (const shield of ['devGod', 'none'] as const) {
       for (const gap of CORNICE_GAPS) {
         for (const pull of [true, false]) {
           const f = breathFight(2, 23);
@@ -209,7 +213,6 @@ describe('Guardian of the Breath: the push, the rim and the gaps', () => {
           walker.maxHp = 1200;
           walker.hp = 1200;
           if (shield === 'devGod') walker.devGod = true;
-          if (shield === 'gm') walker.gm = true;
           const a = (gap.deg * Math.PI) / 180;
           f.put(walker, gap.x - Math.sin(a) * 4, gap.z - Math.cos(a) * 4);
           walker.facing = a;

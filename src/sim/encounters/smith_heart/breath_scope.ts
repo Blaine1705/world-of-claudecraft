@@ -14,7 +14,7 @@ import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import type { Entity } from '../../types';
 import { pickMarkTargets, startBar } from '../sunken_bastion/claim';
-import { inBreathArena } from './breath_geometry';
+import { inBreathArena, inClaimBand } from './breath_geometry';
 import { BREATH_AURAS, type BreathDifficultyRules } from './breath_ids';
 import type { BreathFightState } from './breath_state';
 import { local } from './fight_kit';
@@ -57,7 +57,12 @@ export function cornicePlayers(ctx: SimContext, inst: InstanceSlot): Entity[] {
 
 /** Every player of the claim near the Cornice (alive or not): who hears the
  *  fight's warnings and lines. */
-export function corniceListeners(ctx: SimContext, inst: InstanceSlot): Entity[] {
+
+/** Every player within the Cornice's reach in any band (a body that fell
+ *  north out of a gap can drift past this band's edge): who the void may
+ *  claim (breath_void.ts; the void's own rule keeps the neighbours' floors
+ *  safe). */
+export function voidCandidates(ctx: SimContext, inst: InstanceSlot): Entity[] {
   const o = ctx.instanceOriginOf(inst);
   const out: Entity[] = [];
   for (const meta of ctx.players.values()) {
@@ -65,6 +70,21 @@ export function corniceListeners(ctx: SimContext, inst: InstanceSlot): Entity[] 
     if (!e) continue;
     const d = Math.hypot(e.pos.x - o.x - BREATH.cornice.x, e.pos.z - o.z - BREATH.cornice.z);
     if (d <= 120) out.push(e);
+  }
+  return out.sort((a, b) => a.id - b.id);
+}
+export function corniceListeners(ctx: SimContext, inst: InstanceSlot): Entity[] {
+  const o = ctx.instanceOriginOf(inst);
+  const out: Entity[] = [];
+  for (const meta of ctx.players.values()) {
+    const e = ctx.entities.get(meta.entityId);
+    if (!e) continue;
+    const lx = e.pos.x - o.x;
+    const lz = e.pos.z - o.z;
+    // Near the Cornice and in this claim's own band: the next slot's south
+    // end lies within 120 yd of this one's Cornice.
+    if (!inClaimBand(lz)) continue;
+    if (Math.hypot(lx - BREATH.cornice.x, lz - BREATH.cornice.z) <= 120) out.push(e);
   }
   return out.sort((a, b) => a.id - b.id);
 }
