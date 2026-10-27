@@ -4168,13 +4168,13 @@ export const VISUALS: Record<string, VisualDef> = {
   // (smith_heart_fx/final_fx.ts) until its own model ships. Bound off the
   // goleling's rig (never seen); its height times the boss's scale (3.6) is
   // the colossus's, so the nameplate rides over its head. Every Smith's Heart
-  // bodyless target binds the rig's own FLOATING clips: the elemental attack
-  // lives in a separate donor GLB (ELEMENTAL_FLOATING) that a body nobody
-  // sees has no reason to load.
+  // bodyless target binds ELEMENTAL_FLOATING, so each carries mob_elemental's
+  // Elemental_Attack donor (already loaded for the raid's elemental warders).
   smith_heart_colossus: {
     url: `${CREATURES}/golelingevolved.glb`,
     height: 5.6,
-    clips: FLOATING,
+    clips: ELEMENTAL_FLOATING,
+    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
     bodyless: true,
     clickRadius: 4.4,
   },
@@ -4187,14 +4187,16 @@ export const VISUALS: Record<string, VisualDef> = {
   smith_heart_slabwright: {
     url: `${CREATURES}/golelingevolved.glb`,
     height: 2.15,
-    clips: FLOATING,
+    clips: ELEMENTAL_FLOATING,
+    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
     bodyless: true,
     clickRadius: 1.4,
   },
   smith_heart_seam_singer: {
     url: `${CREATURES}/golelingevolved.glb`,
     height: 2.5,
-    clips: FLOATING,
+    clips: ELEMENTAL_FLOATING,
+    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
     bodyless: true,
     clickRadius: 1.0,
   },
@@ -4207,7 +4209,8 @@ export const VISUALS: Record<string, VisualDef> = {
   smith_heart_breath_guardian: {
     url: `${CREATURES}/golelingevolved.glb`,
     height: 2.0,
-    clips: FLOATING,
+    clips: ELEMENTAL_FLOATING,
+    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
     bodyless: true,
     clickRadius: 1.6,
   },
@@ -4220,7 +4223,8 @@ export const VISUALS: Record<string, VisualDef> = {
   smith_heart_quench_guardian: {
     url: `${CREATURES}/golelingevolved.glb`,
     height: 2.3,
-    clips: FLOATING,
+    clips: ELEMENTAL_FLOATING,
+    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
     bodyless: true,
     clickRadius: 1.6,
   },
@@ -4232,7 +4236,8 @@ export const VISUALS: Record<string, VisualDef> = {
   smith_heart_heat_guardian: {
     url: `${CREATURES}/golelingevolved.glb`,
     height: 2.4,
-    clips: FLOATING,
+    clips: ELEMENTAL_FLOATING,
+    animUrls: [`${CREATURES}/elemental_ability_anims.glb`],
     bodyless: true,
     clickRadius: 1.7,
   },
