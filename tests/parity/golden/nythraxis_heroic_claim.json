@@ -775,7 +775,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1021,
-      "state": "9c9584c5",
+      "state": "9b991258",
       "events": "a82dd91b",
       "rng": {
         "draws": 19,
@@ -2139,6 +2139,7 @@
             "x": 103300,
             "z": -1154
           },
+          "spiritBombRaidPullStarted": true,
           "stats": {
             "armor": 1058
           },
@@ -2156,7 +2157,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 1021,
-      "state": "9c9584c5",
+      "state": "9b991258",
       "events": "741638a5",
       "rng": {
         "draws": 19,
@@ -3520,6 +3521,7 @@
             "x": 103300,
             "z": -1154
           },
+          "spiritBombRaidPullStarted": true,
           "stats": {
             "armor": 1058
           },

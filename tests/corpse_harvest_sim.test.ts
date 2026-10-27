@@ -2562,7 +2562,8 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // tests/gathering.test.ts. Plus buddy_sprites, the flame-sprite pair: 300.
     // Retiring buddy_sapling leaves 299. Zulgar's Hunting Spear is an encounter
     // object without harvest components, bringing the merged roster to 300.
-    expect(Object.keys(MOBS).length - tagged.length).toBe(300);
+    // The four Halloween encounter templates are untagged too.
+    expect(Object.keys(MOBS).length - tagged.length).toBe(304);
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(

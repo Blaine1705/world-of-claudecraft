@@ -1037,6 +1037,16 @@ export const vi_VN: EnTranslations = {
       "fateThreadsConsumeReady": "Ba Sợi Định Mệnh: Nuốt Chửng có thể dệt chúng thành Kết Án bổ sung.",
       "fateThreadsSentenceReady": "Ba Sợi Định Mệnh: Phán Quyết có thể tiêu thụ chúng để tăng 18% sát thương."
     },
+    "priest": {
+      "gloomtitheLabel": "Gloomtithe",
+      "bombLabel": "Tithe Bomb",
+      "gloomtitheStatus": "{value} of {max} Gloomtithe",
+      "bombStatus": "{value} of {max} Tithe Bomb charges",
+      "bombReady": "Ready",
+      "chargeCount": "{value} / {max}",
+      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
+      "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
+    },
     "procOverlay": {
       "soulFragmentsMeter": "Mảnh Linh Hồn",
       "ruinMeter": "Wrack",
@@ -2590,6 +2600,7 @@ export const vi_VN: EnTranslations = {
       "name_lantern_hall_destrier": "Chiến Mã Sảnh Đèn Lồng",
       "name_chimeglass_tortoise": "Tolliver chiếc cốc thủy tinh",
       "name_rickshaw_mount": "Xe kéo Buộc Xương",
+      "name_emberbristle_broom": "Emberbristle Broom",
       "name_wobbles_slime": "Slime Lắc Lư",
       "name_nightwing_chimera": "Chimera Cánh Đêm",
       "desc_valorsteed": "Một con tuấn mã khỏe, bước vững, mang yên da.",
@@ -2613,7 +2624,8 @@ export const vi_VN: EnTranslations = {
       "desc_lantern_hall_destrier": "Chiến mã Sảnh Đèn Lồng, giáp gỗ sồi và sắt dưới sắc xanh bang hội, hai đèn bão đung đưa trên yên soi đường về nhà.",
       "desc_nightwing_chimera": "Phi long chạng vạng hai đầu từ những cành cổ thụ, nghỉ trên đôi chân sau có vuốt và lướt trên mặt đất bằng cánh khắc bí thuật.",
       "desc_chimeglass_tortoise": "Một con rùa bằng muối đã vượt qua ba thế hệ đoàn lữ hành. Những người thợ hàn mài cho anh ta một cặp kính từ kính bão và treo một chiếc chuông đồng vào cổ anh ta, để con đường nghe thấy anh ta từ rất lâu trước khi nó nhìn thấy anh ta.",
-      "desc_rickshaw_mount": "Một cỗ xe xương lọc cọc, với một tên lính xương xẩu bị buộc vào càng xe, kéo bạn lao đi hết tốc lực."
+      "desc_rickshaw_mount": "Một cỗ xe xương lọc cọc, với một tên lính xương xẩu bị buộc vào càng xe, kéo bạn lao đi hết tốc lực.",
+      "desc_emberbristle_broom": "A harvest broom bound with orange ribbon that hovers a hand above the ground, shedding embers from its bristles. A permanent reward from Gourdlight Eve."
     },
     "mountTraining": {
       "mountPrompt": "Nhấn {key} để cưỡi Valorsteed huấn luyện.",
@@ -4662,6 +4674,10 @@ export const vi_VN: EnTranslations = {
       }
     },
     "auraEffect": {
+      "gourdlight": {
+        "thatchbound": "Old Thatchgrin pulls your strings. You cannot act: you are walked to your nearest ally and strike them every {every} sec for {min} to {max} damage (up to {mult} times as much against a level {level} ally). Ends early when you take damage equal to {pct}% of your maximum health, or when an ally dispels it (Magic)."
+      },
+      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
       "wildheart": {
         "packBond": "Chịu ít hơn {pct}% sát thương khi bạn đồng hành đứng gần. Kéo Thầy Thú và báo đốm của hắn ra xa nhau để phá.",
         "packBondFury": "Gây thêm {pct}% sát thương khi bạn đồng hành đứng gần.",
@@ -4765,6 +4781,7 @@ export const vi_VN: EnTranslations = {
       "spellHaste": "Tăng tốc độ thi triển phép thêm {pct}%",
       "sated": "Không thể hưởng thêm hiệu ứng tăng tốc nhóm khác",
       "cauterizeFatigue": "Thiêu Đốt không thể ngăn một đòn chí mạng khác",
+      "seasonalCosmetic": "Cosmetic only: no effect on combat",
       "castShield": "Việc niệm chú không thể bị ngắt quãng hoặc làm chậm bởi sát thương",
       "dmgDone": "Tăng sát thương gây ra lên {pct}%",
       "dmgDoneReduce": "Giảm sát thương gây ra đi {pct}%",
@@ -4912,6 +4929,7 @@ export const vi_VN: EnTranslations = {
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "damageReduction": "Giảm {pct}% toàn bộ sát thương nhận vào",
       "slumber": "Ngủ đến bình minh. Không thể bị tấn công và sẽ không thức giấc vì bất kỳ ai.",
+      "slumberNight": "Hangs lifeless on his pole until nightfall. Cannot be attacked.",
       "guardianWard": "Đòn chí mạng tiếp theo của kẻ địch thay vào đó hồi bạn lên {pct}% máu",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
@@ -4991,7 +5009,8 @@ export const vi_VN: EnTranslations = {
     "worldBoss": {
       "spawn": "{name} trỗi dậy trên {zone}!",
       "wake": "{name} thức giấc trên {zone}!",
-      "sleep": "{name} ngủ đến bình minh."
+      "sleep": "{name} ngủ đến bình minh.",
+      "sleepUntilNightfall": "{name} sleeps until nightfall."
     },
     "auth": {
       "appleLoginCta": "Tiếp Tục với Apple",
@@ -8253,6 +8272,107 @@ export const vi_VN: EnTranslations = {
       }
     }
   },
+  "seasonal": {
+    "pumpkins": {
+      "name": "Haunted Pumpkin",
+      "title": "Haunted Pumpkins",
+      "world": "World",
+      "progress": "{label}: {current}/{total}",
+      "found": "You light a Haunted Pumpkin in {zone}: {count}/{total}. Gourdlight Sweets received: {sweets}.",
+      "flash": "Haunted Pumpkin found! {count}/{total}"
+    },
+    "event": {
+      "gourdlight_eve": {
+        "name": "Gourdlight Eve"
+      }
+    },
+    "trickOrTreat": {
+      "row": "Trick or treat!",
+      "rowAria": "Say trick or treat to {name}",
+      "knockedHint": "You already knocked here today. The door opens again after the daily reset.",
+      "treat": "{name} hands you a treat.",
+      "trick": "{name} plays a trick on you: {trick}!",
+      "alreadyKnocked": "You already trick-or-treated {name} today.",
+      "notActive": "Gourdlight Eve is not running right now.",
+      "tooFar": "Step closer to knock.",
+      "treatFlash": {
+        "one": "Treat! {count} Gourdlight Sweet",
+        "few": "Treat! {count} Gourdlight Sweets",
+        "many": "Treat! {count} Gourdlight Sweets",
+        "other": "Treat! {count} Gourdlight Sweets"
+      },
+      "trickFlash": "Trick! {trick}"
+    },
+    "tricks": {
+      "gourdlight_trick_bat": "Batty",
+      "gourdlight_trick_skeleton": "Rattled Bones",
+      "gourdlight_trick_fumes": "Green Fumes",
+      "gourdlight_trick_strawling": "Strawling Guise",
+      "gourdlight_costume_skeleton": "Skeleton Costume",
+      "gourdlight_costume_ghost": "Ghost Costume",
+      "gourdlight_costume_bat": "Bat Costume"
+    },
+    "pumpkinHead": {
+      "on": "You put on the Carved Pumpkin Head.",
+      "off": "You take off the Carved Pumpkin Head."
+    },
+    "jarTrick": "The jar pops open: {trick}!",
+    "guise": "The charm crackles and the straw climbs over you: {trick}!",
+    "costume": "You drink the draught and change: {trick}!",
+    "titleGranted": "You read the writ. New title earned: {title}.",
+    "titleKnown": "You already hold that title, so you keep the writ.",
+    "boundItemGone": "Gourdlight Eve is over, and your {item} crumbles back into straw.",
+    "itemUse": {
+      "pumpkinHead": "Use: Put on or take off a carved pumpkin lit from inside, worn over your helmet. Cosmetic.",
+      "trickJar": "Use: Plays a random harmless trick on you for a few seconds. Cosmetic.",
+      "pouch": "Use: Open it to receive {count} Gourdlight Sweets.",
+      "strawlingCharm": "Use: Become one of Old Thatchgrin's strawlings for {seconds} seconds. Not in combat. Never consumed. Cosmetic.",
+      "sweet": "Earned by trick-or-treating during Gourdlight Eve. Hester Gourdwick trades cosmetics for them at her stalls in Eastbrook, Fenbridge and Highwatch.",
+      "costumeSkeleton": "Use: Turn into a rattling skeleton for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Cosmetic.",
+      "costumeGhost": "Use: Turn into a drifting ghost for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Cosmetic.",
+      "costumeBat": "Use: Turn into a flapping bat for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Cosmetic.",
+      "toyPrank": "Use: Throw it at another visible player within {range} yards. Their head becomes a glowing jack-o'-lantern for {seconds} seconds, and they can right-click it off. Neither of you can be in combat, and you cannot be stealthed. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
+      "toyLantern": "Use: Set the lantern down in front of you. A small ghost circles you for {seconds} seconds. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
+      "toyBats": "Use: Open the sack. A squeaking swarm of bats bursts out and scatters around you for {seconds} seconds. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
+      "toyCandleShadows": "Use: Light the candle in front of you. For {seconds} seconds its flames throw dancing shadows of a cat, a bat and a witch onto the ground around it, for everyone nearby to see. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
+      "toyCauldron": "Use: Set a big bubbling cauldron down in front of you. It stands for {standing} seconds, and any player who drinks from it bursts in green bubbles and turns into a goblin for {seconds} seconds, replacing any costume they wear. Neither setting it down nor drinking works in combat or while stealthed, and entering combat ends the goblin form. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
+      "titleWrit": "Use: Earn the title {title} for this character, worn from the Book of Deeds. Consumed. Kept if you already hold the title.",
+      "broomSources": "Bought from Hester Gourdwick for {count} Emberwoven Sheaves, or, rarely, dropped by Old Thatchgrin on a day you loot him. Riding it requires the riding skill. Kept permanently and rideable year-round.",
+      "sheaf": "Old Thatchgrin gives one each day you loot him, until you own the Emberbristle Broom. Hester Gourdwick trades {count} for the broom at her stalls in Eastbrook, Fenbridge and Highwatch. Unspent sheaves are kept for the next Gourdlight Eve."
+    },
+    "toy": {
+      "prank": "You throw the pumpkin. It splats onto {name}!",
+      "lantern": "You set the lantern down, and a little ghost drifts out to keep you company.",
+      "bats": "You open the sack, and a swarm of startled bats bursts out!",
+      "candleShadows": "You light the candle, and shadows begin to dance around its flames.",
+      "cauldron": "You set the cauldron down, and it starts to bubble.",
+      "cauldronDrink": "You drink from the cauldron, burst in green bubbles and turn into a goblin!",
+      "pranked": "{name} splats a pumpkin on your head! Right-click it off, or wear it proudly.",
+      "prankedFlash": "Pranked by {name}!",
+      "prankNeedsPlayer": "The pumpkin only splats on another player who is not in combat.",
+      "hidden": "Step out of the shadows first: a toy would give you away."
+    },
+    "itemSource": {
+      "pumpkinHead": "Dropped by Old Thatchgrin, in his pumpkin field past Boar Meadow, the first time you loot him. No vendor sells it."
+    },
+    "boo": {
+      "row": "Boo!",
+      "rowAria": "Leap out at {name} and shout boo",
+      "needsCostume": "Put on a costume first: a costume draught, a bat or skeleton trick, the Strawling Charm, the Carved Pumpkin Head or a goblin sip from the Gurglegreen Cauldron.",
+      "frightenedHint": "{name} is still jumpy from your last fright. Find someone else.",
+      "landed": "You leap out at {name} with a BOO! They shriek and nearly drop everything.",
+      "flash": "BOO! {name} is frightened!",
+      "noCostume": "Without a costume, {name} only laughs at you. Put one on first.",
+      "already": "{name} has had enough frights for one day.",
+      "notOnErrand": "Hester has not asked you to frighten anyone today."
+    },
+    "tokenPrice": "{count} {item}",
+    "thatchgrin": {
+      "poleBound": "Pole-Bound",
+      "wakeYell": "NIGHT falls on the patch! Who walks in MY field?",
+      "sleepYell": "Sun is up. Back on the post, back to watching."
+    }
+  },
   "dungeonGuide": {
     "drownedTemple": {
       "greet": {
@@ -9547,6 +9667,7 @@ export const vi_VN: EnTranslations = {
       "framesGovernedTalkingHead": "Chỉnh sửa Khung cũng nới lỏng bảng Đối thoại, bảng này mang lời thoại của NPC trong khi NPC đó nằm ngoài tầm nhìn của bạn; nó đeo chip tên khi nó bị lỏng.",
       "framesGovernedShardpike": "Sửa Khung cũng mở khóa thanh Thương Mảnh Vỡ, hàng ngắn gồm thao tác công cụ nhiệm vụ cạnh thanh hành động chỉ khi bạn mang thương. Khi mở khóa nó có nhãn tên, để bạn đặt trước trận thay vì trong trận.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
+      "framesGovernedPriest": "Edit Frames also lets you move the Shadow priest's Gloomtithe and Tithe Bomb medallion.",
       "framesGovernedResourceAndHill": "Bật Tách thanh tài nguyên trong thẻ Khung để Chỉnh Sửa Khung cũng mở khóa thanh tài nguyên, cho phép đặt thanh năng lượng phép, năng lượng hoặc nộ riêng ở bất kỳ đâu. Chiều rộng thanh tài nguyên và Chiều cao thanh tài nguyên trong cùng thẻ sẽ điều chỉnh kích thước của thanh. Chỉnh Sửa Khung cũng mở khóa thanh Vua của Đồi. Độ đục nền Vua của Đồi trong thẻ đó làm mờ nền bảng trong khi chữ vẫn rõ ràng.",
       "barsTitle": "Các thanh, bộ đếm giờ, và chữ chiến đấu",
       "barsBody": "Thanh niệm chú của bạn xuất hiện giữa màn hình, ngay phía trên thanh kỹ năng, bất cứ khi nào bạn niệm hoặc duy trì một phép, và hiển thị tên phép cùng thời gian còn lại. Mục tiêu của bạn cũng có thanh niệm chú riêng trên khung của nó, để bạn biết điều gì sắp xảy ra và đối phó kịp thời.\n\nMột thanh vung đòn mảnh nằm dưới thanh niệm chú và đầy dần giữa hai lần vung vũ khí, để một người đánh cận chiến hay tầm xa biết khi nào đòn đánh tự động tiếp theo sẽ trúng.\n\nThanh kinh nghiệm của bạn chạy suốt chiều rộng bên dưới thanh kỹ năng, chia thành từng đoạn, với một dải sáng hơn cho biết lượng kinh nghiệm nghỉ ngơi bạn đã tích lũy.\n\nBơi xuống dưới nước và một thanh hơi thở màu xanh sẽ xuất hiện ở đầu màn hình. Nó cạn dần khi đầu bạn còn ở dưới nước, chớp đỏ khi cạn hết và bạn bắt đầu chết đuối, rồi đầy lại nhanh chóng ngay khi bạn nổi lên mặt nước. Phím Nhảy đưa bạn bơi lên, còn phím Bơi Xuống, mặc định là Ctrl, đưa bạn xuống sâu hơn.\n\nSát thương và hồi máu bay lên trên bất cứ thứ gì chúng vừa tác động, dưới dạng những con số nhỏ, để bạn có thể đọc hiểu một trận đánh mà không cần đọc chữ. Tab Chiến Đấu trong khung trò chuyện của bạn giữ lại toàn bộ ghi chép bằng văn bản.",
@@ -10451,6 +10572,7 @@ export const vi_VN: EnTranslations = {
       "hillBodyRamp": "Cứ mỗi hai giờ, một ngọn đồi xuất hiện tại Vùng Đất Rồng, Đỉnh Sương Giá hoặc Xứ Thu Hổ Phách. Toàn vương quốc nhận cảnh báo trước mười lăm phút và vòng tròn được đánh dấu trên đất trống. Ngọn đồi hoạt động trong ba mươi phút. Bước vào vòng tròn đang hoạt động sẽ bật cờ PvP Thế Giới theo quy tắc cấp độ thông thường, kể cả với thành viên nhóm đột kích. Tổ đội có nhiều người chơi đủ điều kiện nhất bên trong sẽ chiếm ngọn đồi sau một phút duy trì ưu thế số lượng liên tục; người chơi một mình được tính là tổ đội một người, nhưng thành viên nhóm đột kích và người chơi chưa đạt cấp độ yêu cầu của PvP không thể chiếm đồi hoặc nhận Danh dự từ đồi. Mỗi người thuộc tổ đội kiểm soát đang đứng bên trong nhận Danh dự với tốc độ tăng dần. Phần thưởng được trao thường xuyên hơn và tăng nhanh hơn, giữ nguyên tổng Danh dự của sự kiện bốn mươi lăm phút trước đây. Khi quyền kiểm soát đổi chủ, mức thưởng bắt đầu tăng lại từ đầu. Rời vòng tròn vẫn giữ cờ bật; /pvp off áp dụng thời gian chờ năm phút thông thường và không thể hoàn tất bên trong ngọn đồi đang hoạt động hoặc trong lúc chiến đấu. Thanh ngọn đồi hiển thị quyền kiểm soát, số người và tiến độ chiếm giữ; /hill cho biết vị trí của đồi.",
       "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "hillBodyFlat": "Cứ mỗi ba giờ, vào một thời điểm không thể đoán trước, toàn cõi được thông báo rằng một ngọn đồi sẽ xuất hiện tại một trong các vùng phía bắc sau mười lăm phút, và vòng tròn của nó được đánh dấu trên đất trống. Đồi tồn tại bốn mươi lăm phút rồi biến mất. Trong thời gian đó, cứ năm phút lại thông báo vị trí và các nhóm có tổng thời gian chiếm giữ lâu nhất. Nhóm có nhiều người chơi đứng trong vòng tròn nhất tranh giành đồi và chiếm được sau tổng cộng ba mươi giây hơn quân số. Nhóm đối thủ bước vào chỉ tạm dừng bộ đếm cho đến khi nhóm bạn lại dẫn đầu; bộ đếm chỉ bắt đầu lại nếu không còn thành viên nào của nhóm bạn sống trong vòng tròn. Người chơi đơn lẻ được tính là nhóm một người và giữ nguyên quyền kiểm soát đồi khi lập nhóm, nhưng thành viên tổ đội đột kích hoàn toàn không được tính. Mỗi thành viên của nhóm đang giữ đồi đứng trong vòng tròn nhận cùng một lượng Danh Dự mỗi phút, bất kể đã giữ đồi bao lâu. Một nhóm đủ người giữ đồi không bị tranh chấp suốt thời gian tồn tại nhận xấp xỉ ba trận thắng chiến trường. Khi đồi biến mất, nếu nhóm có tổng thời gian giữ lâu nhất đã giữ ít nhất mười phút, mọi người đã đứng trong vòng tròn ít nhất một phút trong thời gian nhóm đó giữ đồi và vẫn thuộc nhóm đó đều nhận một trận thắng cho hàng PvP của Kho Tuần. Thanh phía trên bãi đấu hiển thị bên đang giữ, quân số hai bên và bộ đếm chiếm giữ; nhập /hill trong trò chuyện để biết vị trí.",
+      "hillBodyTwoHour": "Once every two hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the northern zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for thirty minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns the same Honor every minute, however long they have held it, so a full party holding an uncontested hill for its whole stand earns about as much as two battleground wins. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "limitsBodyRaids": "Đánh bại cùng một người chơi lại và lại trả ít hơn mỗi lần và sớm không gì cả, và số lượng của bạn chống lại người chơi đó chỉ bắt đầu lại khoảng một giờ sau những vết sưng đầu tiên của những vết sưng đó, vì vậy cắm trại một nạn nhân không bao giờ đáng chờ đợi. Một mục tiêu xa dưới cấp độ của bạn trả không gì cả. Các sân vận động chiến đấu và Arena chạy các quy tắc riêng của họ trong khi bạn ở bên trong chúng, và họ trả nhiều Danh dự hơn thế giới mở, vì vậy chiến tranh thế giới là con đường chậm hơn đến cùng một người bán hàng. Đột kích không kiếm được gì từ vết sưng thế giới: một thành viên đột kích không lấy Danh dự hoặc vàng và không làm nhỏ lại chia sẻ của bất kỳ ai khác, vì vậy hãy chiến đấu như một bên để được trả tiền."
     },
     "thornhollowPage": {
@@ -15192,6 +15314,7 @@ export const vi_VN: EnTranslations = {
       "accountSuspended": "Tài khoản này bị đình chỉ đến {date}.",
       "alreadyInWorld": "Nhân vật đã ở trong thế giới.",
       "accountSessionLimit": "Quá nhiều nhân vật trên tài khoản này đã ở trong thế giới.",
+      "worldFightHold": "Another character on this account is still in the world after a fight. Try again in a few minutes.",
       "takenOver": "Nhân vật của bạn đã bị một phiên khác chiếm quyền.",
       "vaultMailRecovering": "Khôi phục thư từ hộc.",
       "renameBeforeEntering": "Nhân vật này phải được đổi tên trước khi vào thế giới.",
@@ -18052,6 +18175,18 @@ export const vi_VN: EnTranslations = {
         "name": "Kinh Cầu Thống Khổ",
         "description": "Dồn phép trong 3 giây, gây {damage} sát thương Bóng Tối mỗi giây. Sát thương tăng theo Sức Mạnh Phép Thuật."
       },
+      "vampiric_touch": {
+        "name": "Vampiric Touch",
+        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
+      },
+      "void_rupture": {
+        "name": "Void Rupture",
+        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+      },
+      "spirit_bomb": {
+        "name": "Tithe Bomb",
+        "description": "Detonate a spirit bomb on an enemy, dealing {damage} Shadow damage to enemies within 8 yards of that target. Damage increases with Spell Power, can critically strike, and is reduced beyond 5 targets. Generate 20 Gloomtithe to prepare one bomb. Generation counts even while holding the maximum 5 Gloomtithe; spending charges is not required and adds no progress. Progress lasts between fights, up to one prepared bomb. Dying clears your progress and prepared bomb. Completing the cast consumes the prepared bomb, even if resisted. Cancellation or interruption preserves it. Starting a raid boss encounter clears your progress and prepared bomb. Cannot open a raid boss encounter with this spell."
+      },
       "flash_heal": {
         "name": "Lời Nguyện Khẩn Cấp",
         "description": "Hồi {damage} máu cho một mục tiêu đồng minh. Lượng hồi tăng theo Sức Mạnh Phép Thuật."
@@ -18885,7 +19020,8 @@ export const vi_VN: EnTranslations = {
       },
       "inner_focus": {
         "name": "Tâm Trí Tĩnh",
-        "description": "Khiến phép tu sĩ kế tiếp của bạn miễn phí và không thể bị ngắt. Kéo dài 60 giây."
+        "description": "Khiến phép tu sĩ kế tiếp của bạn miễn phí và không thể bị ngắt. Kéo dài 60 giây.",
+        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
       },
       "innervate": {
         "name": "Nhựa Sống",
@@ -19082,7 +19218,8 @@ export const vi_VN: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Hợp Xướng Giải Thoát",
-        "description": "Vận phép trong 6 giây, hồi máu cho các thành viên trong nhóm trong phạm vi 30 mét {damage} mỗi 2 giây. Lượng hồi tăng theo sức mạnh phép thuật."
+        "description": "Vận phép trong 6 giây, hồi máu cho các thành viên trong nhóm trong phạm vi 30 mét {damage} mỗi 2 giây. Lượng hồi tăng theo sức mạnh phép thuật.",
+        "specNote_shadow": "For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Shadowform. Absorbed damage and overkill do not add healing."
       },
       "bear_charge": {
         "name": "Cú Lao Bruin",
@@ -24297,6 +24434,87 @@ export const vi_VN: EnTranslations = {
       "vanguard_pendant_of_mending": {
         "name": "Mặt Dây Tiền Phương Chữa Lành"
       },
+      "gourdlight_sweet": {
+        "name": "Gourdlight Sweet"
+      },
+      "gourdlight_treat_pouch": {
+        "name": "Gourdlight Treat Pouch"
+      },
+      "carved_pumpkin_head": {
+        "name": "Carved Pumpkin Head"
+      },
+      "jar_of_mischief": {
+        "name": "Jar of Mischief"
+      },
+      "thatchgrin_sweet_sack": {
+        "name": "Thatchgrin's Sweet Sack"
+      },
+      "strawling_charm": {
+        "name": "Strawling Charm"
+      },
+      "rattlebone_draught": {
+        "name": "Rattlebone Draught"
+      },
+      "haunting_draught": {
+        "name": "Haunting Draught"
+      },
+      "batwing_draught": {
+        "name": "Fluttering Draught"
+      },
+      "writ_of_the_gourdlit": {
+        "name": "Writ of the Gourdlit"
+      },
+      "writ_of_the_trickster": {
+        "name": "Writ of the Trickster"
+      },
+      "writ_of_the_hollow_grin": {
+        "name": "Writ of the Hollow Grin"
+      },
+      "reins_emberbristle_broom": {
+        "name": "Emberbristle Broom"
+      },
+      "hearthroot_toffee": {
+        "name": "Hearthroot Toffee"
+      },
+      "gourdseed_brittle": {
+        "name": "Gourdseed Brittle"
+      },
+      "crabapple_chew": {
+        "name": "Crabapple Chew"
+      },
+      "owlwatch_fudge": {
+        "name": "Owlwatch Fudge"
+      },
+      "lantern_mint_drop": {
+        "name": "Lantern Mint Drop"
+      },
+      "emberwoven_sheaf": {
+        "name": "Emberwoven Sheaf"
+      },
+      "prankers_pumpkin": {
+        "name": "Pranker's Pumpkin"
+      },
+      "wanderwisp_lantern": {
+        "name": "Wanderwisp Lantern"
+      },
+      "sack_of_startled_bats": {
+        "name": "Sack of Startled Bats"
+      },
+      "murmurwick_candle": {
+        "name": "Murmurwick Candle"
+      },
+      "gurglegreen_cauldron": {
+        "name": "Gurglegreen Cauldron"
+      },
+      "thatchgrin_patch_pumpkin": {
+        "name": "Patch Pumpkin"
+      },
+      "cursed_candle_stub": {
+        "name": "Cursed Candle Stub"
+      },
+      "gourdlight_crow_feather": {
+        "name": "Gourdlight Crow Feather"
+      },
       "membership_staff": {
         "name": "Trượng Biến Đổi"
       },
@@ -25853,6 +26071,18 @@ export const vi_VN: EnTranslations = {
       "muster_effigy": {
         "name": "Đốc Công Rơm"
       },
+      "gourdlight_thatchgrin": {
+        "name": "Old Thatchgrin"
+      },
+      "gourdlight_crow": {
+        "name": "Gourdlight Crow"
+      },
+      "gourdlight_strawling": {
+        "name": "Strawling"
+      },
+      "gourdlight_swelling_gourd": {
+        "name": "Swelling Gourd"
+      },
       "stable_horse": {
         "name": "Ngựa chuồng"
       },
@@ -26929,6 +27159,11 @@ export const vi_VN: EnTranslations = {
         "name": "Hester Quillby",
         "title": "Người Tạo Bản Đồ",
         "greeting": "Mọi bản đồ đầm này tôi mua đều sai chỉ sau một mùa. Nước dời lối, lối dời nước. Nên tôi tự vẽ, ngồi đây khô ráo chờ mực khô."
+      },
+      "gourdlight_keeper": {
+        "name": "Hester Gourdwick",
+        "title": "Gourdlight Keeper",
+        "greeting": "The gourds are lit and the lanterns are up, so it must be Gourdlight Eve. Knock on the doors of the townsfolk in Eastbrook, Fenbridge and Highwatch, and say the words: trick or treat. Most will hand you a sweet. A few will play a trick on you. Bring the sweets to me, at any of my stalls, and I will trade you something to wear."
       },
       "reeve_ottoline": {
         "name": "Xã Trưởng Ottoline",
@@ -29561,6 +29796,88 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Hồi máu thực tế cho Hình Nhân Hồi Máu"
+          }
+        }
+      },
+      "q_gourdlight_rounds": {
+        "title": "Gourdlight Rounds",
+        "text": "Every Gourdlight Eve the children of the Vale make their rounds, and this year you are joining them, {playerName}. Knock on five doors in our towns, say the words, and see what you are given. Come back to me when you are done.",
+        "completion": "Five doors and you still have all your fingers. Here, a pouch of sweets for the walk home. Come back tomorrow, the doors open again.",
+        "objectives": {
+          "0": {
+            "label": "Doors knocked on"
+          }
+        }
+      },
+      "q_gourdlight_daily_patch": {
+        "title": "Pumpkins from the Patch",
+        "text": "Old Thatchgrin's patch past Boar Meadow is fat with pumpkins, and half of them have rolled out past his straw where a careful soul can reach them. Bring me five, {playerName}. Stay wide of the old scarecrow himself. He counts every one.",
+        "completion": "Five round ones, and not a bite out of any. That is pie for the whole Vale. Here, for your trouble.",
+        "objectives": {
+          "0": {
+            "label": "Patch Pumpkins"
+          }
+        }
+      },
+      "q_gourdlight_daily_boo": {
+        "title": "Boo!",
+        "text": "Nobody in these towns has had a proper fright in a year, {playerName}, and a Gourdlight Eve without one is just a cold night. Put on a costume, any of mine will do, or that pumpkin head if you have earned one. Then creep up on three of the townsfolk and give them a good loud BOO.",
+        "completion": "Three of them? I heard the cook drop a pan from across the square. Well done. Here is your share.",
+        "objectives": {
+          "0": {
+            "label": "Townsfolk frightened"
+          }
+        }
+      },
+      "q_gourdlight_daily_wicks": {
+        "title": "Wicked Wicks",
+        "text": "Someone has been setting candles with green flames at the feet of our lamp posts. They burn without melting and they whisper when you turn your back. Snuff six of them for me, {playerName}, in any of the three towns, and bring me the stubs.",
+        "completion": "Six stubs, cold as frost. Whoever lit them will have to try harder than that. Take this, and wash your hands.",
+        "objectives": {
+          "0": {
+            "label": "Cursed candles snuffed"
+          }
+        }
+      },
+      "q_gourdlight_daily_towns": {
+        "title": "A Door in Every Town",
+        "text": "The children say a true Gourdlight walker knocks in every town before the night is out. Prove them right, {playerName}. Trick or treat at one door in Eastbrook, one in Fenbridge and one in Highwatch. The lanterns on the roads will light your way.",
+        "completion": "Three towns in one night! Your boots have earned this more than you have.",
+        "objectives": {
+          "0": {
+            "label": "A door knocked in Eastbrook"
+          },
+          "1": {
+            "label": "A door knocked in Fenbridge"
+          },
+          "2": {
+            "label": "A door knocked in Highwatch"
+          }
+        }
+      },
+      "q_gourdlight_daily_feathers": {
+        "title": "Feathers for the Fire",
+        "text": "When Old Thatchgrin is pressed, he calls his crows down on whoever is beating at his straw. Their feathers burn green in a hearth, and I need three for tonight's bonfire. Find a fight at his patch, {playerName}, and pluck them from his crows.",
+        "completion": "Black as a moonless field, and they smell of smoke already. The bonfire will be a sight. Thank you.",
+        "objectives": {
+          "0": {
+            "label": "Crow feathers"
+          }
+        }
+      },
+      "q_gourdlight_daily_baskets": {
+        "title": "Baskets for the Neighbours",
+        "text": "I fill a basket of sweets for an old friend in each town every Gourdlight Eve, and my knees are not what they were. Take them round for me, {playerName}: Cook Marlow in Eastbrook, Yara the herbalist in Fenbridge, and Loremaster Caddis up in Highwatch.",
+        "completion": "All three delivered, and I hear Marlow cried. He always cries. Here is a basket of your own.",
+        "objectives": {
+          "0": {
+            "label": "Basket left with Cook Marlow"
+          },
+          "1": {
+            "label": "Basket left with Yara the herbalist"
+          },
+          "2": {
+            "label": "Basket left with Loremaster Caddis"
           }
         }
       },

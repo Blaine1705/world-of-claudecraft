@@ -394,7 +394,16 @@ describe('isHarvestableCorpse', () => {
     // Retiring buddy_sapling leaves 299. Zulgar's Hunting Spear is an encounter
     // object without harvest components, bringing the merged roster to 300.
     expect(untagged).toContain(MOBS.wildheart_hunting_spear);
-    expect(untagged).toHaveLength(300);
+    // Thatchgrin, his strawling and crow adds, and the swelling gourd are
+    // encounter bodies without harvest components.
+    for (const id of [
+      'gourdlight_thatchgrin',
+      'gourdlight_strawling',
+      'gourdlight_crow',
+      'gourdlight_swelling_gourd',
+    ])
+      expect(untagged).toContain(MOBS[id]);
+    expect(untagged).toHaveLength(304);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

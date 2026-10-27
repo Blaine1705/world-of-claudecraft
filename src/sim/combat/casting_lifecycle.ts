@@ -3,6 +3,10 @@ import { courierSummon } from '../courier';
 import { gliderActionsLocked } from '../glider_action_lock';
 import { shadowActionsLocked } from '../shadow_action_lock';
 import { BENISON_WHISPER_AURA_ID } from './priest/benison_dawnweave';
+import { shadowPeriodicHit } from './priest/periodic_crit';
+import { spiritBombCastError } from './priest/spirit_bomb_cast';
+import { completeSpiritBomb } from './priest/spirit_bomb_completion';
+import { consumeRequiredAura, hasRequiredAura } from './required_aura';
 // Player cast lifecycle, extracted from the Sim monolith (C4a).
 //
 // This module owns how a cast STARTS (castAbility/castAbilityBySlot: the
@@ -146,7 +150,6 @@ import {
 import { naturesBoonArmedFor, naturesBoonPowerFor } from './druid_natures_boon';
 import { resolveDualPurposeTarget } from './dual_purpose_target';
 import {
-  consumeAuraKind,
   consumeFreeCostFor,
   consumeNextAttackCrit,
   consumeNextCastCheap,
@@ -225,6 +228,7 @@ import {
 import { paladinManaCostMultiplier } from './paladin_support';
 import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
 import { effectivePlayerAttackRange } from './player_attack_reach';
+import { reserveShadowStilledMind } from './priest/stilled_mind';
 import {
   duskhymnChannelStart,
   duskhymnChannelStopped,
@@ -1380,13 +1384,7 @@ export function castAbility(
   // committing the cast. Reuses the existing not-ready error literal so no new
   // client matcher is needed. requiresAuraStacks (Rimeneedle's full 5-stack
   // Icicles) additionally gates on the stack count.
-  if (
-    ability.requiresAuraKind &&
-    !p.auras.some(
-      (a) =>
-        a.kind === ability.requiresAuraKind && (a.stacks ?? 1) >= (ability.requiresAuraStacks ?? 1),
-    )
-  ) {
+  if (!hasRequiredAura(p, ability)) {
     ctx.error(p.id, 'That ability is not ready yet.');
     return;
   }
@@ -1766,6 +1764,12 @@ export function castAbility(
   }
   if ((ability.ruinCost ?? 0) > ruinAmount(p)) {
     ctx.error(p.id, 'Not enough Wrack!');
+    return;
+  }
+
+  const bombError = spiritBombCastError(ctx, p, target, ability);
+  if (bombError) {
+    ctx.error(p.id, bombError);
     return;
   }
 
@@ -2651,8 +2655,14 @@ function applyChannelTick(
         const completionDoom = isFinalConsumePulse
           ? afflictionDrainCompletionDoom(ctx, src, tgt)
           : 0;
-        const dmg = Math.round(ctx.rng.range(eff.min, eff.max) + channelSp);
-        ctx.dealDamage(src, tgt, dmg, false, res.def.school, res.def.name, 'hit');
+        const periodicHit = shadowPeriodicHit(
+          ctx,
+          src,
+          res.def.id,
+          Math.round(ctx.rng.range(eff.min, eff.max) + channelSp),
+        );
+        const dmg = periodicHit.amount;
+        ctx.dealDamage(src, tgt, dmg, periodicHit.crit, res.def.school, res.def.name, 'hit');
         if (doom > 0) gainDoom(ctx, src, doom);
         if (!src.dead) {
           const intended = Math.round(
@@ -2962,6 +2972,11 @@ function applyAbility(
     ctx.error(p.id, 'Not enough Soul Fragments!');
     return;
   }
+  const bombError = spiritBombCastError(ctx, p, target, ability);
+  if (bombError) {
+    ctx.error(p.id, bombError);
+    return;
+  }
   const necromancyError = necromancyCastError(ctx, p, ability);
   if (necromancyError) {
     ctx.error(p.id, necromancyError);
@@ -3025,7 +3040,10 @@ function applyAbility(
     ability.consumesRequiredAura !== false &&
     !res.effects.some((effect) => effect.type === 'afflictionSentence')
   ) {
-    consumeAuraKind(ctx, p, ability.requiresAuraKind);
+    if (!consumeRequiredAura(ctx, p, ability)) {
+      ctx.error(p.id, 'That ability is not ready yet.');
+      return;
+    }
   }
 
   // helpful spells never miss
@@ -3090,6 +3108,7 @@ function applyAbility(
     spendAbilityCost(ctx, p, meta, res, target);
     armAbilityCooldownWithReflection(ctx, p, meta, res, togglingOff);
     res = reserveRuinousBrandCopy(ctx, p, meta, target, res);
+    res = reserveShadowStilledMind(ctx, p, res);
     if (res.effects.some((effect) => effect.type === 'afflictionNeedle')) {
       completeNeedleOfFateCast(ctx, p, target);
     }
@@ -3170,6 +3189,7 @@ function applyAbility(
   spendAbilityCost(ctx, p, meta, res, target);
   armAbilityCooldownWithReflection(ctx, p, meta, res, togglingOff);
   res = reserveRuinousBrandCopy(ctx, p, meta, target, res);
+  res = reserveShadowStilledMind(ctx, p, res);
   // A shout announces itself: world-visible cue so the caster roars and the
   // shockwave ring reads for everyone nearby (renderer-only; no mechanic).
   if (ability.castFx && !togglingOff) {
@@ -3204,6 +3224,7 @@ function applyAbility(
   // An instant hostile spell (`projectile: false`) rolls the SAME resist a bolt
   // rolls on impact; only the delivery differs. Taunts are exempt here for the
   // reason they are exempt there: a resisted taunt silently breaks tanking.
+  completeSpiritBomb(ctx, p, meta, target, res);
   const instantResisted =
     target !== null &&
     ability.school !== 'physical' &&

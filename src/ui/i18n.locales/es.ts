@@ -20340,6 +20340,21 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'hudChrome.mapAtlas.resizeRailAria': 'Ancho de la barra lateral del mapa',
   'hudChrome.mapAtlas.resizeRailHint':
     'Arrastra para cambiar el tamaño de la barra lateral del mapa. Haz doble clic para restablecer.',
+  'entities.abilities.vampiric_touch.name': 'Toque vampírico',
+  'entities.abilities.vampiric_touch.description':
+    'Inflige {damage} de daño de Sombras durante 15 s, una vez cada 3 s. El daño aumenta con el poder con hechizos y los pulsos pueden ser críticos. Cada pulso reparte una sanación equivalente al 20% de la vida perdida por el enemigo entre tú y los miembros heridos de tu grupo a 30 yardas o menos; en una banda, solo recibe esta sanación tu subgrupo. Si tienes al menos 2 cargas de Diezmo sombrío, aplicar el efecto consume 2 para aumentar todo su daño un 30%.',
+  'hudChrome.priest.gloomtitheLabel': 'Diezmo sombrío',
+  'hudChrome.priest.bombLabel': 'Bomba del diezmo',
+  'hudChrome.priest.gloomtitheStatus': '{value} de {max} cargas de Diezmo sombrío',
+  'hudChrome.priest.bombStatus': '{value} de {max} cargas de Bomba del diezmo',
+  'hudChrome.priest.bombReady': 'Lista',
+  'hudChrome.priest.chargeCount': '{value} / {max}',
+  'hudChrome.priest.gloomtitheTooltip':
+    'Diezmo sombrío: hasta 5 cargas que puedes gastar. Toque vampírico consume 2 para infligir un 30% más de daño; Invocar Diezmademonio consume todas las cargas. Generar cargas también llena Bomba del diezmo, incluso cuando ya tienes las 5.',
+  'hudChrome.priest.bombTooltip':
+    'Bomba del diezmo: genera 20 cargas de Diezmo sombrío para preparar una bomba. Gastar Diezmo sombrío no aumenta el progreso. El progreso se conserva entre combates y después de morir. Se reinicia al comenzar un jefe de banda. Completar el lanzamiento consume la bomba; cancelarlo la conserva.',
+  'entities.abilities.choir_of_deliverance.specNote_shadow':
+    'Durante 15 s, reparte una sanación equivalente al 20% de la vida que pierden los enemigos por tu daño de Sombras entre los miembros heridos de tu grupo a 30 yardas o menos, incluido tú. En una banda, solo sana a tu subgrupo. Se lanza al instante y puedes seguir atacando en Velo Crepuscular. El daño absorbido y el daño que excede la vida restante no generan sanación.',
   'guide.worldPvpPage.hillBodyFlat':
     'Una vez cada tres horas, en un momento impredecible, se anuncia a todo el reino que dentro de quince minutos aparecerá una colina en una de las zonas del norte, y se marca su círculo en terreno abierto. Permanece cuarenta y cinco minutos y luego desaparece. Mientras permanece, cada cinco minutos se anuncian su ubicación y los grupos que la han controlado durante más tiempo en total. El grupo con más jugadores dentro del círculo disputa la colina y la captura tras acumular treinta segundos de superioridad numérica. La entrada de un grupo rival solo pausa el contador hasta que el tuyo vuelva a liderar; solo se reinicia si no queda ningún miembro vivo de tu grupo dentro. Un jugador solo cuenta como un grupo de uno y conserva la colina al formar un grupo, pero los miembros de banda no cuentan. Cada integrante del grupo que controla la colina y está dentro recibe la misma cantidad de Honor por minuto, sin importar cuánto lleve controlándola. Un grupo completo que la controle sin oposición durante toda su duración gana aproximadamente lo mismo que por tres victorias en campos de batalla. Cuando desaparece, si el grupo con el mayor tiempo total de control acumuló al menos diez minutos, todos los que estuvieron dentro durante al menos un minuto mientras ese grupo la controlaba y siguen en él reciben una victoria para la fila de JcJ de la Bóveda Semanal. Una barra sobre el terreno muestra quién la controla, los jugadores de ambos bandos y el contador de captura; /hill en el chat indica dónde está.',
   'errors.noUpdateFound': 'No hay actualizaciones. Inténtalo de nuevo en breve.',

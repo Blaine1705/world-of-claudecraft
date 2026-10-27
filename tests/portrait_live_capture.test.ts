@@ -569,6 +569,15 @@ describe('live portrait capture', () => {
     await settleCapture('player_warrior:12');
     expect(visualPortraitDataUrl('player_mech', 11)).toBeNull();
     await settleCapture('player_mech:11');
+    // toBlob delivery starts FileReader; wait for the reads to reach the cache
+    // before jsdom teardown restores the globals those callbacks still use.
+    await vi.waitFor(() => {
+      expect(
+        cachedPortraitByKey(visualPortraitKey('player_warrior', 11, 'headshot', LONG_HAIR)),
+      ).toBe(ASYNC_URL);
+      expect(cachedPortraitDataUrl('player_warrior', 12)).toBe(ASYNC_URL);
+      expect(cachedPortraitDataUrl('player_mech', 11)).toBe(ASYNC_URL);
+    });
     expect(rig.dressings).toEqual([]);
   });
 });

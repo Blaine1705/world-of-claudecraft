@@ -126,6 +126,7 @@ import {
 } from '../sim/varkhul_shared_pyre';
 import { bastionAuraEffectDescriptor } from './bastion_aura_effect';
 import { cryptAuraEffectDescriptor } from './crypt_aura_effect';
+import { gourdlightAuraEffectDescriptor } from './gourdlight_aura_effect';
 import { sanctumAuraEffectDescriptor } from './sanctum_aura_effect';
 import { templeAuraEffectDescriptor } from './temple_aura_effect';
 import { type TrinketAuraViewer, trinketAuraEffectDescriptor } from './trinket_aura_effect';
@@ -189,6 +190,9 @@ export function auraEffectDescriptor(
   // not say what the trinket does with it).
   const trinket = trinketAuraEffectDescriptor(a, viewer);
   if (trinket) return trinket;
+  // Gourdlight Eve's encounter auras say their rule (gourdlight_aura_effect.ts).
+  const gourdlight = gourdlightAuraEffectDescriptor(a);
+  if (gourdlight) return gourdlight;
   // The Wildheart Basin's marks and boss auras say their rule (wildheart_aura_effect.ts).
   const basin = wildheartAuraEffectDescriptor(a);
   if (basin) return basin;
@@ -208,6 +212,11 @@ export function auraEffectDescriptor(
   // countdown and localized name are the complete tooltip; the generic
   // vulnerability copy would misleadingly claim that it adds 0% damage taken.
   if (a.id === VARKHUL_CINDER_ORBS_AURA_ID) return null;
+  // Shadow Choir's ability description explains its conversion; it grants no damage bonus.
+  if (a.id === 'choir_of_deliverance' && a.kind === 'buff_dmg_done' && a.value === 0) return null;
+  if (a.id === 'priest_stilled_mind_crit') {
+    return { key: `${KEY}.stilledMindCrit`, nums: {} };
+  }
   if (a.id === VARKHUL_ASSEMBLY_FIXATE_AURA_ID) {
     return { key: `${KEY}.varkhulSentinelsGaze`, nums: {} };
   }
@@ -381,6 +390,8 @@ export function auraEffectDescriptor(
   // whole job is to tell the raid he is asleep, so it must never fall through to the
   // generic "reduces damage by 0%" line.
   if (a.id === 'slumber' && a.kind === 'buff_dr') {
+    // value2 1: a NIGHT sleeper (Old Thatchgrin hanging on his pole by day)
+    if (a.value2 === 1) return { key: `${KEY}.slumberNight`, nums: {} };
     return { key: `${KEY}.slumber`, nums: {} };
   }
   // The drill yard's effigy (src/sim/muster_effigy.ts): its plank hide, and a player's own
@@ -577,6 +588,8 @@ export function auraEffectDescriptor(
       return { key: `${KEY}.sated` };
     case 'cauterize_fatigue':
       return { key: `${KEY}.cauterizeFatigue` };
+    case 'seasonal_cosmetic':
+      return { key: `${KEY}.seasonalCosmetic` };
     case 'cast_shield':
       return { key: `${KEY}.castShield` };
     // Mage empowerment moments (owner playtest: every worn buff should read).

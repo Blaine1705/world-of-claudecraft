@@ -1037,6 +1037,16 @@ export const cs_CZ: EnTranslations = {
       "fateThreadsConsumeReady": "Tři Nitě osudu: Vysát je dokáže vetkat do dalšího Odsouzení.",
       "fateThreadsSentenceReady": "Tři Nitě osudu: Rozsudek je dokáže spotřebovat za 18% zvýšené poškození."
     },
+    "priest": {
+      "gloomtitheLabel": "Gloomtithe",
+      "bombLabel": "Tithe Bomb",
+      "gloomtitheStatus": "{value} of {max} Gloomtithe",
+      "bombStatus": "{value} of {max} Tithe Bomb charges",
+      "bombReady": "Ready",
+      "chargeCount": "{value} / {max}",
+      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
+      "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
+    },
     "procOverlay": {
       "soulFragmentsMeter": "Úlomky duše",
       "ruinMeter": "Zkáza",
@@ -2590,6 +2600,7 @@ export const cs_CZ: EnTranslations = {
       "name_lantern_hall_destrier": "Oř Lucernové síně",
       "name_chimeglass_tortoise": "Tolliver Chimeglass",
       "name_rickshaw_mount": "Kostipoutaná rikša",
+      "name_emberbristle_broom": "Emberbristle Broom",
       "name_wobbles_slime": "Sliz Vikláček",
       "name_nightwing_chimera": "Chiméra Noční křídlo",
       "desc_valorsteed": "Odolný oř s jistým krokem a koženým sedlem.",
@@ -2613,7 +2624,8 @@ export const cs_CZ: EnTranslations = {
       "desc_lantern_hall_destrier": "Válečný kůň Lucernové síně, krytý dubem a železem v cechovní modři. Ze sedla se mu houpají dvě bouřkové lucerny, aby osvětlovaly cestu domů.",
       "desc_nightwing_chimera": "Dvouhlavá soumračná wyverna z prastarých korun. Při odpočinku sedí na zadních nohou s drápy a nad zemí klouže na křídlech s vyrytými tajemnými znaky.",
       "desc_chimeglass_tortoise": "Solná želva, která překonala tři generace karavanů. Tinkers mu vybrousil brýle z bouřkového skla a pověsil mu na hrdlo bronzový zvon, takže ho cesta slyší dlouho předtím, než ho uvidí.",
-      "desc_rickshaw_mount": "Chrastící kostěný vozík s kostnatým pěšákem zapřaženým do ojí, který tě veze tryskem."
+      "desc_rickshaw_mount": "Chrastící kostěný vozík s kostnatým pěšákem zapřaženým do ojí, který tě veze tryskem.",
+      "desc_emberbristle_broom": "A harvest broom bound with orange ribbon that hovers a hand above the ground, shedding embers from its bristles. A permanent reward from Gourdlight Eve."
     },
     "mountTraining": {
       "mountPrompt": "Stiskni {key} pro nasednutí na cvičného Udatného oře.",
@@ -4662,6 +4674,10 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "auraEffect": {
+      "gourdlight": {
+        "thatchbound": "Old Thatchgrin pulls your strings. You cannot act: you are walked to your nearest ally and strike them every {every} sec for {min} to {max} damage (up to {mult} times as much against a level {level} ally). Ends early when you take damage equal to {pct}% of your maximum health, or when an ally dispels it (Magic)."
+      },
+      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
       "wildheart": {
         "packBond": "Utrpí o {pct}% méně poškození, dokud jeho druh stojí poblíž. Oddělte Pána šelem od jeho jaguára a pouto přerušíte.",
         "packBondFury": "Způsobuje o {pct}% více poškození, když partner stojí blízko.",
@@ -4765,6 +4781,7 @@ export const cs_CZ: EnTranslations = {
       "spellHaste": "Zvyšuje rychlost sesílání kouzel o {pct} %",
       "sated": "Nemůže těžit z dalšího skupinového efektu na rychlost",
       "cauterizeFatigue": "Vypálení nemůže zabránit dalšímu smrtelnému zásahu",
+      "seasonalCosmetic": "Cosmetic only: no effect on combat",
       "castShield": "Sesílání nelze přerušit ani zpozdit poškozením",
       "dmgDone": "Zvyšuje způsobené poškození o {pct} %",
       "dmgDoneReduce": "Snižuje způsobené poškození o {pct} %",
@@ -4912,6 +4929,7 @@ export const cs_CZ: EnTranslations = {
       "dodgeReduce": "Snižuje šanci na vyhnutí o {pct} %",
       "damageReduction": "Snižuje veškeré utrpěné poškození o {pct} %",
       "slumber": "Spí až do úsvitu. Nelze na něj zaútočit a pro nikoho se neprobudí.",
+      "slumberNight": "Hangs lifeless on his pole until nightfall. Cannot be attacked.",
       "guardianWard": "Příští smrtící nepřátelský útok místo toho obnoví tvoje zdraví na {pct} %",
       "armorFlat": "Snižuje brnění o {value}",
       "armorFlatStacks": "Snižuje brnění o {value} ({stacks} stacků)",
@@ -4991,7 +5009,8 @@ export const cs_CZ: EnTranslations = {
     "worldBoss": {
       "spawn": "{name} povstává nad {zone}!",
       "wake": "{name} se probouzí nad {zone}!",
-      "sleep": "{name} spí až do úsvitu."
+      "sleep": "{name} spí až do úsvitu.",
+      "sleepUntilNightfall": "{name} sleeps until nightfall."
     },
     "auth": {
       "appleLoginCta": "Pokračovat přes Apple",
@@ -8253,6 +8272,107 @@ export const cs_CZ: EnTranslations = {
       }
     }
   },
+  "seasonal": {
+    "pumpkins": {
+      "name": "Haunted Pumpkin",
+      "title": "Haunted Pumpkins",
+      "world": "World",
+      "progress": "{label}: {current}/{total}",
+      "found": "You light a Haunted Pumpkin in {zone}: {count}/{total}. Gourdlight Sweets received: {sweets}.",
+      "flash": "Haunted Pumpkin found! {count}/{total}"
+    },
+    "event": {
+      "gourdlight_eve": {
+        "name": "Gourdlight Eve"
+      }
+    },
+    "trickOrTreat": {
+      "row": "Trick or treat!",
+      "rowAria": "Say trick or treat to {name}",
+      "knockedHint": "You already knocked here today. The door opens again after the daily reset.",
+      "treat": "{name} hands you a treat.",
+      "trick": "{name} plays a trick on you: {trick}!",
+      "alreadyKnocked": "You already trick-or-treated {name} today.",
+      "notActive": "Gourdlight Eve is not running right now.",
+      "tooFar": "Step closer to knock.",
+      "treatFlash": {
+        "one": "Treat! {count} Gourdlight Sweet",
+        "few": "Treat! {count} Gourdlight Sweets",
+        "many": "Treat! {count} Gourdlight Sweets",
+        "other": "Treat! {count} Gourdlight Sweets"
+      },
+      "trickFlash": "Trick! {trick}"
+    },
+    "tricks": {
+      "gourdlight_trick_bat": "Batty",
+      "gourdlight_trick_skeleton": "Rattled Bones",
+      "gourdlight_trick_fumes": "Green Fumes",
+      "gourdlight_trick_strawling": "Strawling Guise",
+      "gourdlight_costume_skeleton": "Skeleton Costume",
+      "gourdlight_costume_ghost": "Ghost Costume",
+      "gourdlight_costume_bat": "Bat Costume"
+    },
+    "pumpkinHead": {
+      "on": "You put on the Carved Pumpkin Head.",
+      "off": "You take off the Carved Pumpkin Head."
+    },
+    "jarTrick": "The jar pops open: {trick}!",
+    "guise": "The charm crackles and the straw climbs over you: {trick}!",
+    "costume": "You drink the draught and change: {trick}!",
+    "titleGranted": "You read the writ. New title earned: {title}.",
+    "titleKnown": "You already hold that title, so you keep the writ.",
+    "boundItemGone": "Gourdlight Eve is over, and your {item} crumbles back into straw.",
+    "itemUse": {
+      "pumpkinHead": "Use: Put on or take off a carved pumpkin lit from inside, worn over your helmet. Cosmetic.",
+      "trickJar": "Use: Plays a random harmless trick on you for a few seconds. Cosmetic.",
+      "pouch": "Use: Open it to receive {count} Gourdlight Sweets.",
+      "strawlingCharm": "Use: Become one of Old Thatchgrin's strawlings for {seconds} seconds. Not in combat. Never consumed. Cosmetic.",
+      "sweet": "Earned by trick-or-treating during Gourdlight Eve. Hester Gourdwick trades cosmetics for them at her stalls in Eastbrook, Fenbridge and Highwatch.",
+      "costumeSkeleton": "Use: Turn into a rattling skeleton for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Cosmetic.",
+      "costumeGhost": "Use: Turn into a drifting ghost for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Cosmetic.",
+      "costumeBat": "Use: Turn into a flapping bat for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Cosmetic.",
+      "toyPrank": "Use: Throw it at another visible player within {range} yards. Their head becomes a glowing jack-o'-lantern for {seconds} seconds, and they can right-click it off. Neither of you can be in combat, and you cannot be stealthed. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
+      "toyLantern": "Use: Set the lantern down in front of you. A small ghost circles you for {seconds} seconds. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
+      "toyBats": "Use: Open the sack. A squeaking swarm of bats bursts out and scatters around you for {seconds} seconds. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
+      "toyCandleShadows": "Use: Light the candle in front of you. For {seconds} seconds its flames throw dancing shadows of a cat, a bat and a witch onto the ground around it, for everyone nearby to see. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
+      "toyCauldron": "Use: Set a big bubbling cauldron down in front of you. It stands for {standing} seconds, and any player who drinks from it bursts in green bubbles and turns into a goblin for {seconds} seconds, replacing any costume they wear. Neither setting it down nor drinking works in combat or while stealthed, and entering combat ends the goblin form. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
+      "titleWrit": "Use: Earn the title {title} for this character, worn from the Book of Deeds. Consumed. Kept if you already hold the title.",
+      "broomSources": "Bought from Hester Gourdwick for {count} Emberwoven Sheaves, or, rarely, dropped by Old Thatchgrin on a day you loot him. Riding it requires the riding skill. Kept permanently and rideable year-round.",
+      "sheaf": "Old Thatchgrin gives one each day you loot him, until you own the Emberbristle Broom. Hester Gourdwick trades {count} for the broom at her stalls in Eastbrook, Fenbridge and Highwatch. Unspent sheaves are kept for the next Gourdlight Eve."
+    },
+    "toy": {
+      "prank": "You throw the pumpkin. It splats onto {name}!",
+      "lantern": "You set the lantern down, and a little ghost drifts out to keep you company.",
+      "bats": "You open the sack, and a swarm of startled bats bursts out!",
+      "candleShadows": "You light the candle, and shadows begin to dance around its flames.",
+      "cauldron": "You set the cauldron down, and it starts to bubble.",
+      "cauldronDrink": "You drink from the cauldron, burst in green bubbles and turn into a goblin!",
+      "pranked": "{name} splats a pumpkin on your head! Right-click it off, or wear it proudly.",
+      "prankedFlash": "Pranked by {name}!",
+      "prankNeedsPlayer": "The pumpkin only splats on another player who is not in combat.",
+      "hidden": "Step out of the shadows first: a toy would give you away."
+    },
+    "itemSource": {
+      "pumpkinHead": "Dropped by Old Thatchgrin, in his pumpkin field past Boar Meadow, the first time you loot him. No vendor sells it."
+    },
+    "boo": {
+      "row": "Boo!",
+      "rowAria": "Leap out at {name} and shout boo",
+      "needsCostume": "Put on a costume first: a costume draught, a bat or skeleton trick, the Strawling Charm, the Carved Pumpkin Head or a goblin sip from the Gurglegreen Cauldron.",
+      "frightenedHint": "{name} is still jumpy from your last fright. Find someone else.",
+      "landed": "You leap out at {name} with a BOO! They shriek and nearly drop everything.",
+      "flash": "BOO! {name} is frightened!",
+      "noCostume": "Without a costume, {name} only laughs at you. Put one on first.",
+      "already": "{name} has had enough frights for one day.",
+      "notOnErrand": "Hester has not asked you to frighten anyone today."
+    },
+    "tokenPrice": "{count} {item}",
+    "thatchgrin": {
+      "poleBound": "Pole-Bound",
+      "wakeYell": "NIGHT falls on the patch! Who walks in MY field?",
+      "sleepYell": "Sun is up. Back on the post, back to watching."
+    }
+  },
   "dungeonGuide": {
     "drownedTemple": {
       "greet": {
@@ -9547,6 +9667,7 @@ export const cs_CZ: EnTranslations = {
       "framesGovernedTalkingHead": "Edit Frames také uvolní panel Dialogue, který nese mluvený řádek NPC, když je NPC mimo váš dohled; nosí svůj jmenný čip, zatímco je uvolněný.",
       "framesGovernedShardpike": "Upravit rámečky také uvolní lištu Střepové píky, krátkou řadu akcí úkolového nástroje vedle akčních lišt, která se objevuje jen při nesení samotné píky. Při uvolnění má vlastní jmenovku, takže ji můžeš umístit před bojem místo během něj.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
+      "framesGovernedPriest": "Edit Frames also lets you move the Shadow priest's Gloomtithe and Tithe Bomb medallion.",
       "framesGovernedResourceAndHill": "Zapni Oddělit lištu zdrojů na kartě Rámy. Volba Upravit rámečky pak uvolní i lištu zdrojů, takže manu, energii nebo zuřivost můžeš umístit samostatně kamkoli. Šířka lišty zdrojů a Výška lišty zdrojů na stejné kartě nastavují její velikost. Upravit rámečky uvolní také lištu Krále kopce. Krytí pozadí Krále kopce na stejné kartě zeslabí její panel, zatímco text zůstane dobře čitelný.",
       "barsTitle": "Lišty, časovače a bojový text",
       "barsBody": "Tvá lišta sesílání se objeví uprostřed obrazovky, těsně nad tvými akčními lištami, kdykoli sesíláš nebo kanáluješ kouzlo, a nese jméno kouzla a zbývající čas. Tvůj cíl má na svém rámu vlastní lištu sesílání, takže vidíš, co přichází, a můžeš na to zareagovat.\n\nPod tvou lištou sesílání sedí tenká lišta švihu, která se plní mezi švihy tvé zbraně, takže útočník na blízko nebo na dálku vidí, kdy dopadne další automatický zásah.\n\nTvá lišta zkušeností běží přes celou šířku pod akčními lištami, rozdělená do úseků, se světlejším pruhem, který ukazuje naspořené odpočaté zkušenosti.\n\nPlav pod vodou a nahoře na obrazovce se objeví modrá lišta dechu. Vyprazdňuje se, dokud máš hlavu pod hladinou, jakmile dojde, zabliká červeně a začneš se topit, a jakmile se vynoříš, rychle se doplní. Mezerník tě žene nahoru a klávesa Plavat dolů, ve výchozím stavu Ctrl, tě táhne hlouběji.\n\nPoškození a léčení vyplouvají nad tím, co zasáhly, jako malá čísla, takže boj přečteš, aniž bys musel číst text. Záložka Bojový záznam v tvém chatu drží úplný písemný záznam.",
@@ -10451,6 +10572,7 @@ export const cs_CZ: EnTranslations = {
       "hillBodyRamp": "Každé dvě hodiny se v Dračích zemích, Kraji Mrazivého závoje nebo Jantarovém pádu objeví kopec. Říše dostane varování patnáct minut předem a kruh je vyznačen na otevřeném prostranství. Kopec zůstává aktivní třicet minut. Vstup do aktivního kruhu zapne příznak světového PvP podle běžných pravidel úrovně, a to i členům nájezdu. Skupina s největším počtem způsobilých hráčů uvnitř získá kopec po minutě nepřerušené převahy; samotný hráč se počítá jako jednočlenná skupina, ale členové nájezdu a hráči pod požadovanou úrovní pro PvP nemohou kopec obsadit ani získávat Čest z kopce. Každý držitel uvnitř získává Čest stále rychleji. Odměny přicházejí častěji a jejich výše roste rychleji, takže celková Čest zůstává stejná jako při dřívější pětačtyřicetiminutové události. Změna držitele spustí růst odměn od začátku. Po opuštění kruhu zůstává příznak zapnutý; /pvp off používá běžnou pětiminutovou prodlevu a nemůže doběhnout uvnitř aktivního kopce ani během boje. Lišta kopce ukazuje držitele, počty hráčů a postup obsazování; /hill oznámí jeho polohu.",
       "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "hillBodyFlat": "Jednou za tři hodiny se v nepředvídatelnou chvíli celé říši oznámí, že za patnáct minut v jedné ze severních zón vyroste kopec. Jeho kruh se vyznačí na otevřeném prostranství. Kopec vydrží čtyřicet pět minut a pak zmizí. Během této doby se každých pět minut oznamuje jeho poloha a skupiny s nejdelším celkovým držením. Skupina s nejvíce hráči v kruhu o kopec usiluje a po celkem třiceti sekundách početní převahy jej získá. Příchod soupeřů pouze pozastaví počítadlo, dokud vaše skupina znovu nezíská převahu; od začátku se počítá jen tehdy, když v kruhu nezůstane žádný živý člen vaší skupiny. Samotný hráč se počítá jako jednočlenná skupina a při založení skupiny si držený kopec ponechá, ale členové raidu se nepočítají vůbec. Každý člen držící skupiny stojící v kruhu získává každou minutu stejně Cti bez ohledu na délku držení. Plná skupina, která kopec nerušeně drží po celou jeho dobu, získá přibližně tolik jako za tři vítězství na bojištích. Když kopec zmizí a skupina s nejdelším celkovým držením jej držela alespoň deset minut, každý, kdo během jejího držení stál v kruhu alespoň minutu a stále je členem této skupiny, získá jedno vítězství do PvP řádku Týdenního trezoru. Lišta nad bojištěm ukazuje držitele, počty hráčů na obou stranách a počítadlo obsazování; /hill v chatu sdělí polohu.",
+      "hillBodyTwoHour": "Once every two hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the northern zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for thirty minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns the same Honor every minute, however long they have held it, so a full party holding an uncontested hill for its whole stand earns about as much as two battleground wins. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "limitsBodyRaids": "Porážení stejného hráče znovu a znovu vyplácí pokaždé méně a brzy nic, a tvůj počet proti tomu hráči se resetuje až zhruba hodinu po prvním z těch zabití, takže čekání na jedné oběti se nikdy nevyplatí. Cíl hluboko pod tvou úrovní nevyplatí vůbec nic. Bojiště a Arény se řídí vlastními pravidly, dokud jsi uvnitř, a vyplácí víc Cti než otevřený svět, takže světové PvP je pomalejší cesta ke stejnému obchodníkovi. Výpravy nezískávají ze světových zabití nic: člen výpravy nedostane žádnou Čest ani zlato a nezmenší podíl nikoho jiného, takže boj jako skupina se vyplatí."
     },
     "thornhollowPage": {
@@ -15192,6 +15314,7 @@ export const cs_CZ: EnTranslations = {
       "accountSuspended": "Tento účet je pozastavený do {date}.",
       "alreadyInWorld": "Postava už je ve světě.",
       "accountSessionLimit": "Příliš mnoho postav na tomto účtu už je ve světě.",
+      "worldFightHold": "Another character on this account is still in the world after a fight. Try again in a few minutes.",
       "takenOver": "Tvoje postava byla převzata jinou relací.",
       "vaultMailRecovering": "Tvá odměna z trezoru se obnovuje. Zkus to za chvíli.",
       "renameBeforeEntering": "Tato postava musí být před vstupem do světa přejmenována.",
@@ -18052,6 +18175,18 @@ export const cs_CZ: EnTranslations = {
         "name": "Litanie běd",
         "description": "Sesílá 3 s a každou vteřinu působí {damage} stínového poškození. Poškození roste se silou kouzel."
       },
+      "vampiric_touch": {
+        "name": "Vampiric Touch",
+        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
+      },
+      "void_rupture": {
+        "name": "Void Rupture",
+        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+      },
+      "spirit_bomb": {
+        "name": "Tithe Bomb",
+        "description": "Detonate a spirit bomb on an enemy, dealing {damage} Shadow damage to enemies within 8 yards of that target. Damage increases with Spell Power, can critically strike, and is reduced beyond 5 targets. Generate 20 Gloomtithe to prepare one bomb. Generation counts even while holding the maximum 5 Gloomtithe; spending charges is not required and adds no progress. Progress lasts between fights, up to one prepared bomb. Dying clears your progress and prepared bomb. Completing the cast consumes the prepared bomb, even if resisted. Cancellation or interruption preserves it. Starting a raid boss encounter clears your progress and prepared bomb. Cannot open a raid boss encounter with this spell."
+      },
       "flash_heal": {
         "name": "Naléhavá modlitba",
         "description": "Vyléčí spřátelený cíl o {damage}. Léčení roste se silou kouzel."
@@ -18885,7 +19020,8 @@ export const cs_CZ: EnTranslations = {
       },
       "inner_focus": {
         "name": "Ztišená mysl",
-        "description": "Tvé další kouzlo kněze bude zdarma a nepřerušitelné. Trvá 60 s."
+        "description": "Tvé další kouzlo kněze bude zdarma a nepřerušitelné. Trvá 60 s.",
+        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
       },
       "innervate": {
         "name": "Míza života",
@@ -19082,7 +19218,8 @@ export const cs_CZ: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Sbor vysvobození",
-        "description": "Kanalizuje po dobu 6 s a každé 2 s léčí členy skupiny do 30 yardů za {damage}. Léčení roste se silou kouzel."
+        "description": "Kanalizuje po dobu 6 s a každé 2 s léčí členy skupiny do 30 yardů za {damage}. Léčení roste se silou kouzel.",
+        "specNote_shadow": "For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Shadowform. Absorbed damage and overkill do not add healing."
       },
       "bear_charge": {
         "name": "Medvědí výpad",
@@ -24297,6 +24434,87 @@ export const cs_CZ: EnTranslations = {
       "vanguard_pendant_of_mending": {
         "name": "Předvojův přívěsek hojení"
       },
+      "gourdlight_sweet": {
+        "name": "Gourdlight Sweet"
+      },
+      "gourdlight_treat_pouch": {
+        "name": "Gourdlight Treat Pouch"
+      },
+      "carved_pumpkin_head": {
+        "name": "Carved Pumpkin Head"
+      },
+      "jar_of_mischief": {
+        "name": "Jar of Mischief"
+      },
+      "thatchgrin_sweet_sack": {
+        "name": "Thatchgrin's Sweet Sack"
+      },
+      "strawling_charm": {
+        "name": "Strawling Charm"
+      },
+      "rattlebone_draught": {
+        "name": "Rattlebone Draught"
+      },
+      "haunting_draught": {
+        "name": "Haunting Draught"
+      },
+      "batwing_draught": {
+        "name": "Fluttering Draught"
+      },
+      "writ_of_the_gourdlit": {
+        "name": "Writ of the Gourdlit"
+      },
+      "writ_of_the_trickster": {
+        "name": "Writ of the Trickster"
+      },
+      "writ_of_the_hollow_grin": {
+        "name": "Writ of the Hollow Grin"
+      },
+      "reins_emberbristle_broom": {
+        "name": "Emberbristle Broom"
+      },
+      "hearthroot_toffee": {
+        "name": "Hearthroot Toffee"
+      },
+      "gourdseed_brittle": {
+        "name": "Gourdseed Brittle"
+      },
+      "crabapple_chew": {
+        "name": "Crabapple Chew"
+      },
+      "owlwatch_fudge": {
+        "name": "Owlwatch Fudge"
+      },
+      "lantern_mint_drop": {
+        "name": "Lantern Mint Drop"
+      },
+      "emberwoven_sheaf": {
+        "name": "Emberwoven Sheaf"
+      },
+      "prankers_pumpkin": {
+        "name": "Pranker's Pumpkin"
+      },
+      "wanderwisp_lantern": {
+        "name": "Wanderwisp Lantern"
+      },
+      "sack_of_startled_bats": {
+        "name": "Sack of Startled Bats"
+      },
+      "murmurwick_candle": {
+        "name": "Murmurwick Candle"
+      },
+      "gurglegreen_cauldron": {
+        "name": "Gurglegreen Cauldron"
+      },
+      "thatchgrin_patch_pumpkin": {
+        "name": "Patch Pumpkin"
+      },
+      "cursed_candle_stub": {
+        "name": "Cursed Candle Stub"
+      },
+      "gourdlight_crow_feather": {
+        "name": "Gourdlight Crow Feather"
+      },
       "membership_staff": {
         "name": "Hůl proměny"
       },
@@ -25853,6 +26071,18 @@ export const cs_CZ: EnTranslations = {
       "muster_effigy": {
         "name": "Slaměný předák"
       },
+      "gourdlight_thatchgrin": {
+        "name": "Old Thatchgrin"
+      },
+      "gourdlight_crow": {
+        "name": "Gourdlight Crow"
+      },
+      "gourdlight_strawling": {
+        "name": "Strawling"
+      },
+      "gourdlight_swelling_gourd": {
+        "name": "Swelling Gourd"
+      },
       "stable_horse": {
         "name": "Stájový kůň"
       },
@@ -26929,6 +27159,11 @@ export const cs_CZ: EnTranslations = {
         "name": "Hester Quillby",
         "title": "Kartografka map",
         "greeting": "Každá mapa této bažiny, kterou jsem kdy koupila, byla do sezóny špatně. Voda přesouvá cesty a cesty přesouvají vodu. Proto si kreslím vlastní a sedím tady v suchu, než inkoust zaschne."
+      },
+      "gourdlight_keeper": {
+        "name": "Hester Gourdwick",
+        "title": "Gourdlight Keeper",
+        "greeting": "The gourds are lit and the lanterns are up, so it must be Gourdlight Eve. Knock on the doors of the townsfolk in Eastbrook, Fenbridge and Highwatch, and say the words: trick or treat. Most will hand you a sweet. A few will play a trick on you. Bring the sweets to me, at any of my stalls, and I will trade you something to wear."
       },
       "reeve_ottoline": {
         "name": "Rychtářka Ottoline",
@@ -29561,6 +29796,88 @@ export const cs_CZ: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Účinné léčení zasazeno do Léčicího cvičného terče"
+          }
+        }
+      },
+      "q_gourdlight_rounds": {
+        "title": "Gourdlight Rounds",
+        "text": "Every Gourdlight Eve the children of the Vale make their rounds, and this year you are joining them, {playerName}. Knock on five doors in our towns, say the words, and see what you are given. Come back to me when you are done.",
+        "completion": "Five doors and you still have all your fingers. Here, a pouch of sweets for the walk home. Come back tomorrow, the doors open again.",
+        "objectives": {
+          "0": {
+            "label": "Doors knocked on"
+          }
+        }
+      },
+      "q_gourdlight_daily_patch": {
+        "title": "Pumpkins from the Patch",
+        "text": "Old Thatchgrin's patch past Boar Meadow is fat with pumpkins, and half of them have rolled out past his straw where a careful soul can reach them. Bring me five, {playerName}. Stay wide of the old scarecrow himself. He counts every one.",
+        "completion": "Five round ones, and not a bite out of any. That is pie for the whole Vale. Here, for your trouble.",
+        "objectives": {
+          "0": {
+            "label": "Patch Pumpkins"
+          }
+        }
+      },
+      "q_gourdlight_daily_boo": {
+        "title": "Boo!",
+        "text": "Nobody in these towns has had a proper fright in a year, {playerName}, and a Gourdlight Eve without one is just a cold night. Put on a costume, any of mine will do, or that pumpkin head if you have earned one. Then creep up on three of the townsfolk and give them a good loud BOO.",
+        "completion": "Three of them? I heard the cook drop a pan from across the square. Well done. Here is your share.",
+        "objectives": {
+          "0": {
+            "label": "Townsfolk frightened"
+          }
+        }
+      },
+      "q_gourdlight_daily_wicks": {
+        "title": "Wicked Wicks",
+        "text": "Someone has been setting candles with green flames at the feet of our lamp posts. They burn without melting and they whisper when you turn your back. Snuff six of them for me, {playerName}, in any of the three towns, and bring me the stubs.",
+        "completion": "Six stubs, cold as frost. Whoever lit them will have to try harder than that. Take this, and wash your hands.",
+        "objectives": {
+          "0": {
+            "label": "Cursed candles snuffed"
+          }
+        }
+      },
+      "q_gourdlight_daily_towns": {
+        "title": "A Door in Every Town",
+        "text": "The children say a true Gourdlight walker knocks in every town before the night is out. Prove them right, {playerName}. Trick or treat at one door in Eastbrook, one in Fenbridge and one in Highwatch. The lanterns on the roads will light your way.",
+        "completion": "Three towns in one night! Your boots have earned this more than you have.",
+        "objectives": {
+          "0": {
+            "label": "A door knocked in Eastbrook"
+          },
+          "1": {
+            "label": "A door knocked in Fenbridge"
+          },
+          "2": {
+            "label": "A door knocked in Highwatch"
+          }
+        }
+      },
+      "q_gourdlight_daily_feathers": {
+        "title": "Feathers for the Fire",
+        "text": "When Old Thatchgrin is pressed, he calls his crows down on whoever is beating at his straw. Their feathers burn green in a hearth, and I need three for tonight's bonfire. Find a fight at his patch, {playerName}, and pluck them from his crows.",
+        "completion": "Black as a moonless field, and they smell of smoke already. The bonfire will be a sight. Thank you.",
+        "objectives": {
+          "0": {
+            "label": "Crow feathers"
+          }
+        }
+      },
+      "q_gourdlight_daily_baskets": {
+        "title": "Baskets for the Neighbours",
+        "text": "I fill a basket of sweets for an old friend in each town every Gourdlight Eve, and my knees are not what they were. Take them round for me, {playerName}: Cook Marlow in Eastbrook, Yara the herbalist in Fenbridge, and Loremaster Caddis up in Highwatch.",
+        "completion": "All three delivered, and I hear Marlow cried. He always cries. Here is a basket of your own.",
+        "objectives": {
+          "0": {
+            "label": "Basket left with Cook Marlow"
+          },
+          "1": {
+            "label": "Basket left with Yara the herbalist"
+          },
+          "2": {
+            "label": "Basket left with Loremaster Caddis"
           }
         }
       },

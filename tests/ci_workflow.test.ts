@@ -302,9 +302,9 @@ function screenshotSparseBlocks(source: string): string[] {
 describe('CI workflow parity', () => {
   // Reads the whole tracked text corpus; disk contention is not a CI policy failure.
   it('sparse-checkout on the test jobs covers every referenced screenshot subtree', () => {
-    // The five sparse test-job checkouts (pr-gate, both long-sims lanes,
-    // release-gate, release-i18n) exclude docs/screenshots DIRECTORIES
-    // (794 MB of committed PR evidence; the measured 11m21s checkout
+    // The seven sparse test-job checkouts (lint, browser-gate, pr-gate, both
+    // long-sims lanes, release-gate, release-i18n) exclude docs/screenshots
+    // DIRECTORIES (794 MB of committed PR evidence; the measured 11m21s checkout
     // pathology scales with the blob payload) except every subtree the repo
     // actually references. The coupling corpus is EVERY tracked
     // reference-carrying file outside docs/screenshots, enumerated from the
@@ -372,6 +372,7 @@ describe('CI workflow parity', () => {
       '            /docs/screenshots/guild-social-v1/',
       '            /docs/screenshots/highwatch-guild/',
       '            /docs/screenshots/harvest-button-refresh/',
+      '            /docs/screenshots/haunted-pumpkins/',
       '            /docs/screenshots/hoard-arcane-icons-v045/',
       '            /docs/screenshots/hoard-brute-icons-v045/',
       '            /docs/screenshots/hoard-ember-icons-v045/',
@@ -427,9 +428,11 @@ describe('CI workflow parity', () => {
     ].join('\n');
     // Job-anchored, not a bare workflow-wide count: each sparse job carries
     // the block exactly once, the full-tree jobs carry it never (their
-    // freshness diffs, builds, and the browser suite read wider), and the
-    // workflow-wide total closes the no-sixth-copy direction.
+    // freshness diffs and builds read wider), and the workflow-wide total
+    // closes the no-eighth-copy direction.
     for (const job of [
+      'lint',
+      'browser-gate',
       'pr-gate',
       'pr-long-sims-a',
       'pr-long-sims-b',
@@ -438,28 +441,28 @@ describe('CI workflow parity', () => {
     ]) {
       expect(jobSource(job).split(SPARSE_CONE), job).toHaveLength(2);
     }
-    for (const job of ['pr-checks', 'browser-gate', 'release-checks', 'release-version-gate']) {
+    for (const job of ['pr-checks', 'release-checks', 'release-version-gate']) {
       expect(jobSource(job).includes(SPARSE_CONE), job).toBe(false);
     }
-    expect(workflow.split(SPARSE_CONE)).toHaveLength(6);
+    expect(workflow.split(SPARSE_CONE)).toHaveLength(8);
     // The counts above are both blind in one direction: they say how many
-    // copies of THIS literal exist, and nothing at all about a sixth block that
+    // copies of THIS literal exist, and nothing at all about an extra block that
     // was copy-pasted and then edited, which reads as zero copies of the
     // literal in a job the first loop does not name. So extract every
     // screenshot-excluding sparse block the workflow actually contains, whole,
     // and require each to BE the literal. That subsumes both counts against a
     // divergent copy: a drifted block is still extracted here and still fails.
     const blocks = screenshotSparseBlocks(workflow);
-    expect(blocks, 'every sparse-checkout block carrying the screenshot exclusion').toHaveLength(5);
+    expect(blocks, 'every sparse-checkout block carrying the screenshot exclusion').toHaveLength(7);
     for (const [i, block] of blocks.entries()) {
       expect(block, `sparse-checkout block ${i + 1} diverged from the one cone`).toBe(SPARSE_CONE);
     }
     // The extractor's own control, and it proves the thing that actually
-    // matters: SIXTH-BLOCK DISCOVERY. Append a synthetic sixth job whose cone
-    // diverged (one subtree dropped) and the extractor must find SIX blocks
+    // matters: EXTRA-BLOCK DISCOVERY. Append a synthetic extra job whose cone
+    // diverged (one subtree dropped) and the extractor must find EIGHT blocks
     // with exactly one of them unequal, which is precisely the state a
     // copy-pasted-then-edited block would leave the workflow in. Mutating one
-    // of the existing five would only prove the extractor reads them.
+    // of the existing seven would only prove the extractor reads them.
     //
     // The dropped subtree is DERIVED from the parsed cone, never a hard-coded
     // path: a hard-coded one silently stops mutating anything the day that
@@ -475,25 +478,25 @@ describe('CI workflow parity', () => {
     expect(divergentCone).not.toBe(SPARSE_CONE);
     const withSixth = `${workflow}\n  synthetic-drift-job:\n    steps:\n      - uses: actions/checkout@v5\n        with:\n${divergentCone}\n`;
     const sixBlocks = screenshotSparseBlocks(withSixth);
-    expect(sixBlocks, 'a sixth block must be DISCOVERED, not silently skipped').toHaveLength(6);
+    expect(sixBlocks, 'an extra block must be DISCOVERED, not silently skipped').toHaveLength(8);
     expect(sixBlocks.filter((block) => block !== SPARSE_CONE)).toHaveLength(1);
 
-    // ...and the same sixth block hiding behind a different block-scalar style
+    // ...and the same extra block hiding behind a different block-scalar style
     // is still discovered, which is what SPARSE_HEADER_RE buys.
     for (const style of ['|-', '|+', '>', '>-']) {
       const restyled = divergentCone.replace(/^(\s*sparse-checkout:\s*)\|$/m, `$1${style}`);
       expect(restyled, `the ${style} rewrite really changed the header`).not.toBe(divergentCone);
       const styled = `${workflow}\n  synthetic-drift-job:\n    steps:\n      - uses: actions/checkout@v5\n        with:\n${restyled}\n`;
-      expect(screenshotSparseBlocks(styled), `a ${style} block must be found`).toHaveLength(6);
+      expect(screenshotSparseBlocks(styled), `a ${style} block must be found`).toHaveLength(8);
     }
 
-    // ...and the same sixth block split by an INTERNAL BLANK LINE above its
+    // ...and the same extra block split by an INTERNAL BLANK LINE above its
     // exclusion line is still discovered whole. Blank lines are legal inside
     // a YAML block scalar, and the pre-fix extractor broke its body walk at
     // the first one: this block's truncated fragment lacked the exclusion, so
-    // the divergent sixth cone left discovery entirely and the five-block
+    // the divergent extra cone left discovery entirely and the seven-block
     // count above stayed green over it. The control reds on that extractor
-    // (five blocks found) and holds the fixed walk to the honest direction:
+    // (seven blocks found) and holds the fixed walk to the honest direction:
     // a formatting trick may only ever surface as MORE blocks discovered
     // (then unequal to the one cone), never fewer.
     const splitLines = divergentCone.split('\n');
@@ -503,13 +506,13 @@ describe('CI workflow parity', () => {
     const blankSplitCone = splitLines.join('\n');
     const withBlankSixth = `${workflow}\n  synthetic-drift-job:\n    steps:\n      - uses: actions/checkout@v5\n        with:\n${blankSplitCone}\n`;
     const blankBlocks = screenshotSparseBlocks(withBlankSixth);
-    expect(blankBlocks, 'a blank-line-split sixth block must be DISCOVERED whole').toHaveLength(6);
+    expect(blankBlocks, 'a blank-line-split extra block must be DISCOVERED whole').toHaveLength(8);
     expect(blankBlocks.filter((block) => block !== SPARSE_CONE)).toHaveLength(1);
     // The closer half of the same immunity (the Phase 18 fresh-read control):
     // a blank line parked between the last subtree row and the cone-mode
-    // closer must not drop the closer from the extracted block. The sixth
+    // closer must not drop the closer from the extracted block. The extra
     // copy here is the UNMODIFIED cone with that one blank inserted, so the
-    // post-fix extractor reads it EQUAL to SPARSE_CONE (six equal blocks);
+    // post-fix extractor reads it EQUAL to SPARSE_CONE (eight equal blocks);
     // the pre-fix lines[end + 1] lookup lost the closer and read it unequal.
     // The divergent cone cannot carry this control (it is unequal either
     // way), which is why the body-split control above cannot see the closer.
@@ -522,7 +525,7 @@ describe('CI workflow parity', () => {
     const blankBeforeCloser = coneLines.join('\n');
     const withBlankCloserSixth = `${workflow}\n  synthetic-drift-job:\n    steps:\n      - uses: actions/checkout@v5\n        with:\n${blankBeforeCloser}\n`;
     const closerBlocks = screenshotSparseBlocks(withBlankCloserSixth);
-    expect(closerBlocks, 'a blank before the closer must not lose the block').toHaveLength(6);
+    expect(closerBlocks, 'a blank before the closer must not lose the block').toHaveLength(8);
     expect(
       closerBlocks.filter((block) => block !== SPARSE_CONE),
       'a blank before the closer must not drop the closer from the block',
@@ -1452,9 +1455,10 @@ describe('CI workflow parity', () => {
       // rebalance without re-sizing.
       ['pr-long-sims-a', 28],
       ['pr-long-sims-b', 28],
-      // 12 since the v0.45.0 integration: a 6.2 minute healthy wall (run
-      // 39354039920) plus the second browser session (rationale on ci.yml).
-      ['browser-gate', 12],
+      // 18 since 2026-10-27: merge_group runs 40156081869 and 40150638622
+      // passed both browser sessions at 12m00s after an 8 to 9 minute checkout
+      // and were bound-killed during Post Set up Node.js (rationale on ci.yml).
+      ['browser-gate', 18],
       // 8 is a measured decision like the rest (healthy worst 4.42 min, all
       // observed stalls over 8), so it is pinned exactly here beside the
       // single-digit shape check the classifier test keeps.
@@ -1596,7 +1600,7 @@ describe('CI workflow parity', () => {
     // checkout left nothing running after it) is ci-stall-rerun.yml, pinned
     // by tests/ci_stall_rerun.test.ts.
     expect(workflow).toMatch(
-      /\nenv:\n {2}GIT_HTTP_LOW_SPEED_LIMIT: '1000'\n {2}GIT_HTTP_LOW_SPEED_TIME: '120'\n/,
+      /\nenv:\n {2}GIT_HTTP_LOW_SPEED_LIMIT: '1000'\n {2}GIT_HTTP_LOW_SPEED_TIME: '240'\n/,
     );
     expect(workflow.match(/GIT_HTTP_LOW_SPEED_LIMIT/g)).toHaveLength(1);
     expect(workflow.match(/GIT_HTTP_LOW_SPEED_TIME/g)).toHaveLength(1);
@@ -1845,7 +1849,7 @@ describe('CI workflow parity', () => {
     // here.
     const cacheStepName = String.raw`- name: Cache vitest transform cache\n`;
     const cacheStepBody = String.raw`(?: {8}#[^\n]*\n)* {8}uses: actions\/cache@v(?:[4-9]|\d{2,})[^\n]*\n {8}with:\n {10}path: node_modules\/\.experimental-vitest-cache\n {10}key: vitest-fsmodule-\$\{\{ runner\.os \}\}-`;
-    const cacheKeyTail = String.raw`-\$\{\{ hashFiles\('pnpm-lock\.yaml', 'vite\.config\.ts', '\.npmrc', 'package\.json'\) \}\}\n\n`;
+    const cacheKeyTail = String.raw`-\$\{\{ hashFiles\('pnpm-lock\.yaml', 'vite\.config\.ts', '\.npmrc'\) \}\}\n\n`;
     const shardKeySegment = String.raw`shard\$\{\{ matrix\.shard \}\}`;
     const prGateCacheStepRe = new RegExp(
       `${cacheStepName}${PR_GATE_STEP_GATE_RE_SEGMENT}${cacheStepBody}${shardKeySegment}${cacheKeyTail}`,
