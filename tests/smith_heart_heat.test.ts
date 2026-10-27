@@ -8,6 +8,11 @@
 // and the seal's quarter lit by the fall, and determinism.
 
 import { describe, expect, it } from 'vitest';
+import {
+  SMITH_HEART_CASTS,
+  SMITH_HEART_GUARDIANS,
+  SMITH_HEART_MOBS,
+} from '../src/sim/content/smith_heart';
 import { HEARTH_CHANNEL, HEARTH_CRYSTAL_SOCKETS } from '../src/sim/content/smith_heart_layout';
 import {
   burnAmp,
@@ -94,6 +99,17 @@ function parkAll(f: HeatFight): void {
     f.put(p, s.x, s.z);
   });
 }
+
+describe('Guardian of the Heat: the ids', () => {
+  it("keeps the trash kit's cast ids (the knell's embers key on its stun)", () => {
+    expect(HEAT_CASTS.knell).toBe(SMITH_HEART_CASTS.heatClang);
+    expect(HEAT_CASTS.pour).toBe(SMITH_HEART_CASTS.heatPour);
+    const kit = SMITH_HEART_MOBS[SMITH_HEART_GUARDIANS.heat].trashKit;
+    expect(kit?.screech?.castId).toBe(HEAT_CASTS.knell);
+    expect(kit?.screech?.stun).toBe(T.knellStun);
+    expect(kit?.line?.castId).toBe(HEAT_CASTS.pour);
+  });
+});
 
 describe('Guardian of the Heat: the geometry', () => {
   it('knows the floor, the channel and its halves, and the nearest body in reach', () => {

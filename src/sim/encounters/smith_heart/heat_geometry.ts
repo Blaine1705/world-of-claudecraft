@@ -81,7 +81,7 @@ export function pickSockets(wave: number, count: number): number[] {
   const w = heatHash(wave, 23) % west.length;
   if (count >= 1) out.push(east[e]);
   if (count >= 2) out.push(west[w]);
-  if (count >= 3) {
+  if (count >= 3 && Math.min(east.length, west.length) > 1) {
     const sideEast = wave % 2 === 0;
     const pool = sideEast ? east : west;
     const taken = sideEast ? e : w;

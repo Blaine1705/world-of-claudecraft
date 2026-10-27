@@ -7,7 +7,9 @@
 // the melee and the tank must move the fight after every knell.
 //
 // A fresh knell is read off the stun the trash kit puts on a player (its id is
-// the cast's, its time nearly whole). Zero rng but the damage rolls.
+// the cast's): each stun aura object is seen once (a WeakSet keyed by the
+// aura itself, so a long tick, a shortened stun or a late look can neither
+// miss it nor count it twice). Zero rng but the damage rolls.
 
 import { DT, type Entity } from '../../types';
 import { embersTemplate, HEAT_CASTS, HEAT_CUES, HEAT_NAMES, HEAT_TUNING as T } from './heat_ids';
@@ -22,6 +24,10 @@ import {
   roll,
   spawnFightObject,
 } from './heat_scope';
+
+/** The knell stuns already seen (by the aura object: deterministic, exact,
+ *  and gone with the aura). */
+const seenStuns = new WeakSet<object>();
 
 /** Lay Knell Embers at instance-local (x, z). Exported for the dev trigger. */
 export function layEmbers(s: HeatScope, x: number, z: number): void {
@@ -50,10 +56,8 @@ export function watchKnell(s: HeatScope): Entity[] {
   const fresh: Entity[] = [];
   for (const p of livePlayers(s)) {
     const a = auraOf(p, HEAT_CASTS.knell);
-    if (!a || a.kind !== 'stun') continue;
-    if (a.remaining < (a.duration || T.knellStun) - 0.2) continue;
-    const last = st.knellAt[p.id];
-    if (last !== undefined && st.clock - last < 1) continue;
+    if (!a || a.kind !== 'stun' || seenStuns.has(a)) continue;
+    seenStuns.add(a);
     st.knellAt[p.id] = st.clock;
     fresh.push(p);
     if (s.rules.knellEmbers) {
