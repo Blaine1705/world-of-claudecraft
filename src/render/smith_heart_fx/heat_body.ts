@@ -785,7 +785,8 @@ export class HeatBody {
     // The wind-up's flash: a white glow round the whole body.
     const as = 9 + 4 * look.flash;
     this.aura.scale.set(as, as * 1.15, 1);
-    this.auraMat.opacity = Math.min(0.75, look.flash * 0.6 + look.white * 0.06);
+    // A halo of heat round it at every heat, white and beating in the wind-up.
+    this.auraMat.opacity = Math.min(0.8, 0.08 + look.haze * 0.14 + look.flash * 0.55);
     // The knell's sphere between its hands.
     if (action === 'knell' || action === 'toll') {
       const l = this.joints[HJ.wristL];
@@ -814,6 +815,7 @@ export class HeatBody {
     this.heartGlowMat.opacity = Math.min(0.95, 0.3 + g * 0.18);
     this.heartGlowMat.color.copy(this.glowColor);
     this.eyeMat.opacity = Math.min(1, 0.65 + g * 0.12);
+    this.auraMat.color.copy(this.glowColor);
     this.threadColor.setRGB(_s.x, _s.y, _s.z).multiplyScalar(0.7 + g * 0.35);
     const tc = this.threadColor;
     const shown = this.threadShown;
@@ -852,12 +854,12 @@ export class HeatBody {
     const d = this.density;
     // Tongues of the first flame licking up from its joints, more and whiter
     // as the Hearth climbs.
-    const flameRate = dt * (6 + 22 * heat + 20 * look.flash) * d;
+    const flameRate = dt * (16 + 34 * heat + 24 * look.flash) * d;
     if (this.rand() < flameRate) {
       const j = this.joints[HEAT_FLAME_JOINTS[Math.floor(this.rand() * HEAT_FLAME_JOINTS.length)]];
       this.worldOf(e, j, _a);
       FLAME.color = look.white > 0.6 ? HEAT_BODY_COLORS.spark : HEAT_BODY_COLORS.ember;
-      FLAME.size[0] = 0.7 + 0.6 * heat;
+      FLAME.size[0] = 1.0 + 0.9 * heat;
       this.particles.puff(_a.x, _a.y, _a.z, 1, FLAME);
     }
     if (this.rand() < dt * (4 + 10 * heat) * d) {

@@ -316,8 +316,8 @@ export const HEAT_FLAME_JOINTS: readonly number[] = [
  *  white, never a threat colour, never volcanic red. */
 export const HEAT_BODY_COLORS = {
   /** The Hearth's basalt: a warm dark grey, umber baked in its shade. */
-  basalt: [0.24, 0.22, 0.21] as const,
-  basaltShade: [0.08, 0.065, 0.06] as const,
+  basalt: [0.36, 0.33, 0.31] as const,
+  basaltShade: [0.13, 0.11, 0.1] as const,
   /** The first flame: gold at rest, white at the top of the heat. */
   gold: 0xffb848,
   fire: 0xffd27a,

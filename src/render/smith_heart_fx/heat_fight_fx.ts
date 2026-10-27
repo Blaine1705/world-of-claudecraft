@@ -96,9 +96,9 @@ import {
 const SCAN_SEC = 0.1;
 const HEAT_KIT_URL = '/models/props/smith_heart_heat_kit.glb';
 /** How deep a crystal waits under the basalt before it tears up. */
-const CRYSTAL_SUNK = 3.4;
+const CRYSTAL_SUNK = 4.6;
 /** Where a ray leaves a crystal (yards over its foot) and strikes a body. */
-const CRYSTAL_TIP = 3.2;
+const CRYSTAL_TIP = 4.0;
 const BODY_CHEST = 1.25;
 
 const _m = new THREE.Matrix4();
@@ -245,8 +245,9 @@ void main() {
   #include <colorspace_fragment>
 }
 `;
-/** The wind-up's heat glow over the whole floor (uniform strength), seams of
- *  light in it beating white. */
+/** The wind-up's heat over the whole floor (uniform strength): a warm wash
+ *  beating white, ripples of heat racing out from the hall's middle, a
+ *  shimmer in them (never a pattern that reads as a footprint). */
 const FLOOR_FRAG = /* glsl */ `
 uniform float uTime;
 uniform float uStrength;
@@ -258,11 +259,13 @@ ${NOISE}
 void main() {
   float r = length(vXY);
   if (r > 1.0 || uStrength <= 0.001) discard;
-  vec2 q = vXY * 18.0;
-  float seams = smoothstep(0.62, 0.72, n(q + vec2(uTime * 0.2, 0.0))) * (1.0 - smoothstep(0.72, 0.9, n(q + vec2(uTime * 0.2, 0.0))));
-  float edge = 1.0 - smoothstep(0.7, 1.0, r);
-  vec3 col = mix(uFire, uCore, uStrength) * (0.35 + seams * 1.4);
-  gl_FragColor = vec4(col * uStrength * edge, uStrength * edge);
+  float fall = 1.0 - smoothstep(0.6, 1.0, r);
+  float shimmer = n(vXY * 9.0 + vec2(uTime * 0.9, -uTime * 0.6)) * 0.5 + 0.5;
+  float ripple = pow(0.5 + 0.5 * sin(r * 26.0 - uTime * 7.0), 6.0) * (0.6 + 0.4 * shimmer);
+  float wash = 0.35 + 0.25 * shimmer;
+  vec3 col = mix(uFire, uCore, uStrength * 0.8);
+  float a = (wash + ripple * 0.9) * uStrength * fall;
+  gl_FragColor = vec4(col * a, a * 0.85);
   #include <colorspace_fragment>
 }
 `;
@@ -355,10 +358,13 @@ varying float vFace;
 ${NOISE}
 void main() {
   float run = n(vec2(vUv.y * 9.0 - uTime * 14.0 * (1.0 - 2.0 * uBack), vUv.x * 6.0));
-  float heart = pow(vFace, 2.2);
-  vec3 col = mix(mix(uGold, uDeep, uBack), uCore, heart * (0.7 + 0.3 * run));
-  float a = (0.25 + 0.75 * heart) * (0.75 + 0.25 * run) * uAlpha;
-  gl_FragColor = vec4(col * a * 1.8, a);
+  // A white-hot core inside a softer gold sheath (the face toward the eye
+  // is the beam's middle).
+  float core = pow(vFace, 6.0);
+  float sheath = pow(vFace, 1.4);
+  vec3 col = mix(mix(uGold, uDeep, uBack), uCore, core * (0.75 + 0.25 * run));
+  float a = (0.15 + 0.55 * sheath + 0.6 * core) * (0.8 + 0.2 * run) * uAlpha;
+  gl_FragColor = vec4(col * a * 3.2, min(1.0, a));
   #include <colorspace_fragment>
 }
 `;
@@ -580,7 +586,7 @@ export class HeatFightFx {
       for (let k = 0; k < 6; k++) {
         const a = (k / 6) * Math.PI * 2 + heatFightHash(i, k) * 0.6;
         const r = k === 0 ? 0 : 0.55 + heatFightHash(i, k + 9) * 0.35;
-        const tall = k === 0 ? 3.0 : 1.3 + heatFightHash(i, k + 17) * 1.2;
+        const tall = k === 0 ? 4.0 : 1.8 + heatFightHash(i, k + 17) * 1.6;
         const lean = k === 0 ? 0 : 0.25 + heatFightHash(i, k + 23) * 0.25;
         const p = new THREE.Group();
         p.position.set(Math.sin(a) * r, 0.35, Math.cos(a) * r);
@@ -601,8 +607,8 @@ export class HeatFightFx {
       }
       holder.add(standIn);
       const halo = new THREE.Sprite(sprite(0xffd27a, 'smithHeartHeatCrystalHalo'));
-      halo.position.set(0, 2, 0);
-      halo.scale.set(5, 5, 1);
+      halo.position.set(0, 2.8, 0);
+      halo.scale.set(6, 6, 1);
       holder.add(halo);
       this.root.add(holder);
       const fan = this.kit.fan(6);
@@ -890,8 +896,8 @@ void main() {
       _box.setFromObject(kit);
       _box.getSize(_size);
       _box.getCenter(_centre);
-      // About four yards tall, standing on its bed.
-      const s = 4.2 / Math.max(1e-3, _size.y);
+      // About five and a half yards tall (three players), on its bed.
+      const s = 5.5 / Math.max(1e-3, _size.y);
       kit.scale.setScalar(s);
       kit.position.set(-_centre.x * s, -_box.min.y * s, -_centre.z * s);
       const content = new THREE.Group();
@@ -1216,12 +1222,12 @@ void main() {
         .multiplyScalar(0.9 + 1.4 * look.light);
       const haloMat = s.halo.material as THREE.SpriteMaterial;
       haloMat.opacity = Math.min(0.85, 0.2 + 0.45 * look.light);
-      const hs = 4 + 2.2 * look.charge * look.charge;
+      const hs = 5 + 3 * look.charge * look.charge;
       s.halo.scale.set(hs, hs, 1);
       // The reach: the soak's gold at the ray's exact range, filling to the
       // next ray (every tier).
       this.kit.paintFan(s.reach.fan, {
-        fill: 0.15 + 0.85 * look.charge,
+        fill: 0.08 + 0.5 * look.charge,
         clock: this.clock,
         range: T.rayRange,
       });
@@ -1455,7 +1461,13 @@ void main() {
   private pulse(src: Entity): void {
     const heat = src.maxResource > 0 ? src.resource / src.maxResource : 0;
     const ring = pulseRing(heat);
-    this.particles.shockRing(src.pos.x, src.pos.z, heat > 0.7 ? C.white : C.ring, ring.radius, 0.8);
+    this.particles.shockRing(
+      src.pos.x,
+      src.pos.z,
+      heat > 0.8 ? C.ring : C.ringGold,
+      ring.radius,
+      0.7,
+    );
     if (heat > 0.5)
       this.particles.puff(src.pos.x, src.pos.y + 3, src.pos.z, Math.round(4 + 10 * heat), {
         ...SPARK_PUFF,

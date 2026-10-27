@@ -171,14 +171,14 @@ export function beamLook(
   }
   if (back) {
     const k = clamp01(since / 0.7);
-    out.width = 0.55 * (1 - k * 0.6);
+    out.width = 0.7 * (1 - k * 0.6);
     out.alpha = 1 - k;
     return out;
   }
   const flash = 1 - clamp01(since / 0.25);
   const end = clamp01((BEAM_HOLD - since) / 0.3);
-  out.width = 0.32 + 0.45 * flash;
-  out.alpha = (0.7 + 0.3 * flash) * end;
+  out.width = 0.5 + 0.6 * flash;
+  out.alpha = (0.8 + 0.2 * flash) * end;
   return out;
 }
 
@@ -277,7 +277,7 @@ export function embersLook(age: number, life: number): number {
 /** The Hearth Pulse's ring at `heat` (0..1): its reach and its strength. */
 export function pulseRing(heat: number): { radius: number; strength: number } {
   const h = clamp01(heat);
-  return { radius: 18 + 22 * h, strength: 0.25 + 0.75 * h };
+  return { radius: 9 + 13 * h, strength: 0.25 + 0.75 * h };
 }
 
 /** The floor's heat glow under the wind-up: `overheating` and the heat
