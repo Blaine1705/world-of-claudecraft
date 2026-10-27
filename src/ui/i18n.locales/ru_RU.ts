@@ -24670,13 +24670,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.heatGuardian.statePhase2':
     'Наполовину погружён в свой источник и никогда не двигается. Базальтовый кулак продолжается; Семена Очага падают под рейд и вскоре лопаются, а Пробуждённый огонь поджигает пол вокруг источника кольцо за кольцом. При 40% здоровья он снова погружается, и Очаг переполняется. В героическом режиме урон выше на {heroicPct}%.',
   'hudChrome.auraEffect.heatGuardian.statePhase3':
-    'Наполовину погружён в свой источник и никогда не двигается. Базальтовый кулак и Пробуждённый огонь продолжаются, а Катящиеся угли падают и преследуют игроков: удар отбрасывает уголь. В героическом режиме при 10% здоровья он вырывается на свободу. В героическом режиме урон выше на {heroicPct}%.',
-  'hudChrome.auraEffect.heatGuardian.statePhase4':
-    'Вырвался из источника: его можно водить где угодно. Рядом с вами сражаются духи Закалки, Дыхания и Молота: замораживайте Катящиеся угли на Льду Закалки, тушите пожары Грозовым дождём Дыхания и протащите стража через Каменный корень, чтобы остановить Сокрушающий кулак.',
+    'Наполовину погружён в свой источник и никогда не двигается. Базальтовый кулак и Пробуждённый огонь продолжаются, а Катящиеся угли падают и преследуют игроков: удар отбрасывает уголь. В героическом режиме урон выше на {heroicPct}%.',
   'hudChrome.auraEffect.heatGuardian.stateUnder':
     'Погружён в источник: пока Очаг переполнен, его нельзя атаковать или ранить. Когда переполнение закончится, он поднимется снова.',
-  'hudChrome.auraEffect.heatGuardian.stateTearing':
-    'Вырывается из источника: его нельзя атаковать или ранить, пока он не встанет.',
   'hudChrome.auraEffect.heatGuardian.scorched':
     'Получаемый урон от огня, льда, природы, тьмы и тайной магии увеличен на {pct}%. Каждые {every} сек Вспышка Очага поражает всех, кто дальше {reach} м от источника, и обновляет этот эффект.',
   'hudChrome.auraEffect.heatGuardian.grip':
@@ -24689,16 +24685,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'За вами гонится Катящийся уголь или Огнесемя. Если Катящийся уголь настигнет вас, вы погибнете, а все в пределах {radius} м сгорят: держитесь подальше и пусть союзники бьют его, каждый удар отбрасывает его на {knock} м (после этого {crust} сек его не отбросить).',
   'hudChrome.auraEffect.heatGuardian.crust':
     'Остыл до твёрдости: пока эффект не закончится, удары не отбрасывают его.',
-  'hudChrome.auraEffect.heatGuardian.rimelocked':
-    'Вмёрз во Лёд Закалки: не может двигаться и получает на {pct}% больше урона.',
-  'hudChrome.auraEffect.heatGuardian.stormRain':
-    'Войдите в Ползучее пламя, чтобы потушить его. Ползучее пламя не может вас обжечь.',
-  'hudChrome.auraEffect.heatGuardian.crushMark':
-    'Когда {seconds}-секундный замах закончится, Сокрушающий кулак стража нанесёт вам от {min} до {max} ед. урона от огня. Протащите его через Каменный корень раньше: корень удержит стража, и удар пройдёт мимо.',
-  'hudChrome.auraEffect.heatGuardian.crushing':
-    'Когда эффект закончится, Сокрушающий кулак нанесёт его танку от {min} до {max} ед. урона от огня, если раньше его не удержит Каменный корень.',
-  'hudChrome.auraEffect.heatGuardian.rooted':
-    'Удержан Каменным корнем на {seconds} сек: не может двигаться, и его Сокрушающий кулак прошёл мимо.',
   'hudChrome.heatGuardian.warn.overflow':
     'Страж погружается, и Очаг переполняется! Уворачивайтесь от огненных рек!',
   'hudChrome.heatGuardian.warn.wellspawn':
@@ -24710,9 +24696,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Пробуждённый огонь! Очаг загорается кольцо за кольцом: уходите!',
   'hudChrome.heatGuardian.warn.cinder':
     'Падает Катящийся уголь! Отбейте его, пока он не настиг свою жертву!',
-  'hudChrome.heatGuardian.warn.tearFree': 'Страж вырывается из источника!',
-  'hudChrome.heatGuardian.warn.spirits': 'Духи Закалки, Дыхания и Молота приходят к Очагу!',
-  'hudChrome.heatGuardian.warn.crush': 'Сокрушающий кулак! Протащите стража через Каменный корень!',
   'hudChrome.heatGuardian.say.fist': 'Встаньте там, куда падает камень, и станьте его частью.',
   'hudChrome.heatGuardian.say.sink': 'Источник поднимается вам навстречу!',
   'hudChrome.heatGuardian.say.sinkAgain': 'Снова Очаг переполняется. Снова вы горите.',
@@ -24721,13 +24704,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.heatGuardian.say.seeds': 'Каждая искра, что я рассыпаю, пускает корни.',
   'hudChrome.heatGuardian.say.zones': 'Очаг просыпается у вас под ногами.',
   'hudChrome.heatGuardian.say.cinder': 'Беги, маленький уголёк. Пламя голодно.',
-  'hudChrome.heatGuardian.say.tearFree': 'Хватит ждать в источнике. Я сам приду за вами!',
-  'hudChrome.heatGuardian.say.crush': 'Этот кулак сокрушит саму гору.',
-  'hudChrome.heatGuardian.say.quench': 'Холод помнит вас. Пусть мой лёд скуёт его угли.',
-  'hudChrome.heatGuardian.say.breath': 'Примите грозовой дождь. Потушите его огонь.',
-  'hudChrome.heatGuardian.say.hammer': 'Встаньте на камень. Гора удержит его.',
   'abilityUi.cast.heart_heat_fist': 'Базальтовый кулак',
-  'abilityUi.cast.heart_heat_tear_free': 'Освобождение',
   'abilityUi.cast.heart_forge_wrath': 'Гнев горна',
   'abilityUi.cast.heart_forge_pour': 'Литьё горна',
   'abilityUi.cast.heart_ember_bolt': 'Угольная стрела',

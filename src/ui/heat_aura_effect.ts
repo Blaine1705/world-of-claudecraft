@@ -4,10 +4,9 @@
 // generic kind line): it returns a hudChrome.auraEffect.heatGuardian.* key
 // plus the raw numbers, and the HUD formats the numbers and renders
 // t(key, values). Most of the fight's marks ride quiet `internal_cd` markers
-// (no stat at all), and Flare-Scorched, Cinder Grip, Rimelocked and Rooted
-// in Stone are a vulnerability, a stacking burn, a stun and a root whose
-// generic lines would not say where they come from or what to do, so each
-// says its rule instead. Every number comes from the fight's tuning
+// (no stat at all), and Flare-Scorched and Cinder Grip are a vulnerability
+// and a stacking burn whose generic lines would not say where they come from
+// or what to do, so each says its rule instead. Every number comes from the fight's tuning
 // (src/sim/encounters/smith_heart/heat_ids.ts), the same constants the sim
 // reads (Normal's numbers, Heroic's damage a quarter higher); a stack count
 // and the guardian's phase come off the aura itself. Pinned by
@@ -32,8 +31,7 @@ function stateDescriptor(a: AuraEffectInput): AuraEffectDescriptor {
   const stage = a.value2 ?? HEAT_STAGES.fight;
   if (stage === HEAT_STAGES.sinking || stage === HEAT_STAGES.under || stage === HEAT_STAGES.rising)
     return { key: `${KEY}.stateUnder`, nums: {} };
-  if (stage === HEAT_STAGES.tearing) return { key: `${KEY}.stateTearing`, nums: {} };
-  const phase = Math.max(1, Math.min(4, Math.round(a.value ?? 1)));
+  const phase = Math.max(1, Math.min(3, Math.round(a.value ?? 1)));
   return {
     key: `${KEY}.statePhase${phase}`,
     nums: { reach: T.flareReach, heroicPct: HEROIC_PCT },
@@ -92,19 +90,6 @@ export function heatAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescript
       };
     case HEAT_AURAS.crust:
       return { key: `${KEY}.crust`, nums: {} };
-    case HEAT_AURAS.rimelocked:
-      return { key: `${KEY}.rimelocked`, nums: { pct: pct(T.frozenVuln) } };
-    case HEAT_AURAS.stormRain:
-      return { key: `${KEY}.stormRain`, nums: {} };
-    case HEAT_AURAS.crushMark:
-      return {
-        key: `${KEY}.crushMark`,
-        nums: { seconds: T.crushSeconds, min: T.crushMin, max: T.crushMax },
-      };
-    case HEAT_AURAS.crushing:
-      return { key: `${KEY}.crushing`, nums: { min: T.crushMin, max: T.crushMax } };
-    case HEAT_AURAS.rooted:
-      return { key: `${KEY}.rooted`, nums: { seconds: T.rootedSeconds } };
     default:
       return null;
   }

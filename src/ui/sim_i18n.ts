@@ -1636,8 +1636,7 @@ const baseEnTable = {
   'mechanic.heartCrossingBlade': 'Crossing Blade',
   'aura.heartDeepeningCold': 'Deepening Cold',
   // The Guardian of the Heat (encounters/smith_heart/heat_ids.ts HEAT_NAMES):
-  // its damage, aura and object names (the spirits speak through their
-  // object's name). EXACT through the mechanic reverse map.
+  // its damage, aura and object names. EXACT through the mechanic reverse map.
   'mechanic.heartFirstWellspring': 'The First Wellspring',
   'mechanic.heartWellspringFire': 'Wellspring Fire',
   'aura.heartFirstFlame': 'The First Flame',
@@ -1657,16 +1656,6 @@ const baseEnTable = {
   'mechanic.heartCinderScorch': 'Cinder Scorch',
   'aura.heartHunted': 'Hunted',
   'aura.heartCoolingCrust': 'Cooling Crust',
-  'aura.heartRimelocked': 'Rimelocked',
-  'mechanic.heartQuenchIce': 'Quench Ice',
-  'aura.heartStormRain': 'Storm-Rain',
-  'mechanic.heartCreepingBlaze': 'Creeping Blaze',
-  'mechanic.heartStoneRoot': 'Stone Root',
-  'mechanic.heartCrushingFist': 'Crushing Fist',
-  'aura.heartRootedInStone': 'Rooted in Stone',
-  'mechanic.heartSpiritOfTheQuench': 'Spirit of the Quench',
-  'mechanic.heartSpiritOfTheBreath': 'Spirit of the Breath',
-  'mechanic.heartSpiritOfTheHammer': 'Spirit of the Hammer',
   'log.sanctumTuskerSpill':
     'The sledge tips over! Burning soul braziers spill across the Sledge Road.',
   // The rune wall's lore line (encounters/gravewyrm_sanctum/rune_wall.ts
@@ -26993,16 +26982,6 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Cinder Scorch': 'mechanic.heartCinderScorch',
   Hunted: 'aura.heartHunted',
   'Cooling Crust': 'aura.heartCoolingCrust',
-  Rimelocked: 'aura.heartRimelocked',
-  'Quench Ice': 'mechanic.heartQuenchIce',
-  'Storm-Rain': 'aura.heartStormRain',
-  'Creeping Blaze': 'mechanic.heartCreepingBlaze',
-  'Stone Root': 'mechanic.heartStoneRoot',
-  'Crushing Fist': 'mechanic.heartCrushingFist',
-  'Rooted in Stone': 'aura.heartRootedInStone',
-  'Spirit of the Quench': 'mechanic.heartSpiritOfTheQuench',
-  'Spirit of the Breath': 'mechanic.heartSpiritOfTheBreath',
-  'Spirit of the Hammer': 'mechanic.heartSpiritOfTheHammer',
   'Creeping Rime': 'aura.sanctumCreepingRime',
   'Iced Over': 'aura.sanctumIcedOver',
   'Ice Slab': 'mechanic.sanctumIceSlab',
@@ -31347,9 +31326,6 @@ export function localizeAuthoredYellSpeakerName(
   if (templateId && (speakerKind === 'mob' || speakerKind === 'npc')) {
     return tEntity({ kind: speakerKind, id: templateId, field: 'name' });
   }
-  // An encounter object that speaks (the Smith's Heart's three spirits) is
-  // named through the mechanic reverse map.
-  if (speakerKind === 'object') return localizeSimAuraName(name) ?? name;
   // Through the shared reverse map, not a fresh `find`: a bare find is FIRST-write
   // wins where the map is last-write wins, so on a colliding mob name the yell
   // speaker and the combat log used to disagree with each other.

@@ -22479,13 +22479,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.heatGuardian.statePhase2':
     '샘에 몸을 반쯤 담근 채 결코 움직이지 않습니다. 현무암 주먹은 계속됩니다. 화로 씨앗이 공격대의 발밑에 떨어졌다가 잠시 뒤 터지고, 깨어나는 불이 샘 주위의 바닥을 띠마다 차례로 불태웁니다. 생명력 40%에서 다시 가라앉고 화로가 넘쳐흐릅니다. 영웅 난이도에서는 피해가 {heroicPct}% 더 큽니다.',
   'hudChrome.auraEffect.heatGuardian.statePhase3':
-    '샘에 몸을 반쯤 담근 채 결코 움직이지 않습니다. 현무암 주먹과 깨어나는 불은 계속되고, 구르는 잉걸불이 떨어져 플레이어를 쫓습니다: 때리면 밀려납니다. 영웅 난이도에서는 생명력 10%에서 샘을 박차고 나옵니다. 영웅 난이도에서는 피해가 {heroicPct}% 더 큽니다.',
-  'hudChrome.auraEffect.heatGuardian.statePhase4':
-    '샘에서 벗어났습니다: 어디로든 끌고 다닐 수 있습니다. 담금질, 숨결, 망치의 영혼이 함께 싸웁니다. 담금질 얼음으로 구르는 잉걸불을 얼리고, 숨결의 폭풍비로 불길을 끄고, 돌뿌리 위로 끌어 분쇄의 주먹을 막으십시오.',
+    '샘에 몸을 반쯤 담근 채 결코 움직이지 않습니다. 현무암 주먹과 깨어나는 불은 계속되고, 구르는 잉걸불이 떨어져 플레이어를 쫓습니다: 때리면 밀려납니다. 영웅 난이도에서는 피해가 {heroicPct}% 더 큽니다.',
   'hudChrome.auraEffect.heatGuardian.stateUnder':
     '샘에 가라앉아 있습니다: 화로가 넘쳐흐르는 동안에는 공격하거나 피해를 줄 수 없습니다. 넘침이 끝나면 다시 떠오릅니다.',
-  'hudChrome.auraEffect.heatGuardian.stateTearing':
-    '샘에서 몸을 뜯어내는 중입니다: 일어설 때까지 공격하거나 피해를 줄 수 없습니다.',
   'hudChrome.auraEffect.heatGuardian.scorched':
     '받는 화염, 냉기, 자연, 암흑, 비전 피해가 {pct}% 증가합니다. {every}초마다 화로의 섬광이 샘에서 {reach}미터보다 멀리 있는 모두를 치고 이 효과를 갱신합니다.',
   'hudChrome.auraEffect.heatGuardian.grip':
@@ -22498,16 +22494,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '구르는 잉걸불이나 씨불이 당신을 쫓고 있습니다. 구르는 잉걸불에 붙잡히면 죽고 {radius}미터 안의 모두가 불탑니다: 거리를 두고 아군이 때리게 하십시오. 한 번 칠 때마다 {knock}미터 밀려납니다(그 뒤 {crust}초 동안은 밀려나지 않습니다).',
   'hudChrome.auraEffect.heatGuardian.crust':
     '단단하게 식었습니다: 이 효과가 끝날 때까지 때려도 밀려나지 않습니다.',
-  'hudChrome.auraEffect.heatGuardian.rimelocked':
-    '담금질 얼음 위에서 얼어붙었습니다: 움직일 수 없고 받는 피해가 {pct}% 증가합니다.',
-  'hudChrome.auraEffect.heatGuardian.stormRain':
-    '번지는 불길 속으로 걸어 들어가 불을 끄십시오. 번지는 불길은 당신을 태우지 못합니다.',
-  'hudChrome.auraEffect.heatGuardian.crushMark':
-    '{seconds}초의 충전이 끝나면 수호자의 분쇄의 주먹이 당신에게 {min}~{max}의 화염 피해를 줍니다. 그 전에 돌뿌리 위로 끌고 가십시오: 뿌리가 수호자를 붙잡고 주먹은 빗나갑니다.',
-  'hudChrome.auraEffect.heatGuardian.crushing':
-    '이 효과가 끝나면 분쇄의 주먹이 방어 전담에게 {min}~{max}의 화염 피해를 줍니다. 그 전에 돌뿌리가 붙잡으면 빗나갑니다.',
-  'hudChrome.auraEffect.heatGuardian.rooted':
-    '돌뿌리에 {seconds}초 동안 붙들렸습니다: 움직일 수 없고 분쇄의 주먹이 빗나갔습니다.',
   'hudChrome.heatGuardian.warn.overflow':
     '수호자가 가라앉고 화로가 넘쳐흐른다! 용암 강줄기를 피하라!',
   'hudChrome.heatGuardian.warn.wellspawn':
@@ -22517,9 +22503,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.heatGuardian.warn.seeds': '화로 씨앗이 떨어진다! 한데 모아 떨어뜨리고 달려라!',
   'hudChrome.heatGuardian.warn.zones': '깨어나는 불! 화로가 띠마다 타오른다: 밖으로 나가라!',
   'hudChrome.heatGuardian.warn.cinder': '구르는 잉걸불이 떨어진다! 먹잇감에 닿기 전에 쳐내라!',
-  'hudChrome.heatGuardian.warn.tearFree': '수호자가 샘에서 몸을 뜯어낸다!',
-  'hudChrome.heatGuardian.warn.spirits': '담금질, 숨결, 망치의 영혼이 화로로 온다!',
-  'hudChrome.heatGuardian.warn.crush': '분쇄의 주먹! 수호자를 돌뿌리 위로 끌고 가라!',
   'hudChrome.heatGuardian.say.fist': '돌이 떨어지는 곳에 서라. 그리고 그 일부가 되어라.',
   'hudChrome.heatGuardian.say.sink': '샘이 너희를 맞으러 솟아오른다!',
   'hudChrome.heatGuardian.say.sinkAgain': '다시 화로가 넘친다. 다시 너희는 타오른다.',
@@ -22528,13 +22511,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.heatGuardian.say.seeds': '내가 흩뿌리는 불티마다 뿌리를 내린다.',
   'hudChrome.heatGuardian.say.zones': '화로가 너희 발밑에서 깨어난다.',
   'hudChrome.heatGuardian.say.cinder': '달려라, 작은 불씨야. 불꽃은 굶주렸다.',
-  'hudChrome.heatGuardian.say.tearFree': '샘에서 기다리는 것은 끝이다. 내가 직접 너희에게 가겠다!',
-  'hudChrome.heatGuardian.say.crush': '이 주먹은 산 자체도 부술 것이다.',
-  'hudChrome.heatGuardian.say.quench': '냉기는 너희를 기억한다. 내 얼음이 그 불씨를 묶게 하라.',
-  'hudChrome.heatGuardian.say.breath': '폭풍비를 받아라. 그 불을 꺼라.',
-  'hudChrome.heatGuardian.say.hammer': '돌 위에 서라. 산이 그것을 붙잡을 것이다.',
   'abilityUi.cast.heart_heat_fist': '현무암 주먹',
-  'abilityUi.cast.heart_heat_tear_free': '속박 끊기',
   'abilityUi.cast.heart_forge_wrath': '화로의 분노',
   'abilityUi.cast.heart_forge_pour': '화로 붓기',
   'abilityUi.cast.heart_ember_bolt': '잔불 화살',

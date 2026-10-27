@@ -23023,13 +23023,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.heatGuardian.statePhase2':
     '半身沉在涌泉之中，从不移动。玄武岩之拳仍在继续；炉心火种落在团队脚下，片刻后爆裂，苏醒之火将涌泉周围的地面一圈接一圈地点燃。生命值降到40%时它会再次沉下，炉心再度满溢。英雄难度下伤害提高{heroicPct}%。',
   'hudChrome.auraEffect.heatGuardian.statePhase3':
-    '半身沉在涌泉之中，从不移动。玄武岩之拳与苏醒之火仍在继续，滚动余烬会坠落并追逐玩家：击中它就能把它打退。英雄难度下，生命值降到10%时它会挣脱涌泉。英雄难度下伤害提高{heroicPct}%。',
-  'hudChrome.auraEffect.heatGuardian.statePhase4':
-    '已挣脱涌泉：可以被拉到任何地方。淬火、吐息与重锤之灵与你们并肩作战：在淬火之冰上冻住滚动余烬，用吐息的风暴之雨扑灭烈焰，并把它拖过石根来阻止碾碎之拳。',
+    '半身沉在涌泉之中，从不移动。玄武岩之拳与苏醒之火仍在继续，滚动余烬会坠落并追逐玩家：击中它就能把它打退。英雄难度下伤害提高{heroicPct}%。',
   'hudChrome.auraEffect.heatGuardian.stateUnder':
     '沉入涌泉之中：炉心满溢期间无法被攻击或伤害。满溢结束后它会再次升起。',
-  'hudChrome.auraEffect.heatGuardian.stateTearing':
-    '正从涌泉中挣脱：在它站起之前无法被攻击或伤害。',
   'hudChrome.auraEffect.heatGuardian.scorched':
     '受到的火焰、冰霜、自然、暗影和奥术伤害提高{pct}%。每{every}秒，炉心闪焰会击中所有距离涌泉超过{reach}码的人并刷新此效果。',
   'hudChrome.auraEffect.heatGuardian.grip':
@@ -23041,14 +23037,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.heatGuardian.hunted':
     '一团滚动余烬或籽焰正在追你。被滚动余烬追上你会死亡，{radius}码内的所有人都会被灼烧：保持距离，让队友击打它，每次击打都会把它打退{knock}码（之后{crust}秒内无法再次打退）。',
   'hudChrome.auraEffect.heatGuardian.crust': '已冷却变硬：此效果结束前，击打无法将它打退。',
-  'hudChrome.auraEffect.heatGuardian.rimelocked':
-    '在淬火之冰上被冻住：无法移动，受到的伤害提高{pct}%。',
-  'hudChrome.auraEffect.heatGuardian.stormRain': '走进蔓延烈焰即可将其扑灭。蔓延烈焰无法灼烧你。',
-  'hudChrome.auraEffect.heatGuardian.crushMark':
-    '{seconds}秒的蓄力结束时，守护者的碾碎之拳会对你造成{min}到{max}点火焰伤害。在此之前把它拖过石根：石根会将它缚住，这一拳便会落空。',
-  'hudChrome.auraEffect.heatGuardian.crushing':
-    '此效果结束时，碾碎之拳会对它的坦克造成{min}到{max}点火焰伤害，除非石根先将它缚住。',
-  'hudChrome.auraEffect.heatGuardian.rooted': '被石根缚住{seconds}秒：无法移动，碾碎之拳落空了。',
   'hudChrome.heatGuardian.warn.overflow': '守护者沉下，炉心满溢了！躲开熔岩之河！',
   'hudChrome.heatGuardian.warn.wellspawn': '涌泉之子爬出来了！在它们抵达涌泉之前减速并消灭它们！',
   'hudChrome.heatGuardian.warn.keepers':
@@ -23056,9 +23044,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.heatGuardian.warn.seeds': '炉心火种落下了！集中放下然后快跑！',
   'hudChrome.heatGuardian.warn.zones': '苏醒之火！炉心一圈接一圈地燃起：快出去！',
   'hudChrome.heatGuardian.warn.cinder': '滚动余烬落下了！在它追上猎物之前把它打退！',
-  'hudChrome.heatGuardian.warn.tearFree': '守护者从涌泉中挣脱了！',
-  'hudChrome.heatGuardian.warn.spirits': '淬火、吐息与重锤之灵来到了炉心！',
-  'hudChrome.heatGuardian.warn.crush': '碾碎之拳！把守护者拖过石根！',
   'hudChrome.heatGuardian.say.fist': '站在岩石落下的地方，成为它的一部分。',
   'hudChrome.heatGuardian.say.sink': '涌泉升起来迎接你们了！',
   'hudChrome.heatGuardian.say.sinkAgain': '炉心再次满溢。你们再次燃烧。',
@@ -23067,13 +23052,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.heatGuardian.say.seeds': '我撒下的每一颗火星都会生根。',
   'hudChrome.heatGuardian.say.zones': '炉心在你们脚下苏醒。',
   'hudChrome.heatGuardian.say.cinder': '跑吧，小小的火星。火焰饿了。',
-  'hudChrome.heatGuardian.say.tearFree': '不再在涌泉里等待。我要亲自来找你们！',
-  'hudChrome.heatGuardian.say.crush': '这一拳连山本身都能击碎。',
-  'hudChrome.heatGuardian.say.quench': '寒冷记得你们。让我的冰缚住它的余烬。',
-  'hudChrome.heatGuardian.say.breath': '接受风暴之雨吧。扑灭它的火焰。',
-  'hudChrome.heatGuardian.say.hammer': '站到石头上。大山会将它按住。',
   'abilityUi.cast.heart_heat_fist': '玄武岩之拳',
-  'abilityUi.cast.heart_heat_tear_free': '挣脱',
   'abilityUi.cast.heart_forge_wrath': '熔炉之怒',
   'abilityUi.cast.heart_forge_pour': '熔炉倾泻',
   'abilityUi.cast.heart_ember_bolt': '余烬箭',

@@ -4770,21 +4770,14 @@ export const id_ID: EnTranslations = {
       "heatGuardian": {
         "statePhase1": "Half sunk in its wellspring: it never moves. Basalt Fist slams a spot on the shore and three Molten Swells roll out from it, and Hearth Flare strikes everyone farther than {reach} yd from the wellspring. At 70% health it sinks and the Hearth overflows. Heroic deals {heroicPct}% more damage.",
         "statePhase2": "Half sunk in its wellspring: it never moves. Basalt Fist goes on; Hearthseeds fall under the raid and burst after a while, and Wakefire ignites the floor round the wellspring band by band. At 40% health it sinks and the Hearth overflows again. Heroic deals {heroicPct}% more damage.",
-        "statePhase3": "Half sunk in its wellspring: it never moves. Basalt Fist and Wakefire go on, and Rolling Cinders fall and hunt players: strike one to knock it back. On Heroic, at 10% health it tears itself free. Heroic deals {heroicPct}% more damage.",
-        "statePhase4": "Torn free of the wellspring: it can be tanked anywhere. The spirits of the Quench, the Breath and the Hammer fight beside you: freeze the Rolling Cinders on the Quench's ice, put out the blazes with the Breath's storm-rain, and drag it across a Stone Root to stop its Crushing Fist.",
+        "statePhase3": "Half sunk in its wellspring: it never moves. Basalt Fist and Wakefire go on, and Rolling Cinders fall and hunt players: strike one to knock it back. Heroic deals {heroicPct}% more damage.",
         "stateUnder": "Sunk in its wellspring: it cannot be attacked or harmed while the Hearth overflows. It rises again when the overflow ends.",
-        "stateTearing": "Tearing itself free of the wellspring: it cannot be attacked or harmed until it stands.",
         "scorched": "Takes {pct}% more Fire, Frost, Nature, Shadow and Arcane damage. Every {every} sec, Hearth Flare strikes everyone farther than {reach} yd from the wellspring and renews this.",
         "grip": "Takes {total} Fire damage every second ({per} for each of your {stacks} stacks). Each of the guardian's landed swings adds a stack, up to {most}, and lasts {seconds} sec: swap tanks before it grows too heavy.",
         "kindling": "In {seconds} sec you trail fire for {trail} sec. Each patch burns allies for {min} to {max} Fire damage a second and heals a Wellspawn standing in it by {heal}% of its health a second: leave the group and the Wellspawn's path.",
         "trail": "You leave a Cinder Trail: patches of fire {radius} yd wide that burn for {life} sec, dealing {min} to {max} Fire damage a second to allies in them and healing a Wellspawn in them by {heal}% of its health a second.",
         "hunted": "A Rolling Cinder or a Seedflame is after you. A Rolling Cinder that reaches you kills you and burns everyone within {radius} yd: keep away, and let allies strike it, each strike knocks it {knock} yd back (then not again for {crust} sec).",
-        "crust": "Cooled hard: strikes cannot knock it back until this ends.",
-        "rimelocked": "Frozen on the Quench's ice: it cannot move and takes {pct}% more damage.",
-        "stormRain": "Walk into a Creeping Blaze to put it out. Creeping Blaze cannot burn you.",
-        "crushMark": "The guardian's Crushing Fist strikes you for {min} to {max} Fire damage when its {seconds} sec charge ends. Drag it across a Stone Root first: the root holds it and the blow misses.",
-        "crushing": "Its Crushing Fist strikes its tank for {min} to {max} Fire damage when this ends, unless a Stone Root holds it first.",
-        "rooted": "Held by a Stone Root for {seconds} sec: it cannot move, and its Crushing Fist missed."
+        "crust": "Cooled hard: strikes cannot knock it back until this ends."
       },
       "sharedPyre": "Memberikan {total}% dari kesehatan maksimum setiap pemain, dibagi berdasarkan jumlah pemain di dalam lingkaran ({perPlayer}% masing-masing dengan {players} pemain).",
       "varkhulSharedPyre": "Memberikan {total}% kesehatan maksimum setiap pemain, dibagi di antara pemain di dalam lingkaran ({perPlayer}% masing-masing dengan {players} pemain). Setiap pemain yang hilang juga memberikan kerusakan {missingPenalty}% kesehatan maksimum ke seluruh raid, termasuk pemain di dalam lingkaran.",
@@ -7377,10 +7370,7 @@ export const id_ID: EnTranslations = {
         "keepers": "Wellkeepers rise from the wellspring! Tank them, and keep their marks away from the Wellspawn!",
         "seeds": "Hearthseeds fall! Drop them together and run!",
         "zones": "Wakefire! The Hearth ignites band by band: step out!",
-        "cinder": "A Rolling Cinder falls! Strike it back before it reaches its quarry!",
-        "tearFree": "The guardian tears itself free of the wellspring!",
-        "spirits": "The spirits of the Quench, the Breath and the Hammer come to the Hearth!",
-        "crush": "Crushing Fist! Drag the guardian across a Stone Root!"
+        "cinder": "A Rolling Cinder falls! Strike it back before it reaches its quarry!"
       },
       "say": {
         "pull": "You walk into the first flame. Nothing leaves it unchanged.",
@@ -7392,11 +7382,6 @@ export const id_ID: EnTranslations = {
         "seeds": "Every spark I scatter takes root.",
         "zones": "The Hearth wakes beneath your feet.",
         "cinder": "Run, little ember. The flame is hungry.",
-        "tearFree": "No more waiting in the well. I come for you myself!",
-        "crush": "This fist will break the mountain itself.",
-        "quench": "The cold remembers you. Let my ice bind its embers.",
-        "breath": "Take the storm-rain. Put its fire out.",
-        "hammer": "Stand on the stone. The mountain will hold it.",
         "wipe": "Ash, all of you. The Hearth burns on.",
         "death": "The flame... sinks back... into the stone. Carry it well."
       }
@@ -16708,7 +16693,6 @@ export const id_ID: EnTranslations = {
       "heart_breath_drawn_lightning": "Drawn Lightning",
       "heart_quench_blades_wake": "The Blades Wake",
       "heart_heat_fist": "Basalt Fist",
-      "heart_heat_tear_free": "Torn Free",
       "kituse_sanctum_topple_brazier": "Robohkan Anglo",
       "trash_demo_nova": "Ledakan Uji",
       "trash_demo_nova_unstoppable": "Ledakan Uji",
