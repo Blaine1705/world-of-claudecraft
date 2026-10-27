@@ -16658,17 +16658,17 @@ export const ru_RU: EnTranslations = {
       "sanctum_counterweight_lash": "Удар хвостом-противовесом",
       "sanctum_branding_iron": "Клеймо",
       "sanctum_rime_breath": "Изморозное дыхание",
-      "heart_mountains_wrath": "Mountain's Wrath",
-      "heart_bellows_gust": "Bellows Gust",
-      "heart_storm_lance": "Storm Lance",
-      "heart_quenching_breath": "Quenching Breath",
-      "heart_molten_pour": "Molten Pour",
-      "heart_anvil_clang": "Searing Knell",
-      "heart_forge_wrath": "Forge Wrath",
-      "heart_forge_pour": "Forge Pour",
+      "heart_mountains_wrath": "Гнев горы",
+      "heart_bellows_gust": "Порыв мехов",
+      "heart_storm_lance": "Грозовое копьё",
+      "heart_quenching_breath": "Дыхание закалки",
+      "heart_molten_pour": "Литьё расплава",
+      "heart_anvil_clang": "Палящий звон",
+      "heart_forge_wrath": "Гнев горна",
+      "heart_forge_pour": "Литьё горна",
       "heart_gale_bolt": "Gale Bolt",
       "heart_rime_bolt": "Rime Bolt",
-      "heart_ember_bolt": "Ember Bolt",
+      "heart_ember_bolt": "Угольная стрела",
       "heart_hammers_weight": "Тяжесть Молота",
       "heart_wake_the_stone": "Пробуждение камня",
       "heart_falling_rock": "Камнепад",
@@ -26511,31 +26511,31 @@ export const ru_RU: EnTranslations = {
         "name": "Оковы Мехов"
       },
       "heart_hammer_warder": {
-        "name": "Hammer Vein Warder"
+        "name": "Хранитель Жилы Молота"
       },
       "heart_ring_warder": {
-        "name": "Ring Forge Warder"
+        "name": "Хранитель Кольцевого Горна"
       },
       "heart_breath_warder": {
-        "name": "Breath Vein Warder"
+        "name": "Хранитель Жилы Дыхания"
       },
       "heart_breath_caller": {
-        "name": "Breath Vein Caller"
+        "name": "Призыватель Жилы Дыхания"
       },
       "heart_quench_warder": {
-        "name": "Quench Vein Warder"
+        "name": "Хранитель Жилы Закалки"
       },
       "heart_quench_caller": {
-        "name": "Quench Vein Caller"
+        "name": "Призыватель Жилы Закалки"
       },
       "heart_heat_warder": {
-        "name": "Heat Vein Warder"
+        "name": "Хранитель Жилы Жара"
       },
       "heart_heat_caller": {
-        "name": "Heat Vein Caller"
+        "name": "Призыватель Жилы Жара"
       },
       "heart_hammer_guardian": {
-        "name": "Guardian of the Hammer"
+        "name": "Страж Молота"
       },
       "heart_slabwright": {
         "name": "Плитотёс"
@@ -26544,16 +26544,16 @@ export const ru_RU: EnTranslations = {
         "name": "Певец Жилы"
       },
       "heart_breath_guardian": {
-        "name": "Guardian of the Breath"
+        "name": "Страж Дыхания"
       },
       "heart_quench_guardian": {
-        "name": "Guardian of the Quench"
+        "name": "Страж Закалки"
       },
       "heart_heat_guardian": {
-        "name": "Guardian of the Heat"
+        "name": "Страж Жара"
       },
       "heart_masterless_strength": {
-        "name": "The Masterless Strength"
+        "name": "Сила без хозяина"
       },
       "thorn_sprout": {
         "name": "Терновый росток"
@@ -30384,9 +30384,9 @@ export const ru_RU: EnTranslations = {
         "leaveText": "Вы пошатываясь выходите на горный ветер."
       },
       "smith_heart": {
-        "name": "The Smith's Heart",
-        "enterText": "The mountain hums around you, like a forge banked for the night...",
-        "leaveText": "You climb back out into the Stormcrag wind."
+        "name": "Сердце Кузнеца",
+        "enterText": "Гора гудит вокруг вас, словно горн, притушенный на ночь...",
+        "leaveText": "Вы выбираетесь обратно на ветер Грозового Утеса."
       },
       "nythraxis_crypt": {
         "name": "Заброшенный склеп",

@@ -16658,17 +16658,17 @@ export const zh_TW: EnTranslations = {
       "sanctum_counterweight_lash": "配重尾鞭",
       "sanctum_branding_iron": "烙鐵",
       "sanctum_rime_breath": "霜凇吐息",
-      "heart_mountains_wrath": "Mountain's Wrath",
-      "heart_bellows_gust": "Bellows Gust",
-      "heart_storm_lance": "Storm Lance",
-      "heart_quenching_breath": "Quenching Breath",
-      "heart_molten_pour": "Molten Pour",
-      "heart_anvil_clang": "Searing Knell",
-      "heart_forge_wrath": "Forge Wrath",
-      "heart_forge_pour": "Forge Pour",
+      "heart_mountains_wrath": "山岳之怒",
+      "heart_bellows_gust": "風箱狂風",
+      "heart_storm_lance": "風暴長槍",
+      "heart_quenching_breath": "淬火吐息",
+      "heart_molten_pour": "熔流傾瀉",
+      "heart_anvil_clang": "灼熱喪鐘",
+      "heart_forge_wrath": "熔爐之怒",
+      "heart_forge_pour": "熔爐傾瀉",
       "heart_gale_bolt": "Gale Bolt",
       "heart_rime_bolt": "Rime Bolt",
-      "heart_ember_bolt": "Ember Bolt",
+      "heart_ember_bolt": "餘燼箭",
       "heart_hammers_weight": "重錘之壓",
       "heart_wake_the_stone": "喚醒岩石",
       "heart_falling_rock": "落石",
@@ -26511,31 +26511,31 @@ export const zh_TW: EnTranslations = {
         "name": "風箱鐐銬"
       },
       "heart_hammer_warder": {
-        "name": "Hammer Vein Warder"
+        "name": "錘脈守衛"
       },
       "heart_ring_warder": {
-        "name": "Ring Forge Warder"
+        "name": "環爐守衛"
       },
       "heart_breath_warder": {
-        "name": "Breath Vein Warder"
+        "name": "息脈守衛"
       },
       "heart_breath_caller": {
-        "name": "Breath Vein Caller"
+        "name": "息脈召喚者"
       },
       "heart_quench_warder": {
-        "name": "Quench Vein Warder"
+        "name": "淬脈守衛"
       },
       "heart_quench_caller": {
-        "name": "Quench Vein Caller"
+        "name": "淬脈召喚者"
       },
       "heart_heat_warder": {
-        "name": "Heat Vein Warder"
+        "name": "熱脈守衛"
       },
       "heart_heat_caller": {
-        "name": "Heat Vein Caller"
+        "name": "熱脈召喚者"
       },
       "heart_hammer_guardian": {
-        "name": "Guardian of the Hammer"
+        "name": "重錘守護者"
       },
       "heart_slabwright": {
         "name": "石板匠"
@@ -26544,16 +26544,16 @@ export const zh_TW: EnTranslations = {
         "name": "礦脈歌者"
       },
       "heart_breath_guardian": {
-        "name": "Guardian of the Breath"
+        "name": "吐息守護者"
       },
       "heart_quench_guardian": {
-        "name": "Guardian of the Quench"
+        "name": "淬火守護者"
       },
       "heart_heat_guardian": {
-        "name": "Guardian of the Heat"
+        "name": "熾熱守護者"
       },
       "heart_masterless_strength": {
-        "name": "The Masterless Strength"
+        "name": "無主之力"
       },
       "thorn_sprout": {
         "name": "荊棘幼芽"
@@ -30384,9 +30384,9 @@ export const zh_TW: EnTranslations = {
         "leaveText": "你踉蹌回到山風之中。"
       },
       "smith_heart": {
-        "name": "The Smith's Heart",
-        "enterText": "The mountain hums around you, like a forge banked for the night...",
-        "leaveText": "You climb back out into the Stormcrag wind."
+        "name": "鐵匠之心",
+        "enterText": "群山在你周圍低鳴，宛如一座為夜晚封住的熔爐……",
+        "leaveText": "你爬回風暴岩的狂風之中。"
       },
       "nythraxis_crypt": {
         "name": "廢棄墓穴",

@@ -16658,17 +16658,17 @@ export const ko_KR: EnTranslations = {
       "sanctum_counterweight_lash": "평형추 꼬리채찍",
       "sanctum_branding_iron": "낙인 인두",
       "sanctum_rime_breath": "서리 숨결",
-      "heart_mountains_wrath": "Mountain's Wrath",
-      "heart_bellows_gust": "Bellows Gust",
-      "heart_storm_lance": "Storm Lance",
-      "heart_quenching_breath": "Quenching Breath",
-      "heart_molten_pour": "Molten Pour",
-      "heart_anvil_clang": "Searing Knell",
-      "heart_forge_wrath": "Forge Wrath",
-      "heart_forge_pour": "Forge Pour",
+      "heart_mountains_wrath": "산의 분노",
+      "heart_bellows_gust": "풀무 돌풍",
+      "heart_storm_lance": "폭풍 창",
+      "heart_quenching_breath": "담금질의 숨결",
+      "heart_molten_pour": "녹은 쇳물 붓기",
+      "heart_anvil_clang": "작열하는 조종",
+      "heart_forge_wrath": "화로의 분노",
+      "heart_forge_pour": "화로 붓기",
       "heart_gale_bolt": "Gale Bolt",
       "heart_rime_bolt": "Rime Bolt",
-      "heart_ember_bolt": "Ember Bolt",
+      "heart_ember_bolt": "잔불 화살",
       "heart_hammers_weight": "망치의 무게",
       "heart_wake_the_stone": "돌 깨우기",
       "heart_falling_rock": "낙석",
@@ -26511,31 +26511,31 @@ export const ko_KR: EnTranslations = {
         "name": "풀무 족쇄"
       },
       "heart_hammer_warder": {
-        "name": "Hammer Vein Warder"
+        "name": "망치 광맥 파수꾼"
       },
       "heart_ring_warder": {
-        "name": "Ring Forge Warder"
+        "name": "고리 화로 파수꾼"
       },
       "heart_breath_warder": {
-        "name": "Breath Vein Warder"
+        "name": "숨결 광맥 파수꾼"
       },
       "heart_breath_caller": {
-        "name": "Breath Vein Caller"
+        "name": "숨결 광맥 부름꾼"
       },
       "heart_quench_warder": {
-        "name": "Quench Vein Warder"
+        "name": "담금질 광맥 파수꾼"
       },
       "heart_quench_caller": {
-        "name": "Quench Vein Caller"
+        "name": "담금질 광맥 부름꾼"
       },
       "heart_heat_warder": {
-        "name": "Heat Vein Warder"
+        "name": "열기 광맥 파수꾼"
       },
       "heart_heat_caller": {
-        "name": "Heat Vein Caller"
+        "name": "열기 광맥 부름꾼"
       },
       "heart_hammer_guardian": {
-        "name": "Guardian of the Hammer"
+        "name": "망치의 수호자"
       },
       "heart_slabwright": {
         "name": "석판장이"
@@ -26544,16 +26544,16 @@ export const ko_KR: EnTranslations = {
         "name": "광맥의 노래꾼"
       },
       "heart_breath_guardian": {
-        "name": "Guardian of the Breath"
+        "name": "숨결의 수호자"
       },
       "heart_quench_guardian": {
-        "name": "Guardian of the Quench"
+        "name": "담금질의 수호자"
       },
       "heart_heat_guardian": {
-        "name": "Guardian of the Heat"
+        "name": "열기의 수호자"
       },
       "heart_masterless_strength": {
-        "name": "The Masterless Strength"
+        "name": "주인 없는 힘"
       },
       "thorn_sprout": {
         "name": "가시 새싹"
@@ -30384,9 +30384,9 @@ export const ko_KR: EnTranslations = {
         "leaveText": "산바람 속으로 비틀거리며 돌아옵니다."
       },
       "smith_heart": {
-        "name": "The Smith's Heart",
-        "enterText": "The mountain hums around you, like a forge banked for the night...",
-        "leaveText": "You climb back out into the Stormcrag wind."
+        "name": "대장장이의 심장",
+        "enterText": "산이 당신을 감싸고 웅웅 울립니다. 밤을 위해 불을 묻어 둔 화로처럼...",
+        "leaveText": "스톰크래그의 바람 속으로 다시 올라갑니다."
       },
       "nythraxis_crypt": {
         "name": "버려진 납골당",

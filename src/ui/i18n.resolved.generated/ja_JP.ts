@@ -16658,17 +16658,17 @@ export const ja_JP: EnTranslations = {
       "sanctum_counterweight_lash": "重り尾の鞭打ち",
       "sanctum_branding_iron": "焼き印",
       "sanctum_rime_breath": "霧氷のブレス",
-      "heart_mountains_wrath": "Mountain's Wrath",
-      "heart_bellows_gust": "Bellows Gust",
-      "heart_storm_lance": "Storm Lance",
-      "heart_quenching_breath": "Quenching Breath",
-      "heart_molten_pour": "Molten Pour",
-      "heart_anvil_clang": "Searing Knell",
-      "heart_forge_wrath": "Forge Wrath",
-      "heart_forge_pour": "Forge Pour",
+      "heart_mountains_wrath": "山の怒り",
+      "heart_bellows_gust": "ふいごの突風",
+      "heart_storm_lance": "嵐の槍",
+      "heart_quenching_breath": "焼き入れの息吹",
+      "heart_molten_pour": "溶鉄の注ぎ",
+      "heart_anvil_clang": "灼熱の弔鐘",
+      "heart_forge_wrath": "炉の怒り",
+      "heart_forge_pour": "炉の注ぎ",
       "heart_gale_bolt": "Gale Bolt",
       "heart_rime_bolt": "Rime Bolt",
-      "heart_ember_bolt": "Ember Bolt",
+      "heart_ember_bolt": "残り火の矢",
       "heart_hammers_weight": "槌の重み",
       "heart_wake_the_stone": "石の目覚め",
       "heart_falling_rock": "落石",
@@ -26511,31 +26511,31 @@ export const ja_JP: EnTranslations = {
         "name": "ふいごの枷"
       },
       "heart_hammer_warder": {
-        "name": "Hammer Vein Warder"
+        "name": "槌脈の番人"
       },
       "heart_ring_warder": {
-        "name": "Ring Forge Warder"
+        "name": "環炉の番人"
       },
       "heart_breath_warder": {
-        "name": "Breath Vein Warder"
+        "name": "息吹脈の番人"
       },
       "heart_breath_caller": {
-        "name": "Breath Vein Caller"
+        "name": "息吹脈の呼び手"
       },
       "heart_quench_warder": {
-        "name": "Quench Vein Warder"
+        "name": "焼き入れ脈の番人"
       },
       "heart_quench_caller": {
-        "name": "Quench Vein Caller"
+        "name": "焼き入れ脈の呼び手"
       },
       "heart_heat_warder": {
-        "name": "Heat Vein Warder"
+        "name": "熱脈の番人"
       },
       "heart_heat_caller": {
-        "name": "Heat Vein Caller"
+        "name": "熱脈の呼び手"
       },
       "heart_hammer_guardian": {
-        "name": "Guardian of the Hammer"
+        "name": "槌の守護者"
       },
       "heart_slabwright": {
         "name": "石板の匠"
@@ -26544,16 +26544,16 @@ export const ja_JP: EnTranslations = {
         "name": "鉱脈の歌い手"
       },
       "heart_breath_guardian": {
-        "name": "Guardian of the Breath"
+        "name": "息吹の守護者"
       },
       "heart_quench_guardian": {
-        "name": "Guardian of the Quench"
+        "name": "焼き入れの守護者"
       },
       "heart_heat_guardian": {
-        "name": "Guardian of the Heat"
+        "name": "熱の守護者"
       },
       "heart_masterless_strength": {
-        "name": "The Masterless Strength"
+        "name": "主なき剛力"
       },
       "thorn_sprout": {
         "name": "茨の芽"
@@ -30384,9 +30384,9 @@ export const ja_JP: EnTranslations = {
         "leaveText": "山風の中へよろめき戻ります。"
       },
       "smith_heart": {
-        "name": "The Smith's Heart",
-        "enterText": "The mountain hums around you, like a forge banked for the night...",
-        "leaveText": "You climb back out into the Stormcrag wind."
+        "name": "鍛冶師の心臓",
+        "enterText": "山があなたを包んで唸る。夜のために火を落とした炉のように……",
+        "leaveText": "ストームクラッグの風の中へと登って戻る。"
       },
       "nythraxis_crypt": {
         "name": "放棄された地下墓所",
