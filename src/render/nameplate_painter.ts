@@ -422,7 +422,8 @@ export class NameplatePainter {
         this.plateBounty.get(id) !== entity.hillBounty;
       // Play Dead (hunter feign death) hides a player's bar the frame it lands.
       const feignFlipped = entity.kind === 'player' && state.hpVisible === shownDead(entity);
-      const flipped = pvpFlipped || bountyFlipped || feignFlipped;
+      const markerOnlyFlipped = state.markerOnly !== plan.markerOnly;
+      const flipped = pvpFlipped || bountyFlipped || feignFlipped || markerOnlyFlipped;
       if (!state.initialized || fullPass || plan.urgent || languageChanged || flipped) {
         this.resolveContent(state, entity, player, plan, showOwnNameplate, showDevBadges);
         // Recorded here, not inside resolveContent's early-returning branches,
@@ -430,6 +431,8 @@ export class NameplatePainter {
         if (entity.hillBounty) this.plateBounty.set(id, entity.hillBounty);
         else this.plateBounty.delete(id);
       }
+      // A far NPC draws only its quest marker; with none there is no plate.
+      if (plan.markerOnly && !state.marker) continue;
 
       const anchor = this.anchorScratch[this.anchorCount];
       if (anchor) {
@@ -737,7 +740,9 @@ export class NameplatePainter {
     state.nameColor = '#fff';
     state.level = '';
     state.levelColor = '#fff';
-    state.guild = entity.kind === 'npc' ? (npcRoleLabel(entity.templateId) ?? '') : '';
+    // A far NPC's marker stands alone above the head, without its role line.
+    state.guild =
+      entity.kind === 'npc' && !plan.markerOnly ? (npcRoleLabel(entity.templateId) ?? '') : '';
     state.guildLabel = '';
     state.guildTier = 0;
     state.title = '';
@@ -754,6 +759,7 @@ export class NameplatePainter {
     state.emoteIconUrl = '';
     state.emoteLabel = '';
     state.friendlyPet = false;
+    state.markerOnly = plan.markerOnly;
 
     const raidMark = plan.nameOnly ? null : this.world.markerFor(entity.id);
     if (raidMark !== null) state.raidMarkerUrl = raidMarkerDataUrl(raidMark);
@@ -885,6 +891,10 @@ export class NameplatePainter {
     state.badges.length = 0;
 
     if (isNpcPlateEntity(entity)) {
+      const questMarker = this.questMarker(entity);
+      state.marker = questMarker.marker;
+      state.markerTone = questMarker.tone;
+      if (plan.markerOnly) return;
       state.name =
         entity.kind === 'npc'
           ? npcDisplayName(entity.templateId)
@@ -908,9 +918,6 @@ export class NameplatePainter {
           state.title = professionTrainerNameplateLabel(entity.templateId);
         }
       }
-      const questMarker = this.questMarker(entity);
-      state.marker = questMarker.marker;
-      state.markerTone = questMarker.tone;
       return;
     }
 

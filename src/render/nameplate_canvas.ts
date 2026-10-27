@@ -134,6 +134,10 @@ export interface NameplateCanvasState {
   raidMarkerUrl: string;
   emoteIconUrl: string;
   emoteLabel: string;
+  /** The plan's markerOnly the content was resolved with: the painter
+   *  re-resolves the frame an NPC crosses NPC_NAMEPLATE_RANGE, so its name
+   *  never lingers on a far plate or waits to appear on a near one. */
+  markerOnly: boolean;
 }
 
 export function createNameplateCanvasState(): NameplateCanvasState {
@@ -179,6 +183,7 @@ export function createNameplateCanvasState(): NameplateCanvasState {
     raidMarkerUrl: '',
     emoteIconUrl: '',
     emoteLabel: '',
+    markerOnly: false,
   };
 }
 

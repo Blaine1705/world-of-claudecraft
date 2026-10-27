@@ -161,9 +161,15 @@ function harness(knobs: {
   cadenceBlocked?: boolean;
   questIds?: string[];
   questStates?: Record<string, QuestState>;
+  /** The viewer's distance from the NPC (default 3, inside NPC_NAMEPLATE_RANGE). */
+  viewerZ?: number;
 }) {
   const orderId = knobs.orderId ?? WORK_ORDER.id;
-  const me = entity({ id: 1, name: 'Me', pos: { x: 0, y: 0, z: 3 } as Entity['pos'] });
+  const me = entity({
+    id: 1,
+    name: 'Me',
+    pos: { x: 0, y: 0, z: knobs.viewerZ ?? 3 } as Entity['pos'],
+  });
   const npc = entity({
     id: 2,
     kind: 'npc',
@@ -441,5 +447,38 @@ describe('nameplate quest marker ambient policy (real profession content)', () =
     mutable.questState = () => 'available';
     painter.update(false);
     expectMarker(painter, '', 'none');
+  });
+});
+
+describe('nameplate quest marker beyond the close NPC plate range', () => {
+  const order = { orderId: SYNTH_ORDER };
+  const plated = (painter: NameplatePainter) =>
+    (painter as unknown as PainterStateAccess & { anchorCount: number }).anchorCount;
+
+  it('draws only the marker for a far quest giver, then the full plate up close', () => {
+    const { painter, world } = harness({ ...order, state: 'available', viewerZ: 30 });
+    painter.update(true);
+    expectMarker(painter, '!', 'quest');
+    expect(stateOf(painter, 2).name).toBe('');
+    expect(stateOf(painter, 2).guild).toBe('');
+    expect(plated(painter)).toBe(1);
+
+    // Walking inside NPC_NAMEPLATE_RANGE re-resolves on a throttled pass too.
+    world.player.pos.z = 3;
+    painter.update(false);
+    expectMarker(painter, '!', 'quest');
+    expect(stateOf(painter, 2).name).not.toBe('');
+
+    // And walking back out drops the name on the next pass.
+    world.player.pos.z = 30;
+    painter.update(false);
+    expect(stateOf(painter, 2).name).toBe('');
+  });
+
+  it('draws nothing for a far NPC with no marker', () => {
+    const { painter } = harness({ ...order, state: 'unavailable', viewerZ: 30 });
+    painter.update(true);
+    expectMarker(painter, '', 'none');
+    expect(plated(painter)).toBe(0);
   });
 });
