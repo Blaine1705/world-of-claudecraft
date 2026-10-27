@@ -8,16 +8,28 @@
 // damage rolls.
 
 import { BREATH, SMITH_HEART_FIELD } from '../../content/smith_heart_layout';
-import { createGroundObject } from '../../entity';
 import { authoredFieldHeight } from '../../instances/authored_field';
 import { displaceAlong } from '../../knockback';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
-import type { Aura, Entity } from '../../types';
+import type { Entity } from '../../types';
 import { pickMarkTargets, startBar } from '../sunken_bastion/claim';
 import { inBreathArena } from './breath_geometry';
 import { BREATH_AURAS, type BreathDifficultyRules } from './breath_ids';
 import type { BreathFightState } from './breath_state';
+import { local } from './fight_kit';
+
+// The shared plumbing (fight_kit.ts), under the names the Breath's modules use.
+export {
+  auraOf,
+  dropAura,
+  dropFightObject as dropBreathObject,
+  living,
+  local,
+  moveFightObject as moveBreathObject,
+  putMarker,
+  spawnFightObject as spawnBreathObject,
+} from './fight_kit';
 
 export interface BreathScope {
   ctx: SimContext;
@@ -27,17 +39,6 @@ export interface BreathScope {
   /** Living players on the Cornice's floor, entity-id order. */
   players: readonly Entity[];
   rules: BreathDifficultyRules;
-}
-
-/** A body that stands and fights (alive). */
-export function living(e: Entity | null | undefined): e is Entity {
-  return e !== null && e !== undefined && !e.dead && e.hp > 0;
-}
-
-/** Instance-local (x, z) of an entity. */
-export function local(ctx: SimContext, inst: InstanceSlot, e: Entity): { x: number; z: number } {
-  const o = ctx.instanceOriginOf(inst);
-  return { x: e.pos.x - o.x, z: e.pos.z - o.z };
 }
 
 /** Living, present players of a claim standing on the Cornice's fighting
@@ -155,93 +156,7 @@ export function holdPlanted(s: BreathScope): void {
   s.ctx.rebucket(b);
 }
 
-// ---- the fight's objects ----------------------------------------------------------------
-
-/** One of the fight's objects at instance-local (x, z): on the claim's roster
- *  so a freed claim drops it with everything else. */
-export function spawnBreathObject(
-  ctx: SimContext,
-  inst: InstanceSlot,
-  templateId: string,
-  name: string,
-  lx: number,
-  lz: number,
-  scale: number,
-): Entity {
-  const o = ctx.instanceOriginOf(inst);
-  const obj = createGroundObject(ctx.nextId++, '', name, ctx.groundPos(o.x + lx, o.z + lz));
-  obj.templateId = templateId;
-  obj.dungeonId = inst.dungeonId;
-  obj.objectItemId = null;
-  obj.lootable = false;
-  obj.scale = scale;
-  ctx.addEntity(obj);
-  inst.objectIds.push(obj.id);
-  return obj;
-}
-
-/** Take one of the fight's objects out of the claim and the world. */
-export function dropBreathObject(ctx: SimContext, inst: InstanceSlot, id: number | null): void {
-  if (id === null) return;
-  const at = inst.objectIds.indexOf(id);
-  if (at >= 0) inst.objectIds.splice(at, 1);
-  if (ctx.entities.has(id)) ctx.dropEntity(id);
-}
-
-/** Move one of the fight's objects to instance-local (x, z). */
-export function moveBreathObject(
-  ctx: SimContext,
-  inst: InstanceSlot,
-  e: Entity,
-  lx: number,
-  lz: number,
-): void {
-  const o = ctx.instanceOriginOf(inst);
-  const p = ctx.groundPos(o.x + lx, o.z + lz);
-  e.prevPos = { ...e.pos };
-  e.pos = p;
-  ctx.rebucket(e);
-}
-
 // ---- auras --------------------------------------------------------------------------------
-
-/** An encounter marker on a player or the guardian: a quiet `internal_cd`
- *  (no stat, no speed: the fight reads it by id), never cleansed. Replaces
- *  any older one of the same id. */
-export function putMarker(
-  e: Entity,
-  id: string,
-  name: string,
-  seconds: number,
-  sourceId: number,
-  extra: Partial<Pick<Aura, 'value' | 'value2' | 'value3' | 'stacks' | 'permanent'>> = {},
-): Aura {
-  dropAura(e, id);
-  const a: Aura = {
-    id,
-    name,
-    kind: 'internal_cd',
-    remaining: seconds,
-    duration: seconds,
-    value: 0,
-    sourceId,
-    school: 'nature',
-    undispellable: true,
-    ...extra,
-  };
-  e.auras.push(a);
-  return a;
-}
-
-/** Drop an aura by id (no-op when absent). */
-export function dropAura(e: Entity, id: string): void {
-  if (e.auras.some((a) => a.id === id)) e.auras = e.auras.filter((a) => a.id !== id);
-}
-
-/** The aura of `id` on `e`, or undefined. */
-export function auraOf(e: Entity, id: string): Aura | undefined {
-  return e.auras.find((a) => a.id === id);
-}
 
 /** Held in Thessaly's calm: no wind, pull, blast or throw moves this body. */
 export function anchored(e: Entity): boolean {
