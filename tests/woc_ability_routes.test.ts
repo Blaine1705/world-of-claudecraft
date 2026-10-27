@@ -95,6 +95,7 @@ const ROUTES: Record<
     attackByAbility: {
       smite: 'Woc_Cast_Shoot',
       mind_blast: 'Woc_Cast_Shoot',
+      void_rupture: 'Woc_Cast_Shoot',
     },
     castByAbility: {
       mind_flay: 'Woc_Channel_Directed',
