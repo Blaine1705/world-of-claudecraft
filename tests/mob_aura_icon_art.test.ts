@@ -180,8 +180,9 @@ describe('mob aura icon art', () => {
     // wildheart_beastmaster), so 111 + 5 - 4. Identities: three new per-template
     // runtime ids (blind_, stackpoison_, warcry_) minus the beastmaster's two;
     // pack_frenzy and mob_charge_stun are shared ids that still have carriers.
-    expect(census.carrierCount).toBe(112);
-    expect(census.identities.size).toBe(92);
+    // The Gourdlight crow adds one blind identity, reusing the existing painting.
+    expect(census.carrierCount).toBe(113);
+    expect(census.identities.size).toBe(93);
     expect([...MOB_AURA_IMAGE_IDS].sort()).toEqual([...new Set(census.identities.values())].sort());
     expect(MOB_AURA_IMAGE_IDS.size).toBe(44);
     for (const [runtimeId, artIdentity] of census.identities) {
