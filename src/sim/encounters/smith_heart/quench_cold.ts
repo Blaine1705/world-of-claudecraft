@@ -98,7 +98,8 @@ export function freezePlayer(s: QuenchScope, p: Entity): void {
     kind: 'stun',
     remaining: T.freezeSeconds,
     duration: T.freezeSeconds,
-    value: 0,
+    // The shatter's splash radius (the difficulty's): every client rings it.
+    value: s.rules.splashR,
     sourceId: s.boss.id,
     school: 'frost',
     unbreakableControl: true,

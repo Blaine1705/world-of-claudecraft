@@ -7,5 +7,8 @@ export { CouncilFx } from './council_fx';
 export { FinalFx } from './final_fx';
 export { HammerFx } from './hammer_fx';
 export { HeatFx } from './heat_fx';
+export { QuenchBladesFx } from './quench_blades_fx';
+export { QuenchBody } from './quench_body';
+export { QuenchFightFx } from './quench_fight_fx';
 export { QuenchFx } from './quench_fx';
 export { SealShake } from './seal_shake';

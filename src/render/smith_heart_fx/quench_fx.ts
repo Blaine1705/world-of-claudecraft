@@ -304,14 +304,15 @@ export class QuenchFx {
         creeping: false,
       });
     }
-    // The spikes of ice (two strikes and a breath in flight at once).
+    // The spikes of ice (the guardian's strikes and breath, and the Smith's
+    // blades echoing them: quench_fight_fx.ts asks through echoAt).
     const spike = spikeGeometry();
     this.geometries.push(spike);
     const iceMat = heartKitSlotMaterial('ice');
-    for (let i = 0; i < QUENCH_FX_POOLS.spikes + 1; i++) {
-      const breath = i === QUENCH_FX_POOLS.spikes;
+    for (let i = 0; i < QUENCH_FX_POOLS.spikes + QUENCH_FX_POOLS.breaths; i++) {
+      const breath = i >= QUENCH_FX_POOLS.spikes;
       const spikes = breath
-        ? this.breathShards(0x77)
+        ? this.breathShards(0x77 + (i - QUENCH_FX_POOLS.spikes) * 13)
         : strikeSpikes(0x31 + i * 7, this.sim.strikeArcDeg, this.sim.strikeRange);
       const mesh = new THREE.InstancedMesh(spike, iceMat, spikes.length);
       mesh.name = breath ? 'smithHeartQuenchBreathIce' : 'smithHeartQuenchStrikeIce';
@@ -376,12 +377,25 @@ export class QuenchFx {
     if (!this.world || this.disposed || ev.type !== 'spellfx') return false;
     if (ev.ability === QUENCHING_BREATH && ev.fx === 'nova') {
       const e = this.world.entities.get(ev.sourceId);
-      if (e) this.breathLands(e);
+      if (e) {
+        const c = this.charges.get(e.id);
+        if (c) this.endCharge(c);
+        this.breathAt(e.pos.x, e.pos.z, e.facing);
+      }
     } else if (ev.fx === 'windup' && ev.ability === ARC_CLEAVE_ABILITY) {
       const e = this.world.entities.get(ev.sourceId);
-      if (e && e.templateId === QUENCH_GUARDIAN) this.strike(e);
+      if (e && e.templateId === QUENCH_GUARDIAN) this.strikeAt(e.pos.x, e.pos.z, e.facing);
     }
     return false;
+  }
+
+  /** One of the Smith's blades echoes the guardian's attack from (x, z),
+   *  facing `yaw` (world): the same freezing gust or ice as the guardian's
+   *  own (quench_fight_fx.ts calls this when an echo lands). */
+  echoAt(kind: 'breath' | 'strike', x: number, z: number, yaw: number): void {
+    if (this.disposed) return;
+    if (kind === 'breath') this.breathAt(x, z, yaw);
+    else this.strikeAt(x, z, yaw);
   }
 
   update(dt: number): void {
@@ -500,13 +514,8 @@ export class QuenchFx {
 
   // ---- Quenching Breath lands -----------------------------------------------------------
 
-  private breathLands(e: Entity): void {
-    const c = this.charges.get(e.id);
-    if (c) this.endCharge(c);
-    const x = e.pos.x;
-    const z = e.pos.z;
+  private breathAt(x: number, z: number, yaw: number): void {
     const y = this.groundY(x, z);
-    const yaw = e.facing;
     const R = this.sim.breathRange;
     const half = (this.sim.breathArcDeg * Math.PI) / 360;
     // The frost: the whole cone frosted, staying a while.
@@ -549,27 +558,22 @@ export class QuenchFx {
       });
     }
     // The ice ripping up behind the front.
-    const set = this.spikeSets[QUENCH_FX_POOLS.spikes];
-    this.liftSpikes(set, x, y, z, yaw);
+    this.liftSpikes(this.freeSet(QUENCH_FX_POOLS.spikes, QUENCH_FX_POOLS.breaths), x, y, z, yaw);
     this.particles.shockRing(x, z, C.ringCold, 7, 0.45);
     this.shakeNear(x, z, 0.35, R + 20);
   }
 
   // ---- Tempering Strike ---------------------------------------------------------------
 
-  private strike(e: Entity): void {
-    const x = e.pos.x;
-    const z = e.pos.z;
+  /** The first idle set of `count` from `from` (all live: the first). */
+  private freeSet(from: number, count: number): SpikeSet {
+    for (let i = from; i < from + count; i++) if (!this.spikeSets[i].live) return this.spikeSets[i];
+    return this.spikeSets[from];
+  }
+
+  private strikeAt(x: number, z: number, yaw: number): void {
     const y = this.groundY(x, z);
-    const yaw = e.facing;
-    let set = this.spikeSets[0];
-    for (let i = 0; i < QUENCH_FX_POOLS.spikes; i++) {
-      if (!this.spikeSets[i].live) {
-        set = this.spikeSets[i];
-        break;
-      }
-    }
-    this.liftSpikes(set, x, y, z, yaw);
+    this.liftSpikes(this.freeSet(0, QUENCH_FX_POOLS.spikes), x, y, z, yaw);
     this.layFrost(x, z, yaw, 'strike', 1, STRIKE_FROST_SECONDS);
     const half = (this.sim.strikeArcDeg * Math.PI) / 360;
     for (let k = 0; k < Math.round(10 * this.density); k++) {

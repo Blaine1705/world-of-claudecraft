@@ -63,6 +63,9 @@ import {
   FinalFx,
   HammerFx,
   HeatFx,
+  QuenchBladesFx,
+  QuenchBody,
+  QuenchFightFx,
   QuenchFx,
   SealShake,
 } from './smith_heart_fx';
@@ -160,6 +163,11 @@ export class RiftDeathZoneVisuals {
   // Its Quench guardian (Quenching Breath's cone telegraph and its frost,
   // Tempering Strike's ice).
   private readonly quenchFx: QuenchFx;
+  /** The Guardian of the Quench's fight on the Frozen Lake, the Smith's four
+   *  blades, and its body. */
+  private readonly quenchFight: QuenchFightFx;
+  private readonly quenchBlades: QuenchBladesFx;
+  private readonly quenchBody: QuenchBody;
   // Its Heat guardian (Molten Pour's lane and Searing Knell's ring
   // telegraphs, and the first flame's fire).
   private readonly heatFx: HeatFx;
@@ -309,6 +317,10 @@ export class RiftDeathZoneVisuals {
     this.breathFight = new BreathFightFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.breathBody = new BreathBody(scene, groundY, world, compileGate, reducedMotion, shake);
     this.quenchFx = new QuenchFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.quenchFight = new QuenchFightFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.quenchFight.setEchoLook((kind, x, z, yaw) => this.quenchFx.echoAt(kind, x, z, yaw));
+    this.quenchBlades = new QuenchBladesFx(scene, groundY, world, compileGate, reducedMotion);
+    this.quenchBody = new QuenchBody(scene, groundY, world, compileGate, reducedMotion, shake);
     this.heatFx = new HeatFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.finalFx = new FinalFx(scene, groundY, world, compileGate, reducedMotion, shake);
     this.councilFx = new CouncilFx(scene, groundY, world, compileGate, reducedMotion, shake);
@@ -403,6 +415,9 @@ export class RiftDeathZoneVisuals {
     this.breathFight.update(dt);
     this.breathBody.update(dt);
     this.quenchFx.update(dt);
+    this.quenchFight.update(dt);
+    this.quenchBlades.update(dt);
+    this.quenchBody.update(dt);
     this.heatFx.update(dt);
     this.finalFx.update(dt);
     this.councilFx.update(dt);
@@ -456,6 +471,9 @@ export class RiftDeathZoneVisuals {
     this.breathFight.dispose();
     this.breathBody.dispose();
     this.quenchFx.dispose();
+    this.quenchFight.dispose();
+    this.quenchBlades.dispose();
+    this.quenchBody.dispose();
     this.heatFx.dispose();
     this.finalFx.dispose();
     this.councilFx.dispose();
@@ -490,6 +508,8 @@ export class RiftDeathZoneVisuals {
     this.breathBody.handleEvent(event);
     const breath = this.breathFight.handleEvent(event);
     this.quenchFx.handleEvent(event);
+    this.quenchBody.handleEvent(event);
+    const quench = this.quenchFight.handleEvent(event);
     this.heatFx.handleEvent(event);
     this.finalFx.handleEvent(event);
     this.councilBodies.handleEvent(event);
@@ -503,7 +523,8 @@ export class RiftDeathZoneVisuals {
       engine ||
       crypt ||
       council ||
-      breath
+      breath ||
+      quench
     );
   }
 

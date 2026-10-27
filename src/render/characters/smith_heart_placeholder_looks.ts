@@ -46,8 +46,11 @@ export const SMITH_HEART_PLACEHOLDER_LOOKS: Record<string, string> = {
   // body too) is drawn by smith_heart_fx/breath_body.ts. Final: its own model
   // (the official pipeline), the same joints.
   heart_breath_guardian: 'smith_heart_breath_guardian',
-  // Final: a glacier giant of clear ice with the lake's cold light inside.
-  heart_quench_guardian: 'mob_hoard_rime_elemental',
+  // The Guardian of the Quench: a bodyless target; its provisional body (an
+  // ice guardian of frost granite and clear lake ice, the lake's cold light
+  // in its heart) is drawn by smith_heart_fx/quench_body.ts. Final: its own
+  // model (the official pipeline), the same joints.
+  heart_quench_guardian: 'smith_heart_quench_guardian',
   // Final: an anvil-bodied forge giant pouring white-gold metal. (The heavy
   // construct, tinted white-gold by its entity colour, never a lava golem.)
   heart_heat_guardian: 'skel_golem',
