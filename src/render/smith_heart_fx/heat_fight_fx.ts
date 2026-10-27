@@ -157,6 +157,9 @@ const FLAME_PUFF = {
   radius: 1,
 };
 
+/** The embers' flames, written in place (no allocation a frame). */
+const EMBERS_FLAME = { ...FLAME_PUFF, radius: 1 };
+
 // ---- shaders ---------------------------------------------------------------------------
 
 const NOISE = /* glsl */ `
@@ -1406,8 +1409,10 @@ void main() {
       this.embers.setMatrixAt(n, _m.compose(_v, _q.identity(), _s));
       this.embers.setColorAt(n, _c.setRGB(Math.max(0.25, burn), heatFightHash(e.id, 7), 0));
       n++;
-      if (this.rand() < dt * 6 * this.density * burn)
-        this.particles.puff(_v.x, _v.y + 0.2, _v.z, 1, { ...FLAME_PUFF, radius: r * 0.7 });
+      if (this.rand() < dt * 6 * this.density * burn) {
+        EMBERS_FLAME.radius = r * 0.7;
+        this.particles.puff(_v.x, _v.y + 0.2, _v.z, 1, EMBERS_FLAME);
+      }
     }
     for (let i = n; i < P.embers; i++) this.embers.setMatrixAt(i, _zero);
     this.embers.instanceMatrix.needsUpdate = true;
