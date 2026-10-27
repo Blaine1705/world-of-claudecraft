@@ -1432,6 +1432,77 @@ export const SFX = [
     prompt:
       'A rush of wind howling down past a cliff edge into a deep chasm, falling away into the distance. No music, no voice.',
   },
+
+  // --- The Smith's Heart: the Guardian of the Quench (ElevenLabs Sound Effects)
+  // Positioned one-shots for the Frozen Lake fight, played by
+  // src/game/smith_heart_quench_audio.ts off the fight's cues, the cracks as
+  // they appear and the guardian's awakening bar.
+  {
+    key: 'heart_quench_freeze',
+    duration: 1.5,
+    prompt:
+      'A body being encased in ice in an instant: a fast crystalline crackle of freezing water locking solid, a sharp glassy tightening. No music, no voice.',
+  },
+  {
+    key: 'heart_quench_shatter',
+    duration: 1.6,
+    prompt:
+      'A thick block of ice exploding apart: a bright violent shatter, shards of ice tinkling and skittering across a frozen lake, a cold whoosh. Single event, no music.',
+  },
+  {
+    key: 'heart_quench_crack',
+    duration: 2.5,
+    prompt:
+      'Thick lake ice groaning and cracking under heavy weight: a deep resonant twang of stressed ice, a spreading crackle racing outward. No music.',
+  },
+  {
+    key: 'heart_quench_hole',
+    duration: 2,
+    prompt:
+      'Lake ice giving way: a loud crack and collapse of breaking ice, a heavy splash of freezing water surging up through the hole, chunks of ice bobbing. No music.',
+  },
+  {
+    key: 'heart_quench_plunge',
+    duration: 1,
+    prompt:
+      'A person plunging through ice into freezing water: a heavy splash and gurgle, ice chunks knocking, a gasp-like rush of bubbles. No music, no voice.',
+  },
+  {
+    key: 'heart_quench_climb',
+    duration: 1.5,
+    prompt:
+      'Someone hauling themselves out of icy water onto ice: water pouring and dripping off, a scrape on ice, a wet slap. No music, no voice.',
+  },
+  {
+    key: 'heart_quench_wake_charge',
+    duration: 4,
+    prompt:
+      'Deep ice groaning and straining under a frozen lake, a rising crystalline choir-like hum of resonating ice building in tension for four seconds. Wordless, no melody, no music.',
+  },
+  {
+    key: 'heart_quench_wake',
+    duration: 3,
+    prompt:
+      'Giant swords of ice tearing free from a frozen lake: a huge explosive crack of breaking ice, massive shards bursting upward, a ringing crystalline resonance like a struck glass bell. No music, no voice.',
+  },
+  {
+    key: 'heart_quench_echo',
+    duration: 1.5,
+    prompt:
+      'A blast of freezing wind and ice released from a floating crystal blade: a sharp resonant ice whoosh with a glassy echo tail. Single event, no music.',
+  },
+  {
+    key: 'heart_quench_cross',
+    duration: 2,
+    prompt:
+      'Two enormous ice blades swooping fast across a frozen lake: a deep doubled whoosh of cutting air, ice crackling and splintering in their wake. No music.',
+  },
+  {
+    key: 'heart_quench_rim',
+    duration: 0.5,
+    prompt:
+      'A ring of shore ice heaving up out of a frozen lake: a deep grinding rumble of ice plates pushing upward, cracking and settling. No music.',
+  },
 ];
 
 // Family ids that have creature vocalizations (used by the integration layer to

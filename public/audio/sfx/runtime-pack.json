@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "be4d86ced16e78cc8e2f07068be84e5617d9183465f872b8836721602593056e",
-  "catalogHash": "8018247a496de90e67680f78d71bbcc51e57d5bcaa8c2980af5910f74c41b839",
+  "bundleId": "6c899213174d7a8548e4d5fb25c5ebbb55d5cc89d50d6360f45dc784a16335d2",
+  "catalogHash": "46881541c023a5e48c5413b967ee9bc0b44a2e52e2531ebbc22416332a6e5208",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -1235,6 +1235,138 @@
           "url": "/audio/sfx/heart_council_wrath_charge.mp3?v=8dd2bec1e590",
           "bytes": 97846,
           "sha256": "8dd2bec1e5902b24580aa5099e305076af53bfdb6cbe8c108f6d10985d0dbedc"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_quench_climb": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_quench_climb.mp3?v=7abc703abd2e",
+          "bytes": 49572,
+          "sha256": "7abc703abd2e354e06174f22080c4acf96b0185ae05a4980412e29bb92880215"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_quench_crack": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_quench_crack.mp3?v=f302c143cfff",
+          "bytes": 49572,
+          "sha256": "f302c143cfffb77faa8af9eaea8049332898e0cec2a19ef8b1fd9ad98a4456f9"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_quench_cross": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_quench_cross.mp3?v=2c6d8af3504a",
+          "bytes": 49572,
+          "sha256": "2c6d8af3504a11419ede4fef4f87c506be006fcef051e43b6227ef9798f39c5b"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_quench_echo": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_quench_echo.mp3?v=63fda15a53cf",
+          "bytes": 37033,
+          "sha256": "63fda15a53cf476eec84f48669967d98db18a55fed4e90c0ce3d39717f11fe58"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_quench_freeze": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_quench_freeze.mp3?v=4f1d0cde590c",
+          "bytes": 49572,
+          "sha256": "4f1d0cde590c948f5b5e5a0a21cbebf39e123d56e94b9be90ecee0a47e15a1b2"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_quench_hole": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_quench_hole.mp3?v=929d0d4d1738",
+          "bytes": 49572,
+          "sha256": "929d0d4d17381bafce3c58429731cd2b6dce97adad95bb83bf8c37fff9cbe610"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_quench_plunge": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_quench_plunge.mp3?v=e93d1bddd4b0",
+          "bytes": 25748,
+          "sha256": "e93d1bddd4b0aba387a9851c8b882f8ebbaf5633afb75334c69c6e0b72c4dfce"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_quench_rim": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_quench_rim.mp3?v=a8d46e47090a",
+          "bytes": 13209,
+          "sha256": "a8d46e47090a358d41022dd6cf7efea33073749e9b14b9bb74bba929cb131ad5"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_quench_shatter": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_quench_shatter.mp3?v=f7ffb666bf2a",
+          "bytes": 49572,
+          "sha256": "f7ffb666bf2adc55287037349dcfca59fc6ca6842026720b8066fb05529d341d"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_quench_wake": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_quench_wake.mp3?v=84993766acc5",
+          "bytes": 73395,
+          "sha256": "84993766acc5e9dae09c9641a235efbb8d80e815af304c8a1d5f0d15316ceb72"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "heart_quench_wake_charge": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/heart_quench_wake_charge.mp3?v=251b372aff8a",
+          "bytes": 97846,
+          "sha256": "251b372aff8a89230c26fb43998461e93fb9ec3ac31b814a7b32e019c0e8623b"
         }
       ],
       "gain": 1,

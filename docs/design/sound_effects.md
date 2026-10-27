@@ -423,6 +423,27 @@ ElevenLabs Sound Effects API through `gen_sfx.mjs`.
 | `heart_breath_swell` | the swelling storm pulses (cooled) | rolling thunder, distant crackle |
 | `heart_breath_fall` | a player goes over a gap's lip | wind howling down past a cliff into a chasm |
 
+### The Smith's Heart: the Guardian of the Quench (spatial one-shots)
+Played by `src/game/smith_heart_quench_audio.ts` (plan: `smith_heart_quench_audio_core.ts`)
+off the fight's own cues, the cracks as they appear and the guardian's awakening bar; the
+HUD's generic nova and burst never double one (`quenchSoundClaims`). Generated with the
+ElevenLabs Sound Effects API. The local player's cold warning (past three quarters) borrows
+the shared `cast_frost` sample, soft, until the fight has a take of its own.
+
+| key | when | prompt summary |
+|---|---|---|
+| `heart_quench_freeze` | a player is encased in rime | ice crystallizing fast round a body, a hard crackling lock |
+| `heart_quench_shatter` | the ice shatters off them | a block of ice bursting into tinkling shards |
+| `heart_quench_crack` | a crack appears under a huddle (cooled) | thick lake ice groaning and splitting |
+| `heart_quench_hole` | the crack gives way into open water | ice breaking through, a slosh of freezing water |
+| `heart_quench_plunge` | a player falls under the ice | a heavy plunge into icy water |
+| `heart_quench_climb` | a player climbs out on the rim | water pouring off, a scramble onto ice |
+| `heart_quench_wake_charge` | the blades' awakening bar starts (fitted to the bar) | deep ice straining, a crystalline hum building |
+| `heart_quench_wake` | the blades tear free | a huge ice crack, shards bursting up, a ringing glass tail |
+| `heart_quench_echo` | the blades echo an attack (one voice, cooled) | a resonant icy whoosh with a glassy echo |
+| `heart_quench_cross` | heroic: two blades cross the lake | a doubled whoosh, ice splintering in the wake |
+| `heart_quench_rim` | the shore ice heaves up (lower and slower: it falls at the end) | a short grinding crack of ice plates |
+
 ### Interface and personal event cues
 
 These cues are non-positional, preload at startup, and keep the existing
