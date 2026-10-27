@@ -802,8 +802,10 @@ export class HeatBody {
     // The slam's flash: a white glow round the whole body.
     const as = 9 + 4 * look.flash;
     this.aura.scale.set(as, as * 1.15, 1);
-    // A halo of heat round it, whiter as the fight deepens.
-    this.auraMat.opacity = Math.min(0.8, 0.08 + look.haze * 0.14 + look.flash * 0.55);
+    // Only through the flash: idle, the body's own glow and haze carry it (a
+    // standing screen-wide additive halo would be overdraw for nothing).
+    this.auraMat.opacity = Math.min(0.8, look.flash * 0.6);
+    this.aura.visible = this.auraMat.opacity > 0.02;
     // The white-hot fist, flaring as Basalt Fist comes down.
     if (action === 'fist' || action === 'slam') {
       const w = this.joints[HJ.wristR];

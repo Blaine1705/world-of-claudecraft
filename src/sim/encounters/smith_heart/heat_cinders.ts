@@ -149,6 +149,11 @@ function landCinder(s: HeatScope, x: number, z: number, quarry: number | null): 
     if (Math.hypot(here.x - x, here.z - z) > T.cinderLandR) continue;
     fireHit(s, p, roll(s, T.cinderLandMin, T.cinderLandMax), HEAT_NAMES.cinderLand);
   }
+  // At the cap the oldest scorch goes out (the renderer's pool is sized to it).
+  while (s.st.scorches.length >= T.scorchCap) {
+    const old = s.st.scorches.shift();
+    if (old) dropFightObject(s.ctx, s.inst, old.objectId);
+  }
   const obj = spawnFightObject(
     s.ctx,
     s.inst,

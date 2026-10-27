@@ -23,9 +23,7 @@ import { floorReach } from '../../sim/encounters/smith_heart/heat_geometry';
 import {
   HEAT_AURAS,
   type HeatWellState,
-  riverOf,
   HEAT_TUNING as T,
-  wellOf,
 } from '../../sim/encounters/smith_heart/heat_ids';
 import type { Entity } from '../../sim/types';
 import {
@@ -41,8 +39,10 @@ import {
   HEAT_FIGHT_POOLS as P,
   type RiverLook,
   riverLook,
+  riverOfCached,
   type WellLook,
   wellLook,
+  wellOfCached,
 } from './heat_fight_fx_core';
 import type { HeatFxHost } from './heat_fx_host';
 import { HEAT_LAVA_GLSL, HEAT_MOLTEN_GLSL, HEAT_NOISE_GLSL } from './heat_lava_glsl';
@@ -328,7 +328,7 @@ export class HeatWellFx {
       mesh.name = 'smithHeartHeatRiver';
       mesh.frustumCulled = false;
       mesh.visible = false;
-      mesh.renderOrder = floorVfxRenderOrder('encounter', 7);
+      mesh.renderOrder = floorVfxRenderOrder('encounter', 3);
       host.root.add(mesh);
       this.rivers.push({ id: -1, born: 0, state: null, facing: 0, length: 1, lane, mesh, mat });
     }
@@ -378,7 +378,7 @@ export class HeatWellFx {
       return;
     }
     if (this.placedFor !== w.id) this.place(w);
-    this.state = wellOf(w.templateId) ?? 'calm';
+    this.state = wellOfCached(w.templateId) ?? 'calm';
     let phase = 0;
     if (guardian && !guardian.dead)
       for (const a of guardian.auras) if (a.id === HEAT_AURAS.state) phase = Math.round(a.value);
@@ -452,7 +452,7 @@ export class HeatWellFx {
       }
     for (const id of riverIds) {
       const e = world.entities.get(id);
-      const of = e ? riverOf(e.templateId) : null;
+      const of = e ? riverOfCached(e.templateId) : null;
       if (!e || !of) continue;
       let s = this.rivers.find((r) => r.id === id);
       if (!s) {

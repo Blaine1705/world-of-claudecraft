@@ -266,6 +266,39 @@ export function patchLook(age: number, life: number): number {
   return catchUp * die;
 }
 
+// ---- the template decoders, memoized for the frame path ----------------------------------
+
+/** A decoder's results by template id: a fight's templates are a bounded
+ *  set (states and tenths of fixed times), so after a template's first sight
+ *  the frame path decodes without allocating. Cleared if it ever grows past
+ *  a few hundred (a guard, never expected). */
+function memo<T>(decode: (id: string) => T): (id: string) => T {
+  const cache = new Map<string, T>();
+  return (id) => {
+    let v = cache.get(id);
+    if (v === undefined) {
+      if (cache.size > 512) cache.clear();
+      v = decode(id);
+      cache.set(id, v);
+    }
+    return v;
+  };
+}
+
+/** riverOf, zoneOf and heatTimedOf for the painters' frame paths. */
+export const riverOfCached = memo(riverOf);
+export const zoneOfCached = memo(zoneOf);
+export const wellOfCached = memo(wellOf);
+const timedCaches = new Map<string, (id: string) => number | null>();
+export function heatTimedOfCached(prefix: string, templateId: string): number | null {
+  let f = timedCaches.get(prefix);
+  if (!f) {
+    f = memo((id) => heatTimedOf(prefix, id));
+    timedCaches.set(prefix, f);
+  }
+  return f(templateId);
+}
+
 /** A small integer hash in [0, 1). */
 export function heatFightHash(a: number, b: number): number {
   let h = (Math.imul(a | 0, 0x2d7a3f91) ^ Math.imul(b | 0, 0x1b873593)) >>> 0;
@@ -278,9 +311,9 @@ export function heatFightHash(a: number, b: number): number {
 export const HEAT_FIGHT_POOLS = {
   rivers: T.riverCount * 2,
   seeds: T.seedCap,
-  zones: 3,
+  zones: ZONE_BANDS.length,
   falls: T.cinderCap,
-  patches: T.trailCap + T.cinderCap + 8,
+  patches: T.trailCap + T.scorchCap,
   cinders: T.cinderCap,
   adds: 16,
   bodies: 12,

@@ -636,6 +636,28 @@ describe('Guardian of the Heat: phase 3, the Rolling Cinders', () => {
     for (const p of f.players) expect(has(p, HEAT_AURAS.hunted)).toBe(false);
   });
 
+  it('keeps at most scorchCap burning landings, the oldest going out first', () => {
+    const f = pulled(3);
+    f.dev('/dev heart heat phase 3');
+    hold(f);
+    const st = f.state();
+    if (!st) throw new Error('no fight');
+    // Two volleys of as many falls as the cinder cap allows, landing together.
+    let first: number[] = [];
+    for (let round = 0; round < 2; round++) {
+      // Forget the rolling cinders so the cap on cinders never stops a fall.
+      st.cinders = [];
+      for (let i = 0; i < T.cinderCap; i++) f.dev('/dev heart heat ember');
+      f.tick(ticks(T.cinderFallWarn + 0.1));
+      expect(st.scorches.length).toBeLessThanOrEqual(T.scorchCap);
+      expect(f.objects(HEAT_OBJECTS.scorchPrefix).length).toBe(st.scorches.length);
+      if (round === 0) first = st.scorches.map((p) => p.objectId);
+    }
+    expect(st.scorches.length).toBe(T.scorchCap);
+    // The second volley put the first out.
+    for (const id of first) expect(st.scorches.some((p) => p.objectId === id)).toBe(false);
+  });
+
   it('falls on its own clock through phase 3', () => {
     const f = pulled(3);
     f.dev('/dev heart heat phase 3');

@@ -371,6 +371,8 @@ export const HEAT_TUNING = {
   cinderLandMin: 300,
   cinderLandMax: 340,
   scorchLife: 8,
+  /** Burning landings at once at most (the oldest goes out first). */
+  scorchCap: 6,
   scorchTick: 0.5,
   scorchMin: 110,
   scorchMax: 130,

@@ -291,7 +291,7 @@ export class HeatCinderFx {
       this.trackAge[i] = 99;
     }
     if (this.track.instanceColor) this.track.instanceColor.setUsage(THREE.DynamicDrawUsage);
-    this.track.renderOrder = floorVfxRenderOrder('encounter', 3);
+    this.track.renderOrder = floorVfxRenderOrder('encounter', 2);
     this.track.visible = false;
     host.root.add(this.track);
     // The hunted's marks.

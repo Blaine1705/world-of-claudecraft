@@ -37,6 +37,7 @@ import {
 } from '../../sim/encounters/smith_heart/heat_ids';
 import type { SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
+import { wrapAngle } from '../facing_smooth';
 import {
   TELEGRAPH_THREAT_COLORS,
   type TelegraphFan,
@@ -233,6 +234,11 @@ interface LaneSlot {
   facing: number;
   /** Its drawn length (to the floor's edge). */
   length: number;
+  /** Its warning's seconds (read once off the template, never per frame). */
+  warn: number;
+  /** The sim's wave object rolling down it (-1 until found): the wall is
+   *  drawn where that object is, so it never trails the hit. */
+  waveId: number;
   lane: TelegraphLane;
   wall: THREE.Mesh;
   wallMat: THREE.ShaderMaterial;
@@ -381,6 +387,8 @@ export class HeatFx {
         id: -1,
         born: 0,
         rollAt: -1,
+        warn: T.fistCast + T.waveDelay,
+        waveId: -1,
         x: 0,
         z: 0,
         y: 0,
@@ -591,7 +599,11 @@ export class HeatFx {
         if (e.kind === 'mob' && e.templateId === 'heart_heat_guardian') this.guardianId = e.id;
         if (e.kind !== 'object') continue;
         const t = e.templateId;
-        if (t.startsWith(HEAT_OBJECTS.fistPrefix) || t.startsWith(HEAT_OBJECTS.lanePrefix))
+        if (
+          t.startsWith(HEAT_OBJECTS.fistPrefix) ||
+          t.startsWith(HEAT_OBJECTS.lanePrefix) ||
+          t === HEAT_OBJECTS.wave
+        )
           ids.push(e.id);
       }
     }
@@ -611,6 +623,7 @@ export class HeatFx {
     for (const s of this.lanes)
       if (s.id >= 0 && !live.includes(s.id)) {
         s.id = -1;
+        s.waveId = -1;
         s.lane.group.visible = false;
         s.wall.visible = false;
         s.wake.visible = false;
@@ -643,6 +656,8 @@ export class HeatFx {
         slot.id = id;
         slot.born = this.clock;
         slot.rollAt = -1;
+        slot.waveId = -1;
+        slot.warn = of.seconds;
         slot.x = e.pos.x;
         slot.z = e.pos.z;
         slot.y = this.groundY(e.pos.x, e.pos.z);
@@ -671,6 +686,21 @@ export class HeatFx {
       }
       if (of.state === 'roll' && slot.rollAt < 0) slot.rollAt = this.clock;
     }
+    // Each wave to the lane it rolls down (its facing, on the lane's line).
+    for (const id of live) {
+      const e = world.entities.get(id);
+      if (!e || e.templateId !== HEAT_OBJECTS.wave) continue;
+      if (this.lanes.some((s) => s.waveId === id)) continue;
+      for (const s of this.lanes) {
+        if (s.id < 0 || s.waveId >= 0) continue;
+        if (Math.abs(wrapAngle(e.facing - s.facing)) > 0.01) continue;
+        const dx = e.pos.x - s.x;
+        const dz = e.pos.z - s.z;
+        if (Math.abs(dx * Math.cos(s.facing) - dz * Math.sin(s.facing)) > 0.75) continue;
+        s.waveId = id;
+        break;
+      }
+    }
   }
 
   private leave(): void {
@@ -684,6 +714,7 @@ export class HeatFx {
     }
     for (const s of this.lanes) {
       s.id = -1;
+      s.waveId = -1;
       s.lane.group.visible = false;
       s.wall.visible = false;
       s.wake.visible = false;
@@ -746,13 +777,11 @@ export class HeatFx {
     for (const s of this.lanes) {
       if (s.id < 0) continue;
       const e = world.entities.get(s.id);
-      const of = e ? swellLaneOf(e.templateId) : null;
       const half = e?.scale || T.laneHalf;
       if (s.rollAt < 0) {
-        const warn = of?.seconds ?? T.fistCast + T.waveDelay;
-        PAINT.fill = Math.min(1, (this.clock - s.born) / Math.max(0.1, warn));
+        PAINT.fill = Math.min(1, (this.clock - s.born) / Math.max(0.1, s.warn));
         PAINT.clock = this.clock;
-        PAINT.range = T.laneLength;
+        PAINT.range = s.length;
         PAINT.front = undefined;
         PAINT.fade = undefined;
         this.kit.paintLane(s.lane, PAINT);
@@ -760,11 +789,19 @@ export class HeatFx {
         s.wake.visible = false;
         continue;
       }
+      // The sim's wave object places the crest while it rolls (re-anchoring
+      // the clock), the clock carries it past the lane's end as it sinks.
+      const wave = s.waveId >= 0 ? world.entities.get(s.waveId) : undefined;
+      if (wave) {
+        const along =
+          (wave.pos.x - s.x) * Math.sin(s.facing) + (wave.pos.z - s.z) * Math.cos(s.facing);
+        if (along < T.laneLength - 0.05) s.rollAt = this.clock - Math.max(0, along) / T.waveSpeed;
+      }
       const front = swellFront(this.clock - s.rollAt);
       // The lane fades as its wave leaves it behind (still on every tier).
       PAINT.fill = 1;
       PAINT.clock = this.clock;
-      PAINT.range = T.laneLength;
+      PAINT.range = s.length;
       PAINT.front = 0;
       PAINT.fade = Math.max(0.25, 1 - front / (s.length + T.waveDepth));
       this.kit.paintLane(s.lane, PAINT);

@@ -1,5 +1,5 @@
 // The Guardian of the Heat's procedural shapes, shared by its painters
-// (heat_fx.ts, heat_well_fx.ts, heat_cinder_fx.ts, heat_spirit_fx.ts): the
+// (heat_fx.ts, heat_well_fx.ts, heat_cinder_fx.ts): the
 // Hearth's hexagonal basalt columns and crystal prisms with the vertex shade
 // the Heart kit's slot materials and the vein glow read, a rolling wave's
 // wall, and a ring for a floor band. Built once in each painter's

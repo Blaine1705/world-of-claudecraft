@@ -41,7 +41,6 @@ import {
   HEAT_OBJECTS,
   heatTimedOf,
   HEAT_TUNING as T,
-  zoneOf,
 } from '../../sim/encounters/smith_heart/heat_ids';
 import type { Entity, SimEvent } from '../../sim/types';
 import type { IWorld } from '../../world_api';
@@ -71,6 +70,7 @@ import {
   heatFightClaims,
   heatFightHash,
   heatObjectKind,
+  heatTimedOfCached,
   HEAT_FIGHT_POOLS as P,
   patchLook,
   SEED_CORE_R,
@@ -78,6 +78,7 @@ import {
   seedLook,
   type ZoneLook,
   zoneLook,
+  zoneOfCached,
   zoneRadii,
 } from './heat_fight_fx_core';
 import type { HeatFxHost } from './heat_fx_host';
@@ -407,7 +408,7 @@ export class HeatFightFx implements HeatFxHost {
       const core = this.kit.fan(7);
       this.kit.layOutFan(core, 360, DANGER);
       core.group.visible = false;
-      const reach = this.kit.fan(3);
+      const reach = this.kit.fan(4);
       this.kit.layOutFan(reach, 360, DANGER);
       reach.group.visible = false;
       this.seeds.push({ id: -1, born: 0, life: T.seedLife, core, reach });
@@ -445,7 +446,7 @@ export class HeatFightFx implements HeatFxHost {
       mesh.name = 'smithHeartHeatWakefire';
       mesh.frustumCulled = false;
       mesh.visible = false;
-      mesh.renderOrder = floorVfxRenderOrder('encounter', 8);
+      mesh.renderOrder = floorVfxRenderOrder('encounter', 3);
       this.root.add(mesh);
       this.zones.push({ id: -1, band: i, state: null, born: 0, mesh, mat });
     }
@@ -462,6 +463,7 @@ export class HeatFightFx implements HeatFxHost {
       vertexShader: DISC_VERT,
       fragmentShader: PATCH_FRAG,
       transparent: true,
+      toneMapped: false,
       depthWrite: false,
       polygonOffset: true,
       polygonOffsetFactor: -2,
@@ -478,7 +480,7 @@ export class HeatFightFx implements HeatFxHost {
       this.patchSlots.push({ id: -1, born: 0 });
     }
     if (this.patches.instanceColor) this.patches.instanceColor.setUsage(THREE.DynamicDrawUsage);
-    this.patches.renderOrder = floorVfxRenderOrder('encounter', 4);
+    this.patches.renderOrder = floorVfxRenderOrder('encounter', 2);
     this.patches.visible = false;
     this.root.add(this.patches);
 
@@ -742,11 +744,16 @@ export class HeatFightFx implements HeatFxHost {
         else if (e.templateId === HEAT_MOBS.cinder) this.cinderIds.push(id);
         else this.addIds.push(id);
       } else if (e.kind === 'player' && !e.dead) {
+        // Once per player, however many of the marks it wears (a doubled id
+        // would take a second slot and could crowd a real quarry out).
+        let hunted = false;
+        let kindled = false;
         for (const a of e.auras) {
-          if (a.id === HEAT_AURAS.hunted) this.huntedIds.push(id);
-          else if (a.id === HEAT_AURAS.kindling || a.id === HEAT_AURAS.trail)
-            this.kindledIds.push(id);
+          if (a.id === HEAT_AURAS.hunted) hunted = true;
+          else if (a.id === HEAT_AURAS.kindling || a.id === HEAT_AURAS.trail) kindled = true;
         }
+        if (hunted) this.huntedIds.push(id);
+        if (kindled) this.kindledIds.push(id);
       }
     }
     this.assign(world);
@@ -865,7 +872,7 @@ export class HeatFightFx implements HeatFxHost {
   private paintZones(world: IWorld): void {
     for (const id of this.ids.get('zone') ?? []) {
       const e = world.entities.get(id);
-      const of = e ? zoneOf(e.templateId) : null;
+      const of = e ? zoneOfCached(e.templateId) : null;
       if (!e || !of) continue;
       const slot = this.zones[of.band];
       if (!slot) continue;
@@ -923,7 +930,7 @@ export class HeatFightFx implements HeatFxHost {
           slot.born = this.clock;
         }
         const prefix = kind === 'scorch' ? HEAT_OBJECTS.scorchPrefix : HEAT_OBJECTS.trailPrefix;
-        const life = heatTimedOf(prefix, e.templateId) ?? T.scorchLife;
+        const life = heatTimedOfCached(prefix, e.templateId) ?? T.scorchLife;
         const burn = patchLook(this.clock - slot.born, life);
         const r = e.scale || (kind === 'scorch' ? T.cinderLandR : T.trailR);
         _v.set(e.pos.x, this.groundY(e.pos.x, e.pos.z) + 0.05, e.pos.z);
@@ -976,7 +983,10 @@ export class HeatFightFx implements HeatFxHost {
       _w.set(dst.pos.x, dst.pos.y + 1.2, dst.pos.z);
       _s.subVectors(_w, _v);
       const len = _s.length();
-      if (len < 0.1) continue;
+      if (len < 0.1) {
+        b.mesh.visible = false;
+        continue;
+      }
       _q.setFromUnitVectors(_up, _s.divideScalar(len));
       const k = since / BOLT_SECONDS;
       b.mesh.position.copy(_v);

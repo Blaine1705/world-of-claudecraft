@@ -153,7 +153,7 @@ describe('heat_fight_fx_core: the fight in the Hearth', () => {
     expect(HEAT_FIGHT_POOLS.zones).toBeGreaterThanOrEqual(ZONE_BANDS.length);
     expect(HEAT_FIGHT_POOLS.falls).toBeGreaterThanOrEqual(T.cinderCap);
     expect(HEAT_FIGHT_POOLS.cinders).toBeGreaterThanOrEqual(T.cinderCap);
-    expect(HEAT_FIGHT_POOLS.patches).toBeGreaterThanOrEqual(T.trailCap + T.cinderCap);
+    expect(HEAT_FIGHT_POOLS.patches).toBeGreaterThanOrEqual(T.trailCap + T.scorchCap);
     expect(HEAT_FIGHT_POOLS.bodies).toBeGreaterThanOrEqual(HEAT_DIFFICULTY.heroic.bolts);
   });
 });
