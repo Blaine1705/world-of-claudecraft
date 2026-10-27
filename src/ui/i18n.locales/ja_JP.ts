@@ -21500,6 +21500,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵を中心に霊魂の爆弾を爆発させ、その敵から8ヤード以内の敵に{damage}のシャドウダメージを与えます。ダメージはスペルパワーで増加し、クリティカルが発生します。対象が5体を超えるとダメージが減少します。闇の献納を合計20生成すると爆弾が1個準備されます。上限の5スタックを保持している間の生成も加算されます。消費は不要で、消費しても進捗は増えません。進捗は戦闘の間も保持され、準備できる爆弾は1個までです。死亡すると進捗と準備済みの爆弾がリセットされます。詠唱が完了すると、抵抗されても爆弾を消費します。キャンセルや中断では保持されます。レイドボスとの戦闘開始時に進捗と準備済みの爆弾がリセットされます。この呪文でレイドボスとの戦闘を開始することはできません。',
   'hudChrome.priest.gloomtitheLabel': '闇の献納',
   'hudChrome.priest.bombLabel': '献納の爆弾',
+  'guide.interfacePage.framesGovernedPriest':
+    'フレーム編集では、シャドウプリーストの闇の献納と献納の爆弾を表示するメダリオンも移動できます。',
   'hudChrome.priest.gloomtitheStatus': '闇の献納 {value} / {max}',
   'hudChrome.priest.bombStatus': '献納の爆弾のチャージ {value} / {max}',
   'hudChrome.priest.bombReady': '準備完了',

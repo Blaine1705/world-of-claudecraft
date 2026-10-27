@@ -10598,6 +10598,7 @@ export type TranslationKeyFlat =
   | 'guide.interfacePage.framesBody'
   | 'guide.interfacePage.framesGovernedAuraTracks'
   | 'guide.interfacePage.framesGovernedExtra'
+  | 'guide.interfacePage.framesGovernedPriest'
   | 'guide.interfacePage.framesGovernedResourceAndHill'
   | 'guide.interfacePage.framesGovernedShardpike'
   | 'guide.interfacePage.framesGovernedTalkingHead'

@@ -22091,6 +22091,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '在敵人身上引爆靈魂炸彈，對目標周圍8碼內的敵人造成{damage}暗影傷害。傷害隨法術能量提高，可以致命一擊，目標超過5個時傷害降低。累計生成20層幽暗什一，可準備一枚炸彈。即使已持有上限5層，生成仍會增加進度。無需消耗層數，消耗也不會增加進度。進度在戰鬥之間保留，最多儲存一枚準備好的炸彈。死亡會清除進度和準備好的炸彈。完成施法會消耗炸彈，即使被抵抗也是如此。取消或中斷施法會保留炸彈。開始與團隊副本首領戰鬥時，進度和準備好的炸彈都會歸零。此法術無法用於開啟團隊副本首領戰鬥。',
   'hudChrome.priest.gloomtitheLabel': '幽暗什一',
   'hudChrome.priest.bombLabel': '獻納靈魂炸彈',
+  'guide.interfacePage.framesGovernedPriest':
+    '編輯框架還可移動暗影牧師顯示幽暗什一與獻納靈魂炸彈的徽章。',
   'hudChrome.priest.gloomtitheStatus': '幽暗什一：{value} / {max}',
   'hudChrome.priest.bombStatus': '獻納靈魂炸彈充能：{value} / {max}',
   'hudChrome.priest.bombReady': '就緒',

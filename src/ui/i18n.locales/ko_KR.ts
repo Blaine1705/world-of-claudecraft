@@ -21462,6 +21462,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '적에게 영혼 폭탄을 터뜨려 대상 주위 8미터 내의 적에게 {damage}의 암흑 피해를 줍니다. 피해는 주문력에 따라 증가하며 극대화될 수 있고 대상이 5명을 초과하면 감소합니다. 암흑 십일조 중첩을 총 20개 생성하면 폭탄 하나가 준비됩니다. 최대 5중첩을 보유한 상태에서 생성해도 진행도가 증가합니다. 중첩을 소모할 필요는 없으며 소모해도 진행도는 증가하지 않습니다. 진행도는 전투 사이에도 유지되며 준비된 폭탄은 하나까지만 저장됩니다. 사망하면 진행도와 준비된 폭탄이 초기화됩니다. 시전을 완료하면 저항당해도 폭탄을 소모합니다. 취소하거나 차단당하면 보존됩니다. 공격대 우두머리 전투가 시작되면 진행도와 준비된 폭탄이 초기화됩니다. 이 주문으로 공격대 우두머리 전투를 시작할 수 없습니다.',
   'hudChrome.priest.gloomtitheLabel': '암흑 십일조',
   'hudChrome.priest.bombLabel': '헌납 폭탄',
+  'guide.interfacePage.framesGovernedPriest':
+    '프레임 편집으로 암흑 사제의 암흑 십일조와 헌납 폭탄 메달도 이동할 수 있습니다.',
   'hudChrome.priest.gloomtitheStatus': '암흑 십일조 {value} / {max}',
   'hudChrome.priest.bombStatus': '헌납 폭탄 충전 {value} / {max}',
   'hudChrome.priest.bombReady': '준비 완료',
