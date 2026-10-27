@@ -24,15 +24,13 @@ export const CARVED_PUMPKIN_HEAD_ID = 'carved_pumpkin_head';
 export const JAR_OF_MISCHIEF_ID = 'jar_of_mischief';
 
 /** The reins of a hovering broom (content/mounts.ts 'emberbristle_broom'), sold by
- *  Hester for Emberwoven Sheaves. Event-bound (ItemDef.seasonalEvent): it lives in the
- *  bags only while Gourdlight Eve runs and is swept away when the event closes. */
+ *  Hester for Emberwoven Sheaves. Earned reins are permanent and usable year-round. */
 export const GOURDLIGHT_BROOM_ID = 'reins_emberbristle_broom';
 export const GOURDLIGHT_BROOM_MOUNT = 'emberbristle_broom';
 
 /** The broom's token: a bundle of enchanted straw Old Thatchgrin pays once a day (his
  *  world-boss daily lockout, content/gourdlight_eve_scarecrow.ts loot), never to a
- *  character who already keeps the broom. Event-bound like the broom, so a sheaf left
- *  over when the event closes crumbles with it. */
+ *  character who already keeps the broom. Unspent sheaves carry over to the next event. */
 export const GOURDLIGHT_SHEAF_ID = 'emberwoven_sheaf';
 /** Sheaves Hester asks for the broom: five daily kills (owner direction 2026-10-18: the
  *  broom takes five days of a roughly two-week event, not one kill). */
@@ -113,7 +111,7 @@ export type GourdlightCandy = (typeof GOURDLIGHT_CANDIES)[number];
 
 /** Hester's toys (round 9): five reusable playthings, each a short `seasonal_cosmetic`
  *  aura and nothing else (no stat, no control, no damage), bought for a few sweets and
- *  swept from the bags when the event closes like the broom (ItemDef.seasonalEvent).
+ *  kept permanently and usable year-round.
  *  Each has its own cooldown (content/item_cooldowns.ts mirrors it for the bar swipe),
  *  none works in combat, and the rules live in seasonal/seasonal_toys.ts.
  *    prank   thrown at another player in reach: their head becomes a lit jack-o'-lantern
@@ -424,7 +422,6 @@ export const GOURDLIGHT_EVE_ITEMS: Record<string, ItemDef> = {
     name: 'Emberwoven Sheaf',
     kind: 'tool',
     quality: 'rare',
-    seasonalEvent: GOURDLIGHT_EVE_ID,
     stackSize: 10,
     sellValue: 0,
     soulbound: true,
@@ -469,7 +466,7 @@ export const GOURDLIGHT_EVE_ITEMS: Record<string, ItemDef> = {
     noVendorSell: true,
     noSalvage: true,
   },
-  // Hester's toys (GOURDLIGHT_TOYS): reusable, one of each, gone when the event closes.
+  // Hester's toys (GOURDLIGHT_TOYS): permanent, reusable, one of each.
   ...Object.fromEntries(
     GOURDLIGHT_TOYS.map((toy): [string, ItemDef] => [
       toy.itemId,
@@ -480,7 +477,6 @@ export const GOURDLIGHT_EVE_ITEMS: Record<string, ItemDef> = {
         quality: 'uncommon',
         use: { type: 'seasonal', action: 'toy' },
         priceItem: { itemId: GOURDLIGHT_SWEET_ID, count: GOURDLIGHT_SHOP_PRICES[toy.itemId] },
-        seasonalEvent: GOURDLIGHT_EVE_ID,
         unique: true,
         sellValue: 0,
         soulbound: true,
@@ -550,8 +546,7 @@ export const GOURDLIGHT_EVE_ITEMS: Record<string, ItemDef> = {
     ]),
   ),
   // Hester's broom, bought for five Emberwoven Sheaves (Old Thatchgrin's daily token):
-  // the one soulbound player mount, because it is EVENT-BOUND (swept when Gourdlight
-  // Eve closes), and a tradable copy could outlive its event in another player's bags.
+  // a permanent, soulbound reward for the character who earned it.
   [GOURDLIGHT_BROOM_ID]: {
     id: GOURDLIGHT_BROOM_ID,
     name: 'Emberbristle Broom',
@@ -560,7 +555,6 @@ export const GOURDLIGHT_EVE_ITEMS: Record<string, ItemDef> = {
     priceItem: { itemId: GOURDLIGHT_SHEAF_ID, count: GOURDLIGHT_BROOM_SHEAVES },
     // the card's tier (content/mounts.ts emberbristle_broom: the base horse's 60%)
     quality: 'common',
-    seasonalEvent: GOURDLIGHT_EVE_ID,
     unique: true,
     soulbound: true,
     noDiscard: true,

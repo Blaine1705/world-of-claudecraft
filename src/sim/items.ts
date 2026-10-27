@@ -1,4 +1,5 @@
 import { endPlayDead } from './combat/hunter_play_dead';
+import { GOURDLIGHT_BROOM_ID } from './content/gourdlight_eve';
 import { MEMBERSHIP_TOKEN_ID } from './content/membership';
 import { gliderActionsLocked } from './glider_action_lock';
 import { membershipWeaponShape } from './membership_weapon';
@@ -1538,12 +1539,10 @@ export function buyItem(
   // (ridingTrained, purchased from Marla for 80g), a hard level-20 gate, and a
   // one-per-account ownership check (owning the reins item IS owning the mount).
   // Placed after the vendor stock/price checks, before payment.
-  // An EVENT-BOUND reins row (ItemDef.seasonalEvent: Hester's Emberbristle Broom, bought
-  // with the tokens a level-10 crowd earns at Old Thatchgrin) skips the riding and
-  // level-20 gates: it is a keepsake that leaves with its event, and riding it still
-  // needs the riding skill (mounts.ts). The one-copy ownership check always applies.
+  // Event reward reins can be collected before riding training. The permanent
+  // Emberbristle Broom keeps that purchase rule; riding still requires training.
   if (def.kind === 'mount') {
-    const eventKeepsake = !!def.seasonalEvent;
+    const eventKeepsake = !!def.seasonalEvent || def.id === GOURDLIGHT_BROOM_ID;
     if (!eventKeepsake && !meta.ridingTrained) {
       ctx.error(meta.entityId, 'You must learn to ride first. Find a riding trainer.');
       return;

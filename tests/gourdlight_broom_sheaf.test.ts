@@ -1,14 +1,13 @@
-// The Emberbristle Broom takes five days (owner direction 2026-10-18): Old Thatchgrin no
-// longer drops it. Each looted kill under his world-boss daily lockout pays one
+// The Emberbristle Broom can be bought after five daily kills, or rarely drops directly.
+// Each looted kill under Old Thatchgrin's world-boss daily lockout pays one
 // Emberwoven Sheaf instead, Hester sells the broom for five, a character who keeps the
-// broom gets no more sheaves and cannot buy a second, and the sheaves are event-bound
-// like the broom, so they crumble when Gourdlight Eve closes.
+// broom gets no more sheaves and cannot buy a second, and the sheaves are permanent
+// like the broom, so they carry over when Gourdlight Eve closes.
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   CARVED_PUMPKIN_HEAD_ID,
   GOURDLIGHT_BROOM_ID,
   GOURDLIGHT_BROOM_SHEAVES,
-  GOURDLIGHT_EVE_ID,
   GOURDLIGHT_KEEPER_ENTITY_ID,
   GOURDLIGHT_KEEPER_NPC,
   GOURDLIGHT_SHEAF_ID,
@@ -190,16 +189,16 @@ describe("Hester's broom", () => {
 });
 
 describe('the sheaf itself', () => {
-  it('is a soulbound, event-bound token that stacks at least five', () => {
+  it('is a soulbound, permanent token that stacks at least five', () => {
     const def = ITEMS[GOURDLIGHT_SHEAF_ID];
     expect(def.name).toBe('Emberwoven Sheaf');
-    expect(def.seasonalEvent).toBe(GOURDLIGHT_EVE_ID);
+    expect(def.seasonalEvent).toBeUndefined();
     expect(def.soulbound).toBe(true);
     expect(def.noVendorSell).toBe(true);
     expect(def.stackSize ?? 1).toBeGreaterThanOrEqual(GOURDLIGHT_BROOM_SHEAVES);
   });
 
-  it('crumbles from the bags and the bank the tick the event closes', () => {
+  it('stays in the bags and bank after the event closes', () => {
     const sim = world();
     sim.chat('/dev season on');
     sim.tick();
@@ -209,10 +208,10 @@ describe('the sheaf itself', () => {
     expect(sim.countItem(GOURDLIGHT_SHEAF_ID)).toBe(3);
     sim.chat('/dev season off');
     sim.tick();
-    expect(sim.countItem(GOURDLIGHT_SHEAF_ID)).toBe(0);
+    expect(sim.countItem(GOURDLIGHT_SHEAF_ID)).toBe(3);
     expect(
       meta(sim).bank.inventory.some((s: { itemId: string }) => s.itemId === GOURDLIGHT_SHEAF_ID),
-    ).toBe(false);
+    ).toBe(true);
   });
 
   it('its tooltip says what it is for, with the live price', () => {

@@ -14,11 +14,10 @@
 // same range, the same validation and the same aura reach every host.
 //
 // One cauldron per owner: a fresh one replaces the one still standing. Every cauldron
-// leaves with the event (updateSeasonal's close edge). Draws no rng and reads no clock;
+// lasts its normal timer, even outside the event. Draws no rng and reads no clock;
 // a placement allocates one entity id, a drink none.
 import { isBlocked } from '../colliders';
 import {
-  GOURDLIGHT_EVE_ID,
   GOURDLIGHT_TOY_FX_PREFIX,
   type GourdlightToy,
   GURGLEGREEN_CAULDRON_ID,
@@ -29,7 +28,6 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Aura, Entity } from '../types';
 import { stripTricks } from './seasonal_cosmetics';
-import { activeSeasonalEventOf } from './seasonal_state';
 
 /** The ground object's item id (its template is `ground_<id>`): the toy's own item id, so
  *  every label names it the way the bag does. */
@@ -118,14 +116,13 @@ function makerOf(ctx: SimContext, potId: number): number {
 /**
  * A player drinks from a toy cauldron. False when `obj` is not one (the caller falls
  * through to its other arms); true when the cauldron owned the click, including a safely
- * refused one (the event closed, a fight, stealth).
+ * refused one (a fight, stealth).
  */
 export function drinkFromToyCauldron(ctx: SimContext, obj: Entity, meta: PlayerMeta): boolean {
   if (!isToyCauldron(obj)) return false;
   const toy = cauldronToy();
   const drinker = ctx.entities.get(meta.entityId);
   if (!toy || !drinker || drinker.dead || drinker.ghost) return true;
-  if (activeSeasonalEventOf(ctx.seasonal) !== GOURDLIGHT_EVE_ID) return true;
   if (drinker.inCombat) {
     ctx.error(meta.entityId, "You can't do that while in combat.");
     return true;
@@ -157,7 +154,7 @@ export function drinkFromToyCauldron(ctx: SimContext, obj: Entity, meta: PlayerM
 }
 
 /** Forget cauldrons that are gone (their timer ran out), and with `all`, take every one
- *  out of the world (the event closing). Cheap: one map walk, empty almost always. */
+ *  out of the world for an explicit reset. Cheap: one map walk, empty almost always. */
 export function updateToyCauldrons(ctx: SimContext, all: boolean): void {
   const live = ctx.seasonal.toyCauldrons;
   if (live.size === 0) return;

@@ -1,20 +1,7 @@
-// Event-bound items (ItemDef.seasonalEvent): things that exist only while their seasonal
-// event runs, Gourdlight Eve's broom first. When the running event is not theirs (the
-// event closed, or another one opened) they leave the character's bags, bank and courier
-// cargo, and a rider on the broom is set down at once.
-//
-// When the sweep runs:
-//   - on every open/close edge, for every character in the world;
-//   - once for each character the first tick it spends in a world whose running event
-//     is not the item's: a login after the event ended (the broom is already gone from
-//     every character online at the close; this catches the ones who were offline).
-//   - again every BOUND_RECHECK_TICKS for every character, bags and courier cargo only:
-//     a broom or sheaf that arrives after its character was checked (a sheaf taken off
-//     a corpse after the close, a mail or a grant) lands in the bags and still leaves
-//     within seconds. The bank is never re-walked on a quiet tick (it only grows by a
-//     deposit, which takes from the bags first), so a large bank costs nothing.
-// A character swept since the last edge is remembered in a WeakMap on the world state,
-// so a quiet tick costs one map lookup per character and no container scan.
+// Temporary event items (ItemDef.seasonalEvent), such as unfinished quest supplies,
+// leave bags, bank and courier cargo when their event closes. Earned rewards have
+// no expiry tag. Sweep on event changes, first login, and every five seconds for
+// late arrivals. The bank is scanned only on edges and first login.
 //
 // Draws no rng and reads no clock: the running event is the seasonal state's one field.
 import { bumpBankWireRev } from '../bank';
@@ -23,6 +10,7 @@ import { forceDismount } from '../mounts';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { InvSlot } from '../types';
+import { expireSeasonalQuests } from './seasonal_quests';
 
 /** How often (sweep ticks, 5 s at 20 Hz) each character is re-checked between edges. */
 export const BOUND_RECHECK_TICKS = 100;
@@ -63,7 +51,7 @@ export function sweepEventBoundItems(
   const bank = withBank ? strip(meta.bank.inventory, active, gone) : false;
   const cargo = meta.courier ? strip(meta.courier.cargo, active, gone) : false;
   if (gone.length === 0) return gone;
-  // wireRev on any removal: the heavy self block (inv, mntOwn) keys on it, and a broom
+  // wireRev on any removal: the heavy self block (inv, mntOwn) keys on it, and a mount
   // only in the bank still counts toward owned mounts. The courier projection keys on
   // its own revision, so a cargo strip bumps that too.
   meta.wireRev++;
@@ -93,6 +81,7 @@ export function updateEventBoundItems(ctx: SimContext, active: string | null, ed
     const at = state.boundSwept.get(meta);
     if (at !== undefined && now - at < BOUND_RECHECK_TICKS) continue;
     state.boundSwept.set(meta, now);
+    expireSeasonalQuests(meta, active);
     sweepEventBoundItems(ctx, meta, active, at === undefined);
   }
 }

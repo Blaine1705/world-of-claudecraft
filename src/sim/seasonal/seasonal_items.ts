@@ -1,6 +1,5 @@
 // The seasonal toys' use arms (items.ts useItem routes `use.type 'seasonal'` and
-// the Gourdlight treat pouch here). Every arm is refused while the event is
-// closed, so a cosmetic bought during the event waits in the bags for next year.
+// the Gourdlight treat pouch here). Earned rewards remain usable year-round.
 
 import { bagsFullError } from '../bags';
 import {
@@ -22,7 +21,6 @@ import {
   pumpkinHeadAura,
   stripSeasonalAura,
 } from './seasonal_cosmetics';
-import { activeSeasonalEventOf } from './seasonal_state';
 import { useGourdlightToy } from './seasonal_toys';
 
 export type SeasonalItemAction =
@@ -32,12 +30,6 @@ export type SeasonalItemAction =
   | 'costume'
   | 'titleWrit'
   | 'toy';
-
-function eventClosed(ctx: SimContext, meta: PlayerMeta): boolean {
-  if (activeSeasonalEventOf(ctx.seasonal) !== null) return false;
-  ctx.emit({ type: 'seasonal', what: 'notActive', pid: meta.entityId });
-  return true;
-}
 
 /** The Carved Pumpkin Head toggles on and off (never consumed); the Jar of
  *  Mischief plays a random trick on its user and is spent; a costume draught wears its
@@ -51,7 +43,6 @@ export function useSeasonalItem(
   consumeOne: () => ItemInstancePayload | undefined,
   itemId = '',
 ): void {
-  if (eventClosed(ctx, meta)) return;
   // A writ is paperwork, not a body swap: readable anywhere, in combat too.
   if (action === 'titleWrit') {
     useTitleWrit(ctx, meta, itemId, consumeOne);

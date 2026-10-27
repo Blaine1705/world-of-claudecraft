@@ -271,17 +271,15 @@ describe('the keeper, the shop and the pumpkin head', () => {
     expect(sim.copper).toBe(copper);
   });
 
-  it('wears the head while the event runs, puts it back after a strip, and takes it off on close', () => {
+  it('wears the head year-round and restores it after a strip', () => {
     const sim = world();
     sim.addItem(CARVED_PUMPKIN_HEAD_ID, 1);
     sim.tick();
     sim.useItem(CARVED_PUMPKIN_HEAD_ID);
-    expect(seasonalEvents(sim.tick()).map((e) => e.what)).toEqual(['notActive']);
-    const head = () => sim.player.auras.some((a) => a.id === PUMPKIN_HEAD_AURA_ID);
-    expect(head()).toBe(false);
-    open(sim);
-    sim.useItem(CARVED_PUMPKIN_HEAD_ID);
     expect(seasonalEvents(sim.tick()).map((e) => e.what)).toEqual(['pumpkinOn']);
+    const head = () => sim.player.auras.some((a) => a.id === PUMPKIN_HEAD_AURA_ID);
+    expect(head()).toBe(true);
+    open(sim);
     expect(head()).toBe(true);
     expect(sim.countItem(CARVED_PUMPKIN_HEAD_ID)).toBe(1);
     // A body that lost the aura (a death's cleanup) gets it back while worn.
@@ -291,8 +289,8 @@ describe('the keeper, the shop and the pumpkin head', () => {
     // The head is never a stat: the sheet is unchanged by wearing it.
     sim.chat('/dev season off');
     sim.tick();
-    expect(head()).toBe(false);
-    // Still the character's choice: it comes back when the event opens again.
+    expect(head()).toBe(true);
+    // Still the character's choice when the event opens again.
     open(sim);
     expect(head()).toBe(true);
     sim.useItem(CARVED_PUMPKIN_HEAD_ID);
@@ -551,7 +549,7 @@ describe('the costume draughts', () => {
     expect(sim.player.auras.some((a) => a.id === c.auraId)).toBe(false);
   });
 
-  it('comes off when the event closes, and is refused while it is closed', () => {
+  it('keeps its timer when the event closes, and works while it is closed', () => {
     const sim = world();
     open(sim);
     const c = GOURDLIGHT_COSTUMES[1];
@@ -559,9 +557,9 @@ describe('the costume draughts', () => {
     sim.useItem(c.itemId);
     sim.chat('/dev season off');
     sim.tick();
-    expect(sim.player.auras.some((a) => a.id === c.auraId)).toBe(false);
+    expect(sim.player.auras.some((a) => a.id === c.auraId)).toBe(true);
     sim.useItem(c.itemId);
-    expect(sim.countItem(c.itemId)).toBe(1);
+    expect(sim.countItem(c.itemId)).toBe(0);
   });
 });
 

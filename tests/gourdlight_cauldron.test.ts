@@ -3,8 +3,8 @@
 // player in reach may drink from it (the ordinary object interaction, the same command
 // online and off) and turns into a goblin for the toy's duration (round 11: a cosmetic
 // aura and nothing else, a body swap on the costumes' seam: one body at a time, combat
-// ends it); a fresh cauldron replaces its maker's last; refused in combat, in stealth and
-// out of season; it leaves the world when its time runs out and when the event closes; no
+// ends it); a fresh cauldron replaces its maker's last; refused in combat and stealth;
+// usable year-round, leaving the world when its time runs out; no
 // rng.
 import { afterEach, describe, expect, it } from 'vitest';
 import { wireEntity } from '../server/game';
@@ -172,15 +172,16 @@ describe('the Gurglegreen Cauldron', () => {
     expect(sim.seasonal.toyCauldrons.size).toBe(0);
   });
 
-  it('is cleared from the world when Gourdlight Eve closes', () => {
+  it('stays drinkable when Gourdlight Eve closes', () => {
     const sim = world();
     place(sim);
     sim.tick();
     expect(pots(sim)).toHaveLength(1);
     sim.chat('/dev season off');
     sim.tick();
-    expect(pots(sim)).toHaveLength(0);
-    expect(sim.seasonal.toyCauldrons.size).toBe(0);
+    expect(pots(sim)).toHaveLength(1);
+    expect(sim.pickUpObject(pots(sim)[0].id)).toBe(true);
+    expect(brewOn(sim.player)).toBeDefined();
   });
 
   it('the goblin is a costume: it takes a costume off, a costume takes it off, combat ends it', () => {

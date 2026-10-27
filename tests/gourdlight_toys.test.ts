@@ -2,13 +2,12 @@
 // five reusable cosmetic toys on her shelf (the cauldron's own rules: gourdlight_cauldron.test.ts).
 // Pinned here: the shelf rows and prices, each
 // toy's look and its duration, the cooldown that stops spamming, never consumed, refused
-// in combat, in stealth and out of season, the prank's targeting rules (another living
+// in combat and in stealth, the prank's targeting rules (another living
 // player, in reach, out of combat), no stat or combat effect, no rng drawn, the cues every
-// nearby client draws and hears, the right-click cancel, and the sweep when the event ends.
+// nearby client draws and hears, the right-click cancel, and persistence when the event ends.
 import { afterEach, describe, expect, it } from 'vitest';
 import { SFX_CLIPS } from '../src/game/sfx_manifest.generated';
 import {
-  GOURDLIGHT_EVE_ID,
   GOURDLIGHT_KEEPER_ENTITY_ID,
   GOURDLIGHT_KEEPER_NPC,
   GOURDLIGHT_SHOP_ITEMS,
@@ -98,7 +97,7 @@ describe("Hester's toy shelf", () => {
     }
   });
 
-  it('every toy is soulbound, unique, unsellable, stat-free and bound to the event', () => {
+  it('every toy is soulbound, unique, unsellable, stat-free and permanent', () => {
     for (const toy of GOURDLIGHT_TOYS) {
       const def = ITEMS[toy.itemId];
       expect(def?.name, toy.itemId).toBe(toy.itemName);
@@ -106,7 +105,7 @@ describe("Hester's toy shelf", () => {
       expect(def?.unique, toy.itemId).toBe(true);
       expect(def?.noVendorSell, toy.itemId).toBe(true);
       expect(def?.sellValue, toy.itemId).toBe(0);
-      expect(def?.seasonalEvent, toy.itemId).toBe(GOURDLIGHT_EVE_ID);
+      expect(def?.seasonalEvent, toy.itemId).toBeUndefined();
       expect(def?.use, toy.itemId).toEqual({ type: 'seasonal', action: 'toy' });
       expect('stats' in (def ?? {}), toy.itemId).toBe(false);
       // the bar swipe reads the same cooldown the sim sets
@@ -218,18 +217,9 @@ describe('the self toys (lantern, bats, candle)', () => {
       expect(toy.cooldown, toy.itemId).toBeGreaterThan(toy.duration);
   });
 
-  it('is refused in combat, in stealth and while the event is closed, spending nothing', () => {
+  it('is refused in combat and in stealth outside the event, spending nothing', () => {
     for (const toy of SELF_TOYS) {
       const sim = world();
-      // out of season: refused, and the event-bound toy does not even stay in the bags
-      sim.addItem(toy.itemId, 1);
-      sim.useItem(toy.itemId);
-      expect(
-        seasonal(sim.tick()).map((e) => e.what),
-        toy.itemId,
-      ).toEqual(['notActive', 'boundItemGone']);
-      expect(sim.countItem(toy.itemId), toy.itemId).toBe(0);
-      open(sim);
       sim.addItem(toy.itemId, 1);
       sim.player.inCombat = true;
       sim.useItem(toy.itemId);
@@ -364,7 +354,7 @@ describe('the toys are pure fun', () => {
 });
 
 describe('when Gourdlight Eve ends', () => {
-  it('every running toy look comes off and every toy leaves the bags', () => {
+  it('keeps the toys and lets their active effects finish', () => {
     const sim = world();
     open(sim);
     const pip = friend(sim, 4);
@@ -376,14 +366,15 @@ describe('when Gourdlight Eve ends', () => {
     sim.chat('/dev season off');
     sim.tick();
     for (const toy of GOURDLIGHT_TOYS) {
-      expect(auraOn(sim.player, toy.auraId), toy.itemId).toBeUndefined();
-      expect(sim.countItem(toy.itemId), toy.itemId).toBe(0);
+      if (toy.effect !== 'prank' && toy.effect !== 'cauldron')
+        expect(auraOn(sim.player, toy.auraId), toy.itemId).toBeDefined();
+      expect(sim.countItem(toy.itemId), toy.itemId).toBe(1);
     }
-    expect(auraOn(pip, PRANK.auraId)).toBeUndefined();
-    // the cauldron set down while it ran is gone from the world too
+    expect(auraOn(pip, PRANK.auraId)).toBeDefined();
+    // The player-placed cauldron keeps its normal lifetime.
     const potLeft = [...sim.entities.values()].some(
       (e) => e.objectItemId === 'gurglegreen_cauldron',
     );
-    expect(potLeft).toBe(false);
+    expect(potLeft).toBe(true);
   });
 });

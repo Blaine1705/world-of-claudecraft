@@ -1,6 +1,6 @@
-// Where Old Thatchgrin's pumpkin patch lies: resolved against the LIVE world, never a
-// hand-placed coordinate, so a rework of Eastbrook or of the meadow moves the field with
-// it instead of leaving the boss standing in a new building.
+// Where Old Thatchgrin's pumpkin patch lies: prefer the authored Eastbrook site,
+// checked against the live world. Other worlds, seeds, or an obstructed site retain
+// the meadow search below, so a rework never leaves the boss inside a building.
 //
 // The anchor is Boar Meadow, the open grassland past Eastbrook's east edge (its POI on the
 // Vale's zone record). Candidates walk out from it on rings, each ring starting on the far
@@ -19,11 +19,22 @@
 import type { Collider } from '../collider_shapes';
 import { isBlocked, queryOpenWorldColliders } from '../colliders';
 import { TOWN_RADIUS } from '../content/zone1';
-import { getActiveWorldContent, getContentGeneration, OVERWORLD_GRAVEYARDS, zoneAt } from '../data';
+import {
+  getActiveWorldContent,
+  getContentGeneration,
+  isBuiltinWorldActive,
+  OVERWORLD_GRAVEYARDS,
+  zoneAt,
+} from '../data';
 import { groundHeight, roadDistance, WATER_LEVEL } from '../world';
+import { WORLD_SEED } from '../world_seed';
 
 export const SCARECROW_FIELD_ZONE = 'eastbrook_vale';
 export const SCARECROW_FIELD_ANCHOR_POI = 'boar_meadow';
+
+/** Owner-selected site, 2026-10-27. Its walkable slope spans 4.54 yards across
+ *  the fight disc; the automatic search keeps its stricter three-yard limit. */
+export const SCARECROW_FIELD_SITE = Object.freeze({ x: 119, z: -71, maxRelief: 5 });
 
 /** The fight's radius: the disc that must be clear, flat and dry (yards). */
 export const SCARECROW_FIELD_RADIUS = 12;
@@ -143,7 +154,10 @@ export function measureScarecrowField(seed: number, x: number, z: number): Scare
   };
 }
 
-export function scarecrowFieldPasses(check: ScarecrowFieldCheck): boolean {
+export function scarecrowFieldPasses(
+  check: ScarecrowFieldCheck,
+  maxRelief = SCARECROW_FIELD_MAX_RELIEF,
+): boolean {
   return (
     check.zone &&
     check.obstacles === 0 &&
@@ -152,7 +166,7 @@ export function scarecrowFieldPasses(check: ScarecrowFieldCheck): boolean {
     check.town &&
     check.clear &&
     check.dry &&
-    check.relief <= SCARECROW_FIELD_MAX_RELIEF &&
+    check.relief <= maxRelief &&
     check.road >= SCARECROW_FIELD_ROAD_CLEARANCE &&
     check.camp >= SCARECROW_FIELD_CAMP_CLEARANCE &&
     check.npc >= SCARECROW_FIELD_NPC_CLEARANCE
@@ -176,7 +190,12 @@ export function resolveScarecrowField(seed: number): ScarecrowField | null {
   const zone = getActiveWorldContent().zones.find((zn) => zn.id === SCARECROW_FIELD_ZONE);
   const anchor = zone?.pois?.find((p) => p.id === SCARECROW_FIELD_ANCHOR_POI) ?? zone?.hub;
   let field: ScarecrowField | null = null;
-  if (zone?.hub && anchor) {
+  if (zone?.hub && isBuiltinWorldActive() && seed === WORLD_SEED) {
+    const { x, z, maxRelief } = SCARECROW_FIELD_SITE;
+    if (scarecrowFieldPasses(measureScarecrowField(seed, x, z), maxRelief))
+      field = { x, z, facing: Math.atan2(zone.hub.x - x, zone.hub.z - z) };
+  }
+  if (!field && zone?.hub && anchor) {
     const hub = zone.hub;
     // Ring zero is the anchor itself; every ring starts on the bearing AWAY from town.
     const away = Math.atan2(anchor.x - hub.x, anchor.z - hub.z);

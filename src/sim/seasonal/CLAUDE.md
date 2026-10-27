@@ -23,12 +23,12 @@ event, e.g. `gourdlight_eve.ts`); this directory holds the rules. Public surface
 | Module | Owns |
 |--------|------|
 | `seasonal_state.ts` | world state (host id, dev override, open/close edge), per-character ledger (`seasonalDay`, `seasonalKnocked`, `pumpkinHeadWorn`), save fragment + sanitizing restore, the day roll on `ctx.resetDay` |
-| `seasonal_tick.ts` | `updateSeasonal`: raises / dismisses each event's keeper NPC (reserved singleton id), strips every seasonal cosmetic on close, re-applies a worn pumpkin head. Zero rng |
+| `seasonal_tick.ts` | `updateSeasonal`: raises / dismisses each event's keeper NPC (reserved singleton id), preserves earned cosmetics year-round, re-applies a worn pumpkin head. Zero rng |
 | `haunted_pumpkins.ts` | fixed event-only objects, personal once-per-edition discovery and cosmetic completion Feat; no RNG or entity allocator draws |
 | `trick_or_treat.ts` | the knock: once per NPC per reset day, treat (sweets) or trick (cosmetic aura + one sweet), credits the rounds quest's `event` objective. Draws world rng only on an accepted knock |
 | `seasonal_cosmetics.ts` | the `seasonal_cosmetic` auras (pumpkin head, tricks): no sim effect at all, `undispellable` so only their own item / timer removes them |
 | `seasonal_items.ts` | item use arms: pumpkin head toggle, Jar of Mischief, the treat pouch |
-| `seasonal_quests.ts` | seasonal quests close with their event through the shared repeat-blocked set |
+| `seasonal_quests.ts` | seasonal quests close with their event through the shared repeat-blocked set; unfinished logs expire with temporary quest supplies |
 | `scarecrow.ts` (bedtime) | by day, the idle-mob throttle (mob/idle_tick_skip.ts) skips an awake, aura-less boss nobody is near, so `updateScarecrow` hands his bedtime to `settleUnwatchedSlumber` (mob/slumber.ts): idle, due and unwatched, he is put straight back on his pole, so nobody riding in can catch him awake by day. Cheap gates first, one boss per tick |
 | `scarecrow_field_ward.ts` | while Gourdlight Eve runs, idle wild mobs keep out of Old Thatchgrin's field (wander targets pushed onto its rim, crossings skirted). Zero rng, never touches Boar Meadow outside the event |
 | `seasonal_cancel.ts` | right-click cancel of a worn cosmetic (costume, trick, guise, pumpkin head) through the authoritative `cancelAura` (combat/aura_cancel_command.ts); clears the worn-head ledger flag |

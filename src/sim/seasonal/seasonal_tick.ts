@@ -4,11 +4,11 @@
 //
 // On open: the event's keeper NPC is raised at each city's stall, each under her own
 // reserved singleton id.
-// On close: the keeper leaves and every seasonal cosmetic comes off every body.
+// On close: the keeper leaves; earned cosmetics keep their normal timers.
 // The event's solid city dressing collides exactly while it runs: its gate is synced at
 // the top of every tick, beside the ferry berths (world_gates.ts), never here.
-// While open: a worn pumpkin head is put back on a body that lost it (a death, a
-// relog), so wearing it is the character's standing choice for the whole event,
+// Year-round: a worn pumpkin head is put back on a body that lost it (a death, a
+// relog), so wearing it is the character's standing choice,
 // for as long as the character still owns one (bags or bank): a head destroyed
 // while worn comes off for good, never stuck on a body nothing can take it off.
 import { countStacked } from '../bags';
@@ -27,12 +27,7 @@ import { updateGourdlightDailyObjects } from './gourdlight_dailies';
 import { updateHauntedPumpkins } from './haunted_pumpkins';
 import { updateScarecrow } from './scarecrow';
 import { updateEventBoundItems } from './seasonal_bound_items';
-import {
-  pumpkinHeadAura,
-  SEASONAL_COSMETIC_AURA_IDS,
-  stripSeasonalAura,
-  stripTricks,
-} from './seasonal_cosmetics';
+import { pumpkinHeadAura, stripSeasonalAura, stripTricks } from './seasonal_cosmetics';
 import { activeSeasonalEventOf } from './seasonal_state';
 import { updateToyCauldrons } from './toy_cauldron';
 
@@ -71,27 +66,19 @@ export function updateSeasonal(ctx: SimContext): void {
   const state = ctx.seasonal;
   const active = activeSeasonalEventOf(state);
   const edge = active !== state.lastActive;
-  // Toy cauldrons: forget the ones whose time ran out, and clear every one on a close.
-  updateToyCauldrons(ctx, edge && active !== GOURDLIGHT_EVE_ID);
+  // Player-placed toy cauldrons keep their normal lifetime across event changes.
+  updateToyCauldrons(ctx, false);
   if (edge) {
     updateHauntedPumpkins(ctx, active);
     updateGourdlightDailyObjects(ctx, active);
     dismissKeeper(ctx, state.lastActive);
     state.lastActive = active;
-    if (active === null) {
-      for (const meta of ctx.players.values()) {
-        const e = ctx.entities.get(meta.entityId);
-        if (!e) continue;
-        for (const id of SEASONAL_COSMETIC_AURA_IDS) stripSeasonalAura(ctx, e, id);
-      }
-    }
   }
-  // Event-bound items (the broom) leave with their event, also from a later login.
+  // Temporary quest items leave with their event, also from a later login.
   updateEventBoundItems(ctx, active, edge);
   // The field boss rises and leaves with his event (and runs his fight while he lives).
   updateScarecrow(ctx, active);
-  if (active === null) return;
-  raiseKeeper(ctx, active);
+  if (active !== null) raiseKeeper(ctx, active);
   for (const meta of ctx.players.values()) {
     const e = ctx.entities.get(meta.entityId);
     if (!e || e.dead) continue;

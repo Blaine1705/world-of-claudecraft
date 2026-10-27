@@ -179,9 +179,8 @@ describe('mount reins items (the collection: owning the item is owning the mount
         isDeveloperMount(key) ||
         MEMBERSHIP_REWARD_MOUNTS.includes(key) ||
         REFERRAL_REWARD_MOUNTS.includes(key) ||
-        // EVENT-BOUND reins (ItemDef.seasonalEvent): swept from every container when
-        // their event closes (seasonal/seasonal_bound_items.ts), so a traded copy
-        // could outlive its event in a buyer's bags. Only the Emberbristle Broom.
+        // The permanent Halloween reward remains bound to its earner.
+        key === 'emberbristle_broom' ||
         item.seasonalEvent !== undefined
       ) {
         // Bound reins, for the same leak reason from different doors: a
@@ -305,8 +304,8 @@ describe('mount reins items (the collection: owning the item is owning the mount
       // Sheaves, the token Old Thatchgrin (a world boss: personal loot, daily lockout)
       // pays once a day to a character who does not keep the broom, so it takes five
       // days; since round 10 HIS table alone also carries it as a rare (3%) personal
-      // draw, never to a keeper (the world-boss shape the Raptor rides above). Event-
-      // bound, so it cannot be kept past Gourdlight Eve, and no faster than the horse.
+      // draw, never to a keeper (the world-boss shape the Raptor rides above).
+      // Permanent, and no faster than the horse.
       if (itemId === 'reins_emberbristle_broom') {
         const holders = Object.values(MOBS).filter((m) => m.loot.some((l) => l.itemId === itemId));
         expect(holders.map((m) => m.id)).toEqual(['gourdlight_thatchgrin']);
@@ -318,7 +317,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
         expect(MOBS.gourdlight_thatchgrin.worldBoss).toBe(true);
         expect(sheaf?.chance).toBe(1);
         expect(sheaf?.unlessOwnedItem).toBe(itemId);
-        expect(ITEMS[itemId].seasonalEvent).toBe('gourdlight_eve');
+        expect(ITEMS[itemId].seasonalEvent).toBeUndefined();
         expect(MOUNTS[key]).not.toHaveProperty('moveSpeedPct');
         continue;
       }

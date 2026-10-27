@@ -38,6 +38,7 @@ import {
   SCARECROW_FIELD_CAMP_CLEARANCE,
   SCARECROW_FIELD_RADIUS,
   SCARECROW_FIELD_ROAD_CLEARANCE,
+  SCARECROW_FIELD_SITE,
   scarecrowFieldPasses,
 } from '../src/sim/seasonal/scarecrow_field';
 import { rainLandingAt, rainScatterCount } from '../src/sim/seasonal/scarecrow_kit';
@@ -105,7 +106,7 @@ describe('his field', () => {
     expect(field).not.toBeNull();
     if (!field) return;
     const check = measureScarecrowField(WORLD_SEED, field.x, field.z);
-    expect(scarecrowFieldPasses(check)).toBe(true);
+    expect(scarecrowFieldPasses(check, SCARECROW_FIELD_SITE.maxRelief)).toBe(true);
     expect(check.road).toBeGreaterThanOrEqual(SCARECROW_FIELD_ROAD_CLEARANCE);
     expect(check.camp).toBeGreaterThanOrEqual(SCARECROW_FIELD_CAMP_CLEARANCE);
     expect(SCARECROW_FIELD_RADIUS).toBeGreaterThan(THATCHGRIN_KIT.rain.radius);
@@ -643,8 +644,8 @@ describe('his keepsakes', () => {
   });
 });
 
-describe('the event-bound broom', () => {
-  it('leaves the bags, the bank and the saddle the tick the event closes', () => {
+describe('the permanent broom', () => {
+  it('stays in bags, bank and saddle after the event closes', () => {
     const sim = world();
     sim.chat('/dev season on');
     sim.tick();
@@ -656,16 +657,16 @@ describe('the event-bound broom', () => {
     expect(sim.countItem(GOURDLIGHT_BROOM_ID)).toBe(1);
     sim.chat('/dev season off');
     const ev = sim.tick();
-    expect(sim.countItem(GOURDLIGHT_BROOM_ID)).toBe(0);
+    expect(sim.countItem(GOURDLIGHT_BROOM_ID)).toBe(1);
     const inBank = meta.bank.inventory.some(
       (s: { itemId: string }) => s.itemId === GOURDLIGHT_BROOM_ID,
     );
-    expect(inBank).toBe(false);
-    expect(sim.player.mountKey).toBe('');
-    expect(ev.some((e) => e.type === 'seasonal' && e.what === 'boundItemGone')).toBe(true);
+    expect(inBank).toBe(true);
+    expect(sim.player.mountKey).toBe(GOURDLIGHT_BROOM_MOUNT);
+    expect(ev.some((e) => e.type === 'seasonal' && e.what === 'boundItemGone')).toBe(false);
   });
 
-  it('bumps every revision the wire and the courier projection key on', () => {
+  it('preserves bank and courier rewards without a cleanup revision', () => {
     const sim = world();
     sim.chat('/dev season on');
     sim.tick();
@@ -687,24 +688,24 @@ describe('the event-bound broom', () => {
     const bankRev = meta.bankWireRev;
     // the sweep itself, so no courier tick moves the revision under it
     const gone = sweepEventBoundItems((sim as any).ctx, meta, null);
-    expect(gone).toEqual([GOURDLIGHT_BROOM_ID]);
-    expect(meta.courier.cargo).toEqual([]);
-    expect(meta.courier.revision).toBe(8);
-    expect(meta.wireRev).toBeGreaterThan(wire);
-    expect(meta.bankWireRev).toBeGreaterThan(bankRev);
+    expect(gone).toEqual([]);
+    expect(meta.courier.cargo).toEqual([{ itemId: GOURDLIGHT_BROOM_ID, count: 1 }]);
+    expect(meta.courier.revision).toBe(7);
+    expect(meta.wireRev).toBe(wire);
+    expect(meta.bankWireRev).toBe(bankRev);
   });
 
-  it('is swept on the first tick of a character who logs in after the event ended', () => {
+  it('is retained on the first tick of a character who logs in after the event ended', () => {
     const sim = world();
     for (let i = 0; i < 3; i++) sim.tick();
     const pid = sim.addPlayer('rogue', 'Late');
     const meta = (sim as any).players.get(pid);
     meta.inventory.push({ itemId: GOURDLIGHT_BROOM_ID, count: 1 });
     sim.tick();
-    expect(sim.countItem(GOURDLIGHT_BROOM_ID, pid)).toBe(0);
+    expect(sim.countItem(GOURDLIGHT_BROOM_ID, pid)).toBe(1);
   });
 
-  it('leaves within seconds when it arrives after its character was checked', () => {
+  it('stays when it arrives after its character was checked', () => {
     const sim = world();
     sim.chat('/dev season on');
     sim.tick();
@@ -714,7 +715,7 @@ describe('the event-bound broom', () => {
     sim.addItem(GOURDLIGHT_BROOM_ID, 1);
     expect(sim.countItem(GOURDLIGHT_BROOM_ID)).toBe(1);
     for (let i = 0; i < BOUND_RECHECK_TICKS + 1; i++) sim.tick();
-    expect(sim.countItem(GOURDLIGHT_BROOM_ID)).toBe(0);
+    expect(sim.countItem(GOURDLIGHT_BROOM_ID)).toBe(1);
   });
 
   it('stays while the event runs, and leaves ordinary items alone', () => {
@@ -730,10 +731,10 @@ describe('the event-bound broom', () => {
     expect(sim.countItem(CARVED_PUMPKIN_HEAD_ID)).toBe(1);
   });
 
-  it('is the event-bound, soulbound reins of a cosmetic ground mount', () => {
+  it('is the permanent, soulbound reins of a cosmetic ground mount', () => {
     const def = ITEMS[GOURDLIGHT_BROOM_ID];
     expect(def.kind).toBe('mount');
-    expect(def.seasonalEvent).toBe(GOURDLIGHT_EVE_ID);
+    expect(def.seasonalEvent).toBeUndefined();
     expect(def.soulbound).toBe(true);
     expect(MOUNTS[GOURDLIGHT_BROOM_MOUNT as keyof typeof MOUNTS]).not.toHaveProperty(
       'moveSpeedPct',

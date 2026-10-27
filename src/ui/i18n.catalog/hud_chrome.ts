@@ -2655,7 +2655,7 @@ export const hudChromeStrings = {
     desc_rickshaw_mount:
       'A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run.',
     desc_emberbristle_broom:
-      'A harvest broom bound with orange ribbon that hovers a hand above the ground, shedding embers from its bristles. It crumbles back to straw when Gourdlight Eve ends.',
+      'A harvest broom bound with orange ribbon that hovers a hand above the ground, shedding embers from its bristles. A permanent reward from Gourdlight Eve.',
   },
   // The riding lesson at the Highwatch stables (q_riding_lessons): Stablemaster
   // Marla lends the player a training Valorsteed for the paddock race. Finishing

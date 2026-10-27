@@ -6,7 +6,6 @@
 // near hears it. Draws no rng and reads no clock.
 //
 // The rules, in refusal order (a refused use spends nothing and starts no cooldown):
-//   - the event must be running (seasonal_items.ts refuses before this module runs);
 //   - never in combat, never while stealthed (a toy's light and noise would give a hidden
 //     player away), and never while the toy's own cooldown runs;
 //   - the prank needs another living player targeted, within reach, out of combat and

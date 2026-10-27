@@ -2,10 +2,10 @@
 // repeat-blocked set both hosts already share (quest_commands.ts
 // repeatBlockedQuestIds, mirrored online through cprof.cadenceBlockedQuests), so
 // an event quest is offered exactly while its event runs, in every world, with no
-// new wire field. A quest already in the log stays finishable (computeQuestState
-// answers 'active'/'ready' before it reads the blocked set). The rotating dailies
+// new wire field. Unfinished quests leave the log when their event closes. The rotating dailies
 // ride the same set: the pool's errands that are not the day's are blocked too.
 import { QUESTS } from '../data';
+import type { PlayerMeta } from '../sim';
 import { offDayDailyQuestIds } from './gourdlight_dailies';
 
 let seasonalQuestIds: readonly { id: string; event: string }[] | null = null;
@@ -20,6 +20,17 @@ function seasonalQuests(): readonly { id: string; event: string }[] {
 }
 
 const blockedMemo = new Map<string, readonly string[]>();
+
+/** Clear unfinished out-of-season quests; lifetime completion and deeds remain.
+ * Called with temporary-item cleanup, including the first tick after a late login. */
+export function expireSeasonalQuests(meta: PlayerMeta, activeEvent: string | null): void {
+  let changed = false;
+  for (const id of meta.questLog.keys()) {
+    const event = QUESTS[id]?.seasonalEvent;
+    if (event && event !== activeEvent) changed = meta.questLog.delete(id) || changed;
+  }
+  if (changed) meta.wireRev++;
+}
 
 /** Every seasonal quest whose event is not the one running now, plus the rotating
  *  dailies that are not the day's (gourdlight_dailies.ts). Memoized per (active event,
