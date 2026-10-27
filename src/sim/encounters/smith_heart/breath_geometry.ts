@@ -58,10 +58,12 @@ export function pinnedAgainstRim(x: number, z: number, heading: number): boolean
 
 /** Has a body at (x, z, local height y) gone over the Cornice's lip and come
  *  to rest in the void (a fall lands on the void's floor; a throw over a gap
- *  can seat a body there outright)? Either way it is dead. */
+ *  can seat a body there outright)? Either way it is dead. The void's floor
+ *  lies under every walk of the raid, so a body down there is the void's
+ *  wherever it walked to once it landed. */
 export function fellFromCornice(x: number, z: number, y: number, onGround: boolean): boolean {
-  if (!nearCornice(x, z)) return false;
-  return (onGround && y < C.h - T.voidDepth) || y < F.voidHeight + 3;
+  if (y < F.voidHeight + 3) return true;
+  return nearCornice(x, z) && onGround && y < C.h - T.voidDepth;
 }
 
 /** Where Thessaly's circle lands: `reach` yards upwind of the guardian (the

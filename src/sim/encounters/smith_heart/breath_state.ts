@@ -98,6 +98,9 @@ export interface BreathFightState {
   pinned: Record<number, number>;
   /** Players gone over an open lip this pull (each said once). */
   overLip: number[];
+  /** The guardian's last spot on the Cornice's floor (world yards): a step
+   *  the mob AI takes off it is undone to here (breath_void.ts). */
+  floorSpot: { x: number; y: number; z: number } | null;
   /** Players Thessaly's calm anchors now (an anchor run out, heroic leaves
    *  them spent). */
   anchors: number[];

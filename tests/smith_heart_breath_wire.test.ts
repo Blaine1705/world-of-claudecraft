@@ -24,6 +24,9 @@ vi.mock('../server/db', () => ({
 }));
 
 import { GameServer } from '../server/game';
+import { BREATH, CORNICE_GAPS } from '../src/sim/content/smith_heart_layout';
+import { displacePlayerForDev } from '../src/sim/dev/dev_displace';
+import { inBreathArena } from '../src/sim/encounters/smith_heart/breath_geometry';
 import {
   BREATH_AURAS,
   BREATH_GUARDIAN,
@@ -171,5 +174,84 @@ describe('the Guardian of the Breath over the wire', () => {
     expect(lifted.auras.some((x: Any) => x.id === BREATH_AURAS.cradled)).toBe(true);
     const swell = boss.auras.find((x: Any) => x.id === BREATH_AURAS.swell);
     expect(swell?.stacks).toBeGreaterThan(0);
+  });
+
+  // Jose's playtest, the online path: two raiders in god mode (as the notes
+  // said), one walks out through a gap on the server's own input frames. The
+  // void kills him on the server and in the mirror; the guardian never
+  // follows him off the Cornice and keeps fighting the one left.
+  it('a walk out through a gap kills online, god mode and all, and the guardian stays home', () => {
+    const saved = process.env.ALLOW_DEV_COMMANDS;
+    process.env.ALLOW_DEV_COMMANDS = '1';
+    let server: Any;
+    try {
+      server = new GameServer();
+    } finally {
+      if (saved === undefined) delete process.env.ALLOW_DEV_COMMANDS;
+      else process.env.ALLOW_DEV_COMMANDS = saved;
+    }
+    const sim = server.sim;
+    const a = joinAt(server, 1, 'Aleph', false);
+    const b = joinAt(server, 2, 'Bet', true);
+    sim.partyInvite(b.pid, a.pid);
+    sim.partyAccept(b.pid);
+    for (const p of [a, b]) {
+      sim.setPlayerLevel(20, p.pid);
+      sim.chat('/dev heart enter', p.pid);
+      sim.chat('/dev heart tp cornice', p.pid);
+      sim.chat('/dev god', p.pid);
+    }
+    sim.chat('/dev heart breath pull', b.pid);
+    const client: Any = bareClient(b.pid);
+    const run = (seconds: number, each?: () => void) => {
+      for (let i = 0; i < Math.round(seconds * 20); i++) {
+        sim.tick();
+        server.broadcastSnapshots();
+        for (const f of b.frames.splice(0)) client.applySnapshot(f);
+        each?.();
+      }
+    };
+    run(1);
+    sim.chat('/dev heart breath calm', b.pid);
+    const bet = sim.entities.get(b.pid);
+    const boss = [...sim.entities.values()].find((e: Any) => e.templateId === BREATH_GUARDIAN);
+    expect(boss.aggroTargetId).toBe(b.pid);
+    // Aleph is in the fight too (on the table, below Bet).
+    boss.threat.set(a.pid, 1);
+    const inst = sim.ctx.instances.find(
+      (i: Any) => i.npcIds.includes(boss.id) || i.mobIds?.includes(boss.id),
+    );
+    const o = sim.ctx.instanceOriginOf(inst);
+    const gap = CORNICE_GAPS.find((g) => g.deg === 182);
+    if (!gap) throw new Error('gap');
+    const ang = (gap.deg * Math.PI) / 180;
+    displacePlayerForDev(
+      sim.ctx,
+      bet,
+      o.x + gap.x - Math.sin(ang) * 4,
+      o.z + gap.z - Math.cos(ang) * 4,
+    );
+    let seq = 1;
+    const walk = () =>
+      server.handleMessage(
+        b.session,
+        JSON.stringify({
+          t: 'input',
+          seq: seq++,
+          mi: { f: 1, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0 },
+          facing: ang,
+        }),
+      );
+    let lowestBoss = boss.pos.y;
+    run(12, () => {
+      if (!bet.dead) walk();
+      lowestBoss = Math.min(lowestBoss, boss.pos.y);
+    });
+    expect(bet.dead).toBe(true);
+    expect(client.entities.get(b.pid).dead).toBe(true);
+    expect(lowestBoss).toBeGreaterThan(BREATH.cornice.h - 1);
+    expect(inBreathArena(boss.pos.x - o.x, boss.pos.z - o.z)).toBe(true);
+    expect(boss.inCombat).toBe(true);
+    expect(boss.aggroTargetId).toBe(a.pid);
   });
 });

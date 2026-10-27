@@ -11,7 +11,7 @@
 // Breath vein and the seal's quarter lit by its fall, and determinism.
 
 import { describe, expect, it } from 'vitest';
-import { CORNICE_GAPS, SMITH_HEART_FIELD } from '../src/sim/content/smith_heart_layout';
+import { BREATH, CORNICE_GAPS, SMITH_HEART_FIELD } from '../src/sim/content/smith_heart_layout';
 import {
   BLOW_BEARINGS,
   BREATH_AURAS,
@@ -25,6 +25,7 @@ import {
   calmSeconds,
   cradleShare,
   forkPath,
+  inBreathArena,
   smithHeartProgress,
   smithHeartVeinWon,
   swellMult,
@@ -187,6 +188,85 @@ describe('Guardian of the Breath: the push, the rim and the gaps', () => {
     meta.moveInput.forward = true;
     until(f, () => walker.dead, 10);
     expect(walker.dead).toBe(true);
+  });
+
+  // Jose's playtest (online, /dev god as the notes said): he walked out
+  // through a gap, did not die on the void's floor, and the guardian walked
+  // down after him. Invulnerability swallowed the fall's damage, and nothing
+  // held the guardian to its Cornice.
+  it('the void kills whatever shields the body: god mode, a GM, in the fight and out of it', () => {
+    for (const shield of ['devGod', 'gm', 'none'] as const) {
+      for (const gap of CORNICE_GAPS) {
+        for (const pull of [true, false]) {
+          const f = breathFight(2, 23);
+          if (pull) {
+            f.dev('/dev heart breath pull');
+            f.tick(2);
+            f.dev('/dev heart breath calm');
+          }
+          const walker = f.players[1];
+          walker.maxHp = 1200;
+          walker.hp = 1200;
+          if (shield === 'devGod') walker.devGod = true;
+          if (shield === 'gm') walker.gm = true;
+          const a = (gap.deg * Math.PI) / 180;
+          f.put(walker, gap.x - Math.sin(a) * 4, gap.z - Math.cos(a) * 4);
+          walker.facing = a;
+          const meta = f.sim.players.get(walker.id);
+          if (!meta) throw new Error('meta');
+          meta.moveInput.forward = true;
+          for (let i = 0; i < 20 * 15 && !walker.dead; i++) f.tick(1, false);
+          expect({ shield, gap: gap.deg, pull, dead: walker.dead }).toEqual({
+            shield,
+            gap: gap.deg,
+            pull,
+            dead: true,
+          });
+        }
+      }
+    }
+  });
+
+  it('the guardian never leaves the Cornice after a target: it drops them and keeps the raid', () => {
+    for (const gap of CORNICE_GAPS) {
+      for (const god of [true, false]) {
+        // A lone raider (the guardian's only target) and a raid of two.
+        for (const n of [1, 2]) {
+          const f = breathFight(n, 23);
+          const walker = f.players[0];
+          if (god) walker.devGod = true;
+          f.tick(20);
+          const boss = f.boss();
+          expect(boss.inCombat).toBe(true);
+          const a = (gap.deg * Math.PI) / 180;
+          f.put(walker, gap.x - Math.sin(a) * 4, gap.z - Math.cos(a) * 4);
+          walker.facing = a;
+          const meta = f.sim.players.get(walker.id);
+          if (!meta) throw new Error('meta');
+          meta.moveInput.forward = true;
+          for (let i = 0; i < 20 * 15; i++) {
+            f.tick(1, false);
+            const at = f.local(boss);
+            expect({ gap: gap.deg, god, n, i, home: inBreathArena(at.x, at.z) }).toEqual({
+              gap: gap.deg,
+              god,
+              n,
+              i,
+              home: true,
+            });
+            expect(boss.pos.y).toBeGreaterThan(BREATH.cornice.h - 1);
+          }
+          expect(boss.threat.has(walker.id)).toBe(false);
+          if (n === 2) {
+            // The one left on the Cornice is still fought.
+            const other = f.players[1];
+            expect(other.dead).toBe(false);
+            expect(boss.inCombat).toBe(true);
+            expect(boss.aggroTargetId).toBe(other.id);
+          }
+        }
+      }
+    }
   });
 
   it('where the wall stands the wind pins a body and hurts it each second; never in the calm', () => {

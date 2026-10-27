@@ -45,7 +45,6 @@ import {
   startGales,
   startInhale,
   startWindBars,
-  stepVoid,
   stepWind,
   stillWind,
   thessalyOf,
@@ -87,6 +86,7 @@ import {
 } from './breath_storm';
 import { clearAnchors, clearCalm, plantCalm, stepThessaly } from './breath_thessaly';
 import { breathSay, THESSALY_PULL_DELAY } from './breath_voice';
+import { stepOverLip, stepVoidDeaths, tetherGuardian } from './breath_void';
 
 // ---- the dev difficulty switch ------------------------------------------------------------
 
@@ -143,6 +143,7 @@ function freshState(boss: Entity, difficulty: BreathDifficulty): BreathFightStat
     calm: null,
     pinned: {},
     overLip: [],
+    floorSpot: null,
     anchors: [],
     vortex: null,
     gales: [],
@@ -307,6 +308,8 @@ function beginBreath(ctx: SimContext, inst: InstanceSlot, boss: Entity): BreathF
 
 /** One tick of the claim's Guardian of the Breath. */
 export function tickBreathGuardian(ctx: SimContext, inst: InstanceSlot): void {
+  // The void is the void's whether the guardian fights or not.
+  stepVoidDeaths(ctx, inst);
   const boss = breathGuardian(ctx, inst);
   if (!boss) return;
   const st0 = boss.smithHeartBreath ?? null;
@@ -327,6 +330,8 @@ export function tickBreathGuardian(ctx: SimContext, inst: InstanceSlot): void {
     return;
   }
   const st = st0 ?? beginBreath(ctx, inst, boss);
+  tetherGuardian({ ctx, inst, st, boss });
+  if (!fighting(boss)) return;
   const s = scopeOf(ctx, inst, st, boss);
   st.clock += DT;
   if (st.clock + 1e-9 >= THESSALY_PULL_DELAY)
@@ -336,7 +341,7 @@ export function tickBreathGuardian(ctx: SimContext, inst: InstanceSlot): void {
   stepWind(s);
   stepThessaly(s);
   stepStorm(s);
-  stepVoid(s);
+  stepOverLip(s);
   startWindBars(s);
   startStormBars(s);
 }

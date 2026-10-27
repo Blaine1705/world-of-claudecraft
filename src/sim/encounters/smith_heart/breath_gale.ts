@@ -30,18 +30,11 @@
 // (breathWindTemplate), so every client draws the telegraph to the tick.
 // Zero rng in every pick; the draws are the damage rolls, in player order.
 
-import { BREATH } from '../../content/smith_heart_layout';
 import type { InstanceSlot } from '../../sim';
 import type { SimContext } from '../../sim_context';
 import { DT, type Entity } from '../../types';
 import { WIND_DRIFT_AURA, WIND_PULL_AURA } from '../../wind_drift';
-import {
-  fellFromCornice,
-  gapAt,
-  inBreathArena,
-  looseGalePos,
-  pinnedAgainstRim,
-} from './breath_geometry';
+import { looseGalePos, pinnedAgainstRim } from './breath_geometry';
 import {
   BREATH_AURAS,
   BREATH_CASTS,
@@ -279,43 +272,6 @@ function stepPinned(s: BreathScope): void {
     const p = s.ctx.entities.get(id);
     if (p) dropAura(p, BREATH_AURAS.pinned);
   }
-}
-
-/** A body over an open lip falls (the kernel's gravity); once it is well
- *  below the Cornice it is dead, whatever carried it there. Said once each. */
-export function stepVoid(s: Pick<BreathScope, 'ctx' | 'inst' | 'st' | 'boss'>): void {
-  const o = s.ctx.instanceOriginOf(s.inst);
-  for (const p of corniceListeners(s.ctx, s.inst)) {
-    if (p.dead || p.ghost) continue;
-    const lx = p.pos.x - o.x;
-    const lz = p.pos.z - o.z;
-    const ly = p.pos.y;
-    const off = !inBreathArena(lx, lz) && ly < BREATH.cornice.h - 0.6 && ly > BREATH.cornice.h - 40;
-    if (off && !s.st.overLip.includes(p.id) && gapNear(lx, lz)) {
-      s.st.overLip.push(p.id);
-      s.ctx.emit({
-        type: 'spellfxAt',
-        x: p.pos.x,
-        z: p.pos.z,
-        school: 'nature',
-        fx: 'burst',
-        radius: 2,
-        ability: BREATH_CUES.fall,
-      });
-      raidWarn(s, s.boss, 'fell', `${p.name} is swept into the void!`, { player: p.name });
-      const thessaly = thessalyOf(s.ctx, s.inst);
-      breathSay(s, thessaly, 'thessaly', 'fall');
-    }
-    if (fellFromCornice(lx, lz, ly, p.onGround)) {
-      s.ctx.dealDamage(null, p, p.hp + p.maxHp * 10, false, 'physical', 'Falling', 'hit', true);
-    }
-  }
-}
-
-/** Is (x, z) by a gap (a body leaving the floor here went over its lip)? */
-function gapNear(x: number, z: number): boolean {
-  for (const dx of [-3, 0, 3]) for (const dz of [-3, 0, 3]) if (gapAt(x + dx, z + dz)) return true;
-  return false;
 }
 
 /** Captain Thessaly in this claim, or null. */
