@@ -807,8 +807,6 @@ const mergeStringsEn = {
       heart_bellows_gust: 'Bellows Gust',
       heart_storm_lance: 'Storm Lance',
       heart_quenching_breath: 'Quenching Breath',
-      heart_molten_pour: 'Molten Pour',
-      heart_anvil_clang: 'Searing Knell',
       heart_forge_wrath: 'Forge Wrath',
       heart_forge_pour: 'Forge Pour',
       heart_gale_bolt: 'Gale Bolt',
@@ -833,8 +831,9 @@ const mergeStringsEn = {
       heart_breath_drawn_lightning: 'Drawn Lightning',
       // The Guardian of the Quench's awakening (encounters/smith_heart/quench_ids.ts).
       heart_quench_blades_wake: 'The Blades Wake',
-      // The Guardian of the Heat's Shed Heat (encounters/smith_heart/heat_ids.ts).
-      heart_heat_shed: 'Shed Heat',
+      // The Guardian of the Heat's bars (encounters/smith_heart/heat_ids.ts).
+      heart_heat_fist: 'Basalt Fist',
+      heart_heat_tear_free: 'Torn Free',
       // The player's own bar while kicking a Soul Brazier over (the trash
       // engine's G3 use, trash_kit/encounter_use.ts).
       kituse_sanctum_topple_brazier: 'Topple Brazier',

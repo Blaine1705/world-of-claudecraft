@@ -4768,10 +4768,23 @@ export const tr_TR: EnTranslations = {
         "deepening": "The lake's cold rises {total}% faster: {step}% more every {every} sec since the blades woke ({stacks} so far)."
       },
       "heatGuardian": {
-        "heat": "The Hearth's heat: {heat} of {max}. It rises by {rise} every second on its own. Every {every} sec the Hearth Pulse deals {min} to {most} Fire damage to everyone on the Hearth's floor at this heat, more the hotter it is. Each Kindled Ray a player takes lowers it by {cool}; a ray with nobody within {range} yd goes back into the guardian and raises it by {back}. At {max} the Hearth overheats.",
-        "burn": "Takes {pct}% more Fire, Frost, Nature, Shadow and Arcane damage: {per}% for each of your {stacks} stacks, at most {most}. Each Kindled Ray that strikes you adds a stack; one stack fades {decay} sec after the last change ({heroicDecay} sec on Heroic).",
-        "stoked": "The Hearth's heat rises {total}% faster: {step}% more every {every} sec of the fight ({stacks} so far).",
-        "overheating": "The heat has reached {at}. At {max} the Hearth overheats: Hearthburst deals {min} to {most} Fire damage to everyone on the floor ({heroicMin} to {heroicMost} on Heroic), then the heat starts again from {vent}. Cool it with the crystals' rays or brace."
+        "statePhase1": "Half sunk in its wellspring: it never moves. Basalt Fist slams a spot on the shore and three Molten Swells roll out from it, and Hearth Flare strikes everyone farther than {reach} yd from the wellspring. At 70% health it sinks and the Hearth overflows. Heroic deals {heroicPct}% more damage.",
+        "statePhase2": "Half sunk in its wellspring: it never moves. Basalt Fist goes on; Hearthseeds fall under the raid and burst after a while, and Wakefire ignites the floor round the wellspring band by band. At 40% health it sinks and the Hearth overflows again. Heroic deals {heroicPct}% more damage.",
+        "statePhase3": "Half sunk in its wellspring: it never moves. Basalt Fist and Wakefire go on, and Rolling Cinders fall and hunt players: strike one to knock it back. On Heroic, at 10% health it tears itself free. Heroic deals {heroicPct}% more damage.",
+        "statePhase4": "Torn free of the wellspring: it can be tanked anywhere. The spirits of the Quench, the Breath and the Hammer fight beside you: freeze the Rolling Cinders on the Quench's ice, put out the blazes with the Breath's storm-rain, and drag it across a Stone Root to stop its Crushing Fist.",
+        "stateUnder": "Sunk in its wellspring: it cannot be attacked or harmed while the Hearth overflows. It rises again when the overflow ends.",
+        "stateTearing": "Tearing itself free of the wellspring: it cannot be attacked or harmed until it stands.",
+        "scorched": "Takes {pct}% more Fire, Frost, Nature, Shadow and Arcane damage. Every {every} sec, Hearth Flare strikes everyone farther than {reach} yd from the wellspring and renews this.",
+        "grip": "Takes {total} Fire damage every second ({per} for each of your {stacks} stacks). Each of the guardian's landed swings adds a stack, up to {most}, and lasts {seconds} sec: swap tanks before it grows too heavy.",
+        "kindling": "In {seconds} sec you trail fire for {trail} sec. Each patch burns allies for {min} to {max} Fire damage a second and heals a Wellspawn standing in it by {heal}% of its health a second: leave the group and the Wellspawn's path.",
+        "trail": "You leave a Cinder Trail: patches of fire {radius} yd wide that burn for {life} sec, dealing {min} to {max} Fire damage a second to allies in them and healing a Wellspawn in them by {heal}% of its health a second.",
+        "hunted": "A Rolling Cinder or a Seedflame is after you. A Rolling Cinder that reaches you kills you and burns everyone within {radius} yd: keep away, and let allies strike it, each strike knocks it {knock} yd back (then not again for {crust} sec).",
+        "crust": "Cooled hard: strikes cannot knock it back until this ends.",
+        "rimelocked": "Frozen on the Quench's ice: it cannot move and takes {pct}% more damage.",
+        "stormRain": "Walk into a Creeping Blaze to put it out. Creeping Blaze cannot burn you.",
+        "crushMark": "The guardian's Crushing Fist strikes you for {min} to {max} Fire damage when its {seconds} sec charge ends. Drag it across a Stone Root first: the root holds it and the blow misses.",
+        "crushing": "Its Crushing Fist strikes its tank for {min} to {max} Fire damage when this ends, unless a Stone Root holds it first.",
+        "rooted": "Held by a Stone Root for {seconds} sec: it cannot move, and its Crushing Fist missed."
       },
       "sharedPyre": "Her oyuncunun azami canının %{total} kadarını, çemberin içindeki oyuncu sayısına bölerek verir ({players} oyuncuyla her birine %{perPlayer}).",
       "varkhulSharedPyre": "Her oyuncunun azami canının %{total} kadarını, çemberin içindeki oyuncular arasında bölerek verir ({players} oyuncuyla her birine %{perPlayer}). Eksik her oyuncu ayrıca, çemberin içindekiler dahil tüm akına azami canın %{missingPenalty} kadarı hasar verir.",
@@ -7359,33 +7372,34 @@ export const tr_TR: EnTranslations = {
     },
     "heatGuardian": {
       "warn": {
-        "crystals": "Kindled Crystals rise! Stand in their rays to cool the Hearth!",
-        "channel": "The Hearth overflows! The channel will split the floor!",
-        "windup": "The Hearth is about to overheat! Cool it with the crystals or brace!",
-        "overheat": "The Hearth overheats!"
+        "overflow": "The guardian sinks and the Hearth overflows! Dodge the rivers!",
+        "wellspawn": "The Wellspawn climb out! Slow them and kill them before they reach the wellspring!",
+        "keepers": "Wellkeepers rise from the wellspring! Tank them, and keep their marks away from the Wellspawn!",
+        "seeds": "Hearthseeds fall! Drop them together and run!",
+        "zones": "Wakefire! The Hearth ignites band by band: step out!",
+        "cinder": "A Rolling Cinder falls! Strike it back before it reaches its quarry!",
+        "tearFree": "The guardian tears itself free of the wellspring!",
+        "spirits": "The spirits of the Quench, the Breath and the Hammer come to the Hearth!",
+        "crush": "Crushing Fist! Drag the guardian across a Stone Root!"
       },
       "say": {
         "pull": "You walk into the first flame. Nothing leaves it unchanged.",
-        "shed": "Take my heat, if you can hold it.",
-        "channel": "The Hearth overflows. Choose your side.",
-        "windup": "Too much fire for one body... it must go somewhere!",
-        "overheat": "BURN WITH ME!",
-        "stoke": "Every breath you take feeds the flame.",
+        "fist": "Stand where the stone falls, and be part of it.",
+        "sink": "The wellspring rises to meet you!",
+        "sinkAgain": "Again the Hearth overflows. Again you burn.",
+        "feed": "Yes... come home to the flame.",
+        "rise": "I rise with the first fire!",
+        "seeds": "Every spark I scatter takes root.",
+        "zones": "The Hearth wakes beneath your feet.",
+        "cinder": "Run, little ember. The flame is hungry.",
+        "tearFree": "No more waiting in the well. I come for you myself!",
+        "crush": "This fist will break the mountain itself.",
+        "quench": "The cold remembers you. Let my ice bind its embers.",
+        "breath": "Take the storm-rain. Put its fire out.",
+        "hammer": "Stand on the stone. The mountain will hold it.",
         "wipe": "Ash, all of you. The Hearth burns on.",
         "death": "The flame... sinks back... into the stone. Carry it well."
       }
-    },
-    "heatAlert": {
-      "heatTitle": "The Hearth heats",
-      "coolingTitle": "The Hearth cools",
-      "burningTitle": "Crystal Burn x{stacks}",
-      "overheatTitle": "Overheat coming!",
-      "heatLine": "Stand within {range} yd of a Kindled Crystal to take its ray and cool the Hearth",
-      "coolingLine": "The crystals' rays are cooling the Hearth: keep someone in every ray",
-      "burningLine": "You take {pct}% more spell damage: step out and let another take the ray",
-      "overheatLine": "At {max} the Hearth bursts over everyone: use your defences",
-      "heatBar": "Heat {heat} / {max}",
-      "heatAria": "Heat {heat} of {max}"
     },
     "sanctumAlert": {
       "quenchTitle": "Soğutma suyundasın!",
@@ -16674,8 +16688,6 @@ export const tr_TR: EnTranslations = {
       "heart_bellows_gust": "Bellows Gust",
       "heart_storm_lance": "Storm Lance",
       "heart_quenching_breath": "Quenching Breath",
-      "heart_molten_pour": "Molten Pour",
-      "heart_anvil_clang": "Searing Knell",
       "heart_forge_wrath": "Forge Wrath",
       "heart_forge_pour": "Forge Pour",
       "heart_gale_bolt": "Gale Bolt",
@@ -16695,7 +16707,8 @@ export const tr_TR: EnTranslations = {
       "heart_breath_thunders_cradle": "Thunder's Cradle",
       "heart_breath_drawn_lightning": "Drawn Lightning",
       "heart_quench_blades_wake": "The Blades Wake",
-      "heart_heat_shed": "Shed Heat",
+      "heart_heat_fist": "Basalt Fist",
+      "heart_heat_tear_free": "Torn Free",
       "kituse_sanctum_topple_brazier": "Mangalı Devir",
       "trash_demo_nova": "Deneme Novası",
       "trash_demo_nova_unstoppable": "Deneme Novası",
@@ -26580,6 +26593,18 @@ export const tr_TR: EnTranslations = {
       },
       "heart_masterless_strength": {
         "name": "The Masterless Strength"
+      },
+      "heart_heat_wellspawn": {
+        "name": "Wellspawn"
+      },
+      "heart_heat_wellkeeper": {
+        "name": "Wellkeeper"
+      },
+      "heart_heat_seedflame": {
+        "name": "Seedflame"
+      },
+      "heart_heat_rolling_cinder": {
+        "name": "Rolling Cinder"
       },
       "thorn_sprout": {
         "name": "Diken Filizi"

@@ -202,8 +202,6 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.heart_bellows_gust': true,
   'abilityUi.cast.heart_storm_lance': true,
   'abilityUi.cast.heart_quenching_breath': true,
-  'abilityUi.cast.heart_molten_pour': true,
-  'abilityUi.cast.heart_anvil_clang': true,
   'abilityUi.cast.heart_forge_wrath': true,
   'abilityUi.cast.heart_forge_pour': true,
   'abilityUi.cast.heart_gale_bolt': true,
@@ -224,7 +222,8 @@ const RIFT_CAST_DISPLAY_KEYS: Partial<Record<TranslationKey, true>> = {
   'abilityUi.cast.heart_breath_thunders_cradle': true,
   'abilityUi.cast.heart_breath_drawn_lightning': true,
   'abilityUi.cast.heart_quench_blades_wake': true,
-  'abilityUi.cast.heart_heat_shed': true,
+  'abilityUi.cast.heart_heat_fist': true,
+  'abilityUi.cast.heart_heat_tear_free': true,
   // The Wildheart Basin's three bosses.
   'abilityUi.cast.wildheart_beast_pit_quake': true,
   'abilityUi.cast.wildheart_jaguar_heel': true,

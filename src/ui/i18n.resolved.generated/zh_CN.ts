@@ -4768,10 +4768,23 @@ export const zh_CN: EnTranslations = {
         "deepening": "湖的寒意上升快了{total}%：自刃苏醒后每{every}秒再快{step}%（目前{stacks}次）。"
       },
       "heatGuardian": {
-        "heat": "炉心热度：{heat}/{max}。它每秒自行上升{rise}。每{every}秒，炉心脉动对炉心地面上的所有人造成{min}到{most}点火焰伤害（按当前热度），越热伤害越高。玩家每承受一道燃焰光束，热度下降{cool}；{range}码内无人时，光束会回到守护者体内，使热度上升{back}。达到{max}时炉心过热。",
-        "burn": "受到的火焰、冰霜、自然、暗影和奥术伤害提高{pct}%：你的{stacks}层每层{per}%，最多{most}层。每被一道燃焰光束击中叠加一层；最后一次变化{decay}秒后消退一层（英雄难度为{heroicDecay}秒）。",
-        "stoked": "炉心热度上升快了{total}%：战斗中每{every}秒再快{step}%（目前{stacks}次）。",
-        "overheating": "热度已达到{at}。达到{max}时炉心过热：炉心爆裂对地面上的所有人造成{min}到{most}点火焰伤害（英雄难度为{heroicMin}到{heroicMost}），之后热度从{vent}重新上升。用水晶的光束降温，否则就做好准备。"
+        "statePhase1": "半身沉在涌泉之中，从不移动。玄武岩之拳砸向岸上的一点，三道熔岩涌浪从那里滚滚而出；炉心闪焰会击中所有距离涌泉超过{reach}码的人。生命值降到70%时它会沉下，炉心随之满溢。英雄难度下伤害提高{heroicPct}%。",
+        "statePhase2": "半身沉在涌泉之中，从不移动。玄武岩之拳仍在继续；炉心火种落在团队脚下，片刻后爆裂，苏醒之火将涌泉周围的地面一圈接一圈地点燃。生命值降到40%时它会再次沉下，炉心再度满溢。英雄难度下伤害提高{heroicPct}%。",
+        "statePhase3": "半身沉在涌泉之中，从不移动。玄武岩之拳与苏醒之火仍在继续，滚动余烬会坠落并追逐玩家：击中它就能把它打退。英雄难度下，生命值降到10%时它会挣脱涌泉。英雄难度下伤害提高{heroicPct}%。",
+        "statePhase4": "已挣脱涌泉：可以被拉到任何地方。淬火、吐息与重锤之灵与你们并肩作战：在淬火之冰上冻住滚动余烬，用吐息的风暴之雨扑灭烈焰，并把它拖过石根来阻止碾碎之拳。",
+        "stateUnder": "沉入涌泉之中：炉心满溢期间无法被攻击或伤害。满溢结束后它会再次升起。",
+        "stateTearing": "正从涌泉中挣脱：在它站起之前无法被攻击或伤害。",
+        "scorched": "受到的火焰、冰霜、自然、暗影和奥术伤害提高{pct}%。每{every}秒，炉心闪焰会击中所有距离涌泉超过{reach}码的人并刷新此效果。",
+        "grip": "每秒受到{total}点火焰伤害（{stacks}层中每层{per}点）。守护者每次命中都会叠加一层（最多{most}层），持续{seconds}秒：在灼烧过重之前换坦克。",
+        "kindling": "{seconds}秒后你会在{trail}秒内留下火焰足迹。每一块足迹每秒对友方造成{min}到{max}点火焰伤害，并为站在其中的涌泉之子每秒恢复{heal}%生命值：离开团队和涌泉之子的路线。",
+        "trail": "你正在留下余烬足迹：宽{radius}码的火焰燃烧{life}秒，每秒对其中的友方造成{min}到{max}点火焰伤害，并为其中的涌泉之子每秒恢复{heal}%生命值。",
+        "hunted": "一团滚动余烬或籽焰正在追你。被滚动余烬追上你会死亡，{radius}码内的所有人都会被灼烧：保持距离，让队友击打它，每次击打都会把它打退{knock}码（之后{crust}秒内无法再次打退）。",
+        "crust": "已冷却变硬：此效果结束前，击打无法将它打退。",
+        "rimelocked": "在淬火之冰上被冻住：无法移动，受到的伤害提高{pct}%。",
+        "stormRain": "走进蔓延烈焰即可将其扑灭。蔓延烈焰无法灼烧你。",
+        "crushMark": "{seconds}秒的蓄力结束时，守护者的碾碎之拳会对你造成{min}到{max}点火焰伤害。在此之前把它拖过石根：石根会将它缚住，这一拳便会落空。",
+        "crushing": "此效果结束时，碾碎之拳会对它的坦克造成{min}到{max}点火焰伤害，除非石根先将它缚住。",
+        "rooted": "被石根缚住{seconds}秒：无法移动，碾碎之拳落空了。"
       },
       "sharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。",
       "varkhulSharedPyre": "造成相当于每名玩家最大生命值 {total}% 的伤害，由圈内玩家分摊（{players} 名玩家时每人承受 {perPlayer}%）。每缺少一名玩家，还会对整个团队（包括圈内玩家）造成最大生命值 {missingPenalty}% 的伤害。",
@@ -7359,33 +7372,34 @@ export const zh_CN: EnTranslations = {
     },
     "heatGuardian": {
       "warn": {
-        "crystals": "燃焰水晶升起了！站进它们的光束为炉心降温！",
-        "channel": "炉心满溢了！流槽将把地面一分为二！",
-        "windup": "炉心即将过热！用水晶降温，否则就做好准备！",
-        "overheat": "炉心过热了！"
+        "overflow": "守护者沉下，炉心满溢了！躲开熔岩之河！",
+        "wellspawn": "涌泉之子爬出来了！在它们抵达涌泉之前减速并消灭它们！",
+        "keepers": "涌泉看守从涌泉中升起！坦住它们，让它们的印记远离涌泉之子！",
+        "seeds": "炉心火种落下了！集中放下然后快跑！",
+        "zones": "苏醒之火！炉心一圈接一圈地燃起：快出去！",
+        "cinder": "滚动余烬落下了！在它追上猎物之前把它打退！",
+        "tearFree": "守护者从涌泉中挣脱了！",
+        "spirits": "淬火、吐息与重锤之灵来到了炉心！",
+        "crush": "碾碎之拳！把守护者拖过石根！"
       },
       "say": {
         "pull": "你们走进了最初的火焰。没有什么能毫无改变地离开。",
-        "shed": "接下我的热量吧，如果你们承受得住。",
-        "channel": "炉心满溢了。选好你们站的那一边。",
-        "windup": "一个躯体装不下这么多火焰……它必须找到出口！",
-        "overheat": "与我一同燃烧！",
-        "stoke": "你们的每一次呼吸都在喂养火焰。",
+        "fist": "站在岩石落下的地方，成为它的一部分。",
+        "sink": "涌泉升起来迎接你们了！",
+        "sinkAgain": "炉心再次满溢。你们再次燃烧。",
+        "feed": "是的……回到火焰的怀抱吧。",
+        "rise": "我随最初之火一同升起！",
+        "seeds": "我撒下的每一颗火星都会生根。",
+        "zones": "炉心在你们脚下苏醒。",
+        "cinder": "跑吧，小小的火星。火焰饿了。",
+        "tearFree": "不再在涌泉里等待。我要亲自来找你们！",
+        "crush": "这一拳连山本身都能击碎。",
+        "quench": "寒冷记得你们。让我的冰缚住它的余烬。",
+        "breath": "接受风暴之雨吧。扑灭它的火焰。",
+        "hammer": "站到石头上。大山会将它按住。",
         "wipe": "都化为灰烬吧。炉心依旧燃烧。",
         "death": "火焰……沉回……岩石之中。好好带着它。"
       }
-    },
-    "heatAlert": {
-      "heatTitle": "炉心升温",
-      "coolingTitle": "炉心降温",
-      "burningTitle": "水晶灼伤 x{stacks}",
-      "overheatTitle": "即将过热！",
-      "heatLine": "站在燃焰水晶{range}码内承受光束，为炉心降温",
-      "coolingLine": "水晶的光束正在为炉心降温：每道光束都要有人站着",
-      "burningLine": "受到的法术伤害提高{pct}%：离开光束，换别人来承受",
-      "overheatLine": "达到{max}时炉心会烧向所有人：使用减伤技能",
-      "heatBar": "热度 {heat} / {max}",
-      "heatAria": "热度 {heat}/{max}"
     },
     "sanctumAlert": {
       "quenchTitle": "身陷淬火之水！",
@@ -16674,8 +16688,6 @@ export const zh_CN: EnTranslations = {
       "heart_bellows_gust": "风箱狂风",
       "heart_storm_lance": "风暴长枪",
       "heart_quenching_breath": "淬火吐息",
-      "heart_molten_pour": "熔流倾泻",
-      "heart_anvil_clang": "灼热丧钟",
       "heart_forge_wrath": "熔炉之怒",
       "heart_forge_pour": "熔炉倾泻",
       "heart_gale_bolt": "Gale Bolt",
@@ -16695,7 +16707,8 @@ export const zh_CN: EnTranslations = {
       "heart_breath_thunders_cradle": "雷霆摇篮",
       "heart_breath_drawn_lightning": "引雷",
       "heart_quench_blades_wake": "诸刃苏醒",
-      "heart_heat_shed": "泄放热量",
+      "heart_heat_fist": "玄武岩之拳",
+      "heart_heat_tear_free": "挣脱",
       "kituse_sanctum_topple_brazier": "推倒火盆",
       "trash_demo_nova": "测试新星",
       "trash_demo_nova_unstoppable": "测试新星",
@@ -26580,6 +26593,18 @@ export const zh_CN: EnTranslations = {
       },
       "heart_masterless_strength": {
         "name": "无主之力"
+      },
+      "heart_heat_wellspawn": {
+        "name": "涌泉之子"
+      },
+      "heart_heat_wellkeeper": {
+        "name": "涌泉看守"
+      },
+      "heart_heat_seedflame": {
+        "name": "籽焰"
+      },
+      "heart_heat_rolling_cinder": {
+        "name": "滚动余烬"
       },
       "thorn_sprout": {
         "name": "荆棘幼芽"

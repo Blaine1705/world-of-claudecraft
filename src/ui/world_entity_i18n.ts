@@ -419,6 +419,11 @@ const MOB_IDS = [
   'heart_quench_guardian',
   'heart_heat_guardian',
   'heart_masterless_strength',
+  // The Guardian of the Heat's adds (encounters/smith_heart/heat*.ts).
+  'heart_heat_wellspawn',
+  'heart_heat_wellkeeper',
+  'heart_heat_seedflame',
+  'heart_heat_rolling_cinder',
   // The Gorgebloom's sprouts (encounters/wildheart_basin/gorgebloom.ts).
   'thorn_sprout',
   // Zulgar's Hunting Spear: the usable body a teammate pulls out

@@ -56,7 +56,6 @@ const ALL_IDS: DungeonPromptId[] = [
   'crypt',
   'council',
   'quench',
-  'heat',
   'temple',
   'kitUse',
 ];
@@ -75,7 +74,6 @@ describe('dungeon prompt policy: what the hints setting governs', () => {
       crypt: true,
       council: true,
       quench: false,
-      heat: false,
       temple: true,
       kitUse: false,
     });
@@ -99,8 +97,6 @@ describe('dungeon prompt policy: what the hints setting governs', () => {
     expect(dungeonPromptEnabled('kitUse', false)).toBe(true);
     // The Guardian of the Quench's cold bar is the player's own gauge.
     expect(dungeonPromptEnabled('quench', false)).toBe(true);
-    // The Guardian of the Heat's gauge is the raid's shared one.
-    expect(dungeonPromptEnabled('heat', false)).toBe(true);
   });
 });
 
@@ -114,7 +110,6 @@ describe('dungeon prompt policy: the shared slot', () => {
     crypt: false,
     council: false,
     quench: false,
-    heat: false,
     temple: false,
     cryptSoft: false,
     wildheartSoft: false,
@@ -134,7 +129,6 @@ describe('dungeon prompt policy: the shared slot', () => {
       'crypt',
       'council',
       'quench',
-      'heat',
       'temple',
     ] as const) {
       expect(usePromptYields({ ...none, [id]: true }), id).toBe(true);

@@ -714,11 +714,10 @@ const UI_PURE_CORES = [
   // Zulgar's breath, spear, Sunstruck window and sun glyphs) and its scene scan.
   'src/ui/hud/dungeon/wildheart_alert_view.ts',
   'src/ui/hud/dungeon/wildheart_alert_scene_core.ts',
-  // The Smith's Heart's alerts: the Hammer Council, the Guardian of the
-  // Quench's cold bar and the Guardian of the Heat's heat gauge.
+  // The Smith's Heart's alerts: the Hammer Council and the Guardian of the
+  // Quench's cold bar.
   'src/ui/hud/dungeon/council_alert_view.ts',
   'src/ui/hud/dungeon/quench_alert_view.ts',
-  'src/ui/hud/dungeon/heat_alert_view.ts',
   // The Sunken Bastion's alert on the Beacon Crown (the scythe, the Fog Veil).
   'src/ui/hud/dungeon/bastion_alert_view.ts',
   // The Drowned Temple's alert (Choirmother Selthe's Score) and its scene scan.

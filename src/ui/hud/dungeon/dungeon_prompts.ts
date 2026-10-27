@@ -14,9 +14,7 @@
 // melody, its answer and her broken voice) and the Smith's Heart's Hammer
 // Council's (council_alert_view.ts: the rock, the wake, the Weight,
 // Resonance), its Guardian of the Quench's cold bar (quench_alert_view.ts:
-// the player's own gauge, never advisory) and its Guardian of the Heat's
-// heat gauge (heat_alert_view.ts: the Hearth's heat and the player's own
-// Crystal Burn, never advisory), plus the trash engine's
+// the player's own gauge, never advisory), plus the trash engine's
 // use prompt (kit_use_prompt_view.ts on the same family: a Soul Brazier to kick
 // over, a Remembrance Candle to relight, a Hunting Spear to pull out). It owns
 // no DOM itself; it builds
@@ -60,7 +58,6 @@ import {
 import { EncounterAlert } from './encounter_alert_painter';
 import { GaolChainAlert } from './gaol_chain_painter';
 import { buildGaolChainView, type GaolChainEntity } from './gaol_chain_view';
-import { buildHeatAlertView, HEAT_ALERT_KINDS } from './heat_alert_view';
 import {
   buildKitUsePromptView,
   KIT_USE_PROMPT_KINDS,
@@ -142,7 +139,6 @@ export class DungeonPrompts {
   private readonly crypt: EncounterAlert;
   private readonly council: EncounterAlert;
   private readonly quench: EncounterAlert;
-  private readonly heat: EncounterAlert;
   private readonly cryptScene = new CryptAlertSceneScan();
   private readonly councilSoul = new CouncilSoulScan();
   private readonly temple: EncounterAlert;
@@ -164,7 +160,6 @@ export class DungeonPrompts {
     crypt: false,
     council: false,
     quench: false,
-    heat: false,
     temple: false,
     cryptSoft: false,
     wildheartSoft: false,
@@ -202,11 +197,6 @@ export class DungeonPrompts {
       id: 'heart-quench-alert',
       className: 'ui-panel-strong encounter-alert heart-quench-alert',
       kinds: QUENCH_ALERT_KINDS,
-    });
-    this.heat = new EncounterAlert(deps, {
-      id: 'heart-heat-alert',
-      className: 'ui-panel-strong encounter-alert heart-heat-alert',
-      kinds: HEAT_ALERT_KINDS,
     });
     this.temple = new EncounterAlert(deps, {
       id: 'temple-alert',
@@ -302,11 +292,6 @@ export class DungeonPrompts {
       ? buildQuenchAlertView({ auras: p.auras, dead: p.dead })
       : HINT_HIDDEN;
     this.quench.paint(quench);
-    // The Hearth's heat is the raid's shared gauge: never hidden by the hints.
-    const heat = dungeonPromptEnabled('heat', hints)
-      ? buildHeatAlertView({ auras: p.auras, dead: p.dead })
-      : HINT_HIDDEN;
-    this.heat.paint(heat);
     const temple = dungeonPromptEnabled('temple', hints)
       ? buildTempleAlertView({
           selfPos: p.pos,
@@ -326,7 +311,6 @@ export class DungeonPrompts {
     slot.crypt = crypt.visible;
     slot.council = council.visible;
     slot.quench = quench.visible;
-    slot.heat = heat.visible;
     slot.temple = temple.visible;
     slot.cryptSoft = cryptSoft;
     slot.wildheartSoft = wildheartSoft;
@@ -357,7 +341,6 @@ export class DungeonPrompts {
     this.crypt.dispose();
     this.council.dispose();
     this.quench.dispose();
-    this.heat.dispose();
     this.temple.dispose();
     this.kitUse.dispose();
   }

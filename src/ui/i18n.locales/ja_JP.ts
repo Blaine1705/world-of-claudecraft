@@ -22495,12 +22495,74 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.heart_quench_caller.name': '焼き入れ脈の呼び手',
   'entities.mobs.heart_heat_warder.name': '熱脈の番人',
   'entities.mobs.heart_heat_caller.name': '熱脈の呼び手',
+  'entities.mobs.heart_heat_wellspawn.name': '湧泉の落とし子',
+  'entities.mobs.heart_heat_wellkeeper.name': '湧泉の守り手',
+  'entities.mobs.heart_heat_seedflame.name': '種火の精',
+  'entities.mobs.heart_heat_rolling_cinder.name': '転がる燃え殻',
   'abilityUi.cast.heart_mountains_wrath': '山の怒り',
   'abilityUi.cast.heart_bellows_gust': 'ふいごの突風',
   'abilityUi.cast.heart_storm_lance': '嵐の槍',
   'abilityUi.cast.heart_quenching_breath': '焼き入れの息吹',
-  'abilityUi.cast.heart_molten_pour': '溶鉄の注ぎ',
-  'abilityUi.cast.heart_anvil_clang': '灼熱の弔鐘',
+  'hudChrome.auraEffect.heatGuardian.statePhase1':
+    '湧泉に半身を沈め、決して動かない。玄武岩の拳が岸の一点を打ち砕き、そこから溶岩のうねりが三方へ広がる。炉床の閃火は湧泉から{reach}ヤードより遠くにいる全員を撃つ。体力70%で沈み、炉床があふれ出す。ヒロイックでは与えるダメージが{heroicPct}%増える。',
+  'hudChrome.auraEffect.heatGuardian.statePhase2':
+    '湧泉に半身を沈め、決して動かない。玄武岩の拳は続く。炉床の種がレイドの足元に落ちてしばらくして弾け、目覚めの炎が湧泉のまわりの床を帯ごとに燃え上がらせる。体力40%で再び沈み、炉床があふれ出す。ヒロイックでは与えるダメージが{heroicPct}%増える。',
+  'hudChrome.auraEffect.heatGuardian.statePhase3':
+    '湧泉に半身を沈め、決して動かない。玄武岩の拳と目覚めの炎は続き、転がる燃え殻が落ちてきてプレイヤーを追う：打てば押し返せる。ヒロイックでは体力10%で湧泉から抜け出す。ヒロイックでは与えるダメージが{heroicPct}%増える。',
+  'hudChrome.auraEffect.heatGuardian.statePhase4':
+    '湧泉から抜け出した：どこへでも引き連れられる。焼き入れ、息吹、槌の霊があなたと共に戦う。焼き入れの氷で転がる燃え殻を凍らせ、息吹の嵐の雨で炎を消し、石の根の上を引きずって粉砕の拳を止めよ。',
+  'hudChrome.auraEffect.heatGuardian.stateUnder':
+    '湧泉に沈んでいる：炉床があふれている間は攻撃もダメージも受けない。あふれが終わると再び浮かび上がる。',
+  'hudChrome.auraEffect.heatGuardian.stateTearing':
+    '湧泉から身を引き剥がしている：立ち上がるまで攻撃もダメージも受けない。',
+  'hudChrome.auraEffect.heatGuardian.scorched':
+    '受ける火炎・冷気・自然・闇・秘術ダメージが{pct}%増加。{every}秒ごとに、炉床の閃火が湧泉から{reach}ヤードより遠くにいる全員を撃ち、この効果を更新する。',
+  'hudChrome.auraEffect.heatGuardian.grip':
+    '毎秒{total}の火炎ダメージを受ける（スタック{stacks}個それぞれ{per}）。守護者の攻撃が命中するたびに1スタック増え（最大{most}個）、{seconds}秒続く：重くなりすぎる前にタンクを交代せよ。',
+  'hudChrome.auraEffect.heatGuardian.kindling':
+    '{seconds}秒後、{trail}秒間あなたは炎の跡を残す。跡の一つひとつが味方に毎秒{min}～{max}の火炎ダメージを与え、その上に立つ湧泉の落とし子の体力を毎秒{heal}%回復させる：集団と湧泉の落とし子の通り道から離れよ。',
+  'hudChrome.auraEffect.heatGuardian.trail':
+    '燃え殻の跡を残している：幅{radius}ヤードの炎が{life}秒間燃え、その中の味方に毎秒{min}～{max}の火炎ダメージを与え、その中の湧泉の落とし子の体力を毎秒{heal}%回復させる。',
+  'hudChrome.auraEffect.heatGuardian.hunted':
+    '転がる燃え殻か種火の精があなたを追っている。転がる燃え殻に追いつかれると死亡し、{radius}ヤード以内の全員が焼かれる：近づかせず、味方に打たせよ。一撃ごとに{knock}ヤード押し返される（その後{crust}秒間は押し返せない）。',
+  'hudChrome.auraEffect.heatGuardian.crust':
+    '固く冷えている：この効果が切れるまで、打っても押し返せない。',
+  'hudChrome.auraEffect.heatGuardian.rimelocked':
+    '焼き入れの氷の上で凍りついている：動けず、受けるダメージが{pct}%増える。',
+  'hudChrome.auraEffect.heatGuardian.stormRain':
+    '這い寄る炎の中へ歩み入れば火を消せる。這い寄る炎はあなたを焼けない。',
+  'hudChrome.auraEffect.heatGuardian.crushMark':
+    '{seconds}秒の溜めが終わると、守護者の粉砕の拳があなたに{min}～{max}の火炎ダメージを与える。その前に石の根の上を引きずれ：根が守護者をとらえ、拳は外れる。',
+  'hudChrome.auraEffect.heatGuardian.crushing':
+    'この効果が切れると、粉砕の拳がタンクに{min}～{max}の火炎ダメージを与える。それまでに石の根がとらえれば外れる。',
+  'hudChrome.auraEffect.heatGuardian.rooted':
+    '石の根に{seconds}秒間とらえられている：動けず、粉砕の拳は外れた。',
+  'hudChrome.heatGuardian.warn.overflow': '守護者が沈み、炉床があふれ出す！溶岩の川をかわせ！',
+  'hudChrome.heatGuardian.warn.wellspawn':
+    '湧泉の落とし子が這い出してきた！湧泉にたどり着く前に足を鈍らせて倒せ！',
+  'hudChrome.heatGuardian.warn.keepers':
+    '湧泉の守り手が現れた！引きつけて、その印を湧泉の落とし子から遠ざけろ！',
+  'hudChrome.heatGuardian.warn.seeds': '炉床の種が降ってくる！まとめて落として走れ！',
+  'hudChrome.heatGuardian.warn.zones': '目覚めの炎！炉床が帯ごとに燃え上がる：外へ出ろ！',
+  'hudChrome.heatGuardian.warn.cinder': '転がる燃え殻が落ちてきた！獲物に届く前に打ち返せ！',
+  'hudChrome.heatGuardian.warn.tearFree': '守護者が湧泉から身を引き剥がした！',
+  'hudChrome.heatGuardian.warn.spirits': '焼き入れ、息吹、槌の霊が炉床へやって来た！',
+  'hudChrome.heatGuardian.warn.crush': '粉砕の拳！守護者を石の根の上へ引きずれ！',
+  'hudChrome.heatGuardian.say.fist': '石の落ちる場所に立て。そしてその一部となれ。',
+  'hudChrome.heatGuardian.say.sink': '湧泉がお前たちを迎えに昇る！',
+  'hudChrome.heatGuardian.say.sinkAgain': '再び炉床はあふれる。再びお前たちは燃える。',
+  'hudChrome.heatGuardian.say.feed': 'そうだ……炎のもとへ帰ってこい。',
+  'hudChrome.heatGuardian.say.rise': '我は最初の火と共に昇る！',
+  'hudChrome.heatGuardian.say.seeds': '我が撒く火花はどれも根を張る。',
+  'hudChrome.heatGuardian.say.zones': '炉床がお前たちの足元で目を覚ます。',
+  'hudChrome.heatGuardian.say.cinder': '走れ、小さき燠火よ。炎は飢えている。',
+  'hudChrome.heatGuardian.say.tearFree': 'もう湧泉で待つのは終わりだ。我自らお前たちのもとへ行く！',
+  'hudChrome.heatGuardian.say.crush': 'この拳は山そのものをも砕く。',
+  'hudChrome.heatGuardian.say.quench': '冷気はお前たちを覚えている。我が氷にその燠火を縛らせよ。',
+  'hudChrome.heatGuardian.say.breath': '嵐の雨を受け取れ。その火を消すのだ。',
+  'hudChrome.heatGuardian.say.hammer': '石の上に立て。山がそれを押さえよう。',
+  'abilityUi.cast.heart_heat_fist': '玄武岩の拳',
+  'abilityUi.cast.heart_heat_tear_free': '解き放ち',
   'abilityUi.cast.heart_forge_wrath': '炉の怒り',
   'abilityUi.cast.heart_forge_pour': '炉の注ぎ',
   'abilityUi.cast.heart_ember_bolt': '残り火の矢',
@@ -22693,40 +22755,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.quenchAlert.coldBar': '冷気 {cold} / {max}',
   'hudChrome.quenchAlert.coldAria': '冷気 {max}中{cold}',
   'hudChrome.quenchAlert.timeAria': '残り{seconds}秒',
-  'hudChrome.heatGuardian.warn.crystals': '燃え立つ結晶が現れた！その光線を浴びて炉床を冷ませ！',
-  'hudChrome.heatGuardian.warn.channel': '炉床があふれる！流路が床を二つに分けるぞ！',
-  'hudChrome.heatGuardian.warn.windup': '炉床が過熱寸前だ！結晶で冷ますか、身構えろ！',
-  'hudChrome.heatGuardian.warn.overheat': '炉床が過熱した！',
   'hudChrome.heatGuardian.say.pull':
     'お前たちは最初の炎へ踏み込んだ。何ものも変わらずには出られぬ。',
-  'hudChrome.heatGuardian.say.shed': '我が熱を受け取れ、抱えきれるものならな。',
-  'hudChrome.heatGuardian.say.channel': '炉床があふれる。どちら側に立つか選べ。',
-  'hudChrome.heatGuardian.say.windup': '一つの体には多すぎる炎だ……どこかへ向かわねばならぬ！',
-  'hudChrome.heatGuardian.say.overheat': '我と共に燃えよ！',
-  'hudChrome.heatGuardian.say.stoke': 'お前たちの吐く息のすべてが炎を育てる。',
   'hudChrome.heatGuardian.say.wipe': '灰だ、一人残らず。炉床は燃え続ける。',
   'hudChrome.heatGuardian.say.death': '炎が……石の中へ……沈んでいく。大切に運べ。',
-  'hudChrome.auraEffect.heatGuardian.heat':
-    '炉床の熱：{max}中{heat}。毎秒{rise}ずつ自然に上がる。{every}秒ごとに炉床の脈動が炉床の床にいる全員に{min}～{most}の火炎ダメージを与え（この熱の場合）、熱いほど強くなる。プレイヤーが燃え立つ光線を1本受けるごとに{cool}下がり、{range}ヤード以内に誰もいない光線は守護者に戻り{back}上がる。{max}で炉床は過熱する。',
-  'hudChrome.auraEffect.heatGuardian.burn':
-    '受ける火炎・冷気・自然・闇・秘術ダメージが{pct}%増加：スタック{stacks}個それぞれ{per}%、最大{most}個。燃え立つ光線を受けるたびに1スタック増え、最後の変化から{decay}秒後に1スタック消える（ヒロイックでは{heroicDecay}秒）。',
-  'hudChrome.auraEffect.heatGuardian.stoked':
-    '炉床の熱の上昇が{total}%速くなっている：戦闘中{every}秒ごとに{step}%ずつ（これまでに{stacks}回）。',
-  'hudChrome.auraEffect.heatGuardian.overheating':
-    '熱が{at}に達した。{max}で炉床は過熱し、炉床爆発が床にいる全員に{min}～{most}の火炎ダメージを与える（ヒロイックでは{heroicMin}～{heroicMost}）。その後、熱は{vent}から再び上がる。結晶の光線で冷ますか、身構えよ。',
-  'hudChrome.heatAlert.heatTitle': '炉床が熱くなる',
-  'hudChrome.heatAlert.coolingTitle': '炉床が冷えていく',
-  'hudChrome.heatAlert.burningTitle': '結晶の火傷 x{stacks}',
-  'hudChrome.heatAlert.overheatTitle': '過熱が迫る！',
-  'hudChrome.heatAlert.heatLine':
-    '燃え立つ結晶から{range}ヤード以内に立ち、光線を受けて炉床を冷ませ',
-  'hudChrome.heatAlert.coolingLine':
-    '結晶の光線が炉床を冷ましている：すべての光線に誰かを立たせ続けよ',
-  'hudChrome.heatAlert.burningLine': '受ける呪文ダメージが{pct}%増加：離れて、光線を他の者に任せよ',
-  'hudChrome.heatAlert.overheatLine': '{max}で炉床が全員を焼き尽くす：防御技を使え',
-  'hudChrome.heatAlert.heatBar': '熱 {heat} / {max}',
-  'hudChrome.heatAlert.heatAria': '熱 {max}中{heat}',
-  'abilityUi.cast.heart_heat_shed': '熱を流す',
   'hudChrome.guildHall.title': '燈火の館',
   'hudChrome.guildHall.close': 'ギルドのウィンドウを閉じる',
   'hudChrome.guildHall.tabsLabel': '燈火の館の項目',
