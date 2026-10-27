@@ -383,6 +383,18 @@ export const hudChromeStrings = {
     fateThreadsSentenceReady:
       'Three Fate Threads: Sentence can consume them for 18% increased damage.',
   },
+  priest: {
+    gloomtitheLabel: 'Gloomtithe',
+    bombLabel: 'Tithe Bomb',
+    gloomtitheStatus: '{value} of {max} Gloomtithe',
+    bombStatus: '{value} of {max} Tithe Bomb charges',
+    bombReady: 'Ready',
+    chargeCount: '{value} / {max}',
+    gloomtitheTooltip:
+      'Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.',
+    bombTooltip:
+      'Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it.',
+  },
   procOverlay: {
     soulFragmentsMeter: 'Soul Fragments',
     ruinMeter: 'Wrack',
@@ -5789,6 +5801,8 @@ export const hudChromeStrings = {
     },
   },
   auraEffect: {
+    stilledMindCrit:
+      'Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.',
     // The Wildheart Basin's marks and boss auras (src/ui/wildheart_aura_effect.ts).
     wildheart: {
       packBond:

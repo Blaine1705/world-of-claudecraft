@@ -1037,6 +1037,16 @@ export const cs_CZ: EnTranslations = {
       "fateThreadsConsumeReady": "Tři Nitě osudu: Vysát je dokáže vetkat do dalšího Odsouzení.",
       "fateThreadsSentenceReady": "Tři Nitě osudu: Rozsudek je dokáže spotřebovat za 18% zvýšené poškození."
     },
+    "priest": {
+      "gloomtitheLabel": "Gloomtithe",
+      "bombLabel": "Tithe Bomb",
+      "gloomtitheStatus": "{value} of {max} Gloomtithe",
+      "bombStatus": "{value} of {max} Tithe Bomb charges",
+      "bombReady": "Ready",
+      "chargeCount": "{value} / {max}",
+      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
+      "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
+    },
     "procOverlay": {
       "soulFragmentsMeter": "Úlomky duše",
       "ruinMeter": "Zkáza",
@@ -4662,6 +4672,7 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "auraEffect": {
+      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
       "wildheart": {
         "packBond": "Utrpí o {pct}% méně poškození, dokud jeho druh stojí poblíž. Oddělte Pána šelem od jeho jaguára a pouto přerušíte.",
         "packBondFury": "Způsobuje o {pct}% více poškození, když partner stojí blízko.",
@@ -9737,6 +9748,7 @@ export const cs_CZ: EnTranslations = {
       "framesGovernedTalkingHead": "Edit Frames také uvolní panel Dialogue, který nese mluvený řádek NPC, když je NPC mimo váš dohled; nosí svůj jmenný čip, zatímco je uvolněný.",
       "framesGovernedShardpike": "Upravit rámečky také uvolní lištu Střepové píky, krátkou řadu akcí úkolového nástroje vedle akčních lišt, která se objevuje jen při nesení samotné píky. Při uvolnění má vlastní jmenovku, takže ji můžeš umístit před bojem místo během něj.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
+      "framesGovernedPriest": "Edit Frames also lets you move the Shadow priest's Gloomtithe and Tithe Bomb medallion.",
       "framesGovernedResourceAndHill": "Zapni Oddělit lištu zdrojů na kartě Rámy. Volba Upravit rámečky pak uvolní i lištu zdrojů, takže manu, energii nebo zuřivost můžeš umístit samostatně kamkoli. Šířka lišty zdrojů a Výška lišty zdrojů na stejné kartě nastavují její velikost. Upravit rámečky uvolní také lištu Krále kopce. Krytí pozadí Krále kopce na stejné kartě zeslabí její panel, zatímco text zůstane dobře čitelný.",
       "barsTitle": "Lišty, časovače a bojový text",
       "barsBody": "Tvá lišta sesílání se objeví uprostřed obrazovky, těsně nad tvými akčními lištami, kdykoli sesíláš nebo kanáluješ kouzlo, a nese jméno kouzla a zbývající čas. Tvůj cíl má na svém rámu vlastní lištu sesílání, takže vidíš, co přichází, a můžeš na to zareagovat.\n\nPod tvou lištou sesílání sedí tenká lišta švihu, která se plní mezi švihy tvé zbraně, takže útočník na blízko nebo na dálku vidí, kdy dopadne další automatický zásah.\n\nTvá lišta zkušeností běží přes celou šířku pod akčními lištami, rozdělená do úseků, se světlejším pruhem, který ukazuje naspořené odpočaté zkušenosti.\n\nPlav pod vodou a nahoře na obrazovce se objeví modrá lišta dechu. Vyprazdňuje se, dokud máš hlavu pod hladinou, jakmile dojde, zabliká červeně a začneš se topit, a jakmile se vynoříš, rychle se doplní. Mezerník tě žene nahoru a klávesa Plavat dolů, ve výchozím stavu Ctrl, tě táhne hlouběji.\n\nPoškození a léčení vyplouvají nad tím, co zasáhly, jako malá čísla, takže boj přečteš, aniž bys musel číst text. Záložka Bojový záznam v tvém chatu drží úplný písemný záznam.",
@@ -18268,6 +18280,18 @@ export const cs_CZ: EnTranslations = {
         "name": "Litanie běd",
         "description": "Sesílá 3 s a každou vteřinu působí {damage} stínového poškození. Poškození roste se silou kouzel."
       },
+      "vampiric_touch": {
+        "name": "Vampiric Touch",
+        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
+      },
+      "void_rupture": {
+        "name": "Void Rupture",
+        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+      },
+      "spirit_bomb": {
+        "name": "Tithe Bomb",
+        "description": "Detonate a spirit bomb on an enemy, dealing {damage} Shadow damage to enemies within 8 yards of that target. Damage increases with Spell Power, can critically strike, and is reduced beyond 5 targets. Generate 20 Gloomtithe to prepare one bomb. Generation counts even while holding the maximum 5 Gloomtithe; spending charges is not required and adds no progress. Progress lasts between fights, up to one prepared bomb. Dying clears your progress and prepared bomb. Completing the cast consumes the prepared bomb, even if resisted. Cancellation or interruption preserves it. Starting a raid boss encounter clears your progress and prepared bomb. Cannot open a raid boss encounter with this spell."
+      },
       "flash_heal": {
         "name": "Naléhavá modlitba",
         "description": "Vyléčí spřátelený cíl o {damage}. Léčení roste se silou kouzel."
@@ -19101,7 +19125,8 @@ export const cs_CZ: EnTranslations = {
       },
       "inner_focus": {
         "name": "Ztišená mysl",
-        "description": "Tvé další kouzlo kněze bude zdarma a nepřerušitelné. Trvá 60 s."
+        "description": "Tvé další kouzlo kněze bude zdarma a nepřerušitelné. Trvá 60 s.",
+        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
       },
       "innervate": {
         "name": "Míza života",
@@ -19298,7 +19323,8 @@ export const cs_CZ: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Sbor vysvobození",
-        "description": "Kanalizuje po dobu 6 s a každé 2 s léčí členy skupiny do 30 yardů za {damage}. Léčení roste se silou kouzel."
+        "description": "Kanalizuje po dobu 6 s a každé 2 s léčí členy skupiny do 30 yardů za {damage}. Léčení roste se silou kouzel.",
+        "specNote_shadow": "For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Shadowform. Absorbed damage and overkill do not add healing."
       },
       "bear_charge": {
         "name": "Medvědí výpad",

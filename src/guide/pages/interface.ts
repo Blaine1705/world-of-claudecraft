@@ -79,7 +79,8 @@ export const interfacePage: GuidePage = {
             paras('guide.interfacePage.framesGovernedTalkingHead') +
             paras('guide.interfacePage.framesGovernedShardpike') +
             paras('guide.interfacePage.framesGovernedUnitTooltip') +
-            paras('guide.interfacePage.framesGovernedResourceAndHill'),
+            paras('guide.interfacePage.framesGovernedResourceAndHill') +
+            paras('guide.interfacePage.framesGovernedPriest'),
         )}
 
         ${section('guide.interfacePage.barsTitle', paras('guide.interfacePage.barsBody'))}

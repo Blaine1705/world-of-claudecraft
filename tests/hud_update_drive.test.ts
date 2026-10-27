@@ -326,6 +326,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'write-elided paladin Devotion/Ascension resource widget driven by the paladinDevotionView core',
   },
   {
+    call: 'this.doomMeter.paintShadow',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'write-elided Shadow Gloomtithe and Tithe Bomb meters read replicated aura banks',
+  },
+  {
     call: 'this.syncActiveHotbarForm',
     band: 'frame',
     gate: '',
@@ -1967,7 +1974,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 99 -> 100: the dungeon objectives tracker's medium-band paint
       // (hud/dungeon/dungeon_tracker_painter.ts), facet-routed like the deed strip.
       // window 53 -> 54: Lantern Hall's guild window (hud/guild_hall/guild_hall_window.ts).
-    ).toEqual({ window: 55, chrome: 100, none: 21 });
+    ).toEqual({ window: 55, chrome: 101, none: 21 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

@@ -2949,7 +2949,11 @@ export const VISUALS: Record<string, VisualDef> = {
         mind_sear: 'Woc_Channel_Directed',
         choir_of_deliverance: 'Woc_Cast_Omni',
       },
-      attackByAbility: { smite: 'Woc_Cast_Shoot', mind_blast: 'Woc_Cast_Shoot' },
+      attackByAbility: {
+        smite: 'Woc_Cast_Shoot',
+        mind_blast: 'Woc_Cast_Shoot',
+        void_rupture: 'Woc_Cast_Shoot',
+      },
     },
     halo: 0xffd766,
     haloUpOffset: 0.28,

@@ -1037,6 +1037,16 @@ export const es: EnTranslations = {
       "fateThreadsConsumeReady": "Tres Hilos del destino: Consumir puede tejerlos en Condena adicional.",
       "fateThreadsSentenceReady": "Tres Hilos del destino: Sentencia puede consumirlos para un 18% más de daño."
     },
+    "priest": {
+      "gloomtitheLabel": "Diezmo sombrío",
+      "bombLabel": "Bomba del diezmo",
+      "gloomtitheStatus": "{value} de {max} cargas de Diezmo sombrío",
+      "bombStatus": "{value} de {max} cargas de Bomba del diezmo",
+      "bombReady": "Lista",
+      "chargeCount": "{value} / {max}",
+      "gloomtitheTooltip": "Diezmo sombrío: hasta 5 cargas que puedes gastar. Toque vampírico consume 2 para infligir un 30% más de daño; Invocar Diezmademonio consume todas las cargas. Generar cargas también llena Bomba del diezmo, incluso cuando ya tienes las 5.",
+      "bombTooltip": "Bomba del diezmo: genera 20 cargas de Diezmo sombrío para preparar una bomba. Gastar Diezmo sombrío no aumenta el progreso. El progreso se conserva entre combates y después de morir. Se reinicia al comenzar un jefe de banda. Completar el lanzamiento consume la bomba; cancelarlo la conserva."
+    },
     "procOverlay": {
       "soulFragmentsMeter": "Fragmentos de alma",
       "ruinMeter": "Ruina",
@@ -4662,6 +4672,7 @@ export const es: EnTranslations = {
       }
     },
     "auraEffect": {
+      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
       "wildheart": {
         "packBond": "Recibe un {pct}% menos de daño mientras su compañero permanece cerca. Separa al Maestro de Bestias de su jaguar para romperlo.",
         "packBondFury": "Inflige un {pct}% más de daño mientras su compañero permanece cerca.",
@@ -9737,6 +9748,7 @@ export const es: EnTranslations = {
       "framesGovernedTalkingHead": "Editar fotogramas también afloja el panel de Diálogo, que lleva la línea hablada de un NPC mientras ese NPC está fuera de tu vista; lleva su chip con nombre mientras está suelto.",
       "framesGovernedShardpike": "Editar marcos también permite mover la barra de la Pica de Fragmentos, la fila breve de acciones de herramienta de misión que aparece junto a tus barras de acción solo mientras llevas la propia Pica de Fragmentos. Muestra su etiqueta de nombre mientras está desbloqueada para que puedas colocarla antes del combate en lugar de durante él.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
+      "framesGovernedPriest": "Edit Frames also lets you move the Shadow priest's Gloomtithe and Tithe Bomb medallion.",
       "framesGovernedResourceAndHill": "Activa Separar barra de recursos en la pestaña Marcos y Editar marcos también desbloqueará tu barra de recursos, para que puedas colocar el maná, la energía o la ira por separado en cualquier lugar; Anchura de la barra de recursos y Altura de la barra de recursos, en esa misma pestaña, ajustan su tamaño. Editar marcos también desbloquea la barra de El Rey de la Colina, y Opacidad del fondo de El Rey de la Colina, en esa pestaña, atenúa su panel sin reducir la claridad del texto.",
       "barsTitle": "Barras, temporizadores y texto de combate",
       "barsBody": "Tu barra de lanzamiento aparece en el centro de la pantalla, justo encima de tus barras de acción, cada vez que lanzas o canalizas, y muestra el nombre del hechizo y el tiempo restante. Tu objetivo tiene su propia barra de lanzamiento en su marco, para que puedas ver lo que viene y responder a ello.\n\nUna fina barra de golpe se sitúa bajo tu barra de lanzamiento y se llena entre los golpes de tu arma, para que un atacante cuerpo a cuerpo o a distancia pueda ver cuándo llega el próximo golpe automático.\n\nTu barra de experiencia ocupa el ancho completo bajo tus barras de acción, dividida en segmentos, con un tramo más claro que muestra la experiencia de descanso que tienes acumulada.\n\nNada bajo el agua y aparecerá una barra de aliento azul en la parte superior de la pantalla. Se vacía mientras tienes la cabeza sumergida, parpadea en rojo en cuanto se agota y empiezas a ahogarte, y se rellena rápido en cuanto sales a la superficie. Space te hace nadar hacia arriba, y la tecla Nadar hacia abajo, Ctrl de forma predeterminada, te lleva más profundo.\n\nEl daño y la sanación flotan hacia arriba sobre aquello que los recibió en forma de pequeños números, para que puedas leer un combate sin leer texto. La pestaña Combate de tu caja de chat conserva el registro escrito completo.",
@@ -18268,6 +18280,18 @@ export const es: EnTranslations = {
         "name": "Letanía de Aflicción",
         "description": "Canaliza durante 3 s, infligiendo {damage} de daño de Sombra cada segundo. El daño aumenta con el poder con hechizos."
       },
+      "vampiric_touch": {
+        "name": "Toque vampírico",
+        "description": "Inflige {damage} de daño de Sombras durante 15 s, una vez cada 3 s. El daño aumenta con el poder con hechizos y los pulsos pueden ser críticos. Cada pulso reparte una sanación equivalente al 20% de la vida perdida por el enemigo entre tú y los miembros heridos de tu grupo a 30 yardas o menos; en una banda, solo recibe esta sanación tu subgrupo. Si tienes al menos 2 cargas de Diezmo sombrío, aplicar el efecto consume 2 para aumentar todo su daño un 30%."
+      },
+      "void_rupture": {
+        "name": "Void Rupture",
+        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+      },
+      "spirit_bomb": {
+        "name": "Tithe Bomb",
+        "description": "Detonate a spirit bomb on an enemy, dealing {damage} Shadow damage to enemies within 8 yards of that target. Damage increases with Spell Power, can critically strike, and is reduced beyond 5 targets. Generate 20 Gloomtithe to prepare one bomb. Generation counts even while holding the maximum 5 Gloomtithe; spending charges is not required and adds no progress. Progress lasts between fights, up to one prepared bomb. Dying clears your progress and prepared bomb. Completing the cast consumes the prepared bomb, even if resisted. Cancellation or interruption preserves it. Starting a raid boss encounter clears your progress and prepared bomb. Cannot open a raid boss encounter with this spell."
+      },
       "flash_heal": {
         "name": "Plegaria Urgente",
         "description": "Sana a un objetivo aliado en {damage}. La sanación aumenta con el poder con hechizos."
@@ -19101,7 +19125,8 @@ export const es: EnTranslations = {
       },
       "inner_focus": {
         "name": "Mente Serena",
-        "description": "Hace que tu próximo hechizo de sacerdote sea gratuito e ininterrumpible. Dura 60 s."
+        "description": "Hace que tu próximo hechizo de sacerdote sea gratuito e ininterrumpible. Dura 60 s.",
+        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
       },
       "innervate": {
         "name": "Savia Vital",
@@ -19298,7 +19323,8 @@ export const es: EnTranslations = {
       },
       "choir_of_deliverance": {
         "name": "Coro de Liberación",
-        "description": "Canaliza durante 6 s y sana a los miembros del grupo en un radio de 30 metros por {damage} cada 2 s. La sanación aumenta con el poder con hechizos."
+        "description": "Canaliza durante 6 s y sana a los miembros del grupo en un radio de 30 metros por {damage} cada 2 s. La sanación aumenta con el poder con hechizos.",
+        "specNote_shadow": "Durante 15 s, reparte una sanación equivalente al 20% de la vida que pierden los enemigos por tu daño de Sombras entre los miembros heridos de tu grupo a 30 yardas o menos, incluido tú. En una banda, solo sana a tu subgrupo. Se lanza al instante y puedes seguir atacando en Velo Crepuscular. El daño absorbido y el daño que excede la vida restante no generan sanación."
       },
       "bear_charge": {
         "name": "Embestida de Bruin",
