@@ -7445,7 +7445,13 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.courierInfo).toBeNull();
   });
 
-  it('omits all delta keys on a no-op re-broadcast and preserves the prior mirror', () => {
+  it('omits all delta keys on a no-op re-broadcast and preserves the prior mirror', ({
+    onTestFinished,
+  }) => {
+    // The realm's weekly-reward wire includes wall time even without a sim tick.
+    // Keep both broadcasts in the same second so this is truly a no-op.
+    const clock = vi.spyOn(Date, 'now').mockReturnValue(Date.UTC(2026, 9, 27));
+    onTestFinished(() => clock.mockRestore());
     const { server, fc, leader, memberPid } = dirtyEveryDeltaField();
     broadcast(server);
     const client = bareClient(leader.pid);
