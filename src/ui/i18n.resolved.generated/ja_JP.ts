@@ -4246,6 +4246,15 @@ export const ja_JP: EnTranslations = {
         "stormForm": "裂けて雷の体となった：息吹の守護者が倒れるまで続く、戦いの嵐の後半。",
         "swell": "{every}秒ごとに膨れ上がる嵐が岩棚の全員に{min}から{max}のダメージを与え、前の脈動ごとに{growth}%ずつ強くなる：これまでに{stacks}回。"
       },
+      "quenchGuardian": {
+        "cold": "あなたの冷気：{max}中{cold}。ひとりでいると約{fill}秒で満ちる。{radius}ヤード以内に他のプレイヤーが{others}人以上いれば、代わりに毎秒{fall}ずつ下がる。{max}に達すると{freeze}秒間霜に閉ざされ、その後氷が砕ける。",
+        "warmth": "レイドと身を寄せ合っている：冷気が毎秒{fall}ずつ下がる。同じ場所に{linger}秒とどまった集団の下では氷が割れ、凍てつく水の穴が開く。動き続けよう。",
+        "frozen": "霜に閉ざされている：行動できない。効果が切れると氷が砕け、あなたは{min}から{max}の冷気ダメージを受けて霜脆化状態になり、{radius}ヤード以内の全員の冷気が{cold}上がる（ヒロイックでは{heroicRadius}ヤード、冷気{heroicCold}）。",
+        "brittle": "あらゆる攻撃から受けるダメージが{pct}%増加する。",
+        "trapped": "氷を踏み抜き凍てつく水に落ちた：移動できず、毎秒{min}から{max}の冷気ダメージを受け、冷気が上がっていく。{seconds}秒後に縁へ這い上がる。水だけで死ぬことはない。",
+        "awake": "鍛冶師の四本の剣が目覚めている。焼き入れの吐息と焼き戻しの一撃が決まるたび、{delay}秒後（体力{lowPct}%未満では{low}秒後）に、すべての剣が浮かぶ場所から同じ向きでそれを繰り返す。剣の陰、攻撃と反対側は常に安全だ。",
+        "deepening": "湖の冷気の上昇が{total}%速くなっている：剣が目覚めてから{every}秒ごとに{step}%ずつ（これまでに{stacks}回）。"
+      },
       "sharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。",
       "varkhulSharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。不足しているプレイヤー1人につき、サークル内を含むレイド全体が最大体力の{missingPenalty}%のダメージを受ける。",
       "makersBrand": "{duration}秒間、1スタックごとにヴァルクルから受けるダメージが{pct}%増加する。最大{max}スタック。タンクは{swap}スタックで交代すること。",
@@ -6765,6 +6774,26 @@ export const ja_JP: EnTranslations = {
         "thessaly_fall": "石にしがみつけ！",
         "thessaly_victory": "息吹は解き放たれた。ハイウォッチはこの登攀を忘れない。",
         "thessaly_wipe": "下がって息を整えろ。もう一度行くぞ。"
+      }
+    },
+    "quenchGuardian": {
+      "warn": {
+        "rim": "岸の氷がせり上がる！湖の上へ移れ！",
+        "frozen": "{player}が凍りついた！氷が砕ける前に離れろ！",
+        "crack": "固まった集団の下で氷がきしむ！散らばれ！",
+        "wake": "鍛冶師の剣が湖から引き抜かれた！打ち込まれる時は剣の陰に立て！",
+        "cross": "二本の剣が湖を横切る！その進路から離れろ！"
+      },
+      "say": {
+        "pull": "我が湖に温かい血か。その温もりも長くは続かぬ。",
+        "shatter": "芯まで凍った。さあ、砕けよ。",
+        "hole": "氷はすべての足音を覚えている。寄り集まれば、崩れる。",
+        "wake": "鍛冶師の剣よ、目覚めよ！我が一撃のすべてに応えよ！",
+        "echo": "我が打つものは、剣もまた打つ。",
+        "cross": "交われ、剣よ！奴らに新たな岸を刻め！",
+        "deepen": "感じるか？冷気がさらに深くなっていく。",
+        "wipe": "静まり、黙し、焼き入れられた。",
+        "death": "冷気が……離れていく……焼き入れはお前たちのものだ。"
       }
     },
     "sanctumAlert": {
@@ -15255,6 +15284,7 @@ export const ja_JP: EnTranslations = {
       "heart_breath_forking_bolt": "跳ねる雷撃",
       "heart_breath_thunders_cradle": "雷のゆりかご",
       "heart_breath_drawn_lightning": "招雷",
+      "heart_quench_blades_wake": "剣の目覚め",
       "kituse_sanctum_topple_brazier": "火鉢倒し",
       "trash_demo_nova": "Test Nova",
       "trash_demo_nova_unstoppable": "Test Nova",

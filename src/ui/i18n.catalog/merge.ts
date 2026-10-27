@@ -787,6 +787,8 @@ const mergeStringsEn = {
       heart_breath_forking_bolt: 'Leaping Bolt',
       heart_breath_thunders_cradle: "Thunder's Cradle",
       heart_breath_drawn_lightning: 'Drawn Lightning',
+      // The Guardian of the Quench's awakening (encounters/smith_heart/quench_ids.ts).
+      heart_quench_blades_wake: 'The Blades Wake',
       // The player's own bar while kicking a Soul Brazier over (the trash
       // engine's G3 use, trash_kit/encounter_use.ts).
       kituse_sanctum_topple_brazier: 'Topple Brazier',

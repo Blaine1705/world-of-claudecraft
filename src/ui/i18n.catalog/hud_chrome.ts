@@ -5475,6 +5475,21 @@ export const hudChromeStrings = {
       swell:
         'Every {every} sec the swelling storm deals {min} to {max} damage to everyone on the Cornice, {growth}% more for every pulse before it: {stacks} so far.',
     },
+    // The Smith's Heart's Guardian of the Quench (src/ui/quench_aura_effect.ts).
+    quenchGuardian: {
+      cold: 'Your cold: {cold} of {max}. Alone it fills in about {fill} sec. Standing within {radius} yd of {others} or more other players lowers it by {fall} every second instead. At {max} you are Encased in Rime for {freeze} sec, then the ice shatters.',
+      warmth:
+        'Huddled with the raid: your cold falls by {fall} every second. A huddle that stays on one spot for {linger} sec cracks the ice beneath it into a hole of freezing water, so keep moving.',
+      frozen:
+        'Encased in rime: you cannot act. When it ends the ice shatters: you take {min} to {max} Frost damage and become Frost-Brittle, and everyone within {radius} yd of you gains {cold} cold ({heroicRadius} yd and {heroicCold} cold on Heroic).',
+      brittle: 'Takes {pct}% more damage from all sources.',
+      trapped:
+        'Fallen through the ice into freezing water: you cannot move, you take {min} to {max} Frost damage every second and your cold rises. After {seconds} sec you climb out on the edge. The water alone never kills you.',
+      awake:
+        "The Smith's four blades are awake. {delay} sec after each Quenching Breath and Tempering Strike lands ({low} sec below {lowPct}% health), every blade repeats it from where it floats, facing the same way. Behind a blade, on the side away from the attack, is always safe.",
+      deepening:
+        "The lake's cold rises {total}% faster: {step}% more every {every} sec since the blades woke ({stacks} so far).",
+    },
     sharedPyre:
       "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
     varkhulSharedPyre:
@@ -9709,6 +9724,29 @@ export const hudChromeStrings = {
       thessaly_fall: 'Hold on to the stone!',
       thessaly_victory: 'The Breath is free. Highwatch will remember this climb.',
       thessaly_wipe: 'Fall back and catch your breath. We go again.',
+    },
+  },
+  // The Smith's Heart's Guardian of the Quench (encounters/smith_heart/
+  // quench*.ts): the raid warnings of its fight and what the guardian SAYS
+  // (quench_voice.ts QUENCH_LINES, the same English).
+  quenchGuardian: {
+    warn: {
+      rim: 'The shore ice heaves up! Get onto the lake!',
+      frozen: '{player} is frozen solid! Step away before the ice shatters!',
+      crack: 'The ice groans under the huddle! Move apart!',
+      wake: "The Smith's blades tear free of the lake! Stand behind a blade when they strike!",
+      cross: 'Two blades cross the lake! Clear their path!',
+    },
+    say: {
+      pull: 'Warm blood on my lake. It will not stay warm for long.',
+      shatter: 'Frozen through. Now break.',
+      hole: 'The ice remembers every step. Stand together, and it gives.',
+      wake: 'Blades of the Smith, wake! Answer every blow I strike!',
+      echo: 'Whatever I strike, they strike again.',
+      cross: 'Cross, blades! Cut them a new shore!',
+      deepen: 'Feel it? The cold is going deeper.',
+      wipe: 'Still. Silent. Quenched.',
+      death: 'The cold... lets go... The Quench is yours.',
     },
   },
   // The Gravewyrm Sanctum's encounter alert (src/ui/hud/dungeon/sanctum_alert_view.ts).

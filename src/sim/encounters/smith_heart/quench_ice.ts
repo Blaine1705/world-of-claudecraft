@@ -24,7 +24,6 @@
 // in every place (the strain's spots are the huddles' own middles); the
 // draws are the damage rolls, in player order.
 
-import { QUENCH } from '../../content/smith_heart_layout';
 import { DT, type Entity } from '../../types';
 import { addCold, isFrozen } from './quench_cold';
 import {
@@ -58,10 +57,8 @@ import {
 import type { QuenchFightState, QuenchHoleState } from './quench_state';
 import { quenchSay } from './quench_voice';
 
-/** The holes as the geometry reads them (a reused view; never mutated). */
-export function holeShapes(st: Pick<QuenchFightState, 'holes'>): QHole[] {
-  return st.holes;
-}
+/** Seconds between two of the crack's raid warnings. */
+const CRACK_WARN_EVERY = 6;
 
 // ---- the strain and the cracks ----------------------------------------------------------
 
@@ -119,7 +116,13 @@ function stepStrain(s: QuenchScope): void {
     if (sp.t + 1e-9 >= T.strainLinger) {
       if (!spotTaken(st, sp.x, sp.z)) {
         startCrack(s, sp.x, sp.z);
-        raidWarn(s, s.boss, 'crack', 'The ice groans under the huddle! Move apart!');
+        // Said at most once in CRACK_WARN_EVERY (the crack's own footprint
+        // is the call; several at once are one warning).
+        const last = st.said.warn_crack;
+        if (last === undefined || st.clock - last >= CRACK_WARN_EVERY - 1e-9) {
+          st.said.warn_crack = st.clock;
+          raidWarn(s, s.boss, 'crack', 'The ice groans under the huddle! Move apart!');
+        }
       }
       continue;
     }
@@ -320,6 +323,3 @@ export function clearIce(s: Pick<QuenchScope, 'ctx' | 'inst' | 'st'>): void {
   st.trapped = {};
   st.grace = {};
 }
-
-/** The lake's floor height (the water's surface). */
-export const QUENCH_WATER_Y = QUENCH.lake.h;

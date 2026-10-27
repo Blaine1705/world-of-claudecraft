@@ -4246,6 +4246,15 @@ export const es_ES: EnTranslations = {
         "stormForm": "Torn open into a body of lightning: the Storm half of the fight, until the Guardian of the Breath falls.",
         "swell": "Every {every} sec the swelling storm deals {min} to {max} damage to everyone on the Cornice, {growth}% more for every pulse before it: {stacks} so far."
       },
+      "quenchGuardian": {
+        "cold": "Your cold: {cold} of {max}. Alone it fills in about {fill} sec. Standing within {radius} yd of {others} or more other players lowers it by {fall} every second instead. At {max} you are Encased in Rime for {freeze} sec, then the ice shatters.",
+        "warmth": "Huddled with the raid: your cold falls by {fall} every second. A huddle that stays on one spot for {linger} sec cracks the ice beneath it into a hole of freezing water, so keep moving.",
+        "frozen": "Encased in rime: you cannot act. When it ends the ice shatters: you take {min} to {max} Frost damage and become Frost-Brittle, and everyone within {radius} yd of you gains {cold} cold ({heroicRadius} yd and {heroicCold} cold on Heroic).",
+        "brittle": "Takes {pct}% more damage from all sources.",
+        "trapped": "Fallen through the ice into freezing water: you cannot move, you take {min} to {max} Frost damage every second and your cold rises. After {seconds} sec you climb out on the edge. The water alone never kills you.",
+        "awake": "The Smith's four blades are awake. {delay} sec after each Quenching Breath and Tempering Strike lands ({low} sec below {lowPct}% health), every blade repeats it from where it floats, facing the same way. Behind a blade, on the side away from the attack, is always safe.",
+        "deepening": "The lake's cold rises {total}% faster: {step}% more every {every} sec since the blades woke ({stacks} so far)."
+      },
       "sharedPyre": "Inflige un {total}% de la salud máxima de cada jugador, dividido entre el número de jugadores dentro del círculo (un {perPlayer}% cada uno con {players} jugadores).",
       "varkhulSharedPyre": "Inflige un {total}% de la salud máxima de cada jugador, repartido entre quienes estén dentro del círculo ({perPlayer}% por persona con {players} jugadores). Cada plaza ausente también inflige un {missingPenalty}% de la salud máxima a toda la banda, incluidos los jugadores dentro del círculo.",
       "makersBrand": "Durante {duration} s, cada acumulación aumenta el daño recibido de Varkhul en un {pct}%. Se acumula hasta {max} veces. Los tanques deben rotar a las {swap} acumulaciones.",
@@ -6765,6 +6774,26 @@ export const es_ES: EnTranslations = {
         "thessaly_fall": "Hold on to the stone!",
         "thessaly_victory": "The Breath is free. Highwatch will remember this climb.",
         "thessaly_wipe": "Fall back and catch your breath. We go again."
+      }
+    },
+    "quenchGuardian": {
+      "warn": {
+        "rim": "The shore ice heaves up! Get onto the lake!",
+        "frozen": "{player} is frozen solid! Step away before the ice shatters!",
+        "crack": "The ice groans under the huddle! Move apart!",
+        "wake": "The Smith's blades tear free of the lake! Stand behind a blade when they strike!",
+        "cross": "Two blades cross the lake! Clear their path!"
+      },
+      "say": {
+        "pull": "Warm blood on my lake. It will not stay warm for long.",
+        "shatter": "Frozen through. Now break.",
+        "hole": "The ice remembers every step. Stand together, and it gives.",
+        "wake": "Blades of the Smith, wake! Answer every blow I strike!",
+        "echo": "Whatever I strike, they strike again.",
+        "cross": "Cross, blades! Cut them a new shore!",
+        "deepen": "Feel it? The cold is going deeper.",
+        "wipe": "Still. Silent. Quenched.",
+        "death": "The cold... lets go... The Quench is yours."
       }
     },
     "sanctumAlert": {
@@ -15255,6 +15284,7 @@ export const es_ES: EnTranslations = {
       "heart_breath_forking_bolt": "Leaping Bolt",
       "heart_breath_thunders_cradle": "Thunder's Cradle",
       "heart_breath_drawn_lightning": "Drawn Lightning",
+      "heart_quench_blades_wake": "The Blades Wake",
       "kituse_sanctum_topple_brazier": "Topple Brazier",
       "trash_demo_nova": "Test Nova",
       "trash_demo_nova_unstoppable": "Test Nova",

@@ -4246,6 +4246,15 @@ export const ko_KR: EnTranslations = {
         "stormForm": "찢어져 번개의 몸이 되었습니다: 숨결의 수호자가 쓰러질 때까지 이어지는 전투의 폭풍 후반부.",
         "swell": "{every}초마다 부풀어 오르는 폭풍이 벼랑 위의 모두에게 {min}~{max}의 피해를 주며, 앞선 맥동마다 {growth}%씩 강해집니다: 지금까지 {stacks}번."
       },
+      "quenchGuardian": {
+        "cold": "당신의 냉기: {max} 중 {cold}. 혼자 있으면 약 {fill}초 만에 가득 찹니다. {radius}미터 안에 다른 플레이어가 {others}명 이상 있으면 대신 매초 {fall}씩 내려갑니다. {max}에 이르면 {freeze}초 동안 서리에 갇히고, 그 뒤 얼음이 부서집니다.",
+        "warmth": "공격대와 함께 모여 있음: 냉기가 매초 {fall}씩 내려갑니다. 한 자리에 {linger}초 동안 머문 무리 아래의 얼음은 갈라져 얼어붙은 물웅덩이가 되니 계속 움직이세요.",
+        "frozen": "서리에 갇힘: 행동할 수 없습니다. 효과가 끝나면 얼음이 부서져 {min}~{max}의 냉기 피해를 입고 서리 취약 상태가 되며, {radius}미터 안의 모두가 냉기 {cold}을 얻습니다(영웅 난이도에서는 {heroicRadius}미터, 냉기 {heroicCold}).",
+        "brittle": "모든 공격으로부터 받는 피해가 {pct}% 증가합니다.",
+        "trapped": "얼음을 뚫고 얼어붙은 물에 빠졌습니다: 움직일 수 없고, 매초 {min}~{max}의 냉기 피해를 입으며 냉기가 올라갑니다. {seconds}초 뒤 가장자리로 기어 올라옵니다. 물만으로는 절대 죽지 않습니다.",
+        "awake": "대장장이의 네 자루 검이 깨어났습니다. 담금질 숨결과 담금질 일격이 적중할 때마다 {delay}초 뒤(생명력 {lowPct}% 미만에서는 {low}초 뒤) 모든 검이 떠 있는 자리에서 같은 방향으로 그것을 되풀이합니다. 검 뒤, 공격 반대편은 언제나 안전합니다.",
+        "deepening": "호수의 냉기가 {total}% 더 빠르게 오릅니다: 검이 깨어난 뒤 {every}초마다 {step}%씩(지금까지 {stacks}회)."
+      },
       "sharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%).",
       "varkhulSharedPyre": "각 플레이어 최대 생명력의 {total}%에 해당하는 피해를 원 안의 플레이어들이 나누어 받습니다({players}명일 때 1인당 {perPlayer}%). 부족한 플레이어 1명당 원 안의 플레이어를 포함한 공격대 전체가 최대 생명력의 {missingPenalty}%에 해당하는 피해를 추가로 받습니다.",
       "makersBrand": "{duration}초 동안 중첩당 발쿨에게 받는 피해가 {pct}% 증가합니다. 최대 {max}회 중첩됩니다. 탱커는 {swap}중첩에서 교대하세요.",
@@ -6765,6 +6774,26 @@ export const ko_KR: EnTranslations = {
         "thessaly_fall": "돌을 붙잡으세요!",
         "thessaly_victory": "숨결이 풀려났습니다. 하이워치는 이 등반을 기억할 겁니다.",
         "thessaly_wipe": "물러나서 숨을 고르세요. 다시 갑니다."
+      }
+    },
+    "quenchGuardian": {
+      "warn": {
+        "rim": "기슭의 얼음이 솟아오릅니다! 호수 위로 올라가세요!",
+        "frozen": "{player}님이 꽁꽁 얼어붙었습니다! 얼음이 깨지기 전에 물러나세요!",
+        "crack": "뭉친 무리 아래에서 얼음이 삐걱입니다! 흩어지세요!",
+        "wake": "대장장이의 검들이 호수에서 뽑혀 나옵니다! 공격이 올 때는 검 뒤에 서세요!",
+        "cross": "두 자루의 검이 호수를 가로지릅니다! 경로에서 벗어나세요!"
+      },
+      "say": {
+        "pull": "내 호수에 따뜻한 피라. 그 온기도 오래가지 않으리라.",
+        "shatter": "속까지 얼었구나. 이제 부서져라.",
+        "hole": "얼음은 모든 발걸음을 기억한다. 함께 서면, 꺼진다.",
+        "wake": "대장장이의 검이여, 깨어나라! 내가 내리치는 모든 일격에 응답하라!",
+        "echo": "내가 치는 것을, 검들도 다시 친다.",
+        "cross": "교차하라, 검들이여! 저들에게 새 기슭을 새겨라!",
+        "deepen": "느껴지느냐? 냉기가 더 깊어지고 있다.",
+        "wipe": "고요하다. 잠잠하다. 담금질되었다.",
+        "death": "냉기가... 물러난다... 담금질은 너희의 것이다."
       }
     },
     "sanctumAlert": {
@@ -15255,6 +15284,7 @@ export const ko_KR: EnTranslations = {
       "heart_breath_forking_bolt": "튀어 오르는 번개",
       "heart_breath_thunders_cradle": "천둥의 요람",
       "heart_breath_drawn_lightning": "끌려오는 번개",
+      "heart_quench_blades_wake": "검의 각성",
       "kituse_sanctum_topple_brazier": "화로 넘어뜨리기",
       "trash_demo_nova": "Test Nova",
       "trash_demo_nova_unstoppable": "Test Nova",

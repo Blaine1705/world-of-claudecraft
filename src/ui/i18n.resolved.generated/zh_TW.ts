@@ -4246,6 +4246,15 @@ export const zh_TW: EnTranslations = {
         "stormForm": "撕裂為閃電之軀：戰鬥的風暴後半段，直到氣息守護者倒下。",
         "swell": "每{every}秒，膨脹的風暴對崖台上的所有人造成{min}到{max}點傷害，之前每次脈動使其增強{growth}%：目前已有{stacks}次。"
       },
+      "quenchGuardian": {
+        "cold": "你的寒意：{cold}/{max}。獨自一人時約{fill}秒充滿。若{radius}碼內有{others}名或更多其他玩家，它反而每秒下降{fall}。達到{max}時你會被霜封{freeze}秒，隨後冰層碎裂。",
+        "warmth": "與團隊相擁取暖：寒意每秒下降{fall}。在同一處停留{linger}秒的人群，腳下冰面會裂成冰冷的水洞，所以要不斷移動。",
+        "frozen": "被霜封住：無法行動。效果結束時冰層碎裂：你受到{min}到{max}點冰霜傷害並陷入霜脆狀態，{radius}碼內的所有人獲得{cold}點寒意（英雄難度為{heroicRadius}碼、{heroicCold}點寒意）。",
+        "brittle": "受到的所有傷害提高{pct}%。",
+        "trapped": "踏穿冰面掉進冰冷的水中：無法移動，每秒受到{min}到{max}點冰霜傷害，寒意不斷上升。{seconds}秒後你會爬上岸邊。僅憑冰水絕不會致死。",
+        "awake": "鐵匠的四把刃已甦醒。每次淬火吐息與回火打擊命中後{delay}秒（生命值低於{lowPct}%時為{low}秒），每把刃都會在漂浮之處朝同一方向重複它。站在刃後、背對攻擊的一側，永遠安全。",
+        "deepening": "湖的寒意上升快了{total}%：自刃甦醒後每{every}秒再快{step}%（目前{stacks}次）。"
+      },
       "sharedPyre": "造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。",
       "varkhulSharedPyre": "造成相當於每名玩家最大生命值 {total}% 的傷害，由圈內玩家分攤（{players} 名玩家時每人承受 {perPlayer}%）。每缺少一名玩家，還會對整個團隊（包括圈內玩家）造成最大生命值 {missingPenalty}% 的傷害。",
       "makersBrand": "持續 {duration} 秒，每層使你受到瓦爾庫爾的傷害提高 {pct}%。最多疊加 {max} 層。坦克應在 {swap} 層時換坦。",
@@ -6765,6 +6774,26 @@ export const zh_TW: EnTranslations = {
         "thessaly_fall": "抓緊岩石！",
         "thessaly_victory": "氣息自由了。高望會記住這次攀登。",
         "thessaly_wipe": "退後，喘口氣。我們再來一次。"
+      }
+    },
+    "quenchGuardian": {
+      "warn": {
+        "rim": "岸冰隆起！快到湖面上去！",
+        "frozen": "{player}被凍透了！在冰碎裂之前離開！",
+        "crack": "抱團的人群下冰面在呻吟！散開！",
+        "wake": "鐵匠之刃從湖中掙脫！它們出擊時站到刃後！",
+        "cross": "兩把刃橫越湖面！離開它們的路徑！"
+      },
+      "say": {
+        "pull": "我的湖上來了溫熱的血。它不會溫熱太久。",
+        "shatter": "凍透了。現在，碎裂吧。",
+        "hole": "冰記得每一步。聚在一起，它便會崩塌。",
+        "wake": "鐵匠之刃，甦醒吧！回應我的每一擊！",
+        "echo": "我擊打的，它們也會再擊一次。",
+        "cross": "交錯吧，刃！為他們劈出新的湖岸！",
+        "deepen": "感覺到了嗎？寒意正越來越深。",
+        "wipe": "靜止。無聲。淬火已成。",
+        "death": "寒意……放手了……淬火歸你們了。"
       }
     },
     "sanctumAlert": {
@@ -15255,6 +15284,7 @@ export const zh_TW: EnTranslations = {
       "heart_breath_forking_bolt": "跳躍雷擊",
       "heart_breath_thunders_cradle": "雷霆搖籃",
       "heart_breath_drawn_lightning": "引雷",
+      "heart_quench_blades_wake": "諸刃甦醒",
       "kituse_sanctum_topple_brazier": "推倒火盆",
       "trash_demo_nova": "Test Nova",
       "trash_demo_nova_unstoppable": "Test Nova",

@@ -123,6 +123,7 @@ import { bastionAuraEffectDescriptor } from './bastion_aura_effect';
 import { breathAuraEffectDescriptor } from './breath_aura_effect';
 import { councilAuraEffectDescriptor } from './council_aura_effect';
 import { cryptAuraEffectDescriptor } from './crypt_aura_effect';
+import { quenchAuraEffectDescriptor } from './quench_aura_effect';
 import { sanctumAuraEffectDescriptor } from './sanctum_aura_effect';
 import { type TrinketAuraViewer, trinketAuraEffectDescriptor } from './trinket_aura_effect';
 import { wildheartAuraEffectDescriptor } from './wildheart_aura_effect';
@@ -197,6 +198,9 @@ export function auraEffectDescriptor(
   // The Guardian of the Breath's wind, calm and storm say theirs (breath_aura_effect.ts).
   const breath = breathAuraEffectDescriptor(a);
   if (breath) return breath;
+  // The Guardian of the Quench's cold, ice and blades say theirs (quench_aura_effect.ts).
+  const quench = quenchAuraEffectDescriptor(a);
+  if (quench) return quench;
   // The Sunken Bastion's marks say theirs (bastion_aura_effect.ts).
   const bastion = bastionAuraEffectDescriptor(a);
   if (bastion) return bastion;
