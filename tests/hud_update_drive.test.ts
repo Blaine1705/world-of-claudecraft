@@ -326,6 +326,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'write-elided paladin Devotion/Ascension resource widget driven by the paladinDevotionView core',
   },
   {
+    call: 'this.doomMeter.paintShadow',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'write-elided Shadow Gloomtithe and Tithe Bomb meters read replicated aura banks',
+  },
+  {
     call: 'this.syncActiveHotbarForm',
     band: 'frame',
     gate: '',
@@ -1559,7 +1566,7 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
       kind: 'module',
       module: 'hud/quest/quest_dialog_controller.ts',
       proof:
-        'if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible || gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig || clueStepRowSig(clueStepRowFor(this.deps.world().clueHunt, npc.templateId)) !== this.lastClueRowSig || (guideDialogView(npc)?.state ?? null) !== this.lastGuideState || this.hearthRowFactionFor(npc) !== this.lastHearthRowFaction) { this.refresh(); }',
+        'if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible || gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig || clueStepRowSig(clueStepRowFor(this.deps.world().clueHunt, npc.templateId)) !== this.lastClueRowSig || seasonalTownsfolkRowsSig(this.seasonalRows(npc)) !== this.lastTrickOrTreatSig || (guideDialogView(npc)?.state ?? null) !== this.lastGuideState || this.hearthRowFactionFor(npc) !== this.lastHearthRowFaction) { this.refresh(); }',
     },
     why: "the gossip dialog's intro hint row plus the offerable-row set (phase 23: a cadence lapse re-offers a work order) plus the Clue Scroll step row (world quests round 2: the hunt step advances on a sim log line) plus a dungeon guide's offer state (another member's answer flips it while the dialog is open), and the Allied Hearthstone attune row, five edges no quest event fires for",
   },
@@ -1967,7 +1974,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 99 -> 100: the dungeon objectives tracker's medium-band paint
       // (hud/dungeon/dungeon_tracker_painter.ts), facet-routed like the deed strip.
       // window 53 -> 54: Lantern Hall's guild window (hud/guild_hall/guild_hall_window.ts).
-    ).toEqual({ window: 55, chrome: 100, none: 21 });
+    ).toEqual({ window: 55, chrome: 101, none: 21 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -2063,7 +2070,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         // cannot move, so the flag is part of the line the pin looks for.
         'hud/loot/loot_window_controller.ts: const unchanged = sig === this.corpseSig && harvestSig === this.harvestStatusSig; if (!force && unchanged) return availability;',
         'hud/professions/farming_plant_sheet_window.ts: if (view.status !== this.paintedStatus) this.paint();',
-        'hud/quest/quest_dialog_controller.ts: if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible || gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig || clueStepRowSig(clueStepRowFor(this.deps.world().clueHunt, npc.templateId)) !== this.lastClueRowSig || (guideDialogView(npc)?.state ?? null) !== this.lastGuideState || this.hearthRowFactionFor(npc) !== this.lastHearthRowFaction) { this.refresh(); }',
+        'hud/quest/quest_dialog_controller.ts: if (this.introHintVisibleFor(npc) !== this.lastIntroHintVisible || gossipRowSig(this.offerableRows(npc)) !== this.lastGossipRowSig || clueStepRowSig(clueStepRowFor(this.deps.world().clueHunt, npc.templateId)) !== this.lastClueRowSig || seasonalTownsfolkRowsSig(this.seasonalRows(npc)) !== this.lastTrickOrTreatSig || (guideDialogView(npc)?.state ?? null) !== this.lastGuideState || this.hearthRowFactionFor(npc) !== this.lastHearthRowFaction) { this.refresh(); }',
         'mailbox_window.ts: if (sig === this.lastSig) return;',
         'market_window.ts: if (sig === this.lastSig) return;',
         'meters.ts: if (!this.isOpen || now - this.lastRender < 250) return;',

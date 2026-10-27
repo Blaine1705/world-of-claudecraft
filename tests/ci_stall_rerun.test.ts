@@ -383,7 +383,7 @@ describe('ci-stall-rerun.yml shape', () => {
 
   it('carries the same dead-transfer floor ci.yml uses for its own checkout', () => {
     expect(workflowCode).toMatch(
-      /\nenv:\n {2}GIT_HTTP_LOW_SPEED_LIMIT: '1000'\n {2}GIT_HTTP_LOW_SPEED_TIME: '120'\n/,
+      /\nenv:\n {2}GIT_HTTP_LOW_SPEED_LIMIT: '1000'\n {2}GIT_HTTP_LOW_SPEED_TIME: '240'\n/,
     );
   });
 

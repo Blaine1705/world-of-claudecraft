@@ -227,6 +227,9 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   // The weekly emissary's pick (src/sim/weekly_quests.ts), beside the world
   // quests it stands next to.
   'weeklyQuest',
+  // Seasonal events (src/sim/seasonal/): the day's trick-or-treat knocks and
+  // the worn pumpkin head; a bounded ledger (64 ids), never professions state.
+  'seasonal',
   'arenaRating',
   'arenaWins',
   'arenaLosses',
@@ -2045,10 +2048,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // skull 42 + Titan 26 + PvP titles 138 + Hard maze 34 + skull bag 62
     // + vault retune 119 + quiver 66 + quest shields 68. No storage limit changes.
     // Advanced riding adds the sparse ridingTier scalar (+15, PR 4390).
-    expect(baselineBytes).toBe(259346);
+    expect(baselineBytes).toBe(261480);
     expect(bytes - baselineBytes).toBe(8284);
     // 266,699 -> 266,721 with Wobbles the Slime's reins (+22, kept).
-    expect(bytes).toBe(267630);
+    expect(bytes).toBe(269764);
     // Keep the warning threshold unchanged: saves above it remain whole.
     expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
     process.stdout.write(
@@ -2255,6 +2258,121 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // pure content-table arithmetic with no shape question in them: `deeds`
     // (10,369), `questsDone` (4,620) and `raidLockouts` (541).
     const bytes = Buffer.byteLength(JSON.stringify(s2), 'utf8');
+    // The maximal fixture fills every DEEDS row. Isolate the new seasonal Feat
+    // before replaying the historical content ledger: exactly 35 bytes for
+    // `"feat_pumpkin_hunter":"2026-08-08",`. This does not change any ceiling.
+    const withoutPumpkinHunter: CharacterState = {
+      ...s2,
+      deeds: Object.fromEntries(
+        Object.entries(s2.deeds ?? {}).filter(([id]) => id !== 'feat_pumpkin_hunter'),
+      ),
+    };
+    expect(s2.deeds?.feat_pumpkin_hunter).toBe('2026-08-08');
+    const pumpkinHunterBytes =
+      bytes - Buffer.byteLength(JSON.stringify(withoutPumpkinHunter), 'utf8');
+    expect(pumpkinHunterBytes).toBe(35);
+    const withoutSeasonalBoss: CharacterState = {
+      ...withoutPumpkinHunter,
+      deeds: Object.fromEntries(
+        Object.entries(withoutPumpkinHunter.deeds ?? {}).filter(
+          ([id]) => id !== 'feat_old_thatchgrin',
+        ),
+      ),
+      deedStats: {
+        ...withoutPumpkinHunter.deedStats,
+        counters: Object.fromEntries(
+          Object.entries(withoutPumpkinHunter.deedStats?.counters ?? {}).filter(
+            ([id]) => id !== 'thatchgrinKills',
+          ),
+        ),
+        itemsDiscovered: (withoutPumpkinHunter.deedStats?.itemsDiscovered ?? []).filter(
+          (id) => id !== 'thatchgrin_sweet_sack' && id !== 'strawling_charm',
+        ),
+      },
+    };
+    const seasonalBossBytes =
+      Buffer.byteLength(JSON.stringify(withoutPumpkinHunter), 'utf8') -
+      Buffer.byteLength(JSON.stringify(withoutSeasonalBoss), 'utf8');
+    expect(seasonalBossBytes).toBe(102);
+    // The rest of Gourdlight Eve (feature/halloween-event), stripped the same way so the
+    // historical ledger below replays the v0.45.0 integration's own catalogue exactly.
+    // Phase 1 adds 143: the rounds quest id (22), feat_gourdlight_guise's deed row (37)
+    // and four discovered item ids (84). Phase 3 adds 270: the three title-writ Feat rows
+    // (112) and seven discovered item ids, three draughts, three writs and the broom's
+    // reins (158). Round 9 adds 110: Hester's five toys as discovered item ids. The six
+    // rotating dailies add 352: their quest ids (165) and nine discovered item ids (187).
+    // Ids are listed literally so a new Gourdlight row reds here by name.
+    const gourdlightDeeds = new Set([
+      'feat_gourdlight_guise',
+      'feat_title_gourdlit',
+      'feat_title_trickster',
+      'feat_title_hollow_grinned',
+      'feat_gourdlight_doorsteps',
+      'feat_gourdlight_errands',
+      'feat_gourdlight_frights',
+      'feat_gourdlight_eve_complete',
+    ]);
+    const gourdlightItems = new Set([
+      'carved_pumpkin_head',
+      'gourdlight_sweet',
+      'gourdlight_treat_pouch',
+      'jar_of_mischief',
+      'rattlebone_draught',
+      'haunting_draught',
+      'batwing_draught',
+      'writ_of_the_gourdlit',
+      'writ_of_the_trickster',
+      'writ_of_the_hollow_grin',
+      'reins_emberbristle_broom',
+      'prankers_pumpkin',
+      'wanderwisp_lantern',
+      'sack_of_startled_bats',
+      'murmurwick_candle',
+      'gurglegreen_cauldron',
+      'crabapple_chew',
+      'gourdseed_brittle',
+      'hearthroot_toffee',
+      'lantern_mint_drop',
+      'owlwatch_fudge',
+      'emberwoven_sheaf',
+      'cursed_candle_stub',
+      'gourdlight_crow_feather',
+      'thatchgrin_patch_pumpkin',
+    ]);
+    const gourdlightQuests = new Set([
+      'q_gourdlight_rounds',
+      'q_gourdlight_daily_patch',
+      'q_gourdlight_daily_boo',
+      'q_gourdlight_daily_wicks',
+      'q_gourdlight_daily_towns',
+      'q_gourdlight_daily_feathers',
+      'q_gourdlight_daily_baskets',
+    ]);
+    const withoutGourdlightEve: CharacterState = {
+      ...withoutSeasonalBoss,
+      questsDone: (withoutSeasonalBoss.questsDone ?? []).filter((id) => !gourdlightQuests.has(id)),
+      deeds: Object.fromEntries(
+        Object.entries(withoutSeasonalBoss.deeds ?? {}).filter(([id]) => !gourdlightDeeds.has(id)),
+      ),
+      deedStats: {
+        ...withoutSeasonalBoss.deedStats,
+        visited: (withoutSeasonalBoss.deedStats?.visited ?? []).filter(
+          (mark) => !mark.startsWith('gourdlight:'),
+        ),
+        itemsDiscovered: (withoutSeasonalBoss.deedStats?.itemsDiscovered ?? []).filter(
+          (id) => !gourdlightItems.has(id),
+        ),
+      },
+    };
+    const gourdlightRestBytes =
+      Buffer.byteLength(JSON.stringify(withoutSeasonalBoss), 'utf8') -
+      Buffer.byteLength(JSON.stringify(withoutGourdlightEve), 'utf8');
+    // round 10: the cauldron's id is 3 characters shorter than the retired play broom's
+    // Round 12 adds four deed rows plus the bounded 27-mark checklist, 1,125 bytes.
+    expect(gourdlightRestBytes).toBe(143 + 270 + 107 + 352 + 1125);
+    // Every Gourdlight Eve byte in this fixture: 35 + 102 + 143 + 270 + 107 + 352 + 1,125 = 2,134.
+    const gourdlightEveBytes = pumpkinHunterBytes + seasonalBossBytes + gourdlightRestBytes;
+    expect(gourdlightEveBytes).toBe(2134);
     // Attribute the stamp-card feature independently from the historical ledger:
     // twenty more bank slots, five discoverable item ids and the paired sprites. Mount relics reuse
     // an existing illuminated page and add no character-save key in this fixture.
@@ -2264,7 +2382,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       Object.keys(REFERRAL_STAMP_ITEMS).filter((id) => id !== 'reins_wobbles_slime'),
     );
     const beforeStampCards: CharacterState = {
-      ...s2,
+      ...withoutGourdlightEve,
       buddies: {
         ...s2.buddies!,
         owned: s2.buddies!.owned!.filter((id) => id !== 'sprites'),
@@ -2278,12 +2396,15 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         inventory: s2.bank!.inventory.slice(0, -20),
       },
       deedStats: {
-        ...s2.deedStats,
-        itemsDiscovered: (s2.deedStats?.itemsDiscovered ?? []).filter((id) => !stampIds.has(id)),
+        ...withoutGourdlightEve.deedStats,
+        itemsDiscovered: (withoutGourdlightEve.deedStats?.itemsDiscovered ?? []).filter(
+          (id) => !stampIds.has(id),
+        ),
       },
     };
     expect(stampIds.size).toBe(5);
-    const stampCardBytes = bytes - Buffer.byteLength(JSON.stringify(beforeStampCards), 'utf8');
+    const stampCardBytes =
+      bytes - gourdlightEveBytes - Buffer.byteLength(JSON.stringify(beforeStampCards), 'utf8');
     const bankRewardBytes =
       20 * (Buffer.byteLength(JSON.stringify(s2.bank!.inventory[0]), 'utf8') + 1);
     const stampDiscoveryBytes = [...stampIds].reduce((sum, id) => sum + id.length + 3, 0);
@@ -2321,7 +2442,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // 249,984 -> 250,006 with Wobbles the Slime's reins (+22, kept).
     // Advanced riding adds the sparse ridingTier scalar (+15, PR 4390).
     expect(beforeReferralBytes).toBe(250915);
-    expect(bytes - stampCardBytes - beforeReferralBytes).toBe(122);
+    expect(bytes - gourdlightEveBytes - stampCardBytes - beforeReferralBytes).toBe(122);
     expect(
       fieldBytes(beforeStampCards, 'deedStats') - fieldBytes(withoutReferral, 'deedStats'),
     ).toBe(122);
@@ -3175,8 +3296,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // Release composition: 250,982 bytes excluding referral cards; retain the 381-byte band.
     // RE-BASED for advanced riding: up exactly 15 for the sparse ridingTier
     // scalar (250,273). Same 381-byte band.
-    expect(bytes - stampCardBytes, reMint).toBeGreaterThan(250657);
-    expect(bytes - stampCardBytes, reMint).toBeLessThan(251038);
+    expect(bytes - gourdlightEveBytes - stampCardBytes, reMint).toBeGreaterThan(250657);
+    expect(bytes - gourdlightEveBytes - stampCardBytes, reMint).toBeLessThan(251038);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

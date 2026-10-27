@@ -481,6 +481,7 @@ import { ChatWindowController } from './hud/chat/chat_window_controller';
 import { DEED_NAME_TOKEN, deedChatLinkEl, deedLineNodes } from './hud/chat/deed_chat_line';
 import { RaidWarningBanner } from './hud/chat/raid_warning_banner';
 import { ReadyCheckLeaderWindow } from './hud/chat/ready_check_leader_window';
+import { createClassResourceMeters } from './hud/class_resources';
 import { type CooldownManagerController, mountCooldowns } from './hud/cooldown_manager';
 import { CosmeticsWindow } from './hud/cosmetics';
 import { SkinEventController } from './hud/cosmetics/skin_event_controller';
@@ -665,7 +666,7 @@ import {
   renderWarfareVendorWindow,
   warfarePurchaseConfirmBody,
 } from './hud/vendor/warfare_vendor_window';
-import { afflictionFateThreadCount, createDoomMeter, destructionRuinPips } from './hud/warlock';
+import { afflictionFateThreadCount, destructionRuinPips } from './hud/warlock';
 import { WocTradeController } from './hud/woc_trade';
 import { HudFrameGroups, refreshHudFrameGroupLabels } from './hud_frame_groups';
 import { partyFrameGrid, registerHudFrames } from './hud_frame_registry';
@@ -921,6 +922,7 @@ import {
   MOTD_RESULT_KEYS,
 } from './result_code_keys';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
+import { seasonalItemTooltipLines } from './seasonal_item_tooltip';
 import { selfPreviewSubject, selfTryOnBody } from './self_preview_subject';
 import { localizeServerText } from './server_i18n';
 import {
@@ -4562,25 +4564,12 @@ export class Hud {
     consumePeek: () => this.peekGuard.consume(),
     keybinds: () => this.keybinds, // live, for the lean keycaps (hud/shardpike/)
   });
-  private readonly doomMeter = createDoomMeter(
+  private readonly doomMeter = createClassResourceMeters(
     document,
     this.playerFrameEl.parentElement as HTMLElement,
     this.playerFrameEl,
     this.writerFacet,
-    {
-      label: () => t('hudChrome.warlock.doomLabel'),
-      formatCount: (value) => formatNumber(value, { maximumFractionDigits: 0 }),
-      formatEmptyStatus: (value, max) => t('hudChrome.warlock.doomEmptyStatus', { value, max }),
-      formatStatus: (value, max, seconds) =>
-        t('hudChrome.warlock.doomStatus', {
-          value,
-          max,
-          remaining: tPlural('hudChrome.plurals.secondsRemaining', seconds),
-        }),
-      fateThreadsLabel: () => t('hudChrome.warlock.fateThreadsLabel'),
-      formatFateThreadsStatus: (value, max) =>
-        t('hudChrome.warlock.fateThreadsStatus', { value, max }),
-    },
+    (el, html) => this.attachTooltip(el, html),
   );
   // One decoded/prescaled marker-art cache is shared by every cartography
   // painter, including the two instance schematics. It must initialize before
@@ -6561,6 +6550,7 @@ export class Hud {
       html += recipePatternTooltipLines(item, this.sim.craftingIdentity, card);
     html += feastTooltipLines(item);
     html += skullBagTooltipLines(item);
+    html += seasonalItemTooltipLines(item); // seasonal event toys (seasonal_item_tooltip.ts)
     // Quest story block (related quest, progress, rules, orphaned). Replaces the
     // old plain "Quest Item" desc that doubled the kind line.
     if (questModel) html += this.questItemTooltipStoryHtml(questModel);
@@ -8503,7 +8493,7 @@ export class Hud {
         inDungeon: p.pos.x > DUNGEON_X_THRESHOLD,
         entities: sim.entities.values(),
         riftFloor: sim.riftFloor,
-        ...authoredMapMusicInput(),
+        ...authoredMapMusicInput(sim),
       });
     }
 
@@ -8664,6 +8654,7 @@ export class Hud {
       this.writerFacet.setAttr(this.comboRowEl, 'aria-hidden', 'true');
     }
     this.paladinDevotionPainter.paint(this.paladinDevotionView.tick(p));
+    this.doomMeter.paintShadow(p, this.sim.talentSpec);
 
     // buff bar / debuff bar: the keyed-pool aura painter, driven by the auras_view core
     // every frame (the elided writers make a no-op frame free). Buffs and debuffs render to
@@ -14467,6 +14458,7 @@ export class Hud {
           factions: this.sim.factions,
           factionCurrencies: this.sim.factionCurrencies,
           vendorFactionId: vendorFactionForNpc(npc.templateId),
+          inventory: this.sim.inventory, // token-priced rows (seasonal sweets)
         },
         this.vendorQtyMultiple,
       ),

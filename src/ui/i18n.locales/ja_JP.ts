@@ -4774,6 +4774,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'errors.api.accountSuspended': 'このアカウントは {date} まで停止されています。',
   'errors.api.alreadyInWorld': 'キャラクターは既に世界にいます。',
   'errors.api.accountSessionLimit': 'このアカウントでは既に多くのキャラクターが世界にいます。',
+  'errors.api.worldFightHold':
+    'このアカウントの別のキャラクターが戦闘後もまだ世界に残っています。数分後にもう一度お試しください。',
   'errors.api.takenOver': 'あなたのキャラクターは別のセッションに引き継がれました。',
   'errors.api.renameBeforeEntering': 'このキャラクターは世界に入る前に名前変更が必要です。',
   'errors.api.renameNotPermitted': 'このキャラクターの名前変更は許可されていません。',
@@ -14771,7 +14773,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ice_block.description':
     '8秒間自身を堅い氷に封じ、あらゆるダメージを無効化します。すでにかかっている通常の有害な効果を取り除き、新たな通常の行動阻害効果の付与を防ぎます。スタンまたは変身中でも使用できます。氷の中では行動できません。再使用すると解除します。（メイジ）',
   'entities.abilities.inner_focus.description':
-    '次のプリーストの呪文を無償かつ中断されないものにします。60秒続きます。',
+    '次のプリーストの呪文はマナを消費せず、中断されません。60秒間持続します。',
   'entities.abilities.innervate.description':
     '生命の樹液が10秒間あふれ、現在のリソースを波状に20回復する。マナ、怒り、エナジーに対応し、変身しても中断されない。睡眠、スタン、ステイシス中は樹液が止まる。（ドルイドのタレント）',
   'entities.abilities.mend_pet.name': '手当て',
@@ -21492,6 +21494,33 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'errors.updateUnavailable':
     'ゲームストアで更新するか、最新クライアントをダウンロードしてください。',
   'errors.updateSearchFailed': '更新を確認できませんでした。もう一度お試しください。',
+  'entities.abilities.vampiric_touch.name': '吸血の接触',
+  'entities.abilities.vampiric_touch.description':
+    '15秒間、3秒ごとに合計{damage}の暗影ダメージを与える。ダメージは呪文威力で増加し、各回のダメージはクリティカル可能。各回で敵が実際に失ったHPの20%を回復量とし、自分と30ヤード以内の負傷したパーティメンバーに均等に分配する。レイドでは自分のサブグループのみが対象。闇の献納が2チャージ以上ある場合、効果の付与時に2チャージを消費し、効果全体のダメージを30%増加させる。',
+  'entities.abilities.spirit_bomb.name': '献納の爆弾',
+  'entities.abilities.spirit_bomb.description':
+    '敵を中心に霊魂の爆弾を爆発させ、その敵から8ヤード以内の敵に{damage}のシャドウダメージを与えます。ダメージはスペルパワーで増加し、クリティカルが発生します。対象が5体を超えるとダメージが減少します。闇の献納を合計20生成すると爆弾が1個準備されます。上限の5スタックを保持している間の生成も加算されます。消費は不要で、消費しても進捗は増えません。進捗は戦闘の間も保持され、準備できる爆弾は1個までです。死亡すると進捗と準備済みの爆弾がリセットされます。詠唱が完了すると、抵抗されても爆弾を消費します。キャンセルや中断では保持されます。レイドボスとの戦闘開始時に進捗と準備済みの爆弾がリセットされます。この呪文でレイドボスとの戦闘を開始することはできません。',
+  'hudChrome.priest.gloomtitheLabel': '闇の献納',
+  'hudChrome.priest.bombLabel': '献納の爆弾',
+  'guide.interfacePage.framesGovernedPriest':
+    'フレーム編集では、シャドウプリーストの闇の献納と献納の爆弾を表示するメダリオンも移動できます。',
+  'hudChrome.priest.gloomtitheStatus': '闇の献納 {value} / {max}',
+  'hudChrome.priest.bombStatus': '献納の爆弾のチャージ {value} / {max}',
+  'hudChrome.priest.bombReady': '準備完了',
+  'hudChrome.priest.chargeCount': '{value} / {max}',
+  'hudChrome.priest.gloomtitheTooltip':
+    '闇の献納：消費できるチャージを最大5まで保持。虚空の裂傷は3チャージを消費する。吸血の接触は2チャージを消費してダメージを30%増加させ、タイスフィーンド招来は全チャージを消費する。チャージの生成は献納の爆弾の進捗も増やし、5チャージ保持中でも加算される。',
+  'hudChrome.priest.bombTooltip':
+    '献納の爆弾：闇の献納を20生成すると爆弾を1個準備できます。闇の献納を消費しても進捗は増えません。進捗は戦闘の間も保持されます。死亡時またはレイドボスとの戦闘開始時にリセットされます。詠唱が完了すると爆弾を消費し、キャンセルすると保持されます。',
+  'entities.abilities.choir_of_deliverance.specNote_shadow':
+    '15秒間、自分の暗影ダメージで敵が実際に失ったHPの20%を回復量とし、自分を含む30ヤード以内の負傷したパーティメンバーに分配する。レイドでは自分のサブグループのみを回復する。即時発動し、黄昏の帳のまま攻撃を続けられる。吸収されたダメージと敵の残りHPを超えたダメージは回復量に含まれない。',
+  'entities.abilities.void_rupture.name': '虚空の裂傷',
+  'entities.abilities.void_rupture.description':
+    '闇の献納を3スタック消費して敵を引き裂き、{damage}のシャドウダメージを与えます。ダメージはスペルパワーで増加し、クリティカルが発生します。3スタックが必要で、抵抗されても消費します。',
+  'entities.abilities.inner_focus.specNote_shadow':
+    'さらに、60秒以内に使う次の精神粉砕または虚空の裂傷は、命中すると必ずクリティカルになります。他の呪文はこの効果を消費しません。虚空の裂傷は引き続き闇の献納を3スタック消費します。抵抗されてもクリティカル効果は消費されます。',
+  'hudChrome.auraEffect.stilledMindCrit':
+    '次の精神粉砕または虚空の裂傷は、命中すると必ずクリティカルになります。他の呪文はこの効果を消費しません。虚空の裂傷は引き続き闇の献納を3スタック消費します。抵抗されてもこの効果は消費されます。',
   'entities.abilities.spore_burst.name': '胞子バースト',
   'entities.abilities.spore_burst.description':
     '対象地点に胞子爆裂体を召喚します。{duration}秒後に爆発し、味方を{healing}回復し、8ヤード以内の敵に{damage}の自然ダメージを与えます。',
@@ -21510,6 +21539,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.pvp_skull_bag.name': '頭蓋袋',
   'guide.worldPvpPage.hillBodyFlat':
     '三時間ごとに、予測できないタイミングでレルム全体に告知が届きます。十五分後、北部の地帯のどこかに丘が出現し、その範囲となる円が開けた地面に示されます。丘は出現から四十五分間続いて消え、その間は五分ごとに場所と各グループの累計占領時間の順位が告知されます。円内に立つ人数が最も多いパーティーが丘を争い、人数優勢の状態を合計三十秒保つと占領できます。敵のパーティーが入っても、自分たちが再び優勢になるまで計時が一時停止するだけです。円内に味方の生存者が一人もいなくなったときだけ、計時が最初からになります。一人でも一人パーティーとして数えられ、占領中にパーティーを組んでも丘を失いませんが、レイドのメンバーは一切数えられません。占領しているパーティーの各メンバーは、円内に立っていると毎分同じ量の名誉を得られます。占領時間が長くなっても報酬は変わらず、満員のパーティーが妨害されずに最初から最後まで占領すれば、戦場で三勝するのとほぼ同じ名誉を得られます。丘が消えるとき、累計占領時間が最も長いグループが合計十分以上占領していれば、そのグループの占領中に円内で合計一分以上過ごし、終了時にも同じグループにいる全員に、週間宝物庫の PvP 枠への一勝が与えられます。戦場上部のバーに占領者、両陣営の人数、争奪の計時が表示され、チャットで /hill と入力すると丘の場所がわかります。',
+  'guide.worldPvpPage.hillBodyTwoHour':
+    '二時間ごとに、予測できないタイミングでレルム全体に告知が届きます。十五分後、北部の地帯のどこかに丘が出現し、その範囲となる円が開けた地面に示されます。丘は出現から三十分間続いて消え、その間は五分ごとに場所と各グループの累計占領時間の順位が告知されます。円内に立つ人数が最も多いパーティーが丘を争い、人数優勢の状態を合計三十秒保つと占領できます。敵のパーティーが入っても、自分たちが再び優勢になるまで計時が一時停止するだけです。円内に味方の生存者が一人もいなくなったときだけ、計時が最初からになります。一人でも一人パーティーとして数えられ、占領中にパーティーを組んでも丘を失いませんが、レイドのメンバーは一切数えられません。占領しているパーティーの各メンバーは、円内に立っていると毎分同じ量の名誉を得られます。占領時間が長くなっても報酬は変わらず、満員のパーティーが妨害されずに最初から最後まで占領すれば、戦場で二勝するのとほぼ同じ名誉を得られます。丘が消えるとき、累計占領時間が最も長いグループが合計十分以上占領していれば、そのグループの占領中に円内で合計一分以上過ごし、終了時にも同じグループにいる全員に、週間宝物庫の PvP 枠への一勝が与えられます。戦場上部のバーに占領者、両陣営の人数、争奪の計時が表示され、チャットで /hill と入力すると丘の場所がわかります。',
   'hudChrome.graphicsRestore.note': '描画を復元中',
   'hudChrome.hill.contestOtherPaused': '相手の進行停止：{seconds}/{total}',
   'hudChrome.hill.contestYouPaused': '進行停止：{seconds}/{total}',
@@ -22046,6 +22077,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '開いた焼き入れの水の中：移動速度が{slow}%低下し、毎秒{damage}のダメージ（ヒロイックでは{heroic}）で焼かれる。どれかの氷板か岸まで泳げ。',
   'hudChrome.auraEffect.sanctum.shardFlare':
     '心臓の欠片が燃え上がる：墓のブレスが{breath}秒ごと、翼の突風が{gale}秒ごとになる。',
+  'hudChrome.auraEffect.gourdlight.thatchbound':
+    'オールド・サッチグリンに操られています。行動できず、最も近い味方のもとへ歩かされ、{every}秒ごとに{min}から{max}のダメージを与えます（レベル{level}の味方には最大{mult}倍）。最大HPの{pct}%に相当するダメージを受けるか、味方に解呪（魔法）されると早めに解除されます。',
   'hudChrome.auraEffect.wildheart.packBond':
     '相棒が近くにいる間、受けるダメージが{pct}%減少する。獣使いとジャガーを引き離せば絆は切れる。',
   'hudChrome.auraEffect.wildheart.packBondFury':
@@ -22187,7 +22220,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '聖歌隊員が彼女の受けるダメージを{pct}%減らしている：先に聖歌隊員を倒せ',
   'hudChrome.cryptAlert.timeAria': '残り{seconds}秒',
   'hudChrome.auraEffect.crypt.measured':
-    'これが切れると、立っている場所に開いた墓が崩れ落ち、{radius}ヤード以内の全員に{min}～{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。墓は戦闘中ずっと残るので、印は仲間から離れた墓地の端まで運ぶこと。',
+    'これが切れると、立っている場所に開いた墓が崩れ落ち、{radius}ヤード以内の全員に{min}から{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。墓は戦闘中ずっと残るので、印は仲間から離れた墓地の端まで運ぶこと。',
   'hudChrome.auraEffect.crypt.graveDirt':
     '開いた墓の中に立っている：移動速度が{slow}%低下し、毎秒{damage}の闇ダメージ（ヒロイックでは{heroic}）。ヒロイックでは墓の中に{linger}秒留まると安らがぬ骨が這い出る。墓から出ること。',
   'hudChrome.auraEffect.crypt.dirtInEyes':
@@ -25462,4 +25495,186 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.hill.callout.godlike': '{name}：ゴッドライク！',
   'hudChrome.hill.callout.legendary': '{name}：レジェンダリー！',
   'hudChrome.hill.callout.shutDown': '{killer}が{victim}をシャットダウン！',
+  'hudChrome.auraEffect.seasonalCosmetic': '見た目のみ：戦闘に影響なし',
+  'seasonal.event.gourdlight_eve.name': 'ゴードライトの宵',
+  'seasonal.trickOrTreat.row': 'トリック・オア・トリート！',
+  'seasonal.trickOrTreat.rowAria': '{name}に「トリック・オア・トリート」と言う',
+  'seasonal.trickOrTreat.knockedHint': '今日はもうここの戸を叩いた。デイリーリセット後にまた開く。',
+  'seasonal.trickOrTreat.treat': '{name}がお菓子をくれた。',
+  'seasonal.trickOrTreat.trick': '{name}がいたずらをした：{trick}！',
+  'seasonal.trickOrTreat.alreadyKnocked': '今日はもう{name}にお菓子をねだった。',
+  'seasonal.trickOrTreat.notActive': 'ゴードライトの宵は今は開催されていない。',
+  'seasonal.trickOrTreat.tooFar': 'もっと近づいて戸を叩こう。',
+  'seasonal.trickOrTreat.treatFlash.one': 'トリート！ゴードライトの菓子 {count}個',
+  'seasonal.trickOrTreat.treatFlash.few': 'トリート！ゴードライトの菓子 {count}個',
+  'seasonal.trickOrTreat.treatFlash.many': 'トリート！ゴードライトの菓子 {count}個',
+  'seasonal.trickOrTreat.treatFlash.other': 'トリート！ゴードライトの菓子 {count}個',
+  'seasonal.trickOrTreat.trickFlash': 'トリック！{trick}',
+  'seasonal.tricks.gourdlight_trick_bat': 'コウモリ化',
+  'seasonal.tricks.gourdlight_trick_skeleton': 'カタカタ骨',
+  'seasonal.tricks.gourdlight_trick_fumes': '緑の煙',
+  'seasonal.pumpkinHead.on': '彫りカボチャの頭をかぶった。',
+  'seasonal.pumpkinHead.off': '彫りカボチャの頭を外した。',
+  'seasonal.jarTrick': '壺がぽんと開いた：{trick}！',
+  'seasonal.itemUse.pumpkinHead':
+    '使用：内側から灯る彫りカボチャを兜の上からかぶる・外す。ゴードライトの宵の間のみ。見た目のみ。',
+  'seasonal.itemUse.trickJar':
+    '使用：数秒間、無害ないたずらをランダムに自分にかける。ゴードライトの宵の間のみ。見た目のみ。',
+  'seasonal.itemUse.pouch': '使用：開けるとゴードライトの菓子を{count}個受け取る。',
+  'seasonal.itemUse.sweet':
+    'ゴードライトの宵の間にお菓子をねだって手に入る。イーストブルックのヘスター・ゴードウィックが見た目アイテムと交換してくれる。',
+  'seasonal.tokenPrice': '{item} ×{count}',
+  'entities.items.gourdlight_sweet.name': 'ゴードライトの菓子',
+  'entities.items.gourdlight_treat_pouch.name': 'ゴードライトのお菓子袋',
+  'entities.items.carved_pumpkin_head.name': '彫りカボチャの頭',
+  'entities.items.jar_of_mischief.name': 'いたずらの壺',
+  'entities.npcs.gourdlight_keeper.name': 'ヘスター・ゴードウィック',
+  'entities.npcs.gourdlight_keeper.title': 'ゴードライトの番人',
+  'entities.npcs.gourdlight_keeper.greeting':
+    'カボチャに火が灯り、ランタンも吊るされた。ゴードライトの宵が来たのね。イーストブルック、フェンブリッジ、ハイウォッチの町の人の戸を叩いて、あの言葉を言いなさい。トリック・オア・トリート。たいていはお菓子をくれるけど、いたずらをする人もいるわ。お菓子を持ってきてくれたら、身につけるものと交換してあげる。',
+  'entities.quests.q_gourdlight_rounds.title': 'ゴードライトの見回り',
+  'entities.quests.q_gourdlight_rounds.text':
+    'ゴードライトの宵には、谷の子どもたちが家々を回るの。今年はあなたも一緒よ、{playerName}。私たちの町で五つの戸を叩いて、あの言葉を言って、何をもらえるか見てきて。終わったら戻ってきてね。',
+  'entities.quests.q_gourdlight_rounds.completion':
+    '五つの戸を叩いて、指もちゃんと全部ある。はい、帰り道のお菓子袋よ。明日また来て。戸はまた開くから。',
+  'entities.quests.q_gourdlight_rounds.objectives.0.label': '叩いた戸',
+  'seasonal.tricks.gourdlight_trick_strawling': '藁人形の扮装',
+  'seasonal.guise': 'お守りがぱちぱちと鳴り、藁が体を這い上がる：{trick}！',
+  'seasonal.itemUse.strawlingCharm':
+    '使用：{seconds}秒間、オールド・サッチグリンの藁人形の姿になる。戦闘中は使えず、ゴードライトの宵の間のみ。消費されない。見た目のみ。',
+  'entities.items.thatchgrin_sweet_sack.name': 'サッチグリンの菓子袋',
+  'entities.items.strawling_charm.name': '藁人形のお守り',
+  'entities.mobs.gourdlight_thatchgrin.name': 'オールド・サッチグリン',
+  'entities.mobs.gourdlight_crow.name': 'ゴードライトのカラス',
+  'hudChrome.mounts.name_emberbristle_broom': 'エンバーブリッスルの箒',
+  'hudChrome.mounts.desc_emberbristle_broom':
+    'オレンジのリボンを巻いた収穫の箒。地面から手のひらひとつ分浮かび、穂先から燠火をこぼす。ゴードライトの宵が終わると藁に戻って崩れ落ちる。',
+  'seasonal.tricks.gourdlight_costume_skeleton': 'スケルトンの仮装',
+  'seasonal.tricks.gourdlight_costume_ghost': 'ゴーストの仮装',
+  'seasonal.tricks.gourdlight_costume_bat': 'コウモリの仮装',
+  'seasonal.costume': '薬を飲むと姿が変わった：{trick}！',
+  'seasonal.titleGranted': '証書を読んだ。新しい称号を獲得：{title}。',
+  'seasonal.titleKnown': 'その称号はすでに持っているので、証書は手元に残る。',
+  'seasonal.boundItemGone': 'ゴードライトの宵が終わり、{item}は藁に戻って崩れ落ちた。',
+  'seasonal.itemUse.costumeSkeleton':
+    '使用：{minutes}分間、カタカタ鳴るスケルトンに変身する。消費される。戦闘中は使用できず、戦闘に入ると解除される。ゴードライトの宵の期間のみ。見た目のみ。',
+  'seasonal.itemUse.costumeGhost':
+    '使用：{minutes}分間、漂うゴーストに変身する。消費される。戦闘中は使用できず、戦闘に入ると解除される。ゴードライトの宵の期間のみ。見た目のみ。',
+  'seasonal.itemUse.costumeBat':
+    '使用：{minutes}分間、羽ばたくコウモリに変身する。消費される。戦闘中は使用できず、戦闘に入ると解除される。ゴードライトの宵の期間のみ。見た目のみ。',
+  'seasonal.itemUse.titleWrit':
+    '使用：このキャラクターの称号{title}を獲得し、功績の書から付けられる。消費される。ゴードライトの宵の期間のみ。称号をすでに持っている場合は証書が残る。',
+  'seasonal.itemUse.sheaf':
+    'オールド・サッチグリンを倒して戦利品を受け取るたび、1日に1つもらえる。エンバーブリッスルの箒を手に入れるまで続く。ヘスター・ゴードウィックがイーストブルック、フェンブリッジ、ハイウォッチの屋台で{count}個を箒と交換してくれる。ゴードライトの宵が終わると藁になって崩れる。',
+  'entities.items.rattlebone_draught.name': 'ガラガラ骨の薬',
+  'entities.items.haunting_draught.name': 'さまよう霊の薬',
+  'entities.items.batwing_draught.name': 'はばたきの薬',
+  'entities.items.writ_of_the_gourdlit.name': 'ゴードリットの証書',
+  'entities.items.writ_of_the_trickster.name': 'トリックスターの証書',
+  'entities.items.writ_of_the_hollow_grin.name': 'うつろな笑みの証書',
+  'entities.items.reins_emberbristle_broom.name': 'エンバーブリッスルの箒',
+  'entities.items.emberwoven_sheaf.name': 'エンバーウーブンの藁束',
+  'entities.items.hearthroot_toffee.name': '炉根のトフィー',
+  'entities.items.gourdseed_brittle.name': 'かぼちゃの種のブリトル',
+  'entities.items.crabapple_chew.name': '姫りんごのチュウ',
+  'entities.items.owlwatch_fudge.name': 'フクロウ見張りのファッジ',
+  'entities.items.lantern_mint_drop.name': 'ランタンミントドロップ',
+  'entities.mobs.gourdlight_swelling_gourd.name': '膨れ瓜',
+  'entities.mobs.gourdlight_strawling.name': '藁人形',
+  'seasonal.pumpkins.name': '幽霊カボチャ',
+  'seasonal.pumpkins.title': '幽霊カボチャ',
+  'seasonal.pumpkins.world': '世界',
+  'seasonal.pumpkins.found':
+    '{zone}の幽霊カボチャに火を灯した：{count}/{total}。ゴードライトの菓子を受け取った：{sweets}。',
+  'seasonal.pumpkins.flash': '幽霊カボチャを発見！{count}/{total}',
+  'seasonal.itemSource.pumpkinHead':
+    'ボアメドウの先にあるカボチャ畑のオールド・サッチグリンから、初めて戦利品を受け取ったときに手に入る。商人は売っていない。',
+  'entities.items.cursed_candle_stub.name': '呪われたろうそくの燃えさし',
+  'entities.items.gourdlight_crow_feather.name': 'ゴードライトのカラスの羽根',
+  'entities.items.thatchgrin_patch_pumpkin.name': '畑のカボチャ',
+  'entities.quests.q_gourdlight_daily_patch.title': '畑のカボチャ',
+  'entities.quests.q_gourdlight_daily_patch.text':
+    'ボアメドウの先にあるオールド・サッチグリンの畑はカボチャで実っていて、半分は藁の囲いの外まで転がり出ているの。気をつければ手が届くわ。五つ持ってきて、{playerName}。あの年寄りのかかし本人には近づかないこと。一つ残らず数えているから。',
+  'entities.quests.q_gourdlight_daily_patch.completion':
+    '丸いのが五つ、かじられた跡もなし。谷じゅうのパイになるわ。はい、手間賃よ。',
+  'entities.quests.q_gourdlight_daily_patch.objectives.0.label': '畑のカボチャ',
+  'entities.quests.q_gourdlight_daily_boo.title': 'わっ！',
+  'entities.quests.q_gourdlight_daily_boo.text':
+    'この町の誰も、この一年ちゃんと驚かされていないのよ、{playerName}。驚きのないゴードライトの宵なんて、ただの寒い夜。仮装をしてちょうだい。私の薬ならどれでもいいし、手に入れたならあのカボチャ頭でもいいわ。それから町の人三人に忍び寄って、大きな声で「わっ！」と驚かせてきて。',
+  'entities.quests.q_gourdlight_daily_boo.completion':
+    '三人も？広場の向こうから料理人が鍋を落とす音が聞こえたわ。よくやったわね。はい、あなたの分よ。',
+  'entities.quests.q_gourdlight_daily_boo.objectives.0.label': '驚かせた町の人',
+  'entities.quests.q_gourdlight_daily_wicks.title': '呪われた灯芯',
+  'entities.quests.q_gourdlight_daily_wicks.text':
+    '誰かが街灯の足もとに緑の炎のろうそくを置いていくの。溶けもせずに燃えて、背を向けるとささやくのよ。三つの町のどこでもいいから六本吹き消して、燃えさしを持ってきて、{playerName}。',
+  'entities.quests.q_gourdlight_daily_wicks.completion':
+    '燃えさしが六本、霜みたいに冷たい。火をつけた誰かさんは、もっと頑張らないとね。これを受け取って、手を洗ってきなさい。',
+  'entities.quests.q_gourdlight_daily_wicks.objectives.0.label': '吹き消した呪われたろうそく',
+  'entities.quests.q_gourdlight_daily_towns.title': 'どの町でも一つの戸を',
+  'entities.quests.q_gourdlight_daily_towns.text':
+    '本物のゴードライトの歩き手は、夜が明ける前にすべての町で戸を叩くものだって子どもたちは言うの。それを証明してきて、{playerName}。イーストブルック、フェンブリッジ、ハイウォッチでそれぞれ一つの戸でトリック・オア・トリートを。道のランタンが行く手を照らしてくれるわ。',
+  'entities.quests.q_gourdlight_daily_towns.completion':
+    '一晩で三つの町！あなたより、あなたのブーツのほうがこれにふさわしいわね。',
+  'entities.quests.q_gourdlight_daily_towns.objectives.0.label': 'イーストブルックで叩いた戸',
+  'entities.quests.q_gourdlight_daily_towns.objectives.1.label': 'フェンブリッジで叩いた戸',
+  'entities.quests.q_gourdlight_daily_towns.objectives.2.label': 'ハイウォッチで叩いた戸',
+  'entities.quests.q_gourdlight_daily_feathers.title': '焚き火のための羽根',
+  'entities.quests.q_gourdlight_daily_feathers.text':
+    'オールド・サッチグリンは追い詰められると、藁を叩く者にカラスを呼び寄せるの。その羽根は炉で緑に燃えて、今夜の焚き火に三枚いるのよ。畑で戦いに加わって、{playerName}、カラスから羽根をむしってきて。',
+  'entities.quests.q_gourdlight_daily_feathers.completion':
+    '月のない畑みたいに真っ黒で、もう煙の匂いがする。焚き火が見ものになるわ。ありがとう。',
+  'entities.quests.q_gourdlight_daily_feathers.objectives.0.label': 'カラスの羽根',
+  'entities.quests.q_gourdlight_daily_baskets.title': 'ご近所へのかご',
+  'entities.quests.q_gourdlight_daily_baskets.text':
+    'ゴードライトの宵には毎年、町ごとに古い友達へお菓子のかごを詰めるの。でも膝がもう昔ほどじゃなくてね。代わりに届けて、{playerName}。イーストブルックのCook Marlow、フェンブリッジの薬草師Yara、そしてハイウォッチのLoremaster Caddisへ。',
+  'entities.quests.q_gourdlight_daily_baskets.completion':
+    '三つとも届いたのね。Marlowは泣いたって聞いたわ。あの人はいつも泣くの。はい、あなたにも一かご。',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.0.label': 'Cook Marlowに届けたかご',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.1.label': '薬草師Yaraに届けたかご',
+  'entities.quests.q_gourdlight_daily_baskets.objectives.2.label': 'Loremaster Caddisに届けたかご',
+  'seasonal.boo.row': 'わっ！',
+  'seasonal.boo.rowAria': '{name}の前に飛び出して「わっ！」と叫ぶ',
+  'seasonal.boo.needsCostume':
+    'まず仮装をすること：仮装の薬、コウモリかガイコツのいたずら、藁人形のお守り、彫りカボチャの頭、またはぐつぐつ緑の大鍋のゴブリンになるひと口。',
+  'seasonal.boo.frightenedHint': '{name}はさっきの驚きでまだびくびくしている。別の人を探そう。',
+  'seasonal.boo.landed':
+    '{name}の前に飛び出して「わっ！」と叫んだ！悲鳴を上げて、持ち物を落としそうになった。',
+  'seasonal.boo.flash': 'わっ！{name}が驚いた！',
+  'seasonal.boo.noCostume': '仮装なしでは、{name}は笑うだけだ。まず仮装をしよう。',
+  'seasonal.boo.already': '{name}は今日はもう十分に驚かされた。',
+  'seasonal.boo.notOnErrand': '今日はヘスターから誰かを驚かせる頼みを受けていない。',
+  'entities.items.prankers_pumpkin.name': 'いたずら者のカボチャ',
+  'entities.items.wanderwisp_lantern.name': 'さまよう鬼火のランタン',
+  'entities.items.sack_of_startled_bats.name': '驚いたコウモリの袋',
+  'entities.items.murmurwick_candle.name': 'ささやき芯のろうそく',
+  'seasonal.itemUse.toyPrank':
+    '使用：{range}ヤード以内の見えている別のプレイヤーに投げつける。相手の頭が{seconds}秒間、光るジャック・オー・ランタンになり、相手は右クリックで外せる。どちらも戦闘中は使えず、ステルス中も使えない。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。',
+  'seasonal.itemUse.toyLantern':
+    '使用：目の前にランタンを置く。小さな幽霊が{seconds}秒間、あなたの周りを回る。戦闘中とステルス中は使えない。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。',
+  'seasonal.itemUse.toyBats':
+    '使用：袋を開ける。キーキー鳴くコウモリの群れが飛び出し、{seconds}秒間あなたの周りに散っていく。戦闘中とステルス中は使えない。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。',
+  'seasonal.toy.prank': 'カボチャを投げた。{name}に命中してべちゃっと割れた！',
+  'seasonal.toy.lantern': 'ランタンを置くと、小さな幽霊がふわりと出てきて付き添ってくれる。',
+  'seasonal.toy.bats': '袋を開けると、驚いたコウモリの群れが飛び出した！',
+  'seasonal.toy.pranked':
+    '{name}があなたの頭にカボチャをぶつけた！右クリックで外すか、堂々とかぶっていよう。',
+  'seasonal.toy.prankedFlash': '{name}のいたずら！',
+  'seasonal.toy.prankNeedsPlayer': 'カボチャは戦闘中でない別のプレイヤーにしか当たらない。',
+  'seasonal.toy.hidden': 'まず物陰から出よう。おもちゃを使えば居場所がばれてしまう。',
+  'entities.items.gurglegreen_cauldron.name': 'ぐつぐつ緑の大鍋',
+  'seasonal.itemUse.toyCandleShadows':
+    '使用：目の前でろうそくを灯す。{seconds}秒間、炎が猫、コウモリ、魔女の踊る影を周りの地面に映し、近くにいる全員に見える。戦闘中とステルス中は使えない。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。',
+  'seasonal.itemUse.toyCauldron':
+    '使用：目の前にぐつぐつ煮える大きな大鍋を置く。大鍋は{standing}秒間そこにあり、飲んだプレイヤーは誰でも緑の泡に包まれ、{seconds}秒間ゴブリンの姿になる（着ている仮装は解ける）。置くことも飲むことも、戦闘中とステルス中はできず、戦闘に入るとゴブリンの姿は解ける。消費されない：{cooldown}秒後に再使用できる。ゴードライトの宵の間のみ。終わるとバッグから消える。見た目のみ。',
+  'seasonal.itemUse.broomSources':
+    'ヘスター・ゴードウィックからエンバーウーブンの藁束{count}個で購入する。まれに、戦利品を受け取った日にオールド・サッチグリンが落とすこともある。乗るには騎乗スキルが必要。ゴードライトの宵の間だけ存在し、イベントが終わると藁になって崩れる。',
+  'seasonal.toy.candleShadows': 'ろうそくを灯すと、炎の周りで影が踊り始めた。',
+  'seasonal.toy.cauldron': '大鍋を置くと、ぐつぐつと泡立ち始めた。',
+  'seasonal.toy.cauldronDrink': '大鍋の中身を飲むと、緑の泡に包まれてゴブリンの姿に変わった！',
+  'hudChrome.worldBoss.sleepUntilNightfall': '{name}は日が暮れるまで眠っている。',
+  'hudChrome.auraEffect.slumberNight': '日が暮れるまで、生気なく柱に吊るされている。攻撃できない。',
+  'seasonal.thatchgrin.poleBound': '柱縛り',
+  'seasonal.thatchgrin.wakeYell': '夜が畑に降りたぞ！ わしの畑を歩くのは誰だ？',
+  'seasonal.thatchgrin.sleepYell': '日が昇った。柱に戻って、また見張りだ。',
+  'seasonal.pumpkins.progress': '{label}：{current}/{total}',
 };

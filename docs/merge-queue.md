@@ -58,7 +58,8 @@ automatically instead of by hand.
   re-merge of the base: base movement is the queue's job now.
 - The queue gives a candidate **90 minutes** for its checks to report
   (`check_response_timeout_minutes` on the merge_queue rule; grouping is
-  ALLGREEN, and it builds at most 2 entries at a time). That value is the
+  ALLGREEN, and it builds at most 4 entries at a time with a 2 minute
+  batch wait). That value is the
   ceiling every job bound has to fit under, so keep this invariant true when
   resizing any bound: the `changes` bound, plus the largest REQUIRED job
   bound, plus runner-acquisition slack (which `timeout-minutes` does not count

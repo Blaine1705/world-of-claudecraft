@@ -399,6 +399,17 @@ const tiers: [string, boolean][] = [
 ];
 
 describe('character ClipMaps match the shipped GLBs', () => {
+  it('binds the priest Void Rupture release to an animated stock rig clip', () => {
+    const priest = VISUALS.player_priest;
+    const clip = priest.clips.attackByAbility?.void_rupture;
+    expect(clip).toBe('Woc_Cast_Shoot');
+    expect(loadedClipNames(priest, true, 'player_priest').has(clip!)).toBe(true);
+    const targets = priest.animUrls
+      ?.map((url) => clipTargetsOf(url).get(clip!))
+      .find((names) => names?.size);
+    expect(targets?.size).toBeGreaterThan(0);
+    expect([...targets!].some((name) => nodeNamesOf(priest.url).has(name))).toBe(true);
+  });
   it('covers every visual key in the manifest', () => {
     expect(rigs.length).toBeGreaterThan(50);
     expect(rigs.length).toBe(Object.keys(VISUALS).length - CLIPLESS_RIGS.size);

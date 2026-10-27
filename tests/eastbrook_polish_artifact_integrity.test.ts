@@ -1377,6 +1377,7 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
+  // Re-minted for Gourdlight Eve (feature/halloween-event): the seasonal decor's renderer wiring moved the renderer leaf, and again for its candle-light registry, for its field boss's effects layer, for its phase 3 rain and broom, for the Haunted Pumpkin hunt's renderer hooks, and for the polish pass's scarecrow audio sink. No capture was retaken.
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
   // Re-minted for the release/v0.44.0 merge into the WebGL context restore. No capture was retaken.
@@ -1433,7 +1434,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
   // Re-minted for the one-colour market canopies on the current integration base.
   // No capture was retaken.
-  '4466561ebe777e344dfef52fa751ea69af1b8f973c6dcb1e0e8b6db6ddcf326b';
+  // Re-minted for Low-tier outdoor night light grading in renderer.ts merged over release/v0.45.3.
+  // No capture was retaken.
+  '026d82d080ba1a60519879800df499ed038a1a6dbd7e1415a74cd5459e1c1533';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Studio town-dressing promotion: eastbrook_town.ts stands its micro batch
   // down under promotedScenery.authoredTownDressing. No capture was retaken.
@@ -1487,7 +1490,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // placements share renderer.ts (remint_polish_provenance.mjs; no capture retaken).
   // Re-minted for the one-colour market canopies on the current integration base.
   // No capture was retaken.
-  'a74dec3c70b5e365354324851b7f9e458973b3c964b119b65ff6a1bf45bfa596';
+  // Re-minted for Low-tier outdoor night light grading in renderer.ts merged over release/v0.45.3.
+  // No capture was retaken.
+  '226ef4c9e6962d8c8178bb76993eab7e200076e7c848e6ba76300410e1fa07e4';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2892,7 +2897,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // LAST again over the re-swept evidence. No capture was retaken.
       // One-colour market canopies on the current integration base: recomputed
       // from the swept evidence. No capture was retaken.
-    ).toBe('2441702873a5a0fbb302a99c26eed732f5755a667abeded533c38f92efbd32ce');
+      // Low-tier outdoor night light grading in renderer.ts merged over
+      // release/v0.45.3: recomputed from the swept evidence. No capture was retaken.
+    ).toBe('e58b234300b60d1252d1eb5e043071936adfc3ca961704332d8da166f6635af3');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
