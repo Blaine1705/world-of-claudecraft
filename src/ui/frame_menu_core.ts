@@ -40,6 +40,7 @@ export function frameMenuGroup(id: string): (typeof FRAME_MENU_GROUPS)[number][0
       'procOverlay',
       'doomMeter',
       'paladinDevotion',
+      'priestCharge',
     ].includes(id)
   )
     return 'combat';
