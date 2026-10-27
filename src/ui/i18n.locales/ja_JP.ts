@@ -25676,4 +25676,5 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'seasonal.thatchgrin.poleBound': '柱縛り',
   'seasonal.thatchgrin.wakeYell': '夜が畑に降りたぞ！ わしの畑を歩くのは誰だ？',
   'seasonal.thatchgrin.sleepYell': '日が昇った。柱に戻って、また見張りだ。',
+  'seasonal.pumpkins.progress': '{label}：{current}/{total}',
 };

@@ -1038,14 +1038,14 @@ export const sv_SE: EnTranslations = {
       "fateThreadsSentenceReady": "Tre Ödestrådar: Dom kan förbruka dem för 18% ökad skada."
     },
     "priest": {
-      "gloomtitheLabel": "Gloomtithe",
-      "bombLabel": "Tithe Bomb",
-      "gloomtitheStatus": "{value} of {max} Gloomtithe",
-      "bombStatus": "{value} of {max} Tithe Bomb charges",
-      "bombReady": "Ready",
+      "gloomtitheLabel": "Skymningstionde",
+      "bombLabel": "Tiondebomb",
+      "gloomtitheStatus": "{value} av {max} Skymningstionde",
+      "bombStatus": "{value} av {max} laddningar av Tiondebomb",
+      "bombReady": "Redo",
       "chargeCount": "{value} / {max}",
-      "gloomtitheTooltip": "Gloomtithe: up to 5 spendable charges. Void Rupture consumes 3; Vampiric Touch consumes 2 for 30% more damage; Call Tithefiend consumes your bank. Generating charges also fills Tithe Bomb, even while this bank is full.",
-      "bombTooltip": "Tithe Bomb: generate 20 Gloomtithe to prepare one bomb. Spending Gloomtithe does not add progress. Progress lasts between fights. Dying or starting a raid boss resets it. A completed cast consumes the bomb; cancelling keeps it."
+      "gloomtitheTooltip": "Skymningstionde: upp till 5 laddningar att spendera. Tomrumsbristning förbrukar 3; Vampyrberöring förbrukar 2 för 30% mer skada; Frammana tiondedemon förbrukar hela ditt förråd. Att generera laddningar fyller även Tiondebomb, också när förrådet är fullt.",
+      "bombTooltip": "Tiondebomb: generera 20 Skymningstionde för att förbereda en bomb. Att spendera Skymningstionde ger inga framsteg. Framsteg sparas mellan strider. De återställs när du dör eller inleder en raidbossstrid. En slutförd besvärjelse förbrukar bomben; avbryter du den behålls bomben."
     },
     "procOverlay": {
       "soulFragmentsMeter": "Själfragment",
@@ -2600,7 +2600,7 @@ export const sv_SE: EnTranslations = {
       "name_lantern_hall_destrier": "Lykthallens stridshäst",
       "name_chimeglass_tortoise": "Tolliver klockglaset",
       "name_rickshaw_mount": "Benbunden Rickshaw",
-      "name_emberbristle_broom": "Emberbristle Broom",
+      "name_emberbristle_broom": "Glödborstkvast",
       "name_wobbles_slime": "Slemmet Vickis",
       "name_nightwing_chimera": "Nattvingad chimära",
       "desc_valorsteed": "En tålig, stadig häst med lädersadel.",
@@ -2625,7 +2625,7 @@ export const sv_SE: EnTranslations = {
       "desc_nightwing_chimera": "En tvåhövdad skymningswyvern från de uråldriga grenarna, vilande på klobeklädda bakben och glidande över marken på vingar ristade med arkana tecken.",
       "desc_chimeglass_tortoise": "En saltplattsköldpadda som har gått ur tre generationer husvagnar. Tinkers malde honom glasögon från stormglas och hängde en bronsklocka i hans hals, så vägen hör honom långt innan den ser honom.",
       "desc_rickshaw_mount": "En skramlande benkärra med en benig hantlangare fastspänd vid skalmarna, som drar dig fram i språngmarsch.",
-      "desc_emberbristle_broom": "A harvest broom bound with orange ribbon that hovers a hand above the ground, shedding embers from its bristles. A permanent reward from Gourdlight Eve."
+      "desc_emberbristle_broom": "En skördekvast med orange band som svävar en handsbredd över marken och fäller glöd från borsten. En permanent belöning från Pumplyktornas afton."
     },
     "mountTraining": {
       "mountPrompt": "Tryck på {key} för att sitta upp på övnings-Tapperhetshästen.",
@@ -4675,9 +4675,9 @@ export const sv_SE: EnTranslations = {
     },
     "auraEffect": {
       "gourdlight": {
-        "thatchbound": "Old Thatchgrin pulls your strings. You cannot act: you are walked to your nearest ally and strike them every {every} sec for {min} to {max} damage (up to {mult} times as much against a level {level} ally). Ends early when you take damage equal to {pct}% of your maximum health, or when an ally dispels it (Magic)."
+        "thatchbound": "Gamle Halmflin drar i dina trådar. Du kan inte agera: du förs till din närmaste allierade och slår denne var {every} sek för {min} till {max} skada (upp till {mult} gånger så mycket mot en allierad på nivå {level}). Avslutas i förtid när du tar skada motsvarande {pct}% av din maximala hälsa, eller när en allierad skingrar effekten (magi)."
       },
-      "stilledMindCrit": "Your next Mindfracture or Void Rupture is a guaranteed critical strike if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the bonus.",
+      "stilledMindCrit": "Din nästa Sinnessplittring eller Tomrumsbristning ger garanterat en kritisk träff om den träffar. Andra besvärjelser förbrukar inte bonusen. Tomrumsbristning förbrukar fortfarande 3 laddningar av Skymningstionde. En motstådd besvärjelse förbrukar bonusen.",
       "wildheart": {
         "packBond": "Tar {pct}% mindre skada medan dess partner står nära. Dra isär bestmästaren och hans jaguar för att bryta effekten.",
         "packBondFury": "Gör {pct}% mer skada medan dess partner står nära.",
@@ -4781,7 +4781,7 @@ export const sv_SE: EnTranslations = {
       "spellHaste": "Ökar besvärjelsehastighet med {pct}%",
       "sated": "Kan inte dra nytta av ännu en grupphastighetsvåg",
       "cauterizeFatigue": "Bränning kan inte förhindra ännu ett dödligt slag",
-      "seasonalCosmetic": "Cosmetic only: no effect on combat",
+      "seasonalCosmetic": "Endast kosmetiskt: påverkar inte strid",
       "castShield": "Kastningar kan inte avbrytas eller få pushback av skada",
       "dmgDone": "Ökar orsakad skada med {pct}%",
       "dmgDoneReduce": "Minskar orsakad skada med {pct}%",
@@ -4929,7 +4929,7 @@ export const sv_SE: EnTranslations = {
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "damageReduction": "Minskar all inkommande skada med {pct}%",
       "slumber": "Sover till gryningen. Kan inte anfallas och vaknar inte för någon.",
-      "slumberNight": "Hangs lifeless on his pole until nightfall. Cannot be attacked.",
+      "slumberNight": "Hänger livlös på sin påle tills mörkret faller. Kan inte attackeras.",
       "guardianWard": "Nästa dödliga fiendeträff återger dig {pct}% av dina livspunkter i stället",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
@@ -5010,7 +5010,7 @@ export const sv_SE: EnTranslations = {
       "spawn": "{name} reser sig över {zone}!",
       "wake": "{name} vaknar över {zone}!",
       "sleep": "{name} sover till gryningen.",
-      "sleepUntilNightfall": "{name} sleeps until nightfall."
+      "sleepUntilNightfall": "{name} sover tills mörkret faller."
     },
     "auth": {
       "appleLoginCta": "Fortsätt med Apple",
@@ -8274,103 +8274,103 @@ export const sv_SE: EnTranslations = {
   },
   "seasonal": {
     "pumpkins": {
-      "name": "Haunted Pumpkin",
-      "title": "Haunted Pumpkins",
-      "world": "World",
+      "name": "Hemsökt pumpa",
+      "title": "Hemsökta pumpor",
+      "world": "Världen",
       "progress": "{label}: {current}/{total}",
-      "found": "You light a Haunted Pumpkin in {zone}: {count}/{total}. Gourdlight Sweets received: {sweets}.",
-      "flash": "Haunted Pumpkin found! {count}/{total}"
+      "found": "Du tänder en Hemsökt pumpa i {zone}: {count}/{total}. Mottaget Pumplyktegodis: {sweets}.",
+      "flash": "Hemsökt pumpa hittad! {count}/{total}"
     },
     "event": {
       "gourdlight_eve": {
-        "name": "Gourdlight Eve"
+        "name": "Pumplyktornas afton"
       }
     },
     "trickOrTreat": {
-      "row": "Trick or treat!",
-      "rowAria": "Say trick or treat to {name}",
-      "knockedHint": "You already knocked here today. The door opens again after the daily reset.",
-      "treat": "{name} hands you a treat.",
-      "trick": "{name} plays a trick on you: {trick}!",
-      "alreadyKnocked": "You already trick-or-treated {name} today.",
-      "notActive": "Gourdlight Eve is not running right now.",
-      "tooFar": "Step closer to knock.",
+      "row": "Bus eller godis!",
+      "rowAria": "Säg bus eller godis till {name}",
+      "knockedHint": "Du har redan knackat här i dag. Dörren öppnas igen efter den dagliga återställningen.",
+      "treat": "{name} ger dig en sötsak.",
+      "trick": "{name} busar med dig: {trick}!",
+      "alreadyKnocked": "Du har redan gått bus eller godis hos {name} i dag.",
+      "notActive": "Pumplyktornas afton pågår inte just nu.",
+      "tooFar": "Gå närmare för att knacka.",
       "treatFlash": {
-        "one": "Treat! {count} Gourdlight Sweet",
-        "few": "Treat! {count} Gourdlight Sweets",
-        "many": "Treat! {count} Gourdlight Sweets",
-        "other": "Treat! {count} Gourdlight Sweets"
+        "one": "Godis! {count} Pumplyktegodis",
+        "few": "Godis! {count} Pumplyktegodisar",
+        "many": "Godis! {count} Pumplyktegodisar",
+        "other": "Godis! {count} Pumplyktegodisar"
       },
-      "trickFlash": "Trick! {trick}"
+      "trickFlash": "Bus! {trick}"
     },
     "tricks": {
-      "gourdlight_trick_bat": "Batty",
-      "gourdlight_trick_skeleton": "Rattled Bones",
-      "gourdlight_trick_fumes": "Green Fumes",
-      "gourdlight_trick_strawling": "Strawling Guise",
-      "gourdlight_costume_skeleton": "Skeleton Costume",
-      "gourdlight_costume_ghost": "Ghost Costume",
-      "gourdlight_costume_bat": "Bat Costume"
+      "gourdlight_trick_bat": "Fladdertokig",
+      "gourdlight_trick_skeleton": "Rasslande ben",
+      "gourdlight_trick_fumes": "Gröna ångor",
+      "gourdlight_trick_strawling": "Halmvätteskepnad",
+      "gourdlight_costume_skeleton": "Skelettdräkt",
+      "gourdlight_costume_ghost": "Spökdräkt",
+      "gourdlight_costume_bat": "Fladdermusdräkt"
     },
     "pumpkinHead": {
-      "on": "You put on the Carved Pumpkin Head.",
-      "off": "You take off the Carved Pumpkin Head."
+      "on": "Du tar på dig Snidat pumpahuvud.",
+      "off": "Du tar av dig Snidat pumpahuvud."
     },
-    "jarTrick": "The jar pops open: {trick}!",
-    "guise": "The charm crackles and the straw climbs over you: {trick}!",
-    "costume": "You drink the draught and change: {trick}!",
-    "titleGranted": "You read the writ. New title earned: {title}.",
-    "titleKnown": "You already hold that title, so you keep the writ.",
-    "boundItemGone": "Gourdlight Eve is over, and your {item} crumbles back into straw.",
+    "jarTrick": "Burken öppnas med en smäll: {trick}!",
+    "guise": "Amuletten sprakar och halmen klättrar över dig: {trick}!",
+    "costume": "Du dricker drycken och förvandlas: {trick}!",
+    "titleGranted": "Du läser brevet. Ny titel upplåst: {title}.",
+    "titleKnown": "Du har redan den titeln, så du behåller brevet.",
+    "boundItemGone": "Pumplyktornas afton är över och din {item} faller sönder till halm igen.",
     "itemUse": {
-      "pumpkinHead": "Use: Put on or take off a carved pumpkin lit from inside, worn over your helmet. Cosmetic.",
-      "trickJar": "Use: Plays a random harmless trick on you for a few seconds. Cosmetic.",
-      "pouch": "Use: Open it to receive {count} Gourdlight Sweets.",
-      "strawlingCharm": "Use: Become one of Old Thatchgrin's strawlings for {seconds} seconds. Not in combat. Never consumed. Cosmetic.",
-      "sweet": "Earned by trick-or-treating during Gourdlight Eve. Hester Gourdwick trades cosmetics for them at her stalls in Eastbrook, Fenbridge and Highwatch.",
-      "costumeSkeleton": "Use: Turn into a rattling skeleton for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Cosmetic.",
-      "costumeGhost": "Use: Turn into a drifting ghost for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Cosmetic.",
-      "costumeBat": "Use: Turn into a flapping bat for {minutes} minutes. Consumed. Not usable in combat, and entering combat ends it. Cosmetic.",
-      "toyPrank": "Use: Throw it at another visible player within {range} yards. Their head becomes a glowing jack-o'-lantern for {seconds} seconds, and they can right-click it off. Neither of you can be in combat, and you cannot be stealthed. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
-      "toyLantern": "Use: Set the lantern down in front of you. A small ghost circles you for {seconds} seconds. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
-      "toyBats": "Use: Open the sack. A squeaking swarm of bats bursts out and scatters around you for {seconds} seconds. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
-      "toyCandleShadows": "Use: Light the candle in front of you. For {seconds} seconds its flames throw dancing shadows of a cat, a bat and a witch onto the ground around it, for everyone nearby to see. Not usable in combat or while stealthed. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
-      "toyCauldron": "Use: Set a big bubbling cauldron down in front of you. It stands for {standing} seconds, and any player who drinks from it bursts in green bubbles and turns into a goblin for {seconds} seconds, replacing any costume they wear. Neither setting it down nor drinking works in combat or while stealthed, and entering combat ends the goblin form. Never consumed: usable again after {cooldown} seconds. Kept permanently and usable year-round. Cosmetic.",
-      "titleWrit": "Use: Earn the title {title} for this character, worn from the Book of Deeds. Consumed. Kept if you already hold the title.",
-      "broomSources": "Bought from Hester Gourdwick for {count} Emberwoven Sheaves, or, rarely, dropped by Old Thatchgrin on a day you loot him. Riding it requires the riding skill. Kept permanently and rideable year-round.",
-      "sheaf": "Old Thatchgrin gives one each day you loot him, until you own the Emberbristle Broom. Hester Gourdwick trades {count} for the broom at her stalls in Eastbrook, Fenbridge and Highwatch. Unspent sheaves are kept for the next Gourdlight Eve."
+      "pumpkinHead": "Använd: Ta på eller av en snidad pumpa som lyser inifrån och bärs över hjälmen. Kosmetiskt.",
+      "trickJar": "Använd: Utsätter dig för ett slumpmässigt, harmlöst bus i några sekunder. Kosmetiskt.",
+      "pouch": "Använd: Öppna för att få {count} Pumplyktegodis.",
+      "strawlingCharm": "Använd: Bli en av Gamle Halmflins halmvättar i {seconds} sekunder. Inte i strid. Förbrukas aldrig. Kosmetiskt.",
+      "sweet": "Fås genom bus eller godis under Pumplyktornas afton. Hester Pumpveke byter dem mot kosmetiska föremål vid sina stånd i Östbäck, Kärrbron och Högvakten.",
+      "costumeSkeleton": "Använd: Förvandlas till ett rasslande skelett i {minutes} minuter. Förbrukas. Kan inte användas i strid och avbryts när du går in i strid. Kosmetiskt.",
+      "costumeGhost": "Använd: Förvandlas till ett svävande spöke i {minutes} minuter. Förbrukas. Kan inte användas i strid och avbryts när du går in i strid. Kosmetiskt.",
+      "costumeBat": "Använd: Förvandlas till en flaxande fladdermus i {minutes} minuter. Förbrukas. Kan inte användas i strid och avbryts när du går in i strid. Kosmetiskt.",
+      "toyPrank": "Använd: Kasta den på en annan synlig spelare inom {range} yards. Spelarens huvud blir en lysande pumplykta i {seconds} sekunder och kan tas av med högerklick. Ingen av er får vara i strid, och du får inte smyga. Förbrukas aldrig: kan användas igen efter {cooldown} sekunder. Behålls permanent och kan användas året runt. Kosmetiskt.",
+      "toyLantern": "Använd: Ställ lyktan framför dig. Ett litet spöke kretsar runt dig i {seconds} sekunder. Kan inte användas i strid eller under smygande. Förbrukas aldrig: kan användas igen efter {cooldown} sekunder. Behålls permanent och kan användas året runt. Kosmetiskt.",
+      "toyBats": "Använd: Öppna säcken. En pipande svärm av fladdermöss far ut och sprids runt dig i {seconds} sekunder. Kan inte användas i strid eller under smygande. Förbrukas aldrig: kan användas igen efter {cooldown} sekunder. Behålls permanent och kan användas året runt. Kosmetiskt.",
+      "toyCandleShadows": "Använd: Tänd ljuset framför dig. I {seconds} sekunder kastar lågorna dansande skuggor av en katt, en fladdermus och en häxa på marken omkring det, synliga för alla i närheten. Kan inte användas i strid eller under smygande. Förbrukas aldrig: kan användas igen efter {cooldown} sekunder. Behålls permanent och kan användas året runt. Kosmetiskt.",
+      "toyCauldron": "Använd: Ställ en stor bubblande kittel framför dig. Den står i {standing} sekunder. Spelare som dricker ur den omsluts av gröna bubblor och förvandlas till gobliner i {seconds} sekunder, vilket ersätter deras dräkt. Det går varken att ställa ut den eller dricka i strid eller under smygande, och goblinformen upphör vid strid. Förbrukas aldrig: kan användas igen efter {cooldown} sekunder. Behålls permanent och kan användas året runt. Kosmetiskt.",
+      "titleWrit": "Använd: Lås upp titeln {title} för den här karaktären. Den väljs i Bedrifternas bok. Förbrukas. Behålls om du redan har titeln.",
+      "broomSources": "Köps av Hester Pumpveke för {count} Glödvävda kärvar eller släpps, i sällsynta fall, av Gamle Halmflin en dag du plundrar honom. Kräver ridfärdighet för att användas som riddjur. Behålls permanent och går att rida året runt.",
+      "sheaf": "Gamle Halmflin ger en varje dag du plundrar honom, tills du äger Glödborstkvasten. Hester Pumpveke byter {count} mot kvasten vid sina stånd i Östbäck, Kärrbron och Högvakten. Oanvända kärvar sparas till nästa Pumplyktornas afton."
     },
     "toy": {
-      "prank": "You throw the pumpkin. It splats onto {name}!",
-      "lantern": "You set the lantern down, and a little ghost drifts out to keep you company.",
-      "bats": "You open the sack, and a swarm of startled bats bursts out!",
-      "candleShadows": "You light the candle, and shadows begin to dance around its flames.",
-      "cauldron": "You set the cauldron down, and it starts to bubble.",
-      "cauldronDrink": "You drink from the cauldron, burst in green bubbles and turn into a goblin!",
-      "pranked": "{name} splats a pumpkin on your head! Right-click it off, or wear it proudly.",
-      "prankedFlash": "Pranked by {name}!",
-      "prankNeedsPlayer": "The pumpkin only splats on another player who is not in combat.",
-      "hidden": "Step out of the shadows first: a toy would give you away."
+      "prank": "Du kastar pumpan. Den smetas ut på {name}!",
+      "lantern": "Du ställer ner lyktan och ett litet spöke svävar ut för att hålla dig sällskap.",
+      "bats": "Du öppnar säcken och en svärm av skrämda fladdermöss far ut!",
+      "candleShadows": "Du tänder ljuset och skuggor börjar dansa runt lågorna.",
+      "cauldron": "Du ställer ner kitteln och den börjar bubbla.",
+      "cauldronDrink": "Du dricker ur kitteln, omsluts av gröna bubblor och blir en goblin!",
+      "pranked": "{name} smetar ut en pumpa på ditt huvud! Högerklicka för att ta av den, eller bär den stolt.",
+      "prankedFlash": "Busad med av {name}!",
+      "prankNeedsPlayer": "Pumpan träffar bara en annan spelare som inte är i strid.",
+      "hidden": "Kliv ur skuggorna först: en leksak skulle avslöja dig."
     },
     "itemSource": {
-      "pumpkinHead": "Dropped by Old Thatchgrin, in his pumpkin field past Boar Meadow, the first time you loot him. No vendor sells it."
+      "pumpkinHead": "Släpps av Gamle Halmflin på hans pumpaåker bortom Vildsvinsängen första gången du plundrar honom. Ingen försäljare säljer det."
     },
     "boo": {
-      "row": "Boo!",
-      "rowAria": "Leap out at {name} and shout boo",
-      "needsCostume": "Put on a costume first: a costume draught, a bat or skeleton trick, the Strawling Charm, the Carved Pumpkin Head or a goblin sip from the Gurglegreen Cauldron.",
-      "frightenedHint": "{name} is still jumpy from your last fright. Find someone else.",
-      "landed": "You leap out at {name} with a BOO! They shriek and nearly drop everything.",
-      "flash": "BOO! {name} is frightened!",
-      "noCostume": "Without a costume, {name} only laughs at you. Put one on first.",
-      "already": "{name} has had enough frights for one day.",
-      "notOnErrand": "Hester has not asked you to frighten anyone today."
+      "row": "Bu!",
+      "rowAria": "Hoppa fram mot {name} och ropa bu",
+      "needsCostume": "Ta på dig en dräkt först: en dräktdryck, ett fladdermus- eller skelettbus, Halmvättens amulett, Snidat pumpahuvud eller en goblinklunk ur Grönbubbelkitteln.",
+      "frightenedHint": "{name} är fortfarande skärrad efter din förra skrämsel. Hitta någon annan.",
+      "landed": "Du hoppar fram mot {name} och ropar BU! Ett skrik hörs och allt är nära att tappas.",
+      "flash": "BU! {name} blir rädd!",
+      "noCostume": "Utan dräkt skrattar {name} bara åt dig. Ta på dig en först.",
+      "already": "{name} har fått nog av skrämsel för i dag.",
+      "notOnErrand": "Hester har inte bett dig skrämma någon i dag."
     },
     "tokenPrice": "{count} {item}",
     "thatchgrin": {
-      "poleBound": "Pole-Bound",
-      "wakeYell": "NIGHT falls on the patch! Who walks in MY field?",
-      "sleepYell": "Sun is up. Back on the post, back to watching."
+      "poleBound": "Bunden vid pålen",
+      "wakeYell": "NATTEN faller över åkern! Vem går på MITT fält?",
+      "sleepYell": "Solen är uppe. Tillbaka på pålen, tillbaka till vakten."
     }
   },
   "dungeonGuide": {
@@ -9667,7 +9667,7 @@ export const sv_SE: EnTranslations = {
       "framesGovernedTalkingHead": "Redigera ramar lossar också dialogpanelen, som bär en NPC: s talade linje medan den NPC är utom synhåll; den bär sitt namnchip medan den är lös.",
       "framesGovernedShardpike": "Redigera ramar låser även upp Skärvpiksfältet, den korta raden med uppdragsverktygshandlingar som visas bredvid dina handlingsfält bara medan du bär själva Skärvpiken; den har sin namnbricka medan den är upplåst så att du kan placera den före striden i stället för under den.",
       "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
-      "framesGovernedPriest": "Edit Frames also lets you move the Shadow priest's Gloomtithe and Tithe Bomb medallion.",
+      "framesGovernedPriest": "Redigera ramar låter dig också flytta skuggprästens medaljong för Skymningstionde och Tiondebomb.",
       "framesGovernedResourceAndHill": "Aktivera Koppla loss resursfältet på fliken Ramar så låser Redigera ramar även upp ditt resursfält. Då kan du placera mana, energi eller vrede separat var du vill. Resursfältets bredd och Resursfältets höjd på samma flik ändrar storleken. Redigera ramar låser även upp fältet för Kungens på kullen. Bakgrundens opacitet för Kungens på kullen på samma flik tonar ned panelen medan texten förblir tydlig.",
       "barsTitle": "Mätare, timer och stridstext",
       "barsBody": "Din besvärjelsemätare visas mitt på skärmen, precis ovanför dina handlingsfält, närhelst du kastar eller kanaliserar, och bär besvärjelsens namn och tiden som återstår. Ditt mål får en egen besvärjelsemätare på sin ram, så du kan se vad som kommer och svara på det.\n\nEn tunn svingmätare sitter under din besvärjelsemätare och fylls mellan dina vapensvingar, så en närstrids- eller distansanfallare kan se när nästa automatiska träff landar.\n\nDin erfarenhetsmätare löper i full bredd under dina handlingsfält, uppdelad i segment, med en ljusare sträcka som visar den vilade erfarenhet du har sparat.\n\nSimma under vatten så visas en blå andningsmätare högst upp på skärmen. Den tappas medan huvudet är under ytan, blinkar rött när den tar slut och du börjar drunkna, och fylls snabbt på igen så fort du dyker upp. Blanksteg simmar dig upp, och tangenten Simma ner, Ctrl som standard, tar dig djupare.\n\nSkada och läkning flyter upp över det de landade på som små siffror, så du kan läsa en strid utan att läsa text. Fliken Stridslogg i din chattruta håller den fullständiga skriftliga redogörelsen.",
@@ -10572,7 +10572,7 @@ export const sv_SE: EnTranslations = {
       "hillBodyRamp": "Varannan timme dyker en kulle upp i Drakländerna, Frostslöjans vidder eller Bärnstensfallet. Riket får en varning femton minuter i förväg och cirkeln markeras på öppen mark. Kullen är aktiv i trettio minuter. När du går in i den aktiva cirkeln aktiveras din flagga för världs-PvP enligt de vanliga nivåreglerna, även för raidmedlemmar. Gruppen med flest behöriga spelare i cirkeln tar kullen efter en minut med obruten majoritet; en ensam spelare räknas som en grupp på en, men raidmedlemmar och spelare under nivåkravet för PvP kan varken inta kullen eller tjäna Ära från den. Varje innehavare som står i cirkeln tjänar Ära i ökande takt. Utbetalningarna sker oftare och ökar snabbare, så att den totala Äran från det tidigare evenemanget på fyrtiofem minuter bevaras. När kullen byter innehavare börjar ökningen om från början. Din flagga förblir aktiv när du lämnar cirkeln; /pvp off använder den vanliga fördröjningen på fem minuter och kan inte slutföras på en aktiv kulle eller under strid. Kullens stapel visar kontroll, spelarantal och erövringsförlopp; /hill anger dess plats.",
       "hillBodyPause": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
       "hillBodyFlat": "En gång var tredje timme får hela riket vid en oförutsägbar tidpunkt veta att en kulle dyker upp i en av de nordliga zonerna om femton minuter. Dess cirkel markeras på öppen mark. Kullen står kvar i fyrtiofem minuter och försvinner sedan. Under tiden meddelas dess plats och grupperna med längst sammanlagd innehavstid var femte minut. Gruppen med flest spelare i cirkeln utmanar om kullen och tar den efter sammanlagt trettio sekunders numerärt övertag. En rivaliserande grupp pausar bara räknaren tills din grupp leder igen; den börjar om först när ingen levande medlem av din grupp finns kvar där inne. En ensam spelare räknas som en grupp på en person och behåller sin kulle när en grupp bildas, men raidmedlemmar räknas inte alls. Varje medlem i gruppen som håller kullen och står i cirkeln får lika mycket Ära varje minut, oavsett hur länge gruppen hållit den. En full grupp som håller kullen ostört under hela dess tid tjänar ungefär lika mycket som för tre segrar på slagfält. När kullen försvinner får alla som stått i cirkeln minst en minut under den ledande gruppens innehav och fortfarande tillhör gruppen en seger till PvP-raden i det veckovisa valvet, om gruppen med längst sammanlagd innehavstid hållit den i minst tio minuter. En stapel över fältet visar vem som håller den, antalet spelare på båda sidor och erövringsräknaren; /hill i chatten visar platsen.",
-      "hillBodyTwoHour": "Once every two hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the northern zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for thirty minutes, then falls, and every five minutes while it stands the realm is told where it is and which groups have held it longest. The party with the most players standing inside contests the hill, and after thirty seconds of majority the hill is theirs. A rival party walking in only pauses that count until yours leads again; it starts over only if nobody from your party is left alive inside. A lone player counts as a party of one and keeps a hill they hold when they form a party, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns the same Honor every minute, however long they have held it, so a full party holding an uncontested hill for its whole stand earns about as much as two battleground wins. When it falls, if the group that held it longest in total held it for at least ten minutes, everyone who stood inside for that group for at least a minute, and is still in that group, earns one win toward the PvP row of the Weekly Vault. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "hillBodyTwoHour": "En gång varannan timme, vid ett oförutsägbart ögonblick, får hela realmen veta att en kulle ska resa sig i en av de norra zonerna om femton minuter. Cirkeln där den ska stå markeras på öppen mark. När kullen reser sig står den i trettio minuter och sjunker sedan undan. Var femte minut medan den står får realmen veta var den finns och vilka grupper som hållit den längst. Gruppen med flest spelare inne i cirkeln tävlar om kullen, och efter trettio sekunders majoritet blir den deras. En rivaliserande grupp som går in pausar bara nedräkningen tills din grupp leder igen; den börjar om endast om ingen i din grupp längre är vid liv där inne. En ensam spelare räknas som en grupp på en och behåller sin kulle när en grupp bildas, men raidmedlemmar räknas inte alls. Medan en grupp håller kullen tjänar varje medlem som står inne lika mycket ära varje minut, oavsett hur länge de hållit den. En full grupp som håller kullen ostört under hela dess tid tjänar därför ungefär lika mycket som två segrar på slagfältet. När kullen sjunker undan får gruppen som hållit den längst sammanlagt en seger till PvP-raden i Veckovalvet, förutsatt att den hållit kullen i minst tio minuter. Segern går till alla som stått inne för den gruppen i minst en minut och fortfarande är med i den. En mätare över fältet visar vem som håller kullen, era antal mot deras och erövringstiden; /hill i chatten visar var den står.",
       "limitsBodyRaids": "Att besegra samma spelare igen och igen betalar mindre varje gång och snart ingenting, och din räkning mot den spelaren börjar bara igen ungefär en timme efter den första av dessa dödningar, så att läger en offer är aldrig värt väntan. Ett mål långt under din nivå betalar ingenting alls. Slagfält och Arenor kör sina egna regler medan du är inne i dem, och de betalar mer Ära än den öppna världen, så världens PvP är den långsammare vägen till samma leverantör. Raid tjänar ingenting från världsdödningar: en raid-medlem tar ingen Ära eller guld och krymper inte någon annans andel, så slå som ett parti för att bli betald."
     },
     "thornhollowPage": {
@@ -15314,7 +15314,7 @@ export const sv_SE: EnTranslations = {
       "accountSuspended": "Detta konto är avstängt till {date}.",
       "alreadyInWorld": "Karaktären är redan i världen.",
       "accountSessionLimit": "För många karaktärer på detta konto är redan i världen.",
-      "worldFightHold": "Another character on this account is still in the world after a fight. Try again in a few minutes.",
+      "worldFightHold": "En annan karaktär på det här kontot är fortfarande kvar i världen efter en strid. Försök igen om några minuter.",
       "takenOver": "Din karaktär togs över av en annan session.",
       "vaultMailRecovering": "Din kassaskatt-belönings-post återställs. Försök igen snart.",
       "renameBeforeEntering": "Denna karaktär måste byta namn innan den går in i världen.",
@@ -18176,16 +18176,16 @@ export const sv_SE: EnTranslations = {
         "description": "Kanaliserar i 3 sek och vållar {damage} Skuggskada varje sekund. Skadan ökar med Besvärjelsekraft."
       },
       "vampiric_touch": {
-        "name": "Vampiric Touch",
-        "description": "Deal {damage} Shadow damage over 15 sec, once every 3 sec. Damage increases with Spell Power and ticks can critically strike. Each tick shares healing equal to 20% of the health lost by the enemy among you and injured party members within 30 yards; in a raid, only your subgroup receives this healing. If you have at least 2 Gloomtithe charges, applying this effect consumes 2 to increase all its damage by 30%."
+        "name": "Vampyrberöring",
+        "description": "Orsaka {damage} skuggskada under 15 sek, en gång var 3:e sek. Skadan ökar med besvärjelsekraft och tick kan träffa kritiskt. Varje tick fördelar läkning motsvarande 20% av den hälsa fienden förlorar mellan dig och skadade gruppmedlemmar inom 30 yards; i en raid läks bara din undergrupp. Om du har minst 2 laddningar av Skymningstionde förbrukas 2 när effekten läggs på, vilket ökar all dess skada med 30%."
       },
       "void_rupture": {
-        "name": "Void Rupture",
-        "description": "Consume 3 Gloomtithe charges to rupture an enemy for {damage} Shadow damage. Damage increases with Spell Power and can critically strike. Requires 3 charges and consumes them even if resisted."
+        "name": "Tomrumsbristning",
+        "description": "Förbruka 3 laddningar av Skymningstionde för att slita upp en fiende och orsaka {damage} skuggskada. Skadan ökar med besvärjelsekraft och kan träffa kritiskt. Kräver 3 laddningar och förbrukar dem även om besvärjelsen motstås."
       },
       "spirit_bomb": {
-        "name": "Tithe Bomb",
-        "description": "Detonate a spirit bomb on an enemy, dealing {damage} Shadow damage to enemies within 8 yards of that target. Damage increases with Spell Power, can critically strike, and is reduced beyond 5 targets. Generate 20 Gloomtithe to prepare one bomb. Generation counts even while holding the maximum 5 Gloomtithe; spending charges is not required and adds no progress. Progress lasts between fights, up to one prepared bomb. Dying clears your progress and prepared bomb. Completing the cast consumes the prepared bomb, even if resisted. Cancellation or interruption preserves it. Starting a raid boss encounter clears your progress and prepared bomb. Cannot open a raid boss encounter with this spell."
+        "name": "Tiondebomb",
+        "description": "Detonera en andebomb på en fiende och orsaka {damage} skuggskada på fiender inom 8 yards från målet. Skadan ökar med besvärjelsekraft, kan träffa kritiskt och minskar över 5 mål. Generera 20 Skymningstionde för att förbereda en bomb. Generering räknas även när du har maximalt 5 Skymningstionde; du behöver inte spendera laddningar, och det ger inga framsteg. Framsteg sparas mellan strider, med högst en förberedd bomb. Döden tar bort dina framsteg och din förberedda bomb. Slutförd besvärjelse förbrukar bomben även om den motstås. Avbrott eller annullering bevarar den. Att inleda en raidbossstrid tar bort dina framsteg och din förberedda bomb. Besvärjelsen kan inte inleda en raidbossstrid."
       },
       "flash_heal": {
         "name": "Brådskande bön",
@@ -19021,7 +19021,7 @@ export const sv_SE: EnTranslations = {
       "inner_focus": {
         "name": "Stillat sinne",
         "description": "Gör er nästa prästbesvärjelse gratis och omöjlig att avbryta. Varar 60 sek.",
-        "specNote_shadow": "Also reserves a guaranteed critical strike for your next Mindfracture or Void Rupture within 60 sec, if it hits. Other spells do not consume this bonus. Void Rupture still consumes 3 Gloomtithe charges. A resisted cast consumes the critical strike bonus."
+        "specNote_shadow": "Reserverar också en garanterad kritisk träff för din nästa Sinnessplittring eller Tomrumsbristning inom 60 sek, om den träffar. Andra besvärjelser förbrukar inte bonusen. Tomrumsbristning förbrukar fortfarande 3 laddningar av Skymningstionde. En motstådd besvärjelse förbrukar bonusen till kritisk träff."
       },
       "innervate": {
         "name": "Livssav",
@@ -19219,7 +19219,7 @@ export const sv_SE: EnTranslations = {
       "choir_of_deliverance": {
         "name": "Befrielsens kör",
         "description": "Kanaliserar i 6 sek och läker gruppmedlemmar inom 30 meter för {damage} varannan sekund. Läkningen ökar med besvärjelsekraft.",
-        "specNote_shadow": "For 15 sec, share 20% of the health enemies lose to your Shadow damage as healing among injured party members within 30 yards, including yourself. In raids, only your subgroup is healed. Cast instantly and keep attacking in Shadowform. Absorbed damage and overkill do not add healing."
+        "specNote_shadow": "Under 15 sek fördelas 20% av den hälsa fiender förlorar av din skuggskada som läkning mellan skadade gruppmedlemmar inom 30 yards, inklusive dig själv. I raider läks bara din undergrupp. Besvärjelsen är omedelbar och du kan fortsätta attackera i Skymningsslöja. Absorberad skada och skada utöver återstående hälsa ger ingen läkning."
       },
       "bear_charge": {
         "name": "Bruinrusning",
@@ -24435,85 +24435,85 @@ export const sv_SE: EnTranslations = {
         "name": "Förtruppens hänge av läkning"
       },
       "gourdlight_sweet": {
-        "name": "Gourdlight Sweet"
+        "name": "Pumplyktegodis"
       },
       "gourdlight_treat_pouch": {
-        "name": "Gourdlight Treat Pouch"
+        "name": "Påse med pumplyktegodis"
       },
       "carved_pumpkin_head": {
-        "name": "Carved Pumpkin Head"
+        "name": "Snidat pumpahuvud"
       },
       "jar_of_mischief": {
-        "name": "Jar of Mischief"
+        "name": "Busburk"
       },
       "thatchgrin_sweet_sack": {
-        "name": "Thatchgrin's Sweet Sack"
+        "name": "Halmflins godissäck"
       },
       "strawling_charm": {
-        "name": "Strawling Charm"
+        "name": "Halmvättens amulett"
       },
       "rattlebone_draught": {
-        "name": "Rattlebone Draught"
+        "name": "Benrasseldryck"
       },
       "haunting_draught": {
-        "name": "Haunting Draught"
+        "name": "Spökdryck"
       },
       "batwing_draught": {
-        "name": "Fluttering Draught"
+        "name": "Fladderdryck"
       },
       "writ_of_the_gourdlit": {
-        "name": "Writ of the Gourdlit"
+        "name": "Pumplystes brev"
       },
       "writ_of_the_trickster": {
-        "name": "Writ of the Trickster"
+        "name": "Busmakarens brev"
       },
       "writ_of_the_hollow_grin": {
-        "name": "Writ of the Hollow Grin"
+        "name": "Hålflinets brev"
       },
       "reins_emberbristle_broom": {
-        "name": "Emberbristle Broom"
+        "name": "Glödborstkvast"
       },
       "hearthroot_toffee": {
-        "name": "Hearthroot Toffee"
+        "name": "Härdrotskola"
       },
       "gourdseed_brittle": {
-        "name": "Gourdseed Brittle"
+        "name": "Pumpafröknäck"
       },
       "crabapple_chew": {
-        "name": "Crabapple Chew"
+        "name": "Vildäppeltugg"
       },
       "owlwatch_fudge": {
-        "name": "Owlwatch Fudge"
+        "name": "Ugglevaktsfudge"
       },
       "lantern_mint_drop": {
-        "name": "Lantern Mint Drop"
+        "name": "Lyktmintkaramell"
       },
       "emberwoven_sheaf": {
-        "name": "Emberwoven Sheaf"
+        "name": "Glödvävd kärve"
       },
       "prankers_pumpkin": {
-        "name": "Pranker's Pumpkin"
+        "name": "Busmakarens pumpa"
       },
       "wanderwisp_lantern": {
-        "name": "Wanderwisp Lantern"
+        "name": "Vandrarlyktan"
       },
       "sack_of_startled_bats": {
-        "name": "Sack of Startled Bats"
+        "name": "Säck med skrämda fladdermöss"
       },
       "murmurwick_candle": {
-        "name": "Murmurwick Candle"
+        "name": "Viskvekeljus"
       },
       "gurglegreen_cauldron": {
-        "name": "Gurglegreen Cauldron"
+        "name": "Grönbubbelkittel"
       },
       "thatchgrin_patch_pumpkin": {
-        "name": "Patch Pumpkin"
+        "name": "Åkerpumpa"
       },
       "cursed_candle_stub": {
-        "name": "Cursed Candle Stub"
+        "name": "Förbannad ljusstump"
       },
       "gourdlight_crow_feather": {
-        "name": "Gourdlight Crow Feather"
+        "name": "Pumplyktekråkans fjäder"
       },
       "membership_staff": {
         "name": "Förändringens stav"
@@ -26072,16 +26072,16 @@ export const sv_SE: EnTranslations = {
         "name": "Halmförman"
       },
       "gourdlight_thatchgrin": {
-        "name": "Old Thatchgrin"
+        "name": "Gamle Halmflin"
       },
       "gourdlight_crow": {
-        "name": "Gourdlight Crow"
+        "name": "Pumplyktekråka"
       },
       "gourdlight_strawling": {
-        "name": "Strawling"
+        "name": "Halmvätte"
       },
       "gourdlight_swelling_gourd": {
-        "name": "Swelling Gourd"
+        "name": "Svällande pumpa"
       },
       "stable_horse": {
         "name": "Stallhäst"
@@ -27161,9 +27161,9 @@ export const sv_SE: EnTranslations = {
         "greeting": "Varje karta över detta träsk jag köpt har blivit fel inom en säsong. Vattnet flyttar stigarna och stigarna flyttar vattnet. Så jag ritar egna och sitter här där det är torrt medan bläcket torkar."
       },
       "gourdlight_keeper": {
-        "name": "Hester Gourdwick",
-        "title": "Gourdlight Keeper",
-        "greeting": "The gourds are lit and the lanterns are up, so it must be Gourdlight Eve. Knock on the doors of the townsfolk in Eastbrook, Fenbridge and Highwatch, and say the words: trick or treat. Most will hand you a sweet. A few will play a trick on you. Bring the sweets to me, at any of my stalls, and I will trade you something to wear."
+        "name": "Hester Pumpveke",
+        "title": "Pumplyktornas väktare",
+        "greeting": "Pumporna är tända och lyktorna upphängda, så det måste vara Pumplyktornas afton. Knacka på hos stadsborna i Östbäck, Kärrbron och Högvakten och säg orden: bus eller godis. De flesta ger dig en sötsak. Några busar med dig. Ta med godiset till mig vid något av mina stånd, så byter jag det mot något att ha på dig."
       },
       "reeve_ottoline": {
         "name": "Fogden Ottoline",
@@ -29800,84 +29800,84 @@ export const sv_SE: EnTranslations = {
         }
       },
       "q_gourdlight_rounds": {
-        "title": "Gourdlight Rounds",
-        "text": "Every Gourdlight Eve the children of the Vale make their rounds, and this year you are joining them, {playerName}. Knock on five doors in our towns, say the words, and see what you are given. Come back to me when you are done.",
-        "completion": "Five doors and you still have all your fingers. Here, a pouch of sweets for the walk home. Come back tomorrow, the doors open again.",
+        "title": "Pumplyktornas runda",
+        "text": "Varje Pumplyktornas afton går dalens barn sin runda, och i år följer du med, {playerName}. Knacka på fem dörrar i våra städer, säg orden och se vad du får. Kom tillbaka till mig när du är klar.",
+        "completion": "Fem dörrar, och du har alla fingrar kvar. Här, en godispåse till hemvägen. Kom tillbaka i morgon, då öppnas dörrarna igen.",
         "objectives": {
           "0": {
-            "label": "Doors knocked on"
+            "label": "Dörrar du knackat på"
           }
         }
       },
       "q_gourdlight_daily_patch": {
-        "title": "Pumpkins from the Patch",
-        "text": "Old Thatchgrin's patch past Boar Meadow is fat with pumpkins, and half of them have rolled out past his straw where a careful soul can reach them. Bring me five, {playerName}. Stay wide of the old scarecrow himself. He counts every one.",
-        "completion": "Five round ones, and not a bite out of any. That is pie for the whole Vale. Here, for your trouble.",
+        "title": "Pumpor från åkern",
+        "text": "Gamle Halmflins åker bortom Vildsvinsängen är full av pumpor, och hälften har rullat bortom hans halm där en försiktig själ kan nå dem. Hämta fem åt mig, {playerName}. Håll dig långt från den gamle fågelskrämman själv. Han räknar varenda en.",
+        "completion": "Fem runda, och inte en enda tugga ur någon. Det blir paj åt hela dalen. Här, för besväret.",
         "objectives": {
           "0": {
-            "label": "Patch Pumpkins"
+            "label": "Åkerpumpor"
           }
         }
       },
       "q_gourdlight_daily_boo": {
-        "title": "Boo!",
-        "text": "Nobody in these towns has had a proper fright in a year, {playerName}, and a Gourdlight Eve without one is just a cold night. Put on a costume, any of mine will do, or that pumpkin head if you have earned one. Then creep up on three of the townsfolk and give them a good loud BOO.",
-        "completion": "Three of them? I heard the cook drop a pan from across the square. Well done. Here is your share.",
+        "title": "Bu!",
+        "text": "Ingen i de här städerna har blivit ordentligt skrämd på ett år, {playerName}, och Pumplyktornas afton utan en skrämsel är bara en kall natt. Ta på dig en dräkt, vilken som helst av mina duger, eller det där pumpahuvudet om du har förtjänat det. Smyg sedan fram till tre stadsbor och ropa ett riktigt högt BU.",
+        "completion": "Tre stycken? Jag hörde kocken tappa en stekpanna tvärs över torget. Bra gjort. Här är din del.",
         "objectives": {
           "0": {
-            "label": "Townsfolk frightened"
+            "label": "Skrämda stadsbor"
           }
         }
       },
       "q_gourdlight_daily_wicks": {
-        "title": "Wicked Wicks",
-        "text": "Someone has been setting candles with green flames at the feet of our lamp posts. They burn without melting and they whisper when you turn your back. Snuff six of them for me, {playerName}, in any of the three towns, and bring me the stubs.",
-        "completion": "Six stubs, cold as frost. Whoever lit them will have to try harder than that. Take this, and wash your hands.",
+        "title": "Onda vekar",
+        "text": "Någon ställer ljus med gröna lågor vid foten av våra lyktstolpar. De brinner utan att smälta och viskar när du vänder ryggen till. Släck sex åt mig, {playerName}, i någon av de tre städerna och ta med stumparna.",
+        "completion": "Sex stumpar, kalla som frost. Den som tände dem får försöka lite hårdare. Ta det här och tvätta händerna.",
         "objectives": {
           "0": {
-            "label": "Cursed candles snuffed"
+            "label": "Släckta förbannade ljus"
           }
         }
       },
       "q_gourdlight_daily_towns": {
-        "title": "A Door in Every Town",
-        "text": "The children say a true Gourdlight walker knocks in every town before the night is out. Prove them right, {playerName}. Trick or treat at one door in Eastbrook, one in Fenbridge and one in Highwatch. The lanterns on the roads will light your way.",
-        "completion": "Three towns in one night! Your boots have earned this more than you have.",
+        "title": "En dörr i varje stad",
+        "text": "Barnen säger att en äkta pumplyktevandrare knackar på i varje stad innan natten är över. Visa att de har rätt, {playerName}. Gå bus eller godis vid en dörr i Östbäck, en i Kärrbron och en i Högvakten. Lyktorna längs vägarna lyser upp din väg.",
+        "completion": "Tre städer på en natt! Dina stövlar har förtjänat det här mer än du.",
         "objectives": {
           "0": {
-            "label": "A door knocked in Eastbrook"
+            "label": "En dörr knackad på i Östbäck"
           },
           "1": {
-            "label": "A door knocked in Fenbridge"
+            "label": "En dörr knackad på i Kärrbron"
           },
           "2": {
-            "label": "A door knocked in Highwatch"
+            "label": "En dörr knackad på i Högvakten"
           }
         }
       },
       "q_gourdlight_daily_feathers": {
-        "title": "Feathers for the Fire",
-        "text": "When Old Thatchgrin is pressed, he calls his crows down on whoever is beating at his straw. Their feathers burn green in a hearth, and I need three for tonight's bonfire. Find a fight at his patch, {playerName}, and pluck them from his crows.",
-        "completion": "Black as a moonless field, and they smell of smoke already. The bonfire will be a sight. Thank you.",
+        "title": "Fjädrar till elden",
+        "text": "När Gamle Halmflin är trängd kallar han ner sina kråkor över den som slår på hans halm. Deras fjädrar brinner grönt i härden, och jag behöver tre till kvällens brasa. Hitta en strid på hans åker, {playerName}, och plocka dem från hans kråkor.",
+        "completion": "Svarta som ett månlöst fält, och de luktar redan rök. Det blir en ståtlig brasa. Tack.",
         "objectives": {
           "0": {
-            "label": "Crow feathers"
+            "label": "Kråkfjädrar"
           }
         }
       },
       "q_gourdlight_daily_baskets": {
-        "title": "Baskets for the Neighbours",
-        "text": "I fill a basket of sweets for an old friend in each town every Gourdlight Eve, and my knees are not what they were. Take them round for me, {playerName}: Cook Marlow in Eastbrook, Yara the herbalist in Fenbridge, and Loremaster Caddis up in Highwatch.",
-        "completion": "All three delivered, and I hear Marlow cried. He always cries. Here is a basket of your own.",
+        "title": "Korgar åt grannarna",
+        "text": "Varje Pumplyktornas afton fyller jag en godiskorg åt en gammal vän i varje stad, men knäna är inte vad de en gång var. Kör ut dem åt mig, {playerName}: till Kocken Marlow i Östbäck, örtkunniga Yara i Kärrbron och Läromästare Caddis uppe i Högvakten.",
+        "completion": "Alla tre levererade, och jag hör att Marlow grät. Det gör han alltid. Här är en egen korg åt dig.",
         "objectives": {
           "0": {
-            "label": "Basket left with Cook Marlow"
+            "label": "Korg lämnad hos Kocken Marlow"
           },
           "1": {
-            "label": "Basket left with Yara the herbalist"
+            "label": "Korg lämnad hos örtkunniga Yara"
           },
           "2": {
-            "label": "Basket left with Loremaster Caddis"
+            "label": "Korg lämnad hos Läromästare Caddis"
           }
         }
       },
