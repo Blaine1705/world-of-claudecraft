@@ -2051,7 +2051,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(baselineBytes).toBe(259431);
     expect(bytes - baselineBytes).toBe(8284);
     // 266,699 -> 266,721 with Wobbles the Slime's reins (+22, kept).
-    expect(bytes).toBe(267630);
+    // +85 with the Smith's Heart raid (see the baseline above).
+    expect(bytes).toBe(267715);
     // Keep the warning threshold unchanged: saves above it remain whole.
     expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
     process.stdout.write(
@@ -2352,7 +2353,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(membershipIds.size).toBe(9);
     const beforeMembershipBytes = Buffer.byteLength(JSON.stringify(withoutMembership), 'utf8');
     // 249,810 -> 249,832 with Wobbles the Slime's reins (+22, kept).
-    expect(beforeMembershipBytes).toBe(250741);
+    // +85 with the Smith's Heart raid (see beforeReferralBytes below).
+    expect(beforeMembershipBytes).toBe(250826);
     expect(beforeReferralBytes - beforeMembershipBytes).toBe(174);
     expect(
       fieldBytes(withoutReferral, 'deedStats') - fieldBytes(withoutMembership, 'deedStats'),
@@ -2878,7 +2880,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // rewards carry no Reliquary page, so no firstFind row. MEASURED.
         68 +
         // Advanced riding adds the sparse scalar ,"ridingTier":2 (15 bytes).
-        15,
+        15 +
+        // The Smith's Heart raid: its raid lockout (+28), Normal and Heroic
+        // clear counts in deedStats.dungeonClears (+18, +25) and its id in
+        // heroicDaily.marked (+14). MEASURED on the merged tree.
+        85,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2940,7 +2946,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // Then -> 21,354: the 36 legacy buddy item ids add 706 discovery bytes.
       // Then -> 21,373 with the Staff of Changing's discovery id (+19, PR 4281).
       // +18 for the sprite buddy's whistle id in itemsDiscovered: 21373 -> 21436.
-      deedStats: 21080,
+      // deedStats +43 with the Smith's Heart raid's Normal and Heroic clear
+      // counts in dungeonClears (+18, +25 of the +85 above).
+      deedStats: 21123,
       reliquary: 14565,
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
@@ -2990,7 +2998,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // The Staff of Changing's discovery id adds 19 (247,136, PR 4281).
       // The sprite buddy's whistle id adds 18 (247,154).
       // Advanced riding contributes 15 bytes for the armed ridingTier scalar.
-    ).toBe(248045);
+      // The Smith's Heart raid's lockout, clear counts and heroic daily mark
+      // add 85 (the +85 attributed above).
+    ).toBe(248130);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -3032,7 +3042,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // The Staff of Changing's discovery id adds 19 (249,946, PR 4281); reins_nightwing_chimera adds 26 (249,972).
       // reins_wobbles_slime adds 22 (249,994).
       // Advanced riding contributes the same 15 bytes here.
-    ).toBe(250903);
+      // The Smith's Heart raid adds the same 85 (the +85 attributed above).
+    ).toBe(250988);
     const priorContent = withoutCrucibleContent(withoutReferral);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -3181,8 +3192,12 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // Release composition: 250,982 bytes excluding referral cards; retain the 381-byte band.
     // RE-BASED for advanced riding: up exactly 15 for the sparse ridingTier
     // scalar (250,273). Same 381-byte band.
-    expect(bytes - stampCardBytes, reMint).toBeGreaterThan(250657);
-    expect(bytes - stampCardBytes, reMint).toBeLessThan(251038);
+    // RE-BASED for the Smith's Heart raid: 251,122 bytes, up exactly 85 for its
+    // raid lockout, its two clear counts and its heroic daily mark (attributed
+    // above). No container or ceiling changed shape. Same 381-byte band:
+    // 250742..251123.
+    expect(bytes - stampCardBytes, reMint).toBeGreaterThan(250742);
+    expect(bytes - stampCardBytes, reMint).toBeLessThan(251123);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was
