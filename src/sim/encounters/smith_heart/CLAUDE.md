@@ -1,10 +1,10 @@
 # src/sim/encounters/smith_heart: the Smith's Heart raid's sim
 
-The raid's gating, its first boss and the Guardian of the Breath (`docs/design/raid/
-smith_heart.md`), ticked once per claim by `tickSmithHeart` (`seal.ts`), called from
-`instances/dungeons.ts` `updateInstances`: the Hammer Council first (so its fall lights the
-Hammer vein the same tick), then the Breath's guardian, then the seal and the arrival, then
-the portal hops.
+The raid's gating, its first boss, the Guardian of the Breath and the Guardian of the
+Quench (`docs/design/raid/smith_heart.md`), ticked once per claim by `tickSmithHeart`
+(`seal.ts`), called from `instances/dungeons.ts` `updateInstances`: the Hammer Council first
+(so its fall lights the Hammer vein the same tick), then the Breath's guardian, then the
+Quench's, then the seal and the arrival, then the portal hops.
 
 | Module | Role |
 |---|---|
@@ -29,6 +29,18 @@ the portal hops.
 | `breath_storm.ts` | The storm breaking and its barrage, the strikes and charged ground, the Leaping Bolt, the Thunder's Cradle (carried, `carried_body.ts`), Drawn Lightning, the swelling storm. |
 | `breath_voice.ts` | What the guardian and Thessaly SAY (`hudChrome.breathGuardian.say.*`, `BREATH_LINES` the same English). |
 | `breath.ts` | The coordinator: the pull, the bar, the halves, the wipe's reset, the fall, the dev tier switch (`setBreathDevTier`) and the `/dev heart breath` triggers and readout. |
+| `fight_kit.ts` | The guardians' shared plumbing (the Breath's and the Quench's): the living test, the claim-local position, the fight's objects (spawn, drop, move), the quiet markers, the aura lookups; `breath_scope.ts` re-exports it. |
+| `quench_ids.ts` | Leaf: the Guardian of the Quench's cast, aura, object and cue ids, the per-difficulty rules (`QUENCH_DIFFICULTY`: splash, dance, `echoRule`; mythic is heroic whole, the seam), the SKETCH tuning (`QUENCH_TUNING`) and the objects' template codecs (`crackTemplate`, `echoTemplate`, `laneTemplate`, `bladeTemplate`). |
+| `quench_geometry.ts` | PURE over the layout (no SimContext, for the bots to reuse): the basin and the lake's ice, the shore ice's ring, the huddles (`huddlesOf`, `warmNeighbours`), the holes and where a body climbs out, the echoes' reach, the lee behind a blade (`inBladeLee`), the crossing's pairs and lanes. |
+| `quench_state.ts` | Type-only: `QuenchFightState` (`Entity.smithHeartQuench` on the guardian). |
+| `quench_scope.ts` | The per-tick scope: the players on the lake and its listeners, the bar, the planted hold, the rolls, the frost hit and the never-lethal hit (`survivableHit`), the raid warnings (`hudChrome.quenchGuardian.warn.*`). |
+| `quench_cold.ts` | The cold bar (an aura: `value` the bar, `value2` its trend), the huddle's warmth, Encased in Rime (the freeze, the shatter and its splash, Frost-Brittle) and Deepening Cold. |
+| `quench_ice.ts` | The ice under a huddle: the strain, the cracks, the holes (they stay; capped), Under the Ice (the trap, the climb out, the grace). |
+| `quench_blades.ts` | The Smith's four blades (claim objects): the wake, the echoes, heroic's crossing and its lane, their combat walls. |
+| `quench_attacks.ts` | Quenching Breath (encounter-driven) and the watch on Tempering Strike's swing cleave that raises the echoes. |
+| `quench_rim.ts` | The shore ice: the ring of oriented combat walls that keeps the fight on the lake, rising at the pull, falling at a wipe or the kill. |
+| `quench_voice.ts` | What the guardian SAYS (`hudChrome.quenchGuardian.say.*`, `QUENCH_LINES` the same English). |
+| `quench.ts` | The coordinator: the pull, the half, the wipe's reset, the fall, the dev tier switch (`setQuenchDevTier`) and the `/dev heart quench` triggers and readout. |
 | `council.ts` | The coordinator: one pull (`keepTogether`), the fallen and their heirs, Memory of Stone, the bars, the wipe's reset (`regrowHead`), the finish, the dev switches for heroic and mythic (`setCouncilDevTier`; a switch mid-fight applies whole through `council_soul.ts` `syncSoulsToTier`) and the `/dev heart council` triggers. |
 
 Rules:
@@ -56,5 +68,7 @@ Rules:
   player text); the Breath: `tests/smith_heart_breath.test.ts` (on
   `tests/helpers/breath_fight.ts`), `tests/smith_heart_breath_ui.test.ts`,
   `tests/smith_heart_breath_wire.test.ts`, `tests/wind_drift.test.ts`,
-  `tests/wind_drift_online.test.ts`. A live raid of bots fights it over a dev server:
+  `tests/wind_drift_online.test.ts`; the Quench: `tests/smith_heart_quench.test.ts` (on
+  `tests/helpers/quench_fight.ts`), `tests/smith_heart_quench_ui.test.ts`,
+  `tests/smith_heart_quench_wire.test.ts`, `tests/quench_water_online.test.ts`. A live raid of bots fights it over a dev server:
   `scripts/heart_council_raid.mjs`.

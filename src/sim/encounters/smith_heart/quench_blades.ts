@@ -17,8 +17,9 @@
 //                 always safe: the cold breaks on the blade's ice, the
 //                 guardian's own breath and every echo alike.
 //   The crossing  heroic: about every 40 s two blades swap places, flying
-//                 straight across the lake: their lane is telegraphed (3 s),
-//                 the flight strikes whoever stands in it, and the lane then
+//                 in a straight line (across the lake or along its side):
+//                 their lane is telegraphed (3 s), the flight strikes whoever
+//                 stands in it, and the lane then
 //                 cracks into holes, so the safe spots move.
 //
 // Zero rng in every pick (the crossing's pair is hashed); the draws are the

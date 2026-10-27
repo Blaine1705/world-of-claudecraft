@@ -918,6 +918,43 @@ circle landing, the swell, a fall over the lip. The guardian's and Thessaly's li
 boss yells (`breath_voice.ts`, `hudChrome.breathGuardian.say.*`); the guardian's voice is
 a later audition.
 
+### 5.20 The Guardian of the Quench's look (prototype)
+
+The fight's effects are `src/render/smith_heart_fx/quench_fight_fx.ts` (pure plan
+`quench_fight_fx_core.ts`), the Smith's four blades `quench_blades_fx.ts`, and its
+provisional body `quench_body.ts` (pure plan `quench_body_core.ts`), hosted by
+`rift_death_zone.ts` beside `QuenchFx` (which keeps Quenching Breath's and Tempering
+Strike's own looks and lends them to the echoes, `echoAt`), all read from IWorld only. The
+vein's art rule holds: living stone, ice and the cold, no metal, no machinery (the old
+"black iron plates" are gone).
+
+| Moment | Look |
+|---|---|
+| The body | An ice guardian of the lake, about three and a half players tall: frost-bound granite (the Heart kit's colossus rock repainted pale), clear lake ice on its chest, a crest of ice blades off its back and a crown on its head, pauldrons of heaved ice, forearms and shins of frozen falls, the lake's blue light in a crystal heart, threads of it between the joints, two eyes of it. Joints kept apart from the pieces so the official pipeline's model replaces the pieces only |
+| Its motion | A slow breath with a plume of frost on every out-breath; a swipe on each melee hit; Tempering Strike's two-fisted slam on the ice; Quenching Breath rears back, heart blazing, then throws the cold out; at half health both arms rise to the sky through the bar and are thrown down as the blades wake; its crest burns brighter while they are awake; the death drops every piece to the ice |
+| The cold | Frost crystals climbing every player's body with their bar, a rime ring under them, pulsing past three quarters (every tier); the personal cold bar over the action bar (`src/ui/hud/dungeon/quench_alert_view.ts`, never hidden by the hints setting) |
+| The warmth | A warm gold glow under every huddled player, threads of warm light between them, embers rising (the one warm colour on the lake) |
+| Encased in Rime | A block of clear ice round the frozen player, cracks climbing it, the shatter's splash ring at its exact radius filling to the shatter (every tier); the shatter's shards, mist and rings |
+| The ice | A crack's footprint at the hole's exact radius (danger) under a web of cracks racing out with light in them; the hole: dark deep water, slush and floes, a thin lip of broken white ice; a trapped player held to the waist in churning water; the plunge's and climb's splashes |
+| The blades | The kit's sunk blades; waking, they tremble, light runs up their fullers, they are wrenched up out of the ice (the lake bursting upward, their points shown) and stand upright floating, a blue light in each, their broad faces turned the way the echoes run with a chevron of light on the ice before them, blazing while an echo is held; a ring of broken ice where each was sunk; flying (heroic) they lean into the flight with a wake of frost |
+| The echoes | Each footprint at the attack's exact arc and reach at its blade (danger, filling to its landing), the lee behind every blade in a sanctuary's mint while they wait; landing, the guardian's own gust or ice |
+| The crossing | The lane between the two blades (danger) through its warning, the flight's wake, then the cracks along it |
+| The shore ice | Slabs of jagged lake ice heaving up round the lake at the pull, standing through the fight, sinking at its end; the lake refreezing in a wave of frost at the guardian's fall |
+
+Readability: the frost on bodies, the cold bar, every crack, hole, echo footprint, lee, lane
+and the splash ring draw on every tier; the low tier sheds only particles (mist, embers,
+glints, splashes); reduced motion drops the shakes. Everything is built in the
+constructors under one gated root (`attachSceneGroupGated`, the kits' program warmers,
+staged kit swaps through the compile gate), fixed pools, no light.
+
+**Sound.** Sampled cues through the SFX pipeline (`heart_quench_*`, catalogued in
+`docs/design/sound_effects.md`), played by `src/game/smith_heart_quench_audio.ts`: a
+freeze, a shatter, a crack groaning, a hole opening, a plunge and a climb, the awakening's
+charge fitted to its bar and the blades tearing free, an echo, the crossing, the shore ice
+heaving, and a frosty breath in the player's own ear as their bar passes three quarters.
+The guardian's lines are boss yells (`quench_voice.ts`, `hudChrome.quenchGuardian.say.*`);
+its voice is a later audition.
+
 ## 6. Set pieces (phase 2 specs)
 
 None of these is built in phase 1; their floors, props and anchors are. Every
@@ -1168,15 +1205,62 @@ and Captain Thessaly were already shipped.
 
 ### 7.3 Guardian of the Quench
 
-- Look: ice and black iron, the tempering armour: blue ice body with black iron
-  plates; fights in the middle of the Frozen Lake, braziers on the shelf.
-- Phase 1 (`heart_quench_guardian`): Tempering Strike (frontal arc cleave);
-  Quenching Breath (cast-bar frontal cone the tank turns away).
-- Presentation (phase 2H, section 5.15): Quenching Breath telegraphs its cone on every tier
-  and has its freezing gust, ice and frost; Tempering Strike thrusts ice up in its arc.
-  Mechanics and numbers unchanged.
-- Target: stacking cold on every player removed only at the shelf braziers
-  (`LAKE_BRAZIERS`), slick ice under the boss, cracks that punish bunching.
+The Frozen Lake's boss (`heart_quench_guardian`, id frozen: its death lights the Quench vein
+and the seal's quarter exactly as before), "together, but not for too long": warmth comes
+from huddling, and huddling breaks the ice. Designed with the owner (2026-10-27) and built
+as a playable Normal and Heroic prototype: every number below is a SKETCH, unmeasured, to
+be calibrated with the meters harness. The code is `src/sim/encounters/smith_heart/
+quench*.ts` (the leaf `quench_ids.ts`: ids, rules, tuning; the geometry
+`quench_geometry.ts`, pure, for the bots to reuse later: the huddles, the holes and where a
+body climbs out, the echoes' reach, the lee behind a blade, the crossing's lanes). It
+avoids the other bosses' patterns: no cover (the Council), no constant movement (the
+Breath), no walk to a spot to clear a debuff (Ignivar; the shelf's braziers stay scenery),
+no plates broken by the boss's fire (Korzul: here the RAID breaks the ice, in round holes).
+
+| Piece | Rule | Where |
+|---|---|---|
+| The shore ice | At the pull the lake's edge heaves up into a ring of jagged ice (28 slabs, 2.5 s rising, then oriented combat walls), so the whole fight stays on the lake's ice (the shelf's rock never cracks, and a raid could otherwise huddle on it for ever). A body still on the shelf when it closes is set down inside. It falls at a wipe and at the kill | `quench_rim.ts`, layout `QUENCH_RIMEWALL` |
+| The cold | Every player in the basin carries a cold bar (0 to 100; an aura whose `value` is the bar and `value2` its trend). Alone it rises 100 / 30 a second (full in about 30 s); within 6 yd of 2 or more other players (a huddle, the warmth aura) it falls 6 a second instead. Frozen and trapped players give no warmth | `quench_cold.ts` |
+| Encased in Rime | At full: frozen solid 4 s (an unbreakable stun; its ring shows the splash on the ice) and the bar resets. Then the ice shatters: 220 to 260 Frost to them (Shattering Cold), +25 cold to everyone within 6 yd, and Frost-Brittle (+20 percent damage taken, 15 s). A splash that fills a bar freezes that player too (a chain) | `quench_cold.ts` |
+| The ice gives way | A huddle (3+ warm players together, `huddlesOf`) strains the ice where it stands; a spot loaded 8 s (its middle within 4 yd of where it began) cracks: 2.5 s of groaning ice (its footprint at the hole's exact 3.5 yd), then a round hole of freezing water. An unloaded spot heals at half a second a second, so a group that keeps moving never breaks through. The holes stay the whole fight (past 30 the oldest skins over), so the safe ice shrinks | `quench_ice.ts` |
+| Under the Ice | A body whose middle goes inside a hole's rim (walking in, standing where one opens, a crossing's lane) falls in: held 4 s (an unbreakable root, re-applied if a class escape breaks it), 150 to 180 on the plunge and 100 to 120 each second, +30 cold (the bar stops one short of full in the water), then set on the rim 1 yd past it, with 1.5 s before the water can take it again. The water never kills on its own: its hits stop one point short (`survivableHit`). The guardian walks over the water (its own cold) | `quench_ice.ts` |
+| Quenching Breath | Kept: 2.5 s bar every 14 s (first at 6), planted, its 22 yd 70 degree cone locked toward the tank at the start (the tank turns it from the raid), 240 to 280 Frost and +20 cold. The record is encounter-driven now (the fight starts and lands it) | `quench_attacks.ts` |
+| Tempering Strike | Kept: the template's swing cleave (every 4th landed swing, 100 degrees, 8 yd); the fight watches for it to raise its echoes | content `arcCleave`, `quench_attacks.ts` |
+| The blades wake | At half health, a 4 s bar (planted, arms raised): the Smith's four blades of ice sunk round the lake (claim objects, round combat walls) tear free and float upright at their places, a blue light in each; objects, never bodies, so nothing can target or harm them | `quench_blades.ts` |
+| The echoes | Phase 2: every Quenching Breath and Tempering Strike is repeated by each standing blade 3 s after the guardian's own lands (2 s below a quarter health), from the blade's place and facing the way the guardian's attack faced (the tank aims them). All four footprints show the moment the guardian begins (the breath's bar, the strike's swing). Echo of the Breath 260 to 300 and +20 cold; Echo of the Strike 200 to 240 and +10 cold | `quench_blades.ts`, `quench_attacks.ts` |
+| The lee | Behind each blade (the side away from the attack) within 5 yd is always safe: the cold breaks on the blade's ice, the guardian's own breath and every echo alike | `quench_geometry.ts` `inBladeLee` |
+| Deepening Cold (soft enrage) | Through phase 2, every 20 s the cold rises 10 percent faster, without end (a stack on the guardian) | `quench_cold.ts` |
+| Heroic | Every number 25 percent higher, plus: contagious cold (a shatter splashes 10 yd and adds 45 cold, so one careless player sets off a chain) and the crossing (phase 2, every 40 s, first 20 s after the wake: two blades, a hashed pair never the same twice running, swap places in a straight line (across the lake or along its side): 3 s lane telegraph, a 1.2 s flight that strikes anyone in its 2.5 yd lane for 300 to 350 and +20 cold, then the lane cracks into holes every 7 yd) | `quench_ids.ts` `QUENCH_DIFFICULTY` |
+| Mythic | Not now: one more `QUENCH_DIFFICULTY` row, today heroic's whole, behind its own dev switch (`/dev heart quench mythic`). The seam for a mythic-only mechanic is the rules' `echoRule` (today `copy` on every tier; the candidate, true mirrors where two blades copy and two reverse by colour, is one more value) | `quench.ts` `setQuenchDevTier` |
+| One wipe | The fight ends when the guardian stops fighting: every bar, cold mark, crack, hole, echo and lane gone, the held set out of the water, the blades sunk at home, the shore ice down | `quench.ts` (`resetQuench`) |
+| Its fall | The Quench vein and the seal's quarter light as before (seal.ts reads the guardian's death); the shore ice falls and the lake refreezes whole (every hole gone), so the walk back is safe | `quench.ts` (`finishQuench`) |
+
+**Health (sketch, unmeasured).** 43,000 base (about 99,000 after the elite factor), the
+Breath's anchor: a 4 to 5 minute fight at the bot raid's measured 400 to 460 a second.
+
+**Damage and cold (sketch, unmeasured).** Anchored to the level-20 cloth reference (about
+1,135 to 1,345 health): a shatter about 20 percent (plus Frost-Brittle), the water about
+55 percent over its 4 s and never lethal alone, an echo about 22 percent, the crossing
+about 27 percent. The cold rewards huddling about a third of the time: an 8 s huddle buys
+back about 14 s alone, so the raid huddles, moves, and huddles again.
+
+Role jobs: the tank keeps the guardian where its breath and, in phase 2, its echoes point
+away from the raid; everyone keeps their bar down by huddling in threes and fours and moves
+the huddle before the ice gives; nobody stands next to a frozen player; in phase 2 the
+huddles form behind the blades when an attack comes; healers cover the water and the
+shatters.
+
+IP check (2026-10-27, exact phrase plus coined token on the major game wikis): Quenching
+Cold, Huddled Warmth, Shattering Cold, Frost-Brittle, Deepening Cold, Crossing Blade,
+Echo of the Breath, Echo of the Strike and Encased in Rime returned no game use (CLEAR).
+"Frozen Solid", the first name for the freeze, is a World of Warcraft boss mechanic (the
+Frostwrought Dominator's and Melidrussa Chillworn's, the former also a "stand near two
+others" rule) and was renamed Encased in Rime before shipping; "Echoed Strike" sat close to
+Diablo II's "Echoing Strike" and became Echo of the Strike. Under the Ice, Freezing Water,
+Groaning Ice, Open Water, Shore Ice, Smith's Blade and The Blades Wake are plain English
+(generic, kept). The brief's warnings were kept: no "Frostbite", "Flash Freeze", "Biting
+Cold", "Frost Beacon", "Unchained Magic", "Ice Tomb", "Icebound" or "Mirror Image".
+Quenching Breath and Tempering Strike were already shipped.
 
 ### 7.4 Guardian of the Heat
 
@@ -1420,6 +1504,18 @@ on both difficulties (dungeon rework README, goal 4).
 | `/dev heart breath tornado` (`gale`) | three loose gales now, on any tier |
 | `/dev heart breath gust [deg]` | a phase-2 storm gust now, on any tier |
 | `/dev heart breath chain` (`fork`), `eye` (`cradle`), `conductor` (`drawn`) | the Leaping Bolt, the Thunder's Cradle or Drawn Lightning now, on a hashed player |
+| `/dev heart quench` | the Guardian of the Quench's readout (difficulty, health, half, your cold, holes, cracks, the next breath, the deepening) |
+| `/dev heart quench pull` | set you down on the Frozen Lake beside the guardian and pull it |
+| `/dev heart quench reset` | the guardian whole, home and out of its fight; the lake whole, the blades sunk, the shore ice down |
+| `/dev heart quench heroic [on, off]`, `mythic [on, off]` | this run's tier for the fight (mythic is heroic whole for now); a live fight takes it at once |
+| `/dev heart quench phase2` | the guardian set to half health: its arms rise and the blades tear free (the 4 s bar) |
+| `/dev heart quench blades` | the blades awake at once (no bar) |
+| `/dev heart quench cold <n>` | set your cold bar |
+| `/dev heart quench burst` | freeze you solid now (the shatter 4 s on) |
+| `/dev heart quench hole`, `crack` | open a hole under you now, or crack the ice under you (a hole 2.5 s on) |
+| `/dev heart quench breath` | Quenching Breath now (echoed by every blade once they are awake) |
+| `/dev heart quench echo [strike]` | a breath (or a strike) echoed by every blade now; wakes the blades first if needed |
+| `/dev heart quench dance` | two blades cross the lake now, on any tier (wakes the blades first if needed) |
 
 Pinned by `tests/smith_heart_dev.test.ts`, including the refusal without
 `devCommands` and the door refusing a non-dev world.
