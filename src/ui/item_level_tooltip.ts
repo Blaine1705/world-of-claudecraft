@@ -4,6 +4,7 @@ import {
   isReferralArmour,
   membershipItemLevel,
 } from '../sim/membership_armour';
+import { isMembershipWeapon } from '../sim/membership_weapon';
 import type { ItemDef, ItemInstancePayload } from '../sim/types';
 import { esc } from './esc';
 import { t } from './i18n';
@@ -17,7 +18,8 @@ export function itemLevelTooltipLines(
   showItemLevel: boolean,
   wearerLevel: number,
 ): string {
-  const membership = isMembershipArmour(item.id) || isReferralArmour(item.id);
+  const membership =
+    isMembershipWeapon(item.id) || isMembershipArmour(item.id) || isReferralArmour(item.id);
   if (!isItemLevelEligible(item) || !(membership || instance?.lootQuality || showItemLevel))
     return '';
   let readout: { level: number; score: number } | undefined;

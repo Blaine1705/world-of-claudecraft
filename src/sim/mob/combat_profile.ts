@@ -1,12 +1,18 @@
 import { isLockedOut, isSilenced } from '../combat/cc';
 import { DUNGEON_X_THRESHOLD, MOBS } from '../data';
+import { ZULGAR_TUNING } from '../encounters/wildheart_basin/ids';
 import {
   advancePin,
   holdsAggroInInstance,
   pinInPlace,
   releasePin,
 } from '../instances/instance_combat_hold';
-import { combatProfileForMob, effectiveMobMeleeRange, type MobCombatProfile } from '../mob_combat';
+import {
+  combatProfileForMob,
+  DEFAULT_MOB_COMBAT_PROFILE,
+  effectiveMobMeleeRange,
+  type MobCombatProfile,
+} from '../mob_combat';
 import { holdHoardBoneReaper } from '../rift/hoard_bone_reaper';
 import { holdHoardBoulder } from '../rift/hoard_boulder';
 import { holdHoardCaveBoss } from '../rift/hoard_cave_kit';
@@ -77,7 +83,19 @@ export function startEvadeHome(mob: Entity): void {
   mob.rangedWindupReleaseTick = null;
 }
 
+// The avatar must actually reach its Prey and cross the sun glyphs en route.
+// Reusing the giant priest's profile stops pursuit outside maul contact.
+const ZULGAR_HUNT_PROFILE: MobCombatProfile = {
+  ...DEFAULT_MOB_COMBAT_PROFILE,
+  meleeRange: ZULGAR_TUNING.catchReach,
+  desiredRange: ZULGAR_TUNING.catchReach * 0.8,
+  movingRangeBonus: 0,
+};
+
 export function mobCombatProfile(mob: Entity): MobCombatProfile {
+  const fight = mob.wildheartFight;
+  if (fight?.kind === 'zulgar' && (fight.phase === 'hunt' || fight.phase === 'final'))
+    return ZULGAR_HUNT_PROFILE;
   return combatProfileForMob(mob.templateId, mob.scale);
 }
 
@@ -87,8 +105,18 @@ export function mobEffectiveMeleeRange(mob: Entity): number {
   return effectiveMobMeleeRange(profile, mobMoved);
 }
 
+function mobCanReachMeleeTarget(
+  mob: Entity,
+  target: Entity,
+  reach = mobEffectiveMeleeRange(mob),
+): boolean {
+  return (
+    Math.abs(mob.pos.y - target.pos.y) <= Math.max(4, reach) && dist2d(mob.pos, target.pos) <= reach
+  );
+}
+
 export function tryMobMeleeSwingInRange(ctx: SimContext, mob: Entity, target: Entity): boolean {
-  if (dist2d(mob.pos, target.pos) > mobEffectiveMeleeRange(mob)) {
+  if (!mobCanReachMeleeTarget(mob, target)) {
     mob.autoAttack = false;
     return false;
   }
@@ -265,9 +293,17 @@ export function updateMobCombatProfile(
   }
 
   updatePursuitProfileCombat(ctx, mob, target, profile);
+  const meleeReach = mobEffectiveMeleeRange(mob);
   if (
     profile.canLeash &&
-    chaseStalledUnreachable(ctx, mob, target, profile.meleeRange, chaseSpeed)
+    chaseStalledUnreachable(
+      ctx,
+      mob,
+      target,
+      meleeReach,
+      chaseSpeed,
+      mobCanReachMeleeTarget(mob, target, meleeReach),
+    )
   ) {
     onChaseStalled(mob, instanceHold);
     return 'done';
@@ -299,10 +335,12 @@ export function holdPinnedMob(ctx: SimContext, mob: Entity): void {
   const chaseSpeed = mob.moveSpeed * profile.chaseSpeedMult * ctx.moveSpeedMult(mob);
   mob.autoAttack = false;
   mob.facing = steadyAngleTo(mob.pos, target.pos, mob.facing);
-  // A caster is in reach at spell range only when it also sees its target
-  // (mob/cast_sight.ts); walled off, it holds and then phases like a melee mob.
+  const reached =
+    spell !== undefined
+      ? dist2d(mob.pos, target.pos) <= reach
+      : mobCanReachMeleeTarget(mob, target, reach);
   if (
-    dist2d(mob.pos, target.pos) <= reach &&
+    reached &&
     !(
       spell !== undefined &&
       casterObeysSight(mob, profile) &&
@@ -469,7 +507,7 @@ function updatePursuitProfileCombat(
     tryMobMeleeSwingInRange(ctx, mob, target);
   }
 
-  if (dist2d(mob.pos, target.pos) > profile.desiredRange) {
+  if (!mobCanReachMeleeTarget(mob, target, profile.desiredRange)) {
     if (!ctx.isRooted(mob)) {
       // Straight at the target, and (a mob that leashes; chase_route.ts
       // leaves bosses and pets out itself) round a wall the straight chase has
@@ -494,5 +532,5 @@ function updatePursuitProfileCombat(
   ) {
     tryMobMeleeSwingInRange(ctx, mob, target);
   }
-  mob.aiState = dist2d(mob.pos, target.pos) <= profile.meleeRange ? 'attack' : 'chase';
+  mob.aiState = mobCanReachMeleeTarget(mob, target) ? 'attack' : 'chase';
 }

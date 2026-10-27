@@ -629,13 +629,20 @@ export function composeRelicHooks(
     handleSpellfx(ev: AbilityVfxSpellfxEvent, admitted: boolean): boolean;
     update(dt: number, reducedMotion: boolean): void;
     setQuality(q: number): void;
+    lanternLightDrawable?(): THREE.Object3D;
   }[]
 ): {
   handleSpellfx(ev: AbilityVfxSpellfxEvent, admitted: boolean): boolean;
   update(dt: number, reducedMotion: boolean): void;
   setQuality(q: number): void;
+  lanternLightDrawable(): THREE.Object3D;
 } {
   return {
+    lanternLightDrawable: () => {
+      const lantern = hooks.find((hook) => hook.lanternLightDrawable)?.lanternLightDrawable?.();
+      if (!lantern) throw new Error('Relic hooks require the lantern first-read drawable');
+      return lantern;
+    },
     handleSpellfx: (ev, admitted) => hooks.some((hook) => hook.handleSpellfx(ev, admitted)),
     update: (dt, reducedMotion) => {
       for (const hook of hooks) hook.update(dt, reducedMotion);

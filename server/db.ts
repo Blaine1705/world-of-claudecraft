@@ -16,6 +16,7 @@ import { ACCOUNT_WEALTH_SCHEMA } from './account_wealth_db';
 import { AD_SPEND_SCHEMA } from './ad_spend_db';
 import { bustAdminGuildListReads } from './admin_guilds_read';
 import { ADMIN_GUILDS_SCHEMA } from './admin_guilds_schema';
+import { consumeAppearanceRerollOn } from './appearance_redesign_db';
 import { APPLE_AUTH_SCHEMA } from './apple_auth_db';
 import { ACCOUNT_ATTRIBUTION_SCHEMA, accountAttributionForExport } from './attribution_db';
 import {
@@ -87,6 +88,7 @@ import {
 } from './guild_bank_receipt_db';
 import type { GuildBankSave, GuildBankWriteResult } from './guild_bank_state';
 import { isUniqueViolation } from './http_util';
+import { ITEM_LEDGER_SCHEMA } from './item_ledger_db';
 import {
   advanceCustodyWatermarkIn,
   confirmBakedCustodyRefs,
@@ -116,11 +118,17 @@ import {
 } from './market_backfill';
 import { MARKET_SOLD_VOLUME_SCHEMA } from './market_sold_volume_db';
 import { materialSourceConnection } from './material_source_connection';
-import { applyMaterialSourceSchema, applyMaterialSourceWriterGuard } from './material_source_host';
+import {
+  applyMaterialSourceSchema,
+  applyMaterialSourceWriterGuard,
+  prepareMaterialSourceWriterUpgrade,
+} from './material_source_host';
 import { MEMBERSHIP_SCHEMA } from './membership_db';
 import { REFERRAL_ARMOUR_SCHEMA } from './referral_armour_db';
 import { REFERRAL_INVITES_SCHEMA } from './referral_invites_db';
 import { REFERRAL_CARDS_SCHEMA } from './referral_schema_db';
+import { REDESIGN_GRANT_SCHEMA } from './release_gifts_db';
+import { SCHEMA_ADVISORY_LOCK_KEY } from './schema_lock';
 
 export { recordReferral } from './referral_armour_db';
 
@@ -140,10 +148,12 @@ import { PROGRESS_EVENTS_SCHEMA } from './progress_events_db';
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';
 import { REALM, REALM_DIRECTORY } from './realm';
 import { REALM_BUILDER_SCHEMA } from './realm_builder_db';
+import { REALM_MOTD_SCHEMA } from './realm_motd_db';
 import { chooseArchiveName } from './reclaim_name';
 import { attachSchemaNoticeForwarder } from './schema_notices';
 import { SEEKER_ENTITLEMENT_SCHEMA } from './seeker_entitlement_db';
 import { SOCIAL_SCHEMA } from './social_db';
+import { STAFF_WATCHLIST_SCHEMA } from './staff_watchlist_db';
 import {
   STORAGE_PURCHASE_SCHEMA,
   type StorageAppliedEffect,
@@ -460,6 +470,7 @@ ALTER TABLE characters ADD COLUMN IF NOT EXISTS appearance JSONB;
 -- reroll endpoint in the same statement that writes the new appearance, so a
 -- token can never be spent twice.
 ALTER TABLE characters ADD COLUMN IF NOT EXISTS appearance_reroll_used BOOLEAN NOT NULL DEFAULT FALSE;
+${REDESIGN_GRANT_SCHEMA};
 -- Max-Level XP Overflow leaderboard: indexed lifetime-XP sort key. The first
 -- index serves the realm-scoped in-game panel; the second serves the global
 -- (cross-realm) home-page board. Both are expression indexes on the bare
@@ -891,6 +902,9 @@ ALTER TABLE accounts ADD COLUMN IF NOT EXISTS chat_strikes INT NOT NULL DEFAULT 
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cheater_mark_seconds INT NOT NULL DEFAULT 0;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cheater_mark_reason TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS cheater_mark_set_at TIMESTAMPTZ;
+-- The operator world quest block (src/sim/world_quest_block.ts): NULL = not blocked.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS world_quests_blocked_at TIMESTAMPTZ;
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS world_quests_block_reason TEXT;
 -- Admin-managed filter word lists. tier 'soft' = cosmetic (masked client-side
 -- when the player's filter is on); tier 'hard' = enforced (blocked + escalated).
 CREATE TABLE IF NOT EXISTS chat_filter_words (
@@ -1225,8 +1239,6 @@ SELECT assoc.account_id, ib.reason
     ON ib.ip_address = assoc.ip_address;
 `;
 
-const SCHEMA_ADVISORY_LOCK_KEY = 0x57_4f_43_01; // "WOC\x01"
-
 export async function ensureSchema(): Promise<void> {
   // In the process-per-realm model several server processes boot against the
   // same database at once. Their idempotent CREATE/ALTER statements would
@@ -1256,13 +1268,11 @@ export async function ensureSchema(): Promise<void> {
     // failure (end() on a never-connected client is a harmless no-op).
     await client.connect();
     await client.query('BEGIN');
-    // Boot DDL serializes on the advisory lock across every realm process, so it
-    // can legitimately wait far longer than any per-request budget. The dedicated
-    // client above escapes the pool's timeouts; this SET LOCAL additionally
-    // overrides any database- or role-level statement_timeout an operator may
-    // have set server-side (SET LOCAL reverts at COMMIT).
+    // Boot serializes across realms outside request budgets. Override role/DB
+    // deadlines for this transaction; SET LOCAL reverts at COMMIT.
     await client.query('SET LOCAL statement_timeout = 0');
     await client.query('SELECT pg_advisory_xact_lock($1)', [SCHEMA_ADVISORY_LOCK_KEY]);
+    await prepareMaterialSourceWriterUpgrade(client, pool);
     await client.query(SCHEMA);
     await client.query(
       MEMBERSHIP_SCHEMA +
@@ -1271,8 +1281,6 @@ export async function ensureSchema(): Promise<void> {
         REFERRAL_CARDS_SCHEMA +
         REFERRAL_INVITES_SCHEMA,
     );
-    // The material source audit's anchor + journal pair: after SCHEMA (it
-    // FK-references characters), before the growth budget that must count it.
     await applyMaterialSourceSchema(client);
     await client.query(BANK_LEDGER_BATCH_RECEIPTS_SCHEMA);
     // Local-recovery reports reference accounts/characters, so their additive
@@ -1298,6 +1306,9 @@ export async function ensureSchema(): Promise<void> {
     // The chance-based crafting outcome audit (craft_roll_events). Same FK
     // shape as the progress logs, so it runs after SCHEMA; idempotent.
     await client.query(CRAFT_ROLL_EVENTS_SCHEMA);
+    // The tracked-item provenance ledger (item_ledger): FK-references
+    // accounts and characters like the audit logs above; idempotent.
+    await client.query(ITEM_LEDGER_SCHEMA);
     // First-touch signup attribution (one row per account, written at
     // registration). FK-references accounts(id), so it runs after SCHEMA.
     await client.query(ACCOUNT_ATTRIBUTION_SCHEMA);
@@ -1310,6 +1321,9 @@ export async function ensureSchema(): Promise<void> {
     // them" column, so it runs after SCHEMA. Bounded at one row a month and
     // deliberately keep-forever: deleting an old row erases a real award.
     await client.query(REALM_BUILDER_SCHEMA);
+    // The admin-set realm message of the day (server/realm_motd.ts): one row
+    // per realm, FK-references accounts(id) for who set it, so after SCHEMA.
+    await client.query(REALM_MOTD_SCHEMA);
     await client.query(SOCIAL_SCHEMA);
     await client.query(ADMIN_GUILDS_SCHEMA);
     await client.query(SEEKER_ENTITLEMENT_SCHEMA);
@@ -1325,6 +1339,9 @@ export async function ensureSchema(): Promise<void> {
     // (idempotent), like the Discord tables.
     await client.query(GITHUB_SCHEMA);
     await client.query(GENERAL_CHAT_QUOTA_SCHEMA);
+    // The in-game /watch staff watchlist (server/staff_watchlist_db.ts).
+    // FK-references accounts(id), so it runs after SCHEMA.
+    await client.query(STAFF_WATCHLIST_SCHEMA);
     // Tier-2 global rate-limit backstop table (pg-backed fixed-window counters,
     // one row per (policy, key)) for the multi-realm deployment. Applied
     // unconditionally (idempotent), like the Discord/GitHub tables. See
@@ -2791,9 +2808,13 @@ export interface CharacterRow {
   // The authored modular-creator look (own JSONB column, hotbar_layout's
   // pattern). Normalized at write; NULL = pre-creator character (legacy rig).
   appearance?: Record<string, unknown> | null;
+  // Presence privacy (server/presence_privacy.ts; SOCIAL_SCHEMA column). Selected
+  // by the join path only, so the setting holds from the session's first tick.
+  presence_mode?: string | null;
   // One-shot redesign token spent (see the reroll endpoint). Selected by the
   // list path only.
   appearance_reroll_used?: boolean;
+  appearance_reroll_granted?: boolean;
   // Selected by the list path only, for the reroll-cutoff check and the
   // char-select payload.
   created_at?: Date | string | null;
@@ -2820,7 +2841,7 @@ export { highestCharacterForAccount } from './character_roster_db';
 export async function listCharacters(accountId: number): Promise<CharacterRow[]> {
   const res = await pool.query(
     `SELECT c.id, c.account_id, c.name, c.class, c.level, c.state, c.is_gm, c.force_rename,
-            c.appearance, c.appearance_reroll_used, c.created_at, c.membership_slot,
+            c.appearance, c.appearance_reroll_used, c.appearance_reroll_granted, c.created_at, c.membership_slot,
             GREATEST(ps.last_played, totals.last_played) AS last_played,
             (COALESCE(ps.playtime_seconds, 0) + COALESCE(totals.playtime_seconds, 0))::bigint AS playtime_seconds
        FROM characters c
@@ -2870,7 +2891,7 @@ export async function getCharacter(
   characterId: number,
 ): Promise<CharacterRow | null> {
   const res = await pool.query(
-    'SELECT id, account_id, name, class, level, state, is_gm, force_rename, hotbar_layout, appearance, membership_slot FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
+    'SELECT id, account_id, name, class, level, state, is_gm, force_rename, hotbar_layout, appearance, membership_slot, presence_mode FROM characters WHERE id = $1 AND account_id = $2 AND realm = $3',
     [characterId, accountId, REALM],
   );
   return res.rows[0] ?? null;
@@ -2940,25 +2961,15 @@ export async function consumeAppearanceReroll(
   helmHidden: boolean | null,
   createdBefore: Date,
 ): Promise<boolean> {
-  const res = await pool.query(
-    `UPDATE characters
-        SET appearance = $3::jsonb,
-            appearance_reroll_used = TRUE,
-            state = CASE
-                      WHEN state IS NULL OR $5::boolean IS NULL THEN state
-                      WHEN $5::boolean AND state->'helmHidden' IS DISTINCT FROM 'true'::jsonb
-                        THEN jsonb_set(state, '{helmHidden}', 'true'::jsonb, true)
-                      WHEN NOT $5::boolean AND state ? 'helmHidden'
-                        THEN state - 'helmHidden'
-                      ELSE state
-                    END,
-            updated_at = now()
-      WHERE id = $1 AND account_id = $2 AND realm = $4
-        AND (created_at < $6 OR appearance IS NULL)
-        AND appearance_reroll_used = FALSE`,
-    [characterId, accountId, JSON.stringify(appearance), REALM, helmHidden, createdBefore],
+  return consumeAppearanceRerollOn(
+    pool,
+    REALM,
+    accountId,
+    characterId,
+    appearance,
+    helmHidden,
+    createdBefore,
   );
-  return (res.rowCount ?? 0) > 0;
 }
 
 // Active character names on this realm for the public character sitemap, ranked

@@ -176,7 +176,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "9a31d447",
+      "state": "bc9d8564",
       "events": "42ffcbe9",
       "rng": {
         "draws": 0,
@@ -253,15 +253,33 @@
             },
             {
               "count": 2,
-              "itemId": "elixir_of_the_serpent"
+              "itemId": "elixir_of_the_serpent",
+              "materialSources": [
+                {
+                  "count": 2,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 2,
-              "itemId": "ironhusk_flask"
+              "itemId": "ironhusk_flask",
+              "materialSources": [
+                {
+                  "count": 2,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 2,
-              "itemId": "warboar_flask"
+              "itemId": "warboar_flask",
+              "materialSources": [
+                {
+                  "count": 2,
+                  "source": {}
+                }
+              ]
             }
           ],
           "lifetimeXp": 167200,
@@ -355,7 +373,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "45c385b5",
+      "state": "fb634c95",
       "events": "e47eb66f",
       "rng": {
         "draws": 0,
@@ -432,15 +450,33 @@
             },
             {
               "count": 1,
-              "itemId": "elixir_of_the_serpent"
+              "itemId": "elixir_of_the_serpent",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 2,
-              "itemId": "ironhusk_flask"
+              "itemId": "ironhusk_flask",
+              "materialSources": [
+                {
+                  "count": 2,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 2,
-              "itemId": "warboar_flask"
+              "itemId": "warboar_flask",
+              "materialSources": [
+                {
+                  "count": 2,
+                  "source": {}
+                }
+              ]
             }
           ],
           "lifetimeXp": 167200,
@@ -544,7 +580,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "94a6e76d",
+      "state": "046367ba",
       "events": "44ee5825",
       "rng": {
         "draws": 0,
@@ -621,15 +657,33 @@
             },
             {
               "count": 1,
-              "itemId": "elixir_of_the_serpent"
+              "itemId": "elixir_of_the_serpent",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
-              "itemId": "ironhusk_flask"
+              "itemId": "ironhusk_flask",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 2,
-              "itemId": "warboar_flask"
+              "itemId": "warboar_flask",
+              "materialSources": [
+                {
+                  "count": 2,
+                  "source": {}
+                }
+              ]
             }
           ],
           "lifetimeXp": 167200,
@@ -735,7 +789,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "94a6e76d",
+      "state": "046367ba",
       "events": "6aa32fcd",
       "rng": {
         "draws": 0,
@@ -812,15 +866,33 @@
             },
             {
               "count": 1,
-              "itemId": "elixir_of_the_serpent"
+              "itemId": "elixir_of_the_serpent",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
-              "itemId": "ironhusk_flask"
+              "itemId": "ironhusk_flask",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 2,
-              "itemId": "warboar_flask"
+              "itemId": "warboar_flask",
+              "materialSources": [
+                {
+                  "count": 2,
+                  "source": {}
+                }
+              ]
             }
           ],
           "lifetimeXp": 167200,
@@ -926,7 +998,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "8ec4a5eb",
+      "state": "d66b5855",
       "events": "eb701442",
       "rng": {
         "draws": 0,
@@ -1003,15 +1075,33 @@
             },
             {
               "count": 1,
-              "itemId": "elixir_of_the_serpent"
+              "itemId": "elixir_of_the_serpent",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
-              "itemId": "ironhusk_flask"
+              "itemId": "ironhusk_flask",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
-              "itemId": "warboar_flask"
+              "itemId": "warboar_flask",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             }
           ],
           "lifetimeXp": 167200,
@@ -1117,7 +1207,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "8ec4a5eb",
+      "state": "d66b5855",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1194,15 +1284,33 @@
             },
             {
               "count": 1,
-              "itemId": "elixir_of_the_serpent"
+              "itemId": "elixir_of_the_serpent",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
-              "itemId": "ironhusk_flask"
+              "itemId": "ironhusk_flask",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             },
             {
               "count": 1,
-              "itemId": "warboar_flask"
+              "itemId": "warboar_flask",
+              "materialSources": [
+                {
+                  "count": 1,
+                  "source": {}
+                }
+              ]
             }
           ],
           "lifetimeXp": 167200,

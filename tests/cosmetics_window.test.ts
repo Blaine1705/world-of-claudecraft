@@ -167,7 +167,8 @@ describe('CosmeticsWindow', () => {
     expect(card(el, 'crystal_lich').textContent).toContain('A presence follows you');
     expect(action(el, 'summon-buddy', 'crystal_lich')).toBeNull();
     expect(action(el, 'summon-buddy', 'forgemaw')).toBeNull();
-    expect(action(el, 'summon-buddy', 'sapling')).toBeNull();
+    expect(el.querySelector('[data-id="sapling"]')).toBeNull();
+    expect(action(el, 'summon-buddy', 'sprites')).toBeNull();
     const summon = action(el, 'summon-buddy', 'horse')!;
     summon.focus();
     summon.click();
@@ -345,12 +346,12 @@ describe('CosmeticsWindow', () => {
     expect(el.querySelectorAll('.cos-tab[tabindex="0"]')).toHaveLength(1);
   });
 
-  it('hints when the character owns no mount and skips a repaint on an unchanged snapshot', () => {
+  it('allows cosmetic selection without reins and skips unchanged repaint', () => {
     const world = fakeWorld();
     world.ownedMounts = () => [];
     const { w, el } = makeWindow(world);
     w.open();
-    expect(el.querySelector('.cos-hint')).toBeTruthy();
+    expect(el.querySelector('.cos-hint')).toBeNull();
     const before = el.innerHTML;
     w.refreshIfChanged();
     expect(el.innerHTML).toBe(before);

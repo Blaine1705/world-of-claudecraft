@@ -254,14 +254,15 @@ describe('which items draw the field weapons', () => {
       axe_field_bronze: 4,
       staff_field_iron: 8,
       staff_field_steel: 7,
-      staff_field_bronze: 5,
+      staff_field_bronze: 6, // + the membership Staff of Changing (PR 4281)
       spear_field_iron: 4,
       wand_field_iron: 4,
       wand_field_steel: 3,
     });
     // 49 common and uncommon weapons, and the 42 rare ones; 53 rare on the v0.45.0
-    // integration with the five-dungeon rework's eleven (placeholder finishes).
-    expect(fieldItems.length).toBe(102);
+    // integration with the five-dungeon rework's eleven (placeholder finishes), and 54
+    // with the membership Staff of Changing (PR 4281).
+    expect(fieldItems.length).toBe(103);
   });
 
   it('only common, uncommon and rare weapons of the matching type draw one', () => {
@@ -288,18 +289,25 @@ describe('which items draw the field weapons', () => {
   // The other direction: no common, uncommon or rare weapon is left behind on another
   // model. A new one takes a field look (or a starter model, for a starting item).
   it('every common, uncommon or rare weapon and shield draws a field or starter model', () => {
+    // The Mirefen world boss's Shardpikes keep their own bespoke spear (the throw
+    // mechanic's model, PR 4259; owner call, 2026-10-20): Skerrit's rare and the
+    // muster's plain one.
+    const BESPOKE_SHARDPIKES = new Set(['skerrits_shardpike', 'muster_shardpike']);
     const rares = Object.values(ITEMS).filter((item) => item.quality === 'rare');
     for (const item of rares.filter((r) => r.kind === 'weapon')) {
+      if (BESPOKE_SHARDPIKES.has(item.id)) continue;
       const key = keyOf(itemWeaponModelUrl(item.id));
       expect(isFieldKey(key), `${item.id} (rare) draws ${key}`).toBe(true);
     }
-    // the rare shields: the walls take the heater, the buckler the starting buckler
+    // The release quest shields retain their authored round/kite/tower silhouettes.
+    // Other rare shields use the field heater or starting buckler.
     expect(
       rares
         .filter((item) => isShieldItem(item))
         .map((item) => [item.id, keyOf(itemOffhandModelUrl(item.id))])
         .sort(),
     ).toEqual([
+      ['barrowfield_tower_shield', 'shield_square'],
       ['pearlward_aegis', SHIELD_KEY],
       ['rare_glacier_hewn_bulwark', SHIELD_KEY],
       ['rare_storm_tuned_buckler', 'shield_starter'],
@@ -308,14 +316,19 @@ describe('which items draw the field weapons', () => {
     const weapons = plain.filter((item) => item.kind === 'weapon');
     expect(weapons.length).toBeGreaterThan(40);
     for (const item of weapons) {
+      if (BESPOKE_SHARDPIKES.has(item.id)) continue;
       const key = keyOf(itemWeaponModelUrl(item.id));
       expect(isFieldKey(key) || key.endsWith('_starter'), `${item.id} draws ${key}`).toBe(true);
     }
     const shields = plain.filter((item) => isShieldItem(item));
     expect(shields.map((item) => item.id).sort()).toEqual([
+      'bastion_kite_shield',
       'eastbrook_buckler',
       'highwatch_wallshield',
+      'lychgate_buckler',
     ]);
+    expect(keyOf(itemOffhandModelUrl('lychgate_buckler'))).toBe('shield_round');
+    expect(keyOf(itemOffhandModelUrl('bastion_kite_shield'))).toBe('shield_badge');
     expect(keyOf(itemOffhandModelUrl('eastbrook_buckler'))).toBe('shield_starter');
     expect(keyOf(itemOffhandModelUrl('highwatch_wallshield'))).toBe(SHIELD_KEY);
   });

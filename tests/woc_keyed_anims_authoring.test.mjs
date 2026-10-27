@@ -26,9 +26,9 @@ const CLIPS = Object.keys(CATALOG);
 let io;
 const rigs = {};
 beforeAll(async () => {
-  if (!AUTHORING) return;
   io = await glbIO();
   for (const fit of ['male', 'female']) rigs[fit] = await wocRig(io, fit);
+  if (!AUTHORING) return;
   const cold = [];
   for (const fit of ['male', 'female']) {
     const model = bindModel(rigs[fit]);
@@ -41,6 +41,18 @@ beforeAll(async () => {
     );
 });
 
+function bakedWorld(clip, rig, frame) {
+  return worldPose(
+    rig,
+    Object.fromEntries(
+      rig.map((b) => [
+        b.name,
+        { t: clip.tracks[b.name].t[frame], q: clip.tracks[b.name].q[frame] },
+      ]),
+    ),
+  );
+}
+
 it('solves a bent two-bone chain without changing either segment length', () => {
   const origin = new Vector3(0, 0, 0),
     target = new Vector3(0.3, 0, 0);
@@ -49,6 +61,39 @@ it('solves a bent two-bone chain without changing either segment length', () => 
   expect(joint.distanceTo(target)).toBeCloseTo(0.2, 8);
   expect(joint.y).toBeGreaterThan(0);
 });
+
+it.each(['male', 'female'])(
+  'tracks %s Woc_Run knees and feet straight ahead without outward splay',
+  (fit) => {
+    const rig = rigs[fit];
+    const clip = authorClip(rig, fit, 'Woc_Run');
+    for (let frame = 0; frame < clip.frames; frame++) {
+      const world = bakedWorld(clip, rig, frame);
+      for (const side of ['l', 'r']) {
+        const sign = side === 'l' ? 1 : -1;
+        const hip = world.get(`upperleg.${side}`).p;
+        const knee = world.get(`lowerleg.${side}`).p;
+        const foot = world.get(`foot.${side}`).p;
+        const toes = world.get(`toes.${side}`).p;
+        const dir = toes.clone().sub(foot);
+        const splayDeg = (Math.atan2(sign * dir.x, Math.hypot(dir.y, dir.z)) * 180) / Math.PI;
+        // Bind foot->toes sits ~3.5 deg outward of the boot mesh centerline; keep
+        // the bone tight to the sagittal YZ plane so the boot never splays out.
+        expect(splayDeg, `${fit}/${side}/${frame} foot splay`).toBeGreaterThan(-6);
+        expect(splayDeg, `${fit}/${side}/${frame} foot splay`).toBeLessThan(11);
+        if (dir.z > 0.075) {
+          const yawDeg = (Math.atan2(sign * dir.x, dir.z) * 180) / Math.PI;
+          expect(yawDeg, `${fit}/${side}/${frame} foot yaw`).toBeGreaterThan(-6);
+          expect(yawDeg, `${fit}/${side}/${frame} foot yaw`).toBeLessThan(8);
+        }
+        // Knee tracks in line with the hip and ankle rather than bowing wide.
+        expect(sign * knee.x - sign * hip.x, `${fit}/${side}/${frame} knee bow`).toBeLessThan(
+          0.015,
+        );
+      }
+    }
+  },
+);
 
 describe.skipIf(!AUTHORING).each(['male', 'female'])('%s hand-keyed authoring', (fit) => {
   it('authors every clip with finite unit rotations and unchanged limb/socket transforms', () => {
@@ -97,17 +142,6 @@ describe.skipIf(!AUTHORING).each(['male', 'female'])('%s hand-keyed authoring', 
   // Hand-keyed clips, evaluated from the same baked 60 Hz tracks the
   // exporter writes. Contact points are the floor points under the heel and the
   // toe joint, carried by the foot and toe bones.
-  function bakedWorld(clip, rig, frame) {
-    return worldPose(
-      rig,
-      Object.fromEntries(
-        rig.map((b) => [
-          b.name,
-          { t: clip.tracks[b.name].t[frame], q: clip.tracks[b.name].q[frame] },
-        ]),
-      ),
-    );
-  }
   function contactPoints(rig) {
     const bind = worldPose(rig, {});
     const points = {};
@@ -143,6 +177,16 @@ describe.skipIf(!AUTHORING).each(['male', 'female'])('%s hand-keyed authoring', 
     'Woc_Attack_Dual',
     'Woc_Attack_Dual#main',
     'Woc_Attack_Dual#off',
+    'Woc_Combat_Idle_1H',
+    'Woc_Combat_Idle_2H',
+    'Woc_Combat_Idle_Dual',
+    'Woc_Hit',
+    'Woc_Shout',
+    'Woc_Cast_Directed',
+    'Woc_Cast_Omni',
+    'Woc_Cast_Shoot',
+    'Woc_Cast_Omni_Release',
+    'Woc_Channel_Directed',
   ];
   it('holds planted contacts still in standing clips and keeps every foot above the floor', () => {
     const rig = rigs[fit],
@@ -298,7 +342,7 @@ describe.skipIf(!AUTHORING).each(['male', 'female'])('%s hand-keyed authoring', 
   it('keeps the support hand on the haft through every keyed two-handed swing', () => {
     const model = bindModel(rigs[fit]);
     const twoHanded = CLIPS.filter((clip) => ['twohand', 'long'].includes(CATALOG[clip].weapon));
-    expect(twoHanded).toHaveLength(5);
+    expect(twoHanded).toHaveLength(6);
     for (const name of twoHanded) {
       const { spec } = keyedSpec(model, fit, name);
       expect(spec.grip?.hand, name).toBe('l');

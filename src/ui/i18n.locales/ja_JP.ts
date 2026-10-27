@@ -13,6 +13,362 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'bossJournal.wildheart.zulgar.pulseSummaryRework':
+    '{every}秒ごとに{cast}秒詠唱し、{radius}ヤード以内の全員に{min}から{max}ダメージ。串刺しのプレイヤーは距離に関係なく{pinMult}倍のダメージを受ける。',
+  'bossJournal.wildheart.zulgar.spearSummary':
+    '{cast}秒の詠唱でタンク以外の一人を串刺しにする。他に誰もいなければタンクを狙う。最大{seconds}秒間移動不能になり、{tick}秒ごとに{bleed}ダメージを受ける。',
+  'bossJournal.wildheart.zulgar.spearResponse':
+    '槍を選び、{range}ヤード以内で調べると{pull}秒で引き抜ける。ダメージでは中断されない。広場に他の自由な仲間がいなければ、本人が調べて{self}秒で脱出できる。',
+  'bossJournal.wildheart.zulgar.glyphSummaryRework':
+    '{count}個の紋様は最初は消えている。狩りの間、獲物でないプレイヤーが{kindle}秒立つと点灯する。獲物以外がいなければ獲物が{alone}秒で点灯できる。離れると進行はリセット。点灯した紋様を彼が通ると{seconds}秒間、移動速度が{slow}低下し、被ダメージが{vulnerability}増える。紋様は{dark}秒間再点灯できず、彼は{wary}秒間ほかの紋様に打たれない。狩りの間、スタン時間は半分になる。',
+  'bossJournal.wildheart.zulgar.glyphResponseRework':
+    '獲物でない仲間が進路の先の紋様を点灯させる。そこへ誘導し、日光に打たれている間に攻撃する。狩りが終わると紋様は消える。',
+  'bossJournal.wildheart.zulgar.idolSummary':
+    '体力が{health}になると、倒されるまでジャガーの霊体を保つ。タンクも獲物に選ばれる。',
+  'bossJournal.wildheart.zulgar.idolHuntSummary':
+    '{every}秒ごとに新しい獲物を選び、{turn}秒間そちらを向いてから追い始める。',
+  'bossJournal.wildheart.zulgar.idolHuntHeroicSummary':
+    '{pair}秒ごとに新しい二人を獲物に選び、{switch}秒ごとに追う相手を切り替える。切り替え後、新しい獲物には{turn}秒の猶予がある。',
+  'bossJournal.wildheart.zulgar.breathSummary':
+    '{every}秒ごとに広場の半分を{warning}秒間予告し、その範囲の全員に{min}から{max}の自然ダメージ。左右交互に放つ。',
+  'bossJournal.wildheart.zulgar.breathResponse':
+    '予告が終わる前に印のない半分へ移動する。中央線は安全。ヒロイックでは吐息がその半分の点灯した紋様も消すが、すぐ点灯し直せる。',
+  'bossJournal.temple.selthe.overviewRework':
+    'セルセは移動も近接攻撃もしない。合唱では集まり、独唱では離れ、溺水のアリアを中断し、湖の波を避ける。二度の体力段階で月の床板の旋律を交代で再現する。',
+  'bossJournal.temple.selthe.phaseSummaryRework':
+    '一行が楽譜に応える間、ほかの攻撃は止まる。月水の矢には詠唱バーがなく、中断できない。',
+  'bossJournal.temple.selthe.boltSummaryRework':
+    'ほかの詠唱の合間に{every}秒ごとに矢が着弾する。{windup}秒前に見た目の予告があり、武器ダメージの{mult}倍を冷気として与える。溺水のアリアを中断すると矢とアリアが{quiet}秒止まる。',
+  'bossJournal.temple.selthe.boltResponseRework':
+    'タンクを彼女の視界内に置く。中断技は溺水のアリアに使う。',
+  'bossJournal.temple.selthe.tipHealerRework':
+    'アリアの標的と合唱を一人で受ける仲間に注意。楽譜では次の音を歌うのを手伝い、失敗の傷を癒す。',
+  'bossJournal.temple.selthe.scoreSummary':
+    '体力{first}と{second}で無敵になり、順に{notes}音と{finalNotes}音の旋律を奏でる。それぞれ{answer}秒と{finalAnswer}秒以内に再現する。誤った床板は{falseNote}の冷気ダメージを与え、進行だけをリセットする。時間切れは全員に{min}から{max}の冷気ダメージ。成功すると{stun}秒スタンし、同時に{bonusSeconds}秒間被ダメージが{vulnerability}増える。',
+  'bossJournal.temple.selthe.scoreResponse':
+    '旋律を見てから床板に順番に入る。生存する別の仲間と正しい音を交代で鳴らす。一人だけ生存していれば単独で完了できる。阻止された踏み込みは無害。答え始める前から立っていた床板も、一度離れて入り直して鳴らす。',
+  'bossJournal.temple.selthe.scoreHeroic': '答える間は床板が暗くなる。旋律を覚えて交代で鳴らす。',
+  'auth.wocBuilder.cat.skinTone': '肌の色',
+  'auth.wocBuilder.slider.eyeSize': '目の大きさ',
+  'hudChrome.raidBossGuide.damageRange': '{min}から{max}',
+  'hudChrome.trinkets.range': '{min}から{max}',
+  'editor.appearance.opacity': '不透明度',
+  'editor.assets.subcategory.players': 'プレイヤー',
+  'editor.assets.subcategory.props': '小物',
+  'editor.biome.galleryLockIn': '決定',
+  'editor.build.done': '完了',
+  'editor.buildMode.redo': 'やり直す',
+  'editor.buildMode.undo': '元に戻す',
+  'editor.camera.title': 'カメラ',
+  'editor.camp.levelMin': '最低レベル',
+  'editor.city.prefabDelete': '削除',
+  'editor.city.roadCancel': 'キャンセル',
+  'editor.city.roadDelete': '削除',
+  'editor.city.roadTypeRoad': '道路',
+  'editor.city.wallCancel': 'キャンセル',
+  'editor.collisionMaster.addMenu': '追加',
+  'editor.collisionMaster.lockIn': '決定',
+  'editor.collisionMaster.sculptRadius': '半径',
+  'editor.decalTool.opacity': '不透明度',
+  'editor.decalTool.rotation': '回転',
+  'editor.dungeon.delete': '削除',
+  'editor.dungeon.field.r': '衝突半径',
+  'editor.dungeon.field.scale': 'スケール',
+  'editor.entityTool.categoryCreature': 'クリーチャー',
+  'editor.entityTool.categoryHumanoid': 'ヒューマノイド',
+  'editor.entityTool.categoryNpc': 'NPC',
+  'editor.fire.smoke': 'スモーク',
+  'editor.fluid.dps': '1秒あたりのダメージ',
+  'editor.fluid.fxSmoke': 'スモーク',
+  'editor.inspector.cameraTab': 'カメラ',
+  'editor.lightTool.color': '色',
+  'editor.map.close': '閉じる',
+  'editor.map.worldTitle': 'ワールドマップ',
+  'editor.map.zoneTitle': 'ゾーンマップ',
+  'editor.mobTool.patrolCancel': 'キャンセル',
+  'editor.mobTool.statHealth': '体力',
+  'editor.mobTool.statScale': 'サイズ',
+  'editor.music.title': '音楽',
+  'editor.newMap.create': '作成',
+  'editor.rock.size': 'サイズ',
+  'editor.rock.texture': 'テクスチャ',
+  'editor.settings.close': '閉じる',
+  'editor.settings.title': '設定',
+  'editor.tool.move': '移動',
+  'editor.tool.music': '音楽',
+  'editor.tool.scale': 'スケール',
+  'editor.tool.zone': 'ゾーン',
+  'editor.topbar.dungeon': 'ダンジョン',
+  'editor.topbar.mapWindow': 'マップ',
+  'editor.topbar.minimap': 'ミニマップ',
+  'editor.topbar.more': 'その他',
+  'editor.topbar.music': '音楽',
+  'editor.topbar.preview': 'プレビュー',
+  'editor.topbar.settings': '設定',
+  'editor.tree.leafSize': 'サイズ',
+  'editor.tree.studioDiscard': '破棄',
+  'editor.tree.volumeR': '半径',
+  'editor.tunnel.ghostCancel': 'キャンセル',
+  'editor.tunnel.holeRadius': '半径',
+  'editor.worldLink.cancel': 'キャンセル',
+  'editor.worldLink.unlink': '連携解除',
+  'hudChrome.expeditions.bellCount.one': 'グループを開く：通知{count}件',
+  'hudChrome.expeditions.bellCount.other': 'グループを開く：通知{count}件',
+  'hudChrome.adventureGuide.catalogueCountPlural.one': '冒険{count}件',
+  'hudChrome.adventureGuide.catalogueCountPlural.other': '冒険{count}件',
+  'hudChrome.adventureGuide.title': '冒険ガイド',
+  'hudChrome.adventureGuide.eyebrow': '遠征の記録',
+  'hudChrome.adventureGuide.intro': '世界を探索し、敵を知り、次の冒険を選ぼう。',
+  'hudChrome.adventureGuide.dungeons': 'ダンジョン',
+  'hudChrome.adventureGuide.raids': 'レイド',
+  'hudChrome.adventureGuide.delves': '探索',
+  'hudChrome.adventureGuide.search': '冒険を検索',
+  'hudChrome.adventureGuide.eligible': '自分のレベル',
+  'hudChrome.adventureGuide.catalogueCount': '冒険 {count}件',
+  'hudChrome.adventureGuide.empty': '条件に合う冒険はありません。',
+  'hudChrome.adventureGuide.reset': '絞り込みを解除',
+  'hudChrome.adventureGuide.delve': '探索',
+  'hudChrome.adventureGuide.delveTravel':
+    '探索の入口から入場してください。現地の掲示板で階級を選べます。自動マッチングは利用できません。',
+  'hudChrome.adventureGuide.dungeonTravel':
+    '以下の戦闘情報を確認してから、グループを選ぶか入口へ向かってください。',
+  'hudChrome.adventureGuide.raidTravel':
+    'レイドを集め、戦闘情報と入場制限を確認してから入場してください。',
+  'hudChrome.adventureGuide.soloTravel': 'ソロ用の冒険です。入口へ向かって開始してください。',
+  'hudChrome.adventureGuide.browseOnly': '入口へ向かう',
+  'hudChrome.adventureGuide.findGroup': 'グループを探す',
+  'hudChrome.adventureGuide.inspectLoot': '戦利品を確認',
+  'hudChrome.adventureGuide.lootClass': 'クラス',
+  'hudChrome.adventureGuide.lootSpec': '専門分野',
+  'hudChrome.adventureGuide.allSpecs': 'すべての専門分野',
+  'hudChrome.adventureGuide.lootHint':
+    '選択した専門分野に適した能力値を持つ、使用可能な装備を表示します。共通の報酬も表示されます。ドロップ率は戦利品テーブル全体に基づきます。',
+  'hudChrome.adventureGuide.lootEmpty': 'このクラスと専門分野に合う装備はありません。',
+  'hudChrome.adventureGuide.fullTableRoll': '戦利品テーブル全体からアイテム1個',
+  'hudChrome.adventureGuide.encountersCount': '戦闘 {count}件',
+  'hudChrome.adventureGuide.tiers': '選択可能な階級：{tiers}',
+  'hudChrome.expeditions.bell': 'グループを開く：通知{count}件',
+  'hudChrome.expeditions.alerts': '通知',
+  'hudChrome.expeditions.groups': 'グループ',
+  'hudChrome.expeditions.rewards': '報酬',
+  'hudChrome.expeditions.sections': '遠征の項目',
+  'hudChrome.expeditions.noAlerts': '確認が必要な遠征通知はありません。',
+  'hudChrome.expeditions.findGroup': 'グループを探す',
+  'hudChrome.expeditions.recruitPlayers': 'メンバーを募集',
+  'hudChrome.expeditions.recruitIntro':
+    'ダンジョンとグループの目的を選び、募集内容を確認して公開してください。',
+  'hudChrome.expeditions.recruitDungeon': 'ダンジョン',
+  'hudChrome.expeditions.recruitDifficulty': '難易度',
+  'hudChrome.expeditions.recruitPreview': '募集のプレビュー',
+  'hudChrome.expeditions.recruitPublish': 'グループを公開',
+  'hudChrome.expeditions.recruitPublishing': 'グループを公開中...',
+  'hudChrome.expeditions.recruitBeforeEntry':
+    'ダンジョンに入る前から募集できます。公開してもグループは転送されません。',
+  'hudChrome.expeditions.recruitUnconfirmed':
+    '募集の公開を確認できませんでした。接続やチャットのメッセージを確認して再試行してください。',
+  'hudChrome.expeditions.recruitLoading': '募集の選択肢を読み込み中...',
+  'hudChrome.expeditions.recruitAlreadyOpen': 'すでに募集中です。グループ管理を利用してください。',
+  'hudChrome.expeditions.recruitExistingRun':
+    'すでに遠征に参加しています。「自分のグループ」から募集を管理してください。',
+  'hudChrome.expeditions.recruitLeaveQueue':
+    '自分のグループを公開する前にマッチング待機列から抜けてください。',
+  'hudChrome.expeditions.recruitFinishProposal':
+    'グループを公開する前にマッチングの招待に回答してください。',
+  'hudChrome.expeditions.recruitCancelRequests':
+    '自分のグループを公開する前に保留中の参加申請を取り下げてください。',
+  'hudChrome.expeditions.recruitNoActivities':
+    '現在のグループのレベルと人数で入場できるダンジョンはありません。',
+  'hudChrome.expeditions.recruitNoRoles': 'このキャラクターが選択できる役割はありません。',
+  'hudChrome.expeditions.recruitInvalidNote':
+    'メモは制御文字を使わず120文字以内で入力してください。',
+  'hudChrome.expeditions.manageRecruitment': '募集を管理',
+  'hudChrome.expeditions.formingGroup': 'グループ編成中',
+  'hudChrome.expeditions.groupGathering':
+    'グループを編成中です。準備ができたらダンジョンの入口に集合してください。',
+  'hudChrome.expeditions.groupChooseDungeon':
+    'グループのダンジョンを選んでから、不足しているメンバーを募集してください。',
+  'hudChrome.expeditions.waitForLeader': 'リーダーがダンジョンを選択し、募集を開始できます。',
+  'hudChrome.expeditions.recruitmentNext':
+    '募集中です。準備ができたらダンジョンの入口に集合してください。',
+  'hudChrome.expeditions.findGroupNext':
+    'グループに参加していません。グループを探して遠征を始めましょう。',
+  'hudChrome.expeditions.awaitingReply': '{count}組からの返答を待っています。',
+  'hudChrome.expeditions.requestSent': '申請を送信しました。リーダーの返答を待っています。',
+  'hudChrome.expeditions.readyToTravel':
+    'グループの準備ができました。準備が整ったらダンジョンへ向かってください。',
+  'hudChrome.expeditions.groupRecruiting': '遠征が進行中です。メンバーを募集しています。',
+  'hudChrome.expeditions.groupInProgress': '遠征が進行中です。',
+  'hudChrome.expeditions.title': '募集中の遠征',
+  'hudChrome.expeditions.entryTitle': 'ソロで進むか、メンバーを募集しますか？',
+  'hudChrome.expeditions.entryBody': '今すぐ開始できます。後からいつでもメンバーを募集できます。',
+  'hudChrome.expeditions.open': 'グループを募集',
+  'hudChrome.expeditions.closeRecruitment': '募集を終了',
+  'hudChrome.expeditions.travel': 'グループへ移動',
+  'hudChrome.expeditions.request': '{name}が{role}として参加を希望しています。',
+  'hudChrome.expeditions.level': 'レベル{level}',
+  'hudChrome.expeditions.accept': '承認',
+  'hudChrome.expeditions.decline': '拒否',
+  'hudChrome.expeditions.acceptPlayer': 'プレイヤーを承認',
+  'hudChrome.expeditions.declinePlayer': 'プレイヤーを拒否',
+  'hudChrome.expeditions.chooseRole': '自分の役割',
+  'hudChrome.expeditions.send': '申請を送信',
+  'hudChrome.expeditions.confirmRequest': '申請を確定',
+  'hudChrome.expeditions.chooseRoleAction': '役割を選ぶ',
+  'hudChrome.expeditions.cancel': 'キャンセル',
+  'hudChrome.expeditions.pending': '申請の返答待ち',
+  'hudChrome.expeditions.join': '参加を申請',
+  'hudChrome.expeditions.members': '{current}/{total}人',
+  'hudChrome.expeditions.progress': 'ボス撃破 {defeated}/{total}',
+  'hudChrome.expeditions.needed': '推奨役割：{roles}',
+  'hudChrome.expeditions.close': '閉じる',
+  'hudChrome.expeditions.empty': '現在募集中の遠征はありません。',
+  'hudChrome.expeditions.finder': 'ダンジョン検索を開く',
+  'hudChrome.expeditions.groupsCount': '募集中のグループ：{count}',
+  'hudChrome.expeditions.requestsCount': '参加申請：{count}',
+  'hudChrome.expeditions.yourGroup': '自分のグループ',
+  'hudChrome.expeditions.otherGroups': '他のグループ',
+  'hudChrome.expeditions.manageGroup': '自分の遠征と参加申請',
+  'hudChrome.expeditions.browseGroups': '手助けするグループを選ぶ',
+  'hudChrome.expeditions.noCurrentGroup': '遠征に参加していません。',
+  'hudChrome.expeditions.noCurrentGroupHint':
+    'ダンジョンに入るか、グループへの参加を申請してください。',
+  'hudChrome.expeditions.recruitmentOpen': '募集中',
+  'hudChrome.expeditions.recruitmentClosed': '募集終了',
+  'hudChrome.expeditions.groupRoster': 'グループメンバー',
+  'hudChrome.expeditions.noRequests': '保留中の参加申請はありません。',
+  'hudChrome.expeditions.requestsCombat': '参加申請が届いています。戦闘後に確認してください。',
+  'hudChrome.expeditions.expires': '残り{time}で期限切れ',
+  'hudChrome.expeditions.waiting': '{name}の返答を待っています。',
+  'hudChrome.expeditions.outcomeAccepted':
+    '{name}が申請を承認しました。準備ができたら「グループへ移動」を使ってください。',
+  'hudChrome.expeditions.outcomeDeclined': '{name}が申請を拒否しました。',
+  'hudChrome.expeditions.outcomeExpired': '申請の期限が切れました。再度申請できます。',
+  'hudChrome.expeditions.outcomeCancelled': '申請を取り下げました。',
+  'hudChrome.expeditions.outcomeClosed': 'そのグループは申請を受け付けなくなりました。',
+  'hudChrome.expeditions.editDetails': 'グループ詳細を編集',
+  'hudChrome.expeditions.purpose': 'グループの目的',
+  'hudChrome.expeditions.purposeFirstTime': '初挑戦',
+  'hudChrome.expeditions.purposeRelaxed': 'のんびり攻略',
+  'hudChrome.expeditions.purposeClear': 'ダンジョンをクリア',
+  'hudChrome.expeditions.purposeNeedsHelp': '助けが必要',
+  'hudChrome.expeditions.note': '短いメモ（任意、120文字以内）',
+  'hudChrome.expeditions.saveDetails': '詳細を保存',
+  'hudChrome.expeditions.available': '手助けできます',
+  'hudChrome.expeditions.stopHelping': 'ヘルパー通知を停止',
+  'hudChrome.expeditions.helperRoles': '担当できる役割',
+  'hudChrome.expeditions.helperOn': 'ヘルパー通知は有効です。参加するグループは自分で選べます。',
+  'hudChrome.expeditions.helperPaused':
+    'グループ参加中、待機列への登録中、申請の返答待ちの間はヘルパー通知が一時停止します。',
+  'hudChrome.expeditions.helperFound': '条件に合う{count}組が手助けを求めています。',
+  'hudChrome.expeditions.viewGroups': 'グループを見る',
+  'hudChrome.expeditions.sound': '新しいグループと参加申請を音で知らせる',
+  'hudChrome.expeditions.shop': '待機列ポイントショップ',
+  'hudChrome.expeditions.backToGroups': 'グループに戻る',
+  'hudChrome.expeditions.shopIntro': '手助けへの報酬',
+  'hudChrome.expeditions.shopDescription':
+    '他のプレイヤーの遠征クリアを手助けして獲得したポイントを使えます。',
+  'hudChrome.expeditions.shopCollection': 'ベルのコレクション',
+  'hudChrome.expeditions.shopOwned': '入手済み',
+  'hudChrome.expeditions.shopLocked': 'アンロック可能',
+  'hudChrome.expeditions.shopRules': 'ポイントの獲得方法',
+  'hudChrome.expeditions.pendingRequests': '返答待ちの申請：{count}/5',
+  'hudChrome.expeditions.multiApplyHint':
+    '最大5組に申請できます。どれかに参加すると、他の申請は取り下げられます。',
+  'hudChrome.expeditions.multiApplyLimit':
+    'すでに5件の申請が返答待ちです。他のグループに申請するには1件取り下げてください。',
+  'hudChrome.expeditions.points': '待機列ポイント：{count}',
+  'hudChrome.expeditions.dailyPoints': '本日の獲得：{earned}/{cap}',
+  'hudChrome.expeditions.rewardRules':
+    'ヘルパーは条件を満たすボスごとに5ポイント、クリアで10ポイントを獲得し、ダンジョンクリア時に受け取ります。各ボスの最大体力の1%以上に相当する有効なダメージ、回復、または被ダメージが条件です。各ボスとクリア報酬はダンジョンの難易度ごとに1日1回、1日最大60ポイントまで獲得できます。参加するだけ、または入口で待つだけでは獲得できません。',
+  'hudChrome.expeditions.rewardScope':
+    'ベルの外観はこのキャラクター専用の永続的な装飾です。ゲームプレイには影響しません。',
+  'hudChrome.expeditions.bronze': '青銅のベル',
+  'hudChrome.expeditions.silver': '銀のベル',
+  'hudChrome.expeditions.gold': '金のベル',
+  'hudChrome.expeditions.price': '待機列ポイント{count}',
+  'hudChrome.expeditions.buy': '購入して装備',
+  'hudChrome.expeditions.equip': '装備',
+  'hudChrome.expeditions.equipped': '装備中',
+  'hudChrome.expeditions.defaultBell': '標準のベルを使う',
+  'hudChrome.expeditions.dismiss': '閉じる',
+  'hudChrome.finder.groups': 'グループ',
+  'hudChrome.finder.dungeonGuide': 'ダンジョンガイド',
+  'hudChrome.finder.backToGroups': 'グループに戻る',
+  'hudChrome.finder.createGroup': 'グループを作成',
+  'hudChrome.finder.cancelCreate': 'キャンセル',
+  'hudChrome.finder.activeQueue': '自分の待機列',
+  'hudChrome.finder.yourRole': '自分の役割',
+  'hudChrome.finder.createQueueLocked': '公開する前にマッチング待機列から抜けてください。',
+  'hudChrome.finder.noCreateActivities': 'このカテゴリには参加条件を満たすコンテンツがありません。',
+  'hudChrome.finder.showGuide': '攻略を見る',
+  'hudChrome.finder.hideGuide': '攻略を隠す',
+  'hudChrome.finder.levelUnavailable': '対象レベル範囲外',
+  'hudChrome.finder.guideUnavailable': 'この戦闘の詳しい攻略はまだありません。',
+  'hudChrome.finder.guide.pulse':
+    'ボスの近くにいるプレイヤーに定期的にダメージを与えます。遠隔攻撃役とヒーラーは距離を取ることで被害を減らせます。ヒーラーは近接戦闘中の味方を回復する準備をしましょう。',
+  'hudChrome.finder.guide.cleave':
+    '近接攻撃は現在の標的の近くにいる他のプレイヤーにもダメージを与えます。タンクの周囲に距離を取りましょう。ボスの背後に立つだけでは巻き込みダメージを防げません。',
+  'hudChrome.finder.guide.adds':
+    '戦闘が進むと増援が現れます。タンクはヒーラーに到達する前に引きつけましょう。複数の増援が同時に残らないよう、攻撃役も速やかに倒しましょう。',
+  'hudChrome.finder.guide.enrage':
+    '体力が少なくなると、ボスの攻撃速度とダメージが上昇します。防御と回復のクールダウンを終盤に温存し、他の仕組みにも対処しながら倒しましょう。',
+  'hudChrome.finder.guide.stomp':
+    '定期的な叩きつけで近くのプレイヤーにダメージと短いスタンを与えます。ヒーラーと遠隔攻撃役は距離を取りましょう。周囲の味方がスタン中に動けなくなるため、叩きつけの前にタンクの体力を回復しておきましょう。',
+  'hudChrome.finder.guide.inferno':
+    'ボスは移動と攻撃を止め、徐々に強くなる炎の波動を放ちます。チャネリングが始まったらすぐにボスの周囲から離れ、終了後に戻りましょう。炎の中で散開しても防げません。',
+  'hudChrome.finder.guide.mending':
+    '自身を含む近くの負傷した味方を定期的に回復します。回復役に攻撃を集中し、追加の敵を回復範囲に入れないようにしましょう。即時効果のため、詠唱を妨害することはできません。',
+  'hudChrome.finder.guide.manaBurn':
+    '近接攻撃が命中すると、マナを使う標的のマナを減らすことがあります。ボスをヒーラーや耐久力の低い術者に近づけないようにしましょう。怒りやエネルギーは減りません。',
+  'hudChrome.finder.guide.mortalWound':
+    '近接攻撃で標的が受ける回復量が減ることがあります。傷の効果中は防御クールダウンを使いましょう。同じ体力を回復するのに、より多くの回復が必要になります。',
+  'hudChrome.finder.guide.bleed':
+    '近接攻撃で出血が付与され、継続ダメージを受けることがあります。敵が標的を変えた後も負傷者に注意し、出血が続く間は回復しましょう。',
+  'hudChrome.finder.guide.haste':
+    '近くの味方の攻撃速度を定期的に上昇させます。ビーストマスターの隣で追加の敵集団と戦うのは避け、複数の敵に効果が付いたら防御クールダウンを準備しましょう。',
+  'hudChrome.finder.guide.ward':
+    '近くの味方に定期的にダメージ吸収シールドを付与します。敵全体に攻撃を分散せず、同じ標的に集中してシールドを破壊し、次のシールドが付く前に倒しましょう。',
+  'hudChrome.finder.guide.knockback':
+    '近接攻撃で標的を吹き飛ばすことがあります。タンクの背後に安全な空間を確保し、未交戦の敵の近くは避けましょう。吹き飛ばされた後は近接攻撃範囲に戻れるように準備してください。',
+  'hudChrome.specPanel.healing': '回復量',
+  'hudChrome.specPanel.absorption': 'ダメージ吸収量',
+  'hudChrome.specPanel.physicalAbilityDamage': '近接および遠隔アビリティのダメージ',
+  'hudChrome.specPanel.primaryHealingBonus':
+    '他の回復ボーナスを適用した後、主な回復効果の回復量が{pct}増加します。',
+  'hudChrome.options.enemyHighlightDistance': '{yards}ヤード',
+  'hud.pet.stanceDesc': 'クリックして受動、防御、攻撃、アシストを選びます。',
+  'editor.liveWorld.name': 'ゲーム世界の調整',
+  'editor.liveWorld.scope':
+    'ゲーム世界：地形の高さと塗装、道路、ゲーム内オブジェクトの位置、追加した小物を編集できます。既存の建物は固定されています。「エクスポート」で変更を保存し、レビューに送ってください。',
+  'hudChrome.courier.inventory': '所持品',
+  'hudChrome.courier.bankTitle': '銀行',
+  'hudChrome.courier.capacity': '{used} / {capacity} スロット',
+  'hudChrome.courier.cargoSafe':
+    'バッグが満杯の場合、返却品は超過分として保管されます。配達後、再召喚するまでクーリエは姿を消します。',
+  'entities.abilities.courier.description':
+    '空飛ぶロバを召喚し、バッグと最寄りの銀行の間でアイテムを運びます。銀行まで10秒、帰りも10秒かかります。1回につき最大24スタックを選択できます。返却品は満杯のバッグにも超過分として入り、クーリエは再召喚するまで姿を消します。死亡中やインスタンス内では帰路が一時停止します。新しい配達にはメンバーシップが必要です。',
+  'itemUi.tooltip.membershipWeaponAdaptive':
+    '装備中はクラスと専門分野に合わせて武器の種類、外見、能力値が変化します。',
+  'itemUi.tooltip.membershipScaling':
+    'アイテムレベル{level}。常にキャラクターレベルより5高くなります。',
+  'itemUi.tooltip.membershipRequired':
+    'メンバーシップが切れると装備の能力値とセット効果が停止し、更新すると復活します。',
+  'itemUi.tooltip.membershipDormant':
+    '無効：メンバーシップを更新すると装備の能力値とセット効果が復活します。',
+  'entities.items.lantern_seal.name': '燈火の印章',
+  'entities.items.reins_lantern_hall_destrier.name': '燈火の館の軍馬の手綱',
+  'entities.items.membership_staff.name': '変化の杖',
+  'hudChrome.bags.membershipSlot': 'メンバーシップバッグ枠',
+  'hudChrome.bags.membershipSlotLocked': 'メンバーシップでこのバッグ枠を解放。',
+  'hudChrome.bags.membershipSlotHint':
+    'メンバーシップ有効中はバッグを1個追加で装備できます。期限が切れてもバッグとアイテムは安全に保管されます。',
+  'hudChrome.wocStore.subscription.benefitBag':
+    'メンバーシップバッグ枠にバッグを1個追加で装備できます。',
+  'hudChrome.wocStore.subscription.benefitArmour':
+    'レア品質のソウルバウンド防具と変化の杖を受け取れます。能力値はクラスと専門分野に適応し、アイテムレベルは常にキャラクターレベルより5高くなります。防具7部位をすべて装備すると経験値が20%増加します。',
+  'hudChrome.wocStore.subscription.benefitExpiry':
+    'メンバーシップが切れると追加キャラクター枠、装備の効果、追加バッグ枠は更新までロックされます。バッグとアイテムは安全に保管され、容量超過分も保持されます。基本キャラクター枠は引き続き利用できます。',
+  'hudChrome.bank.accountArmour': 'メンバーシップ装備を受け取る',
   'hudChrome.courier.title': '配達員',
   'hudChrome.courier.close': '配達員を閉じる',
   'hudChrome.courier.ready': '配達の準備完了',
@@ -28,28 +384,37 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.courier.select': '{item}、{count}を選択',
   'hudChrome.courier.selectedItem': '{item}、{count}の選択を解除',
   'hudChrome.courier.instructions':
-    'スタック全体を選択してください。配達員は預け入れた後、指定したアイテムを引き出します。クエストアイテムは送れません。',
+    '自分の銀行、保管庫、またはほかのキャラクター向けにスタック全体を選択してください。配達員は先に預け入れ、その後で指定のアイテムを引き出します。クエストアイテムは送れません。',
   'hudChrome.courier.membership': '次の配達にはメンバーシップの更新が必要です。',
-  'hudChrome.courier.cargoSafe': 'バッグに空きができるまで、配達員がアイテムを保管します。',
   'hudChrome.courier.unavailable': '配達員を召喚して配達を計画しましょう。',
+  'hudChrome.courier.bagsVault': '素材を保管庫へ送る',
+  'hudChrome.courier.vault': '保管庫から取り出す。選んだ行はまるごと持ち帰ります。',
+  'hudChrome.courier.vaultTitle': '保管庫',
+  'hudChrome.courier.storeTabs': '配達員の保管先',
+  'hudChrome.courier.vaultCap': '各素材は最大{cap}個まで',
+  'hudChrome.courier.vaultEmpty': '保管庫は空です。',
+  'hudChrome.courier.vaultLocked': '配達員で使うには、銀行員のところで保管庫を解放してください。',
+  'hudChrome.courier.boundBank': '銀行へ送る予定',
+  'hudChrome.courier.boundVault': '保管庫へ送る予定',
+  'hudChrome.courier.boundAccount': 'ほかのキャラクターの銀行へ送る予定',
+  'hudChrome.courier.accountTitle': 'ほかのキャラクター',
+  'hudChrome.courier.accountBank':
+    'この銀行から取り出す。配達員の到着時、そのキャラクターはログアウトしている必要があります。',
+  'hudChrome.courier.bagsAccount': '{name}の銀行へ送る',
+  'hudChrome.courier.bagsAccountNone': 'アイテムを送るキャラクターを選んでください。',
+  'hudChrome.courier.accountPlanned':
+    '{name}向けに{count}スタックを予定中。別のキャラクター向けに選ぶと置き換わります。',
   'entities.abilities.courier.name': '配達員',
-  'entities.abilities.courier.description':
-    '空飛ぶロバを召喚し、バッグと最寄りの銀行の間で荷物を運びます。通常の走行速度の250%で飛びます。1回につき最大24スタックを選択できます。新しい配達にはメンバーシップが必要です。',
   // Membership additions: same-change non-Latin coverage (M16).
   'hudChrome.wocStore.subscription.benefitsTitle': '有効なメンバーシップの特典',
   'hudChrome.wocStore.subscription.benefitBank':
     'どの銀行員からでも、ほかのキャラクターの銀行を利用できます。',
   'hudChrome.wocStore.subscription.benefitSlots': 'キャラクター枠を10個追加で解放します。',
-  'hudChrome.wocStore.subscription.benefitArmour':
-    'クラスと専門化に合った能力値を持つ魂縛の防具を受け取れます。レベルに合わせて成長し、レベル20でアイテムレベル25になります。全身に装備すると獲得経験値が20%増加します。',
   'hudChrome.wocStore.subscription.benefitTax': 'オークションの通常の手数料が半額になります。',
-  'hudChrome.wocStore.subscription.benefitExpiry':
-    'メンバーシップが切れると、追加枠のキャラクターと防具の特典は更新するまで利用できなくなります。基本枠のキャラクターは引き続き遊べます。',
   'character.membershipRequired': 'このキャラクターで遊ぶにはメンバーシップを更新してください。',
   'character.membershipSlots': 'メンバーシップでキャラクター枠を解放',
   'character.emptySlot': '利用可能なキャラクター枠',
   'hudChrome.bank.accountTab': 'ほかのキャラクター',
-  'hudChrome.bank.accountArmour': 'メンバーシップ防具を受け取る',
   'hudChrome.bank.accountMembership':
     'メンバーシップが有効な間、ここからほかのキャラクターの銀行を利用できます。',
   'hudChrome.bank.accountCharacters': 'キャラクターの銀行',
@@ -57,15 +422,31 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.accountSelect': 'キャラクターを選んで銀行を読み込んでください。',
   'hudChrome.bank.accountUnavailable':
     'この銀行は利用できません。キャラクターを選び直して更新してください。',
-  'hudChrome.bank.accountDeposit': '自分のバッグ：この銀行に預ける',
-  'hudChrome.bank.accountWithdraw': '選択中の銀行：自分のバッグに引き出す',
   'hudChrome.bank.accountDepositHint':
     'クリックすると、このスタックを選択中のキャラクターの銀行に預けます。',
   'hudChrome.bank.accountWithdrawHint':
     'クリックすると、このスタックを自分のバッグに引き出します。',
   'hudChrome.bank.accountBound':
     '魂縛、ロック済み、クエスト用のアイテムはキャラクター間で移動できません。',
+  'hudChrome.bank.accountLoading': 'キャラクターを読み込んでいます…',
+  'hudChrome.bank.accountOpening': '{name}の銀行を開いています…',
+  'hudChrome.bank.accountOnline':
+    '{name}はログイン中です。そのキャラクターをログアウトすると、ここで銀行を開けます。',
+  'hudChrome.bank.accountBusy': '銀行が混み合っています。少し待ってからもう一度お試しください。',
+  'hudChrome.bank.accountNoFit': 'そのスタックを入れる空きがありません。',
+  'hudChrome.bank.accountStale': '移動する前にスタックが変化しました。もう一度お試しください。',
+  'hudChrome.bank.accountTooLarge':
+    '{name}の銀行は大きすぎるため、ここでは開けません。{name}でログインして利用してください。',
+  'hudChrome.bank.accountRetry': 'もう一度試す',
+  'hudChrome.bank.accountBankTitle': '{name}の銀行',
+  'hudChrome.bank.accountBagsTitle': '自分のバッグ',
+  'hudChrome.bank.accountSlots': '{used} / {total} スロット',
+  'hudChrome.bank.accountWithdrawLead': 'アイテムをクリックすると自分のバッグに移します。',
+  'hudChrome.bank.accountDepositLead': 'アイテムをクリックすると{name}の銀行に送ります。',
+  'hudChrome.bank.accountBankEmpty': 'この銀行は空です。',
+  'hudChrome.bank.accountBagsEmpty': 'バッグは空です。',
   'hudChrome.wocStore.subscription.tokenTitle': '取引可能なメンバーシップトークン',
+  'hudChrome.wocStore.subscription.tokenPrice': '30日分で{price}',
   'hudChrome.wocStore.subscription.tokenTerms':
     '{price}の一括払いで30日分。このキャラクターに郵便で届きます。使用してメンバーシップ期間を追加するか、オークションで売却できます。',
   'hudChrome.wocStore.subscription.tokenBuy': 'メンバーシップトークンを購入',
@@ -76,15 +457,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.membershipToken':
     '使用：このトークンを消費し、アカウントのメンバーシップ期間に{days}日を追加します。残りの期間は失われません。使用前なら取引やオークションでの売却が可能です。',
   'itemUi.tooltip.membershipAdaptive': '能力値と防具の種類がクラスと専門化に合わせて変わります。',
-  'itemUi.tooltip.membershipScaling':
-    'アイテムレベルは自分のレベルに合わせて上がります。レベル20になると完成し、アイテムレベル25になります。',
   'itemUi.tooltip.membershipPerfected': '完成：アイテムレベル{level}。',
   'itemUi.tooltip.membershipFullSet':
     'メンバーシップ防具を全{pieces}部位装備すると、獲得経験値が{percent}%増加します。有効なメンバーシップが必要です。',
-  'itemUi.tooltip.membershipRequired':
-    'メンバーシップが切れると防具の能力値とセット効果は無効になり、更新すると再び有効になります。',
-  'itemUi.tooltip.membershipDormant':
-    '無効：メンバーシップを更新すると、防具の能力値とセット効果が戻ります。',
   'entities.items.membership_token.name': 'メンバーシップトークン（30日）',
   'entities.items.membership_helmet.name': 'メンバーシップの兜',
   'entities.items.membership_shoulder.name': 'メンバーシップの肩当て',
@@ -102,6 +477,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.terms':
     '毎月自動更新されます。Stripe で法定通貨によるお支払いができます。請求設定から解約できます。',
   'hudChrome.wocStore.subscription.subscribe': '定期購入する',
+  'hudChrome.wocStore.subscription.addMonth': '1か月追加',
+  'hudChrome.wocStore.subscription.addYear': '12か月追加',
+  'hudChrome.wocStore.subscription.stackTerms':
+    '今すぐお支払い。期間は現在のメンバーシップの終了日に追加され、その後このプランで更新されます。',
+  'hudChrome.wocStore.subscription.stackCapped':
+    'メンバーシップは一度に最大2年分まで保持できます。更新日が近づいてから再度お試しください。',
+  'hudChrome.wocStore.subscription.stackUnavailable':
+    '現在メンバーシップ期間を追加できません。しばらくしてから再度お試しください。',
+  'hudChrome.wocStore.subscription.billingBlocked':
+    'メンバーシップ期間を追加する前に、「定期購入を管理」で支払い情報を更新してください。',
+  'hudChrome.wocStore.subscription.renewsOn': '{date}に更新',
+  'hudChrome.wocStore.subscription.endsOn': 'メンバーシップは{date}に終了',
   'hudChrome.wocStore.subscription.manage': '定期購入を管理',
   'hudChrome.wocStore.subscription.ending': '現在の請求期間の終了時に解約されます',
   'hudChrome.wocStore.subscription.error':
@@ -443,6 +830,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.legendary_riptide_handwraps.name': '至高の離岸流の手巻き',
   'hudChrome.reliquary.sourceActivityBuriedHoard':
     '宝の地図が導く「埋もれた財宝」の報酬の宝箱から手に入る',
+  'hudChrome.reliquary.sourceActivityLanternHall': '燈火の館の補給係から燈火の印章で購入',
+  'hudChrome.reliquary.sourceActivityWeeklyVaultPvp': '週間宝物庫のPvP枠から選んで手に入る',
   'clues.hunt_drakelands_gate_ashes.reply.1':
     '風は東の砂丘から灰を運んできた。何もない砂から灰は飛んでこない。駐屯地の倉庫のセラが巡回をすべて記録している。誰かが食べ物を持っていけば話してくれるだろう。',
   'clues.hunt_drakelands_gate_ashes.reply.2':
@@ -513,8 +902,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.factionRewards.armorKitUse':
     '使用: 胸部防具を強化し、1 時間アーマーが 12 上昇します。',
   'hudChrome.factionRewards.battleStandardUse':
-    '使用: 聖なる夜明けの軍旗を 5 分間設置し、周囲のすべての味方の非戦闘時の体力とマナの回復を大きく高めます。10 秒間その近くにとどまると、夜明けの祝福（全能力値 +5%、30 分）も得られます。（クールダウン 5 分）',
-  'hudChrome.factionRewards.hub_automatons': 'サウスリーチ（オートマトン鋳造所）',
+    '使用：聖なる暁の戦旗を5分間設置します。15ヤード以内の非戦闘中のプレイヤーは体力再生量が10%増え、マナ使用者はさらに2秒ごとに精神の5%に等しいマナを回復します。近くに10秒間いると暁の祝福を受け、筋力、敏捷性、スタミナ、知力、精神が30分間5%上昇します。（クールダウン5分）',
+  'hudChrome.factionRewards.hub_automatons': 'ワームウォッチ（オートマトン）',
   'hudChrome.factionRewards.hub_church_order': 'イーストブルック渓谷（教会修道会）',
   'hudChrome.factionRewards.hub_none': 'なし（勢力の拠点の近くで使用すると同調します）',
   'hudChrome.factionRewards.hub_rift_watch': 'ドリフトヘイヴン（リフトの見張り）',
@@ -631,8 +1020,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cooldownManager.notInGroupHint':
     'このスペルをグループに入れるとボタンが表示されます。',
   'hudChrome.cooldownManager.notKnown': '{spell}（未習得）',
-  'hudChrome.cooldownManager.onlyWhenReady': '準備完了時のみ表示',
-  'hudChrome.cooldownManager.onlyWhileActive': '有効時のみ表示',
   'hudChrome.cooldownManager.opacity': '不透明度',
   'hudChrome.cooldownManager.orientation': '向き',
   'hudChrome.cooldownManager.otherSpells': 'その他のスペル',
@@ -656,12 +1043,34 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'スペルをグループへドラッグするか、選択してグループと通知を設定します。ボタンはスペルが別のものに変わるとそれに追従し、変わった際には光ります。',
   'hudChrome.cooldownManager.trackedTitle': '追跡中のスペル',
   'hudChrome.cooldownManager.vertical': '縦',
-  'hudChrome.cooldownManager.visAlways': '常に表示',
   'hudChrome.cooldownManager.visCombat': '戦闘中',
-  'hudChrome.cooldownManager.visHidden': '非表示',
   'hudChrome.cooldownManager.visHiddenHint':
     '非表示のグループでも、音は再生され、アクションバーは光ります。',
-  'hudChrome.cooldownManager.visibility': '表示設定',
+  'hudChrome.cooldownManager.auraActive': '発動中',
+  'hudChrome.cooldownManager.auraMissing': '未発動',
+  'hudChrome.cooldownManager.auraShowWhen': 'オーラがこの状態のときにボタンを表示',
+  'hudChrome.cooldownManager.glowWhileMissing': '未発動時に光らせる',
+  'hudChrome.cooldownManager.groupOffHint':
+    '場所が1つもチェックされていないと、このグループは表示されず、音も鳴りません。',
+  'hudChrome.cooldownManager.neverShownHint':
+    'どちらもチェックしていないとボタンは表示されませんが、音は鳴ります。',
+  'hudChrome.cooldownManager.notReadyHint':
+    '使用不可とは、クールダウン中か、今は使えない状態のことです。',
+  'hudChrome.cooldownManager.placeHint':
+    'インスタンスとはダンジョン、レイド、デルヴ、リフト、戦場、アリーナなど、インスタンス化されたすべての場所のことです。チェックしていない場所では、グループは非表示になり音も鳴りません。',
+  'hudChrome.cooldownManager.reminderGlowHint':
+    'オーラがないあいだ、ボタンを明るくし、縁取りして点滅させます。',
+  'hudChrome.cooldownManager.reminderHint':
+    'バフリマインダー: このオーラがないあいだボタンが光り、得ると消えます。',
+  'hudChrome.cooldownManager.reminderSoundHint': 'オーラが切れたときに鳴ります。',
+  'hudChrome.cooldownManager.showButtonWhen': 'ボタンを表示する条件',
+  'hudChrome.cooldownManager.showIn': '表示する場所',
+  'hudChrome.cooldownManager.showInInstances': 'インスタンス',
+  'hudChrome.cooldownManager.showInWorld': 'オープンワールド',
+  'hudChrome.cooldownManager.showNotReady': '使用不可',
+  'hudChrome.cooldownManager.showOutOfCombat': '非戦闘中',
+  'hudChrome.cooldownManager.showReady': '使用可能',
+  'hudChrome.cooldownManager.showWhile': '表示する状況',
   'hudChrome.crafting.mobileStationTitle': '{name}の{station}',
   'hudChrome.hill.contestNone': '{total}の間、内部で過半数を維持すると占拠できます',
   'hudChrome.hill.contestOther': '丘を失いつつあります：{seconds} / {total}',
@@ -687,6 +1096,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootQuality.itemName': '{item}、{quality}',
   'hudChrome.mapAtlas.collapseHint': 'マップサイドバーを折りたたむ',
   'hudChrome.mapAtlas.expandHint': 'マップサイドバーを展開',
+  'hudChrome.mapAtlas.resizeRailAria': 'マップサイドバーの幅',
+  'hudChrome.mapAtlas.resizeRailHint':
+    'ドラッグしてマップサイドバーの幅を変更します。ダブルクリックで元に戻します。',
   'hudChrome.mapAtlas.worldQuests.count': '{done} / {total}',
   'hudChrome.meters.activeProfile': 'アクティブなプロファイル',
   'hudChrome.meters.activeProfileDesc':
@@ -759,6 +1171,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '同時に表示するバーの数です（0＝無制限、ウィンドウの高さに自動調整）。',
   'hudChrome.meters.noDeathEvents': '死亡前に記録されたイベントはありません',
   'hudChrome.meters.noDetailedData': '詳細データがありません',
+  'hudChrome.meters.detailHealSubtitle':
+    '有効：{effective} | 過剰回復：{overheal}（{overhealPercent}） | ヒット数：{hits}（クリティカル {critPercent}）',
+  'hudChrome.meters.detailHitSubtitle':
+    'ヒット数：{hits} | クリティカル：{crits}（{critPercent}） | 平均：{average} | 最小/最大：{min} / {max}',
   'hudChrome.meters.noTargetData': 'この対象のプレイヤーデータがありません',
   'hudChrome.meters.numCompact': '数値：省略表記（k/M）',
   'hudChrome.meters.numDetailed': '数値：詳細表記',
@@ -889,24 +1305,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '他のフラグを立てたプレイヤーがどこでもあなたを攻撃できるようになり、勝てば所持金から最大{cap}を奪われます。再びフラグを下ろすこともできますが、{minutes}分かかります。',
   'hudChrome.worldPvp.confirmCancel': 'キャンセル',
   'hudChrome.worldPvp.disable': 'ワールドPvPを無効化',
-  'hudChrome.worldPvp.disarmLine': 'フラグを下ろすには{minutes}分かかり、戦闘の終了を待ちます。',
+  'hudChrome.worldPvp.disarmLine':
+    '解除には{minutes}分かかり、開催中の丘から出て戦闘が終わるまで完了しません。',
   'hudChrome.worldPvp.enable': 'ワールドPvPを有効化',
   'hudChrome.worldPvp.greyLine': '自分より{levels}レベル以上低いプレイヤーからは何も得られません。',
   'hudChrome.worldPvp.groundContested':
     'それ以外の場所はすべて係争地です。フラグを立てたプレイヤー同士のみが戦えます。',
   'hudChrome.worldPvp.groundFfa':
-    'ドレイクランド、フロストヴェイルの果て、アンバーフォールは無差別戦闘地帯です。そこではフラグの有無に関わらず、誰もが戦えます。',
+    'ドレイクランド、フロストヴェイルの果て、アンバーフォールは通常のPvPフラグルールに従います。開催中の「丘の王」の円に入るとフラグが立ちます。',
   'hudChrome.worldPvp.groundSanctuary':
-    '修練の浜とイーストブルック渓谷は聖域です。ワールドPvPは一切起こりません。',
+    '修練の浜は唯一の聖域です。ここではワールドPvPを有効にしたり、他のプレイヤーと戦ったりできません。',
   'hudChrome.worldPvp.groupLine':
     'パーティとレイドの仲間同士は決して敵対しません。グループ外のギルドメンバーとは戦うことができます。',
   'hudChrome.worldPvp.honorLine': '撃破ごとに名誉{honor}、貢献した全員で分配。',
   'hudChrome.worldPvp.keepUp': 'フラグを維持',
   'hudChrome.worldPvp.levelReq': 'レベル{level}が必要です。',
   'hudChrome.worldPvp.markLine':
-    'そこでフラグを立てていないプレイヤーを攻撃すると自分のフラグが立ちますが、フラグを立てた相手を攻撃しても立ちません。',
-  'hudChrome.worldPvp.noStakeLine':
-    '無差別戦闘地帯でフラグを立てていないプレイヤーが倒されても、金貨を一切支払いません。',
+    '開催中の丘の円に入るとワールドPvPが有効になります。円から出てもフラグは残ります。',
+  'hudChrome.worldPvp.noStakeLine': 'フラグのないプレイヤーはオープンワールドで攻撃されません。',
   'hudChrome.worldPvp.noTakeLine':
     'フラグを立てていない戦闘者もゴールドは得られません。ゴールドが動くのはフラグを立てた2人のプレイヤーの間だけです。',
   'hudChrome.worldPvp.pending': 'レルムからのPvP状態を待っています。',
@@ -914,8 +1330,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.worldPvp.record': '戦績：撃破{kills}、死亡{deaths}',
   'hudChrome.worldPvp.repeatLine':
     '同じプレイヤーを繰り返し倒すと、2回目は{second}、3回目は{third}、以降は何も得られません。カウントは最初の撃破から{reset}後にリセットされます。',
+  'hudChrome.worldPvp.skullName': '{name}の頭蓋骨',
   'hudChrome.worldPvp.splitLine':
     '純粋な1対1なら報酬を独占できます。加勢した仲間とそのヒーラーは分配します。',
+  'hudChrome.worldPvp.spoilsLine':
+    '双方がフラグを立てている場合、とどめを刺した者の取り分の金貨が敗者の頭蓋骨と共に遺体に落ちます。',
   'hudChrome.worldPvp.stakeLine': '敗者は所持金の{percent}か{cap}のうち、少ない方を支払います。',
   'hudChrome.worldPvp.statusDisarming':
     'フラグは{time}後、または現在の戦闘が終わり次第下がります。',
@@ -925,6 +1344,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'PvPフラグは下がっていますが、無差別戦闘地帯では引き続き攻撃することも、攻撃されることもあります。',
   'hudChrome.worldPvp.statusOn':
     'PvPフラグは立っています。フラグを立てたプレイヤーから攻撃を受ける可能性があります。',
+  'hudChrome.worldPvp.rewardTitles':
+    'ワールドPvPを有効にした状態で、オープンワールドまたはPvPインスタンスでのプレイ時間が{thresholds}に達すると、永続的な称号を獲得します。ログアウト中、死亡中、PvEインスタンス内、聖域ではタイマーが停止します。PvPを無効にするとリセットされます。',
+  'hudChrome.worldPvp.rewardPaused': '現在のPvP継続時間：{time}（聖域で一時停止中）',
+  'hudChrome.worldPvp.rewardPausedDead': '現在のPvP継続時間：{time}（死亡中のため一時停止中）',
+  'hudChrome.worldPvp.rewardPausedInstance':
+    '現在のPvP継続時間：{time}（PvEインスタンス内で一時停止中）',
+  'hudChrome.worldPvp.rewardProgress': '現在のPvP継続時間：{time}',
   'hudChrome.worldPvp.tab': 'ワールドPvP',
   'hudChrome.worldPvp.title': 'ワールドPvP',
   'hudChrome.worldPvp.zoneContested': '係争地：ここで戦えるのはフラグを立てたプレイヤーのみです。',
@@ -933,6 +1359,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.orderClosed': 'その注文はもう受け付けていません。',
   'itemUi.errors.orderCountNeeded': '欲しい数量を指定してください。',
   'itemUi.errors.orderNotYours': 'それはあなたの注文ではありません。',
+  'itemUi.errors.orderTrackedItem': '商人は一点物の装備の注文を受け付けません。',
   'itemUi.errors.orderOwn': 'それは自分の注文です。キャンセルすると回収できます。',
   'itemUi.errors.tooManyOrders': '同時に出せる注文は最大{count}件です。',
   'itemUi.logs.orderDelivered':
@@ -1003,7 +1430,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '丘を今すぐ告知します。丘は予告期間が終わると出現します。',
   'devCommand.actions.hillwarn.label': '丘を予告',
   'entities.abilities.lava_burst.description':
-    '{damage}の火炎ダメージを与えます。灰燼の衝撃で燃えている対象には必ずクリティカルヒットします。マグマの奔流：灰燼の衝撃がダメージを与えるたびに20%の確率でこのクールダウンをリセットし、10秒以内に使用する次のマグマバーストを即座の詠唱にします。ダメージは呪文威力とともに上がります。（サンダーコール）',
+    '{damage}の火炎ダメージを与えます。命中で雷鳴を1獲得。自分の灰燼の衝撃で燃えている標的には必ずクリティカルし、通常命中の24%分の追加ダメージを与えます。マグマの奔流：灰燼の衝撃の各継続ダメージには20%の確率でこのクールダウンをリセットし、10秒以内の次のマグマバーストを即時にする効果があります。ダメージは呪文威力で増加します。（エレメンタル）',
   'entities.abilities.lava_burst.name': 'マグマバースト',
   'entities.abilities.lightning_overload.description':
     'パッシブ：電弧の矢とスカイブランチには20%の確率でオーバーロードする効果があり、最初の対象に与えたダメージの50%で再度攻撃し、雷鳴を1得ます。（サンダーコール）',
@@ -1149,7 +1576,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.vanguard_warrior_prot_helmet.name': '鉄壁進撃の兜',
   'entities.items.vanguard_warrior_prot_legs.name': '鉄壁進撃の脚甲',
   'entities.items.vanguard_warrior_prot_shoulder.name': '鉄壁進撃の肩鎧',
+  'entities.items.vanguard_feral_staff.name': '先陣の野性の杖',
   'entities.items.vanguard_warstaff.name': 'ヴァンガードの戦杖',
+  'entities.items.infernal_quiver.name': '業火の矢筒',
   'entities.items.brookwatch_robe.name': '小川監視のローブ',
   'entities.items.brookwatch_leggings.name': '小川監視のレギンス',
   'entities.items.brookwatch_slippers.name': '小川監視のスリッパー',
@@ -1546,14 +1975,20 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.saltwrack_shoulderguards.name': '塩の難破のショルダーガード',
   'entities.items.saltwrack_pauldrons.name': '塩の難破の肩甲',
   'entities.items.saltwrack_epaulets.name': '塩の難破のエポレット',
+  'entities.npcs.contract_clerk_tobias_wren.greeting':
+    '契約は週に三件、更新のたびに貼り出す。署名も手数料もいらない。やり遂げれば印章はあなたのものだ。',
+  'entities.npcs.contract_clerk_tobias_wren.name': 'トバイアス・レン',
+  'entities.npcs.contract_clerk_tobias_wren.title': '契約係',
   'entities.npcs.glider_apprentice.name': 'スカイ',
   'guide.arenaPage.vanguardBody':
     'ヴァンガード装備はウォーフェア装備の第2シーズンで、同じ二人の補給官が元の階層に加えて販売し続けます。元の階層も販売終了にはなりません。どのスペックにも頭、肩、胸、脚、手の五部位からなる専用のヴァンガードセットがあり、ショップにはあなたのクラスが装備できる三つのセットだけが並び、続けて装備できるヴァンガードの武器が並びます。ヴァンガードの部位は元の階層と同じウォーフェアレーティングを、より高いアイテムレベルで備えており、各セットには2点と4点でスペックのアビリティの一つを変化させる二つのボーナスがあります。元のセットと違い、それらのボーナスはモンスター相手を含めどこでも機能しますが、対プレイヤー戦向けに作られているため、レイド内ではレイドセットの方が依然として優れた選択です。',
+  'guide.arenaPage.vanguardStatsBody':
+    '元のティアと違い、ヴァンガード装備には戦闘レーティングも付いています。ヴァンガードの防具、武器、ペンダントにはそれぞれクリティカルレーティングかヘイストレーティングがあり、呪文使いとヒーラー向けの装備には呪文威力か治癒力も付きます。ヴァンガードの指輪とペンダントは武器と並んで販売され、どのクラスでも装備できます。ヴァンガードの近接用の指輪を2つ着けると、同じレベルのプレイヤーへの攻撃の基本ミス率をちょうど打ち消す命中レーティングになり、呪文用の指輪を2つ着けると呪文が抵抗される確率も同様に打ち消せます。二刀流のオートアタックには追加のミス率が残ります。ヒーラー用の指輪には代わりにヘイストレーティングが付きます。',
   'guide.arenaPage.vanguardHeading': 'ヴァンガード装備：ウォーフェアシーズン2',
   'guide.settingsPage.ifColorblindMode':
     'Nythraxisの床の危険地帯（墓所の噴出の警告円、墓炎と魂炎の溜まり、紫炎の直線、魂の裂傷の印）を、色覚異常でも見分けやすい配色に変更します。色相と明るさをはっきり分けているので、重なった円でも境界が見分けられます。大きさ、タイマー、位置は一切変わりません。',
   'guide.settingsPage.ifTargetAurasBelowFrame':
-    'ターゲットフレームのバフとデバフの並びを、フレームの上ではなく下に表示する、クラシックなレイアウトです。既定のターゲットフレームはアクションバーのすぐ上にあるため、初期状態ではオフになっています。フレームを下に余白のある場所へ移動した後にオンにしてください。',
+    '対象の強化・弱体効果の列を、対象フレームの上ではなく、名前と体力バーの下に置く従来の配置です。初期位置では、対象フレームとあなたの詠唱バー、攻撃タイマーが効果一行分上がり、最初の効果行がアクションバーに重ならなくなります。自分で移動したフレームはその位置を保ちます。',
   'guide.stats.warfareBodyPets':
     'ウォーフェアは、名誉の防具が備える、他のプレイヤーと戦うためのステータスです。プレイヤー同士の戦いでは、あなたとペットが他のプレイヤーやそのペットに与えるダメージを高め、あなたとペットが彼らから受けるダメージを下げます。さらに、ダンジョン、レイド、デルヴ、リフトを除くあらゆる場面で最大体力を高めるため、名誉の防具をまとったプレイヤーは、まとっていない相手よりもはるかに倒しにくくなります。これらすべてがキャラクターシートに一行で表示されます。名誉で購入するウォーフェアのギアから得られるので、レベリング中に追いかけるものというより、PvPを遊んだことへの報酬です。',
   'hudChrome.paperdoll.trinketSlot': '装飾品',
@@ -1570,6 +2005,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.selectedTable': 'テーブルを{count}件選択中',
   'hudChrome.weeklyRewards.selectedTables': 'テーブルを{count}件選択中',
   'hudChrome.weeklyRewards.noLevelLoot': '現在のレベルで対象となる戦利品はありません。',
+  'hudChrome.weeklyRewards.lootFocus': '戦利品の専門分野',
+  'hudChrome.weeklyRewards.allClassGear': 'クラスの全装備',
+  'hudChrome.weeklyRewards.lootFocusHelp': '未開封の宝庫にのみ適用されます。',
+  'hudChrome.weeklyRewards.noFocusedLoot':
+    '対象の戦利品がありません。他の専門分野を選んでください。',
+  'hudChrome.weeklyRewards.rolledFocus': '抽選時の専門分野：{focus}',
   'hudChrome.weeklyRewards.tableItem': 'アイテム{count}個',
   'hudChrome.weeklyRewards.tableItemCount': 'アイテム{count}個',
   'hudChrome.weeklyRewards.previouslyRolled': '抽選済みの報酬',
@@ -1579,6 +2020,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '対象アイテムはすべて抽選済みです。公開済みの報酬を選んでください。',
   'hudChrome.weeklyRewards.worldPoolRule':
     'ノーマル難易度のNythraxis装備。レイドのクリアは不要です。',
+  'hudChrome.weeklyRewards.previewPoolRule':
+    'これらの宝物庫で抽選できるすべてのテーブルです。ボスを撃破すると、今後の宝物庫でその戦利品が恒久的に解放されます。ダンジョンのテーブルには撃破したボスの戦利品だけが含まれ、ヒロイックでの撃破はノーマルも解放します。すでに抽選されたアイテムは抽選から除外されます。必要レベルが自分のレベルより{maxLevelOffset}を超えて高い装備は表示されません。',
   'hudChrome.weeklyRewards.selectionPoolRule':
     'レイドとダンジョンの報酬は、開ける前にテーブルを1つ以上選んでください。ダンジョンのテーブルには、この難易度で撃破したボスの戦利品がまとめられています。重複アイテム、レジェンダリーアイテム、必要レベルが自分のレベルより{maxLevelOffset}を超えて高い装備は抽選から除外されます。',
   'questUi.worldQuest.puzzleRetry': 'もう一度',
@@ -1631,6 +2074,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.ferry.castingOff': '{dest}行きの渡し船が出航します',
   'hudChrome.ferry.boardHint': '出航の時に甲板に立っていれば一緒に出発できます。運賃は無料です。',
   'hudChrome.ferry.sailing': '{dest}へ航行中',
+  'hudChrome.ferry.portLabel': '{port}発{dest}行きの渡し船',
+  'hudChrome.ferry.portTitle': '{port}の渡し船乗り場',
+  'hudChrome.ferry.destination': '行き先：{dest}',
+  'hudChrome.ferry.boardNow': '今すぐ乗船できます',
+  'hudChrome.ferry.arrivesIn': '渡し船の到着まで{time}',
+  'hudChrome.ferry.scheduleUnavailable': '渡し船の時刻表を取得できません。',
   'hudChrome.noticeboard.officerEntry': '{name}（{rank}）',
   'hudChrome.professionTrainers.nameplate': '＜{title}＞',
   'landing.contribute': 'ゲーム開発に参加する',
@@ -1657,7 +2106,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'エンチャントは四段階あります。基礎段階は鈴音の粉塵（高位は精髄も少量使用）を消費し、武器スロット、副手、そしてすべての防具スロットをカバーします。各ビルドがすべてのスロットに合った選択肢を見つけられるだけの能力値の軸が揃っており、盾と術者が持つ副手には専用のスタミナエンチャントがあるので、装備スロットにエンチャントの死角はありません。上位段階はGreaterと呼ばれ、鈴音のかけら1個と精髄を消費します。より影響の大きいスロットに強力なボーナスを付与します。かけらの使い道はほかに三つ、二種の護符レシピが各1個（護符の残りの材料は精髄と粉）、道具効果の再充填の最上段、そして光輝段階です。光輝段階では武器と胸のエンチャントが1個ずつ、注入が2個を求めます。使う前に少し蓄えておきましょう。\n\nその間に五つのルーンエンチャントが挟まります。種別副産物を一個ずつ使う構成で、砕いた素材が無駄になりません。ルーンの刃（武器、筋力、共鳴の鋼）、ルーンの印章（武器、知力、共鳴の木材）、ルーン織り（胸、精神、共鳴の糸）、ルーンの革（脚、敏捷、共鳴の革）、ルーンの鎖（兜、スタミナ、共鳴の鎖）の五種。いずれも鈴音の精髄2個を必要とします。同じスロットと能力値に基礎とGreaterの両方がある場合、ルーンのボーナスはその中間に収まります。その一方でルーン織りは胸の精神エンチャントとして端的に最強であり、ルーンの革は脚の敏捷エンチャントとして唯一の存在です。詳細なボーナスは下の表を参照してください。\n\n通常の低位エンチャントの上に立つのが光輝段階、この職の通常エンチャントの頂点です。四種にはエンチャント100、注入には125が必要で、下の表の「スキル」の欄に示されています。いずれも光輝の試薬を必要とし、武器（剛力と呪文威力の二種）、胸、足という各スロットの階段をもう一段だけ上げます。その最後の一つ、光輝の注入は、完全化された品にしか宿りません。完全化はエンチャンターではなく持ち主自身の仕事であり、品がそこへ至る道は生産職のページが語ります。\n\n最後の炎の熱情は独立したレイド製法であり、無料で使える通常エンチャントではありません。付与するには、エンチャント技能100で取引可能な製法書を先に習得してください。1回の付与に最後の炎の核3個と鈴音のかけら2個を消費します。製法書は坩堝でドロップするほか、その補給官から核1個で購入できます。近接攻撃での発動と武器速度の規則は下にすべて記載されています。',
   'guide.profPages.ench.formulaRequired': '製法書が必要',
   'guide.profPages.econ.provenanceBodyUndiscounted':
-    '名前を持つ品があります。素材の入手元の行にはその区分の単位を集めた採集者が記され、プレミアムな署名者がいる場合は別の署名マークがそれを示します。この二つは独立した事実です。通常の採集素材は採集者を記録しますが署名を得るとは限らず、旧来の署名済みの在庫は採集者が記録されなかったと正直に示しつつ署名者の名だけを示すこともあります。完成品はかわりに誰が製作したかを示します。これらの記録は取引、銀行、郵便、ワールドマーケット、そして商人からの買い戻しを経ても品に付いて回り、決して薄れません。\n\n採集は最高の成果に自動で署名します。レア以上の判定になった収穫はすべて署名され、希少な発見はその5倍のまるごとの追加収穫全体に署名します。死体採集の幸運な判定は、その種類に渡せる標本がない場合は収穫そのものに署名し、標本がある場合は収穫を無署名のままにして、署名入りの完璧な標本を別に生成します。製作も同じ原則に従います。レア以上の産出物はすべての個体が署名入りとなり、傑作はその品質にかかわらず必ず署名されるため、どの品でも最上の個体には必ず作り手の名が記されます。通常素材の署名は単位そのものに付随しており、互換性のあるスタックにすでに別の採集者や署名者が含まれているという理由だけで失われることはありません。個別の完璧な標本は別のアイテムであり、なお空き枠を必要とします。収まらない場合、通常の死体収穫は残りますが標本は失われます。\n\n完成品は厳密に一つの個体情報を保つため、二つの個体はすべての印が完全に一致した場合にのみ合流します。同じ品、同じ署名者、同じ傑作の能力値、同じエンチャント、同じ帰属です。互換性のある素材は採集者や署名者が異なっても枠を共有しつつ、各入手元ごとの個数を保持します。ホバー時のツールチップは入手元を要約し、すべての一覧を見るにはスタックを右クリックしてください（タッチ操作では「入手元」ボタンを使用します）。採集者別に分けるを選ぶとバッグ内でそれらのスタックが分かれたままになり、並べ替えもその選択を尊重します。譲渡された素材は受け取り手の素材と通常どおりスタックできます。\n\n署名は職人にも利益をもたらします。製作台のそばで必要な素材の署名入りの個体を一つでも持っていれば、誰が署名したかにかかわらず傑作率が2パーセントポイント上がります。自分自身の手で署名した素材を持っていれば、その素材の必要量が1個減りますが、最低でも1個は必要です。ただし、その素材が割引不可と指定されている場合は例外で、レイドの核は常に全量を消費します。自分が署名したレア以上の作品は、今のところ製作したポーションに限り、なお技能を教え続けてくれます。自分で調合し署名したレアな飲み薬を飲むと、その職が有効な主専攻の一つである限り、それを作った職にわずかな技能が還元されます。これは本当にポーションの領域だけの効果であり、エリクサー、巻物、頂点のフラスコはどれほど見事に署名されていても技能を還元しません。',
+    '名前を持つ品があります。素材の入手元の行にはその区分の単位を集めた採集者が記され、プレミアムな署名者がいる場合は別の署名マークがそれを示します。この二つは独立した事実です。通常の採集素材は採集者を記録しますが署名を得るとは限らず、旧来の署名済みの在庫は採集者が記録されなかったと正直に示しつつ署名者の名だけを示すこともあります。完成品はかわりに誰が製作したかを示します。これらの記録は取引、銀行、郵便、ワールドマーケット、そして商人からの買い戻しを経ても品に付いて回り、決して薄れません。\n\n採集は最高の成果に自動で署名します。レア以上の判定になった収穫はすべて署名され、希少な発見はその5倍のまるごとの追加収穫全体に署名します。死体採集の幸運な判定は、その種類に渡せる標本がない場合は収穫そのものに署名し、標本がある場合は収穫を無署名のままにして、署名入りの完璧な標本を別に生成します。製作も同じ原則に従います。レア以上の産出物はすべての個体が署名入りとなり、傑作はその品質にかかわらず必ず署名されるため、どの品でも最上の個体には必ず作り手の名が記されます。通常素材の署名は単位そのものに付随しており、互換性のあるスタックにすでに別の採集者や署名者が含まれているという理由だけで失われることはありません。個別の完璧な標本は別のアイテムであり、なお空き枠を必要とします。収まらない場合、通常の死体収穫は残りますが標本は失われます。\n\n完成品は厳密に一つの個体情報を保つため、二つの個体はすべての印が完全に一致した場合にのみ合流します。同じ品、同じ署名者、同じ傑作の能力値、同じエンチャント、同じ帰属です。互換性のある素材は採集者や署名者が異なっても枠を共有しつつ、各入手元ごとの個数を保持します。ホバー時のツールチップは入手元を要約し、すべての一覧を見るにはスタックを右クリックしてください（タッチ操作では「入手元」ボタンを使用します）。採集者別に分けるを選ぶとバッグ内でそれらのスタックが分かれたままになり、並べ替えもその選択を尊重します。譲渡された素材は受け取り手の素材と通常どおりスタックできます。\n\n署名は職人にも利益をもたらします。必要素材の署名入りの個体を一つでもバッグ、またはその製作が利用できる素材保管庫に持っていれば、誰が署名したかにかかわらず傑作率が2パーセントポイント上がります。自分自身の手で署名した素材を持っていれば、その素材の必要量が1個減りますが、最低でも1個は必要です。ただし、その素材が割引不可と指定されている場合は例外で、レイドの核は常に全量を消費します。自分が署名したレア以上の作品は、今のところ製作したポーションに限り、なお技能を教え続けてくれます。自分で調合し署名したレアな飲み薬を飲むと、その職が有効な主専攻の一つである限り、それを作った職にわずかな技能が還元されます。これは本当にポーションの領域だけの効果であり、エリクサー、巻物、頂点のフラスコはどれほど見事に署名されていても技能を還元しません。',
   'guide.profPages.econ.introRaidCollections':
     '生産職の間でお金がどう動くかを紹介します。正確な料金と消費先、実際に売れる品、ワールドマーケットの規則、作業依頼、受注製作、そして通常製作と並ぶレイド素材セットの位置付けです。',
   'guide.profPages.econ.doctrineBodyRaidCollections':
@@ -1747,10 +2196,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.formula_piston_drive.name': '製法書：ピストン駆動',
   'hudChrome.enchantName.enchant_weapon_lastflame_zeal': '最後の炎の熱情',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    '命中した近接攻撃は、確率で15秒間筋力を50増加させ、自分の体力を200回復する。回復量の補正が適用される。命中ごとの発動率は、攻撃した武器の基本速度0.6秒につき1%。内部クールダウンはない。強化は両手で共有され、どちらの手で発動しても持続時間が更新される。重複して積み重なることはない。遠隔攻撃では発動しない。狼形態では代わりに1秒の基本攻撃速度を使う。',
+    '命中した近接攻撃で、15秒間筋力が50上昇し、自身の体力が200回復することがあります。回復量の補正が適用されます。 命中ごとに、攻撃した武器の基本速度0.6秒につき1%の確率で判定します。内部クールダウンはありません。両手で一つの強化を共有し、発動するたびに更新されますが重複しません。遠隔攻撃では発動しません。キャットフォームの自動攻撃は代わりに1秒の足の速度で判定します。キャットフォームとブルーインフォームの打撃およびフィニッシャーは武器自体の速度を使い、薙ぎ払う爪は対象ごとではなく使用1回につき1回判定します。',
   'hudChrome.enchantName.enchant_weapon_riftwalkers_grace': '裂け目歩きの優雅',
   'hudChrome.enchantDescription.enchant_weapon_riftwalkers_grace':
-    '命中した近接攻撃は、確率で15秒間敏捷性を60増加させ、近接攻撃速度を2%上昇させる。命中ごとの発動率は、攻撃した武器の基本速度0.6秒につき1%。内部クールダウンはない。強化は両手で共有され、どちらの手で発動しても持続時間が更新される。重複して積み重なることはない。遠隔攻撃では発動しない。キャットフォームでは代わりに1秒の基本攻撃速度を使う。',
+    '命中した近接攻撃で、15秒間敏捷性が60上昇し、近接攻撃速度が2%上昇することがあります。 命中ごとに、攻撃した武器の基本速度0.6秒につき1%の確率で判定します。内部クールダウンはありません。両手で一つの強化を共有し、発動するたびに更新されますが重複しません。遠隔攻撃では発動しません。キャットフォームの自動攻撃は代わりに1秒の足の速度で判定します。キャットフォームとブルーインフォームの打撃およびフィニッシャーは武器自体の速度を使い、薙ぎ払う爪は対象ごとではなく使用1回につき1回判定します。',
   'hudChrome.enchantName.enchant_weapon_dawnfire_etching': '武器銘刻：暁火',
   'hudChrome.enchantDescription.enchant_weapon_dawnfire_etching':
     '武器に呪文威力18を永続的に銘刻する。呪文威力は治癒力にも加算される。固定値のボーナスで、他の能力値によって増減しない。',
@@ -1925,6 +2374,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
   'hudChrome.nameplate.mobLevel': '{level}',
   'hudChrome.nameplate.afkTag': '退席',
+  'hudChrome.nameplate.hillBountyTag': '賞金 {honor}',
   'hudChrome.nameplate.cheaterTag': '< チーター >',
   'hudChrome.nameplate.pledgeTag': '{guild}への誓約者',
   'hudChrome.nameplate.npcRoleTag': '<{role}>',
@@ -1990,6 +2440,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.highwatch_greatsword.name': 'ハイウォッチの大剣',
   'entities.items.highwatch_wallshield.name': 'ハイウォッチの壁盾',
   'entities.items.eastbrook_buckler.name': 'イーストブルックのバックラー',
+  'entities.items.lychgate_buckler.name': '墓門のバックラー',
+  'entities.items.bastion_kite_shield.name': '砦のカイトシールド',
+  'entities.items.barrowfield_tower_shield.name': '塚野のタワーシールド',
   'entities.abilities.avatar.name': '化身',
   'entities.abilities.avatar.description':
     '20秒間コロッサスに変身し、あらゆる行動妨害を解除し、与えるダメージが20%増加します。',
@@ -2040,7 +2493,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '8ヤード以内の敵最大5体を4秒間、恐怖で逃げ惑わせる恐ろしい叫び。ダメージで効果が解けることがあります。',
   'entities.abilities.intimidating_shout.name': '威圧の雄叫び',
   'entities.abilities.iron_resolve.description':
-    '歯を食いしばって痛みを堪え、最大40の怒り（最低20）を消費し、消費した怒り1につき{absorbPerRage}のダメージを吸収します。最大10秒間持続します。（防御）',
+    '歯を食いしばって痛みを堪え、発動時の最大体力の{damage}%に相当するダメージを吸収するシールドを得ます。最大{duration}秒間持続します。（防御）',
   'entities.abilities.iron_resolve.name': '鉄の決意',
   'entities.abilities.measured_fury.description':
     '制御された怒りが効率を高め、アビリティの怒りコストが10%減少します。（武器）',
@@ -2090,6 +2543,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.specPanel.complexityMedium': '中',
   'hudChrome.specPanel.exampleAbilities': '代表的なアビリティ',
   'hudChrome.specPanel.primaryAttr': '主要能力値',
+  'hudChrome.specPanel.specBonus': 'スペシャライゼーションボーナス',
   'hudChrome.specPanel.selectSpec': 'スペシャライゼーションを選択',
   'hudChrome.specPanel.viewTalents': 'タレントを見る',
   'hudChrome.talentRows.comingSoon': '近日公開',
@@ -2140,7 +2594,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.tranquility.name': '木立の歌',
   'entities.abilities.typhoon.name': 'タイフーン',
   'entities.abilities.typhoon.description':
-    '突風で8ヤード以内のすべての敵を吹き飛ばしてよろめかせ、4秒間、移動速度を50%低下させる。',
+    '突風が8ヤード以内の敵全員をあなたから15ヤード離れた場所へ吹き飛ばし、4秒間50%減速させます。敵プレイヤーは空中を直線的に飛び、崖から外れても進み続けて落下ダメージを受けます。落下死はあなたの撃破として扱われます。',
   'entities.abilities.voidfeast.name': '虚無の饗宴',
   'entities.abilities.voidfeast.description':
     '魔法効果（敵の有益効果または味方の有害効果）を貪り、自分の最大体力の6%を回復する。',
@@ -2149,8 +2603,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.title': 'WOCストア',
   'hudChrome.wocStore.close': 'WOCストアを閉じる',
   'hudChrome.wocStore.tabsLabel': 'WOCストアのセクション',
-  'hudChrome.wocStore.storeTab': 'ストア',
-  'hudChrome.wocStore.rewardsTab': 'デイリー報酬',
+  'hudChrome.wocStore.storeTab': 'コスメティックストア',
+  'hudChrome.wocStore.membershipsTab': 'メンバーシップ',
+  'hudChrome.wocStore.membershipsUnavailable':
+    '現在メンバーシップを利用できません。しばらくしてから再度お試しください。',
   'hudChrome.wocStore.mountsEyebrow': 'アカウント共有マウント',
   'hudChrome.wocStore.mountsTitle': '機械の厩舎',
   'hudChrome.wocStore.mountBuyAria': '{item}を購入',
@@ -2194,6 +2650,32 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.collections.emberwrought': '残り火鍛造',
   'hudChrome.wocStore.collections.hoarfrost': '白霜',
   'hudChrome.wocStore.collections.fallen_star': '墜星',
+  'hudChrome.wocStore.skins.lantern_hall_sword.lore':
+    'ギャリック・ホルトはこの剣を見知らぬ者には売らない。週ごとに燈火の館の契約を果たしてきた者にだけ渡し、そのたびに同じ言葉を添える。鍔のランタンは館の炉から灯したもの、どこへ持って行こうと館が共にある、と。樋の炎は見た目にすぎない。大切なのは約束だ。',
+  'hudChrome.wocStore.skins.lantern_hall_sword.look':
+    '樋に灯火の炎を宿した幅広の鋼の刃、金の鍔飾り、鍔に灯る籠入りのランタン、青い革の柄。',
+  'hudChrome.wocStore.skins.lantern_hall_sword.name': '燈火の館の剣',
+  'hudChrome.wocStore.skins.hearthbrand_sword.name': '炉火の剣',
+  'hudChrome.wocStore.skins.hearthbrand_sword.look':
+    '鍛冶の熱を帯びた両刃と、両面を枝分かれして走る溶けた継ぎ目を持つ、黒ずんだ鋼の炎形の刃。燃える石を囲む青銅の炎の鍔、牛血色の柄。',
+  'hudChrome.wocStore.skins.hearthbrand_sword.lore':
+    '燈火の館には、館が建って以来一度も消えたことのない炉がある。ギャリック・ホルトは、この刃はその熾火で焼き入れされたと言い張る。これを携える者たちは、どれほど寒い夜番でも柄は温かいままだと言う。刃に沿う炎は見た目にすぎない。',
+  'hudChrome.wocStore.skins.squallcrest_sword.name': '嵐波の剣',
+  'hudChrome.wocStore.skins.squallcrest_sword.look':
+    '砕ける波のように輝く刃縁を持つ海青色の長い刃。枝分かれした稲妻を宿す嵐の溝、刃元を越える金の波、片側の刃縁に沿うひれ、嵐の真珠を囲む金の砕け波の鍔。',
+  'hudChrome.wocStore.skins.squallcrest_sword.lore':
+    'ギルドのために航海したある船長が、帆柱を奪い船を鐘のように鳴り響かせた嵐からこの刃を持ち帰った。ギャリックは印章と引き換えにしか売らず、買う者には必ず、嵐の前にはうなるぞと忠告する。稲妻と海の光は見た目にすぎない。',
+  'hudChrome.wocStore.skins.rimelight_staff.name': '霧氷灯の杖',
+  'hudChrome.wocStore.skins.rimelight_staff.look':
+    '銀で締められ、光る霧氷が巻きつく淡い柄。頂には氷の破片の冠の中で冷たい光の大きな結晶をつかむ銀の爪があり、襟からはつららが垂れる。',
+  'hudChrome.wocStore.skins.rimelight_staff.lore':
+    '燈火の館の冬の見張りは、このような杖を携えて高い街道を歩き、雪に迷う旅人のために頂を灯した。ギャリックは印章に余裕のある者のために一本を棚に置いている。霜とその冷たい光は見た目にすぎない。',
+  'hudChrome.wocStore.skins.duskwick_staff.name': '黄昏灯芯の杖',
+  'hudChrome.wocStore.skins.duskwick_staff.look':
+    '鉄で締められた二本のねじれた黒い木の柄。頂には二本の巻いた角の間で紫の黄昏の炎を燃やす吹き抜けの鉄のランタンがあり、その底から鎖が揺れる。',
+  'hudChrome.wocStore.skins.duskwick_staff.lore':
+    '館のランタンはどれも明るく燃える、ただ一つを除いて。黄昏の炎は夜の館を守るために灯されたもので、ほかのランタンが光を放つところで影を放つ。ギャリックはその芯を自ら切りそろえる。煙と紫の輝きは見た目にすぎない。',
+  'hudChrome.wocStore.collections.lantern_hall': '燈火の館',
   'hudChrome.wocStore.skins.guildmark_arming_sword.name': 'ギルドマーク・アーミングソード',
   'hudChrome.wocStore.skins.guildmark_arming_sword.look':
     '青焼き鋼の刀身、青銅の魚尾型クロスガード、青緑に染めた革巻きの柄、小さく刻印されたギルドの紋章。',
@@ -2340,6 +2822,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.skins.meteorlatch_crossbow.lore':
     'Mirefenのクレーターがまだ輝いていた頃、生の隕鉄から鍛えられた。「熱すぎて持てない」残骸を叩き、星座を刻んだ宇宙黒の弓部とし、台木に沿って溶融金の核を封じた。ボルトをつがえるのではなく召喚する。宣告のように放たれ、その終わりのように着弾する星火の矢だ。Nythraxisの不死の王冠すら峰の下で最悪のものではないとHighwatchが恐れたとき、城壁に望んだ武器がこれだった。狙いを違えるな。',
   'hudChrome.wocStore.seasonOne': 'シーズン1',
+  'hudChrome.wocStore.membershipPromo.open': 'WOCストアのメンバーシップ',
+  'hudChrome.wocStore.membershipPromo.close': 'メンバーシップの宣伝を閉じる',
+  'hudChrome.wocStore.membershipPromo.eyebrow': 'アカウント特典',
+  'hudChrome.wocStore.membershipPromo.title': 'メンバーシップ',
+  'hudChrome.wocStore.membershipPromo.cta': '今すぐ参加',
+  'hudChrome.wocStore.referralPromo.close': 'フレンド招待の宣伝を閉じる',
+  'hudChrome.wocStore.referralPromo.eyebrow': '一緒に冒険しよう',
+  'hudChrome.wocStore.referralPromo.cta': 'フレンドを招待',
   'hudChrome.wocStore.rarity.uncommon': 'アンコモン',
   'hudChrome.wocStore.rarity.rare': 'レア',
   'hudChrome.wocStore.rarity.epic': 'エピック',
@@ -2585,6 +3075,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'デイリー報酬への参加はあと{remaining}禁止されています。解除日時: {until}。理由: {reason}',
   'hudChrome.keybinds.discord': 'Discord',
   'hudChrome.spectate.banner': '{name}を観戦中',
+  'hudChrome.realmMotd.line': '本日のお知らせ：{text}',
+  'hudChrome.realmMotd.updated': '本日のお知らせを更新しました。',
+  'hudChrome.realmMotd.cleared': '本日のお知らせを削除しました。',
+  'hudChrome.realmMotd.none': '本日のお知らせは設定されていません。',
+  'hudChrome.realmMotd.usage': '使い方：/motd "<メッセージ>" で設定、/motd clear で削除します。',
+  'hudChrome.realmMotd.tooLong': '本日のお知らせは最大{max}文字です。',
+  'hudChrome.realmMotd.saveFailed':
+    '本日のお知らせを保存できませんでした。サーバーを再起動すると失われます。',
   'hudChrome.readyCheck.prompt': '{name} が準備確認を開始しました。準備はいいですか？',
   'hudChrome.readyCheck.ready': '準備完了',
   'hudChrome.readyCheck.notReady': '準備未完了',
@@ -2670,6 +3168,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.stanceBar': 'スタンスバー',
   'hudChrome.interfaceUnlock.frameNames.shardpikeBar': 'シャードパイクバー',
   'hudChrome.interfaceUnlock.frameNames.playerFrame': 'プレイヤー',
+  'hudChrome.interfaceUnlock.frameNames.playerResource': 'リソースバー',
   'hudChrome.interfaceUnlock.frameNames.targetFrame': 'ターゲット',
   'hudChrome.interfaceUnlock.frameNames.partyFrames': 'パーティ',
   'hudChrome.options.combineActionBars': 'アクションバーをまとめる',
@@ -3028,6 +3527,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.onlineHeader': 'オンライン ({n})',
   'hudChrome.social.offlineHeader': 'オフライン ({n})',
   'hudChrome.social.hideOffline': 'オフラインを非表示',
+  'hudChrome.social.presence.label': 'オンライン表示の相手',
+  'hudChrome.social.presence.everyone': '全員',
+  'hudChrome.social.presence.friends': 'フレンドのみ',
+  'hudChrome.social.presence.none': 'なし',
+  'hudChrome.social.presence.title':
+    'フレンドリストとギルド名簿で誰にオンライン状態、ゾーン、マップ上の位置を見せるか。パーティーメンバーには常に表示されます。',
   'hudChrome.social.hideOfflineTitle': 'オフラインのギルドメンバーを非表示',
   'hudChrome.social.billboard.label': 'ギルド掲示板',
   'hudChrome.social.billboard.empty': '掲示板にはまだ何もありません。',
@@ -3077,20 +3582,30 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lootSettings.menuItem': '分配設定',
   'hudChrome.dungeonDifficulty.setHeroic': 'ダンジョン難易度をヒロイックに設定',
   'hudChrome.dungeonDifficulty.setNormal': 'ダンジョン難易度をノーマルに設定',
+  'hudChrome.dungeonDifficulty.unappliedNormal':
+    'ヒロイックを選択中です。現在のインスタンスはまだノーマルです。',
+  'hudChrome.dungeonDifficulty.unappliedHeroic':
+    'ノーマルを選択中です。現在のインスタンスはまだヒロイックです。',
   'hudChrome.dungeonDifficulty.resetAll': 'すべてのインスタンスをリセット',
   'hudChrome.dungeonDifficulty.resetDone': 'すべてのインスタンスをリセットしました。',
   'hudChrome.dungeonDifficulty.resetNone': 'リセットできるインスタンスがありません。',
   'hudChrome.dungeonDifficulty.resetOccupied':
     '中にプレイヤーがいる間はインスタンスをリセットできません。',
+  'hudChrome.dungeonDifficulty.queuedOccupied':
+    'プレイヤーかその死体がまだインスタンス内にあるため、難易度の変更を予約しました。インスタンス内に誰もおらず、死体もなくなれば変更を適用します。',
+  'hudChrome.dungeonDifficulty.queuedCancelled':
+    'パーティーまたはリーダーが変更されたため、予約していた難易度の変更をキャンセルしました。',
   'hudChrome.dungeonDifficulty.resetSameDifficulty':
     'インスタンスをリセットする前にダンジョン難易度を変更してください。空のインスタンスは5分後に自動的にリセットされます。',
+  'hudChrome.dungeonDifficulty.resetAlreadyFresh':
+    'インスタンスはすでにリセット済みです。前回のリセット以降、誰も入っていません。',
   'hudChrome.dungeonDifficulty.resetUsage':
-    '難易度を変更した後、/dungeon reset で空のインスタンスを放棄できます。',
+    '/dungeon reset で空のインスタンスを放棄し、最初から始められます。',
   'hudChrome.dungeonDifficulty.resetLoot':
     '中に戦利品が残っている間はインスタンスをリセットできません。',
   'hudChrome.dungeonDifficulty.resetConfirmTitle': 'すべてのインスタンスをリセットしますか？',
   'hudChrome.dungeonDifficulty.resetConfirmBody':
-    '以前選択していた難易度の空のインスタンスを放棄します。未取得の戦利品がある場合はリセットできません。',
+    '空のインスタンスを放棄し、次の攻略を選択した難易度で最初から始めます。ロックアウトは変わりません。中に誰かが残っている場合や未取得の戦利品がある場合はリセットできません。',
   'hudChrome.dungeonDifficulty.resetConfirm': 'インスタンスをリセット',
   'hudChrome.dungeonDifficulty.resetCooldown': 'インスタンスをリセットできるのは5分に1回だけです。',
   'hudChrome.dungeonDifficulty.entryMismatchNormal':
@@ -3228,6 +3743,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.buyOwnedAria': '{item}を{honor}で購入、所有済み',
   'hudChrome.warfareShop.buyConfirmBody':
     '{item}を{honor}で購入しますか？名誉での購入は返金できません。',
+  'hudChrome.warfareShop.buyConfirmBodyGold':
+    '{item}を{price}で購入しますか？この購入は返金できません。',
   'hudChrome.keybinds.bgFlag': '戦場フラッグアクション',
   'hudChrome.keybinds.friendlyNameplates': '友好ネームプレート切り替え',
   'hudChrome.pvp.mobileLabel': 'PvP',
@@ -3353,8 +3870,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '偉業の書も評判を記録します。ある勢力で信頼に達すること、ある勢力でチャンピオンに達することがそれぞれ偉業として記録され、三勢力すべてでチャンピオンに達することは独自の偉業です。他の偉業と同じく、これらは見た目だけで力にはならず、チャンピオンの偉業は身に着けられる称号を授けます。',
   'guide.commandsPage.pvp':
     'ワールドPvPフラグ: /pvp で切り替え、/pvp on と /pvp off で直接設定します。フラグを立てたプレイヤー同士はどこでも戦えます。解除には5分かかります。',
+  'guide.commandsPage.presence':
+    'フレンドリスト、ギルド名簿、/who で誰にオンライン状態を見せるかを設定します。/presence everyone（初期設定）、/presence friends（自分のフレンドリストにいるプレイヤーのみ）、/presence none。非表示にすると、相手にはオンライン表示、ゾーン、マップ上の位置が見えなくなりますが、ウィスパーや招待は届きます。パーティーメンバーには常に表示されます。/presence だけで現在の設定を確認できます。',
+  'guide.commandsPage.flair':
+    '他のプレイヤーに見える Discord ロール（色付きの名前、ロールタグ、チャットの認証タグ）の表示を切り替えます。/flair on で表示、/flair off で非表示になり、/flair だけで現在の設定を確認できます。Discord アカウントの連携が必要です。',
   'guide.commandsPage.pvpZones':
-    'ワールドPvPフラグ: /pvp で切り替え、/pvp on と /pvp off で直接設定します。フラグを立てたプレイヤー同士は係争地で戦え、聖域ではワールドの戦闘は一切行われず、無差別戦闘地帯ではフラグの有無に関わらず戦えます。解除には5分かかります。',
+    'ワールドPvPフラグ：/pvpで切り替え、/pvp onと/pvp offで有効・無効にします。係争地域ではフラグを立てたプレイヤー同士が戦えますが、聖域ではワールドPvPはできません。開催中の「丘の王」の円に入るとフラグが立ちます。解除には5分かかります。',
   'guide.nav.worldPvp': 'ワールドPvP',
   'guide.worldPvpPage.heading': 'ワールドPvP',
   'guide.worldPvpPage.intro':
@@ -3369,25 +3890,27 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.worldPvpPage.limitsBody':
     '同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。カウントは日次リセットで元に戻ります。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。',
   'guide.worldPvpPage.introZones':
-    'オープンワールドの対人戦は任意参加で、その意味は足元の土地が決めます。PvPフラグを立てると、パーティやレイドに属さないフラグを立てた全プレイヤーが係争地で敵になります。フラグを下ろすと、少し経てば再び傍観者に戻ります。2つのゾーンはワールドの戦闘が一切起こらない聖域で、最北の3つのゾーンは、フラグの有無に関わらずその場の全員が攻撃対象となる無差別戦闘地帯です。パーティとレイドの仲間はどこでも敵になりませんが、グループ外のギルドメンバーは他の誰とも同じく攻撃対象です。',
+    'オープンワールドPvPへの参加は任意で、現在地によってルールが適用されます。係争地域でフラグを立てると、自分のパーティーやレイドに属さない他のフラグ所持者が敵になります。解除すると、短い待ち時間の後に再び傍観者になります。修練の浜は唯一の聖域で、ワールドPvPは一切ありません。最北の3地域も世界の他の地域と同じ任意参加のフラグルールに従います。開催中の「丘の王」の円に入ると自動的にフラグが立ちます。パーティーやレイドの仲間が敵になることはありませんが、グループ外のギルドメンバーは他のプレイヤーと同様に戦闘対象になります。',
   'guide.worldPvpPage.zonesHeading': 'ワールドPvPが起こる場所',
   'guide.worldPvpPage.zonesBody':
-    '世界の土地は3種類に分かれます。修練の浜とイーストブルック渓谷は聖域で、フラグの有無に関わらずワールドPvPは一切起こらないため、新しいキャラクターがフラグとは何かを知る前に戦いを挑まれることはありません。世界の大半は係争地で、そこでは上記のフラグの規則がすべてです。ドレイクランド、フロストヴェイルの果て、アンバーフォールは無差別戦闘地帯で、そこにいる全員がフラグの有無に関わらず、そこにいる他の全員を攻撃できます。境界を越えて入るときにも、出るときにも通知されます。そこでフラグを立てていないプレイヤーを攻撃すると自分のフラグが立つので、仕掛けた側が必ずリスクを背負います。すでにフラグを立てている相手を攻撃しても自分のフラグは立たないため、自衛や、フラグを立てていない誰かを守ることには何の代償もありません。',
+    '修練の浜は唯一の聖域です。ワールドPvPはなく、フラグも立てられません。既に立っているフラグは残りますが、称号のプレイ時間進捗は出るまで停止します。ドレイクランド、フロストヴェイルの果て、アンバーフォールを含む他のすべての場所では、フラグを立てたプレイヤーだけが戦えます。通常のレベル条件を満たしていれば、開催中の「丘の王」の円に入ると自動的にフラグが立ちます。予告中の円ではフラグは立ちません。開催中の円から出てもフラグは残ります。/pvp offで通常の5分間の解除待ちを開始できますが、開催中の丘の中や戦闘中は解除が完了しません。',
   'guide.worldPvpPage.flagBodyAid':
     'チャットで /pvp と入力するか、G キーで PvP ウィンドウを開いてワールドPvPタブを使います。タブには戦績と賭け金も表示されます。序盤のレベルを過ぎればフラグは即座に立ちます。下ろすと数分のカウントダウンが始まり、戦闘中はフラグが下りないので、自分から始めた戦いから逃げる手段にはなりません。戦闘中のフラグを立てたプレイヤーを回復、シールド、強化した場合も自分のフラグが立つため、自分はフラグを立てないまま戦う者を背後から支え続けることはできません。フラグを立てていないプレイヤーを支援しても、フラグは立ちません。',
   'guide.worldPvpPage.stakesBodyFlagged':
-    'フラグを立てたプレイヤーが他のプレイヤーに倒されると、敗者は所持金のわずかな割合（上限あり）を支払い、勝者は PvP 装備につながる名誉を得ます。フラグを立てていなかったプレイヤーは、無差別戦闘地帯で倒れても金貨を一切支払いません。貢献した全員が両方を分け合います。とどめを刺した人、直前にダメージを与えた人、そしてその戦士たちを支えたヒーラーです。純粋な1対1なら独占、集団なら分配です。',
+    'フラグを立てたプレイヤーが他のプレイヤーに倒されると、敗者は所持金のわずかな割合（上限あり）を支払い、勝者は PvP 装備につながる名誉を得ます。 フラグのないプレイヤーはオープンワールドで攻撃されません。 貢献した全員が両方を分け合います。とどめを刺した人、直前にダメージを与えた人、そしてその戦士たちを支えたヒーラーです。純粋な1対1なら独占、集団なら分配です。',
   'guide.worldPvpPage.stakesUnflaggedTake':
     'フラグを立てていない戦闘者もゴールドは得られません。ゴールドはフラグを立てた二人のプレイヤーの間でのみ動きますが、貢献した全員が名誉は得られます。',
   'guide.worldPvpPage.limitsBodyHour':
     '同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。そのプレイヤーに対するカウントは最初の撃破からおよそ1時間後にようやく元に戻るため、一人を狙い続けて待つ価値はありません。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。',
   'guide.worldPvpPage.hillBodyRamp':
     '3時間に1度、予測できない時刻に、無差別戦闘地帯のいずれかに15分後に丘が現れることがレルム全体に告知され、丘が立つ円が開けた土地に示されます。丘は現れてから45分間立ち続け、その後消えます。円の中に立つプレイヤーが最も多いパーティが丘を争い、1分間途切れずに多数を保てば丘はそのパーティのものになります。単独のプレイヤーは一人のパーティとして数えますが、レイドのメンバーは一切数えられません。パーティが丘を占拠している間、円の中に立つそのメンバーは毎分名誉を得て、同じパーティが占拠し続けるほど1分ごとの名誉は増えていきます。満員のパーティが誰にも争われずに丘が立っている間ずっと占拠し続けると、バトルグラウンドの勝利およそ3回分の名誉になります。丘の持ち主が変わると、新しい持ち主の積み上げは最初から始まります。フィールド上部のバーが、誰が占拠しているか、あなた側と相手の人数、そして争奪の時計を表示します。チャットで /hill と入力すると丘の場所が分かります。',
+  'guide.worldPvpPage.hillBodyPause':
+    '3時間に1度、無差別戦闘地帯のいずれかに丘が現れます。丘が立っている間は5分ごとに、その場所と各グループの占拠時間ランキングがレルム全体に告知されます。丘が消えると、合計占拠時間が最も長いグループが合計10分以上占拠していた場合、そのグループに属し、そのグループの占拠中に円内に1分以上立っており、終了時にも同じグループに残っているプレイヤーは、週間宝物庫のPvP進捗に1勝を獲得します。',
   'guide.worldPvpPage.limitsBodyRaids':
     '同じプレイヤーを繰り返し倒すと報酬は毎回減り、すぐにゼロになります。そのプレイヤーに対するカウントは最初の撃破からおよそ1時間後にようやく元に戻るため、一人を狙い続けて待つ価値はありません。自分よりはるかに低いレベルの相手からは何も得られません。バトルグラウンドとアリーナの中では独自のルールが適用され、オープンワールドより多くの名誉を支払うため、ワールドPvPは同じ商人へ向かう遠回りの道です。レイドはワールドでの撃破から何も得られません。レイドのメンバーは名誉もゴールドも受け取らず、他の人の取り分も減らさないため、報酬を得るにはパーティで戦いましょう。',
   'guide.worldPvpPage.hillHeading': '丘の王',
   'guide.worldPvpPage.hillBody':
-    '3時間に1度、予測できない時刻に、無差別戦闘地帯のいずれかに15分後に丘が現れることがレルム全体に告知され、丘が立つ円が開けた土地に示されます。丘は現れてから45分間立ち続け、その後消えます。円の中に立つプレイヤーが最も多いパーティが丘を争い、1分間途切れずに多数を保てば丘はそのパーティのものになります。単独のプレイヤーは一人のパーティとして数えますが、レイドのメンバーは一切数えられません。パーティが丘を占拠している間、円の中に立つそのメンバーは毎分わずかな名誉を得ます。そのため満員のパーティが誰にも争われずに丘が立っている間ずっと占拠し続けると、バトルグラウンドの勝利1回分より少し少ない名誉になります。フィールド上部のバーが、誰が占拠しているか、あなた側と相手の人数、そして争奪の時計を表示します。チャットで /hill と入力すると丘の場所が分かります。',
+    '2時間ごとにドレイクランド、フロストヴェイルの果て、アンバーフォールのいずれかに丘が出現します。レルム全体に15分前の予告が届き、開けた地面に円が表示されます。丘は30分間有効です。開催中の円に入ると、レイドメンバーも含め、通常のレベル条件に従ってワールドPvPフラグが立ちます。円内の参加資格を持つ人数が最も多いパーティーが、1分間連続で優勢を保つと丘を占領します。単独プレイヤーは1人パーティーとして扱われますが、レイドメンバーとPvP必要レベル未満のプレイヤーは占領も丘の名誉獲得もできません。占領側の円内の各メンバーは、次第に高まる割合で名誉を得ます。報酬の支給頻度と増加速度が上がり、以前の45分間のイベントと同じ名誉総量が保たれます。占領側が変わると増加は最初から始まります。円から出てもフラグは残ります。/pvp offは通常の5分待ちを使い、開催中の丘の中や戦闘中には完了しません。丘のバーには占領側、人数、占領進捗が表示され、/hillで場所を確認できます。',
   'guide.thornhollowPage.heading': 'ソーンホロウ平原',
   'guide.thornhollowPage.intro':
     'ソーンピークの下、古い森に抱かれた壁に囲まれた窪地で戦うランク制5対5の旗奪取戦場。峡谷の両端で二つの廃城が向かい合い、その間にはどちらの手にも落ちたことのない、より古い中庭が横たわる。五人ずつ、城は二つ、目的は一つ。相手の旗を奪い、こちらの旗を奪われる前に持ち帰れ。',
@@ -3415,6 +3938,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSheet.defense': '防御',
   'hudChrome.charSheet.spell': '呪文',
   'hudChrome.charSheet.ratings': 'レーティング',
+  'hudChrome.charSheet.gearScore': '装備スコア',
   'hudChrome.charSheet.playtimeLabel': 'プレイ時間',
   'hudChrome.charSheet.playtimeParts': '{major}{minor}',
   'hudChrome.charSheet.playtimeUnderMinute': '1分未満',
@@ -3617,6 +4141,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gfxSectionTouch': 'タッチ操作',
   'hudChrome.options.gfxCustomNote':
     'ダイヤルを変更すると画質プリセットが「詳細」に切り替わります。「高」品質ベースの上に、現在のプリセットに表示されているレベルを起点として組み立てるカスタム設定です。',
+  'hudChrome.options.ambienceVolume': '環境音の音量',
   'hudChrome.options.footstepSounds': '足音',
   'hudChrome.options.interfaceSounds': 'インターフェースとフィードバック音',
   'hudChrome.options.clickFeedback': 'クリックマーカー',
@@ -3626,6 +4151,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.lockCursorOnRotate': '回転中はカーソルを固定',
   'hudChrome.options.keybindHelpLockCursorOnRotate':
     'ドラッグでカメラを回転させている間、マウスカーソルをウィンドウ内に固定し、画面の端や別のモニターに移動しないようにします。自由なカーソルを好む場合はオフにしてください。',
+  'hudChrome.options.rawMouseInput': 'マウスのRAW入力',
+  'hudChrome.options.keybindHelpRawMouseInput':
+    'ドラッグでカメラを回転させている間、マウスの移動をデバイスから直接読み取り、システムのポインター速度と加速を無視して、より安定した回転にします。システムのマウス設定を使う場合はオフにしてください。「回転中はカーソルを固定」がオンのときのみ有効で、一部のブラウザーやシステムでは使用できません。',
   'hudChrome.options.showWalletOnCharacterScreen': 'キャラクター画面にウォレットを表示',
   'hudChrome.options.showPlaytime': 'キャラクター画面にプレイ時間を表示',
   'hudChrome.options.showWalletOnPlayerCard': 'プレイヤーカードにウォレットを表示',
@@ -3683,6 +4211,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.confirmVendorSellMinQuality': '確認する売却品質の下限',
   'hudChrome.options.confirmVendorSellMinQualityNote':
     'この品質未満のアイテムはワンクリックで売却されます。誤って売却したアイテムは商人から買い戻せます。',
+  'hudChrome.options.confirmVendorSellMinQualityNoteGray':
+    'この品質未満のアイテムはワンクリックで売却されます。誤って売却したアイテムは商人から買い戻せますが、署名のない灰色アイテムは除きます。',
   'hudChrome.options.showSecondaryActionBar': 'セカンダリアクションバーを表示',
   'hudChrome.options.showThirdActionBar': '3本目のアクションバーを表示',
   'hudChrome.options.hideUnusedActionSlots': '未使用のアクションスロットを非表示',
@@ -3863,6 +4393,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'footer.terms': '利用規約',
   'footer.privacy': 'プライバシーポリシー',
   'footer.discordLabel': 'Discordに参加する',
+  'footer.levyStreet': 'Levy Street',
   'highscores.title': 'ハイスコアリーダーボード',
   'highscores.desc': 'ワールドの偉大なチャンピオンたちを確認し、あなたの進行度と比較しましょう。',
   'wiki.title': 'ゲームWiki & ガイド',
@@ -4378,6 +4909,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'mobilePreflight.otherStandaloneDetail': '端末を横向き全画面に保ってください。',
   'mobilePreflight.otherInstallDetail':
     '最高のモバイル全画面体験のため、このページをインストールするかホーム画面に追加してください。',
+  'graphicsPrompt.title': 'グラフィック設定を選択',
+  'graphicsPrompt.intro':
+    'このデバイスのグラフィックプリセットを選んでください。低いプリセットほど動作が滑らかに、高いプリセットほど映像が豊かになります。',
+  'graphicsPrompt.autoDesc': 'このデバイスに合ったプリセットを自動で選びます。検出結果：{preset}。',
+  'graphicsPrompt.lowDesc':
+    '最も滑らかな動作。スマートフォン、タブレット、古いGPUや内蔵GPUに最適です。',
+  'graphicsPrompt.mediumDesc': '映像と動作のバランス型。ほとんどのノートPCに適しています。',
+  'graphicsPrompt.highDesc': 'より細かなディテールと豊かな景観。専用グラフィックカード向けです。',
+  'graphicsPrompt.ultraDesc': '最も豊かな固定プリセット。ハイエンドのグラフィックカード向けです。',
+  'graphicsPrompt.changeLater':
+    'この設定はオプションの「グラフィック品質」でいつでも変更できます。',
+  'graphicsPrompt.confirm': '続ける',
   'serverUnavailable.title': 'World of ClaudeCraft - ワールド利用不可',
   'serverUnavailable.logoAlt': 'World of ClaudeCraft',
   'serverUnavailable.eyebrow': 'ワールドメンテナンス',
@@ -4790,6 +5333,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.pet.passive': '受動',
   'hud.pet.defensive': '防御',
   'hud.pet.aggressive': '攻撃',
+  'hud.pet.assist': 'アシスト',
   'hud.pet.petAttackTitle': 'ペット攻撃',
   'hud.pet.petAttackDesc': '現在の敵対対象を攻撃するようペットに命令します。',
   'hud.pet.petTauntTitle': 'ペット挑発',
@@ -4798,10 +5342,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.pet.healPetDesc':
     'クリックしてからバッグ内の食べ物をクリックし、5秒かけてペットに餌を与えて治癒します。',
   'hud.pet.stanceTitle': 'ペットスタンス',
-  'hud.pet.stanceDesc': 'クリックして受動、防御、攻撃を選びます。',
   'hud.pet.passiveDesc': '命令した時だけ攻撃します。',
   'hud.pet.defensiveDesc': 'あなたまたはペットを傷つけた敵を攻撃します。',
   'hud.pet.aggressiveDesc': '近くの敵対的な敵を攻撃します。',
+  'hud.pet.assistDesc':
+    '現在のターゲットにアビリティを使った後、そのターゲットだけを攻撃します。あなたを攻撃する敵は無視します。',
   'hud.pet.rename': 'ペット名変更',
   'hud.pet.revive': '応急処置',
   'hud.pet.abandon': 'ペット放棄',
@@ -4905,6 +5450,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.actionBar.attackTooltip':
     '対象への自動攻撃を切り替えます。敵を右クリックしても攻撃します。',
   'abilityUi.actionBar.attackRemoveHint': '右クリックでバーから外し、スロットを空けます。',
+  'abilityUi.actionBar.moveHint': 'Shift-ドラッグで移動',
   'abilityUi.actionBar.emptySlot': '空きスロット',
   'abilityUi.actionBar.slotAria': 'アクションスロット {slot}: {ability}',
   'abilityUi.actionBar.emptySlotAria': 'アクションスロット {slot}: 空き',
@@ -5029,6 +5575,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.activeStatus': '進行中のワールドクエスト',
   'questUi.worldQuest.expiresIn': '終了まで{time}',
   'questUi.worldQuest.mineOre': '銅鉱石を採掘',
+  'questUi.worldQuest.mineMaterial': '{name}を採掘',
   'questUi.worldQuest.recoverObject': '{name}を回収',
   'questUi.worldQuest.redirectLeyBeam': 'レイビームを目的地へ導く',
   'questUi.worldQuest.puzzleTitle': 'レイビームの調整',
@@ -5173,6 +5720,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.dps': '（秒間 {dps} ダメージ）',
   'itemUi.tooltip.armorStat': '防御力 {value}',
   'itemUi.tooltip.stat': '+{value} {stat}',
+  'itemUi.tooltip.warfareMainHandOnly': 'ウォーフェアはメインハンドでのみ有効です。',
   'itemUi.tooltip.useFood':
     '使用: {seconds}秒かけて体力を{amount}回復します。食事中は座ったままでいる必要があります。',
   'itemUi.tooltip.useDrink':
@@ -5263,6 +5811,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.vendor.sellJunkAria': '{price}ですべての不要品を売却',
   'itemUi.vendor.sellJunkHint':
     'クエストアイテムを除くバッグ内のすべての灰色アイテムを売却します。',
+  'itemUi.vendor.sellJunkNoBuyback':
+    '署名のない灰色アイテムは買い戻しリストに入らないため、売却は取り消せません。',
   'itemUi.market.title': 'ワールドマーケット',
   'itemUi.market.subtitle': '商人の取引所',
   'itemUi.market.close': '市場を閉じる',
@@ -5360,7 +5910,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '待機中のものはありません。売上と期限切れの出品はここで受け取ります。',
   'itemUi.market.collectNote': '商人が預かっている売上と返却品です。',
   'itemUi.market.saleProceeds': '売上',
-  'itemUi.market.saleOlder': 'ほかに {count} 件の以前の売却があり、合計に含まれています。',
+  'itemUi.market.saleOlder': 'ほかに、表示されていない以前の売却が {count} 件あります。',
   'itemUi.market.collectAll': 'すべて受け取る',
   'itemUi.market.history': '履歴',
   'itemUi.market.historyEmpty':
@@ -5540,13 +6090,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.sprint.description': '15秒間、移動速度が70%増加します。',
   'entities.abilities.kidney_shot.name': '急所打ち',
   'entities.abilities.kidney_shot.description':
-    '対象を1秒に加えコンボポイント1つにつき1秒スタンさせるフィニッシュ技（コンボポイント5：6秒）。',
+    '対象を2秒に加えコンボポイント1つにつき1秒スタンさせるフィニッシュ技（コンボポイント5：7秒）。',
   'entities.abilities.ambush.name': '潜伏者の一撃',
   'entities.abilities.ambush.description':
     'ステルス中に対象の背後から奇襲し、武器ダメージの250%に {damage} を加えたダメージを与えます。ダガーが必要です。コンボポイントを1獲得します。',
   'entities.abilities.stealth.name': 'ダスクヴェール',
   'entities.abilities.stealth.description':
-    '影に身を隠します。敵にほとんど気づかれませんが、移動速度が50%低下します。攻撃するかダメージを受けるとダスクヴェールが解除されます。再度使用すると姿を現します。',
+    '影に身を隠します。敵にほとんど気づかれず、通常の速度で移動できます。攻撃するかダメージを受けるとダスクヴェールが解除されます。再度使用すると姿を現します。',
   'entities.abilities.adrenaline_rush.name': '滾る血潮',
   'entities.abilities.adrenaline_rush.description':
     '血が熱くなり、即座にエネルギーを60回復します。',
@@ -5572,7 +6122,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '対象を裂くフィニッシュ技。2秒ごとに出血し、6秒に加えコンボポイント1つにつき2秒続きます（コンボポイント5：16秒、合計{damage}ダメージ）。',
   'entities.abilities.vanish.name': '煙隠れ',
   'entities.abilities.vanish.description':
-    '視界から消え、戦闘中でもダスクヴェール状態に入ります。隠れている間は移動速度が50%低下します。最大10秒間持続します。',
+    '視界から消え、戦闘中でもダスクヴェール状態に入ります。隠れている間も通常の速度で移動できます。最大10秒間持続します。',
   'entities.abilities.instant_poison.name': '毒蛇の噛みつき',
   'entities.abilities.instant_poison.description':
     '武器に30分間毒を塗り、近接攻撃ごとに{damage}の追加自然ダメージを与えます。',
@@ -5655,7 +6205,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'テンの姿をまとい、回避率を30分間8%高めます。',
   'entities.abilities.aspect_of_the_cheetah.name': '駿馬の相',
   'entities.abilities.aspect_of_the_cheetah.description':
-    '駿馬の姿をまとい、移動速度を30分間30%高めます。効果中はダメージを受けるとよろめき、移動速度が4秒間半減します（被弾のたびによろめきが更新されます）。',
+    '駿馬の姿をまとい、移動速度を30分間30%高めます。効果中はダメージを受けるとよろめき、移動速度が2秒間半減します（被弾のたびによろめきが更新されます）。',
   'entities.abilities.aimed_shot.name': '引き絞り',
   'entities.abilities.aimed_shot.description':
     '対象を撃ち、{damage}の物理ダメージを与えます。ダメージは遠隔攻撃力とともに上がります。',
@@ -5712,7 +6262,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '10分間、稲妻をまといます。次にあなたへ向かう近接攻撃3回は、攻撃者に{buff}の自然ダメージを与えます。最短で5秒に1回です。',
   'entities.abilities.flame_shock.name': '灰燼の衝撃',
   'entities.abilities.flame_shock.description':
-    '{damage}の火炎ダメージを与え、続けて12秒かけて{overTime}の火炎ダメージを与えます。最初の命中は呪文威力とともに上がります。',
+    '{damage}の火炎ダメージを与え、続けて{duration}秒かけて{overTime}の火炎ダメージを与えます。最初の命中は呪文威力とともに上がります。',
   'entities.abilities.flametongue_weapon.name': '火焔烙印の武器',
   'entities.abilities.flametongue_weapon.description':
     '武器に30分間力を宿します。一振りごとに{damage}の追加火炎ダメージを与えます。',
@@ -5762,13 +6312,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '自然エネルギーの矢を放ち、{damage} の自然ダメージを与えます。',
   'entities.abilities.healing_touch.name': '野生の癒し',
   'entities.abilities.healing_touch.description': '味方対象の体力を {damage} 回復します。',
+  'entities.abilities.healing_touch.specNote_restoration':
+    '詠唱を完了するたびに翠成が1段階進む（最大3）。蓄えた翠成がこの詠唱を短縮する：翠成1で2.2秒、2で1.9秒、3で1.5秒。自然の恵みにより、詠唱が即時・無料になり、効果が25%上昇する。',
   'entities.abilities.mark_of_the_wild.name': 'ワイルドワード',
   'entities.abilities.mark_of_the_wild.description':
     '味方対象にワイルドワードを付与し、30分間アーマーを{buff}増加させます。',
   'entities.abilities.moonfire.name': '月の嵐',
   'entities.abilities.moonfire.description':
     '月の炎で敵を焼き、{damage} の秘術ダメージと継続ダメージを与えます。',
-  'entities.abilities.rejuvenation.name': '野生の芽吹き',
+  'entities.abilities.rejuvenation.name': 'スポアメンディング',
   'entities.abilities.rejuvenation.description': '12秒間で対象の体力を {damage} 回復します。',
   'entities.abilities.thorns.name': '茨の守り',
   'entities.abilities.thorns.description':
@@ -5777,7 +6329,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.entangling_roots.description': '対象を最大12秒間その場に根付かせます。',
   'entities.abilities.bear_form.name': 'ブルーインフォーム',
   'entities.abilities.bear_form.description':
-    '熊に変身します。アーマー +110%、最大体力 +30%、攻撃力が大きく増加し、攻撃が怒りを生成し、脅威生成が30%増加します。どの姿に変身しても、移動速度が短時間上昇する『軽快な足取り』を得ます。再度使用すると術者形態に戻ります。',
+    '熊に変身します。アーマー +110%、最大体力 +30%、攻撃力が大きく増加し、攻撃が怒りを生成し、脅威生成が30%増加します。攻撃速度が2倍になる代わりに1回あたりのダメージは半分になり、各攻撃が生成する怒りは2倍になります。どの姿に変身しても、移動速度が短時間上昇する『軽快な足取り』を得ます。再度使用すると術者形態に戻ります。',
   'entities.abilities.maul.name': '骨砕き',
   'entities.abilities.maul.description':
     '近接ダメージを {damage} 増加させ、大量の脅威を発生させる猛攻です。次のスイングで発動します。ブルーインフォーム専用。',
@@ -5789,10 +6341,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '対象に唸ります。あなたの脅威が対象の最も憎む敵と同じ値まで上がり、3秒間あなたを攻撃させます。ブルーインフォーム専用。',
   'entities.abilities.cat_form.name': 'キャットフォーム',
   'entities.abilities.cat_form.description':
-    '狼へ変身します。敏捷性がレベルとともに上がり、攻撃力は+8にレベルごとの2を加え、攻撃はエネルギーとコンボポイントを使い、生む脅威度が29%減ります。いずれかの姿に変身すると疾駆の歩みを得ます。3秒間移動速度が60%上昇し、20秒に1回まで発動します。もう一度使えば術者の姿に戻ります。',
+    '猫に変身します。敏捷はレベルに応じて上がり、攻撃力は8とレベルごと2増加。攻撃はエネルギーとコンボポイントを使い、移動速度が15%上がり、脅威が29%減ります。どの形態への変身でも軽快な足取りを得て短時間加速します。再使用で通常の術者形態に戻ります。',
   'entities.abilities.claw.name': '裂爪',
   'entities.abilities.claw.description':
     '敵を引っかき、武器ダメージに {damage} を加えたダメージを与えます。コンボポイントを1獲得します。キャットフォーム専用。',
+  'entities.abilities.scratch.name': 'スクラッチ',
+  'entities.abilities.scratch.description':
+    '6ヤード以内の周囲の対象を引っかき、武器ダメージに {damage} を加えたダメージを与えます。命中した対象1体ごとにコンボポイントを1獲得します。範囲内のステルス中の敵を暴きます。キャットフォーム専用。',
   'entities.abilities.ferocious_bite.name': '血噛み',
   'entities.abilities.ferocious_bite.description':
     '{damage}を与えるフィニッシュムーブです。キャットフォーム専用。',
@@ -5801,7 +6356,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '周囲の敵を薙ぎ払い、{damage} のダメージを与えます。追加の脅威を発生させます。ブルーインフォーム専用。',
   'entities.abilities.regrowth.name': '二度目の開花',
   'entities.abilities.regrowth.description':
-    '味方対象の体力を {damage} 回復し、さらに21秒間追加で回復します。',
+    '味方対象の体力を {damage} 回復し、さらに15秒間追加で回復します。効果が最後まで持続すると、最初の回復と同じ量だけ対象を再び回復します。',
   'entities.abilities.barkskin.name': '樫の肌',
   'entities.abilities.barkskin.description':
     '肌が樹皮のように硬くなり、15秒間アーマーが150増加します。',
@@ -5825,19 +6380,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faerie_fire.description': '対象の防御力を40秒間{damage}%下げます。',
   'entities.abilities.hibernate.name': '微睡み',
   'entities.abilities.hibernate.description':
-    '対象を最大8秒間深い眠りに落とします。ダメージを受けると目を覚まします。',
+    '標的を最大8秒間深く眠らせます。ダメージを受けると目覚めます。プレイヤーには18秒以内の再使用ごとに持続時間が前回の半分になり、4回目は失敗します。',
   'entities.abilities.dash.name': 'ダッシュ',
   'entities.abilities.dash.description':
-    '前方へ駆け出し、移動速度を15秒間50%上昇させます。キャットフォーム専用。',
+    'まだキャットフォームでなければ変身してから、15秒間移動速度が50%上昇する疾走を行います。どの形態でも使用可能。即時で、グローバルクールダウンは発生しません。',
   'entities.abilities.pounce.name': '忍び強襲',
   'entities.abilities.lunge.description':
-    '最大12メートル先の敵に飛びかかり、武器ダメージの60%を与えてコンボポイントを1獲得する。ウルフフォーム時のみ使用可能。',
+    '最大12メートル先の敵に飛びかかり、武器ダメージの60%を与えてコンボポイントを1獲得する。キャットフォーム時のみ使用可能。',
   'entities.abilities.lunge.name': 'ランジ',
   'entities.abilities.hamstring_bite.description':
-    '対象を1秒に加えコンボポイント1つにつき1秒スタンさせるフィニッシュ技（コンボポイント5：6秒）。ウルフフォーム時のみ使用可能。',
+    '対象を1秒に加えコンボポイント1つにつき1秒スタンさせるフィニッシュ技（コンボポイント5：6秒）。キャットフォーム時のみ使用可能。',
   'entities.abilities.hamstring_bite.name': 'テイクダウン',
   'entities.abilities.pounce.description':
-    '隠密状態から放つ先制攻撃で、対象を2秒間スタンさせます。コンボポイントを1獲得します。ウルフフォーム専用。 ステルス状態でない場合、このボタンはランジになる。',
+    '隠密状態から放つ先制攻撃で、対象を2秒間スタンさせます。コンボポイントを1獲得します。キャットフォーム専用。 ステルス状態でない場合、このボタンはランジになる。',
   'entities.abilities.insect_swarm.name': '刺す虫の群れ',
   'entities.abilities.insect_swarm.description':
     '敵が虫の群れに襲われ、12秒かけて{damage}の自然ダメージを受けます。',
@@ -5846,7 +6401,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'エネルギーを{rage}回復し、攻撃力を{duration}秒間{buff}上昇させます。キャットフォーム専用。',
   'entities.abilities.rip.name': '血裂',
   'entities.abilities.rip.description':
-    '対象を24秒間、2秒ごとに出血させるフィニッシュ技。36ダメージに加え、消費したコンボポイント1つにつき24（コンボポイント5：合計{damage}）。猫の姿専用。',
+    'フィニッシュ技。標的に2秒ごと、24秒間出血させます。72ダメージに消費コンボポイントごと48を加算します（5ポイントで合計{damage}）。キャットフォーム専用。',
   'entities.abilities.mortal_strike.name': '重傷の一撃',
   'entities.abilities.mortal_strike.description':
     '凶悪な一撃で武器ダメージに加えて {damage} のダメージを与えます。（武器シグネチャー）',
@@ -5885,19 +6440,25 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'レイスボーンを意のままに束縛します。遠方から強力なシャドウダメージを降らせるエリート悪魔です。長い再使用時間がその破壊的な力を制限します。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。',
   'entities.abilities.bear_charge.name': 'ブルーインラッシュ',
   'entities.abilities.bear_charge.description':
-    '敵に突進して激怒を9獲得し、1秒間スタンさせる。その後3秒間、ウルフフォームは無料になり、対象を押さえ込んで4秒間移動速度を50%低下させる。射程7～23メートル。ブルーインフォーム時のみ使用可能。',
+    '敵に突進して激怒を9獲得し、1秒間スタンさせる。その後3秒間、キャットフォームは無料になり、対象を押さえ込んで4秒間移動速度を50%低下させる。射程7～23メートル。ブルーインフォーム時のみ使用可能。',
   'entities.abilities.demoralizing_roar.name': '臆病の咆哮',
   'entities.abilities.demoralizing_roar.description':
     '周囲の敵を萎縮させ、20秒間その攻撃力を20低下させる。ブルーインフォーム時のみ使用可能。',
   'entities.abilities.prowl.name': 'つけ狙い',
   'entities.abilities.prowl.description':
-    'ウルフフォーム中にステルス状態に入る。戦闘中は使用できない。',
+    'キャットフォーム中にステルス状態に入る。戦闘中は使用できない。',
   'entities.abilities.rake.name': '皮剥ぎ',
   'entities.abilities.rake.description':
-    '敵を切り裂いて武器ダメージに{damage}を加え、18秒間の出血ダメージを与えます。コンボポイントを1与えます。猫の姿専用。',
+    '敵を切り裂いて武器ダメージに{damage}を加え、18秒間で{overTime}の出血ダメージを与えます。コンボポイントを1与えます。猫の姿専用。',
   'entities.abilities.revive_pet.name': '応急処置',
   'entities.abilities.revive_pet.description':
-    'ペットを応急処置する。生存している場合は12秒間、3秒ごとに回復し、合計{overTime}の体力を回復する。死亡している場合は体力35%で蘇生する。',
+    'ペットを応急処置する。生存している場合は12秒間、3秒ごとに回復する。死亡している場合は体力35%で蘇生する。',
+  'entities.abilities.tactical_camo.name': '戦術迷彩',
+  'entities.abilities.tactical_camo.description':
+    '周囲に溶け込む。敵にほとんど気づかれず、移動速度は80%になる。攻撃するかダメージを受けると戦術迷彩は解除される。再使用で解除する。（野戦術）',
+  'entities.abilities.play_dead.name': '死んだふり',
+  'entities.abilities.play_dead.description':
+    '地面に倒れて死んだふりをする。体力と集中値は全員に空として表示される。敵はあなたを忘れ、あなたをターゲットしている敵プレイヤーはターゲットを失う。移動、攻撃、または他のアビリティの使用で終了する。移動中に使用した場合、1秒以内に止まらないと移動によって終了する。再使用で起き上がる。',
   'entities.abilities.holy_shock.name': 'ライトジョルト',
   'entities.abilities.holy_shock.description':
     '聖なる力で味方を衝撃し、体力を{damage}回復します。（ホーリー特性のシグネチャ）',
@@ -5924,10 +6485,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '10秒間、呪文ヘイストが30%上がり、詠唱の中断と遅延を防ぎます。（フロスト特性のシグネチャ）',
   'entities.abilities.cold_blood.name': 'コールドブラッド',
   'entities.abilities.cold_blood.description':
-    '殺意を研ぎ澄まし、次の攻撃を必ずクリティカルにします。（暗殺の象徴）',
+    '殺意を研ぎ澄まし、次の5回の攻撃を必ずクリティカルにします。（暗殺の象徴）',
   'entities.abilities.blade_flurry.name': 'ブレードフラリー',
   'entities.abilities.blade_flurry.description':
-    '刃の乱舞を放ち、攻撃速度を12秒間20%高めます。（コンバットの象徴）',
+    '刃の乱舞を放ち、攻撃速度を30秒間20%高めます。（コンバットの象徴）',
   'entities.abilities.hemorrhage.name': 'ヘモリッジ',
   'entities.abilities.hemorrhage.description':
     '武器ダメージに{damage}を加えて敵を打ち、12秒間の出血ダメージを与え、対象が受ける出血ダメージを40%高めます。コンボポイントを1与えます。2回使うごとに幽冥を1加えます（最大3）。（隠密の象徴）',
@@ -5957,7 +6518,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '原初の力を解き放ちます。キャットフォームでは、10秒間エネルギーの再生速度が100%上昇します。ブルーインフォームでは、即座に怒りを50生成します。（フェラル特性のシグネチャ）',
   'entities.abilities.swiftmend.name': 'スウィフトメンド',
   'entities.abilities.swiftmend.description':
-    '味方の対象にかかった継続回復効果を消費し、{damage}回復します。野生の芽吹きと二度目の開花の植え付けは青翠を貯め、青翠5でこのボタンは満開となり、あなたの継続回復効果を帯びた味方全員を、それらの効果の残量の60%だけ即座に回復します。（回復の象徴）',
+    '味方の対象にかかった継続回復効果を消費し、{damage}回復します。スポアメンディング、二度目の開花、野生の癒しを詠唱するたびに翠成が1段階進み、翠成3でこのボタンは満開となり、あなたの継続回復効果を帯びた味方全員を、それらの効果の残量の60%だけ即座に回復します。（回復の象徴）',
+  'entities.abilities.swiftmend.specNote_restoration':
+    '味方の対象にかかった継続回復効果を消費し、{damage}回復します。スポアメンディングと二度目の開花は翠成を蓄えます。翠成5でこのボタンは満開となり、あなたの継続回復効果を帯びた味方全員を、それらの効果の残量の60%だけ即座に回復します。（回復の象徴）',
   'entities.abilities.crusader_strike.name': 'クルセイダー ストライク',
   'entities.abilities.crusader_strike.description':
     '対象を攻撃し、武器ダメージに加えて {damage} の聖なるダメージを与えます。（パラディンのタレント）',
@@ -6400,6 +6963,18 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '本当によいか？霊魂の癒し手はここであなたを蘇らせる。あなたはレベル10未満なので、今回は復活の後遺症で弱ることはない。',
   'hudChrome.death.spiritHealerAlive': '霊魂の癒し手は死者を見守っている。あなたはまだ生者だ。',
   'hudChrome.death.ghostHint': '死亡した場所まで走るか、霊魂の癒し手に話しかけて復活しよう',
+  'entities.npcs.guild_quartermaster_garrick_holt.greeting':
+    '印章と栄誉の交換だ、友よ。俺の棚に刃を研ぐものはないが、ハイウォッチ中の館があんたがどこで手に入れたか知ることになる。',
+  'entities.npcs.guild_quartermaster_garrick_holt.name': 'ギャリック・ホルト',
+  'entities.npcs.guild_quartermaster_garrick_holt.title': 'ギルドの補給係',
+  'entities.npcs.guild_recruiter_mira_fairweather.greeting':
+    '仲間を探してる？この地図にある墓所も砦も神殿も、みんな私のリストに名前があるわ。どこへ行くのか教えて。',
+  'entities.npcs.guild_recruiter_mira_fairweather.name': 'ミラ・フェアウェザー',
+  'entities.npcs.guild_recruiter_mira_fairweather.title': 'ギルドの募集係',
+  'entities.npcs.guildmaster_hesper_dunmore.greeting':
+    '燈火の館へようこそ、{className}。今週の契約はトバイアスが掲示板に貼っている。ギャリックは我らの印章を身につける価値のある栄誉と交換し、ミラは山の下のどの扉へ向かう仲間でも見つけてくれる。戦利品を持ち帰れば、私の後ろの広間に飾られるだろう。',
+  'entities.npcs.guildmaster_hesper_dunmore.name': 'ヘスパー・ダンモア',
+  'entities.npcs.guildmaster_hesper_dunmore.title': '燈火の館のギルドマスター',
   'entities.npcs.spirit_healer.name': '霊魂の癒し手',
   'entities.npcs.spirit_healer.title': '死者の番人',
   'entities.npcs.spirit_healer.greeting':
@@ -8086,6 +8661,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.pet.petEatsFoodOnly': 'ペットは食べ物しか食べられません。',
   'mode.play': 'プレイ',
   'mode.playAria': 'World of ClaudeCraftをプレイ',
+  'mode.playLoading': '読み込み中',
+  'mode.playStarting': '起動中',
   'mode.serverAria': 'ワールドを選択：オンラインまたはオフライン',
   'mode.serverLabel': 'ワールドを選択',
   'mode.serverOffline': 'オフライン',
@@ -9117,7 +9694,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'タッチ画面では、グラフィックパネルに専用の「タッチ操作」カードが増えます。スティックの大きさとデッドゾーン、画面ボタンの大きさ、操作の不透明度、任意のカメラスティック、左利き向けの左右反転レイアウト、そして反転タッチ視点。画面のほうがあなたの手に合わせるのであって、その逆ではありません。',
   'guide.settingsPage.audioTitle': 'サウンドと言語',
   'guide.settingsPage.audioBody':
-    '設定ウィンドウは画素だけでできているわけではありません。オーディオには音量スライダーが三つ、効果音、音楽、ボイス用にあり、さらに音楽のオンオフと、飽きやすい音のための四つのスイッチがあります。NPCのボイス、足音、インターフェース音、クリックの手応えです。インターフェースパネルの「一般」タブには、再読み込みなしでその場でインターフェース全体を翻訳し直す言語選択と、ウィンドウの装いを選ぶテーマ選択が載っています。',
+    '設定ウィンドウでは音も調整できます。「オーディオ」には効果音、環境音、音楽、声の四つの音量スライダー、音楽のオン・オフ、および気になりやすい四種類の音を切り替えるスイッチがあります。対象はNPCの声、足音、インターフェース音、クリックの反応音です。「インターフェース」の「全般」タブでは、再読み込みせず全体を即座に翻訳する言語と、ウィンドウの外観テーマを選べます。',
   'guide.combat.intro':
     '戦闘はおなじみのクラシックMMOのルールに沿っています。うまく遊ぶために細かく学ぶ必要はまったくありません。これは戦いの仕組みの概要にすぎません。',
   'guide.combat.hitTitle': 'すべての一撃が命中するわけではない',
@@ -9304,7 +9881,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '沼地の道から外れた場所に沈む祠。好奇心旺盛で、しっかり備えた者のための寄り道です。',
   'guide.dungeonsPage.sanctumName': '墓守竜の聖域',
   'guide.dungeonsPage.resetBody':
-    'パーティがまだ確保した周回を抱えたまま難易度を切り替えると、古い確保はしばらく居座ってから自然に解けます。パーティリーダーは代わりに一度に手放せます。自分の肖像メニューから「すべてのインスタンスをリセット」を選ぶか、/dungeon reset と入力してください。リセットが働くのは、難易度が実際に変更された後だけ、中に誰も、生者も倒れた者も残っていない間だけ、そして中の亡骸がすべて拾い尽くされた後だけで、リセットの間には短いクールダウンが挟まります。誤った難易度で扉に着けば、周回が始まる前にゲームが知らせます。レイドはこのやり方では決してリセットされません。レイド自身のロックアウト規則が働きます。',
+    '確保した空のインスタンスはしばらく残り、その後自然に解放されます。パーティリーダーは自分の肖像メニューから「すべてのインスタンスをリセット」を選ぶか、/dungeon reset と入力してすぐに解放できます。次の攻略は現在の難易度で最初から始まります。難易度の変更でも以前の難易度のインスタンスが解放されます。リセットには、生者も倒れた者も中に残っておらず、すべての亡骸から戦利品を回収済みであることが必要です。ロックアウトは短縮されません。ロック中のヒロイックやレイドはその解除までロックされたままで、リセットの間には短いクールダウンがあります。誤った難易度で入口に着くと攻略前に通知されます。レイドも同様にリセットでき、固有のロックアウトと亡骸への帰還の規則は引き続き適用されます。レイドの難易度変更ではクールダウンが省かれるため、難易度を間違えたりヒロイックで行き詰まったりした場合はすぐに戻せます。再挑戦を制限するのはレイド自体のロックアウトです。',
   'guide.dungeonsPage.resetTitle': 'インスタンスのリセット',
   'guide.dungeonsPage.sanctumBody':
     'ソーンピークの高みに隠された氷河。一頭の竜が氷の中に囚われ、カルトは盗んだ魂を燃やしてその氷を解かそうとしている。高い峠から氷の塔、鍛冶神の砕けた鎖、カルトの炎を越えて、氷河の麓の凍った湖へと下っていきます。',
@@ -9608,6 +10185,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'コインは世界全体の潤滑油です。装備や物資、旅の道具を買い、プレイヤー間でやり取りされます。これらはすべて遊んでいるだけで身につくので、このページはお金がどこから来てどこへ行くのかを示す地図だと思ってください。',
   'guide.economy.junkBody':
     '使い道のないドロップ品も、どの商人にでも売れます。バッグがいっぱいになる前に、町を通るたびに空にしましょう。商人の「売却」タブには、粗悪品の半端物をまとめて一括で売れるワンクリックのボタンまで用意されています。本当に価値のないがらくたは、場所を空けるためにそのまま捨てることもできます。',
+  'guide.economy.junkBodyFinal':
+    '使い道のないドロップ品も、どの商人にでも売れます。バッグがいっぱいになる前に、町を通るたびに空にしましょう。商人の「売却」タブには、粗悪品の半端物をまとめて一括で売れるワンクリックのボタンまで用意されています。本当に価値のないがらくたは、場所を空けるためにそのまま捨てることもできます。こうして売った署名のない灰色アイテムは買い戻しリストに入らないので、押す前に残したい物がないか確かめましょう。',
   'guide.economy.junkTitle': 'がらくたの整理',
   'guide.economy.mailBody':
     'どの拠点の町にも、ワタリガラスを彫った柱が立っています。レルムの手紙配達、レイヴンポストのメールボックスです。その前に立てば、オンラインの友人にも長くオフラインの相手にも、名前を指定してどのキャラクターへも手紙を書け、わずかな郵送料でコインや品物を手紙に添えられます。ワタリガラスが飛ぶには少し時間がかかります。届くと、封筒の印が受取人に何かが待っていると知らせてくれます。',
@@ -10613,9 +11192,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '最も近い者が骨の棘を攻撃する。誰の攻撃でも数回当てれば砕け、ダメージ量は問わない。ヒーラーは棘が砕けるまで串刺しにされた味方を生かし続ける。',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionName': '墓所の噴出',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionSummary':
-    '{everyNormal}秒ごとに、骸骨の手がレイドメンバーの足元に{radius}ヤードの円を{countNormal}個描く。{warning}秒後、各円は最大体力の{burstNormal}を闇ダメージとして噴出させ、その後{flameNormal}秒間墓炎として燃え続け、中に立つ者へ毎秒最大体力の{tickNormal}を与える。',
+    '{everyNormal}秒ごとに、骸骨の手がレイドメンバーの足元に{radius}ヤードの円を{countNormal}個描く。{warning}秒後、各円は最大体力の{burstNormal}を闇ダメージとして噴出させ、その後{flameNormal}秒間墓炎として燃え続け、中に立つ者へ毎秒最大体力の{tickNormal}を与える。魂の裂傷のマークが有効な間と、マークが消えてから{gap}秒以内には発生しない。',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionHeroicSummary':
-    '{everyHeroic}秒ごとに、骸骨の手がレイドメンバーの足元に{radius}ヤードの円を{countHeroic}個描く。{warning}秒後、各円は最大体力の{burstHeroic}を闇ダメージとして噴出させ、その後{flameHeroic}秒間墓炎として燃え続け、中に立つ者へ毎秒最大体力の{tickHeroic}を与える。',
+    '{everyHeroic}秒ごとに、骸骨の手がレイドメンバーの足元に{radius}ヤードの円を{countHeroic}個描く。{warning}秒後、各円は最大体力の{burstHeroic}を闇ダメージとして噴出させ、その後{flameHeroic}秒間墓炎として燃え続け、中に立つ者へ毎秒最大体力の{tickHeroic}を与える。魂の裂傷のマークが有効な間と、マークが消えてから{gap}秒以内には発生しない。',
   'hudChrome.raidBossGuide.nythraxis.graveEruptionResponse':
     '噴出する前にすべての警告円から外へ出て、燃える地面を避け続ける。タンクはナイスラクシスを炎から引き離し、近接が動ける余地を確保する。',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilName': '拘束の印',
@@ -10736,7 +11315,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.imbueRange': '武器付与: ヴァーディクトで{min}から{max}の追加ダメージ',
   'hudChrome.auraEffect.stealth': '隠密状態。移動速度が{pct}%低下する',
   'hudChrome.auraEffect.formBear': 'ブルーインフォーム: 体力と防御力が上昇',
-  'hudChrome.auraEffect.wolfForm': 'ウルフフォーム: 近接ダメージとエネルギー、移動速度が{pct}%上昇',
+  'hudChrome.auraEffect.wolfForm':
+    'キャットフォーム: 近接ダメージとエネルギー、移動速度が{pct}%上昇',
   'hudChrome.auraEffect.formTravel': 'フリートフォーム: 移動速度が{pct}%上昇',
   'hudChrome.auraEffect.defensiveStance':
     'ガーデッドスタンス: 受けるダメージが減少し、脅威度が上昇',
@@ -10874,7 +11454,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '骨髄砕きのダメージが30%増加し、緊急時の護りが攻撃を置き換えなくなります。',
   'entities.itemSets.grovespring.name': 'グローヴスプリングの法衣',
   'entities.itemSets.grovespring.bonus2':
-    'スウィフトメンドが自分の野生の芽吹きまたは二度目の開花を優先して消費し、回復量が25%増加します。被ダメージで詠唱が遅れなくなります。',
+    'スウィフトメンドが自分のスポアメンディングまたは二度目の開花を優先して消費し、回復量が25%増加します。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.grovespring.bonus4': '満開が残りの効果の75%を収穫し、その後翠成を1蓄えます。',
   'entities.items.lastflame_core.name': '最後の炎の核',
   'entities.itemSets.slagbreaker.name': 'スラグブレイカーの戦装束',
@@ -10888,7 +11468,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '瀉血が必ずあなたを激昂させ、その回復量が最大体力の8%に上昇します。',
   'entities.itemSets.forgewall.name': 'フォージウォールの守り',
   'entities.itemSets.forgewall.bonus2':
-    '鉄の決意の怒りの変換が、1ポイントにつき4から5の吸収に上昇します。',
+    '鉄の決意のシールドが吸収する量が、最大体力の20%から25%に上昇します。',
   'entities.itemSets.forgewall.bonus4':
     '盾砕きを発動するたびに、鉄の決意の残りクールダウンが2秒短縮されます。',
   'entities.itemSets.dawnforged.name': 'ドーンフォージの祭服',
@@ -10943,31 +11523,36 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vale_arcanist.name': '谷の秘術師の装束',
   'entities.itemSets.vale_arcanist.bonus3': '攻撃速度と詠唱速度が15%上昇します。',
   'entities.itemSets.warfare_ashstalker.name': 'アッシュストーカーの装備',
-  'entities.itemSets.warfare_ashstalker.bonus2': 'ウォーフェア防御レーティングが40上がります。',
+  'entities.itemSets.warfare_ashstalker.bonus2':
+    'ウォーフェア防御レーティングが40上がります。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.warfare_ashstalker.bonus4':
     'ウォーフェア攻撃レーティングが40上がり、敵対プレイヤーがあなたにかける行動制御の持続が15%短くなります。',
   'entities.itemSets.warfare_ashstalker.bonus7':
     'ウォーフェア攻撃・防御レーティングが80上がります。敵対プレイヤーを倒すと灰の歩みを得て、移動速度が6秒間40%上がります。',
   'entities.itemSets.warfare_cinderweave.name': 'シンダーウィーヴの法衣',
-  'entities.itemSets.warfare_cinderweave.bonus2': 'ウォーフェア防御レーティングが40上がります。',
+  'entities.itemSets.warfare_cinderweave.bonus2':
+    'ウォーフェア防御レーティングが40上がります。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.warfare_cinderweave.bonus4':
     'ウォーフェア攻撃レーティングが40上がり、敵対プレイヤーがあなたにかける行動制御の持続が15%短くなります。',
   'entities.itemSets.warfare_cinderweave.bonus7':
     'ウォーフェア攻撃・防御レーティングが80上がります。呪文に15%の確率で燠火の守りが宿り、8秒間120のダメージを吸収します。',
   'entities.itemSets.warfare_furyforged.name': 'フューリーフォージの戦装束',
-  'entities.itemSets.warfare_furyforged.bonus2': 'ウォーフェア防御レーティングが40上がります。',
+  'entities.itemSets.warfare_furyforged.bonus2':
+    'ウォーフェア防御レーティングが40上がります。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.warfare_furyforged.bonus4':
     'ウォーフェア攻撃レーティングが40上がり、敵対プレイヤーがあなたにかける行動制御の持続が15%短くなります。',
   'entities.itemSets.warfare_furyforged.bonus7':
     'ウォーフェア攻撃・防御レーティングが80上がります。敵対プレイヤーを倒すと不断の誓いを得て、10秒間200のダメージを吸収します。',
   'entities.itemSets.warfare_stormbound.name': 'ストームバウンドの法衣',
-  'entities.itemSets.warfare_stormbound.bonus2': 'ウォーフェア防御レーティングが40上がります。',
+  'entities.itemSets.warfare_stormbound.bonus2':
+    'ウォーフェア防御レーティングが40上がります。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.warfare_stormbound.bonus4':
     'ウォーフェア攻撃レーティングが40上がり、敵対プレイヤーがあなたにかける行動制御の持続が15%短くなります。',
   'entities.itemSets.warfare_stormbound.bonus7':
     'ウォーフェア攻撃・防御レーティングが80上がります。呪文に15%の確率で燠火の守りが宿り、8秒間120のダメージを吸収します。',
   'entities.itemSets.warfare_thornhide.name': 'ソーンハイドの装束',
-  'entities.itemSets.warfare_thornhide.bonus2': 'ウォーフェア防御レーティングが40上がります。',
+  'entities.itemSets.warfare_thornhide.bonus2':
+    'ウォーフェア防御レーティングが40上がります。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.warfare_thornhide.bonus4':
     'ウォーフェア攻撃レーティングが40上がり、敵対プレイヤーがあなたにかける行動制御の持続が15%短くなります。',
   'entities.itemSets.warfare_thornhide.bonus7':
@@ -11107,12 +11692,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.open': 'Discord',
   'hudChrome.discord.viewCharacter': '{name}を表示',
   'hudChrome.discord.rank': 'ランク',
-  'hudChrome.discord.roleTag.admin': '管理者',
   'hudChrome.discord.roleTag.levyst': 'Levy St',
   'hudChrome.discord.roleTag.devs': '開発者',
   'hudChrome.discord.roleTag.mods': 'モデレーター',
-  'hudChrome.discord.roleTag.seniormods': 'シニアモデレーター',
-  'hudChrome.discord.roleTag.juniormods': 'ジュニアモデレーター',
+  'hudChrome.discord.roleTag.seniormods': 'センチネル',
+  'hudChrome.discord.roleTag.juniormods': 'オブザーバー',
   'hudChrome.discord.roleTag.contentcreator': 'コンテンツクリエイター',
   'hudChrome.discord.voice.channel': '{channel}に参加中',
   'hudChrome.discord.swag.title': 'グッズ',
@@ -11401,6 +11985,33 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'editor.push.kindObjectMove': 'ゲームプレイオブジェクト',
   'editor.push.kindPaint': '塗ったセル',
   'editor.push.kindField': 'マップ設定',
+  'editor.push.kindRoad': '道路',
+  'editor.push.kindRoadEdit': 'ワールドの道路',
+  'editor.city.roadMode': '道路ツール',
+  'editor.city.roadModeDraw': '新しい道路を描く',
+  'editor.city.roadModeEdit': '道路を編集',
+  'editor.city.roadEditHint':
+    '道路をクリックして選択します。経由点をドラッグすると移動し、道路の線をドラッグすると曲がり角を追加します。Delete キーで選択中の経由点を削除します。',
+  'editor.city.roadEditNone':
+    '道路が選択されていません。ビューでクリックするか、下のリストから選んでください。',
+  'editor.city.roadEditing': '編集中：{name}',
+  'editor.city.roadWaypoints': '経由点：{n}',
+  'editor.city.roadWaypointHeld': '経由点 {n} を選択中。',
+  'editor.city.roadDeletePoint': '経由点を削除',
+  'editor.city.roadRemove': '道路を削除',
+  'editor.city.roadReset': '初期状態に戻す',
+  'editor.city.roadRestore': '復元',
+  'editor.city.roadSelect': '選択',
+  'editor.city.roadBuiltin': 'ワールドの道路 {n}',
+  'editor.city.roadBuiltinEdited': '{name}（変更済み）',
+  'editor.city.roadBuiltinRemoved': '{name}（削除済み）',
+  'editor.city.roadWorldList': 'ワールドの道路（{n}）',
+  'editor.city.roadBuiltinNote':
+    'ワールドの道路はゲーム本来の道路です。変更はこのマップにのみ適用され、「初期状態に戻す」で道路が元に戻ります。',
+  'editor.city.roadPointTooShort':
+    '道路には経由点が2つ以上必要です。代わりに「道路を削除」を使ってください。',
+  'editor.city.roadPointLimit': 'この道路にはこれ以上経由点を追加できません。',
+  'editor.city.roadRemoved': '道路を削除しました。元に戻すで復元できます。',
   'editor.push.close': '閉じる',
   'editor.objectMove.edited': 'このマップで変更済みです。',
   'editor.objectMove.rotation': '回転（度）',
@@ -13601,6 +14212,35 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.tagFullClear': 'フルクリア',
   'hudChrome.finder.tagLearning': '初心者歓迎',
   'hudChrome.finder.tagFastRun': '高速周回',
+  'hudChrome.finder.tagGuildOnly': 'ギルドパーティー',
+  'hudChrome.finder.guildPartyToggle': 'ギルドパーティー',
+  'hudChrome.finder.guildPartyHint': '{guild}のメンバーのみ応募できます。',
+  'hudChrome.finder.guildPartyNeedsGuild':
+    'ギルドパーティーを作成するにはギルドに参加してください。',
+  'hudChrome.finder.guildPartyNote': 'ギルドパーティーはリーダーのギルドメンバーのみ参加できます。',
+  'hudChrome.finder.guildPartyBadge': '{guild}限定',
+  'hudChrome.finder.guildPartyLocked': 'ギルドメンバー限定',
+  'hudChrome.finder.filterContent': 'コンテンツ',
+  'hudChrome.finder.filterAll': 'すべてのコンテンツ',
+  'hudChrome.finder.filterDungeons': 'ダンジョン',
+  'hudChrome.finder.filterRaids': 'レイド',
+  'hudChrome.finder.filterEmpty': 'この条件に合う募集はありません。',
+  'hudChrome.finder.postHeading': 'グループを宣伝',
+  'hudChrome.finder.postGeneral': '一般チャットに投稿',
+  'hudChrome.finder.postDiscord': 'Discordに投稿',
+  'hudChrome.finder.postReadyIn': 'あと{minutes}分',
+  'hudChrome.finder.postDiscordOffline': 'オンラインプレイ限定',
+  'hudChrome.finder.inspect': '詳細を見る',
+  'hudChrome.finder.inspectApplicantAria': '{name}の詳細を見る',
+  'hudChrome.finder.partyHeading': 'パーティーを連れていく',
+  'hudChrome.finder.partyNote':
+    'パーティーはこのグループに参加します。メンバーごとに役割を選ぶか、本人の役割のままにしてください。',
+  'hudChrome.finder.partyRolesHeading': 'パーティーの役割',
+  'hudChrome.finder.partyRolesNote': 'メンバーごとに役割を選ぶか、本人の役割のままにしてください。',
+  'hudChrome.finder.partyRoleOwn': '本人の選択',
+  'hudChrome.finder.partyRoleAria': '{name}の役割',
+  'hudChrome.finder.partyMemberMeta': 'レベル{level} {cls}',
+  'hudChrome.finder.difficultyHeading': '難易度',
   'hudChrome.finder.mech.shadow_pulse': 'シャドウパルス（周期的な範囲ダメージ）',
   'hudChrome.finder.mech.crypt_shovelful':
     'ひとすくいの墓土（11秒ごとに前方8ヤードの扇形に墓土を浴びせる：通常攻撃の1.5倍のダメージと6秒間の移動速度50%低下。背後に立つこと）',
@@ -13875,7 +14515,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_stormfeather_griffin': 'スカイリーチ・ストームフェザー',
   'hudChrome.mounts.name_drakemaw_raptor': '火口のラプトル',
   'hudChrome.mounts.name_avian_strider': 'ヴィリジアン・ヴェイルストライダー',
+  'hudChrome.mounts.name_nightwing_chimera': 'ナイトウィング・キマイラ',
+  'hudChrome.mounts.desc_nightwing_chimera':
+    '古の枝より降り立った双頭の黄昏ワイバーン。休む時は鉤爪の後脚で立ち、進む時は秘術の文様が刻まれた翼で地表を滑空する。',
   'hudChrome.mounts.name_lanternback_troll': 'ランタンバックのグルンボル',
+  'hudChrome.mounts.name_lantern_hall_destrier': '燈火の館の軍馬',
   'hudChrome.mounts.name_chimeglass_tortoise': '鐘硝子のトリヴァー',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。',
@@ -13886,14 +14530,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '巨大な騎乗鳥。太い鉤爪と畳んだ翼が、あらゆる旅路を雷鳴のような疾走に変える。',
   'hudChrome.mounts.desc_lanternback_troll':
     '点灯人に軛で馴らされた丘トロル。肩に鉄の玉座を担ぎ、その両の肘掛けには嵐提灯が灯る。',
+  'hudChrome.mounts.desc_lantern_hall_destrier':
+    '燈火の館の軍馬。ギルドの青の下に樫と鉄の馬鎧をまとい、鞍から揺れる二つの嵐灯が帰り道を照らす。',
   'hudChrome.mounts.desc_chimeglass_tortoise':
     '塩平原の陸亀。隊商三代を歩き通した。彼を引き取った鋳掛屋たちは嵐硝子を削って眼鏡を作り、喉元に青銅の鈴を吊るした。道は姿を見るより先に、その音を聞く。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '大七面鳥サンダーストラット',
+  'hudChrome.mounts.name_wobbles_slime': 'スライムのプルプル',
+  'hudChrome.mounts.desc_wobbles_slime':
+    '鞍を着けられるよう馴らされた大きな青いスライム。歩く代わりに跳ねて進み、乗り手の下でぷるぷると揺れ、体の中を泡がゆっくり昇っていく。',
   'hudChrome.mounts.name_terrorspark_groundshaker': '地揺らしのドレッドスパーク',
   'hudChrome.mounts.name_rickshaw_mount': '骨縛りの人力車',
-  'hudChrome.mounts.desc_valorsteed': '頑健で足取り確かな駿馬。移動速度を高める。',
-  'hudChrome.mounts.desc_grag_bear': '頑健で足取り確かな熊。移動速度を高める。',
-  'hudChrome.mounts.desc_stalkglider_snail': '粘り強くゆっくり燃えるカタツムリ。移動速度を高める。',
+  'hudChrome.mounts.desc_valorsteed': '革の鞍を備えた、丈夫で足取りの確かな馬。',
+  'hudChrome.mounts.desc_grag_bear': '重厚な鞍を備えた、丈夫で足取りの確かな熊。',
+  'hudChrome.mounts.desc_stalkglider_snail': '苔むした殻を背負った、粘り強くたくましいカタツムリ。',
   'hudChrome.mounts.desc_aether_hover_cycle':
     '低空ホバーで戦場を駆け抜けるために設計された強力な魔導バイク。',
   'hudChrome.mounts.desc_shadowjump_toad':
@@ -13914,8 +14563,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.clickManage': 'クリックしてマウントを選択',
   'hudChrome.mountTraining.mountPrompt': '{key} キーを押して訓練用ヴァロースティードに騎乗する。',
   'hudChrome.mountTraining.ownedMountPrompt':
-    '手綱はバッグの中にあります。使用すると騎乗できます。',
-  'hudChrome.mounts.useToRide': '使用してこの騎乗生物を呼び出します。',
+    '外見メニューでマウントを選び、騎乗／降りる操作で乗りましょう。',
+  'hudChrome.mounts.useToRide':
+    '使用するとこの外見を適用してマウントを召喚します。いずれかのキャラクターのバッグまたは銀行にこのアイテムを保管すると、アカウント内の全キャラクターが外見を使えます。速度は騎乗訓練で決まります。',
   'hudChrome.mountTraining.ridePrompt':
     '光る目印をたどってスタートラインへ向かい、「レース開始」を押そう。',
   'hudChrome.mountTraining.begin': 'レッスン開始',
@@ -13961,6 +14611,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '画面上の宝箱ボタンを押すと、デイリー報酬のウィンドウが開きます。毎日いくつかの課題が用意され、クエストを達成したり、灰の闘技場で戦ったり、ヴェイルカップの試合に勝ったりでき、さらに賞品ホイールを一日一回無料で回せます。これらはすべてその日の順位に向けたポイントになり、上位の獲得者たちは、任意のコミュニティトークンの保有者向けの賞金プールを分け合います。いずれもゲーム内で力を授けることはありません。ウィンドウにはその日のルールと参加資格が示され、リーダーボードが表示され、あなたの履歴も残されます。',
   'guide.economy.dailyTitle': 'デイリー報酬',
   'guide.footer.linksLabel': 'プレイとコミュニティのリンク',
+  'guide.footer.guidesLabel': 'プレイヤーガイド',
+  'guide.footer.guideGamesLikeWow': 'WoWに似たゲーム',
+  'guide.footer.guideBrowser': 'ブラウザMMORPG',
+  'guide.footer.guideGamesLikeDiablo': 'ディアブロに似たゲーム',
   'guide.gear.bagsBody':
     '拾ったものはすべて一つの共通の背嚢に入り、バッグを装備することでそれを広げます。バッグウィンドウにはバッグスロットが四つあります。背嚢の中のバッグをクリックすれば空きスロットに差し込めますし、身に着けたバッグはそれぞれ自分の収納を足します。素朴なバッグは安価な商人の品で、より広いものは獣が落とし、最上のものはダンジョンのボスから来るので、持てる量は装備と歩調を合わせて育ちます。積み重ねられる品はどれも、一つのスロットに何個入るかをツールチップに記しているので、ちょっとしたポーションの買い出しがスロット二つ分になることを前もって知ることができます。',
   'guide.gear.bagsTitle': 'バッグと収納容量',
@@ -13982,6 +14636,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.models.formBear': 'ブルーインフォーム',
   'guide.models.formCat': 'キャットフォーム',
   'guide.models.formTravel': 'フリートフォーム',
+  'guide.models.formSporemender': 'スポアメンダーフォーム',
   'guide.models.groupForms': 'ドルイドの変身形態',
   'guide.nav.sidebarLabel': 'ガイドの項目',
   'guide.professions.craftHowTitle': '製作ウィンドウ',
@@ -14127,7 +14782,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.mind_sear.description':
     '3秒間詠唱を維持し、対象範囲から8ヤード以内の敵へ毎秒{damage}の影ダメージを与えます。ダメージは呪文威力とともに上がります。（プリーストのタレント）',
   'entities.abilities.multi_shot.description':
-    '対象地点へ矢の一斉射撃を放ち、8ヤード以内の敵に{damage}の物理ダメージを与える。（ハンターのタレント）',
+    '対象地点に散射し、8ヤード以内の敵に{damage}の物理ダメージを与えます。（ハンターの才能）',
   'entities.abilities.prayer_of_healing.description':
     '30ヤード以内の味方を{damage}回復します。回復量は呪文威力とともに上がります。（聖なる）',
   'entities.abilities.preparation.description':
@@ -14137,7 +14792,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.psychic_scream.description':
     '8ヤード以内の敵を最大4秒間おののかせます。ダメージで効果が解けることがあります。',
   'entities.abilities.shadowstep.description':
-    '影を通り抜けて、味方でも敵でも対象へ、ダスクヴェールを解除せずに近づく。（ローグのタレント）',
+    '影を通り抜けて、味方でも敵でも対象へ、ダスクヴェールを解除せずに近づく。最大2チャージまで蓄積します。（ローグのタレント）',
   'entities.abilities.silence.description': '対象を4秒間沈黙させる。（プリーストのタレント）',
   'entities.abilities.tranquility.description':
     '4秒間、回復エネルギーをチャネリングし、30ヤード以内の味方の体力を毎秒42から52回復する。（ドルイドのタレント）',
@@ -14242,7 +14897,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'パッシブ：呪文のクリティカルが対象を燃焼させ、与えたダメージの30%を6秒かけて与えます。効果は累積します。（火のマスタリー）',
   'entities.abilities.mass_barrier.name': 'マスバリア',
   'entities.abilities.mass_barrier.description':
-    '自身と30メートル以内にいる近くの味方最大4人に、それぞれ130ダメージを吸収するシールドを60秒間付与します。（メイジタレント）',
+    '自身と30メートル以内にいる近くの味方最大4人に、それぞれ{damage}ダメージを吸収するシールドを15秒間付与します。（メイジタレント）',
   'entities.abilities.overload.name': 'オーバーロード',
   'entities.abilities.overload.description':
     '次の呪文の効果が40%増幅されますが、マナ消費が50%増加します。10秒間持続します。（メイジタレント）',
@@ -14379,7 +15034,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.mouseoverCast': 'パーティフレームでマウスオーバーキャスト',
   'hudChrome.options.showTargetOfTarget': 'ターゲットのターゲットを表示',
   'hudChrome.options.showTargetSwingTimer': 'ターゲットの攻撃タイマーを表示',
+  'hudChrome.options.enemyHighlightStyle': '敵ハイライトのスタイル',
+  'hudChrome.options.enemyHighlightEdgeArrow': '画面外ターゲットの画面端矢印',
+  'hudChrome.options.enemyHighlightNameplate': '枠付きの大きなターゲットネームプレート',
+  'hudChrome.options.enemyHighlightOverhead': '頭上に浮かぶマーカー',
+  'hudChrome.options.enemyHighlightReticle': '太い敵対ターゲットリング',
   'hudChrome.options.showPetFrame': '自分のペットを表示',
+  'hudChrome.options.playerFrameResourceDetached': 'リソースバーを分離',
+  'hudChrome.options.playerFrameResourceWidth': 'リソースバーの幅',
+  'hudChrome.options.playerFrameResourceHeight': 'リソースバーの高さ',
+  'hudChrome.options.hillBarOpacity': '丘の王の背景の不透明度',
   'hudChrome.options.showDefensivesTrack': '防御クールダウンを表示',
   'hudChrome.options.showSelfBuffTrack': '自分のバフを表示',
   'hudChrome.options.showOffensiveTrack': '攻撃クールダウンを表示',
@@ -14387,9 +15051,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showUtilityModes': 'ステルスと移動形態を含める',
   'hudChrome.options.showFriendlyTrack': '味方へのバフを表示',
   'hudChrome.options.showShieldTrack': '自分のシールドを表示',
+  'hudChrome.options.classicCombatText': 'クラシック戦闘テキスト',
   'hudChrome.options.stickyTarget': '地面クリックでターゲットを維持',
   'hudChrome.options.showNameplateDots': 'ネームプレートに自分のデバフを表示',
   'hudChrome.options.nameplateDotScale': 'ネームプレートのデバフ表示サイズ',
+  'hudChrome.options.showNameplateCooldowns': '攻撃/防御トラッカー',
+  'hudChrome.options.nameplateCooldownScale': '攻撃/防御トラッカーのサイズ',
   'hudChrome.options.showTargetDots': 'ターゲットデバフ一覧を表示',
   'hudChrome.options.showDungeonHints': 'ダンジョンのギミックヒント',
   'hudChrome.options.showDungeonHintsNote':
@@ -14876,8 +15543,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.dungeons.the_last_keep.name': '最後の砦',
   'entities.items.last_keep_signet.name': '最後の砦の印章',
   'entities.dungeons.the_last_keep.enterText': '最後の砦の冷たく静まり返った広間へ足を踏み入れた。',
+  'entities.items.reins_wobbles_slime.name': 'ゼリーの鞍：プルプル',
   'entities.items.reins_terrorspark_groundshaker.name': 'ドレッドスパークの始動キー',
   'entities.items.reins_avian_strider.name': 'ヴィリジアン・ヴェイルストライダーの手綱',
+  'entities.items.reins_nightwing_chimera.name': 'ナイトウィング・キマイラの手綱',
   'entities.items.reins_lanternback_troll.name': '点灯人の軛：グルンボル',
   'entities.items.reins_chimeglass_tortoise.name': '道守の鈴帯：トリヴァー',
   'entities.items.reins_rickshaw_mount.name': '縛りの手綱：骨縛りの人力車',
@@ -16124,6 +16793,21 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'このアイテムはあと{time}の間、同じドロップを分かち合ったプレイヤーと取引できます。装備すると取引期間は終了します。',
   'hudChrome.itemTooltip.perfectedBadge': '完全化済み',
   'hudChrome.itemTooltip.perfectingRank': '完全化：ランク{rank}／{ranks}',
+  'hudChrome.itemTooltip.lootedBy': '{date} に {name} が獲得',
+  'hudChrome.itemTooltip.questRewardTo': '{date} に {name} がクエスト報酬として入手',
+  'hudChrome.itemTooltip.obtainedBy': '{date} に {name} が入手',
+  'hudChrome.itemMenu.itemHistory': 'アイテム履歴',
+  'hudChrome.itemHistory.title': '{item}：履歴',
+  'hudChrome.itemHistory.passedTo': '{date} に {name} へ譲渡',
+  'hudChrome.itemHistory.noTransfers': 'このアイテムは一度も持ち主が変わっていません。',
+  'hudChrome.plurals.itemHistoryEarlierHidden.one': 'それ以前の {count} 件の譲渡は表示されません。',
+  'hudChrome.plurals.itemHistoryEarlierHidden.few': 'それ以前の {count} 件の譲渡は表示されません。',
+  'hudChrome.plurals.itemHistoryEarlierHidden.many':
+    'それ以前の {count} 件の譲渡は表示されません。',
+  'hudChrome.plurals.itemHistoryEarlierHidden.other':
+    'それ以前の {count} 件の譲渡は表示されません。',
+  'hudChrome.itemHistory.close': '閉じる',
+  'hudChrome.itemHistory.openAria': '{item}のアイテム履歴',
   'devCommand.actions.kit.description':
     '指定したスペック向けのSanctum以前レベル20プリセットを装備します (バッグを先に)。装備品のみです。',
   'devCommand.actions.kit.label': '新規20キットを装備',
@@ -16601,11 +17285,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paperdoll.hideHelmAria': '兜を隠す',
   'hudChrome.paperdoll.showHelmAria': '兜を表示',
   'hudChrome.options.waterRipples': '水面の波紋（航跡）',
+  'hudChrome.options.spellEffects': '呪文エフェクト',
   'hudChrome.options.actionCam': 'アクションカメラ',
   'hudChrome.options.actionCamShoulder': 'アクションカメラの肩',
   'hudChrome.options.actionCamShoulderLeft': '左 {pct}',
   'hudChrome.options.actionCamShoulderRight': '右 {pct}',
   'hudChrome.options.actionCamShoulderCenter': '中央',
+  'hudChrome.options.firstPersonMode': '一人称視点（最大ズーム時）',
   'hudChrome.breath.label': '息',
   'hudChrome.breath.drowning': '溺れています！',
   'abilityUi.resources.devotion': '献身',
@@ -16646,10 +17332,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'グループメンバー1人を光の標に指定する。60メートル以内にいる別のグループメンバーへの有効な直接回復の50%が、光の標も回復する。範囲回復と継続回復は転送されない。どちらかが死亡するまで持続する。',
   'entities.abilities.beacon_of_light.name': '光の標',
   'entities.abilities.bloodhook.description':
-    '8から25ヤード離れた敵へ突進して主傷口を開き、12秒間で24の出血ダメージを与えます。（野戦術のシグネチャ）',
+    '敵に突進し血鉤の傷を付与します。12秒間に4回、基礎34の物理ダメージと遠隔攻撃力の26%を与えます。到着時に標的を3秒間30%減速させます。（生存の固有能力）',
   'entities.abilities.bloodhook.name': '血鉤',
   'entities.abilities.bloodtrail_assault.description':
-    '12秒間、血鉤、裂傷、榴散弾装薬、そしてペットの追撃を強化します。',
+    '12秒間、血鉤が5ヤード以内の最大2体に60%の威力の傷を広げ、傷裂きがペットに18ダメージの攻撃を命じます。榴散弾装薬の射程が2ヤード伸び、主標的への基礎ダメージが25%、発動する傷のダメージが50%増加します。生きたペットがいない間は、集中力の回復速度も100%上昇します。',
   'entities.abilities.bloodtrail_assault.name': '血跡強襲',
   'entities.abilities.body_blow.description':
     '武器ダメージの130%に10を加えた重い一撃。コンボポイントを2獲得し、レッドラインのピップを1増やす（最大4）。（コンバット）',
@@ -16666,6 +17352,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '皮膚を冷えた鉱滓のように10秒間硬化させ、受けるすべてのダメージを25%減少させる。',
   'entities.abilities.cinderhide.name': '燼皮',
   'entities.abilities.claw.specNote_feral': '命中した攻撃ごとに古き血を1蓄える（最大3）。',
+  'entities.abilities.scratch.specNote_feral': '命中した攻撃ごとに古き血を1蓄える（最大3）。',
   'entities.abilities.cold_focus.description':
     '12秒間、精密射撃がより多くの集中値を生成し、引き絞りの速度が上がって消費も減ります。（冷眼のシグネチャ）',
   'entities.abilities.cold_focus.name': '冷徹集中',
@@ -16715,7 +17402,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.ferocious_bite.specNote_feral':
     '命中した攻撃ごとに古き血を1蓄える。古き血が3のとき、このボタンは血の収穫に変化する：古き血を消費した強力な噛みつきで、皮剥ぎと血の亀裂が与えるはずだった残りダメージも即座にすべて与え、エネルギーを回復する。',
   'entities.abilities.fieldcraft_reentry.description':
-    'パッシブ：離脱跳躍は狩猟の勢いを更新し、12秒以内の次の腹裂きの一撃または血鉤を強化します。腹裂きの一撃は1スタックごとに15%の追加ダメージを与えます。血鉤は18から24の追加物理ダメージを与え、1スタックごとに15%増加し、遠隔攻撃力でも増加します。3スタック時はいずれの攻撃も狩猟の勢いを消費します。（野戦術）',
+    'パッシブ：狩猟の勢いがあると、離脱跳躍は次の腹裂きの一撃または血鉤を12秒間強化します。腹裂きの一撃は1段階ごとに15%ダメージ増加。血鉤は18から24の追加物理ダメージを与え、1段階ごとに15%、さらに遠隔攻撃力で増加します。3段階でいずれかの攻撃が狩猟の勢いを消費します。（生存）',
   'entities.abilities.fieldcraft_reentry.name': '再突入準備',
   'entities.abilities.final_edict.description':
     '強烈な武器攻撃を放ち、命中時に献身を1生成する。命中すると暁落としの残りクールダウンが2秒短縮される。通常攻撃と最後の勅令の命中時、15%の確率で8秒間、暁の憤怒を得る。昇天中は自身の周囲に神聖な爆発も放つ。',
@@ -16724,7 +17411,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '投げナイフで6ヤード以内のすべての敵を切り裂き、{damage}の物理ダメージを与え、コンボポイントを2獲得する。（ローグのタレント）',
   'entities.abilities.flurry_of_knives.name': '短剣乱舞',
   'entities.abilities.frostjaw_trap.description':
-    '選択した敵の位置か足元に起動済みの罠を置きます。最初に作動させた敵を足止めし、周囲の敵を減速させます。',
+    '選択した位置に罠を置きます。罠は0.75秒後に起動して1分間持続し、あなたとグループにしか見えません。最初に作動させた敵を3秒間足止めし、4ヤード以内の敵を4秒間、50%減速させます。',
   'entities.abilities.frostjaw_trap.name': '霜顎の罠',
   'entities.abilities.funeral_harvest.description':
     '自分または自分のアンデッドが最近ダメージを与えた敵が死亡すると、魂の欠片を1個獲得します。発動は3秒に1回までです。',
@@ -16750,7 +17437,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '主要な邪眼へ15秒間の審判を下し、断罪を40と運命の糸を3獲得して憑依を発動し、主要な邪眼を通じて生成する断罪を2倍にして、宣告のダメージを20%増加させます。最初の宣告は断罪を50返還します。',
   'entities.abilities.hour_of_judgment.name': '審判の刻',
   'entities.abilities.hunting_momentum.description':
-    'パッシブ：腹裂きの一撃で狩猟の勢いを1スタック獲得します。8秒間持続し、最大3スタックです。3スタック時、反撃の牙の打撃ダメージが45%増加し、全スタックを消費します。（野戦術）',
+    'パッシブ：腹裂きの一撃と敵に命中した榴散弾装薬は、それぞれ狩猟の勢いを1獲得します。最大3で、消費するか戦闘を離れるまで持続し、1段階ごとに移動速度が15%上昇します。3段階で傷裂きの打撃ダメージが60%増加し、段階を消費します。（生存）',
   'entities.abilities.hunting_momentum.name': '狩猟の勢い',
   'entities.abilities.hushbrand.description':
     '呪文の詠唱を中断し、同系統の呪文を4秒間使用不能にする。',
@@ -16771,12 +17458,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '呪眼が選択中の主要な邪眼対象を2.5秒ごとに攻撃し、影ダメージを与えます。邪眼憑依中は攻撃速度が2倍になります。',
   'entities.abilities.maledict_gaze.name': '呪眼の凝視',
   'entities.abilities.marrowbreak.description':
-    '古き血を3消費し、{damage}のダメージを与える高脅威の重撃を放つ。体力が半分未満のときは、代わりに最大体力の18%を吸収する盾を8秒間得て、怒りを15回復する。',
+    '古き血を3消費し、{damage}のダメージを与える高脅威の重撃を放つ。体力が半分未満のときは、代わりに最大体力の18%を回復し、怒りを15回復する。',
   'entities.abilities.marrowbreak.name': '骨髄砕き',
   'entities.abilities.martyrs_aegis.description': '味方1体が受けるダメージを8秒間40%軽減する。',
   'entities.abilities.martyrs_aegis.name': '殉教者の盾',
   'entities.abilities.maul.specNote_feral':
-    '命中した攻撃ごとに古き血を1蓄える。古き血が3のとき、このボタンは骨髄砕きに変化する：78から96のダメージを与える高脅威の一撃。体力が半分未満のときは、代わりに最大体力の18%を吸収する盾を得て、怒りを15回復する。',
+    '命中した攻撃ごとに古き血を1蓄える。古き血が3のとき、このボタンは骨髄砕きに変化する：78から96のダメージを与える高脅威の一撃。体力が半分未満のときは、代わりに最大体力の18%を回復し、怒りを15回復する。',
   'entities.abilities.measured_shot.description':
     '慎重に狙った一射で{damage}の物理ダメージを与え、命中時に集中値を20生成します。',
   'entities.abilities.measured_shot.name': '精密射撃',
@@ -16800,7 +17487,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '敵に15秒間の印を刻み、自分と自分のアンデッドが与えたダメージの20%を蓄積する。もう一度使用すると起爆する。印のついた敵が死亡すると6ヤード以内で爆発し、魂の欠片を1個生成する。',
   'entities.abilities.ossuary_mark.name': '納骨の印',
   'entities.abilities.overbloom.description':
-    '翠成を5消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の{buff}%分を即座に回復し、効果は除去され、対象には新しい野生の芽吹きが植えられる。',
+    '翠成を3消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の{buff}%分を即座に回復し、効果は除去され、対象には新しいスポアメンディングが植えられる。',
+  'entities.abilities.overbloom.specNote_restoration':
+    '翠成を5消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の{buff}%分を即座に回復し、効果は除去され、対象には新しいスポアメンディングが植えられる。',
   'entities.abilities.overbloom.name': '満開',
   'entities.abilities.pack_command.description':
     '生きたペットに攻撃を命じます。命中すると集中値を20生成し、群れの獰猛さを1段階得ます。',
@@ -16843,9 +17532,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '古き血を3消費する：{damage}のダメージを与え、皮剥ぎと血の亀裂が与えるはずだった残りダメージを即座にすべて与え、両方の出血を除去し、エネルギーを{rage}回復する。コンボポイントが0でも使用できる。',
   'entities.abilities.redharvest.name': '血の収穫',
   'entities.abilities.regrowth.specNote_restoration':
-    '新しい花を植えると翠成が1段階進む（最大5）。',
+    '詠唱するたびに翠成が1段階進む（最大3）。すでに効果中の花を上書きした場合も含む。',
   'entities.abilities.rejuvenation.specNote_restoration':
-    '新しい花を植えると翠成が1段階進む（最大5）。翠成が5段階のとき、スウィフトメンドは満開に変化する。',
+    '詠唱するたびに翠成が1段階進む（最大3）。すでに効果中の花を上書きした場合も含む。翠成が3段階のとき、スウィフトメンドは満開に変化する。',
   'entities.abilities.rip.specNote_feral': '命中した一撃が古き血を1蓄える（最大3）。',
   'entities.abilities.ruinous_brand.description':
     '敵に15秒間の烙印を刻みます。次の3回の直接呪文は、烙印のついた敵に対して25%のダメージで反響し、別の対象に使用した場合はその敵へ50%のダメージを複製します。破滅の矢の反響も、追加のクリティカルダメージ倍率を伴わずにクリティカルヒットとして扱われます。',
@@ -16875,7 +17564,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '8秒間、受けるダメージを60%軽減しますが、効果中は攻撃できません。',
   'entities.abilities.shellskin.name': '甲殻の皮膚',
   'entities.abilities.shrapnel_charge.description':
-    '対象と周囲の敵を榴散弾で吹き飛ばし、主対象から短時間の出血を広げます。',
+    '前方10ヤードの扇形を攻撃します。標的、または標的が扇形外なら命中した最も近い敵に24から30の物理ダメージを与えます。他の敵には7から9のダメージと6秒間で12の出血ダメージを与えます。主標的に自分の血鉤の傷がある場合、傷のダメージを直ちに1回与えます。敵に当たると狩猟の勢いを1獲得します。直接ダメージは遠隔攻撃力で増加します。',
   'entities.abilities.shrapnel_charge.name': '榴散弾装薬',
   'entities.abilities.sinister_strike.specNote_assassination': '毒の儀式を1段階進める（最大6）。',
   'entities.abilities.sinister_strike.specNote_combat':
@@ -16924,13 +17613,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '口笛の合図でグループを鼓舞し、10秒間、攻撃・詠唱・チャネリング速度を10%上昇させる。最近グループ速度上昇を受けた味方は疲労しており、効果を受けられない。（ローグのタレント）',
   'entities.abilities.thieves_chorus.name': '盗賊の合唱',
   'entities.abilities.thunder_reservoir.description':
-    'パッシブ：アークボルトとスカイブランチで雷鳴を獲得し、最大5。5になると、アースンジョルトは125%、フォールトウェイクは100%追加ダメージを与え、その後すべての雷鳴を消費する。（サンダーコール）',
+    'パッシブ：電弧の矢、枝分かれの稲妻、マグマバーストが雷鳴を獲得します。最大5。大地の衝撃は雷鳴をすべて消費し、1段階ごとに25%ダメージ増加（5段階で125%）。断層の目覚めはすべて消費し、1段階ごとに20%増加（5段階で100%）。（エレメンタル）',
   'entities.abilities.thunder_reservoir.name': '雷鳴の貯蔵',
   'entities.abilities.tidecall.description':
     '味方1体の体力を{damage}回復します。回復量はスペルパワーで増加します。オーバーヒール前の回復量を癒しの水流に加えます。上限は対象の最大体力の30%です。',
   'entities.abilities.tidecall.name': '潮呼び',
   'entities.abilities.trailbreak.description':
-    '専門化の状態を失わずに後方へ跳びます。野戦術では次の再突入も準備します。',
+    '後方へ25ヤード跳び、移動不能効果と移動速度低下効果を解除します。着地すると移動速度が3秒間50%上がります。狩猟の勢いがある場合はそれを更新し、再突入準備を12秒間付与します。',
   'entities.abilities.trailbreak.name': '離脱跳躍',
   'entities.abilities.umbral_anchor.description':
     '初回使用時、足元に5分間残る影の錨を設置します。40ヤード以内で再使用すると錨へ戻り、錨を消費して45秒の再使用時間が始まります。',
@@ -17053,13 +17742,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '近接ダメージの姿です。ローグと同じくエナジーとコンボポイントで戦い、脅威ははるかに低く抑えられます。',
   'guide.classPage.formLine.form_travel':
     '移動のための姿です。地上をはるかに速く駆けられますが、変身を解くまで他のアビリティは使えません。',
+  'guide.classPage.formLine.form_sporemender':
+    '回復特性の癒しの姿です。より頑丈な外皮と強い回復を備えますが歩みは遅くなり、すべての呪文とマナをそのまま使えます。',
   'guide.classPage.formName.form_bear': 'ブルーインフォーム',
   'guide.classPage.formName.form_travel': 'フリートフォーム',
+  'guide.classPage.formName.form_sporemender': 'スポアメンダーフォーム',
   'guide.classPage.formsHeading': '変身',
   'guide.classPage.formsMoonwing':
-    '均衡（ムーングローブ）のドルイドは、もう一つの姿、ムーンウィングフォームを得ます。均衡型のドルイドが戦うための術者の姿です。獣の姿でありながら呪文を保てる唯一の形であり、ワンドもこの姿か、通常の術者の姿でしか使えません。',
+    '均衡のドルイドは、戦闘で使う術者の姿、ムーンキンフォームも習得します。回復のスポアメンダーフォームと同様に呪文を使え、ワンドはこの二つの姿か通常の術者の姿でのみ使用できます。',
   'guide.classPage.formsWolfEngage':
-    '狼はブルーインラッシュで戦いを開き、すぐにウルフフォームへ変身して対象を押さえ込み、ステルスでないときはランジで距離を詰め、テイクダウンで敵を足止めする。',
+    '狼はブルーインラッシュで戦いを開き、すぐにキャットフォームへ変身して対象を押さえ込み、ステルスでないときはランジで距離を詰め、テイクダウンで敵を足止めする。',
   'guide.classPage.formsAutoUnshift':
     '変身中に回復や攻撃の呪文を唱えると、姿はひとりでに解けます。こうして姿を解くのはマナもかからず、グローバルクールダウンも使いません。ですから即時発動の呪文は押した瞬間に飛びます。もう一度変身するのは普通のアビリティなので、マナもグローバルクールダウンもかかります。',
   'guide.classPage.formsNote':
@@ -17130,7 +17822,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.doesHeader': '働き',
   'guide.commandsPage.dungeonMode': 'ダンジョンの難易度をノーマルとヒロイックで切り替えます。',
   'guide.commandsPage.dungeonReset':
-    '誰も残っていない自分のインスタンスを破棄します。難易度を変えた後にすることです。',
+    '自分の空のインスタンスを放棄し、次の攻略を同じ難易度または新しい難易度で最初から始めます。',
   'guide.commandsPage.dungeons':
     'すべてのダンジョンを、扉のある地方と想定パーティ人数つきで一覧し、今設定している難易度もあわせて表示します。',
   'guide.commandsPage.emotesBody':
@@ -17576,28 +18268,28 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'マーラのカウンターの先では、手綱は買うものではなく見つけるものです。5人用ダンジョンとレイドのヒロイックの最終ボス、そしてリフトの攻略から出てきます。リフトは難しいものを終えるほど、残していく手綱も稀少になります。設計上どれも珍しい掘り出し物で、一度の攻略が必ず一つを約束するわけではありません。ですからマウント探しの穏やかなやり方は、もともと行くつもりだった攻略に、その狩りを重ねることです。どのマウントがどのボスに掛かっているかは、このページでは明かしません。そこはあなた自身が突き止めるところです。',
   'guide.mountsPage.collectHeading': '稀少なマウントの出どころ',
   'guide.mountsPage.firstBody':
-    'この世界のどこかで売られているマウントは、ヴァロースティードただ一頭です。騎乗を習得すれば、マーラが10ゴールドでヴァロースティードの手綱を売ってくれます。その手綱はずっとあなたのものです。ほかのマウントはすべて世界のどこかで勝ち取るものなので、ほとんどの騎手はこの馬から始まります。',
+    '騎乗を学ぶと、マーラからヴァロースティードの手綱を10ゴールドで買えます。手綱を保有すると、外見メニューでアカウント内の全キャラクターに馬の外見が解放されます。騎乗訓練を受けていれば手綱を持ち歩かずに召喚できるので、見た目を変えたいときに馬や他の保有済み外見を選びましょう。',
   'guide.mountsPage.firstHeading': '最初のマウント',
   'guide.mountsPage.goodsBody':
-    'マウントはアイテムですから、経済の中で動かせるものでもあります。手綱がバッグか銀行にある限り、そのマウントはあなたのものです。ただし銀行に預けた手綱は、所有こそ保ちますが乗ることは許してくれません。獣を呼ぶには、手綱を持ち歩いている必要があります。プレイヤー向けの手綱には魂縛がないので、アイテム自体に断りがない限り、ほかの掘り出し物と同じように取引でき、郵送でき、世界市場に出品できます。手放す前に知っておきたいことが二つあります。手綱を買い戻してくれる商人はどこにもいないので、マウントは換金するものではなく、持ち続けるか誰かに譲るものだということ。そして騎乗している最中に手綱が手を離れれば、マウントもそれとともに去り、あなたはその場に降ろされるということです。',
+    'いずれかのキャラクターのバッグまたは個人銀行に対応する手綱が1つ以上ある間、収集したマウント外見はアカウント全体で使えます。最後の対象アイテムを取引、郵送、出品、売却などで手放すと、外見メニューから消えます。使用中の騎乗者は標準の馬の外見に戻り、訓練に応じた速度で騎乗を続けます。\n\nアイテムに別の制限がなければ、手綱は取引、郵送、ワールドマーケットへの出品が可能です。馬の手綱は商人に10ゴールドで売ることもできます。他の手綱にはそれぞれの売却制限が残ります。ストアのマウントスキンは手綱アイテムとは独立したアカウント外見です。',
   'guide.mountsPage.goodsHeading': '手綱はふつうの品物',
   'guide.mountsPage.heading': 'マウントと騎乗',
   'guide.mountsPage.intro':
-    'マウントは世界を速く渡るための手段で、それ以上のものではありません。厩舎で乗り方を習い、最初の手綱を買えば、その後の道はどれも短くなります。',
+    'マウントの外見を選び、厩舎で騎乗を学んで、世界をより速く移動しましょう。速度は訓練で決まり、どのマウントも外見だけを変えます。',
   'guide.mountsPage.learnBody':
-    '騎乗は一度買えば身につくスキルで、レベル{level}で開きます。厩舎長マーラ・ヒッチェンは丘陵に出たゲイルクレストの厩舎を守っており、騎乗訓練を80ゴールドで売っています。この一度の買い物こそが、そもそもマウントにまたがるための条件であり、以後ずっとあなたのもとに残ります。\n\n習得すると、マーラがクエストを用意してくれます。「乗馬の稽古」です。受注してマーカーをたどり、スタートアーチの後ろにある光る区画へ立ち、「レース開始」を押しましょう。稽古のあいだは訓練用のヴァロースティードを貸してくれるので、レッスンそのものにお金はかかりません。コースを走り、走りきったら彼女のもとへ戻って、お金と経験値を受け取ります。借りた馬はそのあと厩へ戻るので、この稽古が授けてくれるのは馬ではなく、鞍の上での身のこなしです。',
+    'レベル{level}で騎乗を学べます。厩舎長マーラ・ヒッチェンはゲイルクレスト厩舎で騎乗訓練を80ゴールドで販売しています。基礎訓練で騎乗中の移動速度が{basicSpeed}%上がります。習得後は上級騎乗訓練を{advancedFee}ゴールドで購入でき、騎乗中の移動速度上昇が{advancedSpeed}%になります。各ランクは習得したキャラクターだけに適用されます。\n\n基礎騎乗の習得後、マーラの騎乗レッスンのクエストを受け、目印に従ってスタートのアーチの後ろにある光る区画へ進みましょう。レース開始を押すと訓練用のヴァロースティードを借りられます。コースを完走して戻り、報酬のゴールドと経験値を受け取りましょう。レッスンが終わると借りた馬は厩舎に戻ります。',
   'guide.mountsPage.learnHeading': '騎乗を習う',
   'guide.mountsPage.raceBody':
     'マーラのパドックにある障害飛越コースは、稽古の最中だけでなく、いつでも誰にでも開かれています。マウントにまたがり、アーチの後ろの光る区画に立ち、「レース開始」を押しましょう。カウントダウンの間はその場に留められ、そのあと時計が動き出します。7つの障害をすべて跳び越え、時間が尽きる前にアーチをくぐって戻ってきてください。\n\n障害が数えられるのは、本当にバーの上を宙に浮いて越えたときだけなので、下をすり抜けるだけでは何も通りません。順番はどれからでもよく、どちら側から跳んでも構いません。一つ失敗しても大ごとではないので、回り込んでもう一度跳べば済みます。死ぬ、降りる、パドックから出る、そのいずれでも挑戦は終わりますが、また始めるのを妨げるものは何もありません。参加料もクールダウンもなく、賞品はその記録そのものだけ。何人の騎手が同時に走っても、互いの邪魔にはなりません。',
   'guide.mountsPage.raceHeading': '厩舎のレース',
   'guide.mountsPage.rideBody':
-    'マウントのウィンドウもお気に入りの設定もありません。手綱そのものがマウントだからです。バッグかアクションバーのスロットから手綱を使えば、そのマウントに乗れます。召喚には一拍かかり、即座ではなく短い呼びかけになるので、まずいプルから逃してはくれません。降りるのは即座で、妨げられることは決してありません。\n\n今乗っているマウントの手綱を使えば、そのマウントをしまいます。騎乗中に別の手綱を使えば、間に召喚を挟まずそのまま乗り換えられます。「騎乗 / 降車」キー（初期設定ではバッククォート）は、いつでも降りるためだけのものです。降りる道であって、乗る道ではありません。唯一の例外が乗馬の稽古で、そこではこの同じキーがマーラの貸してくれる馬を呼びます。借り物の馬には、クリックできる手綱がないからです。スマートフォンやタブレットでは、「その他」のトレイにある「騎乗」ボタンが両方の役目を果たします。',
+    '外見メニューを開き、マウントタブで外見を選びます。騎乗／降りるキー（初期設定はバッククォート）で、その外見のマウントを召喚できます。モバイルの騎乗ボタンも同じ動作です。召喚には短い詠唱が必要ですが、降りる操作は即時です。騎乗中でも速度を変えずに外見を変更できます。\n\nバッグやアクションバーの手綱を使って外見を選び、召喚することもできます。今乗っている外見を使うとマウントをしまいます。銀行や別キャラクターの手綱でも同じ外見が解放され、乗るキャラクターが持ち歩く必要はありません。',
   'guide.mountsPage.rideHeading': '乗り方と降り方',
   'guide.mountsPage.speedBody':
-    '一頭と一頭を分けるのは速さだけです。マーラから買うヴァロースティードが基準の足並みを決め、世界で集めたマウントはそれを上回ります。手綱が稀少なほど走りは速く、なめらかに滑り上がるのではなく、はっきり分かれた数段階で変わります。訓練すべき騎乗の第2段階もなければ、あとから買えるアップグレードもありません。騎乗の代金は一度きりで、以後はどの手綱を使ったかが移動の速さを決めます。',
-  'guide.mountsPage.speedHeading': '速さと段階',
+    '基礎騎乗訓練で騎乗中の移動速度が{basicSpeed}%上がります。上級騎乗訓練では{advancedSpeed}%上がり、マーラから{advancedFee}ゴールドで購入できます。外見の希少度や入手先にかかわらず、速度はキャラクターの訓練ランクで決まります。ストアのスキンも同じ訓練速度を使います。',
+  'guide.mountsPage.speedHeading': '騎乗速度と訓練',
   'guide.mountsPage.whatBody':
-    'マウントはあなたが乗る獣で、与えてくれるのは速さです。防御力もダメージも能力値もありません。地面をより速く運び、跳ぶときにほんの少し高く弾ませてくれる。取り引きはそれだけです。ゲーム内のマウントはすべて地上マウントなので、飛行はできませんし、どれも泳げません。',
+    'マウントは訓練によって乗れるようになった乗り物に適用する外見です。防具、ダメージ、戦闘能力値は得られません。騎乗訓練は地上の移動速度を上げ、騎乗中のジャンプはより高く跳べます。すべて地上用で、泳げません。',
   'guide.mountsPage.whatHeading': 'マウントとは',
   'guide.mountsPage.whereBody':
     'ゲイルクレストの厩舎は、ゲイルクレストの地図に記されています。ザ・シアーとレックフィールズの間、丘陵に出たところです。マーラは厩舎の脇に立ち、レース場のほうを向いています。',
@@ -17654,7 +18346,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '採集道具にはスロットがひとつあり、そこへ収まるのが製作された護符です。「採集者の貯蔵袋」は採取の産出を1つ増やし、「職人の眼」は採れるものの等級を1段上げます。「匠のお守り」は同じ仕組みで産出を2つ増やします。前の二つはエンチャントの仕事で、イーストブルックの工房の主、からくり師ギッゼルが、エンチャントのスキルが25に届いたエンチャンターに教えてくれます。「匠のお守り」のほうは工作の仕事で、ドロップで手に入る設計図をスキル100で作ります。三つとも彼の工房で作ります。\n\n装着したての護符は、コモンの道具なら20回の充填を備え、レア度が1段上がるごとに10回ずつ増えるので、同じ護符をエピックのつるはしに装着すれば50回から始まります。充填が減るのは護符が実際に結果を変えたときだけで、改善しなかった採取では決して減りません。スロットは使うたびに確認する設定にもできるので、あなたが「充填を使う」と言うまで護符は待ってくれます。新しい護符を装着すると、そのとき持っている道具に合わせてスロットが鋳直されるため、以前の最高記録ではなく、その道具が保てる回数まで満たされます。まったく何も変わらない装着し直しは、護符を食べてしまう前に断られます。\n\n充填を使い切っても護符が壊れることはありません。道具の持ち主がスロットを再充填します。秘術素材1個につき10回分で、求められる素材は、持ち歩いている道具と、そのスロットがこれまでに満たされた最上の道具の、より良いほうに従います。コモンかアンコモンの道具なら鈴音の粉塵、レアなら鈴音の精髄、エピックなら鈴音のかけらです。良い道具を銀行に置いてきても、安い再充填が買えるわけではなく、同じ値段で少ない充填になるだけです。安い段へ下りる正直な道は、劣る道具を持った状態で新しい護符を装着し、そこでスロットを鋳直すことです。スロットの上限が今の道具で満たせる量を超えている場合、再充填はその道具の限界で止まり、より良いほうを持ってくるように告げます。護符に署名した製作者本人なら再充填の素材は半分で済み、その護符自身の職（「採集者の貯蔵袋」と「職人の眼」ならエンチャント、「匠のお守り」なら工作）に特化していればさらに少なくなります。それ以外の人は全額です。再充填はこの職のほかの作業と同じく、短い詠唱です。',
   'guide.professions.toolEffectsHeading': '道具効果',
   'guide.progression.ridingBody':
-    '登りの果てに待っているもののひとつが騎乗です。レベル{level}になれば、厩舎長がかなりの金貨と引き換えにこの技を教えてくれ、訓練コースでの稽古が最初の手綱をもたらします。マウントは力を何ひとつ与えませんが、世界を小さくしてくれます。北への長い徒歩のあとでは、それもまた立派なご褒美です。',
+    'レベル{level}で厩舎長マーラから有料の基礎騎乗を学び、その後に上級ランクを購入できます。訓練が騎乗速度を決めます。外見メニューでマウントの外見を選びましょう。収集した外見は、いずれかのキャラクターのバッグや銀行に手綱がある間、アカウント内で共有されます。',
   'guide.progression.ridingTitle': '騎乗を習う',
   'guide.questsPage.availableBody':
     'クエストは連なりになっています。多くは前のクエストを報告して初めて提示され、最低レベルを求めるものも少なくありません。ですから今日はあなたに用のないNPCも、数レベル上げたあとや、今抱えているクエストを片づけたあとには、たくさんの仕事を用意しているかもしれません。乗馬の稽古のように独自の条件を持つものもあり、これは騎乗のスキルを買ったあとにだけ開きます。グループ向けのクエストは、何人で挑むことを勧めるかを明記して、最初から知らせてくれます。繰り返し受けられる仕事もあります。しばらく待てばまた受注でき、依頼主の頭上のマーカーが、また巡ってきたことを教えてくれます。',
@@ -17719,6 +18411,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifExtraBars':
     '2段目のアクションバーを表示し、2段目をオンにすると3段目も現れます。段が隠れているあいだも、スロットはキー割り当てから使えます。',
   'guide.settingsPage.ifFctScale': 'ターゲットから浮かび上がるダメージと回復の数字の大きさです。',
+  'guide.settingsPage.ifClassicCombatText':
+    'まっすぐ上昇する白と淡い金色のシンプルなダメージ数字に戻します。オフ（デフォルト）のままにすると、数字がより目立って左右に広がり、クリティカルや特に大きなヒットが輝きます。',
   'guide.settingsPage.ifFramesIntro':
     '自分のフレーム、ターゲットフレーム、そしてパーティのレイアウト全体です。パーティのまとまりには大きさ、幅、高さ、間隔、列数のスライダーもあるので、レイド用のグリッドを画面に合わせられます。タブの最下部にあるリセットボタンで、すべてのフレームを元の位置に戻せます。',
   'guide.settingsPage.ifGeneralIntro':
@@ -17816,6 +18510,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '世界が遠くまでどこまで描かれてから霞んでいくかです。自分で動かすまでは、各プリセットが値を決めてくれます。',
   'guide.settingsPage.rowWaterQuality':
     '湖、川、大海原の表現です。平板で軽いものから、完全に反射するものまで選べます。',
+  'guide.settingsPage.rowSpellEffects':
+    'プレイヤーとそのペットが放つ呪文の光、火花、飛翔体、着弾時の炸裂です（自分のものも含みます）。オフにすると画面が落ち着き、大人数の戦闘で数フレーム稼げます。敵が放つものはすべて表示されたままで、離れるべき範囲を示すリング、スタン・恐怖・移動不能状態の対象の頭上マーカー、すべての詠唱バーも残ります。',
   'guide.settingsPage.rowWaterRipples':
     '泳いでいるときに背後へ広がる航跡と波紋です。初期設定はオフで、実際にフレームを食う唯一の水面エフェクトです。水しぶきや泡はどちらの設定でも影響を受けません。',
   'guide.settingsPage.valueUltraOrInsane': 'ウルトラ、すべてを求めるなら極限',
@@ -17922,7 +18618,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.cauterizeFatigue': 'コーテライズは次の致死ダメージを防げない',
   'hudChrome.auraEffect.cooldownCap': 'この時間枠でクールダウン短縮を{used}/{cap}秒使用済み',
   'hudChrome.auraEffect.bruinRushWindow':
-    'ウルフフォームのマナ消費がなくなり、ブルーインラッシュの対象を押さえ込んで{sec}秒間移動速度を{pct}%低下させる',
+    'キャットフォームのマナ消費がなくなり、ブルーインラッシュの対象を押さえ込んで{sec}秒間移動速度を{pct}%低下させる',
   'hudChrome.auraEffect.dawnsWrath': '制裁の鎚: HP不問 · +1回 · CD0 · ダメージ+{pct}%',
   'hudChrome.auraEffect.desolation':
     '残り{charges}チャージ：次のカオス・ボルトの詠唱が{castPct}%短縮、または次のレイン・オブ・ファイアが即着弾する',
@@ -17945,6 +18641,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '悪魔形態：体格が{pct}%大きくなる。ほかのボーナスは別のバフで表示される',
   'hudChrome.auraEffect.formMoonkin':
     'ムーンウィング形態：呪文ダメージが{pct}%、アーマーが{armorPct}%増加する',
+  'hudChrome.auraEffect.formSporemender':
+    'スポアメンダーフォーム：与える回復量が{pct}%、アーマーが{armorPct}%増加し、移動速度が{slowPct}%低下する',
   'hudChrome.auraEffect.formShadow': 'グロームヴェイル形態：影ダメージが{pct}%増加する',
   'hudChrome.auraEffect.freeExecute': '次の対象となる処刑アビリティはコストを消費しない',
   'hudChrome.auraEffect.funeralHarvestLock':
@@ -18010,7 +18708,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.venomRitual':
     '毒の儀式:{stacks}/{max}段階。「卑劣な突き」「邪悪な斬撃」「毒針」で1段階ずつ進む。{max}段階で「永の眠り」が「毒裂き」に変化する',
   'hudChrome.auraEffect.verdance':
-    '翠成：{stacks}/{max}段階。新しく植えた野生の芽吹きまたは二度目の開花ごとに1段階進む。{max}段階でスウィフトメンドが満開に変化する',
+    '翠成：{stacks}/{max}段階。スポアメンディング、二度目の開花、野生の癒しを詠唱するたびに1段階進み、1段階ごとに野生の癒しの詠唱時間が短くなる。{max}段階でスウィフトメンドが満開に変化する',
   'hudChrome.auraEffect.warlockAnchor':
     '{range}ヤード以内で再使用するとここへ戻り、アンカーを消費する',
   'hudChrome.auraEffect.wintersChill':
@@ -18305,7 +19003,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professionTrainers.mining': '採鉱のトレーナー',
   'hudChrome.professionTrainers.hobby': '趣味のトレーナー',
   'hudChrome.tutorialGreeting.bellHomeNote':
-    'もう浜から戻ったのかい？さっき鳴らしたのが渡しの鐘だよ。その双子がすぐそこ、レイヴンポストの郵便柱のそばに掛かっている。いつでも鳴らせば、渡しが修練の浜へ運び直してくれる。間違って鳴らしたのなら、それはそれで構わないさ。',
+    'もう浜から戻ったのかい？さっき鳴らしたのが渡しの鐘だよ。その双子がすぐそば、波止場に掛かっている。いつでも鳴らせば、渡しが修練の浜へ運び直してくれる。間違って鳴らしたのなら、それはそれで構わないさ。',
   'hudChrome.tutorialGreeting.islandArrivalNote':
     '渡ってきたばかりかい？ようこそ修練の浜へ。ウォーデン・タムが目の前の浜でガントレットを預かっている。名前が見えるところまで歩み寄って、Fを押すか、左クリックすれば、そのレーンが体の動かし方を全部教えてくれる。発つ支度ができたら、私の桟橋のそばに立つ鐘を鳴らしなさい。渡しがイーストブルックの家まで運んでくれる。',
   'hudChrome.tutorialGreeting.noteClose': 'わかった',
@@ -18450,7 +19148,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.wayfarer_bryn.name': '旅人ブリン',
   'entities.npcs.wayfarer_bryn.title': '港の案内人',
   'entities.npcs.wayfarer_bryn.greeting':
-    'イーストブルック渓谷は来る者を拒まないよ、旅の人。まだ足元がおぼつかないなら、修練の浜がある。レイヴンポストの郵便柱のそばの渡しの鐘が年中いつでも向こうへ運んでくれるし、島の双子の鐘が帰り道を鳴らしてくれる。',
+    'イーストブルック渓谷は来る者を拒まないよ、旅の人。まだ足元がおぼつかないなら、修練の浜がある。波止場の渡しの鐘が年中いつでも向こうへ運んでくれるし、島の双子の鐘が帰り道を鳴らしてくれる。',
   'entities.npcs.instructor_maren.name': '教官マレン',
   'entities.npcs.instructor_maren.title': '修練の師',
   'entities.npcs.instructor_maren.greeting':
@@ -18824,7 +19522,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.faq.a3':
     'これは同じ死体に対するふたつの別々の操作です。死体が抱えているものは、コインとドロップ品も、採取できる素材も、すべて同じウィンドウに開きますが、相互作用キーと「戦利品を取る」が集めるのは通常の戦利品だけで、それは通常の戦利品の規則どおりに配られます。採取のほうは生産職の側で、死体そのものから素材を剥ぎ取るもので、そのウィンドウで「採取」を選んだときにだけ行われます。\n\n採取は早い者勝ちの一度きりです。各死体を採取できるのはちょうど一度、最初に手をかけた者だけで、オンラインでも同じです。何が採れるかを形づくるのが「町のフォーカス」です。拠点の町の中に立っていれば、10ポイントのフォーカスの持ち分を、気にかける素材の種類へ振り分けられます。フォーカスした素材は良い採取ティアを引きやすくなり（フォーカス5ポイントごとに1段階、上がるのは最大2段階まで）、産出も増えます（1ポイントにつき10%）。フォーカスしていない素材が悪くなることは決してありません。',
   'guide.profPages.faq.a4':
-    '幸運を引き当てたのです。およそ90回の採取に1回、珍しい発見が起こります（木ならancient heartwood、鉱脈ならpristine vein、薬草ならmoonlit bloom）。収穫は5倍になり、一つ残らずあなたの名前で署名され、その発見はゾーン全体に告知されます。普通の採取でも、レア以上の品質を引き当てれば収穫に署名が入ります。\n\n署名入りの素材は、手元に置くか高く売る値打ちがあります。必要な素材の署名入りの品をひとつでも持って製作に臨めば、それだけで傑作率が2ポイント上がるからです。ただしスタックできるのは署名が完全に一致する品どうしだけなので、自分だけのバッグ枠に収まることは忘れないでください。',
+    '大当たりの収穫です。約90回に1回、木なら太古の心材、鉱石なら無傷の鉱脈、薬草なら月明かりの花という希少な採集イベントが起こります。収穫量が5倍になり、全単位にあなたの署名が付き、ゾーン全体に発見が告知されます。通常の収穫でも品質判定がレア以上なら収穫物に署名が付きます。\n\n署名入り素材は保管や高値での販売に向いています。必要素材の署名入りの個体をバッグ、またはその製作が利用できる素材保管庫に持っていれば、傑作率が2パーセントポイント上がります。署名なしの素材や別の採集者・署名者の素材と互換性のあるスタックを共有しても印は失われず、各出所と数量は個別に保存されます。',
   'guide.profPages.faq.a5':
     'その品をバッグに入れたまま、どこかの作業場まで歩いて、師匠に料金を払ってください。料金はその品の品質で決まります。アンコモンの品なら銀25、レアなら金1、エピックなら金4。伝説はエピックと同じ額を、受注で作られたコモンの品はアンコモンと同じ額を払います。本物の作業場でなければなりません。移動式の作業場がこの仕事を引き受けることは決してありません。\n\n料金で買えるのは仕切り直しであって、治療ではありません。その品は受注品のままなので、次の取引で受け取った相手にまたバインドされます。バインドされた品が何個か同じスタックに入っている場合は、支払い一回につき1個だけが剥がされてバインド解除されます。',
   'guide.profPages.faq.a8':
@@ -19211,11 +19909,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'questUi.worldQuest.traceReaction.elianComplete':
     'ルーンが完成した！丁寧に練習すれば次はもっと上手くなる。',
   'entities.mobs.buddy_alpaca.name': 'アルパカ',
-  'entities.mobs.buddy_sapling.name': '若木',
-  'entities.items.whistle_sapling.name': '若木の笛',
   'hudChrome.collections.presence.sapling': '小さな根が後ろで軽い足音を立て、落ち葉を揺らす。',
-  'hudChrome.collections.buddyLore.sapling':
-    '樹皮に笑顔を浮かべ、好奇心に満ちた紫の瞳を持つ若木。根を足にして楽しげによちよちと歩き、どこへでもついてくる。',
   'entities.mobs.buddy_horse.name': '馬',
   'entities.mobs.buddy_ansem.name': 'アンセム',
   'entities.mobs.buddy_crimson_claw_crab.name': '紅爪ガニ',
@@ -19224,6 +19918,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.buddy_ember_fox.name': '燃えさし狐',
   'entities.mobs.buddy_emerald_wolf.name': 'エメラルドウルフ',
   'entities.mobs.buddy_forgemaw.name': '溶けたフォージモウ',
+  'entities.mobs.buddy_sprites.name': 'チラリとキラリ',
   'entities.mobs.buddy_frostfire.name': 'フロストファイア',
   'entities.mobs.buddy_golden_sentinel.name': '黄金の歩哨',
   'entities.mobs.buddy_kekius.name': 'ケキウス',
@@ -19241,167 +19936,24 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.buddy_triple_t.name': 'トリプルT',
   'entities.mobs.buddy_trollface.name': 'トロールフェイス',
   'entities.mobs.buddy_tuskhorn_boar.name': 'タスクホーン・ボア',
-  'entities.items.whistle_alon.name': 'アロンの笛',
-  'entities.items.whistle_alpaca.name': 'アルパカの笛',
-  'entities.items.whistle_horse.name': '馬の笛',
-  'entities.items.whistle_ansem.name': 'アンセムの笛',
-  'entities.items.whistle_bull.name': '雄牛の笛',
-  'entities.items.whistle_cate_coin.name': 'ケイトコインの笛',
-  'entities.items.whistle_crimson_claw_crab.name': '紅爪ガニの笛',
-  'entities.items.whistle_crystal_lich.name': 'クリスタルリッチの笛',
-  'entities.items.whistle_crystal_tide.name': 'クリスタルタイドの笛',
-  'entities.items.whistle_ember_fox.name': '燃えさし狐の笛',
-  'entities.items.whistle_emerald_wolf.name': 'エメラルドウルフの笛',
-  'entities.items.whistle_forgemaw.name': '溶けたフォージモウの笛',
-  'entities.items.whistle_frog.name': 'カエルの笛',
-  'entities.items.whistle_frostfire.name': 'フロストファイアの笛',
-  'entities.items.whistle_golden_sentinel.name': '黄金の歩哨の笛',
-  'entities.items.whistle_kekius.name': 'ケキウスの笛',
-  'entities.items.whistle_loot_goblin.name': '戦利品ゴブリンの笛',
-  'entities.items.whistle_moss_hare.name': 'コケウサギの笛',
-  'entities.items.whistle_nightfang.name': 'ナイトファングの笛',
-  'entities.items.whistle_penny_goldspark.name': 'ペニー・ゴールドスパークの笛',
-  'entities.items.whistle_phantom.name': 'ファントムの笛',
-  'entities.items.whistle_proud_grunt.name': '誇り高きグラントの笛',
-  'entities.items.whistle_raptor.name': 'ラプターの笛',
-  'entities.items.whistle_rocky.name': 'ロッキーの笛',
-  'entities.items.whistle_skeleton.name': 'スケルトンの笛',
-  'entities.items.whistle_solbot.name': 'ソルボットの笛',
-  'entities.items.whistle_spider.name': 'クモの笛',
-  'entities.items.whistle_stag.name': '牡鹿の笛',
-  'entities.items.whistle_tiger.name': 'トラの笛',
-  'entities.items.whistle_triple_t.name': 'トリプルTの笛',
-  'entities.items.whistle_trollface.name': 'トロールフェイスの笛',
-  'entities.items.whistle_tuskhorn_boar.name': 'タスクホーン・ボアの笛',
+  'hudChrome.buddyMenu.rename': 'バディの名前を変更',
+  'hudChrome.buddyMenu.nameLabel': 'バディの名前',
   'hudChrome.buddyMenu.autolootEnable': '自動収集を有効化',
   'hudChrome.buddyMenu.autolootDisable': '自動収集を無効化',
   'hudChrome.buddyMenu.autolootHint':
     'バディが30ヤード以内にあるあなた自身の死体から戦利品を回収します。',
   'hudChrome.buddyMenu.cancel': 'キャンセル',
-  'hudChrome.collections.title': 'ハンティング',
-  'hudChrome.collections.close': 'ハンティングを閉じる',
-  'hudChrome.collections.keybindLabel': 'ハンティング',
-  'hudChrome.collections.launcherTitle': 'ハンティング：バディ、マウント、装備セット',
   'hudChrome.collections.tabs.buddies': 'バディ',
-  'hudChrome.collections.tabs.mounts': 'マウント',
   'hudChrome.collections.state.owned': '収集済み',
   'hudChrome.collections.state.notOwned': '未収集',
   'hudChrome.collections.state.unavailable': 'まだ入手不可',
-  'hudChrome.collections.petKind.beast': 'ビースト',
-  'hudChrome.collections.petKind.humanoid': 'ヒューマノイド',
-  'hudChrome.collections.petKind.elemental': 'エレメンタル',
-  'hudChrome.collections.petKind.undead': 'アンデッド',
-  'hudChrome.collections.petKind.celebrity': 'セレブリティ',
-  'hudChrome.collections.armor.cloth': '布',
-  'hudChrome.collections.armor.leather': '革',
-  'hudChrome.collections.stat.strength': '筋力',
-  'hudChrome.collections.stat.agility': '敏捷性',
-  'hudChrome.collections.stat.intellect': '知力',
-  'hudChrome.collections.stat.mixed': 'ハイブリッド',
-  'hudChrome.collections.set.owned': '{total}部位中{owned}部位',
-  'hudChrome.collections.set.bonusLabel': '{pieces}部位',
-  'hudChrome.collections.set.itemLevel': 'アイテムレベル {level}',
-  'hudChrome.collections.detail.dropLabel': 'ドロップ元',
-  'hudChrome.collections.detail.drop': '{mob}（{location}）、討伐ごとに{chance}%',
-  'hudChrome.collections.detail.dropWithHeroic':
-    '{mob}（{location}）、討伐ごとに{chance}%、ヒロイックでは{heroicChance}%',
-  'hudChrome.collections.detail.heroicDrop':
-    '{mob}（{location}）、ヒロイック限定、討伐ごとに{chance}%',
-  'hudChrome.collections.detail.globalDrop':
-    '任意の敵、討伐ごとに{chance}%、同レアリティ{count}種のうち1つ',
-  'hudChrome.collections.detail.fishingDrop': 'どこでも釣り、釣り上げるごとに{chance}%',
-  'hudChrome.collections.detail.noSource': 'ゲーム内に入手手段はまだありません',
-  'hudChrome.collections.detail.noItem': 'これを与えるアイテムはまだありません',
-  'hudChrome.collections.detail.bindLabel': '装備制限',
-  'hudChrome.collections.detail.soulbound': '魂縛',
-  'hudChrome.collections.detail.tradeable': '取引可能',
-  'hudChrome.collections.detail.sellLabel': '商人の買取額',
-  'hudChrome.collections.detail.noSell': '売却不可',
-  'hudChrome.collections.detail.setLabel': '収集済み',
-  'hudChrome.collections.detail.marketLabel': 'ワールドマーケット',
-  'hudChrome.collections.detail.marketNone': '出品なし',
-  'hudChrome.collections.detail.marketChecking': '確認中…',
-  'hudChrome.collections.detail.marketAtMerchant': '商人のところで表示',
-  'hudChrome.collections.detail.exchangeLabel': '$WOC取引所',
-  'hudChrome.collections.detail.exchangeNone': '出品なし',
-  'hudChrome.collections.detail.exchangeUnavailable': 'このクライアントでは利用できません',
-  'hudChrome.collections.detail.honorPrice': '名誉{amount}',
-  'hudChrome.collections.detail.marksPrice': '英雄の証{amount}',
   'hudChrome.options.showPetNames': 'ペット名を表示',
   'hudChrome.warfareShop.companions': 'コンパニオン',
   'itemUi.kind.buddy': 'バディ',
-  'hudChrome.collections.buddyLore.alon':
-    'どの地図も認めない道から来た旅人のマスコット。計画が狂っている場所に必ず現れる。見て、うなずいて、助けは一切しない。',
-  'hudChrome.collections.buddyLore.alpaca':
-    'ゲイルクレストの群れは羊毛と気性のために飼っている。嵐の中でこれほど落ち着いた家畜はいない。この個体は道中きっかり一人に唾を吐く。',
-  'hudChrome.collections.buddyLore.horse':
-    'イーストブルック渓谷のポニーの血統で、果樹園の小道向けに小さく育てられ、自分が軍馬ではないとは一度も教えられていない。あなたの肩の横で歩調を合わせ、一度でもリンゴをくれた相手なら誰にでもついていく。',
-  'hudChrome.collections.buddyLore.ansem':
-    '扉と闇について語るが、それ以上は決して口を割らない。ナイトブルームの信徒は自分たちのものだと言い張るが、儀式のたびにどこかへ行ってしまう。',
-  'hudChrome.collections.buddyLore.bull':
-    '犬ほどの大きさのイーストブルック渓谷の雄牛。屋内で飼うのを誰もが承知した理由はそれだけだ。気性のほうは小さくならなかった。',
-  'hudChrome.collections.buddyLore.cate_coin':
-    '腰を下ろしたコインから決して離れず、物を食べるところを誰も見たことがない猫。イーストブルックの商人たちは今も、どちらがペットなのかで揉めている。',
-  'hudChrome.collections.buddyLore.crimson_claw_crab':
-    '遠つ岸の潮だまりのカニ。水から上げてしばらく経っても爪は赤いままだ。かつて波止場の連中は板の上でこれを競走させ、小銭を賭けていた。',
-  'hudChrome.collections.buddyLore.crystal_lich':
-    'ナイスラクシスそのものの破片で、今なおそれを形づくった冷気を帯びて震えている。レイドの残骸から引き出した者に従うが、そのことをまだ許してはいない。',
-  'hudChrome.collections.buddyLore.crystal_tide':
-    '自分のシーグラスの雫に乗る潮の精。イーストブルック渓谷から遠つ岸まで、夕飯を釣るつもりだった釣り人が静かな水から引き上げた。上がってきた時の水を離さず、戻れと言われても聞かない。',
-  'hudChrome.collections.buddyLore.ember_fox':
-    'イーストブルック渓谷の生け垣から来た雌狐。冬枯れの茂みごしに覗く炭のように赤い毛からその名がついた。土地の罠師たちは何世代も前に子狐を狙うのをやめ、代わりに餌を置くようになった。',
-  'hudChrome.collections.buddyLore.emerald_wolf':
-    'レイスウッドの子狼。林床までほとんど届かない木漏れ日の下では、その毛は緑に見える。森が残していった孤児は、どれもウォーデンたちが育てる。',
-  'hudChrome.collections.buddyLore.forgemaw':
-    '最後の泉のるつぼで鍛えられ、ついに完成しなかったもの。槌の音がまだ響くうちにイグニヴァルの鋳場から歩み出た。見つけられるのはヒロイックの踏破だけだ。この溶けたものは自分を作った炉へ戻り続け、二度炎を生き延びた者について家まで来る。',
-  'hudChrome.collections.buddyLore.frog':
-    'マイアフェン湿地はこれを丸々と、のんきに育てる。葦の茂みから一晩じゅう鳴きどおしだ。沼の案内人たちは、これを乗せた舟は決して座礁しないと請け合う。',
-  'hudChrome.collections.buddyLore.frostfire':
-    'フロストヴェイルの果てで、氷原を突いて温泉が湧く場所に生まれた。自分がどちらの側のものなのか、いまだに決めかねている。冷たい空気の中では湯気を立て、暖かい所では震える。',
-  'hudChrome.collections.buddyLore.golden_sentinel':
-    'アンバーフォールの見張り甲虫。育った樹脂に鍍金されて金色になった。名のほうが樹脂より古い。誰かが樹液を瓶に詰めようと思いつくずっと前から、その種の歩哨がその林を守っていた。',
-  'hudChrome.collections.buddyLore.kekius':
-    '出自不明の笑う相棒。ゲイルクレストの競走場が縁起物として迎え入れた。これを頼みにしていた厩舎を四つ見送っても、まだ健在だ。',
-  'hudChrome.collections.buddyLore.loot_goblin':
-    '英雄の証を持つ者なら誰にでもついていくが、盗みを働くところを一度も押さえられていない。補給係ヴェックスは、それは何の証明にもならないと言い張っている。',
-  'hudChrome.collections.buddyLore.moss_hare':
-    'ウィローフェンの野ウサギ。湿った泥炭に一生寝床を作るうちに毛が緑になった。沼の薬草師たちはこれを縁起物とし、戸口に来たものを追い払わせない。',
-  'hudChrome.collections.buddyLore.nightfang':
-    'ナイトブルームの若い狩人。同族の基準で見てもなお静かだ。連れ立つのは人恋しさからで、蛾より大きな獲物は狩らない。',
-  'hudChrome.collections.buddyLore.penny_goldspark':
-    'ノームの技師の弟子。時間で料金を取るが、その銅貨一枚ぶんの働きは必ずする。防具師ホードは借りを清算するために彼女を引き取り、今では千金を持つ者なら誰にでもこの取り決めを売っている。',
-  'hudChrome.collections.buddyLore.phantom':
-    'レイスウッドの塚から出た手のひらほどの亡霊。布ばかりで骨はない。閉じたはずの荷袋の中に現れ、人恋しさから居着いてしまう。何を求めているのかは誰にも分からず、これまで一度も誰かを脅かそうとしたことがない。',
-  'hudChrome.collections.buddyLore.proud_grunt':
-    '戦備倉庫の古参兵。敬礼は保ち、階級は失った。戦元帥ドレイヴン・コールは、その代償を知るだけの名誉を持つ兵にこれを託す。',
-  'hudChrome.collections.buddyLore.raptor':
-    'ドレイクランドの孵化個体。自分がどれだけ速く走れるかを覚える前に売りに出される。新しい飼い主は必ず「餌を切らすな」と言われ、二度言われる者はいない。',
-  'hudChrome.collections.buddyLore.rocky':
-    'ソーンピーク高地のガレ場に棲む石殻の這うもの。のろく、そして何ごとにも動じない。落盤の直前に一瞬だけぴたりと止まる、そのために坑夫たちが飼っている。',
-  'hudChrome.collections.buddyLore.skeleton':
-    'レイスウッドの塚から這い出し、自分の埃を払って、それ以来ずっと人についてまわっている。この骨が誰のものだったのかは、まだ誰も突き止めていない。',
-  'hudChrome.collections.buddyLore.solbot':
-    '陽光を糧とする小さな自動機械。ドレイクランドの灰に半ば埋もれたところを掘り出されたが、まだ動いていた。これを造った工房は、筐体のどこにも刻印を残していない。',
-  'hudChrome.collections.buddyLore.spider':
-    'レイスウッドの織り手。手のひらほどの大きさで、入れられた荷袋を必ず模様替えしてしまう。その糸は、置き換えられた縫い糸より丈夫だ。',
-  'hudChrome.collections.buddyLore.stag':
-    'エバーガーデンの血統。かつてウォーデンたちが乗った大鹿から小さく掛け合わされてきた。手を挙げれば今も頭を下げる。この個体より古い習いだ。',
-  'hudChrome.collections.buddyLore.tiger':
-    'パームリーチの縞を持ちながら、パームリーチを見たことのない獣。古い見世物小屋が閉じて以来、この血統はずっと飼育下にある。応じるのは笛の音だけで、ほかには何にも応えない。',
-  'hudChrome.collections.buddyLore.triple_t':
-    '何かが三つなのか、一つのものが三度あるのか。証言はどれも食い違い、当の生き物は数えられるほど長くはじっとしていない。',
-  'hudChrome.collections.buddyLore.trollface':
-    'レイスウッドが世に出し、二度と引き取ろうとしなかった、にやりと笑うもの。これを説明しようとする試みは、いつも説明する側が笑い出して諦めるところで終わる。',
-  'hudChrome.collections.buddyLore.tuskhorn_boar':
-    'ソーンピーク高地の血統。柵を倒せない猪が欲しかった羊飼いたちによって、脚を短く掛け合わされた。気性のほうはそのまま残った。',
   'entities.mobs.buddy_emberfall_phoenix.name': 'エンバーフォール・フェニックス',
-  'entities.items.whistle_emberfall_phoenix.name': 'エンバーフォール・フェニックスの笛',
-  'hudChrome.collections.buddyLore.emberfall_phoenix':
-    '秋ごとに燃え尽きて一粒の燃えさしとなり、春には自らの灰から立ち上がってくる。誰に訊いても言えるのはそれだけだ。巣を見つけた者はおらず、同じ個体を二度捕らえた者もいない。',
   'hudChrome.collections.state.pending': '何かが付いてきている',
   'hudChrome.collections.presenceDefault': '何かに見られている気がする。',
   'hudChrome.collections.revealed': '{name}があなたに付いていくことに決めた。',
-  'hudChrome.collections.cosmeticUnlocked': '{name}の新しい姿：{look}。',
   'hudChrome.collections.presence.ember_fox':
     '小さく温かい何かが、あなたの後ろをそっと歩いている。',
   'hudChrome.collections.presence.moss_hare':
@@ -19440,6 +19992,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.collections.presence.skeleton': '乾いた骨があなたの歩みに合わせてかたかた鳴る。',
   'hudChrome.collections.presence.crystal_lich':
     '残骸から冷たいうなりが立ちのぼり、それがあなたを見ている。',
+  'hudChrome.collections.presence.sprites': '小さな二つの炎があなたに燃え移り、消えそうにない。',
   'hudChrome.collections.presence.forgemaw':
     '炉の熱がまだあなたから離れない。何かがそれと共に歩き出た。',
   'hudChrome.collections.presence.crystal_tide':
@@ -19447,46 +20000,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.collections.presence.phantom': 'あなたの後ろの空気が、ほんの少し静かすぎる。',
   'hudChrome.collections.presence.emberfall_phoenix':
     '埋み火のような温もりが、あなたの背に落ち着く。',
-  'hudChrome.collections.cosmetic.crystal_lich_frostbound': '霜縛り',
-  'hudChrome.collections.cosmetic.crystal_lich_voltaic': '雷光',
-  'hudChrome.collections.cosmetic.forgemaw_ashen': '灰燼',
-  'hudChrome.collections.cosmetic.forgemaw_whitehot': '白熱',
-  'hudChrome.collections.cosmetic.stag_acorn': 'どんぐりの冠',
-  'hudChrome.collections.cosmetic.stag_gilded': '金箔',
-  'hudChrome.collections.cosmetic.moss_hare_verdant': '新緑',
-  'hudChrome.collections.cosmetic.proud_grunt_warlord': 'ウォーロード',
   'hudChrome.collections.actions.summon': '呼び出す',
   'hudChrome.collections.actions.dismiss': '下がらせる',
-  'hudChrome.collections.actions.wear': '着せる',
-  'hudChrome.collections.actions.remove': '外す',
-  'hudChrome.collections.looks.title': '姿',
-  'hudChrome.collections.looks.unlocked': '解放済み',
-  'hudChrome.collections.looks.locked': '未解放',
-  'hudChrome.collections.looks.worn': '着用中',
-  'hudChrome.collections.looks.none': 'この相棒にはまだ姿が用意されていない',
-  'hudChrome.collections.source.bossLabel': 'ボスのペット',
-  'hudChrome.collections.source.bossDrop': '{mob}（{location}）、討伐ごとにプレイヤー各自{chance}%',
-  'hudChrome.collections.source.bossDropWithHeroic':
-    '{mob}（{location}）、プレイヤー各自{chance}%、ヒロイックでは{heroicChance}%',
-  'hudChrome.collections.source.bossDropHeroicOnly':
-    '{mob}（{location}）、ヒロイック限定、プレイヤー各自{chance}%',
-  'hudChrome.collections.source.rollNote':
-    '判定はプレイヤーごとに別々に行われ、パーティメンバーに機会を奪われることはない。',
-  'hudChrome.collections.source.deedLabel': '入手条件',
-  'hudChrome.collections.source.deed': '功績「{deed}」',
-  'hudChrome.collections.source.challengeLabel': 'チャレンジ',
-  'hudChrome.collections.source.challengeSpeed': '戦闘開始から{seconds}秒以内に{mob}を倒す',
-  'hudChrome.collections.source.challengeDps': '戦闘を通して{mob}に毎秒{dps}のダメージを与える',
-  'hudChrome.collections.source.craftLabel': '製作',
-  'hudChrome.collections.source.craft': '{item}（{profession}のレシピ）',
-  'hudChrome.collections.source.grantLabel': '授与',
-  'hudChrome.collections.source.grantOnly': 'シーズン報酬：月間ラダーとトップパース報酬',
-  'hudChrome.collections.source.tokenLabel': 'トークン',
-  'hudChrome.collections.source.token': '{item}、一度使うと相棒が付いてくる',
-  'entities.items.charm_stag_acorn.name': 'どんぐりの冠のお守り',
-  'entities.items.charm_stag_gilded.name': '金箔のお守り',
   'itemUi.kind.buddyCosmetic': '相棒の姿',
-  'hudChrome.collections.cosmetic.frog_sapphire': 'サファイアの蛙',
   'hudChrome.deeds.buddiesSection': '相棒',
   'hudChrome.deeds.buddiesNone': '相棒なし',
   'hudChrome.deeds.buddiesEmpty': '相棒を集めると、ここから呼び出せる。',
@@ -19502,7 +20018,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.arenaPage.rewardsBodyLossShare':
     'ランクマッチに勝てば、プレイヤー対プレイヤーの通貨である名誉が支払われ、最後まで戦い抜いた負け試合にもそれより少ない額の名誉が支払われます。引き分けも同様です。ですから、負けて本当に失うものはレーティングだけです。名誉は本物の試合に報いるためのものです。同じ日に同じ相手や同じチームをもう一度倒しても追加の支払いはなく（もう一度負けても同じです）、勝ち続けた長い一日でも最初の何勝かまでは満額が支払われ、その後は一勝あたりが半分になり、さらに勝ち進むともう一度半分になってそこで下げ止まり、相手が棄権した試合はレーティングこそ動きますが名誉はまったく支払われません。この「一日」はワールド自身の一日で、ワールドの夜間リセット時刻に切り替わります。日次のロックアウトがすべて解けるのと同じ境目です。',
   'guide.arenaPage.warfareBodyStatsStay':
-    'ウォーフェアの品はどれもウォーフェア攻撃レーティングとウォーフェア防御レーティングを備えていますが、この二つはモンスター相手にはまったく働きません。効くのは他のプレイヤーと戦うときだけ、決闘、アリーナ、戦場においてのみで、攻撃は与えるダメージを上乗せし、防御は受けるダメージを削り、それぞれに固有の上限があります。各防具系統はセットでもあり、そのセットボーナスもまた、ウォーフェアのレーティングか、プレイヤーにしか働かない効果です。ですから名誉で揃えた一式のセットボーナスは、ダンジョンのボスの前では何の足しにもなりません。品そのものは、通常のステータス、防御力、武器ダメージを変わらず備えており、それらはどこでも働きます。モンスター相手に黙り込むのは、ウォーフェアのレーティングとセットボーナスのほうなのです。',
+    'ウォーフェアの品はどれもウォーフェア攻撃レーティングとウォーフェア防御レーティングを備えていますが、この二つはモンスター相手にはまったく働きません。効くのは他のプレイヤーと戦うときだけ、決闘、アリーナ、戦場においてのみで、攻撃は与えるダメージを上乗せし、防御は受けるダメージを削り、それぞれに固有の上限があります。各防具系統はセットでもあり、そのセットボーナスもまた、ウォーフェアのレーティングか、プレイヤーにしか働かない効果です。ですから名誉で揃えた一式のセットボーナスは、ダンジョンのボスの前では何の足しにもなりません。品そのものは、通常のステータス、防御力、武器ダメージを変わらず備えており、それらはどこでも働きます。モンスター相手に黙り込むのは、ウォーフェアのレーティングとセットボーナスのほうなのです。ただし例外が一つあり、どこでも有効です。これらのどのセットでも2つ装備すると、被ダメージで詠唱が遅れなくなります。',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'それは意図された取り引きです。ウォーフェア装備はプレイヤーと戦うために作られたものであって、ダンジョンの段階を飛び越える近道ではありません。ウォーフェアの品が、同じ部位のダンジョン産エピックほどの戦闘レーティングを備えることは決してなく、その代わりに備えているウォーフェアのレーティングとセットボーナスは、すべて他のプレイヤーに向けて費やされます。アリーナで渡り合いたいなら買いましょう。ヒロイックをより速く駆け抜けたいなら、装備はダンジョンで勝ち取りましょう。',
   'guide.social.calendarBodyDoubleHonor':
@@ -19523,6 +20039,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '「フレームを編集」ではシャードパイクバーも動かせるようになります。シャードパイクバーは、シャードパイクを持っているあいだだけアクションバーの横に現れるクエスト道具の短い列で、ロック解除中は名前チップを表示します。戦闘中ではなく戦闘前に配置しておけます。',
   'guide.interfacePage.framesGovernedUnitTooltip':
     '「フレーム編集」ではツールチップフレームも動かせるようになります。マウスを合わせた対象のカードが表示される位置で、クリーチャーならレベルと種類、ほかのプレイヤーなら称号、ギルド、レベルとクラス、そして専門化とその役割が表示されます。好きな場所へドラッグすると、カードはそこから画面の近い端を避ける向きに広がります。「フレーム設定」の「フレームの表示・非表示」でツールチップのチェックを外すと、このカードを完全に非表示にできます。',
+  'guide.interfacePage.framesGovernedResourceAndHill':
+    '「フレーム」タブで「リソースバーを分離」をオンにすると、「フレーム編集」でリソースバーも動かせるようになり、マナ、エネルギー、怒りを好きな場所に単独で置けます。同じタブの「リソースバーの幅」と「リソースバーの高さ」でサイズを変えられます。「フレーム編集」では丘の王のバーも動かせ、同じタブの「丘の王の背景の不透明度」で文字はそのままにパネルを薄くできます。',
   'guide.interfacePage.framesGovernedAuraTracks':
     '「フレーム編集」は、同じ「インターフェース」オプションの「戦闘」タブでオンにした任意の6つのオーラトラック、すなわち「自分のバフ」トラック、「防御クールダウン」トラック、「自分のシールド」トラック、「攻撃クールダウン」トラック、「移動とステルス」トラック、「味方へのバフ」トラックも緩めます。どのトラックも初期状態ではオフで、緩んでいる間はそれぞれに名前のチップが付きます。',
   'guide.interfacePage.mapBodyZoneFirst':
@@ -19542,6 +20060,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   // Intentional gathering PR2: material provenance and source controls (M16 fills).
   'hudChrome.materialStackSelectionUnavailable': 'この素材の選択は利用できなくなりました。',
   'hudChrome.itemTooltip.materialSourceGatherer': '{count} × {name}が採集',
+  'hudChrome.itemTooltip.trophySkullSource': '{count} × {name}から奪取',
   'hudChrome.itemTooltip.materialSourceGathererSigned': '{count} × {name}が採集、{signer}が署名',
   'hudChrome.itemTooltip.materialSourceUnrecorded': '{count} × 採集者の記録なし',
   'hudChrome.itemTooltip.materialSourceUnrecordedSigned':
@@ -19625,6 +20144,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.kick.admin_target': '管理者アカウントはキックできません。',
   'apiError.kick.reason_required': '理由の入力が必要です。',
   'apiError.kick.target_offline': 'そのプレイヤーはもうこのレルムにオンラインではありません。',
+  'apiError.world_quest_block.admin_target':
+    '管理者アカウントはワールドクエストから除外できません。',
+  'apiError.world_quest_block.reason_required': '理由の入力が必要です。',
+  'apiError.world_quest_block.already_blocked':
+    'そのアカウントはすでにワールドクエストから除外されています。',
+  'apiError.world_quest_block.not_blocked':
+    'そのアカウントはワールドクエストから除外されていません。',
   'entities.items.reins_goblin_rocket_sled.name': 'ゴブリンロケットそりの始動キー',
   'entities.items.reins_rallycart_rxt.name': 'ラリーカートRXTの始動キー',
   'guide.settingsPage.ifAuraBarBelowFrame':
@@ -19736,6 +20262,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.rift_watchers_band.name': '裂け目の監視者の指輪',
   'entities.items.rift_surveyors_satchel.name': '裂け目測量士の鞄',
   'entities.items.emissary_cache.name': '使者の宝箱',
+  'entities.items.pvp_trophy_skull.name': '戦利品の頭蓋骨',
   'entities.npcs.weekly_emissary.name': 'チャム・ピート',
   'entities.npcs.weekly_emissary.title': '使者',
   'entities.npcs.weekly_emissary.greeting':
@@ -19796,7 +20323,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.currencies.delveMark': 'デルブの印',
   'hudChrome.currencies.wocToken': 'WoCトークン',
   'hudChrome.currencies.heroicMarkNote': 'ヒロイックダンジョン . ヒロイック補給官で使用',
-  'hudChrome.currencies.honorNote': '戦場とアリーナ',
+  'hudChrome.currencies.honorNote': '戦場、闘技場、ワールドクエスト',
   'hudChrome.currencies.delveMarkNote': '完了したデルブ',
   'hudChrome.currencies.wocTokenNote': '連携済みウォレットの残高',
   'hudChrome.currencies.walletNotLinked': 'ウォレット未連携',
@@ -19852,6 +20379,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.anyDifficulty': '難易度は問わない',
   'hudChrome.weekly.choose': 'クエストを選ぶ',
   'hudChrome.weekly.inProgress': '進行中（{count}/{required}）',
+  'hudChrome.weekly.completedLastWeek': '先週に完了',
+  'hudChrome.weekly.claimFirst': '先に受け取る',
   'hudChrome.weekly.completed': '今週は完了',
   'hudChrome.weekly.lockedThisWeek': '今週はロック中',
   'hudChrome.weekly.footerPick':
@@ -19863,7 +20392,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.alsoReceive': 'さらに受け取れるもの：',
   'hudChrome.weekly.tally': '{count} / {required}',
   'hudChrome.weekly.cacheDesc':
-    '開けると自分のクラスが装備できるノーマルレイド装備が一つ（ティアセットは除く）と、{item} x {count}が手に入ります。',
+    '開けると自分のクラスが装備できるノーマルレイド装備が一つ（イグニヴァルのティアセットは除く）と、{item} x {count}が手に入ります。',
   'hudChrome.weekly.dialogNote': '週間の任務は同時に一つしか受けられません。{reset}',
   'hudChrome.weekly.accept': '受諾',
   'hudChrome.weekly.decline': '辞退',
@@ -19892,6 +20421,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weekly.done': '週間クエスト完了：{category}',
   'hudChrome.weekly.commendHeading': '使者の推挙',
   'hudChrome.weekly.commendNote': '選んだ一つの勢力に評判{amount}、週に一度。',
+  'hudChrome.weekly.commendCarriedNote':
+    '先週の評判{amount}が未受領です。受け取ると新しい任務を選べます。',
   'hudChrome.weekly.commendClaimed': '今週の推挙は{faction}に贈られました。',
   'hudChrome.weekly.commendRewardLine': '選んだ勢力との評判{amount}',
   'hudChrome.reputation.standingGained': '{faction}の評判 +{amount}',
@@ -20045,6 +20576,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.tabMounts': 'マウント',
   'hudChrome.cosmetics.tabSkins': 'スキン',
   'hudChrome.cosmetics.tabMech': 'メカ',
+  'hudChrome.cosmetics.buddyActive': '召喚中',
+  'hudChrome.cosmetics.buddyDrag': 'アクションバーへドラッグ',
   'hudChrome.cosmetics.legend':
     'アカウント：全キャラクターで共有。キャラクター：このキャラクターのみ。',
   'hudChrome.cosmetics.scopeAccount': 'アカウント',
@@ -20060,13 +20593,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.preview': 'プレビュー',
   'hudChrome.cosmetics.previewAria': '{name}をプレビュー',
   'hudChrome.cosmetics.cardAria': '{name}、{rarity}',
-  'hudChrome.cosmetics.mountsNoMount':
-    'まずマウントを入手してください。スキンには乗るものが必要です。',
+  'hudChrome.cosmetics.mountsNoMount': '厩舎長マーラから騎乗を学ぶとマウントを召喚できます。',
   'hudChrome.cosmetics.skinsEmpty': '武器スキンをまだ所持していません。WOCストアをご覧ください。',
   'hudChrome.cosmetics.skinsApplyHint': '{type}を装備するとこのスキンを適用できます。',
   'hudChrome.cosmetics.mechEmpty': 'コンバットメカのクロマをまだ所持していません。',
   'hudChrome.cosmetics.mountsIntro':
-    'マウントスキンはこのキャラクターが乗るどのマウントにも重ねて描かれます。速度は変わりません。',
+    'ここでマウントの外見を選びます。速度は騎乗訓練で決まります。いずれかのキャラクターのバッグまたは銀行にマウントアイテムを保管すると、アカウント内の全キャラクターがその外見を使えます。',
   'hudChrome.cosmetics.mechIntro':
     'コンバットメカはこのキャラクターの身体を置き換えます。装着できるクロマは一度に一つです。',
   'hudChrome.auraTracks.mode': 'オン',
@@ -20084,6 +20616,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.grove_awakening.description':
     'グループまたはレイドの、40ヤード以内で視線の通る倒れたメンバー全員をあなたのそばに呼び戻し、体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（回復）',
   'entities.abilities.grove_awakening.name': '樹林の覚醒',
+  'entities.abilities.sporemender_form.name': 'スポアメンダーフォーム',
+  'entities.abilities.sporemender_form.description':
+    'スポアメンダーになり、与える回復量が20%、アーマーが40%増加しますが、移動速度が20%低下します。通常形態で使える呪文はすべてそのまま使えます。姿を戻すまで持続します。どの姿に変身しても、移動速度が短時間上昇する『軽快な足取り』を得ます。再び唱えると通常形態に戻ります。（回復の象徴）',
   'entities.abilities.prayer_of_returning.description':
     'グループまたはレイドの、40ヤード以内で視線の通る倒れたメンバー全員をあなたのそばに呼び戻し、体力とマナが30%の状態で蘇生する。戦闘中は詠唱できない。（聖なる・ディシプリン）',
   'entities.abilities.prayer_of_returning.name': '帰還の祈り',
@@ -20677,6 +21212,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.weeklyRewards.readyTitle': '週間報酬の準備ができました',
   'hudChrome.weeklyRewards.readyDescription':
     '完了した週の報酬が待っています。獲得した宝物庫を開け、受け取る一品を選んでください。',
+  'hudChrome.weeklyRewards.previewClaimNotice':
+    '報酬が待っています。イーストブルックの宝物庫の番人を訪ね、宝物庫を開けて報酬を受け取ってください。',
   'hudChrome.weeklyRewards.notNow': '後で',
   'hudChrome.weeklyRewards.completedWeek': '{date}に終了した週',
   'hudChrome.weeklyRewards.currentWeek': '今週の進捗に戻る',
@@ -20770,31 +21307,33 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_warrior_prot.bonus4':
     '4点：Faultlineで受けるダメージが6秒間10%低下。',
   'entities.itemSets.vanguard_paladin_holy.name': 'ヴァンガード：Sunvigil Regalia',
-  'entities.itemSets.vanguard_paladin_holy.bonus2': '2点：Life Covenantのクールダウンが30秒短縮。',
+  'entities.itemSets.vanguard_paladin_holy.bonus2':
+    '2点：Life Covenantのクールダウンが30秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_paladin_holy.bonus4':
     '4点：Life Covenantが対象に最大体力8%のシールドを6秒付与。',
   'entities.itemSets.vanguard_paladin_protection.name': 'ヴァンガード：Shieldvow Bastion',
   'entities.itemSets.vanguard_paladin_protection.bonus2':
-    '2点：Oath Chainのクールダウンが2秒短縮。',
+    '2点：Oath Chainのクールダウンが2秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_paladin_protection.bonus4':
     '4点：Oath Chainで引き寄せた敵は4秒間30%遅く詠唱し、条件を満たすとSolar Reprisalを得る。',
   'entities.itemSets.vanguard_paladin_retribution.name': 'ヴァンガード：Lightbrand Warplate',
   'entities.itemSets.vanguard_paladin_retribution.bonus2':
-    '2点：Valkyr Callingのクールダウンが15秒短縮。',
+    '2点：Valkyr Callingのクールダウンが15秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_paladin_retribution.bonus4':
     '4点：Valkyr CallingがFinal Edictをリセットし、着地後6秒以内の次のFinal Edictのダメージを15%上げる。',
   'entities.itemSets.vanguard_hunter_beast_mastery.name': 'ヴァンガード：Packwarden Harness',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
-    '2点：Rattling Shotのクールダウンが4秒短縮。',
+    '2点：Rattling Shotのクールダウンが4秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
     '4点：Rattling ShotでHowling Rageの残りクールダウンが1秒短縮。',
   'entities.itemSets.vanguard_hunter_marksmanship.name': 'ヴァンガード：Farsight Harness',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
-    '2点：Trailbreakのクールダウンが4秒短縮。',
+    '2点：Trailbreakのクールダウンが4秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
     '4点：Trailbreakで6秒以内の次のLong Drawが即時発動。15秒に1回まで。',
   'entities.itemSets.vanguard_hunter_survival.name': 'ヴァンガード：Snaretooth Harness',
-  'entities.itemSets.vanguard_hunter_survival.bonus2': '2点：Bloodhookのクールダウンが3秒短縮。',
+  'entities.itemSets.vanguard_hunter_survival.bonus2':
+    '2点：Bloodhookのクールダウンが3秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_hunter_survival.bonus4': '4点：BloodhookでHunting Momentumを1得る。',
   'entities.itemSets.vanguard_rogue_assassination.name': 'ヴァンガード：Nightcut Leathers',
   'entities.itemSets.vanguard_rogue_assassination.bonus2':
@@ -20802,7 +21341,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vanguard_rogue_assassination.bonus4':
     '4点：Low Blowで6秒以内の次の攻撃がクリティカルになる。',
   'entities.itemSets.vanguard_rogue_combat.name': 'ヴァンガード：Brawlmark Leathers',
-  'entities.itemSets.vanguard_rogue_combat.bonus2': '2点：Swift Heelsのクールダウンが60秒短縮。',
+  'entities.itemSets.vanguard_rogue_combat.bonus2': '2点：Swift Heelsのクールダウンが15秒短縮。',
   'entities.itemSets.vanguard_rogue_combat.bonus4':
     '4点：Swift Heels中、Wicked SlashとHaymakerがコンボポイントを追加で1得る。',
   'entities.itemSets.vanguard_rogue_subtlety.name': 'ヴァンガード：Shadewalk Leathers',
@@ -20811,76 +21350,210 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '4点：SmokefadeからのGut Punchがコンボポイントを追加で2得る。',
   'entities.itemSets.vanguard_priest_discipline.name': 'ヴァンガード：Veilpsalm Raiment',
   'entities.itemSets.vanguard_priest_discipline.bonus2':
-    '2点：Terror Canticleのクールダウンが3秒短縮。',
+    '2点：Terror Canticleのクールダウンが3秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_priest_discipline.bonus4':
     '4点：Psalm of Warding消費時、守られた味方の移動速度が3秒間20%上昇。8秒に1回まで。',
   'entities.itemSets.vanguard_priest_holy.name': 'ヴァンガード：Gracewing Raiment',
-  'entities.itemSets.vanguard_priest_holy.bonus2': '2点：Veilstepのクールダウンが6秒短縮。',
+  'entities.itemSets.vanguard_priest_holy.bonus2':
+    '2点：Veilstepのクールダウンが6秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_priest_holy.bonus4': '4点：Veilstepが最大体力8%のシールドを6秒付与。',
   'entities.itemSets.vanguard_priest_shadow.name': 'ヴァンガード：Duskhymn Regalia',
   'entities.itemSets.vanguard_priest_shadow.bonus2':
-    '2点：Litany of Woeの詠唱中、対象の移動速度も30%低下。',
+    '2点：Litany of Woeの詠唱中、対象の移動速度も30%低下。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_priest_shadow.bonus4':
     '4点：Call Tithefiendが最大体力10%のシールドを8秒付与。',
   'entities.itemSets.vanguard_shaman_elemental.name': 'ヴァンガード：Tempestwrit Battlemail',
   'entities.itemSets.vanguard_shaman_elemental.bonus2':
-    '2点：Unleash Weaponのクールダウンが3秒短縮。',
+    '2点：Unleash Weaponのクールダウンが3秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_shaman_elemental.bonus4':
     '4点：Unleash Weaponで移動詠唱可能になり、4秒間移動速度20%上昇。20秒に1回まで。',
   'entities.itemSets.vanguard_shaman_enhancement.name': 'ヴァンガード：Galeborn Warmail',
   'entities.itemSets.vanguard_shaman_enhancement.bonus2':
-    '2点：Ancestral Strikeで対象の移動速度が4秒間30%低下。',
+    '2点：Ancestral Strikeで対象の移動速度が4秒間30%低下。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_shaman_enhancement.bonus4':
     '4点：Ancestral StrikeでElemental Tranceの残りクールダウンが4秒短縮。',
   'entities.itemSets.vanguard_shaman_restoration.name': 'ヴァンガード：Brineward Chainmail',
   'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    '2点：体力50%未満の味方へのMending Watersが0.5秒速くなる。',
+    '2点：体力50%未満の味方へのMending Watersが0.5秒速くなる。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_shaman_restoration.bonus4':
     '4点：Tidecallが対象にあなたの最大体力5%のシールドを6秒付与。',
   'entities.itemSets.vanguard_mage_arcane.name': 'ヴァンガード：Hourbinder Vestments',
-  'entities.itemSets.vanguard_mage_arcane.bonus2': '2点：Temporal Barrierのクールダウンが2秒短縮。',
+  'entities.itemSets.vanguard_mage_arcane.bonus2':
+    '2点：Temporal Barrierのクールダウンが2秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_mage_arcane.bonus4':
     '4点：Temporal Barrierが守った対象の移動速度を3秒間20%上昇。',
   'entities.itemSets.vanguard_mage_fire.name': 'ヴァンガード：Emberlash Regalia',
-  'entities.itemSets.vanguard_mage_fire.bonus2': '2点：Cinderfallの再使用が3秒速くなる。',
+  'entities.itemSets.vanguard_mage_fire.bonus2':
+    '2点：Cinderfallの再使用が3秒速くなる。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_mage_fire.bonus4':
     '4点：Cinderfall詠唱でBlazing Barrierの残りクールダウンが2秒短縮。',
   'entities.itemSets.vanguard_mage_frost.name': 'ヴァンガード：Rimewarden Garb',
-  'entities.itemSets.vanguard_mage_frost.bonus2': '2点：Icebindのクールダウンが2秒短縮。',
+  'entities.itemSets.vanguard_mage_frost.bonus2':
+    '2点：Icebindのクールダウンが2秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_mage_frost.bonus4':
     '4点：Icebind詠唱でFlitstepの残りクールダウンが5秒短縮。',
   'entities.itemSets.vanguard_warlock_affliction.name': 'ヴァンガード：Dreadquill Vestments',
-  'entities.itemSets.vanguard_warlock_affliction.bonus2': '2点：Harrowの詠唱時間が0.3秒短縮。',
+  'entities.itemSets.vanguard_warlock_affliction.bonus2':
+    '2点：Harrowの詠唱時間が0.3秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_warlock_affliction.bonus4':
     '4点：Consumeの回復量が30%上昇し、移動中にチャネル可能。',
   'entities.itemSets.vanguard_warlock_demonology.name': 'ヴァンガード：Marrowbound Regalia',
   'entities.itemSets.vanguard_warlock_demonology.bonus2':
-    '2点：Bone Armorのクールダウンが10秒短縮。',
+    '2点：Bone Armorのクールダウンが10秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_warlock_demonology.bonus4':
     '4点：Reaping CommandでBone Armorの残りクールダウンが2秒短縮。',
   'entities.itemSets.vanguard_warlock_destruction.name': 'ヴァンガード：Slagcrown Vestments',
   'entities.itemSets.vanguard_warlock_destruction.bonus2':
-    '2点：Cinderhideのクールダウンが30秒短縮。',
+    '2点：Cinderhideのクールダウンが30秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_warlock_destruction.bonus4':
     '4点：2回ごとのConflagrateで8秒以内の次のRuinboltが即時発動。',
   'entities.itemSets.vanguard_druid_feral.name': '血たてがみの皮装',
-  'entities.itemSets.vanguard_druid_feral.bonus2': '2点：Bruin Rushのクールダウンが3秒短縮。',
+  'entities.itemSets.vanguard_druid_feral.bonus2':
+    '2点：Bruin Rushのクールダウンが3秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_druid_feral.bonus4':
     '4点：Bruin Rushが最大体力6%のシールドを6秒付与。',
   'entities.itemSets.vanguard_druid_restoration.name': 'アザミ花の祭服',
-  'entities.itemSets.vanguard_druid_restoration.bonus2': '2点：Fleetmendのクールダウンが1秒短縮。',
+  'entities.itemSets.vanguard_druid_restoration.bonus2':
+    '2点：Fleetmendのクールダウンが1秒短縮。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_druid_restoration.bonus4': '4点：Fleetmendで移動速度が3秒間30%上昇。',
   'entities.itemSets.vanguard_druid_balance.name': '星守りの装束',
-  'entities.itemSets.vanguard_druid_balance.bonus2': '絡み根の詠唱時間が0.5秒短縮される。',
+  'entities.itemSets.vanguard_druid_balance.bonus2':
+    '絡み根の詠唱時間が0.5秒短縮される。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.vanguard_druid_balance.bonus4':
     '絡み根を詠唱すると、移動しながら詠唱でき、移動速度が4秒間20%上昇する。20秒に1回しか発生しない。',
+  'hudChrome.cosmetics.notCollected': '未収集',
+  'itemUi.vendor.basicRiding': '騎乗訓練',
+  'itemUi.vendor.advancedRiding': '上級騎乗訓練',
+  'itemUi.vendor.ridingSpeed':
+    '騎乗中の移動速度が{speed}%上昇します。すべてのマウントに適用されます。',
+  'entities.letters.world_quest_reward.sender': 'カラス便',
+  'entities.letters.world_quest_reward.subject': 'ワールドクエストの報酬',
+  'entities.letters.world_quest_reward.body':
+    'このワールドクエストの報酬を獲得したとき、バッグがいっぱいでした。そのため、カラスがここまで届けました。空きを作ってから、どのワタリガラスの石柱でも受け取れます。\n\n- カラス便',
+  'questUi.logs.worldQuestRewardMailed':
+    'バッグがいっぱいです。報酬はメールボックスに送られました: {items}。',
+  'hudChrome.death.pvpResurrect': 'PvP蘇生',
+  'hudChrome.death.pvpResurrectTitle':
+    '最寄りの墓地で全回復して蘇生します。新たな番人の通行料は発生しません。',
+  'hudChrome.death.pvpResurrectWaitButton': 'PvP蘇生（{seconds}）',
+  'hudChrome.death.pvpResurrectWaitNote':
+    '{seconds}後にPvP蘇生できます。最寄りの墓地で起き上がります。',
+  'hudChrome.death.pvpResurrectReadyNote': 'PvP蘇生の準備完了。最寄りの墓地で起き上がります。',
+  'hudChrome.options.spellTooltipOnHover': 'ホバーで呪文ツールチップ',
+  'hudChrome.skullBag.title': '頭蓋袋',
+  'hudChrome.skullBag.total': '頭蓋：{count}',
+  'hudChrome.skullBag.close': '頭蓋袋を閉じる',
+  'hudChrome.skullBag.clickOpen': 'クリックして開く',
+  'hudChrome.skullBag.notCarried': '頭蓋を保管または取り出すには、頭蓋袋をバッグに入れてください。',
+  'hudChrome.skullBag.empty': '空です。袋を持っている間、拾った頭蓋は直接ここに入ります。',
+  'hudChrome.skullBag.unrecorded': '戦利品の頭蓋',
+  'hudChrome.skullBag.store': '所持中の頭蓋を保管（{count}）',
+  'hudChrome.skullBag.storeNone': '保管する頭蓋がありません',
+  'hudChrome.skullBag.tooltip':
+    'バッグ枠を使わず任意の数の戦利品の頭蓋を保持します。バッグに入れている間、拾った頭蓋は直接ここに入ります。バッグ内でクリックすると保管または取り出せます。',
+  'hudChrome.treasureMap.inkPickerTitle': 'どの地図に製図師のインクを使いますか？',
+  'hudChrome.treasureMap.inkPickerHeld': '製図師のインクを{held}個持っています。',
+  'hudChrome.treasureMap.inkPickerRead': '追跡中：Xは{zone}にあります。Xは動きません。',
+  'hudChrome.treasureMap.inkPickerUnread': '未読（{count}枚所持）',
+  'hudChrome.treasureMap.inkPickerCost': '{rarity}へ描き直し：インク{inks}',
+  'hudChrome.treasureMap.inkPickerCancel': 'キャンセル',
+  'hudChrome.bags.reorderLocked':
+    'ロックされたアイテムはバッグ枠に残ります。移動するにはロックを解除してください。',
+  'hudChrome.nameplate.bountyTag': '賞金首',
+  'hudChrome.keybindLayout.title': 'キーボード配列',
+  'hudChrome.keybindLayout.open': '変換',
+  'hudChrome.keybindLayout.from': 'ホットキーの元配列',
+  'hudChrome.keybindLayout.to': '変換先',
+  'hudChrome.keybindLayout.keepMovement': '移動キーをそのままにする',
+  'hudChrome.keybindLayout.keepMovementLocked':
+    '前回移動キーをそのままにしたため、今回もそのままです。最初からやり直すには既定値にリセットしてください。',
+  'hudChrome.keybindLayout.help':
+    '各ホットキーは、新しい配列で同じ文字を入力するキーへ移動します。数字段はそのままです。この一覧のキー名はQWERTY位置です。キーボード概要には実際の配列が表示されます。',
+  'hudChrome.keybindLayout.moves': '移動するホットキー：{count}',
+  'hudChrome.keybindLayout.noChange': 'これらの配列間で変わるホットキーはありません。',
+  'hudChrome.keybindLayout.apply': 'ホットキーを変換',
+  'hudChrome.keybindLayout.converted': 'ホットキーを{from}から{to}へ変換しました。',
+  'hudChrome.keybindLayout.layouts.qwertzDe': 'QWERTZ（ドイツ語）',
+  'hudChrome.keybindLayout.layouts.qwertzCh': 'QWERTZ（スイス）',
+  'hudChrome.keybindLayout.layouts.azertyFr': 'AZERTY（フランス語）',
+  'hudChrome.keybindLayout.layouts.azertyBe': 'AZERTY（ベルギー）',
+  'hudChrome.keybindLayout.layouts.qwertyEs': 'QWERTY（スペイン語）',
+  'hudChrome.keybindLayout.layouts.qwertyIt': 'QWERTY（イタリア語）',
+  'hudChrome.keybindLayout.layouts.qwertyNordic': 'QWERTY（スウェーデン語、フィンランド語）',
+  'hudChrome.keybindLayout.layouts.qwertyDa': 'QWERTY（デンマーク語）',
+  'hudChrome.keybindLayout.layouts.qwertyNo': 'QWERTY（ノルウェー語）',
+  'hudChrome.keybindLayout.layouts.qwertyBr': 'QWERTY（ブラジルABNT2）',
+  'hudChrome.keybindLayout.layouts.qwertyPt': 'QWERTY（ポルトガル語）',
+  'hudChrome.keybindLayout.layouts.qwertyTr': 'QWERTY（トルコ語）',
+  'hudChrome.keybindLayout.layouts.dvorak': 'ドヴォラック',
+  'hudChrome.keybindLayout.layouts.colemak': 'コールマック',
+  'errors.searchUpdates': '更新を検索',
+  'errors.noUpdateFound': '更新が見つかりません。少し後でもう一度お試しください。',
+  'errors.updateUnavailable':
+    'ゲームストアで更新するか、最新クライアントをダウンロードしてください。',
+  'errors.updateSearchFailed': '更新を確認できませんでした。もう一度お試しください。',
+  'entities.abilities.spore_burst.name': '胞子バースト',
+  'entities.abilities.spore_burst.description':
+    '対象地点に胞子爆裂体を召喚します。{duration}秒後に爆発し、味方を{healing}回復し、8ヤード以内の敵に{damage}の自然ダメージを与えます。',
+  'entities.abilities.spore_burst.specNote_balance': '月潮3で25%強化され、月潮を消費します。',
+  'entities.abilities.spore_burst.specNote_restoration':
+    '回復した味方それぞれにスポアメンディングも付与します。満蓄の青翠では25%強化され、青翠を消費します。',
+  'entities.abilities.natures_boon.name': '自然の恩恵',
+  'entities.abilities.natures_boon.description':
+    'あなたの呪文は自然の恩恵を10秒間準備できます。指定された呪文は無料になり、25%強化され、どの形態でも詠唱できます。新たな発動で持続時間が更新されます。',
+  'entities.abilities.natures_boon.specNote_feral':
+    '命中した近接自動攻撃ごとに15分の1の確率で、スポアメンディング、または熊形態中はオークハイドに準備します。',
+  'entities.abilities.natures_boon.specNote_balance':
+    'ワイルドボルトまたはスカイフォールを唱えるたび、10%の確率で胞子バーストに準備します。10秒に1回まで。',
+  'entities.abilities.natures_boon.specNote_restoration':
+    'あなたの継続回復効果の各ティックが10%の確率で胞子バーストに準備します。10秒に1回まで。',
+  'entities.items.pvp_skull_bag.name': '頭蓋袋',
+  'guide.worldPvpPage.hillBodyFlat':
+    '三時間ごとに、予測できないタイミングでレルム全体に告知が届きます。十五分後、北部の地帯のどこかに丘が出現し、その範囲となる円が開けた地面に示されます。丘は出現から四十五分間続いて消え、その間は五分ごとに場所と各グループの累計占領時間の順位が告知されます。円内に立つ人数が最も多いパーティーが丘を争い、人数優勢の状態を合計三十秒保つと占領できます。敵のパーティーが入っても、自分たちが再び優勢になるまで計時が一時停止するだけです。円内に味方の生存者が一人もいなくなったときだけ、計時が最初からになります。一人でも一人パーティーとして数えられ、占領中にパーティーを組んでも丘を失いませんが、レイドのメンバーは一切数えられません。占領しているパーティーの各メンバーは、円内に立っていると毎分同じ量の名誉を得られます。占領時間が長くなっても報酬は変わらず、満員のパーティーが妨害されずに最初から最後まで占領すれば、戦場で三勝するのとほぼ同じ名誉を得られます。丘が消えるとき、累計占領時間が最も長いグループが合計十分以上占領していれば、そのグループの占領中に円内で合計一分以上過ごし、終了時にも同じグループにいる全員に、週間宝物庫の PvP 枠への一勝が与えられます。戦場上部のバーに占領者、両陣営の人数、争奪の計時が表示され、チャットで /hill と入力すると丘の場所がわかります。',
+  'hudChrome.graphicsRestore.note': '描画を復元中',
+  'hudChrome.hill.contestOtherPaused': '相手の進行停止：{seconds}/{total}',
+  'hudChrome.hill.contestYouPaused': '進行停止：{seconds}/{total}',
+  'hudChrome.keybindLayout.layouts.qwertyUk': 'QWERTY（英国）',
+  'hudChrome.keybindLayout.layouts.qwertyUs': 'QWERTY（米国）',
+  'hudChrome.pattern.reagent': '{name} ×{count}',
+  'hudChrome.pattern.reagents': '{label} {list}',
+  'hudChrome.skullBag.takeAll': 'すべて取り出す',
+  'hudChrome.skullBag.takeAllAria': 'すべて取り出す：{item}',
+  'hudChrome.skullBag.takeOne': '1個取り出す',
+  'hudChrome.skullBag.takeOneAria': '1個取り出す：{item}',
+  'hudChrome.warfare.reasons.worldQuest': 'ワールドクエスト',
+  'hudChrome.warfareShop.goods': '商品',
+  'hudChrome.weeklyRewards.completedTask.pvpWinMany': 'PvPで{count}勝',
+  'hudChrome.weeklyRewards.completedTask.pvpWinOne': 'PvPで{count}勝',
+  'hudChrome.weeklyRewards.mixedRole': '{first} / {second}',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinMany': 'PvPで{count}勝する',
+  'hudChrome.weeklyRewards.requiredTask.pvpWinOne': 'PvPで{count}勝する',
+  'hudChrome.weeklyRewards.specRole': '{name}（{role}）',
+  'questUi.dialog.attuneHearthstone': '同盟のハースストーンをここに結び付ける。',
+  'questUi.dialog.attuneHearthstoneAria': '{name}のもとで同盟のハースストーンを{hub}に結び付ける',
+  'hudChrome.factionRewards.hearthstoneUnattuned':
+    '同盟のハースストーンが未設定です。同盟の補給官と話すか、同盟の拠点で使用してください。',
+  'hudChrome.factionRewards.hearthstoneBound': '同盟のハースストーンを{hub}に結び付けました。',
+  'hudChrome.factionRewards.hearthstoneTransport': 'ハースストーンがあなたを{hub}に転送します。',
+  'hudChrome.factionRewards.itemCooldown': 'そのアイテムはまだ使えません（残り{minutes}分）。',
+  // PR 4488 hunter follow-up.
+  'entities.abilities.bear_trap.name': 'トラバサミ',
+  'entities.abilities.bear_trap.description':
+    '選択した位置に罠を置きます。0.75秒後に起動して1分間持続し、あなたとグループにしか見えません。最初に作動させた敵は出血し、15秒間で{damage}の物理ダメージを受け、4秒間、50%減速します。ダメージは遠隔攻撃力とともに上がります。同時に起動できるトラバサミは1つだけです。霜顎の罠とは同時に設置できます。新しいトラバサミを設置すると、以前のものは置き換えられます。',
+  'entities.abilities.scatterbolt.name': '拡散ボルト',
+  'entities.abilities.scatterbolt.description':
+    '前方8ヤード、90度の円錐範囲にボルトを撃ち散らし、敵をあなたから最大20ヤード離れた位置までノックバックします。ノックバック無効の敵には効果がありません。ダメージは与えません。',
+  'entities.abilities.phosphor_flask.name': '燐火フラスコ',
+  'entities.abilities.phosphor_flask.description':
+    '反応性の化学混合物を封じた容器で、8ヤードの範囲に3秒間、白熱の炎を噴き上げます。炎の中にいる敵は0.5秒ごとに{damage}の火炎ダメージを受けます。ダメージは遠隔攻撃力とともに上がります。',
+  'hudChrome.options.pixelsValue': '{value} px',
   'hudChrome.wocStore.subscription.monthlyTitle': '月額メンバーシップ',
   'hudChrome.wocStore.subscription.annualTitle': '12か月メンバーシップセット',
   'hudChrome.wocStore.subscription.annualPrice': '12か月分を一括で{price}',
   'hudChrome.wocStore.subscription.annualTerms':
     '同じ料金で毎年更新されます。Stripeで法定通貨を使ってお支払いください。請求設定で解約できます。',
   'hudChrome.wocStore.subscription.annualMount':
-    '支払い後、購入したキャラクターで郵便から魂に縛られた戦車の鍵を受け取れます。戦車はセット用騎乗動物の仮モデルです。',
+    'アカウントの全キャラクターでナイトウィング・キマイラの騎乗動物が解放され、魂に縛られた手綱は購入したキャラクターに郵便で届きます。1アカウントにつき1体で、メンバーシップ終了後も所有できます。',
   'hudChrome.wocStore.subscription.trialTerms':
     '1アカウントにつき1回、{days}日間無料で体験できます。支払い方法の登録が必要です。解約しない場合、体験終了時に{price}が請求されます。',
   'hudChrome.wocStore.subscription.startTrial': '7日間の無料体験を開始',
@@ -20888,11 +21561,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.subscription.annualPending':
     '支払い後、購入したキャラクターに戻って騎乗動物を受け取ってください。支払い処理中や無料体験中の場合は、課金後に再試行してください。',
   'hudChrome.wocStore.subscription.annualDelivered': 'セットの騎乗動物の鍵が郵便で届きました。',
-  'hudChrome.wocStore.subscription.resumeCheckout': '購入手続きを再開',
   'entities.letters.membership_annual_reward.sender': 'レイヴンポスト',
   'entities.letters.membership_annual_reward.subject': '年間メンバーシップの騎乗動物',
   'entities.letters.membership_annual_reward.body':
-    '年間メンバーシップの支払いが完了しました。戦車の鍵を同封しました。所有するには鍵をバッグか銀行に保管してください。メンバーシップが終了しても所有権は維持されます。騎乗スキルが必要です。',
+    '年間メンバーシップの支払いが完了しました。ナイトウィング・キマイラがアカウントの全キャラクターで解放され、手綱を同封しました。メンバーシップが終了しても所有できます。騎乗スキルが必要です。',
   'hudChrome.wocStore.subscription.checkoutClosed':
     'この購入手続きは終了しており、未受領の特典はありません。メンバーシッププランをもう一度選び、新しい購入手続きを開始してください。',
   'itemUi.tooltip.referralFullSet':
@@ -21527,7 +22199,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.crypt.tolling':
     '鐘の綱へ歩み寄り埋葬の鐘を鳴らしている間、ダメージを受けない。鳴らし終えると全員に{min}～{max}の闇ダメージ（ヒロイックでは{heroicMin}～{heroicMax}）を与え、開いた墓すべてから安らがぬ骨が這い出る。',
   'hudChrome.auraEffect.crypt.embraced':
-    '貴婦人の腕に抱え上げられている：行動できず、毎秒{tick}の冷気ダメージ（ヒロイックでは{tickHeroic}）。仲間が彼女の最大体力の{share}%を削れば静かに降ろされるが、高所で{hold}秒抱えられると氷の上に落とされ、{min}～{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。',
+    '貴婦人の腕に抱え上げられている：行動できず、毎秒{tick}の冷気ダメージ（ヒロイックでは{tickHeroic}）。仲間が彼女の最大体力の{share}%（ヒロイックでは{shareHeroic}%）を削れば静かに降ろされるが、高所で{hold}秒抱えられると氷の上に落とされ、{min}～{max}のダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。',
   'hudChrome.auraEffect.crypt.lament':
     '花嫁の哀歌が終わると、灯った墓のランタンから{radius}ヤード以内にいない全員に{min}～{max}の冷気ダメージ（ヒロイックでは{heroicMin}～{heroicMax}）。ランタンが守るのは最も近い{cap}人だけで、その後は消えて次の哀歌を守れない。',
   'hudChrome.auraEffect.crypt.lingering':
@@ -21724,12 +22396,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'referralCards.rewards.fogbinder':
     '装飾品が進化してスタミナがさらに増加し、使用効果を得ます。全能力値が15秒間5上昇し、再使用まで2分かかります。',
   'referralCards.rewards.gravewyrm': '無料の騎乗訓練。',
-  'referralCards.rewards.raid': '限定の友情タンクマウント。',
+  'referralCards.rewards.raid': 'スライムのプルプルの騎乗動物。',
   'referralCards.referrerRewards.1': '限定の友情ラプターマウント。',
   'referralCards.referrerRewards.2': '銀行スロット20枠とキャラクタースロット5枠。',
   'referralCards.referrerRewards.3': 'Claudiumを1,000。',
   'referralCards.referrerRewards.4': 'Claudiumを1,000。',
-  'referralCards.referrerRewards.5': '若木の仲間。',
+  'referralCards.referrerRewards.5': '仲間のチラリとキラリ。',
   'referralCards.reasons.notParticipant':
     'このアカウントはこの絆のフレンド関係に含まれていません。',
   'referralCards.reasons.staleRevision':
@@ -21771,7 +22443,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.social.boundFriendLink': '絆のフレンドは招待リンクで結ばれています。',
   'hudChrome.mounts.name_referral_tank': '友情タンク',
   'hudChrome.mounts.name_referral_raptor': '友情ラプター',
-  'hudChrome.mounts.desc_referral_tank': '招待スタンプカードを完成させると獲得できます。',
+  'hudChrome.mounts.desc_referral_tank': '以前の友達招待スタンプカードの報酬。',
   'hudChrome.mounts.desc_referral_raptor':
     '最初の絆のフレンドがスタンプカードを完成させるのを手伝うと獲得できます。',
   'apiError.character.referral_transfer_pending':
@@ -22001,4 +22673,3016 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.heatAlert.heatBar': '熱 {heat} / {max}',
   'hudChrome.heatAlert.heatAria': '熱 {max}中{heat}',
   'abilityUi.cast.heart_heat_shed': '熱を流す',
+  'hudChrome.guildHall.title': '燈火の館',
+  'hudChrome.guildHall.close': 'ギルドのウィンドウを閉じる',
+  'hudChrome.guildHall.tabsLabel': '燈火の館の項目',
+  'hudChrome.guildHall.tabs.contracts': '契約',
+  'hudChrome.guildHall.tabs.quartermaster': '補給係',
+  'hudChrome.guildHall.seals': '燈火の印章：{count}',
+  'hudChrome.guildHall.resetIn': '新しい契約まで{time}',
+  'hudChrome.guildHall.resetSoon': '新しい契約は次の週次リセットで',
+  'hudChrome.guildHall.contractsIntro':
+    '契約は週に三件、王国のすべての冒険者に同じものが貼り出される。署名は不要：やり遂げれば、その印章は週に一度ずつ直接バッグに届く。',
+  'hudChrome.guildHall.kinds.boss': '討伐依頼',
+  'hudChrome.guildHall.kinds.heroic': 'ヒロイック踏破',
+  'hudChrome.guildHall.kinds.task': '遂行',
+  'hudChrome.guildHall.goals.boss': '{dungeon}で{boss}を倒す（難易度は問わない）。',
+  'hudChrome.guildHall.goals.heroic':
+    'ヒロイックで{dungeon}を踏破する：ヒロイック難易度で{boss}を倒す。',
+  'hudChrome.guildHall.goals.task': '{task}（{dungeon}）',
+  'hudChrome.guildHall.contractLabel': '{kind}：{dungeon}',
+  'hudChrome.guildHall.done': '今週は達成済み',
+  'hudChrome.guildHall.open': '未達成',
+  'hudChrome.guildHall.lifetime': '達成した契約：{count}',
+  'hudChrome.guildHall.emptyBoard': '掲示板は書き換え中だ。週次リセットの後にまた来てほしい。',
+  'hudChrome.guildHall.quartermasterIntro':
+    'ギャリックは燈火の印章を栄誉とだけ交換する：功績の書で身につける称号、ギルドの剣の外見、そしてギルドの軍馬だ。ここに戦いであなたを強くするものは何もない。',
+  'hudChrome.guildHall.titleOffer': '称号：{title}',
+  'hudChrome.guildHall.titlePreview': '表示：{preview}',
+  'hudChrome.guildHall.buy': '購入',
+  'hudChrome.guildHall.owned': '所持済み',
+  'hudChrome.guildHall.needSeals': 'あと{count}個必要',
+  'hudChrome.guildHall.bought': '称号「{title}」を購入した。功績の書で選択できる。',
+  'hudChrome.guildHall.refused.owned': 'それはすでに所持している。',
+  'hudChrome.guildHall.refused.seals': '燈火の印章が足りない。',
+  'hudChrome.guildHall.refused.bags': 'バッグがいっぱいだ。',
+  'hudChrome.guildHall.refused.riding': 'マウントを買う前に騎乗を学ぶこと。',
+  'hudChrome.guildHall.boughtSkin':
+    '外見「{skin}」を購入した。コスメティックのウィンドウから適用できる。',
+  'hudChrome.guildHall.boughtMount': '{mount}を購入した。手綱はバッグの中にある。',
+  'hudChrome.guildHall.skinPreview':
+    '装備中の剣の見た目を変える。アカウントのすべてのキャラクターに適用。外見のみで能力値はない。',
+  'hudChrome.guildHall.skinOffer': '剣の外見：{skin}',
+  'hudChrome.guildHall.mountOffer': 'マウント：{mount}',
+  'hudChrome.guildHall.mountPreview':
+    'アカウントの全キャラクターで使えるマウントの外見。移動速度は騎乗訓練で決まります。',
+  'hudChrome.guildHall.refused.range': '取引するには補給係のそばに立つこと。',
+  'hudChrome.guildHall.reward.one': '燈火の印章{count}個',
+  'hudChrome.guildHall.reward.few': '燈火の印章{count}個',
+  'hudChrome.guildHall.reward.many': '燈火の印章{count}個',
+  'hudChrome.guildHall.reward.other': '燈火の印章{count}個',
+  'hudChrome.guildHall.contractDone.one': '契約達成：{contract}。燈火の印章を{count}個受け取った。',
+  'hudChrome.guildHall.contractDone.few': '契約達成：{contract}。燈火の印章を{count}個受け取った。',
+  'hudChrome.guildHall.contractDone.many':
+    '契約達成：{contract}。燈火の印章を{count}個受け取った。',
+  'hudChrome.guildHall.contractDone.other':
+    '契約達成：{contract}。燈火の印章を{count}個受け取った。',
+  'hudChrome.guildHall.signSubtitle': '冒険者ギルド',
+  'hudChrome.guildHall.board.noticesLabel': '今週の契約',
+  'hudChrome.guildHall.board.weekProgress': '今週：契約{total}件中{done}件を達成',
+  'hudChrome.guildHall.board.weekProgressAria': '今週達成した契約',
+  'hudChrome.guildHall.board.cardProgress': '今週 {done}/{total}',
+  'hudChrome.guildHall.board.rewardLine': '報酬：{reward}',
+  'hudChrome.guildHall.board.stamp': '封印済み',
+  'hudChrome.guildHall.board.sealsTip':
+    '燈火の印章は燈火の館の週替わり契約で支払われ、補給係ギャリック・ホルトのもとでのみ使える。あなたに結びつけられている。',
+  'hudChrome.guildHall.shop.stockLabel': 'ギャリック・ホルトの品揃え',
+  'hudChrome.guildHall.shop.kindMount': 'マウント',
+  'hudChrome.guildHall.shop.kindSword': '剣の外見',
+  'hudChrome.guildHall.shop.mountHeading': '鞍にまたがるあなた',
+  'hudChrome.guildHall.shop.skinHeading': 'あなたの手に',
+  'hudChrome.guildHall.shop.stageLabel': '{name}の3Dプレビュー',
+  'hudChrome.guildHall.shop.stageUnavailable': 'この端末では3Dプレビューを表示できない。',
+  'hudChrome.guildHall.shop.mountHowTo':
+    '購入すると手綱がバッグに入る。手綱を使えば騎乗でき、手綱を持っている限りこの馬はあなたのものだ。',
+  'hudChrome.guildHall.shop.mountOwned': 'このマウントは所持済みだ。手綱はバッグの中にある。',
+  'hudChrome.guildHall.shop.skinHowTo':
+    '購入後、外見ウィンドウで適用する。アカウントのすべてのキャラクターで使える。',
+  'hudChrome.guildHall.shop.skinOwned': 'この外見は所持済みだ。外見ウィンドウで適用できる。',
+  'hudChrome.guildHall.shop.kindTitle': '称号',
+  'hudChrome.guildHall.shop.plateHeading': 'あなたのネームプレート',
+  'hudChrome.guildHall.shop.howTo': '購入後、功績の書で選ぶと名前と一緒に表示される。',
+  'hudChrome.guildHall.shop.cosmetic': '見た目のみ：能力値は変わらない。',
+  'hudChrome.guildHall.shop.price': '価格：{price}',
+  'hudChrome.guildHall.shop.have': '所持：{count}',
+  'hudChrome.guildHall.shop.ownedLong': 'この称号は所持済みだ。功績の書で選択できる。',
+  'hudChrome.guildHall.shop.short.one': '燈火の印章があと{count}個必要だ。',
+  'hudChrome.guildHall.shop.short.few': '燈火の印章があと{count}個必要だ。',
+  'hudChrome.guildHall.shop.short.many': '燈火の印章があと{count}個必要だ。',
+  'hudChrome.guildHall.shop.short.other': '燈火の印章があと{count}個必要だ。',
+  'hudChrome.raidBossGuide.dungeonButton': 'ボス攻略: {dungeon}',
+  'hudChrome.raidBossGuide.dungeonBossesLabel': 'ダンジョンのボス',
+  'hudChrome.raidBossGuide.rankMiniboss': 'ミニボス',
+  'hudChrome.raidBossGuide.rankFinal': '最終ボス',
+  'hudChrome.raidBossGuide.defeated': '撃破済み',
+  'hudChrome.raidBossGuide.browseBossDefeated': '{boss}を表示(撃破済み)',
+  'hudChrome.raidBossGuide.heroicHeading': '英雄での変更点',
+  'hudChrome.raidBossGuide.tipsHeading': 'ロール別のコツ',
+  'hudChrome.raidBossGuide.choicesHeading': '重要な選択',
+  'hudChrome.raidBossGuide.choiceGain': '得られるもの',
+  'hudChrome.raidBossGuide.choiceRisk': '負うリスク',
+  'hudChrome.raidBossGuide.markHeroicOnly': '英雄のみ',
+  'hudChrome.raidBossGuide.markHeroicChanged': '英雄で変更',
+  'hudChrome.raidBossGuide.damageCompare': '通常 {normal} | 英雄 {heroic}',
+  'hudChrome.raidBossGuide.finderOpen': 'ボス攻略',
+  'hudChrome.raidBossGuide.finderOpenLabel': '{boss}のボス攻略を開く',
+  'bossJournal.common.enrageName': '激昂',
+  'bossJournal.common.phaseEnrageSummary': '体力が{health}を下回ると、ボスは戦闘終了まで激昂する。',
+  'bossJournal.common.enrageSummary':
+    '体力が{health}を下回ると、戦闘終了まで近接攻撃のダメージが{damage}増加し、攻撃速度が{haste}上昇する。',
+  'bossJournal.common.enrageResponse':
+    'タンクとヒーラーは防御とヒールのクールダウンをこの段階用に温存。それ以外の全員はダメージを集中して早く終わらせよう。',
+  'bossJournal.common.heroicHarder':
+    'このページのすべてのアビリティは、通常の{scale}倍の威力になる。',
+  'bossJournal.sanctum.tusker.overview':
+    '家ほどもある巨牙獣が、燃える魂の火鉢を載せたそりを引いてそり道を行き来する。道を周回し、引き寄せた場所でそりを切り離す。体力が半分になるとそりが倒れ、背後に炎をぶちまける。',
+  'bossJournal.sanctum.tusker.phaseRoadSummary':
+    '開始時から予兆のある攻撃が2つ。正面への薙ぎ払いと、描かれた線に沿った突進。',
+  'bossJournal.sanctum.tusker.phaseSpillName': 'そりの転倒',
+  'bossJournal.sanctum.tusker.phaseSpillSummary':
+    '体力が{health}になるとそりが倒れ、背後に魂火がこぼれる。',
+  'bossJournal.sanctum.tusker.phaseEnrageName': '激昂',
+  'bossJournal.sanctum.tusker.phaseEnrageSummary':
+    '体力が{health}を下回ると、戦闘が終わるまで激昂する。',
+  'bossJournal.sanctum.tusker.sweepSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、牙で正面{arc}度の扇形を、体から{range}ヤード先まで薙ぎ払う。{min}〜{max}ダメージと{push}ヤードのノックバック。',
+  'bossJournal.sanctum.tusker.sweepResponse':
+    'タンクは群れに背を向けさせて保持する。それ以外は側面か背後から攻撃。',
+  'bossJournal.sanctum.tusker.trampleSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、最も遠いプレイヤーに向けて長さ{length}ヤードの線を描き、その線に沿って突進する。線内の全員に{min}〜{max}ダメージと{stun}秒のノックダウン。',
+  'bossJournal.sanctum.tusker.trampleResponse':
+    '詠唱が終わる前に、描かれた線から横へ避けること。最も遠い者が標的なので、遠隔は横へ動く余裕を残しておく。',
+  'bossJournal.sanctum.tusker.spillName': 'こぼれた火鉢',
+  'bossJournal.sanctum.tusker.spillSummary':
+    '体力が{health}になった時に1度だけ。そりが倒れ、{count}つの魂火の炎({radius}ヤード)が背後で{seconds}秒間燃え、中にいる者に毎秒{min}〜{max}ダメージ。',
+  'bossJournal.sanctum.tusker.spillResponse': 'すぐに炎から出て、炎の跡から離れて戦う。',
+  'bossJournal.sanctum.tusker.enrageSummary':
+    '体力が{health}を下回ると、戦闘が終わるまで与ダメージが{damage}増える。',
+  'bossJournal.sanctum.tusker.enrageResponse':
+    'ヒールと防御のクールダウンを最後の局面に温存し、早く倒しきろう。',
+  'bossJournal.sanctum.tusker.tipTank':
+    '群れに背を向けさせたまま動かず保持し、薙ぎ払いの扇形が味方に向かないようにする。牙薙ぎのたびにノックバックがある。',
+  'bossJournal.sanctum.tusker.tipHealer':
+    '牙薙ぎと踏みつぶしがダメージのピーク。踏みつぶしが狙う最遠の端ではなく側面に立ち、体力が{health}を下回る激昂に備えてクールダウンを残しておく。',
+  'bossJournal.sanctum.tusker.tipDamage':
+    '側面か背後から攻撃。足元の描かれた線に注意して、そこから出る。体力が半分になったら、背後の炎から離れる。',
+  'bossJournal.sanctum.korgath.overview':
+    '鍛冶師の親方は、4本の封印の柱に鎖でつながれている。残っている鎖1本ごとに被ダメージが{perChain}減るので、鎖を断つほど倒しやすくなる。だが鎖を断つたびに、戦闘が終わるまで彼の攻撃が1つ解き放たれる。',
+  'bossJournal.sanctum.korgath.phaseLockSummary':
+    '開始時は{chains}本の鎖で、各柱に1本ずつ縛られている。各柱の封印の枷が、その鎖を保っている。',
+  'bossJournal.sanctum.korgath.phaseFreedName': '断たれた鎖',
+  'bossJournal.sanctum.korgath.phaseFreedSummary':
+    '鎖を1本断つごとに、のちに鎖が再び鋲で留められても、戦闘が終わるまで攻撃が1つ解き放たれる。',
+  'bossJournal.sanctum.korgath.phaseEnrageName': '激昂',
+  'bossJournal.sanctum.korgath.lockboundName': '鎖縛り',
+  'bossJournal.sanctum.korgath.lockboundSummary':
+    '無傷の鎖1本ごとに被ダメージが{perChain}減る。4本すべてが保たれている間は{all}減。',
+  'bossJournal.sanctum.korgath.lockboundResponse':
+    '鎖を断てば討伐が早まる。まず何本断つか決めること。1本ごとに攻撃も1つ解き放たれる。',
+  'bossJournal.sanctum.korgath.shacklesName': '封印の枷',
+  'bossJournal.sanctum.korgath.shacklesSummary':
+    '各柱の根元に封印の枷が立つ。コルガスを引き寄せるまで枷は攻撃できない。1つ倒すとその鎖が断たれる。金床の鎖が保たれている間、彼はテラス中央から{leash}ヤード以上離れられない。',
+  'bossJournal.sanctum.korgath.shacklesResponse':
+    'ダメージ役は、断つと決めた鎖の枷を倒す。その間、タンクはコルガスを中央に保つ。',
+  'bossJournal.sanctum.korgath.strainSummary':
+    '鎖が1本でも保たれている間、{every}秒ごとに{cast}秒の詠唱の後、鎖がまだ保たれている各柱の周囲{radius}ヤードの円環に爆発が起こる。{min}〜{max}ダメージとノックバック。4本すべて断つと止まる。',
+  'bossJournal.sanctum.korgath.strainResponse':
+    '詠唱が終わる前に、鎖が無傷の柱すべてから離れること。',
+  'bossJournal.sanctum.korgath.stompSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、体から{radius}ヤード先までの円環が発生し、内側の全員に{min}〜{max}ダメージ。',
+  'bossJournal.sanctum.korgath.stompResponse':
+    '遠隔は円環の外にいる。近接は可能なら外へ出る。ヒーラーは被弾者を回復する。',
+  'bossJournal.sanctum.korgath.rerivetSummary':
+    '鎖が断たれて{delay}秒後、竜誓団の突き棒鍛冶が柱の裏の縁を乗り越えて枷まで歩き、{channel}秒間「再鋲打ち」を詠唱し続ける。完了すると鎖と新しい枷が戻り、{perChain}の被ダメージ軽減も復活するが、解き放たれた攻撃は残る。',
+  'bossJournal.sanctum.korgath.rerivetResponse':
+    '詠唱が終わる前に、突き棒鍛冶を中断、スタン、または倒すこと。',
+  'bossJournal.sanctum.korgath.lastLinkSummary':
+    '鎖がちょうど1本残っている間、鎖の引き締めは{base}秒ごとではなく{every}秒ごとに来る。',
+  'bossJournal.sanctum.korgath.lastLinkResponse':
+    '最後の鎖を素早く断つか、{every}秒ごとにその柱から離れる準備をしておく。',
+  'bossJournal.sanctum.korgath.maulSummary':
+    '大槌の鎖が断たれている場合、{every}秒ごとに{cast}秒の詠唱の後、正面{arc}度、体から{range}ヤード先までを薙ぎ払う。近接攻撃の{mult}倍のダメージ。',
+  'bossJournal.sanctum.korgath.maulResponse':
+    '正面に立つのはタンクだけ。それ以外は詠唱中に彼の背後へ回る。',
+  'bossJournal.sanctum.korgath.flailSummary':
+    '火ばさみの鎖が断たれている場合、{every}秒ごとに{cast}秒の詠唱で、タンク以外の最も遠いプレイヤーに向けて長さ{length}ヤードの線を描き、鞭が線内の全員を打つ。{min}〜{max}ダメージ。',
+  'bossJournal.sanctum.korgath.flailResponse': '詠唱が終わる前に、線から横へ避けること。',
+  'bossJournal.sanctum.korgath.chargeSummary':
+    '金床の鎖が断たれている場合、彼はテラス中央から離れられる。{every}秒ごとに{cast}秒の詠唱で、最も遠いプレイヤーに向けて長さ{length}ヤードの線を描き、その線に沿って突進する。{min}〜{max}ダメージとノックバック。',
+  'bossJournal.sanctum.korgath.chargeResponse':
+    '線から出ること。金床の鎖が保たれている間、彼は中央から{leash}ヤード以内にとどまり、突進しない。',
+  'bossJournal.sanctum.korgath.bellowSummary':
+    'ふいごの鎖が断たれている場合、{every}秒ごとに{cast}秒の詠唱の後、全員に{min}〜{max}ダメージを与え、彼から{push}ヤード突き飛ばす。',
+  'bossJournal.sanctum.korgath.bellowResponse':
+    '全員に当たり回避できない。ヒーラーは着弾前に全員を回復しておく。',
+  'bossJournal.sanctum.korgath.tipTank':
+    '彼を中央で、群れに背を向けさせて保持する。大槌の鎖が断たれたら、大槌の弧撃が正面のすべてに当たる。金床の鎖が断たれるまで、彼は中央から{leash}ヤード以上離れられない。',
+  'bossJournal.sanctum.korgath.tipHealer':
+    '鎖の引き締め、震える踏みつけ、そして解き放たれた攻撃はどれも強烈。鎖が残るほど戦闘は長引き、断つほど耐えるべき攻撃が増える。',
+  'bossJournal.sanctum.korgath.tipDamage':
+    '枷を倒して決めた鎖を断ち、コルガスに火力を集中する。描かれた線から出て、鎖が保たれている柱から離れること。',
+  'bossJournal.sanctum.korgath.tipDamageHeroic':
+    '枷を倒して決めた鎖を断ち、コルガスに火力を集中する。再鋲打ちが終わる前に突き棒鍛冶をすべて止める。描かれた線から出て、鎖が保たれている柱から離れること。',
+  'bossJournal.sanctum.korgath.choiceName': '鎖を何本断つ?',
+  'bossJournal.sanctum.korgath.choiceGain':
+    '鎖を1本断つごとに被ダメージ軽減が{perChain}ずつ消える。4本すべてが保たれている時の{all}から、最後にはゼロに。戦闘が大幅に短くなる。',
+  'bossJournal.sanctum.korgath.choiceRisk':
+    '鎖を1本断つごとに、戦闘が終わるまで攻撃が1つ解き放たれる。大槌: 大槌の弧撃。火ばさみ: 鎖の鞭打ち。金床: 境界の突進、そして中央から離れられるようになる。ふいご: 親方の咆哮。',
+  'bossJournal.sanctum.korgath.choiceRiskHeroic':
+    '鎖を1本断つごとに、戦闘が終わるまで攻撃が1つ解き放たれる。大槌: 大槌の弧撃。火ばさみ: 鎖の鞭打ち。金床: 境界の突進、そして中央から離れられるようになる。ふいご: 親方の咆哮。さらに、断たれた鎖ごとに突き棒鍛冶が再び鋲で留めに来る。',
+  'bossJournal.sanctum.korgath.heroicRerivet':
+    '再鋲打ち: 鎖が断たれて{delay}秒後、突き棒鍛冶が鎖の復元を試みる。中断、スタン、または倒すこと。',
+  'bossJournal.sanctum.korgath.heroicLastLink':
+    '最後の鎖: 鎖が1本残ると、鎖の引き締めが{every}秒ごとに来る。',
+  'bossJournal.sanctum.velkhar.overview':
+    'ヴェルカーは、3つの融水の池から解凍された死者を甦らせる。彼らを鎮めるのは冷たさだけ。乾いた氷の上で倒された骨歩きは死んだままだが、融水の中で倒されると再び起き上がり、彼を回復する。',
+  'bossJournal.sanctum.velkhar.phaseVaultName': '儀式の間',
+  'bossJournal.sanctum.velkhar.phaseVaultSummary':
+    '骨歩きが次々と池から這い上がってくる。体力が{wave1}と{wave2}になると追加の波が現れ、各池から1体ずつ。',
+  'bossJournal.sanctum.velkhar.thawName': '目覚めの雪解け',
+  'bossJournal.sanctum.velkhar.thawSummary':
+    '{every}秒ごとに、いずれかの池の火葬壇が燃え上がり、{warn}秒後に{count}体の甦った骨歩きが這い上がる。池は順番に使われる。体力が{wave1}と{wave2}になると、各池からさらに1体ずつ這い上がる。',
+  'bossJournal.sanctum.velkhar.thawResponse':
+    'タンクは敵を集めて乾いた氷の上へ引く。ダメージ役はそこで倒す。',
+  'bossJournal.sanctum.velkhar.heldName': '封じと不滅',
+  'bossJournal.sanctum.velkhar.heldSummary':
+    '乾いた氷の上で倒された骨歩きは封じられ、像のように凍りついて死んだままになる。融水の中で倒されたものは沈み、{delay}秒後に体力{share}で再び起き上がり、ヴェルカーの体力を{heal}回復する。',
+  'bossJournal.sanctum.velkhar.heldResponse':
+    '骨歩きは必ず乾いた氷の上でだけ倒すこと。池の中や融水の帯の上では倒さない。',
+  'bossJournal.sanctum.velkhar.graspName': '解凍された者の握り',
+  'bossJournal.sanctum.velkhar.graspSummary': '融水の中に立つ骨歩きは、与ダメージが{bonus}増える。',
+  'bossJournal.sanctum.velkhar.graspResponse': 'タンクは骨歩きを水から遠ざけておく。',
+  'bossJournal.sanctum.velkhar.trenchSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、彼からタンク以外のプレイヤーに向けて、間の縁まで幅{width}ヤードの線を描く。線内の全員に{min}〜{max}ダメージを与え、線は{seconds}秒間融水のまま残る。',
+  'bossJournal.sanctum.velkhar.trenchResponse':
+    '線から出ること。残った融水の帯の上で骨歩きを倒さない。',
+  'bossJournal.sanctum.velkhar.volleySummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、全員に{min}〜{max}の闇ダメージ。',
+  'bossJournal.sanctum.velkhar.volleyResponse': '回避できない。ヒーラーは全員の体力を保っておく。',
+  'bossJournal.sanctum.velkhar.warmHandsName': '温かな手',
+  'bossJournal.sanctum.velkhar.warmHandsSummary':
+    '{still}秒間立ち止まった骨歩きは、足元に半径{radius}ヤードの融水の水たまりを{seconds}秒間作り出す。',
+  'bossJournal.sanctum.velkhar.warmHandsResponse':
+    '骨歩きを動かし続け、水たまりの上でとどめを刺さないこと。',
+  'bossJournal.sanctum.velkhar.twiceWokenName': '二度目の目覚め',
+  'bossJournal.sanctum.velkhar.twiceWokenSummary':
+    '再び起き上がった骨歩きは体力全快で戻り、与ダメージが{bonus}増える。',
+  'bossJournal.sanctum.velkhar.twiceWokenResponse':
+    '1体も起き上がらせないこと。すべて乾いた氷の上で倒す。',
+  'bossJournal.sanctum.velkhar.tipTank':
+    'すべての骨歩きを引きつけ、池や融水の帯から離れた乾いた氷の上へ引く。融水の中では攻撃が{bonus}強くなる。',
+  'bossJournal.sanctum.velkhar.tipTankHeroic':
+    'すべての骨歩きを引きつけ、池や融水の帯から離れた乾いた氷の上へ引く。動かし続けること。立ち止まったものは足元に水たまりを作る。',
+  'bossJournal.sanctum.velkhar.tipHealer':
+    '影の斉射は{every}秒ごとに全員に当たる。融水の中の骨歩きは{bonus}強く攻撃するので、水に入ったらタンクの体力に注意。',
+  'bossJournal.sanctum.velkhar.tipDamage':
+    '骨歩きは乾いた氷の上でだけ倒し、その後ヴェルカーへ戻る。魂火の溝の線から出ること。',
+  'bossJournal.sanctum.velkhar.choiceName': '死者をどこで倒す?',
+  'bossJournal.sanctum.velkhar.choiceGain':
+    '乾いた氷の上で倒された骨歩きは完全に消える。敵が減り、戦闘がすっきりする。',
+  'bossJournal.sanctum.velkhar.choiceRisk':
+    '融水の中で倒すと再び起き上がり、そのたびにヴェルカーの体力を{heal}回復する。乾いた氷へ引くには時間がかかるので、攻撃を始める前に倒す場所を決めておこう。',
+  'bossJournal.sanctum.velkhar.heroicWarmHands':
+    '温かな手: {still}秒間立ち止まった骨歩きは融水の水たまりを作る。',
+  'bossJournal.sanctum.velkhar.heroicTwiceWoken':
+    '二度目の目覚め: 再び起き上がった骨歩きは体力全快で戻り、与ダメージが{bonus}増える。',
+  'bossJournal.sanctum.korzul.overview':
+    '彼の炎が絶えず砕く凍った湖上での竜との戦い。ブレスのたびに氷が失われ、炎の向きは群れが決めるので、どの氷を失うかも群れ次第。氷を失った竜は、間断なくブレスを吐く。',
+  'bossJournal.sanctum.korzul.phaseLakeName': '凍った湖',
+  'bossJournal.sanctum.korzul.phaseLakeSummary':
+    '彼は氷を突き破って現れ、湖の中央に降り立つ。着地した時から戦闘が始まる。',
+  'bossJournal.sanctum.korzul.phaseFlightName': '飛翔',
+  'bossJournal.sanctum.korzul.phaseFlightSummary':
+    '体力が{first}と{second}になると飛び立ち、墜落してくるまで空中から戦う。',
+  'bossJournal.sanctum.korzul.phaseLastName': '最後の局面',
+  'bossJournal.sanctum.korzul.phaseLastSummary':
+    '2度目の飛翔の後: 地上で{breath}秒ごとに墓所のブレス、{gale}秒ごとに翼の烈風。',
+  'bossJournal.sanctum.korzul.iceName': '砕ける氷',
+  'bossJournal.sanctum.korzul.iceSummary':
+    '湖は氷板でできている。彼の炎は無傷の氷板にひびを入れ、ひびの入った氷板を砕く。ひびの入った氷板は{refreeze}秒後に再び凍る。砕けた氷板は開けた水面になる。',
+  'bossJournal.sanctum.korzul.iceHeroicSummary':
+    '湖は氷板でできている。彼の炎は無傷の氷板にひびを入れ、ひびの入った氷板を砕く。深き焼き入れ: 英雄ではひびの入った氷板は二度と凍らない。砕けた氷板は開けた水面になる。',
+  'bossJournal.sanctum.korzul.iceResponse':
+    '氷は意図して使うこと。群れが失ってもよい氷板に彼の炎を向ける。',
+  'bossJournal.sanctum.korzul.waterName': '開けた水面',
+  'bossJournal.sanctum.korzul.waterSummary':
+    '開けた水面に立つと、移動速度が{slow}低下し、毎秒{perSecond}ダメージを受ける。',
+  'bossJournal.sanctum.korzul.waterResponse':
+    '氷の上にとどまる。突き飛ばされて水に入ったら、すぐに出ること。',
+  'bossJournal.sanctum.korzul.breathSummary':
+    '{every}秒ごとに、タンクの方向へ{cast}秒の詠唱の後、体から{range}ヤード先まで{arc}度の炎の扇形を放つ。タンク以外の範囲内の全員に{min}〜{max}ダメージ。扇形の下にある氷板は最大{plates}枚、近い順に燃える。',
+  'bossJournal.sanctum.korzul.breathResponse':
+    '正面に立つのはタンクだけ。タンクはブレスを、群れが失ってもよい氷へ向ける。',
+  'bossJournal.sanctum.korzul.tailSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、背後{arc}度、体から{range}ヤード先まで尾で薙ぎ払う。{min}〜{max}ダメージとノックバック。',
+  'bossJournal.sanctum.korzul.tailResponse': '背後には絶対に立たない。側面から攻撃する。',
+  'bossJournal.sanctum.korzul.infernoSummary':
+    '{every}秒ごと、および体力が{health}の時に1度、{duration}秒間チャネリングし、半径{radius}ヤード以内に{pulses}回の炎の脈動を放つ。脈動は回を追うごとに強まる(最後の脈動は{min}〜{max})。{crack}回目の脈動で足元の氷板にひびが入り、{brk}回目で砕ける。砕けると彼は鎮火され、チャネリングが終わる。',
+  'bossJournal.sanctum.korzul.infernoResponse':
+    '彼から{radius}ヤード離れること。ひびの入った氷板の上で始めさせれば、{crack}回目の脈動でチャネリングが終わる。',
+  'bossJournal.sanctum.korzul.galeSummary':
+    '{cast}秒の詠唱の後、全員が彼から{push}ヤード押し出される。',
+  'bossJournal.sanctum.korzul.galeResponse':
+    '背後の開けた水面を避けておき、押し出された先が氷になるようにする。',
+  'bossJournal.sanctum.korzul.plungeSummary':
+    '空中でタンク以外のプレイヤー1人に{eye}秒間「ワームの眼」の印を付ける。印が消えると、そのプレイヤーのいる氷板全体に「降り注ぐ炎」を浴びせる。{warn}秒の予兆の後、氷板上の全員に{min}〜{max}ダメージを与え、氷板が燃える。1度目の飛翔で{roundsFirst}回、2度目で{roundsSecond}回。',
+  'bossJournal.sanctum.korzul.plungeHeroicSummary':
+    '空中でタンク以外のプレイヤー2人に{eye}秒間「ワームの眼」の印を付ける(双つの眼)。印が消えると、印を受けた各プレイヤーのいる氷板全体に「降り注ぐ炎」を浴びせる。{warn}秒の予兆の後、氷板上の全員に{min}〜{max}ダメージを与え、氷板が燃える。1度目の飛翔で{roundsFirst}回、2度目で{roundsSecond}回。',
+  'bossJournal.sanctum.korzul.plungeResponse':
+    '印を受けたら、群れから離れた無傷の氷板へ向かう。それ以外の全員はその氷板から離れる。',
+  'bossJournal.sanctum.korzul.broodName': '地の底からの竜群',
+  'bossJournal.sanctum.korzul.broodSummary':
+    '彼が飛び立つと、砕けた氷板ごとにスケイルガードが這い上がる。最大{max}体。',
+  'bossJournal.sanctum.korzul.broodResponse':
+    'タンクが敵を引きつけ、彼が空中にいる間に群れで倒す。',
+  'bossJournal.sanctum.korzul.descentSummary':
+    '各飛翔の終わりに、最も多くのプレイヤーがいる無傷の氷板へ着地する。{warn}秒の影の予兆の後、半径{radius}ヤード以内に{min}〜{max}ダメージとノックバック、その氷板は燃える。',
+  'bossJournal.sanctum.korzul.descentResponse':
+    '失ってもよい氷板に集まり、彼が着地する前に影から走り出ること。',
+  'bossJournal.sanctum.korzul.flareName': '欠片の閃光',
+  'bossJournal.sanctum.korzul.flareSummary':
+    '2度目の飛翔の後、欠片が閃光を放つ。地上で{breath}秒ごとに墓所のブレス、{gale}秒ごとに翼の烈風。',
+  'bossJournal.sanctum.korzul.flareResponse':
+    'ブレスの間隔が短くなる。残りのどの氷板を使うか計画しておくこと。',
+  'bossJournal.sanctum.korzul.noIceSummary':
+    '氷板がすべて砕けると、彼は開けた水面の上に滞空し、間断なくブレスを吐く。',
+  'bossJournal.sanctum.korzul.noIceResponse': '氷を切らしてはならない。全滅で戦闘が終わる。',
+  'bossJournal.sanctum.korzul.tipTank':
+    '墓所のブレスは群れの方ではなく、失ってもよい氷へ向ける。墓場のインフェルノの前に彼をひびの入った氷板へ移動させ、短く終わらせる。',
+  'bossJournal.sanctum.korzul.tipHealer':
+    '墓場のインフェルノの脈動は急速に強まる。全員が離れたか確認すること。降り注ぐ炎、墜落着地、水へのノックバックはどれも大ダメージ。',
+  'bossJournal.sanctum.korzul.tipDamage':
+    '彼の正面にも背後にも立たない。ワームの眼を受けたら、群れから離れた無傷の氷板へ向かう。飛翔中にスケイルガードを倒す。',
+  'bossJournal.sanctum.korzul.tipDamageHeroic':
+    '彼の正面にも背後にも立たない。ワームの眼は2人に同時に付く。それぞれ別の、群れから離れた無傷の氷板へ向かうこと。飛翔中にスケイルガードを倒す。',
+  'bossJournal.sanctum.korzul.choiceIceName': 'どの氷を使う?',
+  'bossJournal.sanctum.korzul.choiceIceGain':
+    'ブレス、降り注ぐ炎、着地を選んだ氷板へ向ければ、湖の残りは安全に立てるまま保たれる。',
+  'bossJournal.sanctum.korzul.choiceIceRisk':
+    '砕けた氷板はすべて開けた水面になり、次の飛翔でそれぞれからスケイルガードが這い上がる(最大{max}体)。氷がなくなると、彼は間断なくブレスを吐く。',
+  'bossJournal.sanctum.korzul.choiceDouseName': 'インフェルノを鎮火する?',
+  'bossJournal.sanctum.korzul.choiceDouseGain':
+    'ひびの入った氷板の上に彼がいれば、{crack}回目の脈動でそれが砕け、彼は鎮火され、墓場のインフェルノは最も強い脈動の前に早く終わる。',
+  'bossJournal.sanctum.korzul.choiceDouseRisk':
+    'その氷板は永久に失われる。無傷の氷の上に置いたままだと、チャネリングは{brk}回目の脈動まで続き、結局は氷板が砕ける。',
+  'bossJournal.sanctum.korzul.heroicDeepQuench': '深き焼き入れ: ひびの入った氷板は二度と凍らない。',
+  'bossJournal.sanctum.korzul.heroicTwinEyes': '双つの眼: ワームの眼が同時に2人に付く。',
+  'bossJournal.wildheart.saurian.overview':
+    '輿を背負った家ほどもある戦獣が、川の浅瀬を周回している。避けて通ることはできない：蔓の橋は、こいつを倒して初めて開く。予告付きの攻撃が2種類、体力半分で現れる回復役の騎手、そして終盤の激昂。',
+  'bossJournal.wildheart.saurian.phaseFordName': '川の浅瀬',
+  'bossJournal.wildheart.saurian.phaseFordSummary':
+    '戦闘開始から、背後への尾の薙ぎ払いと周囲への踏みつけを交互に使う。同時に使う攻撃は1つだけ。',
+  'bossJournal.wildheart.saurian.phaseHowdahName': '輿の崩壊',
+  'bossJournal.wildheart.saurian.phaseHowdahSummary':
+    '体力が{health}になると輿が砕け、輿の呪術師が飛び降りてグレート・サウリアンを回復する。',
+  'bossJournal.wildheart.saurian.phaseEnrageName': '激昂',
+  'bossJournal.wildheart.saurian.phaseEnrageSummary':
+    '体力が{health}を下回ると、戦闘終了まで激昂する。',
+  'bossJournal.wildheart.saurian.tailSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、尾で背後{arc}度の扇形を、体の中心から{range}ヤード先まで薙ぎ払う。{min}〜{max}ダメージと{push}ヤードのノックバック。',
+  'bossJournal.wildheart.saurian.tailResponse': '背後には絶対に立たない。側面から攻撃する。',
+  'bossJournal.wildheart.saurian.stompSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、中心から{radius}ヤード以内の全員が{min}〜{max}ダメージを受け、{stun}秒間倒される。',
+  'bossJournal.wildheart.saurian.stompResponse':
+    '動ける者は詠唱が終わる前に円の外へ出る。タンクは耐え、ヒーラーはその後タンクを回復する。',
+  'bossJournal.wildheart.saurian.riderName': '輿の騎手',
+  'bossJournal.wildheart.saurian.riderSummary':
+    '一度だけ、体力が{health}の時：輿の呪術師がグレート・サウリアンの傍に飛び降りて共に戦い、祖霊の樹液で回復する。',
+  'bossJournal.wildheart.saurian.riderResponse':
+    'タンクが騎手を引き受ける。DPSは回復を妨害するか、先に倒す。',
+  'bossJournal.wildheart.saurian.sapSummary':
+    '騎手の回復：{every}秒ごとに{cast}秒の詠唱で、グレート・サウリアンの最大体力の{heal}を回復する。',
+  'bossJournal.wildheart.saurian.sapResponse': '毎回妨害するか、騎手を倒す。',
+  'bossJournal.wildheart.saurian.enrageSummary':
+    '体力が{health}を下回ると、近接攻撃、尾の薙ぎ払い、大地を揺るがす踏みつけのすべてのダメージが{damage}増加する。',
+  'bossJournal.wildheart.saurian.tipTank':
+    '群れに背を向けさせ、誰も尾の後ろに回らないようにする。輿の呪術師は着地した瞬間に引き受ける。',
+  'bossJournal.wildheart.saurian.tipHealer':
+    '大地を揺るがす踏みつけは周囲の全員を倒すので、毎回その後にタンクを回復する。激昂用にクールダウンを残す。',
+  'bossJournal.wildheart.saurian.tipDamage':
+    '側面に立ち、尾の扇形と踏みつけの円から外れる。体力半分で、祖霊の樹液を妨害するか騎手を倒す。',
+  'bossJournal.wildheart.saurian.choiceName': '騎手が先か、グレート・サウリアンが先か？',
+  'bossJournal.wildheart.saurian.choiceGain':
+    '騎手を倒せば回復は完全に止まる：祖霊の樹液は{every}秒ごとにグレート・サウリアンの{heal}を回復する。',
+  'bossJournal.wildheart.saurian.choiceRisk':
+    '騎手を倒している間も、グレート・サウリアンは薙ぎ払いと踏みつけを続ける。騎手を放置するなら、誰かが毎回の回復を妨害しなければならない。',
+  'bossJournal.wildheart.beast.overview':
+    '牙王の獣使いと大ジャガーは体力を共有し、同時に倒れる。近くにいると遥かに頑丈になり、攻撃も重くなる。タンクは獣使いを引き離し、ジャガーは印を付けた者を狩る。',
+  'bossJournal.wildheart.beast.phasePitsName': '獣穴',
+  'bossJournal.wildheart.beast.phasePitsSummary':
+    '1つの戦闘、2つの体。タイマーは戦闘中ずっと動き続ける。体力による局面はない。',
+  'bossJournal.wildheart.beast.bondSummary':
+    '獣使いとジャガーが{reach}ヤード以内にいる間、両者とも被ダメージが{dr}減少し、与ダメージが{damage}増加する。',
+  'bossJournal.wildheart.beast.bondHeroicSummary':
+    '狂乱の絆：獣使いとジャガーが{reach}ヤード以内にいる間、両者とも被ダメージが{dr}減少し、与ダメージが{damage}増加する。',
+  'bossJournal.wildheart.beast.bondResponse':
+    'タンクは獣使いをジャガーから{reach}ヤードより遠くへ引き離し、そこで保持する。',
+  'bossJournal.wildheart.beast.sharedName': '体力共有',
+  'bossJournal.wildheart.beast.sharedSummary':
+    '2体は1つの体力を共有する：どちらへのダメージも同じに数えられ、片方が倒れるともう片方も倒れる。',
+  'bossJournal.wildheart.beast.sharedResponse':
+    '最も安全に届く方を攻撃する。ターゲットを切り替えても損はない。',
+  'bossJournal.wildheart.beast.stalkName': '忍び狩り',
+  'bossJournal.wildheart.beast.stalkSummary':
+    'ジャガーは主人のタンクではない者に印を付け、{seconds}秒間、挑発を無視して狩る。射程内では{biteEvery}秒ごとに噛みつき、{min}〜{max}ダメージ、その後{bleedEvery}秒ごとに{bleed}の出血が{bleedSeconds}秒続く。その後、新たな獲物を選ぶ。',
+  'bossJournal.wildheart.beast.stalkResponse':
+    '印を付けられたら：走って、ジャガーを獣使いから引き離す。他の者は鈍足・拘束・スタンで止める。',
+  'bossJournal.wildheart.beast.warySummary':
+    '各種の行動阻害（スタン、拘束、鈍足）はジャガーに一度だけ効き、その後その種類は{lockout}秒間効かなくなる。行動不能、恐怖、変異はスタン扱い。',
+  'bossJournal.wildheart.beast.waryResponse':
+    '順番に使う：拘束、鈍足、スタンを1回ずつ。同じ種類を3回続けない。',
+  'bossJournal.wildheart.beast.quakeSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、獣使いから{radius}ヤード以内の全員が{min}〜{max}ダメージを受ける。',
+  'bossJournal.wildheart.beast.quakeResponse': 'タンク以外は獣使いから離れる。',
+  'bossJournal.wildheart.beast.huntSummary':
+    '{every}秒ごとに、2体とも{seconds}秒間、攻撃速度が{haste}上昇する。',
+  'bossJournal.wildheart.beast.huntResponse':
+    'タンクとヒーラーはこの間クールダウンを使う。ジャガーの噛みつきも速くなる。',
+  'bossJournal.wildheart.beast.wardName': 'シックハイドウォード',
+  'bossJournal.wildheart.beast.wardSummary':
+    '{every}秒ごとに、ジャガーが{amount}ダメージを吸収するシールドを{seconds}秒間得る。',
+  'bossJournal.wildheart.beast.wardResponse':
+    'シールドがある間は獣使いを攻撃する：体力は共有されている。',
+  'bossJournal.wildheart.beast.heelSummary':
+    '{every}秒ごとに、ジャガーが{cast}秒の詠唱の後、獣使いの元へ跳び戻り、絆が復活する。',
+  'bossJournal.wildheart.beast.heelResponse':
+    '詠唱中にジャガーをスタン、行動不能、変異にすれば中断できる。ジャガーがすでにスタンを警戒している場合は効かない。',
+  'bossJournal.wildheart.beast.tipTank':
+    '獣使いをジャガーから一気に{normal}ヤードより遠くへ引き離して保持し、群れに背を向けさせる。',
+  'bossJournal.wildheart.beast.tipTankHeroic':
+    '獣使いをジャガーから一気に{heroic}ヤードより遠くへ引き離して保持する。戻れ！のたびに再び引き離す。',
+  'bossJournal.wildheart.beast.tipHealer':
+    '忍び狩りの標的に注意：噛みつきと出血は速く入り、コール・オブ・ザ・ハント中はさらに速い。',
+  'bossJournal.wildheart.beast.tipDamage':
+    '最も安全な方を攻撃する。狙われたらジャガーを獣使いから引き離す。それ以外は鈍足・拘束・スタンを順番に使う。',
+  'bossJournal.wildheart.beast.tipDamageHeroic':
+    '最も安全な方を攻撃する。戻れ！の詠唱ごとにスタンを用意し、ジャガーに鈍足と拘束を順番に使う。',
+  'bossJournal.wildheart.beast.choiceName': 'ジャガーを今止めるか、取っておくか？',
+  'bossJournal.wildheart.beast.choiceGain':
+    '鈍足・拘束・スタンで、ジャガーを獲物からも獣使いからも遠ざけておける。',
+  'bossJournal.wildheart.beast.choiceRisk':
+    '各種の阻害は一度だけ効き、その後{lockout}秒間効かなくなる。3つ同時に使い切ると、次の狩りに使えるものが残らない。',
+  'bossJournal.wildheart.beast.choiceRiskHeroic':
+    '各種の阻害は一度だけ効き、その後{lockout}秒間効かなくなる。スタンを早く使うと、次の戻れ！を止められなくなる。',
+  'bossJournal.wildheart.beast.heroicBond': '狂乱の絆：群れの絆の範囲が{reach}ヤードになる。',
+  'bossJournal.wildheart.beast.heroicHeel':
+    '戻れ！：詠唱中にスタンが入らなければ、ジャガーは獣使いの元へ跳び戻る。シックハイドウォードは{amount}を吸収する。',
+  'bossJournal.wildheart.bloom.overview':
+    '根を張った人喰い花が、周囲の腐葉土の花壇に種莢を降らせる。花粉のない者は芽吹く前に莢を踏み潰す。受粉した者は莢に近づいてはならない。触れると莢はすぐに芽吹く。',
+  'bossJournal.wildheart.bloom.phaseTerraceName': '涙の滝',
+  'bossJournal.wildheart.bloom.phaseTerraceSummary':
+    '決して動かない。別の詠唱中はタイマーが止まるため、記載の間隔は最短のものになる。',
+  'bossJournal.wildheart.bloom.seedSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、{count}個の種莢が各腐葉土の花壇に1つずつ落ちる。受粉していない状態で莢を踏むと潰せる。放置された莢は{sprout}秒後に茨の芽になる。',
+  'bossJournal.wildheart.bloom.seedHeroicSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、{count}個の種莢が各腐葉土の花壇に1つずつ落ちる。受粉していない状態で莢を踏むと潰せる。潜る種：放置された莢は{burrow}秒後に地中へ潜り、最も近い者の傍に茨の芽が現れる。',
+  'bossJournal.wildheart.bloom.seedResponse':
+    '受粉していない者はすべての莢を素早く踏んで回る。受粉した者は近づかない。',
+  'bossJournal.wildheart.bloom.pollinateName': '受粉',
+  'bossJournal.wildheart.bloom.pollinateSummary':
+    '{every}秒ごとに、{count}人が{seconds}秒間受粉する。受粉した者が莢に触れると、莢はすぐに芽吹く。',
+  'bossJournal.wildheart.bloom.pollinateHeroicSummary':
+    '{every}秒ごとに、{count}人が{seconds}秒間受粉する。受粉した者が莢に触れると、莢はすぐに芽吹く。花粉の雲：受粉した者の{cloudRadius}ヤード以内に{cloudSeconds}秒間立っていると、あなたも受粉する。',
+  'bossJournal.wildheart.bloom.pollinateResponse':
+    '受粉したら：効果が切れるまで莢に近づかない。ヒロイックでは味方からも離れる。',
+  'bossJournal.wildheart.bloom.sproutName': '茨の芽',
+  'bossJournal.wildheart.bloom.sproutSummary':
+    '芽吹いた莢から育つエリートの雑魚で、最も近い者を攻撃する。ゴージブルームが倒れると枯れる。',
+  'bossJournal.wildheart.bloom.sproutResponse': 'タンクが引き受け、DPSが倒す。',
+  'bossJournal.wildheart.bloom.lashSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、長さ{length}ヤード、幅{width}ヤードの帯をプレイヤー（可能ならタンク以外）に向ける：{min}〜{max}ダメージと{root}秒の拘束。',
+  'bossJournal.wildheart.bloom.lashResponse': '詠唱が終わる前に横へ動いて帯から出る。',
+  'bossJournal.wildheart.bloom.gorgeSummary':
+    '{every}秒ごとに標的へ{cast}秒の詠唱の後、近接攻撃の{mult}倍の噛みつきと消化：{seconds}秒間、毎秒{perSecond}ダメージ。移動では避けられない。',
+  'bossJournal.wildheart.bloom.gorgeResponse':
+    'タンク：これには防御クールダウンを使う。ヒーラーは消化ダメージをカバーする。',
+  'bossJournal.wildheart.bloom.spitName': '花の唾吐き',
+  'bossJournal.wildheart.bloom.spitSummary':
+    '標的が{delay}秒間射程外にいると、{every}秒ごとに唾を吐き、{min}〜{max}ダメージを与える。',
+  'bossJournal.wildheart.bloom.spitResponse': 'タンクは近接範囲に留まる。',
+  'bossJournal.wildheart.bloom.tipTank':
+    '近接範囲に留まる：離れると花の唾吐きを受ける。貪り食いのたびにクールダウンを使い、茨の芽はすべて引き受ける。',
+  'bossJournal.wildheart.bloom.tipHealer':
+    '貪り食いはタンクへの大ダメージで、その後に消化が続く。蔓の鞭は帯の中にいる者を拘束して傷つける。',
+  'bossJournal.wildheart.bloom.tipDamage':
+    '受粉していなければ、攻撃の合間に莢を踏み潰す。蔓の鞭から出て、茨の芽は素早く倒す。',
+  'bossJournal.wildheart.bloom.choiceName': '誰が種を踏み潰す？',
+  'bossJournal.wildheart.bloom.choiceGain':
+    '莢を潰すたびにエリートの茨の芽が1体減り、戦闘は花に集中できる。',
+  'bossJournal.wildheart.bloom.choiceRisk':
+    '花壇へ走るとダメージと近接の時間を失う。受粉した者が莢に触れると、すぐに芽吹いてしまう。',
+  'bossJournal.wildheart.bloom.heroicBurrow':
+    '潜る種：触れられなかった莢は{burrow}秒後に地中へ潜り、最も近い者の傍に芽が現れる。',
+  'bossJournal.wildheart.bloom.heroicCloud':
+    '花粉の雲：受粉した者の{cloudRadius}ヤード以内に{cloudSeconds}秒間立っていると、あなたも受粉する。',
+  'bossJournal.wildheart.zulgar.overview':
+    '盆地の大司祭。予告付きの円がある安定した戦いだが、ジャガーの霊に変じて1人を狩り始める。狩られる者は、点灯した太陽紋の上を通って誘導し、彼を鈍足にする。',
+  'bossJournal.wildheart.zulgar.phaseShrineName': '祭壇',
+  'bossJournal.wildheart.zulgar.phaseShrineSummary': '近接で戦い、自身の周囲に円状の脈動を放つ。',
+  'bossJournal.wildheart.zulgar.phaseHuntName': '狩りの魂',
+  'bossJournal.wildheart.zulgar.phaseHuntSummary':
+    '体力が{first}と{second}になると、{seconds}秒間ジャガーの霊となり、印を付けた者を追う。',
+  'bossJournal.wildheart.zulgar.phaseEnrageName': '激昂',
+  'bossJournal.wildheart.zulgar.pulseSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、彼から{radius}ヤード以内の全員に一撃：{min}〜{max}ダメージ。',
+  'bossJournal.wildheart.zulgar.pulseResponse': 'タンク以外は詠唱が終わる前に円から出る。',
+  'bossJournal.wildheart.zulgar.roarName': 'ジャガーロア',
+  'bossJournal.wildheart.zulgar.roarSummary':
+    '近接攻撃が当たるたび、{chance}の確率で相手を{distance}ヤードノックバックさせる。',
+  'bossJournal.wildheart.zulgar.roarResponse': 'タンクは背後に空間を確保する。',
+  'bossJournal.wildheart.zulgar.huntSummary':
+    '体力が{first}と{second}の時：{cast}秒の詠唱の後、{seconds}秒間、印を付けた1人（獲物。他にいる限りタンクにはならない）を狩る。移動速度はプレイヤーより{speed}速く、挑発を無視し、攻撃しない。獲物に追いつくと：{maul}ダメージと{stun}秒のスタン。その後、新たな獲物を選ぶ。引き裂かれた者は{respite}秒間安全。',
+  'bossJournal.wildheart.zulgar.huntHeroicSummary':
+    '体力が{first}と{second}の時：{cast}秒の詠唱の後、{seconds}秒間、獲物を狩る。双つの獲物：2人に印が付き、{switchEvery}秒ごとに標的を切り替える。移動速度はプレイヤーより{speed}速く、挑発を無視し、攻撃しない。獲物に追いつくと：{maul}ダメージと{stun}秒のスタン。',
+  'bossJournal.wildheart.zulgar.huntResponse':
+    '獲物：点灯した太陽紋の上を走って彼を鈍足にする。他の者は狩りの間、鈍足・拘束・スタンで止める。',
+  'bossJournal.wildheart.zulgar.glyphName': '太陽紋',
+  'bossJournal.wildheart.zulgar.glyphSummary':
+    '{count}個の紋が祭壇を囲む。ジャガーの霊が点灯した紋を越えると{seconds}秒間{slow}鈍足になり、その紋は{dark}秒間消灯する。狩りの間、鈍足と拘束は効き、スタンの持続は半分になる。',
+  'bossJournal.wildheart.zulgar.glyphResponse': '紋は分けて使う：最初の狩りで使い切らない。',
+  'bossJournal.wildheart.zulgar.ambushName': '狩人の待ち伏せ',
+  'bossJournal.wildheart.zulgar.ambushSummary':
+    '狩りのたびに{seconds}秒間姿を消す。最も遠い者に半径{radius}ヤードの円が示され、{warn}秒の予告の後、彼がそこに降り立つ：円内の全員が{min}〜{max}ダメージ。',
+  'bossJournal.wildheart.zulgar.ambushResponse': '円から出る。',
+  'bossJournal.wildheart.zulgar.tipTank':
+    'ジャガーロアに備えて背後に空間を確保する。狩りが終わると彼はあなたの元へ戻る：引き受ける準備をしておく。',
+  'bossJournal.wildheart.zulgar.tipHealer':
+    'ワイルドハートの脈動は円に残った者に当たる。引き裂きは大きな単発ダメージ：獲物を回復する。',
+  'bossJournal.wildheart.zulgar.tipDamage':
+    '脈動の円から出る。狩りの間は鈍足・拘束・スタンで獲物を守り、自分が獲物なら点灯した紋の上を走る。',
+  'bossJournal.wildheart.zulgar.tipDamageHeroic':
+    '脈動の円から出る。狩りの間は鈍足・拘束・スタンで2人の獲物を守る。狩りのたびに、待ち伏せの円から出る。',
+  'bossJournal.wildheart.zulgar.choiceName': '紋を今使うか、取っておくか？',
+  'bossJournal.wildheart.zulgar.choiceGain':
+    '点灯した紋を通らせるたびに彼は大きく鈍足になり、獲物の時間を稼げる。',
+  'bossJournal.wildheart.zulgar.choiceRisk':
+    '使った紋は{dark}秒間消灯したままで、狩りは{seconds}秒続く：最初に使い切ると、狩りの終盤に使える紋が残らない。',
+  'bossJournal.wildheart.zulgar.heroicTwinPrey':
+    '双つの獲物：2人が狩られる。{switchEvery}秒ごとに標的を切り替える。',
+  'bossJournal.wildheart.zulgar.heroicAmbush':
+    '待ち伏せ：狩りのたびに、最も遠い者の半径{radius}ヤードの円へ飛びかかる。',
+  'bossJournal.crypt.drake.overview':
+    '骨の竜が葬列の道の高空を旋回している。その下を通ると降りてきて戦う。正面には炎の吐息、背後には尾の一撃、周囲には翼の突風。',
+  'bossJournal.crypt.drake.phaseName': '葬列の道',
+  'bossJournal.crypt.drake.phaseSummary': '引き寄せられた場所に降り立ち、地上で戦う。',
+  'bossJournal.crypt.drake.breathSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、正面{arc}度の扇形、{range}ヤード先まで炎を吐く：{min}〜{max}ダメージ。詠唱中は向きが固定される。',
+  'bossJournal.crypt.drake.breathResponse': '正面に立つのはタンクだけ。それ以外は側面にいること。',
+  'bossJournal.crypt.drake.tailSummary':
+    '背後に誰かがいる間、{every}秒ごとに{cast}秒の詠唱の後、背後{arc}度の扇形、{range}ヤードを薙ぎ払う：{min}〜{max}ダメージ。',
+  'bossJournal.crypt.drake.tailResponse': '背後には絶対に立たない。',
+  'bossJournal.crypt.drake.gustSummary':
+    '誰かが近くにいる間、{every}秒ごとに{cast}秒の詠唱の後、{radius}ヤード以内の全員に{min}〜{max}ダメージと{push}ヤードのノックバック。',
+  'bossJournal.crypt.drake.gustResponse': 'ノックバックに備え、足場の端に背を向けないこと。',
+  'bossJournal.crypt.drake.embersName': '塚炎の残り火',
+  'bossJournal.crypt.drake.embersSummary':
+    '吐息のたびに足元が{seconds}秒間燃え続ける：上にいる者に毎秒{min}〜{max}ダメージ。',
+  'bossJournal.crypt.drake.embersResponse':
+    '竜を燃える地面から引き離し、自分も燃える地面から出ること。',
+  'bossJournal.crypt.drake.tipTank':
+    '吐息が群れと逆を向くように回し、ヒロイックでは燃える地面から竜を動かす。',
+  'bossJournal.crypt.drake.tipHealer': '吐息と翼の突風がダメージのピーク。側面に立つこと。',
+  'bossJournal.crypt.drake.tipDamage': '側面から攻撃する。正面にも背後にも立たない。',
+  'bossJournal.crypt.drake.heroicEmbers': '塚炎の残り火：吐息のたびに地面が{seconds}秒間燃える。',
+  'bossJournal.crypt.marrow.overview':
+    '蘇った墓掘りが、プレイヤーの墓を採寸する。墓はどれも開いたままで、中の者を鈍らせて焼く。彼が埋葬の鐘を鳴らすと、墓ごとに安らがぬ骨が這い出る。墓は墓地の端に掘らせ、数を抑えること。',
+  'bossJournal.crypt.marrow.phaseYardSummary':
+    '印を付けたプレイヤーの足元に墓を掘り、タンクにシャベルを振るう。',
+  'bossJournal.crypt.marrow.phaseTollName': '埋葬の鐘',
+  'bossJournal.crypt.marrow.phaseTollSummary':
+    '体力が{first}と{second}になると、鐘の綱へ歩み寄り、埋葬の鐘を鳴らす。',
+  'bossJournal.crypt.marrow.shovelSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、正面{arc}度の扇形、{range}ヤード先までシャベルを振るい、近接攻撃の{mult}倍のダメージ。命中した全員に目に入った土が付く：移動速度が{slow}低下、{seconds}秒。',
+  'bossJournal.crypt.marrow.shovelResponse':
+    '正面に立つのはタンクだけ。タンクは詠唱中に外れてもよい。',
+  'bossJournal.crypt.marrow.measureSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、プレイヤー1人に印を付ける。{mark}秒後、その足元で墓が崩れる：{radius}ヤード以内の全員に{min}〜{max}ダメージ。墓は戦闘中ずっと開いたままで、中にいると移動速度が{slow}低下し、毎秒{dirt}ダメージを受ける。墓は最大{cap}つ。新しい墓ができると最も古い墓が埋まる。',
+  'bossJournal.crypt.marrow.measureResponse':
+    '印を付けられたら、墓が開く前に墓地の端へ歩くこと。開いた墓の中には絶対に立たない。',
+  'bossJournal.crypt.marrow.blowSummary':
+    '{every}秒ごとに、タンクへ{cast}秒の詠唱：近接攻撃で、被ダメージ{vuln}上昇のスタックが1つ増える。最大{stacks}スタック（{max}）、{seconds}秒。',
+  'bossJournal.crypt.marrow.blowResponse':
+    'タンク：スタックが増えたらクールダウンを使う。ヒーラーはタンクを注視。',
+  'bossJournal.crypt.marrow.vigorName': '墓の活力',
+  'bossJournal.crypt.marrow.vigorSummary':
+    '開いた墓の中に立っている間、攻撃速度が{haste}上昇する。',
+  'bossJournal.crypt.marrow.vigorResponse': 'タンクは彼を墓に入れない。',
+  'bossJournal.crypt.marrow.unquietName': '安らがぬ大地',
+  'bossJournal.crypt.marrow.unquietSummary':
+    '墓の中に{linger}秒留まったプレイヤーがいると、その墓から安らがぬ骨が這い出る。その墓は{rest}秒間休眠する。',
+  'bossJournal.crypt.marrow.unquietResponse': '墓からはすぐ出ること。',
+  'bossJournal.crypt.marrow.tollSummary':
+    '綱へ歩み寄り、{ring}秒間鐘を鳴らす。歩いている間も鳴らしている間もダメージ無効。その後、全員に{min}〜{max}ダメージ、開いた墓ごとに安らがぬ骨が這い出る。',
+  'bossJournal.crypt.marrow.tollResponse':
+    'ヒーラーは最後の一打の前に全員を回復。タンクは安らがぬ骨を引き受け、ダメージ役が倒す。',
+  'bossJournal.crypt.marrow.tipTank':
+    '彼を群れから背けて保持する。埋葬の鐘のあとは、安らがぬ骨をすべて引き受ける。',
+  'bossJournal.crypt.marrow.tipTankHeroic':
+    '彼を群れから背けて保持し、どの墓にも入れない。墓掘りの一撃はスタックする：増えたらクールダウンを使う。',
+  'bossJournal.crypt.marrow.tipHealer':
+    '埋葬の鐘は全員に当たる。墓は中の者を鈍らせて焼くので、はまった者を助けること。',
+  'bossJournal.crypt.marrow.tipDamage':
+    '印を付けられたら、墓を墓地の端まで運ぶ。鐘のたびに安らがぬ骨を倒してから、マロウに戻る。',
+  'bossJournal.crypt.marrow.choiceName': '墓をどこに作らせる?',
+  'bossJournal.crypt.marrow.choiceGain':
+    '墓地の端に掘らせた墓は、中央を戦いと回避の場所として空けておける。',
+  'bossJournal.crypt.marrow.choiceRisk':
+    '場所を問わず、開いた墓のすべてが次の鐘で安らがぬ骨を呼び出す。同時に最大{cap}体。',
+  'bossJournal.crypt.marrow.choiceRiskHeroic':
+    '場所を問わず、開いた墓のすべてが次の鐘で安らがぬ骨を呼び出す。同時に最大{cap}体。ヒロイックでは、タンクの近くの墓がマロウも加速させる。',
+  'bossJournal.crypt.marrow.heroicBlow':
+    '墓掘りの一撃：タンクへの攻撃で、被ダメージ{vuln}上昇がスタックする。',
+  'bossJournal.crypt.marrow.heroicVigor': '墓の活力：墓の中では攻撃速度が{haste}上昇する。',
+  'bossJournal.crypt.marrow.heroicUnquiet':
+    '安らがぬ大地：墓に{linger}秒いると安らがぬ骨が這い出る。',
+  'bossJournal.crypt.lady.overview':
+    '幽霊の花嫁。墓のランタンに守られていない者全員を、慟哭で傷つける。ランタン1つが守れるのは2人までで、守ると消えるので、交代で使う必要がある。さらに、パーティが十分に焼くまで、プレイヤー1人を宙に掲げて離さない。',
+  'bossJournal.crypt.lady.phaseRavineName': '霜の峡谷',
+  'bossJournal.crypt.lady.phaseRavineSummary':
+    '峡谷の周りに墓のランタンが3つ立っている。彼女の通った跡はすべりやすい氷になる。',
+  'bossJournal.crypt.lady.phaseFreezeName': '花嫁の凍結',
+  'bossJournal.crypt.lady.phaseFreezeSummary':
+    '体力が{health}になると、峡谷の床全体が戦闘終了まで凍りつく。',
+  'bossJournal.crypt.lady.lamentSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、ランタンに守られていない全員に{min}〜{max}ダメージ。命中のたびに哀歌の名残が1スタック増える：1スタックごとに哀歌のダメージが{perStack}増加、{seconds}秒、最大{stacks}スタック。',
+  'bossJournal.crypt.lady.lamentResponse': '詠唱が終わる前に、灯ったランタンの光の中に立つ。',
+  'bossJournal.crypt.lady.lanternName': '墓のランタン',
+  'bossJournal.crypt.lady.lanternSummary':
+    '灯ったランタンは、{radius}ヤード以内の最大{cap}人を哀歌から守る。誰かを守ったランタンは{dark}秒間消えるので、次の哀歌でもまだ暗い。',
+  'bossJournal.crypt.lady.lanternHeroicSummary':
+    '灯ったランタンは、{radius}ヤード以内の最大{cap}人を哀歌から守る。誰かを守ったランタンは{dark}秒間消える。ヒロイックでは、灯ったランタンも{lit}秒後に自然に燃え尽き、{gutter}秒間暗いままになる。',
+  'bossJournal.crypt.lady.lanternResponse':
+    '誰がどのランタンを使うか決めておき、哀歌ごとに灯ったランタンへ交代する。',
+  'bossJournal.crypt.lady.embraceSummary':
+    '{every}秒ごとに、タンク以外のプレイヤー1人を捕らえて宙に掲げ、離さない。{hold}秒以内に彼女の体力の{share}を削れば静かに降ろす。さもなくば落とす：{min}〜{max}ダメージ。',
+  'bossJournal.crypt.lady.embraceHeroicSummary':
+    '{every}秒ごとに、タンク以外のプレイヤー{victims}人を捕らえて宙に掲げ、離さない。{hold}秒以内に彼女の体力の{share}を削れば静かに降ろす。さもなくば落とす：{min}〜{max}ダメージ。',
+  'bossJournal.crypt.lady.embraceResponse':
+    '誰かが捕まったら、全員ですぐにバーストを叩き込む。ヒーラーは捕まった者を回復。',
+  'bossJournal.crypt.lady.rimeSummary':
+    '漂った跡にすべりやすい氷を残す。1つにつき{seconds}秒間続く。氷の上では滑り、旋回が遅くなる。',
+  'bossJournal.crypt.lady.rimeResponse': '素早く動く必要がある時は、彼女の軌跡を避ける。',
+  'bossJournal.crypt.lady.freezeSummary':
+    '体力が{health}になると{cast}秒の詠唱の後、床全体が戦闘終了まですべりやすい氷になる。詠唱中の哀歌は打ち消される。',
+  'bossJournal.crypt.lady.freezeResponse': '早めに動く：氷の上ではランタンまで時間がかかる。',
+  'bossJournal.crypt.lady.tipTank': '彼女を中央付近に保ち、全員がどのランタンにも届くようにする。',
+  'bossJournal.crypt.lady.tipHealer':
+    '守られていない者は哀歌を受けてスタックが増える。掲げられた者は、掲げられている間ダメージを受け続ける。',
+  'bossJournal.crypt.lady.tipDamage':
+    '誰かが捕まった瞬間にバースト。哀歌ごとに、灯ったランタンの間を交代する。',
+  'bossJournal.crypt.lady.choiceName': '誰が哀歌を受ける?',
+  'bossJournal.crypt.lady.choiceGain':
+    '3つすべてのランタンを使えば、それぞれ最大{cap}人を守れるので、この哀歌は誰も受けない。',
+  'bossJournal.crypt.lady.choiceRisk':
+    '使ったランタンは次の哀歌でも暗いままなので、その時は誰かが受ける。哀歌の名残は1スタックごとにダメージが{perStack}増える。',
+  'bossJournal.crypt.lady.heroicEmbrace': '凍てつく抱擁は{victims}人を同時に捕らえる。',
+  'bossJournal.crypt.lady.heroicLanterns':
+    '灯ったランタンは{lit}秒後に自然に燃え尽き、{gutter}秒間暗いままになる。',
+  'bossJournal.crypt.ilvane.overview':
+    '聖歌隊長。2人の虚ろの聖歌隊員が生きている間、彼女のダメージを減らす。彼女の挽歌は、姿が見える全員を傷つけて沈黙させるので、中断するか柱の陰に隠れること。骨のオルガンも奏で、音符の筋を聖歌隊席に走らせる。',
+  'bossJournal.crypt.ilvane.phaseLoftName': '聖歌隊席',
+  'bossJournal.crypt.ilvane.phaseLoftSummary': '2人の虚ろの聖歌隊員を従え、聖歌隊席から歌う。',
+  'bossJournal.crypt.ilvane.phaseCrescendoName': 'クレッシェンド',
+  'bossJournal.crypt.ilvane.phaseCrescendoSummary':
+    '体力が{health}になると歌が速くなり、オルガンが3波目を奏でる。',
+  'bossJournal.crypt.ilvane.harmonyName': '調和',
+  'bossJournal.crypt.ilvane.harmonySummary':
+    '生きている聖歌隊員1人ごとに、彼女の受けるダメージが{per}減る：2人とも立っていれば{both}。',
+  'bossJournal.crypt.ilvane.harmonyResponse': '聖歌隊員を先に倒すこと。',
+  'bossJournal.crypt.ilvane.dirgeSummary':
+    '{every}秒ごとに{cast}秒の詠唱。完了すると、彼女の姿が見える全員に{min}〜{max}ダメージと{silence}秒の沈黙。中断された後は{quiet}秒間、挽歌を歌わない。',
+  'bossJournal.crypt.ilvane.dirgeResponse': '中断するか、詠唱が終わる前に柱の陰で視線を切ること。',
+  'bossJournal.crypt.ilvane.organSummary':
+    '{every}秒ごとにオルガンへ歩み寄り、音符の筋を{waves}波、聖歌隊席に走らせる。筋は{gather}秒間表示された後に炸裂する：{min}〜{max}ダメージ。',
+  'bossJournal.crypt.ilvane.organResponse':
+    '最初の筋と筋の間に立ち、すでに炸裂した筋の中へ入ること。',
+  'bossJournal.crypt.ilvane.encoreName': 'アンコール',
+  'bossJournal.crypt.ilvane.encoreSummary':
+    'もう1人が立っている間に{seconds}秒倒れていた聖歌隊員は、全快で再び起き上がる。',
+  'bossJournal.crypt.ilvane.encoreResponse': '聖歌隊員2人を、{seconds}秒以内の間隔で倒すこと。',
+  'bossJournal.crypt.ilvane.unbrokenSummary': '{nth}回目ごとの挽歌は途切れぬ詩節：中断できない。',
+  'bossJournal.crypt.ilvane.unbrokenResponse': 'その時は柱の陰に隠れること。',
+  'bossJournal.crypt.ilvane.crescendoName': 'クレッシェンド',
+  'bossJournal.crypt.ilvane.crescendoSummary':
+    '体力が{health}を下回ると、挽歌の詠唱は{cast}秒になり{every}秒ごとに来て、オルガンは{waves}波を奏でる。3波目は1波目の筋を再び使う。',
+  'bossJournal.crypt.ilvane.crescendoResponse':
+    '挽歌はすべて中断し、3波目では最初の筋から外れること。',
+  'bossJournal.crypt.ilvane.tipTank':
+    '聖歌隊員をまとめて保持し、素早く倒せるようにしてから、イルヴェインを引き受ける。',
+  'bossJournal.crypt.ilvane.tipHealer':
+    '完了した挽歌は自分も沈黙させる：誰も中断できないなら柱の陰に隠れる。',
+  'bossJournal.crypt.ilvane.tipDamage': '聖歌隊員を先に倒し、挽歌を中断し、オルガンの筋を避ける。',
+  'bossJournal.crypt.ilvane.tipDamageHeroic':
+    '聖歌隊員2人を{seconds}秒以内の間隔で倒し、挽歌を中断し、途切れぬ詩節はすべて隠れてやり過ごす。',
+  'bossJournal.crypt.ilvane.choiceName': '中断する? 隠れる?',
+  'bossJournal.crypt.ilvane.choiceGain': '中断すれば挽歌が止まり、彼女は{quiet}秒間静かになる。',
+  'bossJournal.crypt.ilvane.choiceRisk':
+    '柱の陰に隠れると攻撃の時間が減る。中断を外すと、視界内の全員が沈黙してダメージを受ける。',
+  'bossJournal.crypt.ilvane.heroicEncore':
+    'アンコール：もう1人が生きている間に{seconds}秒倒れていた聖歌隊員は再び起き上がる。',
+  'bossJournal.crypt.ilvane.heroicUnbroken': '途切れぬ詩節：{nth}回目ごとの挽歌は中断できない。',
+  'bossJournal.crypt.morthen.overview':
+    '三幕の儀式を執り行うリッチの司教。第一幕では魂を呼んで自らを強化する。体力が{rite}になると結界の陰に隠れ、パーティが体力を払って4本のろうそくを灯し直すまで出てこない。体力が{last}になると巨大な大鎌を振るう。',
+  'bossJournal.crypt.morthen.phaseCallingName': '呼び声',
+  'bossJournal.crypt.morthen.phaseCallingSummary':
+    '周囲に闇の脈動を放ち、魂を呼んで自らに糧を与える。',
+  'bossJournal.crypt.morthen.phaseRiteName': '安らがぬ者の儀式',
+  'bossJournal.crypt.morthen.phaseRiteSummary':
+    '体力が{health}になると祭壇に戻り、4本のろうそくがすべて再び灯るまでダメージを受けなくなる。',
+  'bossJournal.crypt.morthen.phaseLastName': '終の儀式',
+  'bossJournal.crypt.morthen.phaseLastSummary':
+    '体力が{health}になると、戦いの終幕に向けて大鎌を構える。',
+  'bossJournal.crypt.morthen.pulseSummary':
+    '{every}秒ごと（終の儀式では{everyLast}秒ごと）に{cast}秒の詠唱の後、{radius}ヤード以内の全員に{min}〜{max}ダメージ。',
+  'bossJournal.crypt.morthen.pulseResponse':
+    'タンクも含め全員が、詠唱が終わる前に{radius}ヤードの外へ出る。',
+  'bossJournal.crypt.morthen.gravecallName': '墓呼び',
+  'bossJournal.crypt.morthen.gravecallSummary':
+    '{every}秒ごとに、縛られし魂が壁龕から彼に向かって漂う。届くと、スタックごとに与えるダメージが{per}増え（最大{stacks}スタック）、体力を{heal}回復する。最初に触れたプレイヤーが代わりに受け止める：{min}〜{max}ダメージ。',
+  'bossJournal.crypt.morthen.gravecallResponse': '手の空いたプレイヤーが、魂ごとに進路へ入る。',
+  'bossJournal.crypt.morthen.graspName': '墓の掌握',
+  'bossJournal.crypt.morthen.graspSummary':
+    '{every}秒ごとに、{count}人の足元に半径{radius}ヤードの輪が現れる。{fuse}秒後に手が噴き出す：内側の全員が{root}秒間移動不能になり、{min}〜{max}ダメージを受ける。',
+  'bossJournal.crypt.morthen.graspResponse': 'すぐに輪から出ること。',
+  'bossJournal.crypt.morthen.riteSummary':
+    'ダメージ無効になり、{candles}本のろうそくが消える。安らがぬ骨が{bones}体這い出る。墓の冷気が毎秒全員に当たる：{base}ダメージで、{chillEvery}秒ごとに{step}ずつ増え、上限はない。',
+  'bossJournal.crypt.morthen.riteResponse': '4本のろうそくを素早く灯し直す：冷気は増え続ける。',
+  'bossJournal.crypt.morthen.relightName': '追憶のろうそくを灯し直す',
+  'bossJournal.crypt.morthen.relightSummary':
+    'ろうそくの近く（{range}ヤード以内）で{channel}秒詠唱して灯し直す。灯す者は最大体力の{drain}を失う。4本目が灯ると、彼は{stun}秒間スタンし、受けるダメージが{vuln}増える。',
+  'bossJournal.crypt.morthen.relightResponse':
+    '体力に余裕のある者にろうそくを割り振り、スタン中にバーストを叩き込む。',
+  'bossJournal.crypt.morthen.nameDeadSummary':
+    'ろうそくは、台帳から伸びる金色の光線が示す順に灯すこと。違うろうそくを灯すと、最後に灯したろうそくが消え、灯した者に{min}〜{max}のダメージ。',
+  'bossJournal.crypt.morthen.nameDeadResponse': '光線が指すろうそくだけを灯す。',
+  'bossJournal.crypt.morthen.reapSummary':
+    '{every}秒ごとに、タンクへ{cast}秒の詠唱の後、正面{arc}度の扇形、{range}ヤード先まで大鎌を薙ぎ払う：{min}〜{max}ダメージ。',
+  'bossJournal.crypt.morthen.reapResponse':
+    '正面に立つのはタンクだけ。タンクは詠唱中に横へ外れてよい。',
+  'bossJournal.crypt.morthen.tipTank':
+    '彼を群れから背けて保持し、全員と一緒にシャドウパルスから出る。',
+  'bossJournal.crypt.morthen.tipHealer':
+    'ろうそく1本ごとに、灯す者の体力が大きく削られ、墓の冷気も増え続ける：灯す者を優先して回復。',
+  'bossJournal.crypt.morthen.tipDamage':
+    '縛られし魂を体で止め、儀式ではろうそくを灯し直し、スタン中にバーストを叩き込む。',
+  'bossJournal.crypt.morthen.tipDamageHeroic':
+    '縛られし魂を体で止め、墓の掌握を避ける。儀式では金色の光線に従って正しいろうそくを灯す。',
+  'bossJournal.crypt.morthen.choiceCandleName': '何人で灯す?',
+  'bossJournal.crypt.morthen.choiceCandleGain':
+    '複数人で同時に灯し直せば、墓の冷気が強まる前に儀式が早く終わる。',
+  'bossJournal.crypt.morthen.choiceCandleRisk':
+    '灯す者はろうそく1本につき最大体力の{normal}を払い、その間も冷気は増え続ける。',
+  'bossJournal.crypt.morthen.choiceSoulName': '魂を止める?',
+  'bossJournal.crypt.morthen.choiceSoulGain':
+    '止めた魂は彼に届かない：ダメージのスタックも回復もなし。',
+  'bossJournal.crypt.morthen.choiceSoulRisk':
+    '止めた者が魂のダメージを受ける。通した魂は1つごとに彼のダメージを{per}増やし、彼を{heal}回復させる。',
+  'bossJournal.crypt.morthen.heroicNameDead':
+    '死者の名を呼べ：ろうそくは、台帳が示す順に灯すこと。',
+  'bossJournal.crypt.morthen.heroicGrasp': '墓の掌握：移動不能とダメージの輪が、どの幕でも現れる。',
+  'bossJournal.crypt.morthen.heroicDrain':
+    'ろうそく1本につき、灯す者の最大体力の{drain}を消費する。',
+  'bossJournal.crypt.wyrm.overview':
+    'モーセンの断末魔の儀式が火葬壇に火を灯し、骨の竜がそこへ降り立つ。納骨堂の骨竜と同じように戦うが、さらに燃える掃射の筋と、プレイヤーを吹き飛ばす代わりに自らが隙を晒す咆哮がある。',
+  'bossJournal.crypt.wyrm.phaseName': '竜呼びの火葬壇',
+  'bossJournal.crypt.wyrm.phaseSummary':
+    '手の届かない高みから滑空し、炎の爆発とともに環の中へ降り立つ。',
+  'bossJournal.crypt.wyrm.strafeSummary':
+    '{every}秒ごとに、プレイヤー1人を通る幅{width}ヤードの筋を{mark}秒間示し、その上を炎を撒きながら飛ぶ：筋の中の全員に{min}〜{max}ダメージ。筋は{seconds}秒間燃え続ける：毎秒{burn}ダメージ。',
+  'bossJournal.crypt.wyrm.strafeResponse': '示された筋から横へ出て、燃える地面にも入らない。',
+  'bossJournal.crypt.wyrm.bellowSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、{radius}ヤード以内に{min}〜{max}ダメージと{push}ヤードのノックバック。その後{seconds}秒間、受けるダメージが{vuln}増える。',
+  'bossJournal.crypt.wyrm.bellowResponse':
+    '燃える筋へ吹き飛ばされないこと。その後の隙にクールダウンを使う。',
+  'bossJournal.crypt.wyrm.knellSummary':
+    '{every}秒ごとに手の届かない高みへ飛び上がり、環の半分に炎を{breaths}回吐く。炎の{mark}秒前に、その半分が示される：中の全員に{min}〜{max}ダメージ。',
+  'bossJournal.crypt.wyrm.knellResponse': '毎回、示されていない側の半分へ走る。',
+  'bossJournal.crypt.wyrm.tipTank': '群れと逆を向かせ、燃える筋から外へ回す。',
+  'bossJournal.crypt.wyrm.tipHealer':
+    '火葬の掃射と恐怖の咆哮がダメージのピーク。燃える筋に吹き飛ばされた者を回復する。',
+  'bossJournal.crypt.wyrm.tipDamage': '示された筋から出て、恐怖の咆哮のたびにクールダウンを使う。',
+  'bossJournal.crypt.wyrm.tipDamageHeroic':
+    '示された筋から出て、燃える弔鐘の間は毎回安全な半分へ走る。',
+  'bossJournal.crypt.wyrm.heroicKnell': '燃える弔鐘：飛び上がり、環の半分に炎を{breaths}回吐く。',
+  'bossJournal.bastion.captain.overview':
+    '浮遊する幽霊船長が下層外郭の堀を巡回しており、彼を倒すまで跳ね橋は上がったままだ。タンク以外のプレイヤーを狙う3種のレーン攻撃を順に繰り出し、どれも発動前に床へ描かれる。',
+  'bossJournal.bastion.captain.phaseSummary':
+    '最初の技はプル後{first}秒で始まり、幽霊船の一斉砲撃、呪いの錨、幻影の斬り込みの順に{recovery}秒間隔で続く。各技の間、彼は動かない。',
+  'bossJournal.bastion.captain.broadsideSummary':
+    '{warn}秒の予告の後、長さ{length}ヤードの平行レーン{lanes}本が一斉に発射される。レーン内の全員に{min}〜{max}ダメージ。',
+  'bossJournal.bastion.captain.broadsideResponse': 'レーンとレーンの間の隙間に立つ。',
+  'bossJournal.bastion.captain.anchorSummary':
+    '{warn}秒の予告の後、呪いの錨がレーンに沿って{length}ヤード後方へ{seconds}秒かけて引き戻され、通り道の全員に{min}〜{max}ダメージ。',
+  'bossJournal.bastion.captain.anchorResponse': '発動前にレーンから出る。',
+  'bossJournal.bastion.captain.boardingSummary':
+    '{warn}秒の予告の後、長さ{length}ヤードのレーン内の全員に{min}〜{max}ダメージを与え、彼がそのレーンに沿って突進する。',
+  'bossJournal.bastion.captain.boardingResponse': 'レーンの横へ避ける。',
+  'bossJournal.bastion.captain.sailorsName': '難破船に縛られた船員',
+  'bossJournal.bastion.captain.sailorsSummary':
+    '体力が{first}と{second}になると、難破船に縛られた船員が{count}体ずつ戦闘に加わる。船員は倒れた直後に魂のエネルギーで爆発する。',
+  'bossJournal.bastion.captain.sailorsResponse':
+    'タンクが引き受ける。倒れたばかりの船員から離れる。',
+  'bossJournal.bastion.captain.tipTank':
+    '彼を動かさず、難破船に縛られた船員を引き受ける。レーンはほかの者を狙い、あなたは狙われない。',
+  'bossJournal.bastion.captain.tipHealer':
+    '幽霊船の一斉砲撃が最も痛い。レーンに立っていた者を回復する。',
+  'bossJournal.bastion.captain.tipDamage':
+    '床を見る。どの技も発動前に描かれる。一斉砲撃の隙間に立つ。',
+  'bossJournal.bastion.olen.overview':
+    '堕ちたパラディンの騎士。聖なる潮水の溜まりが彼を守るので、タンクは彼を溜まりから引き出す。パーティーは散開し、跳ね返る大盾と宣告の柱が1人にしか当たらないようにする。体力が半分になると跪いて無敵になり、溺れた軍曹が全滅するまで続く。',
+  'bossJournal.bastion.olen.phaseBreachName': '破られた砦',
+  'bossJournal.bastion.olen.phaseBreachSummary':
+    '技は一度に一つずつ詠唱し、詠唱中はタイマーが止まる。',
+  'bossJournal.bastion.olen.phaseOathName': '不壊の誓い',
+  'bossJournal.bastion.olen.phaseOathSummary':
+    '体力が{health}になると跪いて無敵になり、溺れた軍曹が代わりに戦う。',
+  'bossJournal.bastion.olen.brineSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、足元に半径{radius}ヤードの聖なる潮水の溜まりを{seconds}秒間作り、中にいる者に毎秒{perSecond}ダメージ。彼がいずれかの溜まりに立っている間は受けるダメージが{shield}減る。',
+  'bossJournal.bastion.olen.brineResponse':
+    'タンクが彼を溜まりから引き出す。ほかの全員も溜まりから出る。',
+  'bossJournal.bastion.olen.bulwarkSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、タンク以外のプレイヤーを狙う。大盾は{min}〜{max}ダメージを与え、{reach}ヤード以内で最も近い未被弾のプレイヤーへ跳ね返り、最大{hits}人に当たる。',
+  'bossJournal.bastion.olen.bulwarkResponse': '散開する：ほかの全員から{reach}ヤード以上離れる。',
+  'bossJournal.bastion.olen.sentenceSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、タンク以外のプレイヤーに印を付ける。{seconds}秒後、どこにいても柱が落ち、{radius}ヤード以内の全員に{min}〜{max}ダメージ。',
+  'bossJournal.bastion.olen.sentenceResponse': '印を受けたら、柱が落ちる前にパーティーから離れる。',
+  'bossJournal.bastion.olen.arcName': '刈り取りの弧',
+  'bossJournal.bastion.olen.arcSummary':
+    '彼の近接攻撃は、タンクから{radius}ヤード以内にいるほかの全プレイヤーにも、その一撃の{share}で当たる。',
+  'bossJournal.bastion.olen.arcResponse': 'タンクの{radius}ヤード以内にはタンク以外誰も立たない。',
+  'bossJournal.bastion.olen.oathSummary':
+    '体力が{health}になった時に1度だけ：跪いて最大{max}秒詠唱し、ダメージを受けない。その間に溺れた軍曹が{count}体現れ、タンク以外のプレイヤーを攻撃する。全員倒すと彼は{stun}秒気絶し、{vulnSeconds}秒間受けるダメージが{vuln}増える。',
+  'bossJournal.bastion.olen.oathResponse':
+    'タンクが軍曹を集め、全員で倒し、気絶中のオレンに火力を集中する。',
+  'bossJournal.bastion.olen.tipTank':
+    '彼をすべての潮水の溜まりから引き出す。彼の薙ぎ払いが飛び散る、自分の周囲{radius}ヤードにパーティーを入れない。',
+  'bossJournal.bastion.olen.tipHealer':
+    '跳ね返る大盾と潮の宣告は、プレイヤーが固まっているほど痛い。軍曹は低体力で激昂する。',
+  'bossJournal.bastion.olen.tipDamage':
+    '散開して互いに{reach}ヤード以上離れ、タンクからも離れる。誓いの段階では軍曹を先に倒す。',
+  'bossJournal.bastion.olen.choiceName': '固まる？散る？',
+  'bossJournal.bastion.olen.choiceGain':
+    '散開すれば、跳ね返る大盾、潮の宣告、刈り取りの弧はそれぞれ1人にしか当たらない。',
+  'bossJournal.bastion.olen.choiceRisk':
+    '被弾者から{reach}ヤード以内の者は跳ね返りを受け、タンクから{radius}ヤード以内の者は飛び散りを受ける。',
+  'bossJournal.bastion.olen.heroicChanges':
+    '潮水の溜まりは{radius}ヤード、大盾は{hits}人に跳ね返り、宣告の柱は{sentence}ヤード、現れる軍曹は{count}体。',
+  'bossJournal.bastion.turnkey.overview':
+    '牢の鍵番はプレイヤーを鉄の檻に閉じ込める。囚われた者はインタラクトキーを連打して脱出し、仲間は檻を攻撃して後押しできる。',
+  'bossJournal.bastion.turnkey.phaseName': '牢の鉄格子',
+  'bossJournal.bastion.turnkey.phaseSummary':
+    '一定間隔で檻に閉じ込め、体力が半分になると囚人を解き放つ。',
+  'bossJournal.bastion.turnkey.cageSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、タンク以外のプレイヤーに檻が落ち、気絶させる。檻の耐久は{hits}：囚われた者はインタラクトキーを押すたびに{press}、味方は攻撃のたびに{helper}壊し、檻はゆっくり修復される。{max}秒経つと檻が囚われた者を押し潰し、最大体力の{crush}のダメージ。',
+  'bossJournal.bastion.turnkey.cageHeroicSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、タンク以外のプレイヤー{cages}人に檻が落ちる。各檻の耐久は{hits}：囚われた者はインタラクトキーを押すたびに{press}、味方は攻撃のたびに{helper}壊す。檻の中では上昇する塩水が毎秒体力を奪う。{max}秒経つと檻が押し潰し、最大体力の{crush}のダメージ。',
+  'bossJournal.bastion.turnkey.cageResponse':
+    '檻に入ったら：インタラクトキーを素早く連打。ほかの全員は檻を攻撃して壊す。',
+  'bossJournal.bastion.turnkey.cellsName': '房を開け放つ',
+  'bossJournal.bastion.turnkey.cellsSummary':
+    '体力が{health}になると、枷の囚人{count}体を解き放つ。体力が4分の1になると鎖が切れ、戦闘から離脱する。',
+  'bossJournal.bastion.turnkey.cellsResponse': '体力を4分の1まで削る。倒す必要はない。',
+  'bossJournal.bastion.turnkey.tipTank': '彼と囚人を引き受ける。檻があなたを狙うことはない。',
+  'bossJournal.bastion.turnkey.tipHealer':
+    '檻に入った者を回復しておく：押し潰しは体力の割合ダメージ。',
+  'bossJournal.bastion.turnkey.tipDamage': 'すべての檻を即座に狙い、壊れるまで攻撃する。',
+  'bossJournal.bastion.turnkey.heroicCages': '鉄の檻は一度に{cages}人を閉じ込める。',
+  'bossJournal.bastion.turnkey.heroicFlood':
+    '塩水の洪水：檻に入った者は、解放されるまで毎秒体力を失う。',
+  'bossJournal.bastion.ossick.overview':
+    '牢番は錨でプレイヤーを引っ掛け、溺死の穴へ巻き寄せる。引っ掛けられた者は灯った係留柱まで走るか、パーティーで鎖を断つ。その間、別の2人が鎖でつながれ、離れずにいなければならない。',
+  'bossJournal.bastion.ossick.phaseName': '溺れの中庭',
+  'bossJournal.bastion.ossick.phaseSummary':
+    '体力が{first}と{second}になるたびに、枷の囚人{count}体が牢から出てくる。',
+  'bossJournal.bastion.ossick.anchorSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、タンク以外のプレイヤー1人が引っ掛けられる。{settle}秒後、鎖が穴へ巻き寄せる。脱出：引っ掛けられた地点から{run}ヤード以上離れた灯った係留柱の{reach}ヤード以内に入る（その柱は{dark}秒間消える）か、パーティーが錨に{hits}回攻撃を当てる。穴に到達：最大体力の{pit}のダメージと{stun}秒の気絶。',
+  'bossJournal.bastion.ossick.anchorHeroicSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、タンク以外のプレイヤー1人が引っ掛けられ、錨の着地で{crashRadius}ヤード以内のほかの全員に{min}〜{max}ダメージ。{settle}秒後、鎖が穴へ巻き寄せる。脱出：{run}ヤード以上離れた灯った係留柱か、錨への{hits}回の攻撃。穴に到達：最大体力の{pit}のダメージと{stun}秒の気絶。',
+  'bossJournal.bastion.ossick.anchorResponse':
+    '引っ掛けられたら：早めに灯った係留柱へ走る。ほかの全員は錨を攻撃。',
+  'bossJournal.bastion.ossick.shackleSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、2人を{seconds}秒間鎖でつなぐ。{range}ヤードより離れて立っている間、毎秒2人とも{min}〜{max}ダメージ。',
+  'bossJournal.bastion.ossick.shackleResponse':
+    '鎖につながれたら：相方から{range}ヤード以内にいる。',
+  'bossJournal.bastion.ossick.cudgelSummary':
+    '{every}秒ごとに{cast}秒の詠唱でタンクを狙う：近接攻撃の{mult}倍のダメージ、防具無視、{seconds}秒間移動速度が{slow}低下。',
+  'bossJournal.bastion.ossick.cudgelResponse':
+    'タンク：クールダウンを使う。ヒーラーは一撃に備える。',
+  'bossJournal.bastion.ossick.tipTank':
+    '彼を中央付近で保持し、囚人を引き受ける。牢番の棍棒はあなたの防具を無視する。',
+  'bossJournal.bastion.ossick.tipHealer':
+    '引っ掛けられた者と鎖でつながれた者に注意。穴は体力の大きな割合を奪う。',
+  'bossJournal.bastion.ossick.tipDamage':
+    '誰かが引っ掛けられた瞬間に錨を攻撃。鎖でつながれたら相方の近くにいる。',
+  'bossJournal.bastion.ossick.choiceName': '柱へ走る？鎖を断つ？',
+  'bossJournal.bastion.ossick.choiceGain':
+    '灯った係留柱なら引っ掛けられた1人だけが解放され、パーティーは攻撃を続けられる。',
+  'bossJournal.bastion.ossick.choiceRisk':
+    '係留柱は{run}ヤード以上離れている必要があり、{dark}秒間消える。鎖が短くなると届く柱がなくなり、断つしかない。',
+  'bossJournal.bastion.ossick.heroicCrash':
+    '錨の墜落：錨は引っ掛けられた者から{crashRadius}ヤード以内の全員に当たる。',
+  'bossJournal.bastion.ossick.heroicChanges':
+    '錨を断つには{hits}回の攻撃が必要で、鎖でつながれた者は{range}ヤード以内にいなければならない。',
+  'bossJournal.bastion.vael.overview':
+    'フードを被った死神。3回連続でプレイヤーの背後の影の溜まりから現れ、鎌でその背中を薙ぐ。体力が{first}と{second}になると、そっくりの分身に紛れ、聖歌が全員を傷つける。霧灯台の光線が本物の姿を示す。',
+  'bossJournal.bastion.vael.phaseCrownName': '灯標の冠',
+  'bossJournal.bastion.vael.phaseCrownSummary':
+    'プレイヤーが冠に踏み込むと彼が現れる。体力が{first}と{second}になると、溺れた下僕が{count}体ずつ戦闘に加わる。',
+  'bossJournal.bastion.vael.phaseVeilSummary':
+    '体力が{first}と{second}になると、そっくりの分身に紛れる。',
+  'bossJournal.bastion.vael.surgeSummary':
+    '{cast}秒の詠唱の後、彼から{radius}ヤード以内の全員に{min}〜{max}ダメージ。通常は{every}秒ごと、体力が{below}を下回ると{lastEvery}秒ごと。',
+  'bossJournal.bastion.vael.surgeResponse': '遠隔は{radius}ヤードより外にいる。',
+  'bossJournal.bastion.vael.crossingSummary':
+    '{every}秒ごとに影を渡り、最大{chain}回連続で、毎回別のプレイヤーの背後に出る：背後{behind}ヤードに溜まりが開き、彼が現れ、その方向へ{range}ヤード、{arc}度の扇形を薙ぐ：{min}〜{max}ダメージ。',
+  'bossJournal.bastion.vael.crossingResponse':
+    '死の刻印を受けたら：前へ動いて薙ぎ払いから出るか、溜まりの後ろへ回る。ほかの者は印を受けた者の前に立たない。',
+  'bossJournal.bastion.vael.graveName': '墓の影',
+  'bossJournal.bastion.vael.graveSummary':
+    '影の溜まりは{seconds}秒間残り、{radius}ヤード以内の全員を毎秒{perSecond}ダメージで焼く。',
+  'bossJournal.bastion.vael.graveResponse': '古い溜まりに入らない。',
+  'bossJournal.bastion.vael.veilSummary':
+    '彼は姿を隠し、冠の周りに四つの姿が現れる：ヴァエルと3体の霧の影。四つとも{seconds}秒間溺れの聖歌を歌い、毎秒ごとに全員への被害が増す。霧灯台の光線が{beam}秒ごとに走査し、本物のヴァエルが光る。彼の体力の{share}を削るとヴェールが破れ、{stun}秒気絶し、{vulnSeconds}秒間受けるダメージが{vuln}増える。',
+  'bossJournal.bastion.vael.veilHeroicSummary':
+    '彼は姿を隠し、冠の周りに四つの姿が現れる：ヴァエルと3体の霧の影が{drift}秒ごとに1つずつ位置をずらす。四つとも{seconds}秒間溺れの聖歌を歌う。霧灯台の光線が本物のヴァエルを示す。彼の体力の{share}を削るとヴェールが破れ、{stun}秒の気絶と{vulnSeconds}秒間の被ダメージ{vuln}増加。',
+  'bossJournal.bastion.vael.veilResponse': '光線を見て、全員が本物のヴァエルだけを攻撃する。',
+  'bossJournal.bastion.vael.fogburstName': '霧の爆裂',
+  'bossJournal.bastion.vael.fogburstSummary':
+    '霧の影への攻撃は何であれそれを破裂させ、{radius}ヤード以内のプレイヤーに{min}〜{max}ダメージと{stun}秒の気絶。',
+  'bossJournal.bastion.vael.fogburstHeroicSummary':
+    '霧の影への攻撃は何であれそれを破裂させ、{radius}ヤード以内のプレイヤーに{min}〜{max}ダメージと{stun}秒の気絶を与え、その場に溺れた下僕が現れる。',
+  'bossJournal.bastion.vael.fogburstResponse': '分身を攻撃しない：光線を待つ。',
+  'bossJournal.bastion.vael.tipTank':
+    '溺れた下僕を引き受ける。ヴェールの間は本物のヴァエル探しを手伝う。',
+  'bossJournal.bastion.vael.tipHealer':
+    '溺れの聖歌はヴェールが破れるまで全員に強まり続ける。霧の奔流は彼から{radius}ヤード以内の全員に当たる。',
+  'bossJournal.bastion.vael.tipDamage':
+    '死の刻印を受けたら、前へ動くか溜まりの後ろへ回る。ヴェールの間は、光線が照らす姿だけを攻撃する。',
+  'bossJournal.bastion.vael.tipDamageHeroic':
+    '死の刻印を受けたら、前へ動くか溜まりの後ろへ回り、古い溜まりも避ける。ヴェールの間は、光線が照らす姿だけを攻撃する。',
+  'bossJournal.bastion.vael.choiceName': '光線を待つ？当てずっぽう？',
+  'bossJournal.bastion.vael.choiceGain':
+    '光線を待てば全ての攻撃が本物のヴァエルに当たり、ヴェールが早く破れる。',
+  'bossJournal.bastion.vael.choiceRisk':
+    'ヴェールの間は毎秒聖歌の被害が増す。外すと分身が破裂し、周囲にダメージと気絶。',
+  'bossJournal.bastion.vael.choiceRiskHeroic':
+    'ヴェールの間は毎秒聖歌の被害が増す。外すと分身が破裂し、近くのプレイヤーを気絶させて溺れた下僕を残す。',
+  'bossJournal.bastion.vael.heroicGrave': '墓の影：影の溜まりはそれぞれ{seconds}秒間燃え続ける。',
+  'bossJournal.bastion.vael.heroicVeil':
+    'ヴェールの間、姿は{drift}秒ごとに位置をずらし、破裂した分身は溺れた下僕を残す。',
+  'bossJournal.temple.selthe.overview':
+    '聖歌母は池の中から歌い、動かず、近接攻撃もしない。プレイヤーに印をつけて、全員で分け合う合唱と、1人で受ける独唱を起こし、1人に向けて高まるアリアのビームを放ち、中庭に波を送る。矢もアリアも中断できる。',
+  'bossJournal.temple.selthe.phaseName': '聖歌の中庭',
+  'bossJournal.temple.selthe.phaseSummary':
+    'フェーズは1つで、すべてタイマー式。詠唱中に発動時刻が来た技は、詠唱が終わるまで待つ。',
+  'bossJournal.temple.selthe.chorusName': '合唱',
+  'bossJournal.temple.selthe.chorusSummary':
+    '{every}秒ごとに、タンク以外のプレイヤー1人が{mark}秒間マークされる。終了時、そのプレイヤーの周囲{radius}ヤード以内の全員で{total}ダメージを等分する。',
+  'bossJournal.temple.selthe.chorusHeroicSummary':
+    '{every}秒ごとに、タンク以外のプレイヤー1人が{mark}秒間マークされる。終了時、そのプレイヤーの周囲{radius}ヤード以内の全員で{total}ダメージを等分する。反響: {echo}秒後に同じ場所がもう一度爆発し、残っている各プレイヤーに{echoDamage}を与える。こちらは分割されない。',
+  'bossJournal.temple.selthe.chorusResponse':
+    '全員で合唱の対象に集まり、反響の前にその場所を離れる。',
+  'bossJournal.temple.selthe.soloSummary':
+    '各合唱の{offset}秒後に、別のプレイヤー1人が{mark}秒間マークされる。終了時、マークされたプレイヤーと周囲{radius}ヤード以内の全員が{damage}ダメージを受ける。',
+  'bossJournal.temple.selthe.soloHeroicSummary':
+    '二重唱: 独唱が合唱と同時に、別のプレイヤーに発動する。終了時、マークされたプレイヤーと周囲{radius}ヤード以内の全員が{damage}を受け、{echo}秒後にその場所がもう一度爆発する。',
+  'bossJournal.temple.selthe.soloResponse': '独唱の対象は、全員から離れてから、その場所を離れる。',
+  'bossJournal.temple.selthe.songSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、中庭の全プレイヤーに{min}〜{max}の冷気ダメージ。',
+  'bossJournal.temple.selthe.songResponse':
+    '避けられない。ヒーラーは全員の体力を常に満たしておく。',
+  'bossJournal.temple.selthe.boltSummary':
+    '通常攻撃にあたる技。{cast}秒の詠唱で、ターゲットに近接攻撃の{mult}倍の冷気ダメージを与える。中断された後は、{quiet}秒間、矢もアリアも使わない。',
+  'bossJournal.temple.selthe.boltResponse': 'アリアが来ない間に矢を中断する。',
+  'bossJournal.temple.selthe.ariaSummary':
+    '{every}秒ごとに、タンク以外のプレイヤー1人に向けて{channel}秒間ビームを放つ。{pulses}回の脈動が、同じ相手に{min}から{max}まで増えていく。ビームに踏み込んだプレイヤーが脈動を代わりに受け、増加は最初からやり直しになる。',
+  'bossJournal.temple.selthe.ariaResponse':
+    '中断するか、灯りの柱の陰で射線を切るか、ビームに踏み込んで分け合う。',
+  'bossJournal.temple.selthe.surgeSummary':
+    '{every}秒ごとに、タンク以外のプレイヤーを狙って{cast}秒の詠唱の後、{arc}度、長さ{range}ヤードの波を放つ。{min}〜{max}ダメージと{push}ヤードのノックバック。',
+  'bossJournal.temple.selthe.surgeResponse': '横へ動いて扇形から出る。',
+  'bossJournal.temple.selthe.tipTank':
+    '彼女から見える位置に立ち、矢を自分に向けさせる。ここでタンクが処理すべき技はほかにない。',
+  'bossJournal.temple.selthe.tipHealer':
+    '海の歌は{every}秒ごとに全員に当たる。アリアの対象と、合唱で孤立した人に注意。',
+  'bossJournal.temple.selthe.tipDamage':
+    '合唱では集まり、独唱では散り、アリアを中断し、湖の大波から出る。',
+  'bossJournal.temple.selthe.tipDamageHeroic':
+    '合唱での集合と独唱での散開が同時に来る。反響の前に両方の場所を離れる。アリアを中断する。',
+  'bossJournal.temple.selthe.choiceName': 'アリアを中断するか、受け止めるか?',
+  'bossJournal.temple.selthe.choiceGain':
+    '中断か柱で、ビームはすぐに止まる。ビームに踏み込むと、増加は自分の上で最初からやり直しになる。',
+  'bossJournal.temple.selthe.choiceRisk':
+    'アリアを中断すると矢もしばらく止まるが、誰も動かなければ、増加しきった脈動が1人に集中する。',
+  'bossJournal.temple.selthe.heroicDuet': '二重唱: 合唱と独唱が、2人に同時に発動する。',
+  'bossJournal.temple.selthe.heroicEcho':
+    '反響: 各マークが{echo}秒後に同じ場所でもう一度爆発する。',
+  'bossJournal.temple.hydra.overview':
+    '3つの首が3つの属性、氷、毒、水を持ち、1つの戦闘を共有する。倒れた首は攻撃を次の首に引き継ぎ、ほかの首が生きている間は{regrow}秒後に生え戻る。大波がタイマーで池の半分を洗い、波の合間には2つの首がブレスを合体させる。',
+  'bossJournal.temple.hydra.phaseName': 'ヒュドラの池',
+  'bossJournal.temple.hydra.phaseSummary':
+    '左の首は氷を吐き、中央の首は毒を吐きかけ、右の首は水を放つ。',
+  'bossJournal.temple.hydra.phaseComboName': '合体ブレス',
+  'bossJournal.temple.hydra.phaseComboSummary':
+    '各波の{after}秒後に2つの首が合体する。順番は常に、凍てつく激流、毒の潮流、毒の霧氷。',
+  'bossJournal.temple.hydra.phaseComboHeroicSummary':
+    '各波の{early}秒後と{after}秒後に2つの首が合体する。順番は、凍てつく激流、毒の潮流、毒の霧氷。',
+  'bossJournal.temple.hydra.headsName': '三つの首',
+  'bossJournal.temple.hydra.headsSummary':
+    '倒れた首は属性を次の首に渡し、生きている首は倒れた首1本につき与ダメージが{enrage}増える。ほかの首が生きている間、倒れた首は{regrow}秒後に体力{share}で生え戻る。',
+  'bossJournal.temple.hydra.headsResponse': '3本を同時に倒し、{regrow}秒以内に仕留める。',
+  'bossJournal.temple.hydra.breathSummary':
+    '{every}秒ごとに、タンク以外のプレイヤーを狙って{cast}秒の詠唱の後、{arc}度、長さ{range}ヤードの氷の円錐を吐く。{min}〜{max}ダメージと、{seconds}秒間の{slow}の移動速度低下。',
+  'bossJournal.temple.hydra.breathResponse': '円錐から出る。',
+  'bossJournal.temple.hydra.spitName': '毒の吐きかけ',
+  'bossJournal.temple.hydra.spitSummary':
+    '{every}秒ごとに、別々のプレイヤーの足元にある半径{radius}ヤードの毒の池が最大{count}個、{warn}秒後に破裂する。{min}〜{max}ダメージの後、その場で{seconds}秒間、毎秒{perSecond}の毒が燃える。',
+  'bossJournal.temple.hydra.spitResponse': '散開してから、池の外へ出る。',
+  'bossJournal.temple.hydra.torrentSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、タンク以外のプレイヤーに向けて長さ{length}ヤードの水流を放つ。{min}〜{max}ダメージと{push}ヤードの押し出し。',
+  'bossJournal.temple.hydra.torrentResponse': '横へ動いて水流から出る。',
+  'bossJournal.temple.hydra.tsunamiSummary':
+    '最初は{first}秒、以降は前の波が終わってから{every}秒後。{cast}秒の詠唱の間、首の被ダメージが{reduction}減り、その後、波が池の半分を襲う。{min}〜{max}ダメージと{push}ヤードの押し出し。',
+  'bossJournal.temple.hydra.tsunamiHeroicSummary':
+    '最初は{first}秒、以降は前の波が終わってから{every}秒後。{cast}秒の詠唱の間、首の被ダメージが{reduction}減り、その後、波が池の半分を襲う。{min}〜{max}ダメージと押し出し。返し波: {backwash}秒後に、もう半分を波が洗う。',
+  'bossJournal.temple.hydra.tsunamiResponse':
+    'もう半分へ移るか、縁の柱の陰か、氷の壁の陰に入る。首が水中にいる間は攻撃しない。',
+  'bossJournal.temple.hydra.frostlockSummary':
+    'プレイヤーに向けた水流。{min}〜{max}ダメージと{stun}秒の凍結。{wall}秒間残る氷の壁を作る。壁の後ろ{lee}ヤード以内に立てば次の波を防げるが、波は壁を砕く。',
+  'bossJournal.temple.hydra.frostlockHeroicSummary':
+    'プレイヤーに向けた水流。{min}〜{max}ダメージと{stun}秒の凍結。氷の壁を残し、壁の後ろに立てば次の波を防げる。壁が砕けると、壁の周囲{reach}ヤード以内の全員が{shardMin}〜{shardMax}を受ける。',
+  'bossJournal.temple.hydra.frostlockResponse': '水流をかわし、その後、氷の壁を津波の遮蔽に使う。',
+  'bossJournal.temple.hydra.currentSummary':
+    '毒の池が半径{radius}ヤードに広がり、池の中心から外へ{slide}ヤード滑り、毎秒{perSecond}で燃える。',
+  'bossJournal.temple.hydra.currentResponse': '滑る進路から脇へ避ける。',
+  'bossJournal.temple.hydra.rimeSummary':
+    '毒の池が結晶に凍り、{seconds}秒後に破裂する。半径{radius}ヤード以内に{min}〜{max}ダメージ。',
+  'bossJournal.temple.hydra.rimeResponse': '破裂する前に、すべての結晶から離れる。',
+  'bossJournal.temple.hydra.tipTank': '届く首を押さえる。首の攻撃は、ほかの者を狙う。',
+  'bossJournal.temple.hydra.tipHealer':
+    '津波と合体ブレスがダメージのピーク。倒れた首が増えるほど、ほかの首は痛くなる。',
+  'bossJournal.temple.hydra.tipDamage':
+    'ダメージを均等に分け、3本が{regrow}秒以内に倒れるようにする。津波の間は攻撃を止める。',
+  'bossJournal.temple.hydra.choiceName': 'どの首を先に倒す?',
+  'bossJournal.temple.hydra.choiceGain':
+    '3本を同時に倒せば戦闘は終わる。近いタイミングで倒れるなら、順番は問わない。',
+  'bossJournal.temple.hydra.choiceRisk':
+    '倒れた首1本ごとに、ほかの首の与ダメージが{enrage}増え、{regrow}秒後に生え戻る。最後に残った首はすべての属性を使う。',
+  'bossJournal.temple.hydra.heroicChanges': '生え戻った首は体力{share}で戻り、各波は返し波を伴う。',
+  'bossJournal.temple.colossus.overview':
+    '歩くガラスの巨人。体力の節目3か所で、全プレイヤーに自分を追う鏡像が与えられる。自分の鏡像は攻撃できず、生きている鏡像1体ごとに巨像を守る盾になる。その合間には、水流、叩きつけ、1片ずつ砕ける床が襲う。',
+  'bossJournal.temple.colossus.phaseName': 'プリズムのテラス',
+  'bossJournal.temple.colossus.phaseSummary': '詠唱のたびに足を止め、テラスからは決して離れない。',
+  'bossJournal.temple.colossus.phaseFlareName': 'プリズムの閃光',
+  'bossJournal.temple.colossus.phaseFlareSummary':
+    '体力が{first}、{second}、{third}になると、潮硝子の映し身を召喚する。',
+  'bossJournal.temple.colossus.lanceSummary':
+    '{every}秒ごとに{cast}秒の詠唱で、タンク以外のプレイヤーに向けて長さ{length}ヤードの水流を放つ。{min}〜{max}ダメージ。',
+  'bossJournal.temple.colossus.lanceResponse': '横へ動いて水流から出る。',
+  'bossJournal.temple.colossus.slamSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、半径{radius}ヤード以内に{min}〜{max}ダメージと{push}ヤードのノックバック。',
+  'bossJournal.temple.colossus.slamResponse': '近接は範囲から出られる。ヒーラーはタンクを支える。',
+  'bossJournal.temple.colossus.fractureSummary':
+    '最初は{first}秒、以降は{every}秒ごと。床が{slices}片に割れ、{rounds}ラウンド続く。各ラウンドで数片が赤く光り、{warn}秒後に爆発する。{min}〜{max}ダメージ。中央は毎ラウンド爆発する。',
+  'bossJournal.temple.colossus.fractureResponse':
+    '毎ラウンド、安全な床片へ移り、中央には入らない。',
+  'bossJournal.temple.colossus.flareSummary':
+    '{cast}秒のチャネリングの後、全プレイヤーが、巨像の体力{share}を持つ潮硝子の映し身を1体ずつ受け取り、追われる。自分の映し身は攻撃できない。',
+  'bossJournal.temple.colossus.flareResponse': '互いの映し身を倒す。自分のは決して攻撃しない。',
+  'bossJournal.temple.colossus.wardName': 'プリズムの護り',
+  'bossJournal.temple.colossus.wardSummary':
+    '生きている映し身1体ごとに、巨像の被ダメージが{per}減る。上限は{cap}。',
+  'bossJournal.temple.colossus.wardResponse': '映し身を片づけてから、巨像に戻る。',
+  'bossJournal.temple.colossus.shatterName': '砕けるガラス',
+  'bossJournal.temple.colossus.shatterSummary':
+    '映し身が砕けると、その周囲{radius}ヤード以内の全員が{damage}ダメージを受ける。',
+  'bossJournal.temple.colossus.shatterResponse': 'もうすぐ倒れる映し身のそばに立たない。',
+  'bossJournal.temple.colossus.swapName': '入れ替わる像',
+  'bossJournal.temple.colossus.swapSummary':
+    '{every}秒ごとに映し身の持ち主が入れ替わり、どの像を攻撃できるかが変わる。',
+  'bossJournal.temple.colossus.swapResponse': '入れ替わるたびに、攻撃できる像を確かめ直す。',
+  'bossJournal.temple.colossus.tipTank':
+    '閃光のたびに巨像を取り直す。巨像はターゲットを追って歩く。',
+  'bossJournal.temple.colossus.tipHealer':
+    '映し身は持ち主を攻撃する。潮硝子の亀裂は、赤い床片に残った者を罰する。',
+  'bossJournal.temple.colossus.tipDamage':
+    '閃光のたびに仲間の映し身を倒し、亀裂では1片ずつ移動する。',
+  'bossJournal.temple.colossus.tipDamageHeroic':
+    '閃光のたびに仲間の映し身を倒す。入れ替わったら確かめ直す。倒れかけの像のそばに立たない。',
+  'bossJournal.temple.colossus.choiceName': '映し身を倒すか、巨像を倒すか?',
+  'bossJournal.temple.colossus.choiceGain':
+    '像を倒せば、最大{cap}のダメージ軽減がなくなり、追われることもなくなる。',
+  'bossJournal.temple.colossus.choiceRisk':
+    '像に費やした時間は巨像を攻撃できない時間になり、ヒロイックでは像が砕けるたびに爆発する。',
+  'bossJournal.temple.colossus.heroicShatter':
+    '砕けるガラス: 映し身が砕けると、周囲{radius}ヤード以内の全員が傷つく。',
+  'bossJournal.temple.colossus.heroicSwap':
+    '入れ替わる像: 映し身の持ち主が{every}秒ごとに入れ替わる。',
+  'bossJournal.temple.ysolei.overview':
+    '溺月の化身は、全員を引き寄せて叩きつけ、島の半分を水没させ、月の落とし子を呼び、月光の涙を自分に向けて転がす。最後は、グループが間に合って護りを破らない限り、月が落ちる。',
+  'bossJournal.temple.ysolei.phaseAltarName': '月の祭壇',
+  'bossJournal.temple.ysolei.phaseAltarSummary':
+    '動かない。リーチが長く、近接は中心から離れて立つ。',
+  'bossJournal.temple.ysolei.phaseTideName': '満ち潮',
+  'bossJournal.temple.ysolei.phaseTideSummary':
+    '体力が{health}になると島の半分が水没し、以後、水没する側が入れ替わる。',
+  'bossJournal.temple.ysolei.phaseMoonSummary': '体力が{health}になると、月を呼び落とす。',
+  'bossJournal.temple.ysolei.lunarSummary':
+    '{every}秒ごとに{cast}秒の詠唱の後、中心から半径{radius}ヤード以内の全員に{min}〜{max}ダメージ。',
+  'bossJournal.temple.ysolei.lunarResponse':
+    '遠隔は範囲の外にいる。近接は常に範囲内なので、ヒーラーが支える。',
+  'bossJournal.temple.ysolei.undertowSummary':
+    '{every}秒ごとに{seconds}秒間チャネリングし、全員を毎秒{pull}ヤードで自分へ引き寄せる。その後、潮の激突: 半径{radius}ヤード以内に{min}〜{max}ダメージ。',
+  'bossJournal.temple.ysolei.undertowHeroicSummary':
+    '{every}秒ごとに{seconds}秒間チャネリングし、全員を自分へ引き寄せる。その後、潮の激突: 半径{radius}ヤード以内に{min}〜{max}ダメージ。離岸流: 各プレイヤーが立っていた場所に池が開き、{pool}秒間、毎秒{riptide}で燃える。',
+  'bossJournal.temple.ysolei.undertowResponse':
+    'チャネリング中は、近接も含め全員が乾いた地面へ走って出る。水没した場所では動きが遅くなる。',
+  'bossJournal.temple.ysolei.tearsSummary':
+    '体力が{first}と{second}になると、自分へ転がる月光の涙を{count}個呼ぶ。涙はプレイヤーに触れると止まる。{min}〜{max}ダメージに加え、月焼けのスタックごとに{bonus}が上乗せされる。月焼けは{sear}秒続く。涙が彼女に届くと、戦闘中の与ダメージが{swell}増え、体力が{heal}回復する。',
+  'bossJournal.temple.ysolei.tearsHeroicSummary':
+    '体力が{first}と{second}になると、自分へ転がる月光の涙を{count}個呼ぶ。涙はプレイヤーに触れると止まる。{min}〜{max}ダメージに加え、月焼けのスタックごとに{bonus}が上乗せされ、毎秒{glow}で燃えるこぼれた月光が残る。涙が彼女に届くと、与ダメージが{swell}増え、体力が{heal}回復する。',
+  'bossJournal.temple.ysolei.tearsResponse':
+    'すべての涙を体で受け止め、交代で受けて、誰も月焼けを重ねないようにする。',
+  'bossJournal.temple.ysolei.tideName': '満ち潮',
+  'bossJournal.temple.ysolei.tideSummary':
+    '体力が{health}になると、島の半分が一度に水没する。{every}秒ごとに水没する側が入れ替わり、その前に{warn}秒間水面がきらめく。水中では毎秒{perSecond}のダメージと{slow}の移動速度低下。',
+  'bossJournal.temple.ysolei.tideHeroicSummary':
+    '体力が{health}になると、島の半分が一度に水没する。{every}秒ごとに水没する側が入れ替わる。水中では毎秒{perSecond}のダメージと{slow}の移動速度低下。溺れた月: {moonEvery}秒ごとに、水没した側から月の落とし子が這い上がる。',
+  'bossJournal.temple.ysolei.tideResponse': '乾いた側に留まり、反対側がきらめいたら移動する。',
+  'bossJournal.temple.ysolei.callSummary':
+    '体力が{first}と{second}になると、月の落とし子を{count}体呼ぶ。',
+  'bossJournal.temple.ysolei.callResponse': 'タンクが引き受け、ダメージ役が倒す。',
+  'bossJournal.temple.ysolei.moonSummary':
+    '体力の{ward}分の護りに守られた{cast}秒の詠唱。間に合って護りを破ると、{stun}秒スタンし、被ダメージが{vuln}増える。護りが残った場合は、島にいる全員に{min}〜{max}ダメージを与え、以後の戦闘中、与ダメージが{might}増える。',
+  'bossJournal.temple.ysolei.moonResponse':
+    'ダメージ役は全員で護りを攻撃し、ヒーラーは衝撃に備える。',
+  'bossJournal.temple.ysolei.tipTank':
+    '月の落とし子をすべて引き受ける。全員と一緒に引き潮から走り出る。',
+  'bossJournal.temple.ysolei.tipHealer':
+    '月の潮は詠唱のたびに近接に当たる。涙は月焼けを重ねる。涙を止めた人を回復する。',
+  'bossJournal.temple.ysolei.tipDamage':
+    '引き潮からは必ず走り出て、交代で涙を止め、月の落とし子を倒し、落ちる月の護りを削りきる。',
+  'bossJournal.temple.ysolei.tipDamageHeroic':
+    '引き潮とその離岸流の池から必ず走り出て、交代で涙を止め、月の落とし子を倒し、落ちる月の護りを素早く削りきる。',
+  'bossJournal.temple.ysolei.choiceName': '涙を止めるか、通すか?',
+  'bossJournal.temple.ysolei.choiceGain':
+    '止めた涙は彼女に届かない。与ダメージ{swell}の強化も、{heal}の回復もない。',
+  'bossJournal.temple.ysolei.choiceRisk':
+    '止めた人はダメージと月焼け1スタックを受け、次にその人に当たる涙は{bonus}強くなる。交代で止めること。',
+  'bossJournal.temple.ysolei.heroicRiptide':
+    '離岸流: 引き潮のたびに、プレイヤーが立っていた場所に燃える池が残る。',
+  'bossJournal.temple.ysolei.heroicDrownedMoon':
+    '溺れた月: {moonEvery}秒ごとに、洪水の中から月の落とし子が這い上がる。',
+  'bossJournal.temple.ysolei.heroicTears': '1波につき涙{count}個。落ちる月の詠唱は{cast}秒続く。',
+  'abilityUi.cast.sanctum_thaw_the_held': '囚われし者を解凍',
+  'abilityUi.cast.trash_demo_nova': 'テストノヴァ',
+  'abilityUi.cast.trash_demo_nova_unstoppable': 'テストノヴァ',
+  'abilityUi.cast.trash_demo_walker': 'テストオーブ',
+  'auth.bodyTypeA': 'タイプA',
+  'auth.bodyTypeB': 'タイプB',
+  'auth.wocBuilder.bodyGlyph.a': 'A',
+  'auth.wocBuilder.bodyGlyph.b': 'B',
+  'auth.wocBuilder.cat.bodyType': '体型',
+  'auth.wocBuilder.cat.face': '顔',
+  'auth.wocBuilder.eye.blue': '青',
+  'auth.wocBuilder.eye.grey': '灰色',
+  'auth.wocBuilder.eye.paleBlue': '淡い青',
+  'auth.wocBuilder.eye.teal': 'ティール',
+  'auth.wocBuilder.hairColor.red': '赤',
+  'auth.wocBuilder.piercing.brow': 'まゆ',
+  'auth.wocBuilder.piercing.ears': '耳全体',
+  'auth.wocBuilder.piercing.full': '一式',
+  'auth.wocBuilder.piercing.lip': '唇',
+  'auth.wocBuilder.piercing.none': 'なし',
+  'auth.wocBuilder.section.ears': '耳',
+  'auth.wocBuilder.section.mouth': '唇',
+  'auth.wocBuilder.section.nose': '鼻',
+  'auth.wocBuilder.skin.fair': '色白',
+  'auth.wocBuilder.skin.rose': 'ローズ',
+  'auth.wocBuilder.skin.sand': '砂色',
+  'auth.wocBuilder.skin.tan': '小麦色',
+  'auth.wocBuilder.slider.bodyScale': '体の大きさ',
+  'auth.wocBuilder.slider.eyeTilt': '目の傾き',
+  'auth.wocHead.brows.slim': '細め',
+  'auth.wocHead.brows.soft': 'やわらかめ',
+  'auth.wocHead.brows.soft_arch': '緩やかなアーチ',
+  'auth.wocHead.hair.bald': '坊主',
+  'auth.wocHead.hair.bob': 'ボブ',
+  'auth.wocHead.hair.long': 'ロング',
+  'auth.wocHead.mouth.full': 'ふっくら',
+  'auth.wocHead.mouth.thin': '細め',
+  'auth.wocHead.nose.soft': 'やわらかめ',
+  'hudChrome.bg.flagDroppedByLog': '{name}が{team}の旗を落とした。',
+  'hudChrome.bg.flagNameAzure': '蒼天の旗',
+  'hudChrome.bg.flagNameCrimson': '深紅の旗',
+  'hudChrome.bg.flagReturnedByLog': '{name}が{team}の旗を返還した。',
+  'hudChrome.dungeonTracker.heroicTitle': '{name}（{difficulty}）',
+  'hudChrome.expeditions.leader': 'リーダー: {name}',
+  'hudChrome.expeditions.solo': 'ソロで挑む',
+  'hudChrome.raidBossGuide.dungeonSubtitle': '{dungeon} | {boss} | {difficulty}',
+  'hudChrome.shardpike.blindBanner': 'バロウハイド破壊',
+  'hudChrome.shardpike.promptStrike': '今すぐ眼を突け、残り{seconds}秒',
+  'hudChrome.shardpike.promptTally': '{count}体の眼を潰した',
+  'hudChrome.warfareShop.companionOwnedAria': '{item}、入手済みまたはお披露目待ち',
+  'hudChrome.warfareShop.companionPurchase':
+    'この相棒を恒久的に解放し、すぐに召喚します。バッグにアイテムは追加されません。',
+  'bossJournal.bastion.vael.phaseVeilName': '霧のヴェール',
+  'bossJournal.wildheart.beast.bondName': '群れの絆',
+  'bossJournal.wildheart.beast.huntName': '狩りの呼び声',
+  'editor.assets.recentsTab': '最近',
+  'editor.assets.subcategory.nature': '自然',
+  'editor.assets.subcategory.other': 'その他',
+  'editor.authoring.allGroups': 'すべて',
+  'editor.authoring.vfxNone': 'なし',
+  'editor.biome.alphaNone': 'なし',
+  'editor.build.light': '小',
+  'editor.build.material': '素材',
+  'editor.buildMode.modeObject': 'オブジェクト',
+  'editor.buildMode.selectedAsset': 'アセット：{name}',
+  'editor.buildMode.sideBack': '戻る',
+  'editor.camp.tagBoss': 'ボス',
+  'editor.camp.tagElite': 'エリート',
+  'editor.camp.tagRare': 'レア',
+  'editor.city.kitChosen': '配置中：{name}',
+  'editor.collisionMaster.modeFace': '顔',
+  'editor.decalTool.catArcane': '秘術',
+  'editor.decalTool.catDamage': 'ダメージ',
+  'editor.decalTool.catNature': '自然',
+  'editor.decalTool.importedDecal': '「{name}」をインポートしました。',
+  'editor.dungeon.field.style': 'スタイル',
+  'editor.entityTool.selected': '選択中: {name}',
+  'editor.foliage.kind': '植える',
+  'editor.lighting.day': '昼',
+  'editor.lighting.night': '夜',
+  'editor.mobTool.statDamage': 'ダメージ',
+  'editor.settings.graphicsHigh': '高',
+  'editor.settings.graphicsLow': '低',
+  'editor.settings.graphicsUltra': 'ウルトラ',
+  'editor.toolGroup.world': 'ワールド',
+  'editor.tree.leafOrient': '向き',
+  'editor.tree.orient.random': 'ランダム',
+  'editor.tree.volumeJitter': 'ジッター',
+  'editor.weather.auto': '自動',
+  'editor.weather.blizzard': 'ブリザード',
+  'editor.weather.clear': 'クリア',
+  'bossJournal.crypt.morthen.nameDeadName': '死者の名を呼べ',
+  'bossJournal.temple.selthe.soloName': '独唱',
+  'bossJournal.bastion.captain.phaseName': '堀',
+  'bossJournal.crypt.lady.rimeName': '霜の道',
+  'bossJournal.crypt.marrow.phaseYardName': '鐘の中庭',
+  'bossJournal.sanctum.korgath.lastLinkName': '最後の鎖環',
+  'bossJournal.sanctum.korgath.phaseLockName': '錠',
+  'bossJournal.sanctum.korzul.noIceName': '氷なき湖',
+  'bossJournal.sanctum.tusker.phaseRoadName': '道中',
+  'bossJournal.temple.ysolei.phaseMoonName': '満月',
+  'bossJournal.wildheart.beast.waryName': '警戒',
+  'editor.appearance.fire': '炎の効果（アニメーション付き）',
+  'editor.appearance.glow': '発光色',
+  'editor.appearance.glowStrength': '発光の強さ',
+  'editor.appearance.hint':
+    'プレイテストでも同じ見た目になります。色調は色を変え、不透明度は幽霊のように薄くし、発光は自己発光を加えます。',
+  'editor.appearance.reset': '外見をリセット',
+  'editor.appearance.tint': '色調',
+  'editor.appearance.title': '外見（シェーダー）',
+  'editor.assets.allTab': 'すべて（{count}）',
+  'editor.assets.collision.authored': '衝突: Collision Masterで作成済み',
+  'editor.assets.collision.baked': '衝突: ベイク済みの箱形（自動生成された形状）',
+  'editor.assets.collision.none': '衝突: なし。配置物は、設定がある場合のみ簡易円で遮ります',
+  'editor.assets.collisionMaster': 'Collision Master: このアセットの既定の衝突形状を作成',
+  'editor.assets.favouriteAdd': '{name}をお気に入りに追加',
+  'editor.assets.favouriteRemove': '{name}をお気に入りから削除',
+  'editor.assets.favouritesEmpty':
+    'お気に入りはまだありません。アセットの星をクリックすると、ここに保存できます。',
+  'editor.assets.favouritesTab': 'お気に入り（{count}）',
+  'editor.assets.importedEmpty':
+    'このセッションで読み込んだモデルはありません。「モデルを読み込む」で、このコンピューターの.glbまたは.gltfを読み込めます。',
+  'editor.assets.importedTab': '読み込み済み',
+  'editor.assets.recentsEmpty':
+    'このブラウザーではまだ何も配置していません。配置したアセットがここに表示されます。',
+  'editor.assets.removeImported': '読み込んだモデルを削除（このセッションのみ）',
+  'editor.assets.resizeHandle': 'ドラッグしてアセットブラウザーのサイズを変更',
+  'editor.assets.subcategory.buildings': '建物',
+  'editor.assets.subcategory.containers': '収納容器',
+  'editor.assets.subcategory.decor': '装飾',
+  'editor.assets.subcategory.enemies': '敵',
+  'editor.assets.subcategory.environment': '環境',
+  'editor.assets.subcategory.furniture': '家具',
+  'editor.assets.subcategory.lighting': '照明',
+  'editor.assets.subcategory.modular': 'モジュール式',
+  'editor.assets.subcategory.structure': '構造物',
+  'editor.assets.subcategoryAll': 'すべて（{count}）',
+  'editor.assets.subcategoryTab': '{name}（{count}）',
+  'editor.authoring.aiBrief': 'AIとクエストの概要',
+  'editor.authoring.aiNotes': 'AIの方針',
+  'editor.authoring.browseAll': 'すべて見る',
+  'editor.authoring.defaults': '既定値',
+  'editor.authoring.filterLabel': 'カタログのグループを絞り込む',
+  'editor.authoring.noResults': '一致する項目がありません。',
+  'editor.authoring.questNotes': 'クエスト制作メモ',
+  'editor.authoring.resultCount': '{count}件',
+  'editor.authoring.search': '全モデルを検索...',
+  'editor.authoring.searchLabel': 'カタログを検索',
+  'editor.authoring.showing':
+    '{total}件中{shown}件を表示しています。検索を絞り込むと、残りも確認できます。',
+  'editor.authoring.vfxArcane': '秘術の光粒',
+  'editor.authoring.vfxFire': '火の残り火',
+  'editor.authoring.vfxFrost': '霜のきらめき',
+  'editor.authoring.vfxHint':
+    'パーティクルを再利用し、エディターとプレイテストで軽快な効果を保ちます。',
+  'editor.authoring.vfxHoly': '聖なる輝き',
+  'editor.authoring.vfxIntensity': '視覚効果の強さ',
+  'editor.authoring.vfxNature': '自然の小光',
+  'editor.authoring.vfxPreset': 'プリセット',
+  'editor.authoring.vfxShadow': '影の光粒',
+  'editor.authoring.vfxTitle': '環境の視覚効果',
+  'editor.biome.alphaImport': 'アルファを読み込む',
+  'editor.biome.alphaImportFailed': 'その画像をブラシのアルファとして読み込めませんでした。',
+  'editor.biome.alphaImportTitle':
+    'グレースケール画像をブラシマスクとして読み込みます。白は描画し、黒は描画を防ぎます（このブラウザーに保存）',
+  'editor.biome.alphaRemove': '読み込んだこのアルファを削除',
+  'editor.biome.alphaTitle': 'ブラシのアルファ',
+  'editor.biome.autoAllOff': 'ペイントのみ（すべてオフ）',
+  'editor.biome.autoAllOffTitle':
+    '自動ルールをすべてオフにし、傾斜、高さ、水際による地面の再テクスチャを止めます。以後は手動のペイントだけが適用されます。',
+  'editor.biome.autoHint':
+    '自動テクスチャルールはペイントの下に適用されます。有効なルールは対象の地面を塗り直し続けるため、塗った崖も岩に戻ります。チェックを外すと、そのルールをマップ全体から除去します。新規マップではすべてオフです。',
+  'editor.biome.autoRetexture': 'マップを自動再テクスチャ',
+  'editor.biome.autoRetextureDone':
+    '{count}セルのテクスチャを変更しました。ブラシでどこでも塗り直せます。',
+  'editor.biome.autoRetextureHint':
+    'ワンクリックで、標高、傾斜、水、ゾーン、道に合った内蔵テクスチャをマップ全体に適用します。砂漠や浜辺には砂、急斜面には崖、平地には変化のある草地と土、町や道路には石畳を使います。その後もブラシですべて自由に塗り直せます。',
+  'editor.biome.autoRim': 'マップ端の山々',
+  'editor.biome.autoScree': '崖の岩屑（高画質）',
+  'editor.biome.autoShoreSand': '水際の砂',
+  'editor.biome.autoSlopeRock': '急斜面の岩',
+  'editor.biome.autoSnowCaps': '雪を頂く山頂',
+  'editor.biome.autoTitle': '自動テクスチャ',
+  'editor.biome.bucket': '塗りつぶし（テクスチャの置換）',
+  'editor.biome.bucketArmedHint':
+    'バケツ準備完了。地面をクリックすると、クリックしたテクスチャをマップ全体で置き換えます。',
+  'editor.biome.bucketDone': 'ペイント済みの{count}セルを置き換えました。',
+  'editor.biome.bucketTitle':
+    'バケツを準備して地面をクリックします。クリックしたテクスチャで塗られたすべてのセルを、選択中のスウォッチに置き換えます',
+  'editor.biome.builtinGroup': 'テクスチャライブラリー',
+  'editor.biome.builtinTitle':
+    'エディター同梱の地面テクスチャです。選ぶと、このマップのスウォッチとして追加されます（どのコンピューターでも利用可能）',
+  'editor.biome.customFull': 'スウォッチの上限に達しました（{max}）。',
+  'editor.biome.customHint':
+    'カスタムスウォッチは地面の色だけを変え、地形はゾーンのバイオームを維持します。マップと一緒に保存されます。',
+  'editor.biome.depth': '表面の深さ',
+  'editor.decalTool.imported': '読み込み済み',
+  'editor.dungeon.kind.decor': '装飾',
+  'editor.inspector.lightingTab': '照明',
+  'editor.lighting.title': '照明',
+  'editor.tree.preset': 'プリセット',
+  'editor.tunnel.digAlphaLabel': 'ブラシのアルファ',
+  'editor.biome.edgeDetail': '境界の細かさ',
+  'editor.biome.edgeHint':
+    'マップ全体で、塗った2つのテクスチャの境界の見た目を調整します。ソフトブラシは縁を点在する個別セルとして保存します。1セルに保持できるテクスチャは1つだけで、ペイント格子は1/4ヤード単位です。そのため、この2項目がどちらも0なら、硬さスライダーにかかわらず、境界は斑点のあるくっきりした線になります。境界の柔らかさは混合幅を広げ、点在したセルを本来のなだらかな移行として見せます。境界の細かさは細かなノイズで境界を揺らし、格子に沿う代わりに本物の地面のように噛み合わせます。どちらも追加のテクスチャ読み取りは不要ですが、柔らかさの幅より狭いペイントの細部はぼけます。',
+  'editor.biome.edgeSoftness': '境界の柔らかさ',
+  'editor.biome.galleryCount': '{n}種類のテクスチャ',
+  'editor.biome.galleryCurrent': '現在',
+  'editor.biome.galleryHint': 'すべてのテクスチャを見て、塗りたいものを確定してください。',
+  'editor.biome.galleryTitle': '地面のテクスチャを選択',
+  'editor.biome.groupBiomes': 'バイオーム',
+  'editor.biome.groupSwatches': '自分のスウォッチ',
+  'editor.biome.hardness': 'ブラシの硬さ',
+  'editor.biome.hue': '色相',
+  'editor.biome.importTexture': 'テクスチャスウォッチを読み込む',
+  'editor.biome.importTextureFailed': 'その画像を読み込めませんでした。',
+  'editor.biome.importTextureTitle':
+    '画像ファイルを選択します。新しいスウォッチで塗ると、地面に画像を繰り返し敷き詰めます（このブラウザーに保存。他のコンピューターでは平均色を表示）',
+  'editor.biome.light': '明暗',
+  'editor.biome.pickTexture': '塗るテクスチャを選択',
+  'editor.biome.removeSwatch': 'スウォッチを削除',
+  'editor.biome.removeSwatchTitle':
+    'このカスタムスウォッチをマップから削除します。それで塗った地形は、元のバイオームの見た目に戻ります。',
+  'editor.biome.saveSwatch': '色調をスウォッチとして保存',
+  'editor.biome.saveSwatchTitle':
+    'この色相と明るさの組み合わせを独立したスウォッチに保存し、スライダーを変更した後も再利用できるようにします',
+  'editor.biome.swatchRemoved': 'スウォッチ「{name}」を削除しました。',
+  'editor.biome.swatchSaved': 'スウォッチ「{name}」を保存しました。',
+  'editor.biome.textureSlots': 'テクスチャ枠: {used} / {max}使用中、空き{free}',
+  'editor.biome.textureSlotsFull':
+    '1マップに描画できるテクスチャ付きスウォッチは{max}個までです。超過分は単色で表示されます。未使用のテクスチャを削除すると枠が空きます。',
+  'editor.biome.textureSlotsOver':
+    '上限を{over}個超過しています。最後に追加したテクスチャは単色で描かれます。テクスチャスウォッチを削除すると枠が空きます。',
+  'editor.biome.textureSlotsTitle':
+    'このマップの異なるテクスチャはそれぞれ{max}枠のうち1枠を使います。雪のテクスチャは地形の雪レイヤーを使うため、枠を消費しません。テクスチャスウォッチを削除すると、その枠が空きます。',
+  'editor.biome.tileSize': 'テクスチャの繰り返し幅（ヤード）',
+  'editor.biome.variation': '変化量',
+  'editor.biome.variationHint':
+    '回転した座標系でテクスチャをもう一度読み取り、繰り返し格子を目立たなくします。0%は通常の繰り返しで追加コストはなく、値を上げると、このスウォッチで塗った場所ごとにテクスチャ読み取りが1回増えます。表面の深さは、アンビエントオクルージョンマップからテクスチャ自体のくぼみに陰影を付け、塗った地面が平坦に見えるのを防ぎます。コストは同じです。',
+  'editor.brush.reapplyWater': '水を再適用',
+  'editor.brush.reapplyWaterTitle':
+    '現在の地形から水を再構築します。ブラシ操作は触れた水をすでに更新します。もともと水のなかった場所に掘った盆地など、更新されずに残った部分に使ってください。',
+  'editor.build.banner': 'モデル作成中',
+  'editor.build.bannerHint': 'モデリングバーで形状を追加し、頂点、辺、面を編集します。',
+  'editor.build.bare': '無地（テクスチャなし）',
+  'editor.build.collision': 'メッシュを衝突形状に使う',
+  'editor.build.collisionHint':
+    'モデルの実体部分がプレイヤーを遮ります。歩行可能な形状（緑）は坂道になります。',
+  'editor.build.editModel': 'モデルを編集',
+  'editor.build.entered':
+    'モデルを編集中です。形状の追加、テクスチャの適用、衝突の切り替えを行い、最後に「完了」を押してください。',
+  'editor.build.hue': '色相',
+  'editor.build.materialHint':
+    'ライブラリーの素材はシェーダー内で形状に投影されるため、階段、坂、曲面でも引き伸ばされません。色相、彩度、明るさで色調を変えられます。',
+  'editor.build.materialMany': '素材の設定は、選択中の{n}個すべての作成モデルに適用されます。',
+  'editor.build.newHint':
+    'マップをクリックして新しいモデルを作るか、モデルを選択して編集してください。',
+  'editor.build.panelTitle': '作成モデル',
+  'editor.build.resetLook': '素材の色調をリセット',
+  'editor.build.saturation': '彩度',
+  'editor.build.shapes': '{n}個の形状',
+  'editor.build.texture': '表面のテクスチャ',
+  'editor.build.tileSize': 'テクスチャの縮尺',
+  'editor.build.tileSizeUnit': 'ヤード / タイル',
+  'editor.build.walkableTip':
+    'ヒント: モデリングバーの「歩行可能」を切り替えると、形状を坂道にできます。',
+  'editor.buildMode.addLevel': '階を追加',
+  'editor.buildMode.autoBase': '最初の配置で設定',
+  'editor.buildMode.bare': '元の表面',
+  'editor.buildMode.bareFinish': '元の表面',
+  'editor.buildMode.bareWall': '無地の壁',
+  'editor.buildMode.baseY': '基礎の高さ（ヤード）',
+  'editor.buildMode.building': '建物',
+  'editor.buildMode.buildingNumber': '建物{number}',
+  'editor.buildMode.capacity':
+    '建物が大きすぎます。区画を小さくするか、不要な部品を取り除いてください。',
+  'editor.buildMode.chooseAsset': '先にアセットを選択してください。',
+  'editor.buildMode.choosePaintWall': '建物の壁または壁のアセットをクリックしてください。',
+  'editor.buildMode.chooseWall':
+    '壁のアセットを選び、プレビューを待つか、「無地の壁」を選択してください。',
+  'editor.buildMode.chosenAsset': '選択中のアセット',
+  'editor.buildMode.fineRotation': '細かい回転（15°）',
+  'editor.buildMode.finishHint': '仕上げを選択し、壁をクリックして塗ります。',
+  'editor.buildMode.finishRun': 'つながった壁に適用',
+  'editor.buildMode.finishSide': '塗る面',
+  'editor.buildMode.finishTexture': '壁のテクスチャ',
+  'editor.buildMode.finishTile': 'テクスチャの繰り返し幅（ヤード）',
+  'editor.buildMode.floorHeight': '階の高さ（ヤード）',
+  'editor.buildMode.floorHint': '長方形をドラッグして、この階に床を追加します。',
+  'editor.buildMode.floorNumber': '{number}階',
+  'editor.buildMode.foundationLocked': '建築を開始すると、基礎の設定は変更できません。',
+  'editor.buildMode.gridCell': '{size}ヤード',
+  'editor.buildMode.gridOff': 'オフ',
+  'editor.buildMode.gridSize': '格子の間隔',
+  'editor.buildMode.groundFloor': '地上階',
+  'editor.buildMode.hideAbove': '上の階を非表示',
+  'editor.buildMode.importFailed':
+    'テクスチャを読み込めませんでした。8 MB未満で、各辺8192ピクセル以下のPNG、JPG、WebPを使ってください。',
+  'editor.buildMode.importTexture': 'テクスチャを読み込む',
+  'editor.buildMode.importedTexture': '読み込んだテクスチャ{number}',
+  'editor.buildMode.importingTexture': 'テクスチャを読み込み中...',
+  'editor.buildMode.invalid':
+    'この壁または部屋は収まりませんでした。格子を調整するか、別の部品を選択してください。',
+  'editor.buildMode.larger': '大きく',
+  'editor.buildMode.levels': '建物の階',
+  'editor.city.gridOff': 'オフ',
+  'editor.decalTool.importFailed': 'その画像を読み込めませんでした。',
+  'editor.fire.saturation': '彩度',
+  'editor.fluid.hue': '色相',
+  'editor.sculpt.hardness': 'ブラシの硬さ',
+  'editor.water.hue': '色相',
+  'editor.buildMode.materialNames.Bricks076C': '苔むした煉瓦',
+  'editor.buildMode.materialNames.Cliff001': '赤い崖',
+  'editor.buildMode.materialNames.Cliff002': '苔むした岩山',
+  'editor.buildMode.materialNames.Cliff003': 'ごつごつした岩',
+  'editor.buildMode.materialNames.Cliff004': '風化した断崖',
+  'editor.buildMode.materialNames.Cliff005': '地層の崖',
+  'editor.buildMode.materialNames.Cliff006': '日焼けした崖',
+  'editor.buildMode.materialNames.Cobblestone001': '石畳の道',
+  'editor.buildMode.materialNames.Cobblestone002': '古い石畳',
+  'editor.buildMode.materialNames.Concrete034': '打設コンクリート',
+  'editor.buildMode.materialNames.Gravel024': '砂利',
+  'editor.buildMode.materialNames.Marble012': '縞模様の大理石',
+  'editor.buildMode.materialNames.Metal032': 'ヘアライン鋼',
+  'editor.buildMode.materialNames.Metal034': '塗装鋼',
+  'editor.buildMode.materialNames.PavingStones046': '敷石',
+  'editor.buildMode.materialNames.PavingStones131': '苔むした角石',
+  'editor.buildMode.materialNames.Plaster001': '石灰漆喰',
+  'editor.buildMode.materialNames.Rock029': '風化した岩',
+  'editor.buildMode.materialNames.Rock035': '層状の石',
+  'editor.buildMode.materialNames.Rock051': '花崗岩',
+  'editor.buildMode.materialNames.Rock052': '荒々しい石',
+  'editor.buildMode.materialNames.Rock053': '鉄岩',
+  'editor.buildMode.materialNames.Rock054': '砂岩の岩肌',
+  'editor.buildMode.materialNames.Rock055': '錆色の岩',
+  'editor.buildMode.materialNames.Rock056': '草原の石',
+  'editor.buildMode.materialNames.Rock057': '縞模様の暗色石',
+  'editor.buildMode.materialNames.Roots001': '絡み合う根',
+  'editor.buildMode.materialNames.Roots002': '生きた根',
+  'editor.buildMode.materialNames.Rust004': '錆びた鉄',
+  'editor.buildMode.materialNames.Tiles001': '地衣類の敷石',
+  'editor.buildMode.materialNames.Tiles002': '粘板岩の敷石',
+  'editor.buildMode.materialNames.Wood001': 'オークの板',
+  'editor.buildMode.materialNames.Wood002': '松の板',
+  'editor.buildMode.materialNames.Wood003': '風化した樹皮',
+  'editor.buildMode.materialNames.Wood004': '苔むした樹皮',
+  'editor.buildMode.modeFinish': '壁の仕上げ',
+  'editor.buildMode.modeFloor': '床',
+  'editor.buildMode.modeRoom': '部屋',
+  'editor.buildMode.modeWall': '壁',
+  'editor.buildMode.newBuilding': '新しい建物',
+  'editor.buildMode.noAsset': 'ブラウザーからアセットを選択してください。',
+  'editor.buildMode.noBuilding': '新しい建物',
+  'editor.buildMode.objectHint': '選択した階にオブジェクトを配置します。',
+  'editor.buildMode.pickAsset': 'アセットを選択',
+  'editor.buildMode.roomHint': '長方形をドラッグして、壁と床のある部屋を作ります。',
+  'editor.buildMode.rotateLeft': '左に回転',
+  'editor.buildMode.rotateRight': '右に回転',
+  'editor.buildMode.selectExisting': '既存の部品を選択',
+  'editor.buildMode.settings': '格子と基礎',
+  'editor.buildMode.sideBoth': '両面',
+  'editor.buildMode.sideClicked': 'クリックした面',
+  'editor.buildMode.sideFront': '正面',
+  'editor.buildMode.smaller': '小さく',
+  'editor.buildMode.thickness': '壁の厚さ（ヤード）',
+  'editor.buildMode.title': '建物を建てる',
+  'editor.buildMode.transformControls': 'アセットの操作',
+  'editor.buildMode.transformEmpty': '回転またはサイズ変更するアセットを選択してください。',
+  'editor.buildMode.transformReadout': '回転: {degrees}° | 大きさ: {scale}倍',
+  'editor.buildMode.transformShortcuts': '回転: , と . | サイズ変更: [ と ]',
+  'editor.buildMode.wallHint': 'ドラッグして直線の壁を描きます。',
+  'editor.buildMode.wallSource': '壁の種類',
+  'editor.camera.assetViewDistance': '配置アセットが消え始める距離',
+  'editor.camera.assetViewHint':
+    '配置した装飾を何ヤード先まで描画するかを設定します。それ以上では徐々に消え、描画を停止して負荷を軽減します。値を下げると遠くのアセットを早く非表示にし、上げると遠くまで見えます。マップと一緒に保存され、プレイテストにも反映されます。',
+  'editor.camera.assetViewMax': '霧まで',
+  'editor.camera.assetViewTitle': 'アセットの表示距離',
+  'editor.camera.axisWidget': 'カメラの軸方向表示',
+  'editor.camera.flySpeedSet': '飛行速度{value}倍',
+  'editor.camera.focus': '選択対象に注目（.）',
+  'editor.camera.focusTitle':
+    '周回の中心を選択したオブジェクトへ移し、その周りをカメラが回るようにします。何も選択していない場合は、マップ全体を画面に収めます',
+  'editor.camera.freeFly': '自由飛行（Shift+F）',
+  'editor.camera.freeFlyHint':
+    'WASDで移動、Q/Eで上下移動します。ドラッグで一人称のように周囲を見回し、ホイールで速度を調整します。',
+  'editor.camera.invertPan': 'カメラを反転',
+  'editor.camera.loadingHaze': '読み込み中の霞',
+  'editor.camera.lookSpeed': 'マウス視点の速度',
+  'editor.camera.moveSpeed': 'WASD移動速度',
+  'editor.camera.panSpeed': '平行移動の速度',
+  'editor.camera.perfAssets': '配置済みアセット',
+  'editor.camera.perfCoords': 'ワールド座標（x, z）',
+  'editor.camera.perfFps': 'フレームレート',
+  'editor.camera.perfFrameMs': 'フレーム時間（ミリ秒）',
+  'editor.camera.perfHint': '編集時にビューポートの隅へ固定表示する、リアルタイムの計測値です。',
+  'editor.camera.perfSelTris': '選択対象のポリゴン数',
+  'editor.camera.perfShow': 'ビューポートに表示',
+  'editor.camera.perfStreaming': '地形ストリーミング',
+  'editor.camera.perfTerrain': '地形の編集',
+  'editor.camera.perfTitle': 'パフォーマンス表示',
+  'editor.camera.perfTris': 'シーンのポリゴン数',
+  'editor.camera.resetSpeeds': '速度をリセット',
+  'editor.camera.showBoundary': 'マップ境界の壁を表示',
+  'editor.camera.showPlayer': 'プレイテストのプレイヤーを表示',
+  'editor.camera.snapNegativeX': 'X軸の負方向から表示',
+  'editor.camera.snapNegativeY': '下から表示',
+  'editor.camera.snapNegativeZ': 'Z軸の負方向から表示',
+  'editor.camera.snapPositiveX': 'X軸の正方向から表示',
+  'editor.camera.snapPositiveY': '上から表示',
+  'editor.camera.snapPositiveZ': 'Z軸の正方向から表示',
+  'editor.camera.speedHint':
+    'ビューポートのカメラが飛行、視点変更、平行移動する速度です。エディター内だけに適用されます。自由飛行中のマウスホイールはズームではなく、この移動速度を変えるスロットルとして働きます。',
+  'editor.camera.speedTitle': '移動速度',
+  'editor.camera.visibilityDistance': '地形の表示距離',
+  'editor.camera.visibilityHint':
+    'カメラの近くで元の細かさの地形を読み込みます。各ゾーンは準備が整うまで霞で隠れます。距離を伸ばすと、GPUとメモリーの使用量が増えます。',
+  'editor.city.kitPick': 'アセットを選択',
+  'editor.city.tabWalls': '壁',
+  'editor.camera.visibilityTitle': '地形の表示',
+  'editor.camera.wireframe': 'ワイヤーフレームモード',
+  'editor.camera.xray': '透明X線モード',
+  'editor.camp.aiNotesPlaceholder':
+    'AIの挙動、巡回ロジック、遭遇の進行、会話のきっかけを記述してください。',
+  'editor.camp.catalogMeta': '{family} | レベル{min}-{max}',
+  'editor.camp.chooseMob': 'モブのモデルを選択',
+  'editor.camp.levelMax': '最大レベル',
+  'editor.camp.overrideLevels': 'テンプレートのレベルを上書き',
+  'editor.camp.questNotesPlaceholder':
+    'この野営地で目標、報酬、クエストの進行をどう支えるか説明してください。',
+  'editor.camp.statAggro': '索敵距離: {value}ヤード',
+  'editor.camp.statFamily': '種族: {value}',
+  'editor.camp.statScale': '縮尺: {value}',
+  'editor.camp.tagCaster': '術者',
+  'editor.camp.tagEnrage': '狂暴化',
+  'editor.camp.tagStationary': '固定',
+  'editor.camp.tagSummoner': '召喚者',
+  'editor.camp.tagSupport': '支援',
+  'editor.camp.tagSwimmer': '水泳者',
+  'editor.city.gridSize': '格子の大きさ',
+  'editor.city.kitGhostBlocked': '配置不可: 配置済みのアセットと重なっています。',
+  'editor.city.kitNone':
+    'ブラウザーからアセットを選択し、マップをクリックして格子上に配置してください。',
+  'editor.city.kitRotate': '回転（R）',
+  'editor.city.kitScale': '部品の縮尺',
+  'editor.city.kitTileHint':
+    '「タイルを接続」は各部品をその大きさと最初のタイルの高さに合わせます。床が端同士でつながり、起伏のある地面でも平らに保たれます。Escキーを押すか別のアセットを選ぶと、新しい高さで開始します。オフにするとワールド格子を使います。',
+  'editor.city.kitTileSnap': 'タイルを接続',
+  'editor.city.prefabCount': '{n}個の部品',
+  'editor.city.prefabName': 'プレハブ名',
+  'editor.city.prefabNeedSelection':
+    '先に配置済みのアセットを1つ以上選択してください（Shift+クリックまたは範囲選択）。',
+  'editor.city.prefabNone':
+    'プレハブはまだありません。配置済みのアセットをいくつか選択し、プレハブとして保存してください。',
+  'editor.city.prefabSave': '選択対象をプレハブとして保存',
+  'editor.city.prefabSaved': 'プレハブを保存しました: {name}',
+  'editor.city.prefabStamp': '押印配置',
+  'editor.city.prefabStamped': 'プレハブを配置しました（{n}個の部品）。',
+  'editor.city.roadAuthored': '道路{n}',
+  'editor.city.roadDraw': '道路を描く',
+  'editor.city.roadDrawing':
+    'クリックで経由点を追加します。Enterまたはダブルクリックで完了、Escでキャンセルします。',
+  'editor.city.roadFinish': '道路を完成',
+  'editor.city.roadHint':
+    '道路は内蔵のワールド道路と同様に地形に溶け込み、その下の凹凸を平らにします。',
+  'editor.city.roadLegacy': '内蔵道路',
+  'editor.city.roadLimit': 'このマップの道路数はすでに上限に達しています。',
+  'editor.city.roadList': 'このマップの道路',
+  'editor.city.roadPlaced': '道路を配置しました。',
+  'editor.city.roadTooShort': '道路を作るには、少なくとも2点を描いてください。',
+  'editor.city.roadType': '道路の種類',
+  'editor.city.roadTypePath': '小道',
+  'editor.city.rotSnap': '回転スナップ',
+  'editor.city.routeAddHint':
+    'クリックごとに経由点を追加します。Enterで完了、Escで編集を終了します。',
+  'editor.city.routeClear': '経路を消去',
+  'editor.city.routeCleared': '経路を消去しました。',
+  'editor.city.routeCount': '{n}個の経由点',
+  'editor.city.routeEditing': '{name}の経路: マップをクリックして経由点を追加してください。',
+  'editor.city.routeFinish': '経路を保存',
+  'editor.city.routeMode': '移動方式',
+  'editor.city.routeModeLoop': '周回',
+  'editor.city.routeModePingPong': '往復',
+  'editor.city.routeNoNpc':
+    'NPCが選択されていません。先にビューポート内のNPCをクリックしてください。',
+  'editor.city.routePick': 'NPCをクリックして経路を編集してください。',
+  'editor.city.routeSaved': '経路を保存しました（{n}個の経由点）。',
+  'editor.city.routeSpeed': '歩行速度',
+  'editor.city.routeWait': '経由点での待機',
+  'editor.city.routeWaitUnit': '秒',
+  'editor.city.settings': '建築設定',
+  'editor.city.snapHint':
+    '格子スナップは、壁の節点、キットの配置、プレハブの押印配置に適用されます。',
+  'editor.city.styleCastle': '城壁',
+  'editor.city.styleCastleFence': '城の柵',
+  'editor.city.styleHexWall': '六角の壁',
+  'editor.city.styleMetalFence': '金属の柵',
+  'editor.city.styleStone': '石壁',
+  'editor.city.styleWoodFence': '木の柵',
+  'editor.city.tabKit': 'キット',
+  'editor.city.tabPrefabs': 'プレハブ',
+  'editor.city.tabRoads': '道路',
+  'editor.city.tabRoutes': '経路',
+  'editor.city.title': '街づくり',
+  'editor.city.wallBuildFailed': '壁のアセットを生成できませんでした。描いた経路は残っています。',
+  'editor.city.wallClosed': '輪を閉じる',
+  'editor.city.wallDraw': '壁を描く',
+  'editor.city.wallDrawing':
+    'クリックして表示中の格子に角を追加します。節点のダブルクリックまたはEnterで完了します。BackspaceまたはDeleteで最後の節点を削除し、Escでキャンセルします。',
+  'editor.city.wallEditHint':
+    '壁の部品を選択すると、その一続きの壁が有効になります。「壁」に戻って形を変えるか、「選択」でDeleteを押して全体を削除してください。',
+  'editor.city.wallFinish': '壁を完成',
+  'editor.city.wallGateHint': '門の区画は省略され、壁に開口部が残ります。',
+  'editor.city.wallHeight': '高さ',
+  'editor.city.wallLiveEdit': '上の設定を変更すると、最後に作った壁を即座に更新します。',
+  'editor.city.wallNodes': '壁の節点を{n}個配置しました。',
+  'editor.city.wallPlaced': '一続きの壁を配置しました（{n}個の部品）。',
+  'editor.city.wallPostEvery': '支柱の間隔',
+  'editor.city.wallPostsOff': '支柱なし',
+  'editor.city.wallScale': '壁の縮尺',
+  'editor.city.wallStairs': '上り階段',
+  'editor.city.wallStyle': '壁の様式',
+  'editor.city.wallThickness': '厚さ',
+  'editor.city.wallTooShort': '壁を作るには、少なくとも2点を描いてください。',
+  'editor.city.wallUndoPoint': '最後の点を取り消す',
+  'editor.city.wallWalkHint':
+    '「歩ける上面」は壁沿いに巡回用の通路を作り、プレイテスト中に歩けるようにします。「上り階段」は両端に（閉じた輪ではその脇に）、地面から通路へ上る階段を追加します。',
+  'editor.city.wallWalkTop': '歩ける上面',
+  'editor.clutterTool.capReached':
+    '散布物の上限（{max}個）に達しました。さらに配置するには一部を消してください。',
+  'editor.clutterTool.clearAll': '塗った散布物をすべて削除',
+  'editor.clutterTool.clumps': '群がり（0 = 均等に分布）',
+  'editor.clutterTool.count': '散布物を{count}個配置済み',
+  'editor.clutterTool.density': '密度',
+  'editor.clutterTool.erase': '消去モード（ブラシの下の散布物を取り除く）',
+  'editor.clutterTool.hint':
+    '地面をドラッグして、有効な散布物をブラシ範囲内に散らします。1回のストロークが1回の取り消し操作に対応します。散布物は移動を妨げません。',
+  'editor.collider.height': '高さ',
+  'editor.foliage.plantHeight': '高さ',
+  'editor.foliageTool.density': '密度',
+  'editor.mobTool.patrolSpeed': '歩行速度',
+  'editor.rock.height': '高さ',
+  'editor.rock.walkable': '歩ける上面',
+  'editor.tool.city': '街づくり',
+  'editor.tree.volumeRise': '高さ',
+  'editor.tunnel.cutHeight': '高さ',
+  'editor.clutterTool.kinds.leaves': '落ち葉',
+  'editor.clutterTool.kinds.letter': '落とされた手紙',
+  'editor.clutterTool.kinds.paper_scraps': '丸めた紙',
+  'editor.clutterTool.kinds.pebbles': '小石',
+  'editor.clutterTool.kinds.pot_shards': '割れた陶器',
+  'editor.clutterTool.kinds.splinters': '木のささくれ',
+  'editor.clutterTool.kinds.stones': '転がる石',
+  'editor.clutterTool.kinds.straw': '藁',
+  'editor.clutterTool.kinds.tile_broken': 'ひび割れた敷石',
+  'editor.clutterTool.kinds.tile_shards': 'タイルの破片',
+  'editor.clutterTool.kindsTitle': '散布物の種類',
+  'editor.clutterTool.maxScale': '最大サイズ',
+  'editor.clutterTool.minScale': '最小サイズ',
+  'editor.clutterTool.noneSelected': '塗るには、散布物を少なくとも1種類有効にしてください。',
+  'editor.clutterTool.tierNote':
+    '散布物は高画質以上で表示されます。それより低い設定では省略され、負荷はかかりません。',
+  'editor.clutterTool.title': '散布物ブラシ',
+  'editor.collider.box': '箱形コライダー',
+  'editor.collider.depth': '奥行き',
+  'editor.collider.diameter': '直径',
+  'editor.collider.floorOffset': '床の高さのオフセット',
+  'editor.collider.hideVolumes': '衝突領域を非表示',
+  'editor.collider.hideVolumesHint':
+    'ビューポート内の緑の領域表示を隠します（プレイテスト中は引き続き通行を妨げます）。',
+  'editor.collider.hint':
+    '形状を選び、地面をクリックして置きます。移動、回転、拡大縮小ツール（または下のスライダー）で形を整えてください。',
+  'editor.collider.plane': '床の平面',
+  'editor.collider.playtestNote':
+    '領域はエディターでは緑に表示され、プレイテストでは見えません。箱と球は移動を遮り、床の平面は歩ける地面の高さを上げます。',
+  'editor.collider.shapeLabel': 'コライダーの形状',
+  'editor.collider.sizeHint':
+    '寸法は縮尺1でのヤード数です。拡大縮小ツールで、その値に倍率を掛けます。',
+  'editor.collider.sphere': '球形コライダー',
+  'editor.collider.title': '衝突領域',
+  'editor.collider.wall': '壁の平面',
+  'editor.collider.width': '幅',
+  'editor.collisionMaster.addMenuTitle':
+    '衝突用の基本形状を追加します。実際の三角形メッシュの立体です（円柱は実際の円柱メッシュです）',
+  'editor.collisionMaster.adopted':
+    'このマップ内の既存の{count}個の配置物に、今作成した衝突形状を適用しました。',
+  'editor.collisionMaster.assetLabel': '{name}の既定の衝突形状を作成中。',
+  'editor.collisionMaster.barLabel': '衝突形状のモデリングツール',
+  'editor.collisionMaster.cancel': 'マップに戻る',
+  'editor.collisionMaster.catalogOnly':
+    'Collision Masterはカタログのアセット専用です。読み込んだモデルは、読み込み時のベイクを保持します。',
+  'editor.collisionMaster.copied':
+    '{n}個の衝突領域をコピーしました。Ctrl+Vで貼り付けられます（別のアセットにも対応）。',
+  'editor.collisionMaster.copyEmpty': 'コピーする衝突領域がありません。',
+  'editor.collisionMaster.delete': '削除',
+  'editor.collisionMaster.deleteTitle': '選択した箱を削除',
+  'editor.collisionMaster.devOnly':
+    '「確定」はプロジェクトのファイルに書き込むため、ローカル開発サーバー（npm run dev）が必要です。',
+  'editor.collisionMaster.duplicate': '複製',
+  'editor.collisionMaster.duplicateTitle': '選択した箱を複製',
+  'editor.collisionMaster.dyntopo': '動的トポロジー',
+  'editor.collisionMaster.dyntopoTitle':
+    '動的トポロジーは、スカルプトブラシの周囲で長い辺を局所的に分割し、短い辺を安全に統合します。',
+  'editor.collisionMaster.fill': '面を張る',
+  'editor.collisionMaster.fillTitle': '選択した3個以上の境界頂点に、新しい面を張ります。',
+  'editor.collisionMaster.fittedBox': 'ぴったりの箱',
+  'editor.collisionMaster.fittedBoxTitle': 'アセット全体を囲む1つの箱から始める',
+  'editor.collisionMaster.fromBake': 'ベイクから開始',
+  'editor.collisionMaster.fromBakeTitle': 'アセットの自動ベイク済みボクセル箱から始める',
+  'editor.collisionMaster.fromClear': '空の状態から開始',
+  'editor.collisionMaster.fromClearTitle': 'すべての衝突形状を取り除き、空のシーンから始める',
+  'editor.collisionMaster.fromCylinder': '円柱から開始',
+  'editor.collisionMaster.fromCylinderTitle': 'アセットの底部を囲む、編集可能な1本の円柱から始める',
+  'editor.collisionMaster.heroStatus': 'アセットの衝突: {mode}',
+  'editor.collisionMaster.heroTitle': 'コリジョンマスター',
+  'editor.collisionMaster.hint':
+    '下の選択パネルで、このアセットの衝突形状を作ります。衝突の種類を選び、ギズモで箱を移動、回転、拡大縮小し、箱を追加または削除してください。「確定」で、あらゆる場所で使うアセットの既定値としてプロジェクトに保存します。',
+  'editor.collisionMaster.inset': '差し込み',
+  'editor.collisionMaster.insetTitle': '選択した面を内側へ差し込み、接続された境界の環を作ります。',
+  'editor.collisionMaster.lockInTitle':
+    'このアセットの既定の衝突形状として保存し（プロジェクトへ書き込み）、マップに戻る',
+  'editor.collisionMaster.locked': '確定しました: {name}は、すべての場所でこの衝突形状を使います。',
+  'editor.collisionMaster.loopCut': 'ループカット',
+  'editor.collisionMaster.loopCutFail':
+    'まず辺モードで箱の辺を選んでください。ループカットには四角面の辺が必要です（端面や球は使えません）。',
+  'editor.collisionMaster.loopCutTitle':
+    '辺のループを挿入します。辺モードで辺を選び、「ループカット」を使うと、形状の周囲に平行な辺の環を追加します（新しいループをドラッグするとスライドします）。',
+  'editor.collisionMaster.mapName': 'コリジョンマスター: {name}',
+  'editor.collisionMaster.meshUnsupported':
+    '実メッシュはマップごとのベイクのため、プロジェクトの既定値にはできません。「ベイク」「基本」「なし」から選んでください。',
+  'editor.collisionMaster.mirror': 'X軸で反転',
+  'editor.collisionMaster.mirrorTitle':
+    '選択した領域を、そのローカルX軸を基準に反転したコピーとして追加します。',
+  'editor.collisionMaster.modeEdge': '辺',
+  'editor.collisionMaster.modeEdgeTitle':
+    '辺を選択（V）: 辺をクリックすると、ギズモでその2頂点を移動、回転、拡大縮小できます',
+  'editor.collisionMaster.modeFaceTitle':
+    '面を選択（C）: 面をクリックすると、ギズモでその面を局所的に移動、回転、拡大縮小できます',
+  'editor.collisionMaster.modeObject': 'オブジェクト',
+  'editor.collisionMaster.modeObjectTitle':
+    'オブジェクトモード（Tab）: ギズモで領域全体を移動、回転、拡大縮小します',
+  'editor.collisionMaster.modeVertex': '頂点',
+  'editor.collisionMaster.modeVertexTitle':
+    '頂点を選択（Z）: 頂点をクリックすると、ギズモはその頂点だけを動かします。Ctrl+ドラッグで複数を投げ縄選択できます',
+  'editor.collisionMaster.noBoxes':
+    '確定できる衝突箱がありません。箱を少なくとも1つ追加するか、「基本」または「なし」を選んでください。',
+  'editor.collisionMaster.openFromSelection': 'コリジョンマスター',
+  'editor.collisionMaster.openFromSelectionTitle':
+    'コリジョンマスターのシーンで、このアセットの既定の衝突形状を作成します（プロジェクトに保存。マップは自動保存され、作業後ここに戻ります）',
+  'editor.collisionMaster.pasted': '{n}個の衝突領域を貼り付けました。',
+  'editor.collisionMaster.polyBuildFail':
+    'このモデルは細かさの上限に達しており、これ以上押し出せません。',
+  'editor.collisionMaster.polyBuildHint':
+    'ポリゴン作成: モデルの面をクリックして外へドラッグすると、押し出して手作業で形を作れます。オフにすると、再び周回や選択ができます。',
+  'editor.collisionMaster.polyBuildShort': 'ポリゴン作成',
+  'editor.collisionMaster.polySnap': 'ポリゴンスナップブラシ',
+  'editor.collisionMaster.polySnapHint':
+    'モデルの表面をドラッグし、形状に密着した衝突平面を敷きます。ドラッグの始点と終点で長さと水平角を、取得した高さで縦の範囲を決めます。壁、屋根、坂道に適しています。',
+  'editor.collisionMaster.polySnapShort': 'ポリゴンスナップ',
+  'editor.collisionMaster.presetPromptBody':
+    '「確定」により、すでにプロジェクト全体で{name}の既定の衝突形状となり、マップ内の全コピーにも適用されました。プリセットは、この端末だけでさらに一歩進めます。新たに配置する{name}には毎回、これらの箱が個別に編集できるヒットボックスとして付くため、「ヒットボックスを編集」でコピーごとに調整できます。衝突を機能させるために必要な操作ではありません。',
+  'editor.collisionMaster.presetPromptDontAsk':
+    '今後は確認しない（「その他」>「確定時にプリセットについて確認」で再び有効にできます）',
+  'editor.collisionMaster.presetPromptNo': 'いいえ、結構です',
+  'editor.collisionMaster.presetPromptTitle': 'プリセットとしても保存しますか？',
+  'editor.collisionMaster.presetPromptYes': 'プリセットを保存',
+  'editor.collisionMaster.primBox': '箱',
+  'editor.collisionMaster.primCylinder': '円柱',
+  'editor.collisionMaster.primPlane': '平面',
+  'editor.collisionMaster.primSphere': '球',
+  'editor.collisionMaster.primTitle': '衝突形状の組に、基本形状「{name}」を追加',
+  'editor.collisionMaster.primWedge': '坂道',
+  'editor.collisionMaster.rampToggle': '歩行可能',
+  'editor.collisionMaster.title': 'コリジョンマスター',
+  'editor.dungeon.exit': 'マップに戻る',
+  'editor.foliageTool.maxScale': '最大サイズ',
+  'editor.foliageTool.minScale': '最小サイズ',
+  'editor.tree.leafFill': '面を張る',
+  'editor.tunnel.cutDepth': '奥行き',
+  'editor.tunnel.cutShape.box': '箱',
+  'editor.tunnel.width': '幅',
+  'editor.collisionMaster.rampToggleTitle':
+    '歩ける坂道: 選択した領域は通行を遮る代わりに、傾斜に沿って歩ける地面を持ち上げます（プレイヤーは上れます）。坂道の基本形状は、初めから歩行可能です。',
+  'editor.collisionMaster.saveEndpointFailed': '既定値を保存できませんでした: {error}',
+  'editor.collisionMaster.saveFailed':
+    'コリジョンマスターを開く前に、マップを保存できませんでした。',
+  'editor.collisionMaster.saveUnreachable':
+    '保存先に接続できませんでした（開発サーバーは起動していますか？）。衝突形状はファイルとしてダウンロードされたため、失われていません。「npm run dev」を起動して再び確定するか、ファイルをdata/asset_collision_overrides.jsonへ統合してください。',
+  'editor.collisionMaster.sculptCrease': 'スカルプト: 折り目',
+  'editor.collisionMaster.sculptDeflate': 'スカルプト: 収縮',
+  'editor.collisionMaster.sculptDetail': '細かさ',
+  'editor.collisionMaster.sculptGrab': 'スカルプト: つかむ',
+  'editor.collisionMaster.sculptInflate': 'スカルプト: 膨張',
+  'editor.collisionMaster.sculptOff': 'スカルプト: オフ',
+  'editor.collisionMaster.sculptPinch': 'スカルプト: つまむ',
+  'editor.collisionMaster.sculptRelax': 'スカルプト: 緩和',
+  'editor.collisionMaster.sculptSettings': 'スカルプト設定',
+  'editor.collisionMaster.sculptSmooth': 'スカルプト: 滑らかに',
+  'editor.collisionMaster.sculptStrength': '強さ',
+  'editor.collisionMaster.sculptTitle': '動的メッシュのスカルプトブラシ',
+  'editor.collisionMaster.singleBox': '単一の箱',
+  'editor.collisionMaster.singleBoxTitle': 'アセットの底部にある、単純な箱1つから始める',
+  'editor.collisionMaster.stashOnly':
+    'ブラウザーへの保存がブロックされているため、マップはメモリー内に保持されています。コリジョンマスターからはマップに戻れますが、永続的なコピーが必要ならエクスポートしてください。',
+  'editor.collisionMaster.subdivide': '細分化',
+  'editor.collisionMaster.subdivideTitle':
+    '各三角形を辺を共有する4つの三角形に分割し、モデリングの細かさを増やします。',
+  'editor.collisionMaster.symmetry': '対称',
+  'editor.collisionMaster.symmetryHint':
+    '各スカルプト操作を、選択したローカルX、Y、Z軸で反転して適用します。',
+  'editor.collisionMaster.topologyFail': '現在の選択対象には、そのトポロジー操作を適用できません。',
+  'editor.collisionMaster.weld': '溶接',
+  'editor.collisionMaster.weldTitle': '選択した頂点を、その中心で統合します。',
+  'editor.decalTool.aspect': '引き伸ばし',
+  'editor.decalTool.capReached': 'デカールの上限（{max}）に達しました。',
+  'editor.decalTool.catBurn': '焼け跡',
+  'editor.decalTool.catGore': '流血跡',
+  'editor.decalTool.catMarker': '目印',
+  'editor.decalTool.catTracks': '足跡',
+  'editor.decalTool.decalN': 'デカール{num}',
+  'editor.decalTool.deleteTitle': 'このデカールを削除',
+  'editor.decalTool.glow': '発光',
+  'editor.decalTool.hint':
+    'デカールを選び、地面をクリックして配置します。地形に沿って貼り付き、カメラが近いときだけ読み込まれるため、大量に配置できます。配置済みのデカールをクリックして選択し、Deleteで削除します。',
+  'editor.decalTool.importDecal': 'デカール画像を読み込む',
+  'editor.decalTool.importTitle':
+    '透過部分のあるPNG/WebPを選びます。配置可能なデカールになります（このブラウザーに保存され、マップバンドルにも含まれます）',
+  'editor.decalTool.library': 'デカールライブラリー',
+  'editor.decalTool.libraryTitle':
+    'エディター同梱のデカールです（オリジナルのCC0素材）。1つ選び、地面をクリックして配置してください。',
+  'editor.decalTool.none': 'デカールはまだ配置されていません。',
+  'editor.decalTool.pickFirst': '先にライブラリーからデカールを選択してください。',
+  'editor.decalTool.randomRotate': '配置ごとにランダムに回転',
+  'editor.decalTool.removed': 'デカールを削除しました。',
+  'editor.decalTool.selectTitle': 'ワールド内のこのデカールを選択（Deleteで削除）',
+  'editor.decalTool.size': '大きさ（ヤード）',
+  'editor.decalTool.sortOrder': '上に重ねる',
+  'editor.decalTool.stamped': '「{name}」を配置しました。',
+  'editor.decalTool.tint': '色調',
+  'editor.decalTool.title': 'デカール',
+  'editor.dungeon.addBarrier': '障壁を追加',
+  'editor.dungeon.addDecor': '装飾を追加',
+  'editor.dungeon.addDoor': '扉を追加',
+  'editor.dungeon.addOpening': '開口部を追加',
+  'editor.dungeon.addRoom': '部屋を追加',
+  'editor.dungeon.collapse': '折りたたむ',
+  'editor.dungeon.expand': '展開',
+  'editor.dungeon.field.hd': '奥行きの半分',
+  'editor.dungeon.field.hw': '幅の半分',
+  'editor.dungeon.field.id': '識別子',
+  'editor.dungeon.field.innerScale': '内部の縮尺',
+  'editor.dungeon.field.key': 'モデル',
+  'editor.dungeon.field.scaleX': 'X方向の縮尺',
+  'editor.dungeon.field.scaleZ': 'Z方向の縮尺',
+  'editor.dungeon.field.x': 'X座標',
+  'editor.dungeon.field.x0': '西端（x0）',
+  'editor.dungeon.field.x1': '東端（x1）',
+  'editor.dungeon.field.y': '高さのオフセット',
+  'editor.dungeon.field.yaw': '水平回転角（ラジアン）',
+  'editor.dungeon.field.z': 'Z座標',
+  'editor.dungeon.field.z0': '手前の端（z0）',
+  'editor.dungeon.field.z1': '奥の端（z1）',
+  'editor.dungeon.hint':
+    'クリックで選択します（再クリックで重なった対象を切り替え）。ドラッグで移動、矢印キーで微調整、Deleteで削除、Ctrl+Zで元に戻します。Shift+ドラッグで平行移動、中ボタンドラッグで周回します。',
+  'editor.dungeon.kind.barrier': '障壁',
+  'editor.dungeon.kind.dais': 'ボスの壇',
+  'editor.dungeon.kind.door': '扉',
+  'editor.dungeon.kind.opening': '見た目の開口部',
+  'editor.dungeon.kind.room': '部屋',
+  'editor.dungeon.noIssues': '問題は見つかりませんでした',
+  'editor.dungeon.none': '何も選択されていません。平面図の輪郭をクリックしてください。',
+  'editor.dungeon.save': 'ソースに保存',
+  'editor.dungeon.saveFailed':
+    '開発用の保存先が利用できないため、代わりにレイアウトをダウンロードしました',
+  'editor.dungeon.saved': 'レイアウトをsrc/sim/dungeon_layout.tsに書き込みました（開発サーバー）',
+  'editor.dungeon.title': 'ダンジョンのレイアウト',
+  'editor.dungeon.unsaved': 'レイアウトに未保存の変更あり',
+  'editor.dungeon.validate': '検証',
+  'editor.entityTool.aiNotesPlaceholder':
+    '性格、会話の調子、予定、反応、交流のルールを記述してください。',
+  'editor.entityTool.automaticModel': 'テンプレートの自動リグ',
+  'editor.entityTool.automaticModelHint':
+    'このNPCテンプレートに割り当てられたキャラクターを使います。',
+  'editor.entityTool.cancelPlacement': '配置をキャンセル',
+  'editor.entityTool.categoryForm': '変身形態',
+  'editor.entityTool.categoryPlayer': 'プレイヤーのリグ',
+  'editor.entityTool.characterModel': 'リグ付きキャラクター',
+  'editor.entityTool.chooseNpcModel': 'キャラクターモデルを選択',
+  'editor.entityTool.facing': '向き',
+  'editor.materials.color': '色調',
+  'editor.tree.leafGlow': '発光',
+  'editor.tree.leafTint': '色調',
+  'editor.tree.volumeSy': '引き伸ばし',
+  'editor.tree.volumeX': 'X座標',
+  'editor.tree.volumeZ': 'Z座標',
+  'editor.entityTool.hint':
+    'NPCを選択すると、リグ、役割、視覚効果、AIの概要を設定できます。モブを選択すると、種類、レベル、能力値の補正、巡回、再出現を設定できます。',
+  'editor.entityTool.manyMobs': '{count}体のモブ',
+  'editor.entityTool.name': '表示名',
+  'editor.entityTool.none': 'マップ内のモブまたはNPCをクリックして選択してください。',
+  'editor.entityTool.oneMob': 'モブ1体',
+  'editor.entityTool.placeNpc': 'NPCを配置',
+  'editor.entityTool.placeNpcHint':
+    '{name}の準備ができました。地形をクリックして、このNPCを配置してください。',
+  'editor.entityTool.questNotesPlaceholder':
+    '今後AIが作成するクエスト、目標、物語の展開のために指示を残してください。',
+  'editor.entityTool.role': '物語での役割',
+  'editor.entityTool.rolePlaceholder': 'クエストの依頼人、商人、衛兵、訓練師...',
+  'editor.entityTool.title': 'NPCとモブ',
+  'editor.entityTool.titleField': '称号',
+  'editor.eyedropperTool.empty':
+    'ここはまだ塗られていません。塗られたテクスチャをクリックして取得してください。',
+  'editor.fire.add': '+ 炎の発生源を追加',
+  'editor.fire.anchor': '取り付け先',
+  'editor.fire.anchorBase': 'モデルの底部',
+  'editor.fire.anchorCenter': 'モデルの中心',
+  'editor.fire.anchorTop': 'モデルの上部',
+  'editor.fire.blend': '合成モード',
+  'editor.fire.blendAdditive': '加算発光',
+  'editor.fire.blendAlpha': '自然なアルファ',
+  'editor.fire.colorMotion': '色と動き',
+  'editor.fire.customize': 'すべての設定を開く',
+  'editor.fire.duplicate': '発生源を複製',
+  'editor.fire.embers': '舞う火の粉',
+  'editor.fire.emitter': '炎{count}',
+  'editor.fire.enabled': '発生源を有効化',
+  'editor.fire.flameShape': '炎の形状',
+  'editor.fire.flicker': '揺らめき',
+  'editor.fire.glow': '光の強さ',
+  'editor.fire.glowRange': '光の半径（ヤード）',
+  'editor.fire.height': '炎の高さ',
+  'editor.fire.hint':
+    '独立した手続き型の炎の発生源を追加し、1つ選んで、ビューポートの移動ギズモでモデル上に正確に配置してください。',
+  'editor.fire.hue': '炎の色相',
+  'editor.fire.intensity': 'シェーダーの強さ',
+  'editor.fire.layers': '炎の層数',
+  'editor.fire.legacy': '旧式の単一炎',
+  'editor.fire.light': '発光ライト',
+  'editor.fire.opacity': '炎の不透明度',
+  'editor.fire.position': '位置',
+  'editor.fire.positionX': 'ローカルX（ヤード）',
+  'editor.fire.positionY': 'ローカルY（ヤード）',
+  'editor.fire.positionZ': 'ローカルZ（ヤード）',
+  'editor.fire.preset': '効果のプリセット',
+  'editor.fire.remove': '発生源を削除',
+  'editor.fire.removeAll': 'すべての炎を削除',
+  'editor.fire.scale': '全体の縮尺',
+  'editor.fire.smokeAmount': '煙の量',
+  'editor.fire.smokeRise': '煙の上昇',
+  'editor.fire.smokeScale': '煙の大きさ',
+  'editor.fire.speed': 'アニメーション速度',
+  'editor.fire.style.bonfire': '焚き火',
+  'editor.fire.style.embers': '熾火',
+  'editor.fire.style.soulfire': '魂の炎',
+  'editor.fire.style.torch': '松明',
+  'editor.fire.style.wildfire': '野火',
+  'editor.fire.title': 'アセットの炎効果',
+  'editor.fire.turbulence': '乱流',
+  'editor.fire.width': '炎の幅',
+  'editor.flatMapName': '平坦なワールド',
+  'editor.flatten.noiseHint':
+    '小さな起伏に高い粗さを組み合わせると、岩がちの荒れた地面に見えます。大きな起伏に低い粗さを組み合わせると、草原の丘のようにうねります。高さはブラシの強さで決まります。',
+  'editor.flatten.noiseRough': '粗さ',
+  'editor.flatten.noiseSize': '起伏の大きさ（ヤード）',
+  'editor.flatten.shiftHint':
+    'Shiftを押しながらドラッグすると、そのストロークだけ平坦化と平滑化を入れ替えます。',
+  'editor.flatten.smoothMode': '平坦化の代わりに平滑化',
+  'editor.flatten.style.noise': 'ノイズ',
+  'editor.flatten.style.sharpen': '先鋭化',
+  'editor.flatten.style.smooth': '平滑化',
+  'editor.flatten.style.terrace': '段々地形',
+  'editor.flatten.styleHint.noise':
+    'ブラシ全体に自然なうねりを描きます。大きな起伏に細部を重ねた形です。1回のストロークは同じ模様を保つため、ドラッグで起伏のある地面を作れます。改めて塗ると新しい細部が重なります。',
+  'editor.flatten.styleHint.sharpen': '平滑化の逆です。塗るたびに尾根が尖り、溝が深まります。',
+  'editor.flatten.styleHint.smooth':
+    'ブラシの下の地面を平均化します。繰り返すと起伏が滑らかに消えます。',
+  'editor.flatten.styleHint.terrace':
+    '斜面を段々の棚に整えます。段の高さはブラシの強さで決まります。',
+  'editor.fluid.fxBubbles': '泡',
+  'editor.fluid.fxHaze': '霞',
+  'editor.fluid.fxLight': '発光ライト',
+  'editor.fluid.hint':
+    '液体を選び、地面をクリックして池を置きます。変形ツールで移動、平面の引き伸ばし、水面をくぼみへ下げる操作ができます。',
+  'editor.fluid.kind.acid': '酸',
+  'editor.fluid.kind.lava': '溶岩',
+  'editor.fluid.kind.spectral': '霊体の液体',
+  'editor.fluid.kind.water': '静水',
+  'editor.fluid.light': '明度',
+  'editor.fluid.resetPreset': 'プリセットにリセット',
+  'editor.fluid.selHint':
+    'ギズモで池の平面範囲（X/Z）を拡大縮小し、Y軸の矢印で水面の高さを調整します。液体に入った者は毎秒1回ダメージを受けます。',
+  'editor.fluid.surfaceOffset': '水面の高さ',
+  'editor.fluid.title': '液体の池',
+  'editor.foliage.bake': 'アセットとして保存',
+  'editor.foliage.bakeFailed': '植物を保存できませんでした: {reason}',
+  'editor.foliage.bakeHint':
+    '植物をGLBとしてpublic/models/generatedに書き込み、レシピから通常のカタログアセットに変えます。他のアセットとまとめて描画でき、衝突のベイクを設定でき、どのマップにも配置できます。設定はファイル内に残るため、後で開き直して再ベイクできます。開発サーバーが必要です。',
+  'editor.foliage.bakePrompt': 'この植物に名前を付ける',
+  'editor.foliage.baked':
+    '{id}として保存しました。アセットカタログを再生成すると、ブラウザーに表示されます。',
+  'editor.foliage.clumps': '葉の群がり',
+  'editor.foliage.footprint': '広がり',
+  'editor.foliage.hang': '垂れ下がり',
+  'editor.foliage.kinds.bush': '低木',
+  'editor.foliage.kinds.fern': 'シダ',
+  'editor.foliage.kinds.grass': '草の茂み',
+  'editor.foliage.kinds.tree': '木',
+  'editor.lighting.worldSpeed': 'アニメーション速度',
+  'editor.tool.fluid': '液体の池',
+  'editor.tree.branchAngle': '広がり',
+  'editor.tree.volumeSpread': '広がり',
+  'editor.tunnel.modeSmooth': '平滑化',
+  'editor.water.light': '明度',
+  'editor.foliage.kinds.vine': '蔓',
+  'editor.foliage.preset': '開始形状',
+  'editor.foliage.presets.bushBerry': 'ベリーの茂み',
+  'editor.foliage.presets.bushDry': '乾いた低木',
+  'editor.foliage.presets.bushRound': '丸い低木',
+  'editor.foliage.presets.fernForest': '森のシダ',
+  'editor.foliage.presets.grassMeadow': '草原の茂み',
+  'editor.foliage.presets.grassTuft': '草束',
+  'editor.foliage.presets.vineHanging': '垂れ下がる蔓',
+  'editor.foliage.splay': '開き具合',
+  'editor.foliage.strands': '本数',
+  'editor.foliageTool.ambientAllHint':
+    'マップ全体を変換すると、数千の木や岩が個別の配置物になり、ゾーンや周辺だけを変換するより多くのメモリーを使います。',
+  'editor.foliageTool.ambientConverted': '近くの{count}個の植生を編集可能にしました。',
+  'editor.foliageTool.ambientConvertedAll': '環境植生（{count}個）がすべて編集可能になりました。',
+  'editor.foliageTool.ambientEditableHint':
+    '環境植生はオフです。このブラシで塗った植生はすべて、選択、移動、回転、拡大縮小、消去ができます。',
+  'editor.foliageTool.ambientHint':
+    '内蔵の木や岩は手続き生成され、選択できません。目的の場所へカメラを向け、そのゾーン（推奨）、近い一群、またはマップ全体を変換してください。',
+  'editor.foliageTool.ambientPartial':
+    '{count}個を変換しました。残りは上限を増やすか、もう一度変換してください。',
+  'editor.foliageTool.ambientTitle': '既存のマップ植生',
+  'editor.foliageTool.bushes': '低木',
+  'editor.foliageTool.collide': '新しい植生が移動を遮る',
+  'editor.foliageTool.customChosen': 'ブラシ対象: {name}',
+  'editor.foliageTool.customClear': '内蔵の植生に戻る',
+  'editor.foliageTool.customHint':
+    '内蔵セットの代わりに、自分のアセットを散布できます。下のブラウザーからモデルを選び、通常どおりブラシで塗ってください。',
+  'editor.foliageTool.customNeedsPick':
+    '先にアセットブラウザーを開き、カスタムブラシ用のアセットを選んでください。',
+  'editor.foliageTool.customPick': 'アセットブラウザーから選択',
+  'editor.foliageTool.customTitle': 'カスタムブラシのアセット',
+  'editor.foliageTool.ferns': 'シダとキノコ',
+  'editor.foliageTool.grass': '草（アニメーション付き）',
+  'editor.foliageTool.grassClump': '茂みの大きさ（本数）',
+  'editor.foliageTool.grassHue': '草の色相',
+  'editor.foliageTool.grassLight': '草の明度',
+  'editor.foliageTool.grassPreview': '新しく塗る草の色',
+  'editor.foliageTool.hint':
+    '地面をドラッグし、有効な植生をブラシ範囲内に散布します。1回のストロークが1回の取り消し操作に対応します。削除には消去を使ってください。',
+  'editor.foliageTool.makeAllAmbientEditable': 'すべての植生を編集可能にする',
+  'editor.foliageTool.makeAmbientEditable': '近くの植生を編集可能にする',
+  'editor.foliageTool.makeZoneEditable': 'このゾーンを編集可能にする',
+  'editor.foliageTool.makeZoneEditableHint':
+    'カメラのあるゾーンの木と岩をすべて、編集可能な配置物に変換します。遠くのエリアを一度に1地域ずつ、負荷を抑えて編集する方法です。',
+  'editor.foliageTool.noneSelected': '塗るには、植生のグループを少なくとも1つ有効にしてください。',
+  'editor.foliageTool.rocks': '岩',
+  'editor.foliageTool.title': '植生ブラシ',
+  'editor.foliageTool.trees': '木々',
+  'editor.genTerrain.clear': 'マップを平坦化',
+  'editor.genTerrain.cleared': '地形の元データを消去しました。マップは再び平らな土台になりました。',
+  'editor.genTerrain.dragHint':
+    'コピーしたい地形に金色の長方形をドラッグしてください。点は出現地点です。',
+  'editor.genTerrain.generated': '（{x}, {z}）付近のワールド配置から地形を生成しました。',
+  'editor.genTerrain.hint':
+    'マップの地形の元にする旧ワールドの範囲を選びます。金色の長方形を目的の地域へドラッグしてください。その丘、湖、海岸線がマップの基礎地形になり、後からスカルプトできます。生成すると現在のスカルプト編集を置き換えますが、マップは独立した空間のままです。',
+  'editor.genTerrain.save': '生成',
+  'editor.genTerrain.status': '（{x}, {z}）付近のワールド配置を取得中。',
+  'editor.genTerrain.title': '地形を生成',
+  'editor.grassClearTool.hint':
+    'クリックまたはドラッグして、手続き生成された草原の草を消します。内蔵ワールドにベイクされた草も含みます。大きいブラシなら広い範囲を1回で消せます。',
+  'editor.grassClearTool.restore': 'すべての草を復元',
+  'editor.grassClearTool.title': '草を除去',
+  'editor.help.key.multiSelect':
+    'Shift+クリックでアセットを選択に追加、または選択から外します。NPCとモブのツールでは、Ctrl+クリックで複数のエンティティを選択します。',
+  'editor.help.tool.clutter':
+    '割れたタイル、小石、手紙、落ち葉などの地面の散布物をブラシで塗ります。高画質以上で描画されます。',
+  'editor.help.tool.collider': '箱、球、床平面の衝突領域を置きます。プレイテストでは見えません。',
+  'editor.help.tool.foliage': '草、低木、木、岩を、サイズに変化を付けてブラシで塗ります。',
+  'editor.help.tool.meshfix':
+    '切り口や洞窟の入口の周囲に残る、引き伸ばされた地形ポリゴンを除去または復元します。ツールが有効な間はワイヤーフレームが表示されます。',
+  'editor.help.tool.move': '3軸ギズモの矢印で、選択したアセットを移動します。',
+  'editor.help.tool.rotate': 'ギズモのリングで、選択したアセットを回転します。',
+  'editor.help.tool.scale':
+    'ギズモのハンドルで、選択したアセットを各軸方向または均等に拡大縮小します。',
+  'editor.help.tool.tree': '幹、枝、樹冠の領域、葉をすべて自由に調整できる木を育てます。',
+  'editor.importModel.failed': 'そのモデルファイルを読み込めませんでした。',
+  'editor.importModel.imported':
+    '「{name}」を読み込みました。このセッション中だけ保持されます。再読み込み後は、もう一度インポートしてください。',
+  'editor.importModel.notModel': '.glbまたは.gltfファイルを選択してください。',
+  'editor.importModel.tooLarge': 'そのファイルは、読み込み上限の64 MiBを超えています。',
+  'editor.inspector.sceneTab': 'シーン',
+  'editor.inspector.toolTab': 'ツール',
+  'editor.lightTool.capReached': 'ライトの上限（{max}）に達しました。',
+  'editor.lightTool.deleteTitle': 'このライトを削除',
+  'editor.lightTool.height': '高さ（ヤード）',
+  'editor.lightTool.hint':
+    '地面をクリックしてライトを置きます。ライトはエディターとプレイテストの両方に表示されます（最大{max}個。最も近い数個だけが同時に発光）。',
+  'editor.lightTool.intensity': '強度',
+  'editor.lightTool.lightN': 'ライト{num}',
+  'editor.lightTool.none': 'ライトはまだありません。',
+  'editor.lightTool.range': '範囲（ヤード）',
+  'editor.lightTool.selectTitle':
+    'ワールド内のこのライトを選択（電球マークが拡大し、Deleteで削除）',
+  'editor.lightTool.title': '点光源',
+  'editor.lighting.ambient': '環境光の強さ',
+  'editor.lighting.azimuth': '太陽の方向',
+  'editor.lighting.birdCount': '数',
+  'editor.lighting.birdFormation': 'V字編隊で飛ぶ',
+  'editor.lighting.birds': '空を飛ぶ鳥',
+  'editor.lighting.birdsTitle': '鳥',
+  'editor.lighting.caveLight': '洞窟の明るさ',
+  'editor.lighting.caveLightHint':
+    '掘った洞窟の壁が、深さに応じてどれほど暗くなるかを設定します。0は既定の洞窟の暗さです。0.4前後なら、大きな洞窟も松明の光で見渡せます。',
+  'editor.lighting.customHint': 'カスタムの照明（プリセットから編集）。',
+  'editor.lighting.dusk': '夕暮れ',
+  'editor.lighting.elevation': '太陽の高さ',
+  'editor.lighting.environment': '空の環境光',
+  'editor.lighting.hint': 'マップの照明は保存され、エディターとプレイテストの両方で使われます。',
+  'editor.lighting.nightFloor': '夜の明るさ',
+  'editor.lighting.nightFloorHint':
+    '最も深い夜に、昼の明るさをどれだけ残すかを設定します。0は既定の夜です。0.35前後なら、暗く濁らず、冷たい色調で見渡せます。',
+  'editor.lighting.overcast': '曇天',
+  'editor.lighting.presetLabel': '照明のプリセット',
+  'editor.lighting.skyColor': '空の色調',
+  'editor.soundTool.height': '高さ（ヤード）',
+  'editor.tool.grassClear': '草を除去',
+  'editor.topbar.generateTerrain': '地形を生成',
+  'editor.weather.intensity': '強度',
+  'editor.lighting.skyboxCustomActive': 'カスタムスカイボックスが有効です。',
+  'editor.lighting.skyboxDefault': '既定の空',
+  'editor.lighting.skyboxHint':
+    '同梱の空を選ぶか、パノラマ（正距円筒図法）の画像をアップロードしてください。マップと一緒に保存され、プレイテストでもゲーム内に表示されます。',
+  'editor.lighting.skyboxImportFailed': 'その画像を読み込めませんでした。',
+  'editor.lighting.skyboxImported': 'スカイボックスを読み込みました。',
+  'editor.lighting.skyboxMissing': 'そのスカイボックスは、このブラウザーにもう保存されていません。',
+  'editor.lighting.skyboxTitle': 'スカイボックス',
+  'editor.lighting.skyboxTooLarge': 'スカイボックス画像が大きすぎます（最大24 MB）。',
+  'editor.lighting.skyboxUpload': 'スカイボックスをアップロード...',
+  'editor.lighting.skybox_amber_sunset': '琥珀の夕日 HDR',
+  'editor.lighting.skybox_ember_storm': '残り火の嵐 HDR',
+  'editor.lighting.skybox_fen_day': '湿地の昼 HDR',
+  'editor.lighting.skybox_frost_twilight': '霜の薄明 HDR',
+  'editor.lighting.skybox_hollow_dusk': '虚ろの夕暮れ HDR',
+  'editor.lighting.skybox_marsh_backdrop': '湿原の背景画',
+  'editor.lighting.skybox_marsh_overcast': '湿原の曇天 HDR',
+  'editor.lighting.skybox_night': '夜 HDR',
+  'editor.lighting.skybox_nightbloom_dream': '夜咲きの夢 HDR',
+  'editor.lighting.skybox_peaks_backdrop': '山峰の背景画',
+  'editor.lighting.skybox_peaks_dawn': '山峰の夜明け HDR',
+  'editor.lighting.skybox_space_galaxy': '宇宙の銀河',
+  'editor.lighting.skybox_toon_day': 'アニメ風の青空',
+  'editor.lighting.skybox_vale_backdrop': '渓谷の背景画',
+  'editor.lighting.skybox_vale_day': '渓谷の昼 HDR',
+  'editor.lighting.skybox_wraithwood_gloom': '幽霊森の暗がり HDR',
+  'editor.lighting.sun': '太陽光の強さ',
+  'editor.lighting.sunColor': '太陽光の色',
+  'editor.lighting.worldSpeedHint':
+    '水、炎、植生の揺れ、鳥、天候など、環境内のすべての動きを速くしたり遅くしたりします。見た目だけの設定で、プレイテストのゲーム内容やタイミングは変わりません。',
+  'editor.lighting.worldSpeedReset': '通常の速度にリセット',
+  'editor.lighting.worldSpeedTitle': 'ワールドの速度',
+  'editor.lighting.zoneHint':
+    'ゾーンを選び、そのゾーン独自の照明、スカイボックス、環境の動作速度を設定します。',
+  'editor.lighting.zoneReset': 'マップの雰囲気を使う',
+  'editor.lighting.zoneSelect': '編集するゾーン',
+  'editor.lighting.zoneTitle': 'ゾーンの雰囲気',
+  'editor.map.pinHint': 'マップをクリックしてテレポートのピンを置きます。',
+  'editor.map.showWorld': 'ワールド全体を表示',
+  'editor.map.showZone': 'このゾーンを表示',
+  'editor.map.teleportToPin': 'ピンへテレポート',
+  'editor.map.useLiveTerrain': '実際の地形を使う',
+  'editor.map.usePainted': 'ペイント済みのマップを使う',
+  'editor.markerTool.capReached': 'マーカーの上限（{max}）に達しました。',
+  'editor.markerTool.defaultName': '{kind} {num}番',
+  'editor.markerTool.deleteTitle': 'このマーカーを削除',
+  'editor.markerTool.hint':
+    'AIによるクエストやイベント生成用の、エディター限定のメモです（「ここに依頼人」「ここに宝箱」など）。プレイテストには表示されません。',
+  'editor.markerTool.kind': 'マーカーの種類',
+  'editor.markerTool.none': 'マーカーはまだありません。',
+  'editor.markerTool.npc': 'ノンプレイヤーキャラクター',
+  'editor.markerTool.object': '操作できるオブジェクト',
+  'editor.markerTool.place': '出現地点を移動せず、マーカーを配置する',
+  'editor.markerTool.title': 'AI用マーカー',
+  'editor.meshFixTool.capReached':
+    'メッシュ修正の上限（{max}か所）に達しました。さらに除去するには一部を復元してください。',
+  'editor.meshFixTool.clear': 'すべて復元',
+  'editor.meshFixTool.count': '{n}か所を除去済み',
+  'editor.meshFixTool.hint':
+    'このツールの有効中はワイヤーフレームが表示されます。洞窟の入口を覆う、引き伸ばされた地形ポリゴン上を、洞窟の外または中からドラッグして除去します。中心がブラシの下にあるポリゴンは描画されなくなります。描画のみの変更で、歩く地面は変わりません。1ストロークにつき1回取り消せます。',
+  'editor.meshFixTool.miss': '地形メッシュを狙ってください。カーソルの下には何もありませんでした。',
+  'editor.meshFixTool.nudgeHint':
+    '引き伸ばされたポリゴンを除去せずに移動したい場合は、ごく小さなブラシでその頂点を隆起または低下させてください。',
+  'editor.meshFixTool.restore': '復元モード（ブラシの下の除去済みポリゴンを戻す）',
+  'editor.meshFixTool.title': 'メッシュ修正',
+  'editor.meshFixTool.vertexClearAll': '移動したすべての頂点をリセット',
+  'editor.meshFixTool.vertexClearSel': '選択を解除',
+  'editor.meshFixTool.vertexCount': '選択中{sel}個、移動済み{n}頂点',
+  'editor.meshFixTool.vertexHint':
+    'カーソル付近の地形の頂点が小さな四角で表示され、選択中は黄色になります。クリックで1つ選び、ボックスをドラッグして複数選べます。Shift+クリックまたはShift+ドラッグで追加し、Ctrl/Cmd+クリックで切り替え、Alt+クリックで外します。その後、選択した頂点をドラッグして上下に動かしてください。描画のみの変更で、歩く地面は変わりません。',
+  'editor.meshFixTool.vertexMode': 'モード: 頂点（個々の頂点を選択して移動）',
+  'editor.meshFixTool.vertexReset': '選択した頂点をリセット',
+  'editor.mobTool.delete': 'モブを削除',
+  'editor.mobTool.deleteMany': '{count}体のモブを削除',
+  'editor.mobTool.deleteManyNpcs': '{count}人のキャラクターを削除',
+  'editor.mobTool.deleteNpc': 'キャラクターを削除',
+  'editor.mobTool.deleted': '{count}体のモブを削除しました。',
+  'editor.mobTool.deletedNpcs': '{count}人のキャラクターを削除しました。',
+  'editor.mobTool.hint':
+    'マップ内のモブをクリックすると、種類、レベル、能力値、巡回、再出現を編集できます。',
+  'editor.mobTool.levelDefaultHint': 'このモブのテンプレートにあるレベル範囲を使用中です。',
+  'editor.mobTool.mixedHint':
+    '選択したモブの設定は異なっています。最初の1体の値を表示し、変更はすべてに適用します。',
+  'editor.mobTool.mixedType': '複数の種類',
+  'editor.mobTool.overrideLevels': 'レベル範囲を上書き',
+  'editor.mobTool.patrolClear': '巡回を消去',
+  'editor.mobTool.patrolDraftPoints': '配置した経由点: {count}',
+  'editor.mobTool.patrolEdit': '巡回経路を編集',
+  'editor.mobTool.patrolFinish': '経路を完成',
+  'editor.mobTool.patrolFull': '巡回経路に設定できる経由点は、最大{max}個です。',
+  'editor.mobTool.patrolLoop': '始点に戻って周回',
+  'editor.mobTool.patrolMode': '経路の終点での動作',
+  'editor.mobTool.patrolNeedPoints': '経路を完成する前に、少なくとも2つの経由点を置いてください。',
+  'editor.mobTool.patrolNone':
+    'このモブは出現地点の近くを歩き回ります。巡回を設定すると経路に沿って歩きます。',
+  'editor.mobTool.patrolNoneNpc':
+    'このキャラクターは配置した場所に留まります。巡回を設定すると経路に沿って歩きます。',
+  'editor.mobTool.patrolPickHint':
+    'マップをクリックして、順番に経由点を置きます。最後の点をダブルクリックするか、Enterを押すと完了します。',
+  'editor.mobTool.patrolPingpong': '引き返す',
+  'editor.mobTool.patrolPoints': '{count}個の経由点を巡回中',
+  'editor.mobTool.patrolRemoved': '巡回を消去しました。',
+  'editor.mobTool.patrolSaved': '巡回を設定しました: {count}個の経由点。',
+  'editor.mobTool.patrolSet': '巡回経路を設定',
+  'editor.mobTool.patrolTitle': '巡回',
+  'editor.mobTool.patrolUndoPoint': '最後の点を削除',
+  'editor.mobTool.patrolWait': '各経由点で停止',
+  'editor.mobTool.patrolWaitHint': 'これ以降に置くすべての経由点に、この停止時間が適用されます。',
+  'editor.mobTool.respawnDefault': '既定の再出現速度',
+  'editor.tool.meshFix': 'メッシュ修正',
+  'editor.mobTool.respawnDefaultHint':
+    'このモブにはレルムの既定値を使います（レアとボスは長くかかります）。',
+  'editor.mobTool.respawnSeconds': '再出現までの時間',
+  'editor.mobTool.respawnTitle': '再出現',
+  'editor.mobTool.seconds': '{value}秒',
+  'editor.mobTool.statArmor': '防御力',
+  'editor.mobTool.statAttackSpeed': '攻撃間隔',
+  'editor.mobTool.statBonus': '{value}倍（+{percent}%）',
+  'editor.mobTool.statDefault': '既定値の{value}倍',
+  'editor.mobTool.statLevels': 'テンプレートのレベル{min}-{max}',
+  'editor.mobTool.statMoveSpeed': '移動速度',
+  'editor.mobTool.statPenalty': '{value}倍（-{percent}%）',
+  'editor.mobTool.statsHint':
+    'レベルに応じた能力値への倍率です。1より大きいと強化、小さいと弱体化です。値をクリックすると正確な数値を入力できます。',
+  'editor.mobTool.statsReset': '補正をリセット',
+  'editor.mobTool.statsTitle': '能力値の補正',
+  'editor.mobTool.type': 'モブの種類',
+  'editor.mobTool.typeHeader': 'モブ: {name}',
+  'editor.mobTool.typeHeaderMany': 'モブ: {name}（{count}体を選択）',
+  'editor.mobTool.yardsPerSecond': '毎秒{value}ヤード',
+  'editor.music.areaCap': '音楽エリアの上限（{max}）に達しました。',
+  'editor.music.areaN': 'エリア{num}',
+  'editor.music.areaTrack': '新しいエリアの曲',
+  'editor.music.areasTitle': '音楽エリア',
+  'editor.music.default': '自動（バイオームのテーマ）',
+  'editor.music.dragHint':
+    '地面で枠をドラッグすると、上の曲を使うエリアを追加します。エリアをクリックして選択し、Deleteで削除します。重なる場所では、小さいエリアを優先します。',
+  'editor.music.hint':
+    'マップ全体の曲を選ぶか、枠をドラッグしてエリアごとに曲を設定します。プレイテストでは、境界を越えると曲が切り替わります。',
+  'editor.music.none': '音楽エリアはまだありません。',
+  'editor.music.previewDisabled': '設定で音楽がオフになっています。',
+  'editor.music.previewOff': 'エリアの音楽を停止しました。',
+  'editor.music.previewZone': '再生中: {zone}',
+  'editor.music.removeArea': 'この音楽エリアを削除',
+  'editor.music.rowTrack': 'このエリアの曲',
+  'editor.music.selectArea': 'ワールド内のこのエリアを選択（枠を強調表示し、Deleteで削除）',
+  'editor.music.track.dungeon_gravewyrm_sanctum': 'ダンジョン: 墓竜の聖域（ボスへの道）',
+  'editor.music.track.dungeon_hollow_crypt': 'ダンジョン: 虚ろの地下墓地（骸骨の舞）',
+  'editor.music.track.dungeon_sunken_bastion': 'ダンジョン: 沈みし砦（水没した要塞）',
+  'editor.music.track.marsh': '湿原（鳴き声の沼）',
+  'editor.music.track.peaks': '山峰（英雄的な民謡）',
+  'editor.music.track.town_eastbrook': '町: イーストブルック（暖かな田園）',
+  'editor.music.track.town_fenbridge': '町: フェンブリッジ（古い中世）',
+  'editor.music.track.town_goldcrest': '町: ゴールドクレスト港（交易港）',
+  'editor.music.track.town_highwatch': '町: ハイウォッチ（軽快な行進曲）',
+  'editor.music.track.vale': '渓谷（陽気な草原）',
+  'editor.music.track.vale_legacy': '旧渓谷（元のテーマ）',
+  'editor.music.zoneTrack': 'マップの曲',
+  'editor.newMap.height': '高さ（ヤード）',
+  'editor.newMap.hint':
+    'プリセットを選ぶか、ヤード単位でサイズを設定します。マップには境界があり、地形の縁の壁と見えない周囲の障壁により、プレイテストの範囲を内部に制限します。',
+  'editor.newMap.interior': '屋内（60 x 60）',
+  'editor.newMap.openWorld': 'オープンワールド（360 x 1080）',
+  'editor.newMap.scale': '縮尺の倍率',
+  'editor.newMap.title': '新しいマップ',
+  'editor.newMap.width': '幅（ヤード）',
+  'editor.newMap.zone': 'ゾーン（240 x 360）',
+  'editor.openDrawer.colType': '種類',
+  'editor.openDrawer.openCopy': 'コピーを開く',
+  'editor.openDrawer.publishedUnreadable':
+    '公開済みマップ「{slug}」を開発サーバーから読み込めませんでした。',
+  'editor.openDrawer.tabShipped': '同梱マップ',
+  'editor.openDrawer.typePublished': 'ゲームに公開済み（{slug}）',
+  'editor.openDrawer.typeShippedPublished': '{group}・自分の公開版',
+  'editor.playtestBack': 'エディターに戻る',
+  'editor.playtestBackTitle':
+    'マップエディターに戻る（プレイテストの開始時にマップは保存済みです）',
+  'editor.publish.done':
+    '公開しました。/index.html?map={slug}から起動できます。配信するには生成されたファイルをコミットしてください。',
+  'editor.publish.failed': '公開がブロックされました: {error}',
+  'editor.publish.noDevServer':
+    '公開処理はプロジェクトへ書き込むため、ローカル開発サーバー（npm run dev）が必要です。',
+  'editor.publish.rejected': '公開が拒否されました: {error}',
+  'editor.publish.removeConfirm':
+    '「{slug}」の公開ファイル（data/mapsとsrc/sim/maps）を削除し、標準のClaudeCraftワールドを復元します。エディター内のマップは変わらず、いつでも再公開できます。',
+  'editor.publish.removeTitle': 'このマップをゲームから削除しますか？',
+  'editor.publish.removed':
+    '「{slug}」をゲームから削除しました。標準のClaudeCraftワールドが復元されました。',
+  'editor.publish.removedNothing':
+    '削除するものはありません。「{slug}」はこのリポジトリーに公開されていません。',
+  'editor.rock.baseTex': '基本テクスチャ',
+  'editor.rock.chainCount': '{count}個の点を配置済み',
+  'editor.rock.chainHint':
+    'クリックで青い点を置きます。「生成」はそれらをつなぐ単一の立体を作り、くぼみを直線で跨ぎ、歩ける上面を付けるため、橋や尾根として機能します。生成後も点は残り、ギズモで移動や拡大縮小をすると立体も追従します。',
+  'editor.rock.chainMode': '橋 / 尾根モード',
+  'editor.rock.chainTooShort': '先に少なくとも2点を置いてください。',
+  'editor.rock.clearChain': '点を消去',
+  'editor.rock.depth': '埋め込みの深さ',
+  'editor.rock.detail': '形状の細かさ',
+  'editor.rock.generateChain': '岩の尾根を生成',
+  'editor.rock.hint':
+    '地面をクリックして、手続き型の巨岩を生成します。下のスライダーは次の岩の形を変えます。配置済みの岩は選択ツールで選び、その場で形を変えられます。ギズモで引き伸ばすと、石板や崖の板状岩にできます。',
+  'editor.rock.jag': 'ギザギザ度',
+  'editor.rock.noise': 'ノイズ量',
+  'editor.rock.reroll': '形状を再抽選',
+  'editor.rock.selTitle': '生成した岩',
+  'editor.rock.sharp': '鋭さ',
+  'editor.rock.texBare': '無地（着色可能）',
+  'editor.rock.texSandstone': '砂岩',
+  'editor.rock.texStone': '石',
+  'editor.rock.title': '岩ジェネレーター',
+  'editor.scene.count': '{n}個のオブジェクト',
+  'editor.scene.hiddenBadge': '非表示',
+  'editor.scene.hideTitle': 'このオブジェクトをエディターで非表示にする（マップ内には存在します）',
+  'editor.scene.hint':
+    '配置済みのすべてのオブジェクトを表示します。クリックで選択、名前をダブルクリックして変更できます。',
+  'editor.scene.isolateTitle': '{zone}を単独表示: このゾーンの外をすべて読み込み解除（表示のみ）',
+  'editor.scene.none': 'オブジェクトはまだ配置されていません。',
+  'editor.scene.pinTitle': 'このオブジェクトにカメラを向けて選択する',
+  'editor.scene.renameLabel': 'オブジェクト名',
+  'editor.scene.residentBadge': '常駐',
+  'editor.scene.showTitle': 'このオブジェクトを再表示',
+  'editor.scene.streamGuide': '常駐範囲の境界を表示',
+  'editor.scene.streamGuideHint':
+    '読み込み済みゾーンの端に薄赤い壁を描き、ストリーミング範囲の境界を推測せずに確認できるようにします。',
+  'editor.scene.title': 'シーンの一覧',
+  'editor.scene.zoneLockTitle':
+    'このゾーンの読み込みを固定: カメラの動きにかかわらず、解除するまで維持する',
+  'editor.scene.zoneStream': 'カメラ付近のゾーンをストリーミング',
+  'editor.scene.zoneStreamAt':
+    '{zone}をストリーミング中（{count}ゾーン）。範囲外へ飛ぶと、次の組を読み込みます。',
+  'editor.scene.zoneStreamHint':
+    'カメラに最も近い{count}ゾーンを読み込んだまま維持し、範囲外へ飛ぶと組全体を切り替えます。',
+  'editor.scene.zoneStreamLocked': '{zone}に固定中。カメラを再び追従するには解除してください。',
+  'editor.scene.zoneStreamOn':
+    '{zone}をストリーミング中: {count}ゾーンが常駐し、それ以外はすべて読み込み解除済み。',
+  'editor.scene.zoneUnlockTitle': '固定解除: 再びカメラを追って次のゾーンへ移る',
+  'editor.sculpt.alphaHint':
+    'アルファは地形の実際の表面を変え、エディターとプレイテストで同じ形を保ちます。',
+  'editor.sculpt.alphaNone': '円形',
+  'editor.sculpt.alphaTitle': 'スカルプトのアルファ',
+  'editor.sculpt.autoTex': '角度に応じた自動テクスチャ',
+  'editor.sculpt.autoTexAngle': '急斜面の開始角度（度）',
+  'editor.sculpt.autoTexFlat': '平地のテクスチャ',
+  'editor.sculpt.autoTexHint':
+    '操作ごとに、加工した範囲を地面の角度で塗り直します。しきい値より低い場所と高い場所に異なるテクスチャを使い、即座に崖を表現します。',
+  'editor.sculpt.autoTexNone': 'そのままにする',
+  'editor.sculpt.autoTexSteep': '急斜面のテクスチャ',
+  'editor.sculpt.grab': 'つかむ / 引く（スネークフック）',
+  'editor.sculpt.grabHint':
+    '押してブラシ下の地面をつかみ、そのままドラッグすると地形がカーソルに追従します。上で持ち上げ、下で押し込み、横でマップ上をずらし、粘土を引くように動かせます。1回のつかみが1回の取り消し操作です。引く範囲の幅はブラシの大きさで決まります。',
+  'editor.sculpt.hint':
+    'ドラッグして地面を持ち上げます。チェックを入れると、代わりに下へ掘ります。',
+  'editor.sculpt.lower': '隆起の代わりに低下',
+  'editor.sculpt.shapeTitle': 'ブラシの形状',
+  'editor.sculpt.shiftHint':
+    'Shiftを押しながらドラッグすると、反対の操作になります（隆起と低下を入れ替え）。',
+  'editor.selection.collisionBaked':
+    'ベイクされたモデル形状で通行を遮ります（メッシュに沿う{count}個の箱）。半径スライダーを動かすと単純な円で上書きし、「自動」でベイク形状に戻せます。',
+  'editor.selection.collisionCopied': '{count}個の{name}に衝突形状をコピーしました。',
+  'editor.selection.collisionCopyAll': 'すべての{name}（{count}個）に衝突形状をコピー',
+  'editor.selection.collisionCopyAllHint':
+    'マップ上の他のすべての{name}に、同じ種類と形の衝突を適用します。各コピーの大きさに合わせるため、小さいものの占有範囲が巨大になることはありません。',
+  'editor.selection.collisionCopyConfirm': 'すべてにコピー',
+  'editor.selection.collisionCopyConfirmBody':
+    'マップ上の他の{count}個の{name}すべてについて、既存の衝突をこの種類と形で置き換えます。それぞれ自身の縮尺に合わせるため、小さいコピーの占有範囲も小さくなります。Ctrl+Zでコピー操作全体を元に戻せます。',
+  'editor.selection.collisionCopyConfirmTitle': 'すべての{name}に衝突形状をコピーしますか？',
+  'editor.selection.collisionCustom':
+    'カスタム占有範囲（円/四角）でベイクされたモデル形状を上書きしています。「自動」で元に戻せます。',
+  'editor.selection.collisionEdited':
+    'カスタムヒットボックス（{count}個の箱）。シミュレーションはこの形状どおりに通行を遮ります。',
+  'editor.selection.collisionTitle': '衝突',
+  'editor.selection.collisionType': '衝突の種類',
+  'editor.selection.collisionTypeBaked': 'ベイク済みヒットボックス',
+  'editor.selection.collisionTypeBasic': '基本（半径）',
+  'editor.selection.collisionTypeMesh': '実形状の衝突（高負荷）',
+  'editor.selection.collisionTypeNone': '衝突なし',
+  'editor.selection.combine': '結合（{count}個）',
+  'editor.selection.combineGrouped': '{count}個の配置物をグループ化しました。',
+  'editor.selection.combineHint':
+    '選択対象を1つのオブジェクトにまとめます。分割した建物の部品は元の建物に戻り、それ以外はグループ化されるため、選択、移動、削除をまとめて行えます。',
+  'editor.selection.combineNeedsTwo': '結合するには配置物を2つ以上選択してください。',
+  'editor.selection.combineRejoined': '{name}に再結合しました。',
+  'editor.selection.hitboxAdd': 'ヒットボックスを追加',
+  'editor.selection.hitboxCap': 'ヒットボックスの上限（アセットごとに{max}個）に達しました。',
+  'editor.selection.hitboxClearPreset': '保存済みプリセットを消去',
+  'editor.selection.hitboxDelete': '選択対象を削除',
+  'editor.selection.hitboxDone': '編集を完了',
+  'editor.selection.hitboxEdit': 'ヒットボックスを編集',
+  'editor.selection.hitboxHint':
+    'ヒットボックスをクリックして選び、Ctrl/Shift+クリックで複数選択します。他のオブジェクトと同様に、移動、回転、拡大縮小ツール（またはギズモ）で形を調整できます。Deleteで選択した箱を削除し、Escで編集モードを終了します。',
+  'editor.selection.hitboxPresetCleared': 'ヒットボックスのプリセットを消去しました。',
+  'editor.selection.hitboxPresetHint':
+    'プリセットはこの端末に保存されます。以後このアセットを配置すると、保存されたヒットボックスが付きます。',
+  'editor.selection.hitboxPresetSaved':
+    '{name}のヒットボックスのプリセットを保存しました。新しく配置するものに、これらの箱をコピーします。',
+  'editor.selection.hitboxReset': 'ベイク済みの形に戻す',
+  'editor.selection.hitboxSavePreset': 'プリセットとして保存',
+  'editor.selection.hitboxSelected': '{count}個のヒットボックスを選択中',
+  'editor.selection.meshBakeDone': '実形状の衝突が準備できました（{count}個の箱）。',
+  'editor.selection.meshBakeFailed': 'このアセットの実形状の衝突をベイクできませんでした。',
+  'editor.selection.meshBaking': 'モデルメッシュから実形状の衝突をベイク中...',
+  'editor.selection.meshHint':
+    '実形状の衝突は、実際のモデルメッシュから多数の小さな箱でヒットボックスを再構築します。高負荷のため、特殊な場合だけに使ってください。選択時にアセットごとに1回ベイクします。',
+  'editor.selection.meshReady':
+    '実形状の衝突が有効です。実際のモデルメッシュに密着する高密度の箱を使用中です。',
+  'editor.selection.multiCount': '{count}個のアセットを選択中',
+  'editor.selection.multiHint':
+    '移動、Shift+Dの複製、Deleteは選択全体に適用されます。Shift+クリックでアセットを選択に追加、または選択から外します。',
+  'editor.selection.pieces': '部品を編集（{count}個）',
+  'editor.selection.piecesCap': 'この建物を分割するための配置枠が足りません。',
+  'editor.selection.piecesDone': '{count}個の部品に分割しました。',
+  'editor.selection.piecesHint':
+    'Blenderで作られたこの建物を、キットの部品と外殻に分け、それぞれ個別に移動、回転、拡大縮小、削除できる配置物にします。Ctrl+Zで建物を元に戻せます。',
+  'editor.selection.scaleAllButton': 'すべての{name}（{count}個）を拡大縮小',
+  'editor.selection.scaleAllConfirm': 'すべてを拡大縮小',
+  'editor.selection.scaleAllConfirmBody':
+    'マップ上の{count}個すべての{name}（これを含む）の縮尺を、{min}から{max}の間のランダムな値で置き換えます。Ctrl+Zで元に戻せます。',
+  'editor.selection.scaleAllConfirmTitle': 'すべての{name}を拡大縮小しますか？',
+  'editor.selection.scaleAllDone': '{count}個の{name}を拡大縮小しました。',
+  'editor.selection.scaleAllHint':
+    'このアセットのすべてのコピーに、最小値と最大値の間でランダムな縮尺を設定します（両値を同じにすると均一になります）。',
+  'editor.selection.scaleAllTitle': 'すべてのコピーを拡大縮小',
+  'editor.selection.scaleMax': '最大縮尺',
+  'editor.selection.scaleMin': '最小縮尺',
+  'editor.selection.selectAllOfAsset': 'このアセットをすべて選択（{count}個）',
+  'editor.selection.selectAllOfAssetTitle':
+    'マップ上に配置されたこのアセットをすべて選択し、移動、削除、プロパティ変更をまとめて適用します。',
+  'editor.selection.squareCollision': '四角形の衝突（回転に追従）',
+  'editor.selection.sway': '風の揺れ',
+  'editor.selection.swayHint':
+    'このアセットを風で揺らします。植物は既定で有効です。選択中のものだけでなく、マップ上のこのアセットの全配置物に適用されます。',
+  'editor.selection.ungroup': 'グループ解除（{count}個）',
+  'editor.selection.ungroupDone': '{count}個の配置物のグループを解除しました。',
+  'editor.selection.y': 'Y座標',
+  'editor.settings.applyGraphics': '適用するにはエディターを再読み込み',
+  'editor.settings.graphicsHint':
+    '次のプレイテストに適用され、再読み込み後にはエディターにも適用されます。',
+  'editor.settings.graphicsMedium': '中',
+  'editor.settings.graphicsTitle': '画質',
+  'editor.settings.hint':
+    'エディターとプレイテストの画質と音の設定です。ゲームと同じ設定を使い、このブラウザーに保存されます。',
+  'editor.settings.music': '音楽を再生',
+  'editor.settings.musicVolume': '音楽の音量',
+  'editor.settings.sfxVolume': '効果音の音量',
+  'editor.settings.soundTitle': 'サウンド',
+  'editor.soundTool.capReached': '点音源の上限（{max}）に達しました。',
+  'editor.soundTool.clip': '効果音',
+  'editor.soundTool.deleteTitle': 'この音源を削除',
+  'editor.soundTool.hint':
+    '地面をクリックしてループ音源を置き、音を選び、最大音量と半径を設定します。減衰球で届く範囲を確認でき、プレイテストでは空間音として再生されます。',
+  'editor.tree.volumeY': 'Y座標',
+  'editor.tunnel.digAlpha.round': '円形',
+  'editor.soundTool.none': '点音源はまだありません。',
+  'editor.soundTool.radius': '半径（ヤード）',
+  'editor.soundTool.selectTitle': 'ワールド内のこの音源を選択（マークが拡大し、Deleteで削除）',
+  'editor.soundTool.soundN': '音源{num}',
+  'editor.soundTool.title': '点音源',
+  'editor.soundTool.volume': '最大音量',
+  'editor.spawn.area': '出現エリア: {width} x {height}ヤード',
+  'editor.status.bundleExported':
+    '「{name}」をモデル、テクスチャ、スカイボックスとともに書き出しました。別のコンピューターでは、単独の.jsonではなく.wocmap.zipを読み込んでください。',
+  'editor.status.caveCapReached':
+    '洞窟の上限（{max}）に達しました。先に洞窟を削除するか、取り消してください。',
+  'editor.status.entityCapReached':
+    'マップのエンティティ数が上限に達しました。コピーしたNPCやモブの一部を貼り付けられませんでした。',
+  'editor.status.exportBlockedInvalid':
+    'マップがエンジン互換性チェックに合格しなかったため、書き出しをブロックしました。コピーを保存し、最近の変更を確認してから再試行してください。',
+  'editor.status.exportBlockedMissingDeps':
+    '書き出しをブロックしました。参照中のモデル、テクスチャ、スカイボックスのファイル{count}件が、このブラウザーにありません。完全なマップをエンジンへ渡せるよう、復元してから書き出してください。',
+  'editor.status.holeCapReached':
+    '穴の上限（{max}）に達しました。先に穴を削除するか、取り消してください。',
+  'editor.status.importMissingDeps':
+    'モデル、テクスチャ、スカイボックスのファイル{count}件がないため、マップの一部が空白です。.wocmap.zipバンドルを読み込み直して補ってください。',
+  'editor.status.loading3dAssets': 'アセットを読み込み中...',
+  'editor.status.loading3dEngine': 'エンジンを起動中...',
+  'editor.status.loading3dZone': 'ワールドを構築中...',
+  'editor.status.newFlatMap': '空のマップを開始しました。',
+  'editor.status.openFailedLocal':
+    'そのセーブデータは破損または不完全で、読み込めませんでした。コピーを書き出してある場合は、「その他」>「読み込み」からファイルを読み込める可能性があります。',
+  'editor.status.publishedMapOpened':
+    '公開済みの「{name}」を開きました。これは、このマップでゲームが配信するバージョンです。',
+  'editor.status.selectionCopied': '選択した{count}項目をコピーしました。',
+  'editor.status.selectionNothingToCopy': 'コピーする前に、アセット、NPC、モブを選択してください。',
+  'editor.status.selectionNothingToPaste':
+    '貼り付ける前に、アセット、NPC、モブをコピーしてください。',
+  'editor.status.selectionPasted': '{count}項目を貼り付けました。',
+  'editor.status.shippedMapOpened': '「{name}」の編集可能なコピーを開きました。',
+  'editor.status.waterReapplied': '現在の地形から水を再構築しました。',
+  'editor.tool.build': 'モデルを作成',
+  'editor.tool.building': '建築モード',
+  'editor.tool.clutter': '散布物を塗る',
+  'editor.tool.collider': 'コライダー',
+  'editor.tool.decal': 'デカール',
+  'editor.tool.entity': 'NPCとモブを移動',
+  'editor.tool.eyedropper': 'スポイト',
+  'editor.tool.foliage': '植生を塗る',
+  'editor.tool.light': '点光源',
+  'editor.tool.rock': '岩生成',
+  'editor.tool.rotate': '回転',
+  'editor.tool.sound': '点音源',
+  'editor.tool.tree': '木ジェネレーター',
+  'editor.tool.tunnel': '洞窟',
+  'editor.toolGroup.assets': 'アセット',
+  'editor.toolGroup.effects': '効果',
+  'editor.toolGroup.terrain': '地形',
+  'editor.topbar.axisGimbal': 'カメラのジンバル',
+  'editor.topbar.axisGimbalTitle': 'カメラの向きを示すジンバルを表示または非表示',
+  'editor.topbar.dungeonTitle': '作成済みダンジョンの内部レイアウトを編集',
+  'editor.topbar.evenBuildings': '建物の縦横を整える',
+  'editor.topbar.evenBuildingsDone': '{count}棟の建物を整えました。',
+  'editor.topbar.evenBuildingsNone': '押し潰れた建物は見つかりませんでした。',
+  'editor.topbar.evenBuildingsTitle':
+    '敷地を埋めるため横に伸ばされた建物を修正します。高さと占有面積を維持しながら幅と奥行きを等しくし、押し潰れた見た目をなくします',
+  'editor.topbar.fullBuildDone': '全{total}ゾーンが常駐しています。',
+  'editor.topbar.fullBuildPreview': '全体構築プレビュー',
+  'editor.topbar.fullBuildPreviewTitle':
+    'このマップの全ゾーンをビューポートに読み込みます（時間がかかる場合があります）',
+  'editor.topbar.fullBuildProgress': 'ゾーンを構築中: {done}/{total}',
+  'editor.topbar.generateTerrainTitle':
+    '基本ゲームワールドの一地域から、このマップの地形を生成します。ワールドマップ上で輪郭をドラッグし、元の配置のどこを使うか選んでください',
+  'editor.topbar.hitboxes': 'ヒットボックス',
+  'editor.topbar.hitboxesTitle':
+    'ゲームが実際に通行を遮る衝突形状を表示（青はコリジョンマスターで作成済み、赤は自動ベイクの箱）',
+  'editor.topbar.importModel': 'モデルを読み込む',
+  'editor.topbar.importModelTitle':
+    'このコンピューターから.glbまたは.gltfモデルを読み込み、完全オフラインで配置します（このセッション中のみ保持）',
+  'editor.topbar.mapWindowTitle': '現在のゾーンのマップを開く（ワールド全体の表示ボタン付き）',
+  'editor.topbar.minimapTitle': '隅のミニマップを切り替える（カメラに追従する真上からの表示）',
+  'editor.topbar.moreTitle':
+    'その他の操作: 名前を付けて保存、自動保存、分岐、読み込み/書き出し、アップロード',
+  'editor.topbar.musicTitle':
+    'カメラ下のエリアの音楽を再生します。音楽エリアの曲、マップの曲、ゾーン固有の曲の順に優先します。飛び回ると音楽も追従します。',
+  'editor.topbar.newFlat': '空のマップ',
+  'editor.topbar.newFlatTitle': '基本ゲームの内容を含まない、新しい空のマップを好きな大きさで開始',
+  'editor.topbar.presetPrompt': '確定時にプリセットについて確認',
+  'editor.topbar.presetPromptTitle':
+    'コリジョンマスターで確定した後、この端末のヒットボックスのプリセットとして箱も保存するか確認します。「今後は確認しない」を選んでいた場合は、ここで有効に戻せます。',
+  'editor.topbar.previewTitle':
+    'ゲーム内の見た目でマップを確認します。衝突箱、音楽エリア、マーカー、リング、ギズモなど、エディター限定の表示を隠します。',
+  'editor.topbar.primaryTools': '基本の変形ツール',
+  'editor.topbar.projectionOrthographic': '平行投影',
+  'editor.topbar.projectionPerspective': '透視投影',
+  'editor.topbar.projectionTitle': '透視投影と平行投影を切り替える（テンキー5）',
+  'editor.topbar.publishMap': 'ゲームに公開',
+  'editor.topbar.publishMapTitle':
+    'このマップを実際のゲーム内容としてローカルリポジトリーに書き込む（data/mapsとsrc/sim/maps）。?map=<slug>で起動できます',
+  'editor.topbar.settingsTitle': '画質と音の設定（プレイテストと共通）',
+  'editor.topbar.unpublishMap': 'ゲームから削除',
+  'editor.topbar.unpublishMapTitle':
+    'ローカルゲームからこのマップを削除します。公開時に書き込んだファイルを消し、標準のClaudeCraftワールドを復元します',
+  'editor.topbar.workspace': '表示',
+  'editor.topbar.workspaceTitle': '表示、マップ、プレビュー、ワークスペースのモード',
+  'editor.topbar.worldLink': 'ワールドに接続',
+  'editor.topbar.worldLinkTitle':
+    '基本ゲームワールド内にこのマップを配置します。ワールドマップ上に輪郭をドラッグすると、プレイテストでその場所へ組み込まれ、周囲では基本ゲームが動作します',
+  'editor.topbar.zoneIsolateOff': '全体構築',
+  'editor.topbar.zoneIsolateOn': 'ゾーン: {zone}',
+  'editor.topbar.zoneIsolateTitle':
+    '全体構築とゾーン表示を切り替えます。カメラのゾーンだけを表示し、切り替え直すまで外側をすべて読み込み解除します。表示のみの変更で、マップ自体は変わりません。',
+  'editor.transform.moveHint':
+    'ギズモの矢印をドラッグすると、その軸に沿って動かします。黄色い四角をドラッグすると自由に動かせます。矢印キーで微調整します。',
+  'editor.transform.pickHint': 'アセットをクリックして選ぶと、ギズモが表示されます。',
+  'editor.transform.rotateHint':
+    'ギズモのリングをドラッグして、その軸の周りに回転します。Shift+スクロールでも15度ずつ回転します。',
+  'editor.transform.scaleHint':
+    'ギズモの軸ハンドルをドラッグすると、その軸に沿って伸縮します。中央の黄色い立方体で均等に拡大縮小します。',
+  'editor.tree.addVolume': '球を追加',
+  'editor.tree.bark': '樹皮のテクスチャ',
+  'editor.tree.barkTile': '樹皮の繰り返し幅（ヤード）',
+  'editor.tree.branchDepth': '階層数',
+  'editor.tree.branchDroop': '垂れ具合',
+  'editor.tree.branchLen': '長さ',
+  'editor.tree.leafDroop': '垂れ具合',
+  'editor.tree.title': '木ジェネレーター',
+  'editor.tunnel.cutLength': '長さ',
+  'editor.tunnel.listTitle': '洞窟',
+  'editor.worldLink.title': 'ワールドに接続',
+  'editor.tree.branchSection': '枝',
+  'editor.tree.branchTaper': '先細り',
+  'editor.tree.branchTwist': 'ねじれ',
+  'editor.tree.branches': '大枝ごとの本数',
+  'editor.tree.canopyHint':
+    '葉は必ずこれらの球の中に配置されます。形を選んで並べ、広がりと大きさを調整してください。下で球を個別に編集し、樹冠を手作業で整えることもできます。',
+  'editor.tree.canopySection': '樹冠の領域',
+  'editor.tree.collide': '幹のヒットボックス',
+  'editor.tree.collideHint':
+    '幹自体の太さに対するコライダー半径の倍率です。0ならプレイヤーは通り抜けられます。',
+  'editor.tree.copyToTool': 'ツールの既定値として使用',
+  'editor.tree.editVolumes': '球を編集',
+  'editor.tree.girth': '太さ',
+  'editor.tree.heightScale': '幹の高さ',
+  'editor.tree.hint':
+    '地面をクリックして木を生やします。下の設定は次の木の形を変えます。配置済みの木は選択ツールで選び、その場で形を変えられます。',
+  'editor.tree.leafBranchBias': '枝に引き寄せる',
+  'editor.tree.leafClump': 'まとまり',
+  'editor.tree.leafCross': '交差する板ポリゴン',
+  'editor.tree.leafCrossHint':
+    '葉1枚につき四角面を1つではなく2つ使います。負荷は2倍ですが、樹冠に実際の奥行きが生まれます。',
+  'editor.tree.leafFillHint': '0では各球の表面に葉を付け、1では内部を完全に埋めます。',
+  'editor.tree.leafJitter': '回転のばらつき',
+  'editor.tree.leafSection': '葉',
+  'editor.tree.leafSet': '葉の画像',
+  'editor.tree.leafSizeVar': '大きさの変化',
+  'editor.tree.leafTintVar': '色の変化',
+  'editor.tree.leaves': '数',
+  'editor.tree.openStudio': 'ツリースタジオで編集',
+  'editor.tree.openStudioHint':
+    '空のシーンで木だけを開き、村に邪魔されずに形を調整できます。完了後に保存すると、ツールの既定値になります。',
+  'editor.tree.orient.billboard': 'カメラを向く',
+  'editor.tree.orient.droop': '垂れ下がる',
+  'editor.tree.orient.out': '外向き',
+  'editor.tree.orient.up': '直立',
+  'editor.tree.orient.volume': '樹冠に沿う',
+  'editor.tree.presetHint': 'バイオームに合う開始形です。後からすべての設定を編集できます。',
+  'editor.tree.randomize': '新しいシード',
+  'editor.tree.randomizeHint': '設定を変えずに、枝の伸び方と葉の散らばりを再抽選します。',
+  'editor.tree.removeVolume': '削除',
+  'editor.tree.resetVolumes': 'プリセットの形状に戻る',
+  'editor.tree.shape': '形状',
+  'editor.tree.shapeName.column': '柱形',
+  'editor.tree.shapeName.cone': '円錐',
+  'editor.tree.shapeName.dome': 'ドーム',
+  'editor.tree.shapeName.sockets': '大枝の上',
+  'editor.tree.shapeName.sphere': '球形',
+  'editor.tree.shapeName.umbrella': '傘形',
+  'editor.tree.shapeName.weeping': 'しだれ',
+  'editor.tree.showVolumes': '球を表示',
+  'editor.tree.stats': '葉{leaves}枚、枝{branches}本、高さ{height}ヤード',
+  'editor.tree.studioBanner': 'ツリースタジオ',
+  'editor.tree.studioHint':
+    'ここで木の形を整え、ツールの既定値として保存するか破棄してください。元のマップはそのまま待っています。',
+  'editor.tree.studioKeep': 'この木を使う',
+  'editor.tree.studioKept': 'ツリースタジオの設定を、ツールの既定値にしました。',
+  'editor.tree.studioMapName': 'ツリースタジオ',
+  'editor.tree.sway': '揺れ',
+  'editor.tree.trunk': '基部',
+  'editor.tree.trunkSection': '幹',
+  'editor.tree.volumeCount': '球の数',
+  'editor.tree.volumeLabel': '球{n}',
+  'editor.tree.volumeScale': '球の大きさ',
+  'editor.tree.windSection': '風と衝突',
+  'editor.tunnel.autoMouth': '入口を自動で掘る',
+  'editor.tunnel.autoMouthHint':
+    '管が地表に出る場所では地面を切り開くため、穴と入口を手作業で合わせる必要はありません。地中の部分では切らず、地表より上に浮いた部分の下の地面もそのままです。',
+  'editor.tunnel.carveDelete': '掘削形状を削除',
+  'editor.tunnel.carveHint':
+    '地面をクリックすると立体の青い仮表示が現れます。ドラッグで配置して調整し、「切削を確定」またはEnterを押すと、岩の中に実際の部屋やトンネルを掘ります。歩ける床、岩壁、天井ができ、周囲の地面のメッシュも再構築します。球なら小部屋、傾けたカプセルを丘に埋めればトンネル、箱なら広間になります。「混合」を上げると隣の掘削形状が溶け合い、きれいな1つの洞窟になります。地表に出た面から入れます。',
+  'editor.tunnel.carveLabel': '掘削{n}',
+  'editor.tunnel.carveList': '掘削一覧',
+  'editor.tunnel.caveLabel': '洞窟{n}（{nodes}点）',
+  'editor.tunnel.cutArch': 'アーチ',
+  'editor.tunnel.cutBend': '曲がり',
+  'editor.tunnel.cutBlend': '混合',
+  'editor.tunnel.cutBrush': '次の切削',
+  'editor.tunnel.cutPitch': '傾き',
+  'editor.tunnel.cutShape.capsule': 'カプセル',
+  'editor.tunnel.cutShape.sphere': '球形',
+  'editor.tunnel.cutShape.tube': '洞窟の入口（掘削孔から）',
+  'editor.tunnel.cutShape.voxel': '掘った岩',
+  'editor.tunnel.cutTaper': '先細り',
+  'editor.tunnel.cutWarp': 'うねり',
+  'editor.tunnel.cutWarpScale': 'うねりの大きさ',
+  'editor.tunnel.cutWobble': '揺らぎ',
+  'editor.tunnel.cutWobbleLen': '揺らぎの長さ',
+  'editor.tunnel.cutYaw': '旋回',
+  'editor.tunnel.delete': '洞窟を削除',
+  'editor.tunnel.digAlpha.crescent': '三日月',
+  'editor.tunnel.digAlpha.halfmoon': '半月',
+  'editor.tunnel.digAlpha.ragged': '不揃い',
+  'editor.tunnel.digCell': '掘削の細かさ（セル幅、ヤード）',
+  'editor.tunnel.digCellCoarsened':
+    'このブラシの大きさに合わせ、掘削のセル幅を{cell}ヤードにしました（より細かいセルは領域の上限を超えます）。',
+  'editor.tunnel.digCellHint':
+    'ストロークはこのセル幅の1つの岩領域として、直接マップへベイクされます。細かいほどメモリーと三角形数が増えます。最初の操作後はセル幅が固定されます。',
+  'editor.tunnel.digClear': '掘った岩を消去',
+  'editor.tunnel.digNoise': '縁のノイズ',
+  'editor.tunnel.digVolumeFull':
+    '掘った岩の領域が、マップで保持できる最大サイズに達しました。消去するか、既存の掘削部の近くを掘ってください。',
+  'editor.tunnel.endOpen': '出口を開く',
+  'editor.tunnel.eraseConfirm': '洞窟を消去',
+  'editor.tunnel.eraseDone': '箱の中の洞窟データを{n}件消去しました',
+  'editor.tunnel.eraseGhostHint':
+    '箱はクリックした場所に立ち、もう一度クリックすると移動します。確定すると、中の洞窟状のものをすべて消します。',
+  'editor.tunnel.eraseHalf': '幅の半分（ヤード）',
+  'editor.tunnel.eraseNothing': '箱の中に洞窟はありません',
+  'editor.tunnel.eraseTitle': '消去箱',
+  'editor.tunnel.fillHint':
+    '地面をクリックして消去箱を置き、スライダーかギズモで幅、長さ、高さを自由に調整してから、「洞窟を消去」またはEnterを押します。箱の中の掘削形状、穴、掘った領域をすべて除去します。箱と一部だけ重なる掘削形状も、重なった部分は岩で埋め戻します。1回で取り消せます。',
+  'editor.tunnel.floorVariance': '床の凹凸',
+  'editor.tunnel.generate': '洞窟を生成（{count}個が準備済み）',
+  'editor.tunnel.ghostConfirm': '切削を確定',
+  'editor.tunnel.ghostGizmoHint':
+    '2、3、4（移動、回転、拡大縮小）を押して、仮表示をギズモで動かしてください。その後「洞窟」ツールに戻って掘削します。',
+  'editor.tunnel.ghostHint':
+    '青い仮表示は、切削で取り除く立体です。地面のどこでもクリックまたは押し続けて配置し、下で大きさ、形、深さを調整してください。「切削を確定」またはEnterで確定し、キャンセルまたはEscで破棄します。確定するまで何も除去しません。',
+  'editor.tunnel.ghostLockHint':
+    'Enterで切削を確定し、Escapeで破棄します。先にツール2から4で仮表示を移動、回転、拡大縮小できます。',
+  'editor.tunnel.ghostTitle': '未確定の切削',
+  'editor.tunnel.guideHint':
+    '点線でつながる青い節点が洞窟の模型です。すべてのツールで見えます。移動ツールで節点を動かし、Y矢印で上げ下げし、拡大縮小でその場所の洞窟を広げられます。管は即座に再生成され、必ず設定した大きさを保ちます。緑の球が入口、赤い矢印が出口です。',
+  'editor.tunnel.height': '内部の高さ',
+  'editor.tunnel.hint':
+    '地面をクリックして入口の節点を置き、続けて青い経由点を置きます。最後の点が出口です。「生成」を押すと、節点だけから独立した管状の洞窟を作り、周囲の地形が押し潰したり形を変えたりすることはありません。「入口を自動で掘る」をオンにすると、地表に出た場所を管が切り開きます。オフなら「穴を切る」と「洞窟全体を選択」、移動ツールで位置を合わせてください。',
+  'editor.tunnel.holeDelete': '切削を削除',
+  'editor.tunnel.holeHint':
+    '地面をクリックして切削の青い仮表示を出し、位置を調整して「地面を切り抜く」を押すと、地形メッシュを貫通させます。その場所の地面はなくなり、開口部の周りに岩の縁ができます。下に洞窟の入口を合わせれば、歩いて入ったり飛び降りたりできます。最初に球、隙間や戸口用の向き付き箱、アーチ用のカプセルを選んでください。確定した切削は下でサイズ変更や削除ができ、取り消しは最後の1つを除去します。',
+  'editor.tunnel.holeLabel': '切削{n}',
+  'editor.tunnel.holeList': '切削一覧',
+  'editor.tunnel.modeCarve': '掘削形状',
+  'editor.tunnel.modeDig': '洞窟を掘る',
+  'editor.tunnel.modeFill': '埋め戻しブラシ',
+  'editor.tunnel.modeHole': '穴を切る',
+  'editor.tunnel.modePatch': '穴を塞ぐ',
+  'editor.tunnel.modeRemesh': 'メッシュ再構築',
+  'editor.tunnel.modeSculpt': '掘削ブラシ',
+  'editor.tunnel.mouthBlend': '入口の混合',
+  'editor.tunnel.needExit':
+    '入口を配置しました。続けて点を置き、経路を作ってください。最後の点が出口です。その後「生成」を押します。',
+  'editor.tunnel.noRig': 'この洞窟には操作できる節点がありません。新しい洞窟を作ってください。',
+  'editor.tunnel.patchDelete': 'パッチを削除',
+  'editor.tunnel.patchHint':
+    '地面をクリックして、ブラシ半径の幅のパッチを置きます。切削と同じ形が使え、重なった切削部分の地面を埋め戻します。各切削の周りの空白を整えるために使ってください。パッチは触れた切削より常に優先します。下でサイズ変更や削除ができ、取り消しは最後の1つを除去します。',
+  'editor.tunnel.patchLabel': 'パッチ{n}',
+  'editor.tunnel.patchList': 'パッチ一覧',
+  'editor.tunnel.remeshAll': '全洞窟のメッシュを再構築',
+  'editor.tunnel.remeshAllHint':
+    'マップ上の全掘削形状と掘った領域に、共通のセル幅を設定します。セルを大きくすると三角形数が大幅に減ります。マップ全体に一度で適用し、メッシュを再構築します。その上で下の領域設定により、個々の場所を細かく、または粗くできます。',
+  'editor.tunnel.remeshAllTitle': '全洞窟のメッシュを再構築',
+  'editor.tunnel.remeshCell': '細かさ（セル幅、ヤード）',
+  'editor.tunnel.remeshDelete': '領域を削除',
+  'editor.tunnel.remeshGlobal': '洞窟メッシュの細かさ（セル幅、ヤード）',
+  'editor.tunnel.remeshHint':
+    'クリックで、ブラシ半径の幅の細かさ領域を塗ります。触れたすべての掘削形状を、選んだセル幅で再構築します。既定より細かくも粗くもできます。洞窟をきれいに見せたい場所だけ細かくし、重すぎる掘削形状はセルを大きくしてください。細かいセルほど三角形数が増えます。',
+  'editor.tunnel.remeshLabel': '領域{n}（{r}ヤード、セル幅{cell}ヤード）',
+  'editor.tunnel.remeshList': '細かさ領域',
+  'editor.tunnel.remeshRegionsTitle': '細かさ領域（ブラシ）',
+  'editor.tunnel.reverse': '入口と出口を交換',
+  'editor.tunnel.sculptHint':
+    '掘削した壁、床、天井をドラッグし、粘土ブラシのように岩を掘り取ります。塗るたびに、ブラシ半径で決まる大きさの混ざり合う溝を掘ります。開けた地面をドラッグすると地表を削ります。1ストロークにつき1回取り消せます。',
+  'editor.tunnel.selectCave': '洞窟全体を選択',
+  'editor.tunnel.smoothHint':
+    '掘った縁に沿ってドラッグして滑らかにします。ブラシの下にあるすべての切削と埋め戻しの混合値を上げ、掘削線の折り目や瘤を一つの丸い表面に溶け合わせます。1ストロークにつき1回取り消せます。',
+  'editor.tunnel.spikeSize': '鍾乳石の大きさ',
+  'editor.tunnel.stalactites': '鍾乳石',
+  'editor.tunnel.stalagmites': '石筍',
+  'editor.tunnel.startOpen': '入口を開く',
+  'editor.tunnel.texDefault': '花崗岩（既定）',
+  'editor.tunnel.texture': '内部のテクスチャ',
+  'editor.tunnel.tooShort': '節点が近すぎます。少なくとも数ヤードの間隔を空けてください。',
+  'editor.tunnel.variance': 'ばらつき',
+  'editor.water.placeWaterfall': '滝を配置',
+  'editor.water.placeWaterfallTitle': '配置ツールに動く滝を設定（崖をクリックして設置）',
+  'editor.water.tintReset': '色調をリセット',
+  'editor.water.tintTitle': '水の色調',
+  'editor.water.waterfallHint':
+    '水しぶきの池を伴う、落下する水のアニメーション面です。Sキーかギズモで崖に合わせて拡大し、Y軸の拡大縮小ハンドルで高さだけを伸ばせます。',
+  'editor.water.waterfallLabel': '滝',
+  'editor.water.waterfallTitle': '滝の一覧',
+  'editor.weather.addStep': 'ステップを追加',
+  'editor.weather.addStepTitle': '各ステップを設定した分数だけ順に実行し、その後繰り返します',
+  'editor.weather.aurora': 'オーロラ',
+  'editor.weather.auroraHint':
+    'カメラがどこへ移動しても高空に光の幕が広がります。夜は最も明るく、昼は淡くなります。',
+  'editor.weather.cloudCover': '雲量',
+  'editor.weather.cloudHeight': '雲の高さ（ヤード）',
+  'editor.weather.cloudHint': '低い雲は地形に沿い、流れる地霧のように見えます。',
+  'editor.weather.minutesShort': '分',
+  'editor.weather.rain': '雨',
+  'editor.weather.removeStep': 'このステップを削除',
+  'editor.weather.scheduleHint':
+    'ステップは順に繰り返します（雨5分、その後晴れ10分、など）。マップと一緒に保存され、プレイテストでも動作します。',
+  'editor.weather.scheduleTitle': '変化する天候',
+  'editor.weather.scheduleWins': 'スケジュールが実行中のため、上の固定天候より優先します。',
+  'editor.weather.snow': '雪',
+  'editor.weather.sparkle': '金色のきらめき',
+  'editor.weather.stepMinutes': 'このステップの継続時間（分）',
+  'editor.weather.stepMode': 'このステップの天候',
+  'editor.weather.title': '天候',
+  'editor.weather.zoneHint':
+    'プレイヤーがこのゾーン内にいる間は、マップ全体の空よりゾーンの天候を優先します。1つのレルムでも地域独自の嵐を設定できます。',
+  'editor.weather.zoneTitle': 'このゾーンの天候',
+  'editor.worldLink.dragHint':
+    '金色の長方形をドラッグしてマップの位置を設定します。点は出現地点です。',
+  'editor.worldLink.hint':
+    'マップの輪郭を、基本ゲームワールドの配置したい場所へドラッグします。プレイテストでは、その場所へマップの地形、配置物、出現地点を組み込み、周囲で元のモブ、NPC、クエストが動作します。旧ワールドの外にある外海にも置け、そこでは新しい陸地として現れます。編集空間は変わらず、接続を使うのはプレイテストだけです。',
+  'editor.worldLink.linked': 'マップをワールドの（{x}, {z}）へ接続しました。',
+  'editor.worldLink.save': '接続を保存',
+  'editor.worldLink.standaloneOnly':
+    'ワールドに接続できるのは、独立した自作マップだけです。先に空のマップを開くか、マップを読み込んでください。',
+  'editor.worldLink.statusLinked': '接続済み: マップの原点は、ワールド内の（{x}, {z}）にあります。',
+  'editor.worldLink.statusUnlinked': '独立: このマップは、独自の別空間としてプレイテストします。',
+  'editor.worldLink.unlinked': '接続を解除しました。再び独立したマップとしてプレイテストします。',
+  'editor.zoneTool.deleteTitle': 'この場所を削除',
+  'editor.zoneTool.hideBoxes': 'エリアの枠を非表示',
+  'editor.zoneTool.hint':
+    '地面で枠をドラッグし、名前を付けてください。プレイテストでその中に立つと、場所の名前として表示します。',
+  'editor.zoneTool.namePrompt': '場所の名前',
+  'editor.zoneTool.none': '名前付きの場所はまだありません。',
+  'editor.zoneTool.title': '名前付きの場所',
+  'entities.mobs.buddy_alon.name': 'アロン',
+  'entities.mobs.buddy_bull.name': '雄牛',
+  'entities.mobs.buddy_cate_coin.name': 'ケイトコイン',
+  'entities.mobs.buddy_frog.name': 'カエル',
+  'entities.mobs.buddy_moss_hare.name': '苔ウサギ',
+  'entities.mobs.buddy_stag.name': '雄鹿',
+  'entities.zones.goldcrest_harbor.name': 'ゴールドクレスト港',
+  'entities.zones.goldcrest_harbor.pois.0.label': '大門',
+  'entities.zones.goldcrest_harbor.pois.1.label': '大広場',
+  'entities.zones.goldcrest_harbor.pois.2.label': 'ゴールドクレスト取引所',
+  'entities.zones.goldcrest_harbor.pois.3.label': '市場区',
+  'entities.zones.goldcrest_harbor.pois.4.label': '港区',
+  'entities.zones.goldcrest_harbor.pois.5.label': 'ハイクラウン城塞',
+  'entities.zones.goldcrest_harbor.pois.6.label': '光の尖塔',
+  'entities.zones.goldcrest_harbor.pois.7.label': '黄金の光',
+  'entities.zones.goldcrest_harbor.pois.8.label': '黄金の大橋',
+  'entities.zones.goldcrest_harbor.welcome':
+    'ゴールドクレスト港、世界市場の中心。レルムのすべての道、潮、帳簿がここに集まる。',
+  // Zulgar's hunt rework (the sun glyphs, the Hunting Spear, The Idol Wakes):
+  // the M16 non-Latin fills of its new English.
+  'hudChrome.auraEffect.wildheart.sunstruck': '光る太陽紋に焼かれた：移動速度が{pct}%低下する。',
+  'hudChrome.auraEffect.wildheart.sunstruckExposed':
+    '光る太陽紋に焼かれた：受けるダメージが{pct}%増加する。',
+  'hudChrome.auraEffect.wildheart.sunWary':
+    'この効果が終わるまで、どの太陽紋も彼を焼けない。その間に踏まれた光る太陽紋は光ったまま残る。',
+  'hudChrome.auraEffect.wildheart.pinned':
+    '狩りの槍があなたをその場に釘付けにしている。{every}秒ごとに{bleed}の物理ダメージ（ヒロイックでは{heroicBleed}）の出血を受け、ワイルドハートの脈動はどこにいても命中してダメージが{pulse}%増加する。仲間は{pull}秒で槍を引き抜ける。他に動ける仲間がいなければ、自分で{wrench}秒かけて引き抜ける。{seconds}秒後には自然に抜ける。',
+  'hudChrome.auraEffect.wildheart.idolAwake':
+    '石のジャガーが目覚めた。{every}秒ごとに、床に{warning}秒の予兆を出してからテラスの片側ずつに息を吐く：その側にいる全員に{min}から{max}の自然ダメージ（ヒロイックでは{heroicMin}から{heroicMax}）。ズルガーは倒されるまでジャガーの化身のままで、{seconds}秒ごと（ヒロイックでは{heroicSeconds}秒ごと）に獲物を替える。',
+  'hudChrome.wildheartAlert.preyAloneLine':
+    '太陽紋を灯せる仲間がいない。消えた太陽紋の上に{seconds}秒立って灯し、ズルガーにそこを通らせろ',
+  'hudChrome.wildheartAlert.pinnedTitle': '釘付けにされた！',
+  'hudChrome.wildheartAlert.pinnedLine':
+    '仲間に狩りの槍を引き抜いてもらえ。釘付けの間はワイルドハートの脈動のダメージが増える',
+  'hudChrome.wildheartAlert.pinnedSelfLine':
+    '助けに来られる仲間がいない：ワイルドハートの脈動が来る前に自分で狩りの槍を引き抜け',
+  'hudChrome.wildheartAlert.sunstruckTitle': 'ズルガーが太陽に焼かれた！',
+  'hudChrome.wildheartAlert.sunstruckLine':
+    '効果が終わるまで受けるダメージが{pct}%増加する：今こそ最強の攻撃を叩き込め',
+  'hudChrome.wildheartAlert.spearTitle': '仲間が釘付けにされた！',
+  'hudChrome.wildheartAlert.spearLine': '狩りの槍まで走り、ワイルドハートの脈動が来る前に引き抜け',
+  'hudChrome.wildheartAlert.glyphTitle': '太陽紋を灯せ',
+  'hudChrome.wildheartAlert.glyphLine':
+    '消えた太陽紋の上に{seconds}秒立つと灯る。ズルガーがそこを通ると、{duration}秒間受けるダメージが{pct}%増加する',
+  'hudChrome.wildheartAlert.glyphLightingTitle': '太陽紋を灯している',
+  'hudChrome.wildheartAlert.glyphLightingLine':
+    '灯るまで太陽紋の上にとどまれ。離れるとやり直しになる',
+  'hudChrome.wildheartAlert.breathTitle': '偶像の息吹！',
+  'hudChrome.wildheartAlert.breathLine':
+    '石のジャガーがテラスのこちら側に息を吐こうとしている。反対側へ渡れ',
+  'hudChrome.kitUse.freeLine':
+    '槍を地面から引き抜き、釘付けにされた者を解放する。攻撃を受けても中断されないが、移動やスタンでは中断される',
+  'hudChrome.kitUse.freeKey': '{name}を引き抜く',
+  'hudChrome.kitUse.freeTap': 'ここをタップして{name}を引き抜く',
+  'hudChrome.kitUse.freeClick': 'ここをクリックして{name}を引き抜く',
+  'hudChrome.kitUse.freeFar': '{range}ヤード以内に近づいて引き抜け',
+  'hudChrome.kitUse.freeAria': '{name}を引き抜く',
+  'hudChrome.kitUse.freeUsingLine': '槍を引き抜くまで動くな：移動やスタンで中断される',
+  'abilityUi.cast.wildheart_zulgar_hunting_spear': '狩りの槍',
+  'abilityUi.cast.wildheart_zulgar_idol_wakes': '偶像の目覚め',
+  'abilityUi.cast.kituse_wildheart_pull_spear': '槍を引き抜く',
+  'abilityUi.cast.wildheart_idols_breath': '偶像の息吹',
+  'abilityUi.cast.wildheart_sun_glyph_kindle': '点灯中',
+  'abilityUi.cast.wildheart_sun_glyph_cold': '冷却中',
+  'entities.mobs.wildheart_hunting_spear.name': '狩りの槍',
+  // Choirmother Selthe's Score (the Drowned Temple alert, her ward and her
+  // broken voice, her two bars): the M16 non-Latin fills of its new English.
+  'hudChrome.templeAlert.melodyTitle': '楽譜',
+  'hudChrome.templeAlert.melodyLine':
+    '月のタイルが順番に鳴るのを見ておけ。仲間と交代しながら同じ順番で踏め',
+  'hudChrome.templeAlert.melodyDarkLine':
+    'タイルが暗くなる前に順番を覚えろ。仲間と交代しながら同じ順番で踏め',
+  'hudChrome.templeAlert.answerTitle': '楽譜に答えろ！',
+  'hudChrome.templeAlert.answerLine':
+    '交代して踏め。{place}の印がある月のタイルに踏み入れ。鳴らした数：{total}枚中{done}枚',
+  'hudChrome.templeAlert.answerDarkLine':
+    '交代しながら覚えた順番どおりに踏め。同じタイルを踏み直すには、一度降りること。鳴らした数：{total}枚中{done}枚',
+  'hudChrome.templeAlert.stepOffTitle': '一度降りて、踏み直せ',
+  'hudChrome.templeAlert.stepOffLine':
+    '月のタイルは誰かが踏み入った時にだけ鳴る。このタイルから降りて、もう一度踏み入れ',
+  'hudChrome.templeAlert.falseTitle': '外れた音！',
+  'hudChrome.templeAlert.falseLine': 'そのタイルは順番が違う。答えは最初のタイルからやり直しになる',
+  'hudChrome.templeAlert.brokenTitle': 'セルセの声が砕けた！',
+  'hudChrome.templeAlert.brokenLine':
+    '効果が終わるまで受けるダメージが{pct}%増加する：今こそ最強の攻撃を叩き込め',
+  'hudChrome.templeAlert.timeAria': '残り{seconds}秒',
+  'hudChrome.auraEffect.temple.scoreWard':
+    '楽譜を歌っている：終わるまでダメージを受けない。歌が終わる前に、鳴った順番どおりに月のタイルへ踏み入ると彼女の声が砕ける。交代して踏むこと。音を鳴らしたら、別のプレイヤーが次の正しい音を鳴らすまで待つ。生存者が一人なら、一人で最後まで答えられる。先に歌が終わると、不協和音が広間の全員に{min}から{max}の冷気ダメージ（ヒロイックでは{heroicMin}から{heroicMax}）を与える。',
+  'hudChrome.auraEffect.temple.brokenVoice':
+    '声が砕けている：この効果が終わるまで受けるダメージが{pct}%増加する。',
+  'abilityUi.cast.temple_score': '楽譜',
+  'abilityUi.cast.temple_score_answer': '楽譜に答えろ',
+  // The Dungeon Finder's line for Selthe's Score (M16).
+  'hudChrome.finder.mech.the_score':
+    '楽譜（彼女は二度、月のタイルで旋律を歌う：鳴った順番どおりに踏み入ると彼女の声が砕ける）',
+  'hudChrome.templeAlert.spentTitle': '次は別の人が答える番',
+  'hudChrome.templeAlert.spentLine':
+    '別のプレイヤーが次の正しい音を鳴らすまで、タイルを鳴らせない。鳴らした数：{total}枚中{done}枚',
+  'hudChrome.auraEffect.temple.spentVoice':
+    '別のプレイヤーが次の正しい音を鳴らすまで、月のタイルを鳴らせない。この間にタイルを踏んでも答えはリセットされず、ダメージも受けない。解除不可。同じインスタンスで生きているプレイヤーが自分だけになるか、楽譜が終了すると解除される。',
+  'hudChrome.options.firstPersonBody': '体を表示',
+  'hudChrome.options.firstPersonNoBody': '体を非表示',
+  'hudChrome.options.firstPersonOff': 'オフ',
+  'footer.guideBest': '最高のMMORPG',
+  'footer.guideFree': '無料MMORPG',
+  'footer.guideNew': '新作MMORPG',
+  'guide.footer.guideBest': '最高のMMORPG',
+  'guide.footer.guideFree': '無料MMORPG',
+  'guide.footer.guideNew': '新作MMORPG',
+  'entities.items.vanguard_band_of_might.name': 'ヴァンガードの力の指輪',
+  'entities.items.vanguard_band_of_precision.name': 'ヴァンガードの精密の指輪',
+  'entities.items.vanguard_band_of_focus.name': 'ヴァンガードの集中の指輪',
+  'entities.items.vanguard_band_of_mending.name': 'ヴァンガードの癒しの指輪',
+  'entities.items.vanguard_pendant_of_might.name': 'ヴァンガードの力のペンダント',
+  'entities.items.vanguard_pendant_of_precision.name': 'ヴァンガードの精密のペンダント',
+  'entities.items.vanguard_pendant_of_focus.name': 'ヴァンガードの集中のペンダント',
+  'entities.items.vanguard_pendant_of_mending.name': 'ヴァンガードの癒しのペンダント',
+  'footer.guidesLabel': 'プレイヤーガイド',
+  'footer.guideGamesLikeWow': 'WoWに似たゲーム',
+  'footer.guideBrowser': 'ブラウザMMORPG',
+  'footer.guideGamesLikeDiablo': 'ディアブロに似たゲーム',
+  'hudChrome.hill.pvpEntry': '開催中の円に入るとワールドPvPが有効になります。',
+  'hudChrome.hill.pvpBanner': 'PvP',
+  'hudChrome.hill.callout.killingSpree': '{name}：キリングスプリー！',
+  'hudChrome.hill.callout.rampage': '{name}：ランペイジ！',
+  'hudChrome.hill.callout.unstoppable': '{name}：アンストッパブル！',
+  'hudChrome.hill.callout.dominating': '{name}：ドミネイティング！',
+  'hudChrome.hill.callout.godlike': '{name}：ゴッドライク！',
+  'hudChrome.hill.callout.legendary': '{name}：レジェンダリー！',
+  'hudChrome.hill.callout.shutDown': '{killer}が{victim}をシャットダウン！',
 };

@@ -5,7 +5,17 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+
+// These mutable temporary images must not stay open in libvips' operation cache.
+const cache = sharp.cache();
+beforeAll(() => {
+  sharp.cache(false);
+});
+afterAll(() => {
+  sharp.cache({ memory: cache.memory.max, files: cache.files.max, items: cache.items.max });
+});
+
 import {
   assertItemArtAuditPass,
   buildItemArtAudit,
@@ -829,7 +839,7 @@ describe('item-art audit builder', () => {
       execFileSync(process.execPath, ['scripts/item_art_audit.mjs', '--verify-only'], {
         cwd: repoRoot,
         encoding: 'utf8',
-        timeout: 30_000,
+        timeout: 55_000,
       }),
     ) as Record<string, unknown>;
     // Restored post-merge (release/v0.42.0 into professions): neither
@@ -878,29 +888,37 @@ describe('item-art audit builder', () => {
       // 2005 / 2034 on 42 sheet pages with the five-dungeon rework (PR 4352) on the v0.45.0
       // integration, re-measured.
       // Buddy union measured with scripts/item_art_audit.mjs --verify-only.
-      catalogSha256: '432503f1b9cd93e304acec6fae601d6eda0b621a3be304351a5c709c0d1a5ee9',
-      catalogBytes: 1112221,
+      // 2040 / 2069 with the membership Staff of Changing (PR 4281), re-measured with
+      // `--verify-only` on the merged tree.
+      // Integration45: 141 new files plus repainted loot and Nightwing Chimaera, measured by --verify-only.
+      // 2,183 owners / 2,212 live with Wobbles the Slime's reins, re-measured with
+      // `node scripts/item_art_audit.mjs --verify-only` (catalog +523 bytes).
+      // + the sprite buddy's whistle render: 2186 / 2215, re-measured with --verify-only.
+      // Release adds five painted owners; measured with --verify-only on the combined tree.
+      // Restored feral staff and eight jewelry paintings; measured with --verify-only.
+      catalogSha256: '14c4ebd9b13939840b19ee2aae4374db4bd88bce88571f2b7953d5b587ce7deb',
+      catalogBytes: 1182978,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 2039,
-      liveItemCount: 2068,
+      catalogCount: 2164,
+      liveItemCount: 2193,
       generatedHeroicDefinitions: 116,
       heroicDefinitionsWithOwnWebp: 86,
       heroicWeaponArtAliases: 30,
-      groupCount: 28,
-      sheetPageCount: 44,
-      sheetCount: 352,
+      groupCount: 26,
+      sheetPageCount: 45,
+      sheetCount: 360,
       sheetModeCounts: {
-        '128-color': 44,
-        '40-color': 44,
-        '28-color': 44,
-        '22-color': 44,
-        '28-grayscale': 44,
-        '64-circle': 44,
-        'small-multiview': 44,
-        identity: 44,
+        '128-color': 45,
+        '40-color': 45,
+        '28-color': 45,
+        '22-color': 45,
+        '28-grayscale': 45,
+        '64-circle': 45,
+        'small-multiview': 45,
+        identity: 45,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '2a34c06963c60cdff8a9ab277ab5b5b8264dfe4146edb7ca23a9220c2b4f6e3b',
+      shippingCatalogSha256: '21a26de395561c44c1fa71f4d0a808f5aedfb9619c51b2344f8a0a09a5aa4c65',
       machineChecksPassed: true,
       verdict: null,
     });

@@ -137,7 +137,7 @@ describe('referral receipt growth follows permanent bag custody', () => {
     const saved = roundTrip(state);
     expect(saved.referralRewards).toEqual(state.referralRewards);
     expect(saved.referralInviterRewards).toBe(3);
-    expect(saved.buddies?.owned).toEqual(['sapling']);
+    expect(saved.buddies?.owned).toEqual(['sprites']);
     expect(grantReferralInviterReward(saved, 5)).toBe(saved);
     expect(roundTrip(saved)).toEqual(saved);
     expect(Buffer.byteLength(JSON.stringify(saved))).toBe(21780);

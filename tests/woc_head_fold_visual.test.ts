@@ -803,7 +803,7 @@ describe('a seeded run of heads that take a chain to fold', () => {
         12,
         (v) => {
           const on = chance(0.4);
-          v.setGhost(on, 'stealth');
+          v.setGhost(on, 'stealth-rogue');
           return `stealth ${on}`;
         },
       ],

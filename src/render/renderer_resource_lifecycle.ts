@@ -15,6 +15,7 @@ export interface RendererPrewarmAndGroundFxOwner<T extends RendererDisposable> {
   vfx?: RendererDisposable;
   abilityVfxFx?: RendererDisposable;
   jungleFeatures?: RendererDisposable | null;
+  selectionReticle?: RendererDisposable;
   // The farm patch visuals (src/render/farm_patches.ts) own per-plot material
   // clones; their dispose() walks plots AND feasts. Added at the Phase 17
   // render review: the class carried a correct idempotent terminal owner that
@@ -51,6 +52,7 @@ export function disposeRendererPrewarmAndGroundFx(
   bestEffort(() => resources.abilityVfxFx?.dispose());
   bestEffort(() => resources.jungleFeatures?.dispose());
   bestEffort(() => resources.vfx?.dispose());
+  bestEffort(() => resources.selectionReticle?.dispose());
   bestEffort(() => resources.farmPatchVisuals?.dispose());
   bestEffort(() => resources.frozenOrbFx?.dispose());
   bestEffort(() => resources.necromancyArmyPortalFx?.dispose());

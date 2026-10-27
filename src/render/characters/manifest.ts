@@ -10,12 +10,14 @@ import {
   COLOSSUS_MOONLIGHT_LANCE,
   COLOSSUS_PRISM_FLARE,
   COLOSSUS_RESONANT_SLAM,
+  SELTHE_BOLT_GATHER,
   SELTHE_CHORUS_MARK,
   SELTHE_DROWNING_ARIA,
   SELTHE_MERE_SURGE,
-  SELTHE_MOONWATER_BOLT,
-  SELTHE_SEA_SONG,
+  SELTHE_SCORE,
+  SELTHE_SCORE_ANSWER,
   SELTHE_SOLO_MARK,
+  SELTHE_VOICE_BREAKS,
   YSOLEI_CALL,
   YSOLEI_LUNAR_TIDE,
   YSOLEI_UNDERTOW,
@@ -216,6 +218,7 @@ import { SMITH_HEART_PLACEHOLDER_LOOKS } from './smith_heart_placeholder_looks';
 import type { WeaponLoadout } from './weapon_loadout_core';
 import { WILDHEART_MOB_KEYS, wildheartPlaceholderLooks } from './wildheart_creature_looks';
 import { type WocFit, wocAnimsUrl, wocBaseUrl } from './woc_armor_core';
+import wocAutoAttackContacts from './woc_autoattack_contacts.json';
 import {
   WOC_DRUID_FEMALE_MANIFEST,
   WOC_DRUID_MANIFEST,
@@ -261,6 +264,21 @@ export interface ClipMap {
    *  jitter, seconds of standing still. Absent = the shared 5 s beat (visual.ts
    *  IDLE_VARIANT_MIN), tuned for a mount that is meant to be always mid-fidget. */
   idleVariantCadence?: { everySec: number; jitterSec?: number };
+  /** Hold a due fidget until the base idle loop wraps, then fire it on the
+   *  seam. For a rig whose fidgets all START on the idle's first frame and
+   *  whose idle travels far from it mid-loop (the sprite pair merging), so a
+   *  fidget cutting in mid-loop would visibly pop. */
+  idleVariantsOnLoopSeam?: boolean;
+  /** Draw the `idleVariants` from a shuffle bag (anim_state.drawIdleVariant):
+   *  each plays once per round, in random order, never twice in a row. Absent
+   *  = an independent random pick each time. */
+  idleVariantsShuffled?: boolean;
+  /** Count the base `idle` itself as one of the pool: drawing it plays one
+   *  more idle loop instead of a fidget. With a short cadence and the loop
+   *  seam hold, fidgets chain straight into one another and the base idle is
+   *  just one entry among them (a rig whose base idle is itself a set piece,
+   *  the sprite pair merging, rather than a breather). */
+  idleVariantsIncludeIdle?: boolean;
   /** Clip substitutions while the hands hold a given loadout (weapon_loadout_core.ts):
    *  'twohand' = a two-hand weapon (held in one fist on the WOC bodies), 'single' = a one-hand
    *  weapon with an empty off hand (the free hand stays down), 'dual' = a weapon in each hand.
@@ -663,6 +681,11 @@ export interface VisualDef {
    *  instead — e.g. the cosmetic-only Combat Mech, loaded via preloadMechAssets()
    *  when the skin-select preview opens, so it never bloats every client's boot. */
   lazyPreload?: boolean;
+  /** Clips looped for the visual's whole life BESIDE the state clips (idle,
+   *  walk, jump, ...), on their own clock, so they never restart when the
+   *  state changes: Wobbles the Slime's drifting bubbles. Each must animate
+   *  only bones no state clip touches, or the two actions blend. */
+  ambientClips?: readonly string[];
   /** Post-load orientation fixups for weapon/prop nodes baked INTO a creature
    *  GLB at the wrong angle (some KayKit handslot weapons ship without the grip
    *  flip the standalone weapon files carry). Node name as authored in the GLB;
@@ -842,6 +865,14 @@ const WOC_SINGLE: Readonly<Record<string, string>> = {
   '1H_Chop': '1H_Chop_Single',
   '1H_Slash': '1H_Slash_Single',
   Hit: 'Hit_Single',
+  Woc_Combat_Idle_1H: 'Woc_Combat_Idle_1H',
+  Woc_Hit: 'Woc_Hit',
+  Woc_Attack_1H_0: 'Woc_Attack_1H_0',
+  Woc_Attack_1H_1: 'Woc_Attack_1H_1',
+  Woc_Attack_1H_Stab: 'Woc_Attack_1H_Stab',
+  Woc_Special_1H: 'Woc_Special_1H',
+  // No shield to drive forward (Hushbrand needs none): the quick one-hand strike instead.
+  Woc_Shield_Bash: 'Woc_Attack_1H_0',
 };
 
 // Two-hand weapon: no two-hand stance (owner call, 2026-09-30: "just have the same animations as
@@ -855,6 +886,8 @@ const WOC_SINGLE: Readonly<Record<string, string>> = {
 const WOC_TWO_HAND: Readonly<Record<string, string>> = {
   ...WOC_SINGLE,
   '2H_Chop': '1H_Chop_Single',
+  Woc_Attack_2H_0: 'Woc_Attack_1H_0',
+  Woc_Attack_2H_1: 'Woc_Attack_1H_1',
 };
 
 // Dual wield: a blade in each hand (weapon_loadout_core 'dual'). The two blades cross in front
@@ -864,12 +897,21 @@ const WOC_TWO_HAND: Readonly<Record<string, string>> = {
 // fast Dual_Chop halves (attackByHand.dualwield) and its both-hands pairs (dualWieldPair).
 const WOC_DUAL: Readonly<Record<string, string>> = {
   Combat_Idle: 'Combat_Idle_Dual',
+  Woc_Combat_Idle_1H: 'Woc_Combat_Idle_Dual',
   Hit: 'Hit_Dual',
+  Woc_Hit: 'Woc_Hit',
   '1H_Chop': 'Dual_Stab',
   '1H_Slash': 'Dual_Cross',
   // The heavy chop (Execute, Slam, Mortal Strike...) with a weapon in each hand, a Titan's
   // Grip pair of two-handers included (2026-09-29): the X-slash, never both fists on one grip.
   '2H_Chop': 'Dual_Cross',
+  Woc_Attack_1H_0: 'Woc_Attack_Offhand_Stab',
+  Woc_Attack_1H_1: 'Woc_Attack_Dual',
+  Woc_Attack_1H_Stab: 'Woc_Attack_Offhand_Stab',
+  Woc_Special_1H: 'Woc_Attack_Dual',
+  Woc_Attack_2H_0: 'Woc_Attack_Dual',
+  Woc_Attack_2H_1: 'Woc_Attack_Dual',
+  Woc_Shield_Bash: 'Woc_Attack_Offhand_Stab',
 };
 
 // Blade contact times (seconds from the first frame, hand order) of the WOC melee clips, per
@@ -888,6 +930,11 @@ export const WOC_CONTACTS: Readonly<Record<string, readonly number[]>> = {
   Dual_Cross: [0.125, 0.092],
   Dual_Stab: [0.108],
   Block: [0.358],
+  ...wocAutoAttackContacts.male,
+  Woc_Attack_1H_Stab: [0.325],
+  Woc_Attack_Offhand_Stab: [0.542],
+  Woc_Shield_Bash: [0.292],
+  Woc_Special_1H: [0.325],
 };
 
 /** The female body's contacts (its own clips: the same keys, its own reach and timing). */
@@ -903,6 +950,11 @@ export const WOC_CONTACTS_FEMALE: Readonly<Record<string, readonly number[]>> = 
   Dual_Cross: [0.125, 0.108],
   Dual_Stab: [0.108],
   Block: [0.358],
+  ...wocAutoAttackContacts.female,
+  Woc_Attack_1H_Stab: [0.375],
+  Woc_Attack_Offhand_Stab: [0.325],
+  Woc_Shield_Bash: [0.292],
+  Woc_Special_1H: [0.325],
 };
 
 /** A WOC body's files (woc_armor_core.ts): its fit's shared base and animation
@@ -965,7 +1017,7 @@ const wocRigClips = (attack: string[]): ClipMap => ({
   emote: WOC_EMOTES,
   loadoutSwaps: { twohand: WOC_TWO_HAND, single: WOC_SINGLE, dual: WOC_DUAL },
   // two swings in one frame: the X-slash, then the one-two of the whole Dual_Chop
-  dualWieldPair: ['Dual_Cross', 'Dual_Chop'],
+  dualWieldPair: ['Woc_Attack_Dual', 'Dual_Chop'],
   contacts: WOC_CONTACTS,
 });
 
@@ -1029,6 +1081,24 @@ const animal = (attack: string[]): ClipMap => ({
 // and death alias Walk/Idle since a buddy never plays either.
 const BUDDY_CLIPS: ClipMap = { idle: 'Idle', walk: 'Walk', run: 'Walk', attack: [], death: 'Idle' };
 
+// Flicker and Glimmer, the flame-sprite pair (docs/design/sprites-buddy/): a
+// 6s Idle loop in which the two merge into one green sprite and split again,
+// plus five fidgets that each start and end on Idle's first frame. Standing
+// still, the six take turns evenly: a shuffle bag holds the five fidgets and
+// one Idle loop, each plays once per round in random order, never the same
+// twice in a row, and each starts on the Idle seam (fidgets chain straight
+// into one another), so nothing cuts the merge mid-way. Search has no ClipMap
+// slot yet; Jump is shipped for a later hop state.
+const SPRITES_BUDDY_CLIPS: ClipMap = {
+  ...BUDDY_CLIPS,
+  run: 'Run',
+  idleVariants: ['Idle_Nuzzle', 'Idle_Peekaboo', 'Idle_Dance', 'Idle_Doze', 'Idle_Leapfrog'],
+  idleVariantCadence: { everySec: 1, jitterSec: 0 },
+  idleVariantsOnLoopSeam: true,
+  idleVariantsShuffled: true,
+  idleVariantsIncludeIdle: true,
+};
+
 // Rideable mounts. The Tripo-lane rigs (bear, toad, griffin) ship clips baked
 // locally by scripts/bake_mount_gaits.mjs (the Tripo quadruped retarget was
 // near-static, 4-5 animated joints), which authors Idle/Walk/Run/Death gait
@@ -1044,6 +1114,38 @@ const MOUNT_RIGGED: ClipMap = {
   run: 'Run',
   attack: [],
   death: 'Death',
+};
+
+// Wobbles the Slime ships Idle / Walk / Run / Jump / Land (docs/design/slime-mount).
+// Naming `land` opts it into the held-jump treatment, like the tortoise: `Jump`
+// is the gather and spring, clamped on its airborne pose for the whole flight,
+// and `Land` is the touchdown splat. Neither carries a rise (the arc is the
+// game's). Death holds Idle: a ridden mount never plays one.
+const MOUNT_SLIME: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  attack: [],
+  death: 'Idle',
+  jump: 'Jump',
+  land: 'Land',
+};
+
+// The Drakemaw Raptor's own rig and clips, built in Blender from scratch
+// (scripts/assets/drakemaw_raptor/). WalkBack is a real backpedal: with no
+// walkBack clip a backpedal falls through to Run played FORWARD while the body
+// slides back. Naming `land` holds `Jump` on its last frame (the legs reaching
+// for the ground) for as long as it is airborne, then Land plays on a standing
+// touchdown (visual.ts isOnce). Death holds Idle: a ridden mount never plays one.
+const RAPTOR_MOUNT_RIGGED: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Run',
+  walkBack: 'WalkBack',
+  jump: 'Jump',
+  land: 'Land',
+  attack: [],
+  death: 'Idle',
 };
 
 // The Viridian Valestrider is authored as a mount-specific four-clip rig. It
@@ -1101,6 +1203,13 @@ const MOUNT_TORTOISE: ClipMap = {
   // mount would still be held above the ground when it touches down.
   jump: 'Jump',
   land: 'Land',
+};
+
+const MOUNT_CHIMERA: ClipMap = {
+  ...MOUNT_RIGGED,
+  idleVariants: ['Idle_Look'],
+  walkBack: 'WalkBackward',
+  jump: 'Jump',
 };
 
 // The Drakelands dragonkin brood (tmp/dragonkin_build.mjs bakes): artist
@@ -1346,31 +1455,22 @@ const STATIC_PROP: ClipMap = {
   death: 'Idle',
 };
 
-// Custom baked wolf rig (wolf_basic/greyjaw, Dog_Animation donor skeleton): the
-// animal() core plus the donor's Sit/Fall clips so player wolf forms sit and
-// jump properly, and a Walk swim base (a paddling gait at the gentle clip
-// pitch beats the steep no-clip procedural prone on a quadruped).
+// The wolf rig (wolf_basic/greyjaw): a skeleton fitted to each body by
+// scripts/assets/wolf_rig/ (spine, two-segment ears, a tail along the tail's own curl;
+// no jaw, the mouths stay as modeled; joints and clips pinned by its contract.mjs and
+// tests/wolf_rig.test.ts), every clip carried from the old dog-rig set and finished
+// there (planted paws, nothing through the floor, a tail that trails the body, ears;
+// the hit reacts are short flinches, where the old ones were copies of the 2.8 s Bark).
+// The animal() core plus Sit/Fall so player wolf forms sit and jump properly, and a
+// Walk swim base (a paddling gait at the gentle clip pitch beats the steep no-clip
+// procedural prone on a quadruped). Greyjaw plays it too: his own attack (a
+// sit-down howl into a lunge) was dropped with the rebuild, since a wolf that sits
+// to howl mid-fight reads wrong, so he bites like the pack.
 const WOLF_BAKED: ClipMap = {
   ...animal(['Attack']),
   sitIdle: 'Sit',
   swim: 'Walk',
   jump: 'Fall',
-};
-
-// Greyjaw's own attack (scripts/build_greyjaw_anims.mjs, issue #2889 round
-// 2): greyjaw.glb is a much richer, dedicated 48-node rig (not shared with
-// mob_wolf's separate wolf_basic.glb) that ships unused bonus donor clips
-// (Bark, Howl, "Idle Alert", Sneak) specific to this named rare; this
-// blends Howl's rear-back windup into Attack's lunge for a howl-then-pounce,
-// more dramatic than the plain Attack every other WOLF_BAKED user (mob_wolf,
-// form_ghost_wolf) still plays. WOLF_BAKED itself is untouched: both still read it,
-// and changing the shared base would change player shaman form combat
-// feel, out of scope here. greyjaw already ships and wires BOTH
-// Idle_HitReact_Left and Idle_HitReact_Right (via animal()), so no
-// hit-variety work is needed here: this override is attack-only.
-const GREYJAW_WOLF: ClipMap = {
-  ...WOLF_BAKED,
-  attack: ['Greyjaw_Attack'],
 };
 
 // Druid Bear Form: a purpose-built quadruped rig (29 deform bones; the gaits are
@@ -1415,6 +1515,7 @@ const DRUID_CAT_FORM: ClipMap = {
   attack: ['Attack_Left', 'Attack_Right'],
   attackByAbility: {
     claw: 'Attack_Left',
+    scratch: 'Attack_Left',
     rake: 'Attack_Right',
     ferocious_bite: 'Bite',
     rip: 'Finisher',
@@ -2026,6 +2127,10 @@ export const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
   votive_ward_of_the_deathless_court: 'shield_rare_b_violet', // Nythraxis gap-fill healer shield
   templar_dawn_shield: 'shield_rare_a_dawn', // Church Order quartermaster's mail shield (faction_vendors.ts)
   varkhul_emberward: 'varkhul_emberward', // Ignivar raid legendary (Varkhul drop)
+  // The leveling quest shields (content/quest_shields.ts), one per starting zone.
+  lychgate_buckler: 'shield_round',
+  bastion_kite_shield: 'shield_badge', // the pointed heater silhouette reads as a kite shield
+  barrowfield_tower_shield: 'shield_square',
 };
 
 /** Held-model GLBs whose materials are AUTHORED surfaces: a Tripo or Blender
@@ -2597,58 +2702,56 @@ export const VISUALS: Record<string, VisualDef> = {
     // timing and are meant to play at 1x (handoff INTEGRATION.md), not the
     // KayKit-era 1.3x speed-up playAttack defaults to.
     attackTimeScale: 1,
-    // The stroke rides its hips 1.33 world units above the origin, which the sim
-    // seats 0.75 under the line: this leaves the chest at the surface and the
-    // hips 0.07 under it (measured, tmp/woc/swim_measure.mjs). The upright
-    // Swim_Idle tread keeps its hips at standing height, so it sinks further
-    // to put the waterline at the chest.
-    swimRise: { stroke: -0.65, tread: -1.0 },
+    // Woc_Swim rides its neck ~1.72 world units above the origin, which the sim
+    // seats 0.75 under the line: -1.0 puts the waterline at the neck and keeps
+    // the chest and stroking hands submerged across both fits. The upright
+    // Woc_Swim_Idle tread stands its chest at ~1.9, so it sinks further to put
+    // the waterline at the shoulders and keep the sculling hands under water.
+    swimRise: { stroke: -1.0, tread: -1.3 },
     // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
     clips: {
-      ...woc(['1H_Chop', '1H_Slash']),
+      ...woc(['Woc_Attack_1H_0', 'Woc_Attack_1H_1']),
       // Instant casts play no gesture on this body (owner call): the six
       // shouts keep their ring and wave, the roar animation is off.
       shoutEmote: null,
-      attackByHand: { twohand: '2H_Chop', dualwield: 'Dual_Chop' },
+      attackByHand: { twohand: 'Woc_Attack_2H_0', dualwield: 'Dual_Chop' },
       // Dual_Chop is two self-contained fast strikes from the crossed guard, 24
       // frames at 60 fps each (2026-09-28): the cut at 0.4 s lands exactly on the
       // guard between them, and each blade lands ~0.125 s into its half
       // (WOC_CONTACTS; tests/woc_character.test.ts measures both off the library).
       dualWieldSplit: 0.4,
       // Every warrior ability the KayKit body routed keeps its entry; the clips
-      // are this rig's own vocabulary (verified against the shipped GLB by
+      // are the hand-keyed WOC library (verified against the shipped GLB by
       // tests/character_clipmaps.test.ts and tests/warrior_render_contract.test.ts).
       attackByAbility: {
-        mortal_strike: '2H_Chop',
-        execute: '2H_Chop',
-        slam: '2H_Chop',
-        red_harvest: '2H_Chop',
-        breachmaker: '2H_Chop',
-        // Shieldcrack braces behind the offhand shield: the rig's guard (the
-        // KayKit body had a synthesized shield bash; this rig ships none).
-        shield_slam: 'Block',
-        raging_gale: 'Dual_Chop',
-        bloodthirst: 'Dual_Chop',
+        mortal_strike: 'Woc_Attack_2H_0',
+        execute: 'Woc_Attack_2H_0',
+        slam: 'Woc_Attack_2H_0',
+        red_harvest: 'Woc_Attack_2H_1',
+        breachmaker: 'Woc_Attack_2H_1',
+        // Shieldcrack drives the offhand shield forward (the keyed shield bash).
+        shield_slam: 'Woc_Shield_Bash',
+        raging_gale: 'Woc_Attack_Dual',
+        bloodthirst: 'Woc_Attack_Dual',
         // Reaping Arc and Revenge sweep the frontal arc: the sideways slash,
         // never the top-to-bottom chop (owner: "sideways sword sweep").
-        cleave: '1H_Slash',
-        revenge: '1H_Slash',
-        thunder_clap: '1H_Chop',
-        faultline: '1H_Chop',
-        heroic_strike: '1H_Slash',
-        overpower: '1H_Slash',
-        hamstring: '1H_Slash',
-        // Jawcrack is a bare-fist interrupt; this rig has no punch, so the
-        // quick chop stands in.
-        pummel: '1H_Chop',
+        cleave: 'Woc_Special_1H',
+        revenge: 'Woc_Attack_1H_1',
+        thunder_clap: 'Woc_Special_1H',
+        faultline: 'Woc_Attack_2H_1',
+        heroic_strike: 'Woc_Attack_1H_0',
+        overpower: 'Woc_Attack_1H_1',
+        hamstring: 'Woc_Attack_1H_Stab',
+        // Jawcrack is a bare-fist interrupt (the keyed unarmed jab).
+        pummel: 'Woc_Attack_Unarmed_0',
         // Vaulting Charge completes through the renderer's generic 'selfCast'
         // cue, which only draws a body gesture via this exact entry: the
-        // two-hand slam reads as the landing (no bespoke leap on this rig).
-        heroic_leap: '2H_Chop',
+        // two-hand slam reads as the landing.
+        heroic_leap: 'Woc_Attack_2H_0',
         // Victor's Surge is a real weapon strike: the decisive one-hand slash.
-        victory_rush: '1H_Slash',
+        victory_rush: 'Woc_Attack_1H_1',
         // Deliberately absent (owner call: instant casts play no animation on
         // this body): sanguine_aura, raised_guard, die_by_sword, berserker_rage,
         // recklessness, avatar, piercing_howl. With no entry the ability
@@ -2663,7 +2766,7 @@ export const VISUALS: Record<string, VisualDef> = {
     weaponSlots: [0],
     offhandSlot: 1,
   },
-  // The paladin rides the SAME WOC body, appearance parts and 51 clips as the
+  // The paladin rides the SAME WOC body, appearance parts and clips as the
   // warrior (its build takes the warrior pack's base and appearance; only the
   // armor pack differs) and dresses from `armor_paladin.glb`. Same owner rules
   // as the warrior: instant casts play no gesture, only real strikes swing.
@@ -2678,28 +2781,29 @@ export const VISUALS: Record<string, VisualDef> = {
     wocCharacter: WOC_PALADIN_MANIFEST,
     hideWeaponsWhileSwimming: true,
     attackTimeScale: 1,
-    swimRise: { stroke: -0.65, tread: -1.0 },
+    swimRise: { stroke: -1.0, tread: -1.3 },
     // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
     clips: {
-      ...woc(['1H_Chop', '1H_Slash']),
+      ...woc(['Woc_Attack_1H_0', 'Woc_Attack_1H_1']),
       shoutEmote: null,
-      attackByHand: { twohand: '2H_Chop', dualwield: 'Dual_Chop' },
+      attackByHand: { twohand: 'Woc_Attack_2H_0', dualwield: 'Dual_Chop' },
       dualWieldSplit: 0.4,
+      cast: 'Woc_Cast_Omni',
       // Only the weapon strikes: Crusader Strike and Vowkeeper Strike are
-      // one-hand blows, Final Edict the decisive two-hand chop; the two
-      // interrupts stand in with the quick chop like the warrior's Jawcrack.
+      // one-hand blows, Final Edict the decisive two-hand chop; Hushbrand
+      // drives the shield, Rebuke swings the quick chop.
       // Every instant cast (auras, blessings, wards, shocks, hammers, the
       // taunts, Consecration, Bastion Sweep, Sunward Disc) has no entry on
-      // purpose: no gesture, no emote. Timed heals ride the cast loop.
+      // purpose: no gesture, no emote. Timed heals ride the omni cast loop.
       attackByAbility: {
-        crusader_strike: '1H_Chop',
-        vowkeeper_strike: '1H_Slash',
-        final_edict: '2H_Chop',
-        hushbrand: '1H_Chop',
-        rebuke: '1H_Chop',
-        mercy_lance: 'Cast_Shoot',
+        crusader_strike: 'Woc_Attack_1H_0',
+        vowkeeper_strike: 'Woc_Attack_1H_1',
+        final_edict: 'Woc_Attack_2H_0',
+        hushbrand: 'Woc_Shield_Bash',
+        rebuke: 'Woc_Attack_1H_0',
+        mercy_lance: 'Woc_Cast_Shoot',
       },
     },
     attach: [
@@ -2710,13 +2814,10 @@ export const VISUALS: Record<string, VisualDef> = {
     offhandSlot: 1,
   },
   // The hunter on the WOC body (equipment set of 2026-09-18). The auto shot and
-  // every instant shot play the artist's crossbow clip; a timed shot aims from
-  // its raise and holds the crossbow up until the cast lands, then the release
+  // every instant shot play the keyed crossbow/rifle clip; a timed shot aims
+  // from its raise and holds the crossbow up until the cast lands, then the release
   // half (the shot and the lowering) plays at the damage event, so the raise
-  // never replays under the shot (clipSplits). The clip is a snap shot
-  // (2026-09-29): the sim launches the bolt on the attack event, so the
-  // crossbow is up and aimed by 0.13 s and fires straight after the 0.17 s
-  // split, instead of the old 0.62 s raise that fired long after the bolt.
+  // never replays under the shot (clipSplits).
   // Melee strikes swing the blade. Aspects, traps and pet commands play nothing.
   player_hunter: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
@@ -2729,48 +2830,54 @@ export const VISUALS: Record<string, VisualDef> = {
     wocCharacter: WOC_HUNTER_MANIFEST,
     hideWeaponsWhileSwimming: true,
     attackTimeScale: 1,
-    swimRise: { stroke: -0.65, tread: -1.0 },
+    swimRise: { stroke: -1.0, tread: -1.3 },
     // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
     clips: {
-      ...woc(['Ranged_Shoot']),
-      meleeAttack: ['1H_Chop', '1H_Slash'],
+      ...woc(['Woc_Attack_Rifle']),
+      meleeAttack: ['Woc_Attack_1H_0', 'Woc_Attack_1H_1'],
       shoutEmote: null,
       clipSplits: [
-        { clip: 'Ranged_Shoot', at: 0.17, names: ['Ranged_Shoot#aim', 'Ranged_Shoot#release'] },
+        {
+          clip: 'Woc_Attack_Rifle',
+          at: 0.17,
+          names: ['Woc_Attack_Rifle#aim', 'Woc_Attack_Rifle#release'],
+        },
       ],
-      cast: 'Ranged_Shoot#aim',
+      cast: 'Woc_Attack_Rifle#aim',
       castHoldPointSeconds: 0.15,
       castByAbility: {
-        volley: 'Ranged_Shoot',
-        rapid_fire: 'Ranged_Shoot',
-        tame_beast: 'Cast_Loop',
-        revive_pet: 'Cast_Loop',
+        volley: 'Woc_Attack_Rifle',
+        rapid_fire: 'Woc_Attack_Rifle',
+        tame_beast: 'Woc_Channel_Directed',
+        revive_pet: 'Woc_Cast_Omni',
       },
       attackByAbility: {
-        aimed_shot: 'Ranged_Shoot#release',
-        measured_shot: 'Ranged_Shoot#release',
-        arcane_shot: 'Ranged_Shoot',
-        serpent_sting: 'Ranged_Shoot',
-        wyvern_sting: 'Ranged_Shoot',
-        raptor_strike: '1H_Chop',
-        mongoose_bite: '1H_Slash',
-        wing_clip: '1H_Slash',
-        bloodhook: '1H_Slash',
-        counter_shot: 'Ranged_Shoot',
-        startle_shot: 'Ranged_Shoot',
-        concussive_shot: 'Ranged_Shoot',
-        multi_shot: 'Ranged_Shoot',
-        shrapnel_charge: 'Ranged_Shoot',
+        aimed_shot: 'Woc_Attack_Rifle#release',
+        measured_shot: 'Woc_Attack_Rifle#release',
+        arcane_shot: 'Woc_Attack_Rifle',
+        serpent_sting: 'Woc_Attack_Rifle',
+        wyvern_sting: 'Woc_Attack_Rifle',
+        raptor_strike: 'Woc_Attack_1H_0',
+        mongoose_bite: 'Woc_Attack_1H_1',
+        wing_clip: 'Woc_Attack_1H_1',
+        bloodhook: 'Woc_Attack_1H_Stab',
+        counter_shot: 'Woc_Attack_Rifle',
+        startle_shot: 'Woc_Attack_Rifle',
+        concussive_shot: 'Woc_Attack_Rifle',
+        multi_shot: 'Woc_Attack_Rifle',
+        shrapnel_charge: 'Woc_Attack_Rifle',
+        phosphor_flask: 'Woc_Attack_Rifle',
+        scatterbolt: 'Woc_Attack_Rifle',
       },
     },
     attach: [{ url: `${WEAPONS}/crossbow_starter.glb`, bone: 'handslot.r' }],
   },
   // The rogue on the WOC body: every strike, opener and finisher is a weapon
-  // blow, so the physical damage event swings the artist's clips (the dual
+  // blow, so the physical damage event swings the keyed clips (the dual
   // halves alternate when two blades are drawn) and needs no per-ability
-  // entry; stealth, sprint, poisons and the cooldowns play nothing.
+  // entry for builders; stealth, sprint, poisons and the cooldowns play nothing.
   player_rogue: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
@@ -2782,30 +2889,29 @@ export const VISUALS: Record<string, VisualDef> = {
     wocCharacter: WOC_ROGUE_MANIFEST,
     hideWeaponsWhileSwimming: true,
     attackTimeScale: 1,
-    swimRise: { stroke: -0.65, tread: -1.0 },
+    swimRise: { stroke: -1.0, tread: -1.3 },
     // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
     clips: {
-      ...woc(['1H_Chop', '1H_Slash']),
+      ...woc(['Woc_Attack_1H_0', 'Woc_Attack_1H_1']),
       shoutEmote: null,
       attackByHand: { dualwield: 'Dual_Chop' },
       dualWieldSplit: 0.4,
-      // The one-hand names resolve through the loadout: with a blade in each hand the chop
-      // family plays the thrust (Dual_Stab) and the slash family the X-slash (Dual_Cross);
-      // with one blade the free-hand single set. Sinister Strike, Hemorrhage and the rest of
-      // the builders swing the fast Dual_Chop halves like the auto attack.
+      // The one-hand names resolve through the loadout: with a blade in each hand the stab
+      // and chop family plays the offhand thrust (Woc_Attack_Offhand_Stab) and the slash/special
+      // family the dual strike (Woc_Attack_Dual); with one blade the free-hand single set.
       attackByAbility: {
-        venom_dart: 'Cast_Shoot',
-        crippling_poison: '1H_Slash',
-        rupture: '1H_Slash',
-        eviscerate: '1H_Slash',
-        expose_armor: '1H_Slash',
-        backstab: '1H_Chop',
-        ambush: '1H_Chop',
-        gouge: '1H_Chop',
-        cheap_shot: '1H_Chop',
-        kidney_shot: '1H_Chop',
+        venom_dart: 'Woc_Attack_Thrown',
+        crippling_poison: 'Woc_Attack_1H_1',
+        rupture: 'Woc_Attack_1H_1',
+        eviscerate: 'Woc_Special_1H',
+        expose_armor: 'Woc_Attack_1H_1',
+        backstab: 'Woc_Attack_1H_Stab',
+        ambush: 'Woc_Attack_1H_Stab',
+        gouge: 'Woc_Attack_1H_0',
+        cheap_shot: 'Woc_Attack_1H_0',
+        kidney_shot: 'Woc_Attack_1H_0',
       },
     },
     attach: [
@@ -2816,9 +2922,9 @@ export const VISUALS: Record<string, VisualDef> = {
     offhandSlot: 1,
   },
   // The priest on the WOC body (the Holy Priest set). Smite and Mind Blast
-  // release through the throw; the heals lower the arm; Mind Flay, Mind Sear
-  // and the Choir channel the cast loop. The halo rides the head bone at the
-  // hood's tip, sized to this rig (the KayKit 1.45 cleared the mage hat).
+  // release through the throw; Mind Flay and Mind Sear channel the directed
+  // beam; Choir of Deliverance weaves the omni loop. The halo rides the head
+  // bone at the hood's tip, sized to this rig.
   player_priest: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
@@ -2830,28 +2936,20 @@ export const VISUALS: Record<string, VisualDef> = {
     wocCharacter: WOC_PRIEST_MANIFEST,
     hideWeaponsWhileSwimming: true,
     attackTimeScale: 1,
-    swimRise: { stroke: -0.65, tread: -1.0 },
+    swimRise: { stroke: -1.0, tread: -1.3 },
     // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
     clips: {
-      ...woc(['2H_Chop']),
+      ...woc(['Woc_Attack_2H_0']),
       shoutEmote: null,
-      // A timed cast raises the casting arm (Cast_Raise) and holds it at the
-      // top until the cast lands: a bolt then releases through the throw
-      // (Cast_Shoot, attackByAbility below), anything else (heals, wards,
-      // summons, conjures) lowers the arm through the clip's own recovery.
-      // Channels weave the artist's cast loop. Every instant is silent: no
-      // gesture, no emote.
-      cast: 'Cast_Raise',
-      castHoldPointSeconds: 1.0,
-      castPlayOut: ['Cast_Raise'],
+      cast: 'Woc_Cast_Directed',
       castByAbility: {
-        mind_flay: 'Cast_Loop',
-        mind_sear: 'Cast_Loop',
-        choir_of_deliverance: 'Cast_Loop',
+        mind_flay: 'Woc_Channel_Directed',
+        mind_sear: 'Woc_Channel_Directed',
+        choir_of_deliverance: 'Woc_Cast_Omni',
       },
-      attackByAbility: { smite: 'Cast_Shoot', mind_blast: 'Cast_Shoot' },
+      attackByAbility: { smite: 'Woc_Cast_Shoot', mind_blast: 'Woc_Cast_Shoot' },
     },
     halo: 0xffd766,
     haloUpOffset: 0.28,
@@ -2864,10 +2962,9 @@ export const VISUALS: Record<string, VisualDef> = {
     offhandSlot: 1,
   },
   // The shaman on the WOC body: weapon strikes (Stormstrike, the imbued auto
-  // attack, two-hand and dual-wield swings) ride the blade clips; Lightning
-  // Bolt and Chain Lightning release through the throw; the heals, Ghost Wolf
-  // and Ancestor Return lower the arm. Shocks, totems, shields and imbues play
-  // nothing.
+  // attack, two-hand and dual-wield swings) ride the keyed blade clips;
+  // Lightning Bolt and Chain Lightning release through the throw. Shocks,
+  // totems, shields and imbues play nothing.
   player_shaman: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
@@ -2879,25 +2976,21 @@ export const VISUALS: Record<string, VisualDef> = {
     wocCharacter: WOC_SHAMAN_MANIFEST,
     hideWeaponsWhileSwimming: true,
     attackTimeScale: 1,
-    swimRise: { stroke: -0.65, tread: -1.0 },
+    swimRise: { stroke: -1.0, tread: -1.3 },
     // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
     clips: {
-      ...woc(['1H_Chop', '1H_Slash']),
+      ...woc(['Woc_Attack_1H_0', 'Woc_Attack_1H_1']),
       shoutEmote: null,
-      attackByHand: { twohand: '2H_Chop', dualwield: 'Dual_Chop' },
+      attackByHand: { twohand: 'Woc_Attack_2H_0', dualwield: 'Dual_Chop' },
       dualWieldSplit: 0.4,
-      // A timed cast raises the casting arm (Cast_Raise) and holds it at the
-      // top until the cast lands: a bolt then releases through the throw
-      // (Cast_Shoot, attackByAbility below), anything else (heals, wards,
-      // summons, conjures) lowers the arm through the clip's own recovery.
-      // Channels weave the artist's cast loop. Every instant is silent: no
-      // gesture, no emote.
-      cast: 'Cast_Raise',
-      castHoldPointSeconds: 1.0,
-      castPlayOut: ['Cast_Raise'],
-      attackByAbility: { lightning_bolt: 'Cast_Shoot', chain_lightning: 'Cast_Shoot' },
+      cast: 'Woc_Cast_Directed',
+      attackByAbility: {
+        lightning_bolt: 'Woc_Cast_Shoot',
+        chain_lightning: 'Woc_Cast_Shoot',
+        stormstrike: 'Woc_Special_1H',
+      },
     },
     attach: [
       { url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' },
@@ -2906,12 +2999,10 @@ export const VISUALS: Record<string, VisualDef> = {
     weaponSlots: [0],
     offhandSlot: 1,
   },
-  // The mage on the WOC body. Bolts, the timed ground spells and the timed
-  // crowd control release through the throw; Arcane Missiles and Evocation
-  // channel the cast loop; barriers, procs, Blink and the instant novas play
-  // nothing. The Hourglass keeps a throw because the ability painter forces a
-  // gesture on hostile crowd control, and a throw beats the staff swing it
-  // would fall back to.
+  // The mage on the WOC body. Bolts and crowd control release through the
+  // directed throw; area and burst spells release through the omni burst;
+  // Arcane Missiles channels the directed beam and Evocation weaves the omni
+  // loop; barriers, procs, Blink and the instant novas play nothing.
   player_mage: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
@@ -2923,38 +3014,33 @@ export const VISUALS: Record<string, VisualDef> = {
     wocCharacter: WOC_MAGE_MANIFEST,
     hideWeaponsWhileSwimming: true,
     attackTimeScale: 1,
-    swimRise: { stroke: -0.65, tread: -1.0 },
+    swimRise: { stroke: -1.0, tread: -1.3 },
     // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
     clips: {
-      ...woc(['2H_Chop']),
+      ...woc(['Woc_Attack_2H_0']),
       shoutEmote: null,
-      // A timed cast raises the casting arm (Cast_Raise) and holds it at the
-      // top until the cast lands: a bolt then releases through the throw
-      // (Cast_Shoot, attackByAbility below), anything else (heals, wards,
-      // summons, conjures) lowers the arm through the clip's own recovery.
-      // Channels weave the artist's cast loop. Every instant is silent: no
-      // gesture, no emote.
-      cast: 'Cast_Raise',
-      castHoldPointSeconds: 1.0,
-      castPlayOut: ['Cast_Raise'],
-      castByAbility: { arcane_missiles: 'Cast_Loop', evocation: 'Cast_Loop' },
+      cast: 'Woc_Cast_Directed',
+      castByAbility: {
+        arcane_missiles: 'Woc_Channel_Directed',
+        evocation: 'Woc_Cast_Omni',
+      },
       attackByAbility: {
-        fireball: 'Cast_Shoot',
-        frostbolt: 'Cast_Shoot',
-        flurry: 'Cast_Shoot',
-        glacial_spike: 'Cast_Shoot',
-        pyroblast: 'Cast_Shoot',
-        arcane_surge: 'Cast_Shoot',
-        scorch: 'Cast_Shoot',
-        flamestrike: 'Cast_Shoot',
-        blizzard: 'Cast_Shoot',
-        rings_of_frost: 'Cast_Shoot',
-        polymorph: 'Cast_Shoot',
-        temporal_hourglass: 'Cast_Shoot',
-        glacial_front: 'Cast_Shoot',
-        dragons_breath: 'Cast_Shoot',
+        fireball: 'Woc_Cast_Shoot',
+        frostbolt: 'Woc_Cast_Shoot',
+        flurry: 'Woc_Cast_Shoot',
+        glacial_spike: 'Woc_Cast_Shoot',
+        pyroblast: 'Woc_Cast_Shoot',
+        arcane_surge: 'Woc_Cast_Omni_Release',
+        scorch: 'Woc_Cast_Shoot',
+        flamestrike: 'Woc_Cast_Omni_Release',
+        blizzard: 'Woc_Cast_Omni_Release',
+        rings_of_frost: 'Woc_Cast_Omni_Release',
+        polymorph: 'Woc_Cast_Shoot',
+        temporal_hourglass: 'Woc_Cast_Shoot',
+        glacial_front: 'Woc_Cast_Shoot',
+        dragons_breath: 'Woc_Cast_Omni_Release',
       },
     },
     attach: [
@@ -2965,9 +3051,9 @@ export const VISUALS: Record<string, VisualDef> = {
     offhandSlot: 1,
   },
   // The warlock on the WOC body: the wand auto attack is the throw itself,
-  // every timed bolt and curse releases through it, Drain Life channels the
-  // cast loop, the summons lower the arm. Life Tap, Demon Skin, the pet
-  // commands and every other instant play nothing.
+  // timed bolts and curses release through it, Soul Harvest releases the omni
+  // burst, and Drain Life channels the directed beam. Life Tap, Demon Skin,
+  // the pet commands and every other instant play nothing.
   player_warlock: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
@@ -2979,34 +3065,26 @@ export const VISUALS: Record<string, VisualDef> = {
     wocCharacter: WOC_WARLOCK_MANIFEST,
     hideWeaponsWhileSwimming: true,
     attackTimeScale: 1,
-    swimRise: { stroke: -0.65, tread: -1.0 },
+    swimRise: { stroke: -1.0, tread: -1.3 },
     // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
     clips: {
-      ...woc(['Cast_Shoot']),
-      meleeAttack: ['1H_Chop', '1H_Slash'],
+      ...woc(['Woc_Cast_Shoot']),
+      meleeAttack: ['Woc_Attack_1H_0', 'Woc_Attack_1H_1'],
       shoutEmote: null,
-      // A timed cast raises the casting arm (Cast_Raise) and holds it at the
-      // top until the cast lands: a bolt then releases through the throw
-      // (Cast_Shoot, attackByAbility below), anything else (heals, wards,
-      // summons, conjures) lowers the arm through the clip's own recovery.
-      // Channels weave the artist's cast loop. Every instant is silent: no
-      // gesture, no emote.
-      cast: 'Cast_Raise',
-      castHoldPointSeconds: 1.0,
-      castPlayOut: ['Cast_Raise'],
-      castByAbility: { drain_life: 'Cast_Loop' },
+      cast: 'Woc_Cast_Directed',
+      castByAbility: { drain_life: 'Woc_Channel_Directed' },
       attackByAbility: {
-        shadow_bolt: 'Cast_Shoot',
-        immolate: 'Cast_Shoot',
-        corruption: 'Cast_Shoot',
-        soul_lance: 'Cast_Shoot',
-        searing_pain: 'Cast_Shoot',
-        soul_harvest: 'Cast_Shoot',
-        chaos_bolt: 'Cast_Shoot',
-        fear: 'Cast_Shoot',
-        needle_of_fate: 'Cast_Shoot',
+        shadow_bolt: 'Woc_Cast_Shoot',
+        immolate: 'Woc_Cast_Shoot',
+        corruption: 'Woc_Cast_Shoot',
+        soul_lance: 'Woc_Cast_Shoot',
+        searing_pain: 'Woc_Cast_Shoot',
+        soul_harvest: 'Woc_Cast_Omni_Release',
+        chaos_bolt: 'Woc_Cast_Shoot',
+        fear: 'Woc_Cast_Shoot',
+        needle_of_fate: 'Woc_Cast_Shoot',
       },
     },
     attach: [
@@ -3025,9 +3103,10 @@ export const VISUALS: Record<string, VisualDef> = {
     weaponSlots: [0],
   },
   // The druid on the WOC body (the caster form; bear, cat and travel forms are
-  // their own visuals). Wrath and Starfire release through the throw, Roots and
-  // Hibernate too, Hurricane channels the cast loop, the heals lower the arm.
-  // Moonfire, Faerie Fire, the buffs and the shapeshifts play nothing.
+  // their own visuals). Wrath, Roots and Hibernate release through the throw,
+  // Starfire releases the omni burst, Hurricane channels the directed storm,
+  // and Tranquility weaves the omni loop. Moonfire, Faerie Fire, the buffs and
+  // the shapeshifts play nothing.
   player_druid: {
     // the male base and animation library, streamed on demand (woc_armor_core.ts)
     url: `${PLAYERS}/woc/base_male.glb`,
@@ -3039,28 +3118,23 @@ export const VISUALS: Record<string, VisualDef> = {
     wocCharacter: WOC_DRUID_MANIFEST,
     hideWeaponsWhileSwimming: true,
     attackTimeScale: 1,
-    swimRise: { stroke: -0.65, tread: -1.0 },
+    swimRise: { stroke: -1.0, tread: -1.3 },
     // The backpedal is authored at its game speed (0.65 x the 7 yd/s run).
     walkBackRef: 4.55,
     rightShoulderSheathe: true,
     clips: {
-      ...woc(['2H_Chop']),
+      ...woc(['Woc_Attack_2H_0']),
       shoutEmote: null,
-      // A timed cast raises the casting arm (Cast_Raise) and holds it at the
-      // top until the cast lands: a bolt then releases through the throw
-      // (Cast_Shoot, attackByAbility below), anything else (heals, wards,
-      // summons, conjures) lowers the arm through the clip's own recovery.
-      // Channels weave the artist's cast loop. Every instant is silent: no
-      // gesture, no emote.
-      cast: 'Cast_Raise',
-      castHoldPointSeconds: 1.0,
-      castPlayOut: ['Cast_Raise'],
-      castByAbility: { hurricane: 'Cast_Loop', tranquility: 'Cast_Loop' },
+      cast: 'Woc_Cast_Directed',
+      castByAbility: {
+        hurricane: 'Woc_Channel_Directed',
+        tranquility: 'Woc_Cast_Omni',
+      },
       attackByAbility: {
-        wrath: 'Cast_Shoot',
-        starfire: 'Cast_Shoot',
-        entangling_roots: 'Cast_Shoot',
-        hibernate: 'Cast_Shoot',
+        wrath: 'Woc_Cast_Shoot',
+        starfire: 'Woc_Cast_Omni_Release',
+        entangling_roots: 'Woc_Cast_Shoot',
+        hibernate: 'Woc_Cast_Shoot',
       },
     },
     attach: [
@@ -3184,8 +3258,9 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   form_cat: {
     url: `${CREATURES}/druid_cat_form.glb`,
-    // Sized a fifth above the world wolves (mob_wolf / form_ghost_wolf are 1.6)
-    // so the druid's cat reads as the bigger predator on the field.
+    // Sized a fifth above the world wolves as they were drawn when this was set
+    // (mob_wolf / form_ghost_wolf at 1.6 on the old rig, 1.47 on the rebuilt one,
+    // the same on-screen size) so the druid's cat reads as the bigger predator.
     height: 1.92,
     clips: DRUID_CAT_FORM,
     authoredAtlas: true,
@@ -3204,10 +3279,41 @@ export const VISUALS: Record<string, VisualDef> = {
     attackTimeScale: 1,
     deathTimeScale: 1,
   },
+  // Shaman Shadewolf keeps the original wolf and tint, drawn under the spirit
+  // veil's wolf palette (its tint shows through the kept colours).
+  // Druid Sporemender Form (Groveheart): the owner's concept redrawn in T-pose
+  // (Tripo image-to-image) and built, auto-rigged and retargeted by Tripo, so
+  // the skeleton is fitted to this short-torso chibi (the KayKit rig put the
+  // shoulders at face height and folded the arms into the robe). The rig was
+  // then post-processed: arm-chain weight stripped from the robe and satchels,
+  // the cap and face bound rigidly to the head, and both upper arms spread 30
+  // degrees in every clip so the hands clear the satchels. Tripo bipeds face
+  // +X; its slash and defeat presets run long (the Lich form's time scales).
+  // Auto-attack plays the Cast gesture: the form fights with the wand, and the
+  // slash preset buries the face under the cap. Jump is left out the same way
+  // as the Lich (airborne frames hold Idle). Same height as the player bodies.
+  form_sporemender: {
+    url: `${CREATURES}/sporemender_form.glb`,
+    height: HUMANOID_H,
+    yaw: -Math.PI / 2,
+    authoredAtlas: true,
+    attackTimeScale: 6,
+    deathTimeScale: 3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Cast'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+  },
   // Shaman Shadewolf retains the original wolf, tint and ghost-material overlay.
+  // Height: as mob_wolf (same file, same on-screen size).
   form_ghost_wolf: {
     url: `${CREATURES}/wolf_basic.glb`,
-    height: 1.6,
+    height: 1.47,
     clips: WOLF_BAKED,
     tint: 0xd08b45,
     tintStrength: 0.35,
@@ -3238,6 +3344,28 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: MOUNT_RIGGED,
     walkRef: 2.3,
     runRef: 12,
+    lazyPreload: true,
+  },
+  // Lantern Hall's war horse (scripts/assets/lantern_hall_steed/build_steed.py): a heavy
+  // draught-built destrier regrown on the valorsteed's rig (steed_body.py), playing its authored
+  // clips under oak-and-iron barding, sized well over its rider. Same gait refs as the horse it
+  // is built from (the clips are the same strides) scaled by the size ratio (4.25 / 3.8), so the
+  // longer legs take slower strides and the hooves keep their plant at the larger size.
+  mount_lantern_hall_destrier: {
+    url: `${MOUNTS_DIR}/lantern_hall_destrier.glb`,
+    height: 4.25,
+    // its own authored rear (build_steed.py author_rear), played as the flourish on a standing
+    // jump (render/mount_rear_core.ts), and its own backing-up walk (author_walkback)
+    clips: { ...MOUNT_RIGGED, flourish: 'Rear', walkBack: 'WalkBack' },
+    walkRef: 2.57,
+    // WalkBack reaches 1.5 times the walk's stride (build_steed.py STRIDE), so it matches at
+    // 1.5 times the walk's reference. A mounted backpedal runs at the sim's BACKPEDAL_MULT of the
+    // mount's speed (about 7.8 here), which would need twice the clip's cadence to plant every
+    // hoof; that read as pedalling. The cadence is capped near a calm walk instead and the
+    // hooves glide a little: a deliberate back-up, not a scramble.
+    walkBackRef: 3.86,
+    walkTimeScaleMax: 1.3,
+    runRef: 13.4,
     lazyPreload: true,
   },
   mount_grag_bear: {
@@ -3373,6 +3501,23 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 10,
     lazyPreload: true,
   },
+  // Wobbles the Slime: 4.0 tall, a touch over the horse, so the seat lands
+  // about a body higher than a horse's. One hop per Walk/Run loop; the refs
+  // pick a hop cadence that reads as bounding at mounted speed rather than
+  // matching any foot (it has none).
+  mount_wobbles_slime: {
+    url: `${MOUNTS_DIR}/wobbles_slime.glb`,
+    height: 4.0,
+    clips: MOUNT_SLIME,
+    // The bubbles drift on their own loop, never reset by a gait change.
+    ambientClips: ['Bubbles'],
+    // The tack is Tripo's baked texture (dark leather and navy): keep black
+    // black on the low tier rather than lifting it to a flat grey.
+    authoredAtlas: true,
+    walkRef: 2.5,
+    runRef: 11,
+    lazyPreload: true,
+  },
   // Compact fantasy tank. One wheel revolution per locomotion clip matches
   // its authored tread cadence at the reference ground speeds below.
   mount_terrorspark_groundshaker: {
@@ -3383,30 +3528,29 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 4.4,
     lazyPreload: true,
   },
-  // The Drakemaw Raptor (broodlord legendary drop): saddle-broken Tripo biped,
-  // gait-baked by scripts/bake_mount_gaits.mjs like the bear/toad/griffin. The
-  // imported source clips drove Hip TRANSLATION half a model unit off the bind
-  // pose (baked-in root motion), which at this height threw the body clear of
-  // the saddle and lurched it every stride; the baker authors rotation-only
-  // keys plus a root Y bob, so that cannot recur. walkRef is MEASURED off the
-  // baked clip (tmp/dragonkin_gait_measure.mjs): walk 3.02 yd/s.
+  // The Drakemaw Raptor (also the Friendship Raptor's body): the Tripo mesh on a
+  // theropod rig with every clip authored in Blender from scratch
+  // (scripts/assets/drakemaw_raptor/, `node scripts/assets/drakemaw_raptor/build.mjs`).
+  // It is built one model yard per game yard and `height` is the Idle's own
+  // height on the frame the renderer sizes it by (0.5 s), so normScale is
+  // exactly 1 and every ref below is that clip's FOOT-LOCK speed: a planted ball
+  // slides back that many yards a second, so at timeScale 1 the planted foot
+  // stands still on the ground (tests/drakemaw_raptor_mount.test.ts pins all of
+  // it to the GLB). A rider moves at one speed, so the refs that matter are
+  // constants: forward RUN_SPEED 7 x (1 + 0.8) = 12.6, the sprint with two
+  // flights a stride at 2.2 strides/s (the legacy baked cycle never left the
+  // ground, so it had to choose between a frantic cadence and sliding feet), and
+  // backpedal 12.6 x BACKPEDAL_MULT 0.65 = 8.19; both play at exactly 1.0. Walk
+  // only shows below the run band (a heavy slow, a start), and its time scale
+  // max is raised so it holds the lock right up to the 5.2 yd/s run threshold.
   mount_drakemaw_raptor: {
     url: `${MOUNTS_DIR}/drakemaw_raptor.glb`,
-    height: 3.4,
-    clips: MOUNT_RIGGED,
-    walkRef: 3.0,
-    // runRef is deliberately the RIDDEN speed (RUN_SPEED 7 x +80% = 12.6), not
-    // the Run clip's measured 9.04 yd/s, so timeScale lands on exactly 1.0 and
-    // the clip plays at its authored 2.0 strides/sec (6.3 yd per bound).
-    // Foot-matching instead (runRef 9.04) gives timeScale 1.48 and a 2.96/sec
-    // cadence, which read as badly sped up on a 3.4 yd mount. That is the real
-    // tradeoff on this rig: under a perfect foot match, cadence is
-    // bodySpeed / (2 x stride x normScale) and so depends only on stride
-    // LENGTH, never on clip duration, which timeScale rescales away. Short legs
-    // therefore can only buy a calm cadence with slide. This costs 28%, well
-    // inside what the other baked mounts already ship (grag_bear's 3.58 yd/s
-    // natural against the same 12.6 leaves it sliding over half its travel).
+    height: 3.30239,
+    clips: RAPTOR_MOUNT_RIGGED,
+    walkRef: 2.6,
+    walkTimeScaleMax: 2.0,
     runRef: 12.6,
+    walkBackRef: 8.19,
     lazyPreload: true,
   },
   // Tall two-legged fantasy bird authored on its own avian skeleton. The
@@ -3471,6 +3615,18 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 12.25,
     lazyPreload: true,
   },
+  // The Nightwing Chimaera: two-headed bipedal wyvern that perches on its two
+  // hind legs at rest (Idle / Idle_Look) and lifts into low-altitude flight
+  // when moving (Walk / Run / WalkBackward / Jump).
+  mount_nightwing_chimera: {
+    url: `${MOUNTS_DIR}/nightwing_chimera.glb`,
+    authoredAtlas: true,
+    height: 5.78,
+    clips: MOUNT_CHIMERA,
+    walkRef: 5.6,
+    runRef: 12.6,
+    lazyPreload: true,
+  },
   // Developer-only Halloween cart (image-to-glb static prop, no clips of its
   // own): height is the measured shipped bbox (npx gltf-transform inspect).
   // The puller is a SEPARATE visual (skel_rickshaw_puller) composed at
@@ -3517,13 +3673,17 @@ export const VISUALS: Record<string, VisualDef> = {
 
   // -- mob families --------------------------------------------------------
   mob_wolf: {
-    // Custom Tripo wolf auto-rigged onto the Dog_Animation quadruped skeleton
-    // (same pipeline as greyjaw), clips renamed to the animal() names at bake
-    // time. Baked basecolor texture; keeps a light entity tint so this doubles
-    // as the beast-family fallback and each beast keeps its own colour.
+    // Custom Tripo wolf on the rebuilt wolf rig (scripts/assets/wolf_rig/, see
+    // WOLF_BAKED). Baked basecolor texture; keeps a light entity tint so this
+    // doubles as the beast-family fallback and each beast keeps its own colour.
+    // Height 1.47 draws it exactly as large as the old rig's 1.6 did: the game
+    // sizes a creature by its posed idle, and the old idle measured taller than the
+    // wolf (a sliver of the left hind heel was weighted to the tail and hung below
+    // the paws), which also stood the old wolves off the ground. tests/wolf_rig.test.ts
+    // pins the size (WOLF_ON_SCREEN_SCALE in scripts/assets/wolf_rig/contract.mjs).
     url: `${CREATURES}/wolf_basic.glb`,
     authoredAtlas: true, // baked Tripo/contributor atlas: low-tier floor rides the map
-    height: 1.6,
+    height: 1.47,
     clips: WOLF_BAKED,
     tint: 'entity',
     tintStrength: 0.35,
@@ -3551,18 +3711,15 @@ export const VISUALS: Record<string, VisualDef> = {
     tintStrength: 0.2,
   },
   greyjaw: {
-    // Custom Tripo wolf auto-rigged onto the Dog_Animation quadruped skeleton;
-    // clips renamed to the animal() names at bake time. Baked texture, no tint.
-    // Old Greyjaw's model: 2.2 at scale 1 (his template scale 1.25 makes the
-    // rare ~2.75 in-world vs the 1.6 pack wolf).
+    // Custom Tripo wolf on the rebuilt wolf rig (scripts/assets/wolf_rig/, his own
+    // skeleton fitted to his body, see WOLF_BAKED). Baked texture, no tint. Height
+    // 2.05 draws him exactly as large as the old rig's 2.2 did (pinned like
+    // mob_wolf's); his template scale 1.25 then makes the rare stand well over the
+    // pack wolf in-world.
     url: `${CREATURES}/greyjaw.glb`,
     authoredAtlas: true, // baked Tripo/contributor atlas: low-tier floor rides the map
-    height: 2.2,
-    clips: GREYJAW_WOLF,
-    // Greyjaw_Attack clip donor (scripts/build_greyjaw_anims.mjs): mesh-free,
-    // baked off this same rig's own poses (a howl-then-pounce, distinct from
-    // the plain Attack every other WOLF_BAKED user still plays).
-    animUrls: [`${CREATURES}/greyjaw_ability_anims.glb`],
+    height: 2.05,
+    clips: WOLF_BAKED,
   },
   mob_boar: {
     url: `${CREATURES}/wild_boar.glb`,
@@ -3595,12 +3752,6 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 0.75,
     clips: BUDDY_CLIPS,
   },
-  buddy_sapling: {
-    url: `${BUDDIES_DIR}/sapling.glb`,
-    height: 0.75,
-    clips: { ...BUDDY_CLIPS, run: 'Run' },
-    authoredAtlas: true,
-  },
   buddy_crystal_lich: {
     url: `${BUDDIES_DIR}/crystal_lich.glb`,
     height: 0.9,
@@ -3613,6 +3764,16 @@ export const VISUALS: Record<string, VisualDef> = {
     // The rig is authored facing -Z, so without this it heels the owner
     // back-to-front: chest toward the camera while its owner walks away.
     yaw: Math.PI,
+  },
+  // The flames are live, not in the GLB: sprites_buddy_flame.ts.
+  buddy_sprites: {
+    url: `${BUDDIES_DIR}/sprites.glb`,
+    // One orb's height. Its flame (sprites_buddy_flame.ts) reaches 2.1 orb
+    // heights tall, so 0.4 stands the pair about 1.45 world units high at the
+    // roster scale, among the other buddies (1.3 to 1.6).
+    height: 0.4,
+    clips: SPRITES_BUDDY_CLIPS,
+    authoredAtlas: true,
   },
   // Yumi, the Protect Yumi objective cat familiar (Meshy rig, scale baked by
   // scripts/_bake_meshy_scale.mjs, meshopt + 1024 webp). The GLB ships ONE
@@ -5332,7 +5493,9 @@ export const VISUALS: Record<string, VisualDef> = {
   // foot speeds at the drawn size.
   bastion_drowned_revenant: {
     url: `${CREATURES}/drowned_revenant.glb`,
-    height: 4.95,
+    // Twice the player: authored against the KayKit-sized player, grown the same
+    // tenth the WOC player body grew (player_warrior).
+    height: 4.95 * 1.1,
     clips: {
       idle: 'Idle',
       combatIdle: 'CombatIdle',
@@ -5361,7 +5524,9 @@ export const VISUALS: Record<string, VisualDef> = {
   // (sunken_bastion/bastion_boathook_fx.ts), the recovery playing out after.
   bastion_skel_watchman: {
     url: `${CREATURES}/drowned_watchman.glb`,
-    height: 4.9,
+    // Twice the player: authored against the KayKit-sized player, grown the same
+    // tenth the WOC player body grew (player_warrior).
+    height: 4.9 * 1.1,
     clips: {
       idle: 'Idle',
       combatIdle: 'CombatIdle',
@@ -5396,7 +5561,9 @@ export const VISUALS: Record<string, VisualDef> = {
   // sunken_bastion/bastion_creature_fx.ts from ARBALEST_MUZZLE.
   bastion_skel_arbalest: {
     url: `${CREATURES}/drowned_arbalest.glb`,
-    height: 5.1,
+    // Twice the player: authored against the KayKit-sized player, grown the same
+    // tenth the WOC player body grew (player_warrior).
+    height: 5.1 * 1.1,
     attackTimeScale: 1,
     clips: {
       idle: 'Idle',
@@ -5765,7 +5932,9 @@ export const VISUALS: Record<string, VisualDef> = {
   // while the aura lasts) until he leaves the world.
   bastion_prisoner: {
     url: `${CREATURES}/drowned_prisoner.glb`,
-    height: 4.6,
+    // Half again the player: the 4.6 he was authored at against the KayKit-sized
+    // player, grown the same tenth the WOC player body grew (player_warrior).
+    height: 4.6 * 1.1,
     clips: {
       idle: 'Idle',
       walk: 'Walk',
@@ -6153,20 +6322,22 @@ export const VISUALS: Record<string, VisualDef> = {
   // kelp hanging from her forearms, and below the waist a violet serpent's
   // tail that falls to the floor and runs back along it to its fluke; a vast
   // silver lionfish fan opens behind her head. Her tail's bend stays planted
-  // on the floor while she leans and rears over it. Sea-Song (1.5 s bar)
-  // plays SeaSong: arms wide, head back, the fan flaring and shivering, the
-  // song on the bar's end. She is a caster and never swings her hands:
-  // Moonwater Bolt (2.0 s bar) plays Bolt, the water orb held before her
-  // chest through the bar, drawn back and flung on its end; Mere Surge (3.0 s
-  // bar) plays Surge, sinking low to gather the pool and hurling the wave up
-  // and out on the bar's end; the Drowning Aria (a 5 s channel) loops Beam,
-  // both palms thrust at her target. The bolt and the surge finish their
-  // follow-through. Her claws (Attack, Attack2) keep their weight should she
-  // ever swing them. The Chorus and Solo marks arrive as windup cues and play
-  // Chorus (her hands to her mouth, the fan folding in, then flung open) and
-  // Solo (her right arm raised, the fan flung wide). Dying, she rears up, the
-  // fan folds, and she slumps forward over her coils onto the floor. Drawn
-  // 9.0 at her 1.15.
+  // on the floor while she leans and rears over it. She is a caster and never
+  // swings her hands. Her Score (both its bars: the melody and the answer she
+  // holds open) loops SeaSong: arms wide, head back, the fan flaring and
+  // shivering (the clip the retired Sea-Song bar played once). Moonwater Bolt
+  // has no bar: its gather cue plays Bolt as a one-shot at double speed, the
+  // water orb held before her chest, drawn back and flung on the one-second
+  // beat the bolt flies on; Mere Surge (3.0 s bar) plays Surge, sinking low
+  // to gather the pool and hurling the wave up and out on the bar's end; the
+  // Drowning Aria (a 5 s channel) loops Beam, both palms thrust at her
+  // target. The surge finishes its follow-through. Her claws (Attack,
+  // Attack2) keep their weight should she ever swing them. The Chorus and
+  // Solo marks arrive as windup cues and play Chorus (her hands to her mouth,
+  // the fan folding in, then flung open) and Solo (her right arm raised, the
+  // fan flung wide). When her voice breaks she recoils (Hit). Dying, she
+  // rears up, the fan folds, and she slumps forward over her coils onto the
+  // floor. Drawn 9.0 at her 1.15.
   temple_selthe: {
     url: `${CREATURES}/woc_temple_selthe.glb`,
     height: 7.83,
@@ -6175,26 +6346,39 @@ export const VISUALS: Record<string, VisualDef> = {
       // Each claw lands on frame 18 of its 1.5 s swing at 1x (30 fps).
       contacts: { Attack: [0.567], Attack2: [0.567] },
       castByAbility: {
-        [SELTHE_SEA_SONG]: 'SeaSong',
-        [SELTHE_MOONWATER_BOLT]: 'Bolt',
+        [SELTHE_SCORE]: 'SeaSong',
+        [SELTHE_SCORE_ANSWER]: 'SeaSong',
         [SELTHE_DROWNING_ARIA]: 'Beam',
         [SELTHE_MERE_SURGE]: 'Surge',
       },
       castTimeScaleByAbility: {
-        [SELTHE_SEA_SONG]: 1,
-        [SELTHE_MOONWATER_BOLT]: 1,
+        [SELTHE_SCORE]: 1,
+        // The verse she holds open: the same song, drawn out.
+        [SELTHE_SCORE_ANSWER]: 0.6,
         [SELTHE_DROWNING_ARIA]: 1,
         [SELTHE_MERE_SURGE]: 1,
       },
-      castPlayOut: ['Bolt', 'Surge'],
-      attackByAbility: { [SELTHE_CHORUS_MARK]: 'Chorus', [SELTHE_SOLO_MARK]: 'Solo' },
-      attackTimeScaleByAbility: { [SELTHE_CHORUS_MARK]: 1, [SELTHE_SOLO_MARK]: 1 },
+      castPlayOut: ['Surge'],
+      attackByAbility: {
+        [SELTHE_CHORUS_MARK]: 'Chorus',
+        [SELTHE_SOLO_MARK]: 'Solo',
+        [SELTHE_BOLT_GATHER]: 'Bolt',
+        [SELTHE_VOICE_BREAKS]: 'Hit',
+      },
+      attackTimeScaleByAbility: {
+        [SELTHE_CHORUS_MARK]: 1,
+        [SELTHE_SOLO_MARK]: 1,
+        // The Bolt clip flings its orb 2 s in: at double speed that is the
+        // bolt's one-second gather (ids.ts SELTHE_TUNING.boltWindup).
+        [SELTHE_BOLT_GATHER]: 2,
+        [SELTHE_VOICE_BREAKS]: 1,
+      },
     },
     attackTimeScale: 1,
     walkRef: 2.5,
     runRef: 7,
-    // The bars land on their end; the aria's beam loops.
-    castClipSync: [SELTHE_SEA_SONG, SELTHE_MOONWATER_BOLT, SELTHE_MERE_SURGE],
+    // The surge lands on its bar's end; the aria's beam and the Score's song loop.
+    castClipSync: [SELTHE_MERE_SURGE],
     castPlayOutHoldsAttacks: true,
     authoredAtlas: true,
     selfIllumination: 0.16,
@@ -8089,9 +8273,9 @@ const MOB_KEYS: Record<string, string> = {
   guardian_tithefiend: 'mob_demonalt',
   // Active cosmetic buddy followers.
   buddy_horse: 'buddy_horse',
-  buddy_sapling: 'buddy_sapling',
   buddy_crystal_lich: 'buddy_crystal_lich',
   buddy_forgemaw: 'buddy_forgemaw',
+  buddy_sprites: 'buddy_sprites',
   // Packlord Stampede guardians are transient local templates, not MOBS rows.
   // Give the three summoned beasts distinct existing bodies instead of the
   // generic humanoid bandit fallback.
@@ -8480,6 +8664,8 @@ export function authoredRigOverride(e: Entity): string | null {
   return e.kind === 'npc' && e.visualKey && VISUALS[e.visualKey] ? e.visualKey : null;
 }
 
+const MOB_FALLBACK_KEY = 'mob_bandit';
+
 export function visualKeyFor(e: Entity): string {
   if (e.kind === 'player') {
     if (isMechWearer(e)) return 'player_mech';
@@ -8497,6 +8683,34 @@ export function visualKeyFor(e: Entity): string {
   if (look) return npcBodyKey(look);
   if (e.templateId.startsWith('brother_aldric')) return 'npc_aldric';
   return NPC_KEYS[e.templateId] ?? 'npc_villager';
+}
+
+/** The mob arm of visualKeyFor, by template id alone. */
+export function mobVisualKeyFor(templateId: string): string {
+  return mobVisualKey(templateId);
+}
+
+/** Every template id the mob dispatch names, including transient templates
+ *  that have no MOBS row (the Packlord Stampede guardians). */
+export function mobKeyTemplateIds(): string[] {
+  return Object.keys(MOB_KEYS);
+}
+
+/** The visual keys the dispatch reaches WITHOUT naming a mob template: the
+ *  family and global mob fallbacks and every NPC route (the table plus the two
+ *  defaults visualKeyFor returns). Any entity no content table describes can
+ *  land on one of these, so no content-derived class of keys
+ *  (rift_body_stream_core.ts) may ever claim them. */
+export function fallbackVisualKeys(): string[] {
+  return [
+    ...new Set([
+      ...Object.values(FAMILY_KEYS),
+      MOB_FALLBACK_KEY,
+      ...Object.values(NPC_KEYS),
+      'npc_villager',
+      'npc_aldric',
+    ]),
+  ];
 }
 
 /** Held-weapon layout override for the class-agnostic Combat Mech body. The mech

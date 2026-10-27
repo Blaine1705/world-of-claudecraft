@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
+import { EMPTY_LIVE_ACCOUNT_COSMETICS } from '../server/account_cosmetics_live';
+import { AccountCosmeticsService } from '../server/account_cosmetics_service';
 import { CASKET_MOUNT_CHANCE, CASKET_MOUNT_REINS_ITEM_ID } from '../src/sim/clue_casket';
 
 // Mock the db layer so importing server/game (for wireEntity) needs no Postgres,
@@ -15,11 +17,19 @@ vi.mock('../server/db', () => ({
   walletForAccount: vi.fn(async () => null),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  grantAccountMountSkins: vi.fn(async (_accountId: number, mountSkinIds: string[]) => ({
+    completedQuestIds: [],
+    mechChromaIds: [],
+    weaponSkinIds: [],
+    weaponSkinLoadout: {},
+    mountSkinIds,
+  })),
 }));
 
 import { meleeSwing, updatePlayerAutoAttack } from '../src/sim/combat/auto_attack';
 import { castAbility } from '../src/sim/combat/casting_lifecycle';
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
+import { FACTION_VENDOR_GATES } from '../src/sim/content/faction_vendors';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
@@ -38,6 +48,7 @@ import {
 } from '../src/sim/content/mounts';
 import { ITEMS, MOBS, NPCS, QUESTS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { exchangeHardLock } from '../src/sim/exchange_eligibility';
 import { guildBankPipeRefusal } from '../src/sim/guild_bank';
 import { sellItem, useItem } from '../src/sim/items';
 import { MARKET_HOUSE_STOCK } from '../src/sim/market';
@@ -110,49 +121,26 @@ function ride(sim: Sim, pid: number, key: string): void {
 
 describe('mount catalog', () => {
   it('keeps the horse first and appends the two referral milestone mounts', () => {
-    expect(MOUNT_KEYS).toHaveLength(13);
+    // Existing mount identities remain stable, including the retired tanks and guild destrier.
+    expect(MOUNT_KEYS).toHaveLength(16);
+    // Pinned as a literal: the acquisition sweeps below iterate this list, so a
+    // mount dropped from it would silently lose its no-route checks.
+    expect(DEVELOPER_MOUNTS).toEqual(['terrorspark_groundshaker', 'referral_tank']);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(MOUNT_KEYS.slice(-2)).toEqual(['referral_tank', 'referral_raptor']);
     expect(DEFAULT_MOUNT).toBe('valorsteed');
-    // Every developer-only mount is a real catalog key, and the tank keeps the
-    // tail so a new PLAYER-facing mount always lands above it.
+    // Every developer-only mount remains a real catalog key.
     for (const key of DEVELOPER_MOUNTS) expect(MOUNT_KEYS).toContain(key);
   });
 
-  it('pins each card: rarity and speed, with NO per-mount level gate', () => {
-    const spec = (k: string) => {
-      const d = MOUNTS[k as keyof typeof MOUNTS];
-      return [d.rarity, d.moveSpeedPct];
-    };
-    expect(spec('valorsteed')).toEqual(['common', 0.6]);
-    expect(spec('stormfeather_griffin')).toEqual(['uncommon', 0.7]);
-    expect(spec('shadowjump_toad')).toEqual(['uncommon', 0.7]);
-    expect(spec('grag_bear')).toEqual(['rare', 0.75]);
-    expect(spec('stalkglider_snail')).toEqual(['rare', 0.75]);
-    expect(spec('aether_hover_cycle')).toEqual(['epic', 0.8]);
-    expect(spec('thunderstrut_gobbler')).toEqual(['epic', 0.8]);
-    expect(spec('lanternback_troll')).toEqual(['epic', 0.8]);
-    expect(spec('terrorspark_groundshaker')).toEqual(['epic', 0.8]);
-    expect(spec('drakemaw_raptor')).toEqual(['epic', 0.8]);
-    // The level field is GONE, not merely unused: it never fired (reins carry no
-    // requiredLevel and every source is level-20 content) and leaving it would
-    // invite a second gate to grow back beside ridingTrained.
-    for (const k of MOUNT_KEYS) {
-      expect(MOUNTS[k], `${k} has no level gate`).not.toHaveProperty('level');
-    }
-  });
-
-  it('speed rises strictly with rarity, so the tiers mean something', () => {
-    const rank = { common: 0, uncommon: 1, rare: 2, epic: 3 } as const;
-    const rows = MOUNT_KEYS.map((k) => MOUNTS[k]);
-    for (const a of rows) {
-      for (const b of rows) {
-        if (rank[a.rarity] < rank[b.rarity]) {
-          expect(a.moveSpeedPct, `${a.key} (${a.rarity}) < ${b.key} (${b.rarity})`).toBeLessThan(
-            b.moveSpeedPct,
-          );
-        }
-      }
+  it('catalog mounts are cosmetic records without speed stats or per-mount level gates', () => {
+    expect(MOUNTS.valorsteed.rarity).toBe('common');
+    expect(MOUNTS.stormfeather_griffin.rarity).toBe('uncommon');
+    expect(MOUNTS.grag_bear.rarity).toBe('rare');
+    expect(MOUNTS.aether_hover_cycle.rarity).toBe('epic');
+    for (const key of MOUNT_KEYS) {
+      expect(MOUNTS[key]).not.toHaveProperty('moveSpeedPct');
+      expect(MOUNTS[key]).not.toHaveProperty('level');
     }
   });
 
@@ -203,10 +191,10 @@ describe('mount reins items (the collection: owning the item is owning the mount
         expect(item.soulbound).toBeFalsy();
         // sellValue is 0, so the vendor path stays closed instead of paying
         // nothing for an accidental sale that buyback rotation could eat.
-        expect(item.noVendorSell).toBe(true);
+        expect(item.noVendorSell).toBe(key !== 'valorsteed' ? true : undefined);
       }
       expect(item.noDiscard).toBe(true);
-      expect(item.sellValue).toBe(0);
+      expect(item.sellValue).toBe(key === 'valorsteed' ? 100_000 : 0);
       // The item's name color matches the card's rarity tier.
       expect(item.quality).toBe(MOUNTS[key].rarity);
     }
@@ -224,16 +212,16 @@ describe('mount reins items (the collection: owning the item is owning the mount
     expect(granted.sort()).toEqual(MOUNT_KEYS.map((key) => mountItemId(key)).sort());
   });
 
-  it('two reins are purchasable: the horse for 10 gold, the Valestrider for 100 at Champion standing', () => {
+  it('two reins are purchasable: the horse for 10 gold, the Valestrider for marks at Champion standing', () => {
     const horse = reinsFor('valorsteed')[0];
     expect(horse.id).toBe('reins_valorsteed');
     expect(horse.buyValue).toBe(100_000); // 10 gold in copper (ridingTrained gated)
     // The Rift Watch quartermaster's Champion row (content/faction_vendors.ts):
-    // the classic epic-mount ratio, ten times the basic mount, on top of the
-    // same riding gate.
+    // priced in Rift Watch marks, never coin, on top of the same riding gate.
     const strider = reinsFor('avian_strider')[0];
     expect(strider.id).toBe('reins_avian_strider');
-    expect(strider.buyValue).toBe(1_000_000);
+    expect(strider.buyValue).toBe(0);
+    expect(FACTION_VENDOR_GATES.reins_avian_strider.currencyCost).toBe(500);
     for (const key of MOUNT_KEYS.filter((k) => k !== 'valorsteed' && k !== 'avian_strider')) {
       expect(reinsFor(key)[0].buyValue).toBeUndefined();
     }
@@ -287,6 +275,24 @@ describe('mount reins items (the collection: owning the item is owning the mount
     for (const key of MOUNT_KEYS) {
       if (key === 'valorsteed') continue; // the purchase, not a drop
       if (key === 'avian_strider') continue; // the Rift Watch Champion purchase, pinned above
+      if (key === 'lantern_hall_destrier') {
+        // Lantern Hall's seal purchase (content/guild_contracts.ts, tests/guild_steed_and_sword):
+        // ONE door, so it rides no mob table, no heroic boss and no rift pool.
+        const reins = mountItemId(key)!;
+        for (const mob of Object.values(MOBS))
+          expect(
+            mob.loot.some((l) => l.itemId === reins),
+            `${reins} on ${mob.id}`,
+          ).toBe(false);
+        for (const rows of Object.values(HEROIC_BOSS_LOOT))
+          expect(
+            rows.some((l) => l.itemId === reins),
+            `${reins} heroic`,
+          ).toBe(false);
+        for (const pool of [RIFT_EPIC_MOUNT_REINS, RIFT_BLUE_MOUNT_REINS, RIFT_GREEN_MOUNT_REINS])
+          expect(pool as readonly string[]).not.toContain(reins);
+        continue;
+      }
       if (isDeveloperMount(key)) continue; // developer-only, pinned separately below
       if (MEMBERSHIP_REWARD_MOUNTS.includes(key)) continue; // paid receipt delivery, pinned below
       if (REFERRAL_REWARD_MOUNTS.includes(key)) continue; // transactional milestone delivery, referral_rewards.test.ts
@@ -522,11 +528,8 @@ describe('mount reins items (the collection: owning the item is owning the mount
   });
 
   it('bagOwnedMounts is bags-only: a bank-only reins does not count (#2739 followup)', () => {
-    // The mobile quick-summon button (src/ui/mount_quick_summon.ts) picks from
-    // this list, not the wider ownedMounts(), because it hands the result
-    // straight to useItem, which gates on countItem (bags only). A bank-only
-    // reins must therefore be invisible here even though ownedMounts() (bags +
-    // bank) reports it, or the button would offer a summon useItem refuses.
+    // Item-use callers need bags-only possession; a bank-only reins can
+    // grant an appearance through ownedMounts() without being usable in bags.
     const sim = makeWorld();
     const pid = join(sim, 20);
     const meta = sim.players.get(pid)!;
@@ -657,7 +660,7 @@ describe('mount reins transfer (not soulbound: the collection trades hands)', ()
     }
   }
 
-  it('listing the ridden reins away dismounts within the re-validation window', () => {
+  it('listing the ridden reins away removes its cosmetic within the re-validation window', () => {
     // The ride follows the item: once the reins leave the player's possession
     // (here the market escrow, but any pipe), the mounted state must not
     // outlive ownership, or one reins could keep a chain of players mounted.
@@ -676,10 +679,11 @@ describe('mount reins transfer (not soulbound: the collection trades hands)', ()
     expect(sim.countItem('reins_grag_bear', pid)).toBe(0);
 
     revalidateWindow(sim, pid);
-    expect(e.mountKey).toBe('');
+    expect(e.mountKey).toBe(DEFAULT_MOUNT);
+    expect(e.mountSkinId).toBeNull();
   });
 
-  it('mailing the ridden reins away dismounts within the re-validation window', () => {
+  it('mailing the ridden reins away removes its cosmetic within the re-validation window', () => {
     // Same rule through the mail escrow: the parcel carries the mount away at
     // send time, so the rider must come down.
     const sim = makeWorld();
@@ -708,10 +712,11 @@ describe('mount reins transfer (not soulbound: the collection trades hands)', ()
     expect(sim.countItem('reins_grag_bear', pid)).toBe(0);
 
     revalidateWindow(sim, pid);
-    expect(e.mountKey).toBe('');
+    expect(e.mountKey).toBe(DEFAULT_MOUNT);
+    expect(e.mountSkinId).toBeNull();
   });
 
-  it('trading the ridden reins away dismounts once the trade completes', () => {
+  it('trading the ridden reins away removes its cosmetic once the trade completes', () => {
     // The full trade pipe through the real tick loop: items move only at
     // completion, so the rider stays up until then and comes down within one
     // re-validation window after.
@@ -743,7 +748,8 @@ describe('mount reins transfer (not soulbound: the collection trades hands)', ()
 
     expect(sim.countItem('reins_grag_bear', b)).toBe(1);
     expect(mountOwned(sim.players.get(b)!, 'grag_bear')).toBe(true);
-    expect(eA.mountKey).toBe('');
+    expect(eA.mountKey).toBe(DEFAULT_MOUNT);
+    expect(eA.mountSkinId).toBeNull();
   });
 
   it('a banked reins keeps the ride: ownership spans bags plus bank', () => {
@@ -787,7 +793,7 @@ describe('mount reins transfer (not soulbound: the collection trades hands)', ()
     expect(e.mountKey).toBe(TRAINING_MOUNT_KEY);
   });
 
-  it('the re-validation draws no rng, on both the pass and the dismount arm', () => {
+  it('cosmetic ownership re-validation draws no rng on pass and removal', () => {
     const sim = makeWorld();
     const pid = join(sim);
     sim.addItem('reins_grag_bear', 1, pid);
@@ -808,8 +814,9 @@ describe('mount reins transfer (not soulbound: the collection trades hands)', ()
       meta.inventory.findIndex((s) => s.itemId === 'reins_grag_bear'),
       1,
     );
-    updateMountTransition(sim.ctx, e, false); // the dismount arm
-    expect(e.mountKey).toBe('');
+    updateMountTransition(sim.ctx, e, false); // the cosmetic removal arm
+    expect(e.mountKey).toBe(DEFAULT_MOUNT);
+    expect(e.mountSkinId).toBeNull();
     expect(draws).toBe(0);
     sim.rng.setObserver(null);
   });
@@ -823,40 +830,68 @@ describe('mount reins transfer (not soulbound: the collection trades hands)', ()
     }
   });
 
-  it('the annual reward tank stays refused by the exchange pipes (still soulbound)', () => {
-    expect(guildBankPipeRefusal({ itemId: 'reins_terrorspark_groundshaker', count: 1 })).not.toBe(
-      null,
-    );
+  it('the annual reward Chimaera stays refused by the exchange pipes (still soulbound)', () => {
+    expect(guildBankPipeRefusal({ itemId: 'reins_nightwing_chimera', count: 1 })).not.toBe(null);
   });
 
-  it('the annual tank remains owned and rideable after membership expires', () => {
+  it('the annual Chimaera reins can never be listed on the $WOC exchange or salvaged', () => {
+    const def = ITEMS.reins_nightwing_chimera;
+    expect(exchangeHardLock(def, undefined)).toBe('no_market_list');
+    expect(def).toMatchObject({ soulbound: true, noDiscard: true, noSalvage: true });
+  });
+
+  it('the annual Chimaera entitlement unlocks it on every character of the account, reins or not', async () => {
+    const sim = makeWorld();
+    const first = join(sim);
+    const second = sim.addPlayer('warrior', 'Alt');
+    const sessions = [first, second].map((pid) => ({
+      accountId: 4002,
+      pid,
+      accountCosmetics: { ...EMPTY_LIVE_ACCOUNT_COSMETICS },
+    }));
+    const service = new AccountCosmeticsService({
+      sim: () => sim,
+      sessions: () => sessions,
+      resyncQuests: vi.fn(),
+    });
+    service.grantMembershipMount(4002);
+    await vi.waitFor(() =>
+      expect(mountOwned(sim.players.get(second)!, 'nightwing_chimera')).toBe(true),
+    );
+    expect(mountOwned(sim.players.get(first)!, 'nightwing_chimera')).toBe(true);
+    expect(ownedMounts(sim.players.get(second)!)).toContain('nightwing_chimera');
+    sim.setMembership(second, 0);
+    expect(mountOwned(sim.players.get(second)!, 'nightwing_chimera')).toBe(true);
+  });
+
+  it('the annual Chimaera remains owned and rideable after membership expires', () => {
     const sim = makeWorld();
     const pid = join(sim);
-    sim.addItem('reins_terrorspark_groundshaker', 1, pid);
+    sim.addItem('reins_nightwing_chimera', 1, pid);
     sim.setMembership(pid, 30);
     sim.setMembership(pid, 0);
-    expect(mountOwned(sim.players.get(pid)!, 'terrorspark_groundshaker')).toBe(true);
-    summonMountItem(sim.ctx, pid, 'terrorspark_groundshaker');
+    expect(mountOwned(sim.players.get(pid)!, 'nightwing_chimera')).toBe(true);
+    summonMountItem(sim.ctx, pid, 'nightwing_chimera');
     finishTransition(sim, pid);
-    expect(sim.entities.get(pid)!.mountKey).toBe('terrorspark_groundshaker');
+    expect(sim.entities.get(pid)!.mountKey).toBe('nightwing_chimera');
   });
 
-  it('vendor sell still refuses reins (noVendorSell: sellValue 0 protects the collection)', () => {
+  it('selling horse reins refunds 10 gold and removes the cosmetic', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Seller');
-    const marla = [...sim.entities.values()].find(
-      (e) => e.kind === 'npc' && e.templateId === 'stablemaster_marla',
-    )!;
+    const marla = [...sim.entities.values()].find((e) => e.templateId === 'stablemaster_marla')!;
     const player = sim.entities.get(pid)!;
     player.pos.x = marla.pos.x;
     player.pos.z = marla.pos.z;
     sim.addItem('reins_valorsteed', 1, pid);
-    sim.drainEvents();
-
+    sim.setMountSkin(pid, 'valorsteed');
+    expect(player.mountSkinId).toBe('valorsteed');
+    const before = sim.players.get(pid)!.copper;
     sellItem(sim.ctx, 'reins_valorsteed', 1, pid);
-
-    expect(sim.countItem('reins_valorsteed', pid)).toBe(1);
-    expect(errorTexts(sim.drainEvents())).toContain('That item is not for sale.');
+    expect(sim.countItem('reins_valorsteed', pid)).toBe(0);
+    expect(sim.players.get(pid)!.copper).toBe(before + 100_000);
+    revalidateWindow(sim, pid);
+    expect(player.mountSkinId).toBeNull();
   });
 });
 
@@ -1042,16 +1077,15 @@ describe('mount and dismount rules', () => {
     expect(e.mountKey).toBe('');
   });
 
-  it('the toggle does NOT summon: unmounted with reins in bags, it is a no-op', () => {
-    // Summoning moved onto the reins item. If the toggle ever regains a summon
-    // path it would resurrect the implicit "selected mount" this change deleted.
+  it('the toggle summons the trained mount without requiring reins', () => {
     const sim = makeWorld();
     const pid = join(sim, 20);
     const e = sim.entities.get(pid)!;
-    sim.addItem('reins_valorsteed', 1, pid);
-    expect(toggleMount(sim.ctx, pid)).toBe(false);
+    expect(toggleMount(sim.ctx, pid)).toBe(true);
     expect(e.mountKey).toBe('');
-    expect(e.mountCastRemaining ?? 0).toBe(0);
+    expect(e.mountCastRemaining).toBe(MOUNT_SUMMON_SECONDS);
+    finishTransition(sim, pid);
+    expect(e.mountKey).toBe(DEFAULT_MOUNT);
   });
 
   it('refuses to mount in combat but always allows dismounting', () => {
@@ -1162,7 +1196,7 @@ describe('mount summon/dismount channel (updateMountTransition)', () => {
     expect(e.mountCastRemaining).toBe(0);
   });
 
-  it('leaves the player unmounted if the reins vanish mid-summon', () => {
+  it('keeps the trained ride if the cosmetic item vanishes mid-summon', () => {
     const sim = makeWorld();
     const pid = join(sim, 20);
     const meta = sim.players.get(pid)!;
@@ -1171,7 +1205,7 @@ describe('mount summon/dismount channel (updateMountTransition)', () => {
     summonMountItem(sim.ctx, pid, 'valorsteed');
     meta.inventory = meta.inventory.filter((s) => s.itemId !== 'reins_valorsteed');
     finishTransition(sim, pid);
-    expect(e.mountKey).toBe('');
+    expect(e.mountKey).toBe(DEFAULT_MOUNT);
   });
 });
 
@@ -1188,13 +1222,13 @@ describe('mount specialty stats', () => {
     // The whole speed ladder, walked by instant swaps: common 60, uncommon 70,
     // rare 75, epic 80. Each swap applies its new speed on the same call.
     ride(sim, pid, 'valorsteed');
-    expect(moveSpeedMult(e), 'common').toBeCloseTo(1.6, 10);
+    expect(moveSpeedMult(e), 'common').toBeCloseTo(1.7, 10);
     summonMountItem(sim.ctx, pid, 'stormfeather_griffin');
     expect(moveSpeedMult(e), 'uncommon').toBeCloseTo(1.7, 10);
     summonMountItem(sim.ctx, pid, 'grag_bear');
-    expect(moveSpeedMult(e), 'rare').toBeCloseTo(1.75, 10);
+    expect(moveSpeedMult(e), 'rare').toBeCloseTo(1.7, 10);
     summonMountItem(sim.ctx, pid, 'aether_hover_cycle');
-    expect(moveSpeedMult(e), 'epic').toBeCloseTo(1.8, 10);
+    expect(moveSpeedMult(e), 'epic').toBeCloseTo(1.7, 10);
     e.auras.push({
       id: 'slow_test',
       name: 'slow',
@@ -1205,7 +1239,7 @@ describe('mount specialty stats', () => {
       sourceId: 0,
       school: 'physical',
     });
-    expect(moveSpeedMult(e)).toBeCloseTo(0.9, 10);
+    expect(moveSpeedMult(e)).toBeCloseTo(0.85, 10);
   });
 });
 
@@ -1451,7 +1485,7 @@ describe('mount + stealth interaction (stealth horse fix)', () => {
     // Full valorsteed speed (1.6): the exploit combined the stealth slow (0.5) with the
     // mount bonus (1.6) into a 0.8 apparent multiplier while STILL fully concealed; with
     // stealth broken there is nothing left riding along with the mount speed.
-    expect(moveSpeedMult(e)).toBeCloseTo(1.6, 5);
+    expect(moveSpeedMult(e)).toBeCloseTo(1.7, 5);
   });
 
   it('summon completion strips a stealth aura that slipped through mid-channel', () => {
@@ -1849,8 +1883,8 @@ describe('mount skins preserve gameplay', () => {
     expect(rider.mountKey).toBe('');
     expect(moveSpeedMult(rider)).toBe(1);
     for (const [key, speed] of [
-      ['valorsteed', 1.6],
-      ['grag_bear', 1.75],
+      ['valorsteed', 1.7],
+      ['grag_bear', 1.7],
     ] as const) {
       rider.mountKey = key;
       expect(moveSpeedMult(rider)).toBeCloseTo(speed, 10);
@@ -1860,5 +1894,111 @@ describe('mount skins preserve gameplay', () => {
     const alt = sim.addPlayer('warrior', 'Alt', { state: saved });
     expect(sim.entities.get(alt)?.mountSkinId).toBe(skin);
     expect(sim.ownedMountsFor(alt)).toEqual([]);
+  });
+});
+
+describe('collectible mount cosmetics', () => {
+  it('keeps a selected alt-backed skin through real revalidation and summon completion until hydration succeeds', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    const meta = sim.meta(pid)!;
+    const player = sim.entities.get(pid)!;
+    meta.mountSkinId = player.mountSkinId = 'grag_bear';
+    const sessions = [
+      { accountId: 4001, pid, accountCosmetics: { ...EMPTY_LIVE_ACCOUNT_COSMETICS } },
+    ];
+    const service = new AccountCosmeticsService({
+      sim: () => sim,
+      sessions: () => sessions,
+      resyncQuests: vi.fn(),
+    });
+    service.setCollectibleMountSkins(4001, [], sessions, false);
+    sim.tickCount = pid;
+    updateMountTransition(sim.ctx, player, false);
+    expect(player.mountSkinId).toBe('grag_bear');
+    expect(mountOwned(meta, 'grag_bear')).toBe(false);
+    expect(toggleMount(sim.ctx, pid)).toBe(true);
+    finishTransition(sim, pid);
+    expect(player.mountSkinId).toBe('grag_bear');
+    expect(player.mountKey).toBe(DEFAULT_MOUNT);
+    service.setCollectibleMountSkins(4001, [], sessions, true);
+    expect(player.mountSkinId).toBeNull();
+    expect(meta.mountSkinId).toBeNull();
+  });
+  it('treats an online account projection as authoritative without scanning bags or bank', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    const meta = sim.players.get(pid)!;
+    sim.addItem('reins_grag_bear', 1, pid);
+    expect(mountOwned(meta, 'grag_bear')).toBe(true);
+    meta.accountMountSkinIds = [];
+    Object.defineProperty(meta, 'inventory', {
+      get: () => {
+        throw new Error('online inventory scan');
+      },
+    });
+    Object.defineProperty(meta.bank, 'inventory', {
+      get: () => {
+        throw new Error('online bank scan');
+      },
+    });
+    expect(mountOwned(meta, 'grag_bear')).toBe(false);
+    expect(ownedMounts(meta)).toEqual([]);
+    meta.accountMountSkinIds = ['grag_bear'];
+    expect(mountOwned(meta, 'grag_bear')).toBe(true);
+    expect(ownedMounts(meta)).toEqual(['grag_bear']);
+  });
+
+  it('wears an account-owned appearance without local reins and summons through the trained toggle', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    const meta = sim.players.get(pid)!;
+    meta.accountMountSkinIds = ['grag_bear'];
+    expect(mountOwned(meta, 'grag_bear')).toBe(true);
+    expect(ownedMounts(meta)).toEqual(['grag_bear']);
+    sim.changeMountSkin('grag_bear');
+    const e = sim.entities.get(pid)!;
+    expect(e.mountSkinId).toBe('grag_bear');
+    expect(toggleMount(sim.ctx, pid)).toBe(true);
+    finishTransition(sim, pid);
+    expect(e.mountKey).toBe(DEFAULT_MOUNT);
+    expect(e.mountSkinId).toBe('grag_bear');
+    expect(moveSpeedMult(e)).toBeCloseTo(1.7);
+    e.ridingTier = 2;
+    expect(moveSpeedMult(e)).toBeCloseTo(2.1);
+    meta.accountMountSkinIds = [];
+    sim.tickCount = e.id;
+    updateMountTransition(sim.ctx, e, false);
+    expect(e.mountSkinId).toBeNull();
+    expect(e.mountKey).toBe(DEFAULT_MOUNT);
+    expect(moveSpeedMult(e)).toBeCloseTo(2.1);
+    sim.changeMountSkin('grag_bear');
+    expect(e.mountSkinId).toBeNull();
+  });
+
+  it('drops a vanished collectible appearance at summon completion', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    const meta = sim.players.get(pid)!;
+    sim.addItem('reins_grag_bear', 1, pid);
+    summonMountItem(sim.ctx, pid, 'grag_bear');
+    meta.inventory = meta.inventory.filter((s) => s.itemId !== 'reins_grag_bear');
+    finishTransition(sim, pid);
+    const e = sim.entities.get(pid)!;
+    expect(e.mountSkinId).toBeNull();
+    expect(e.mountKey).toBe(DEFAULT_MOUNT);
+  });
+
+  it('keeps a paid skin on the trained ride without owning a reins item', () => {
+    const sim = makeWorld();
+    const pid = join(sim);
+    sim.setMountSkin(pid, 'mech_bird');
+    expect(ownedMounts(sim.players.get(pid)!)).toEqual([]);
+    expect(toggleMount(sim.ctx, pid)).toBe(true);
+    finishTransition(sim, pid);
+    const e = sim.entities.get(pid)!;
+    expect(e.mountKey).toBe(DEFAULT_MOUNT);
+    expect(e.mountSkinId).toBe('mech_bird');
+    expect(moveSpeedMult(e)).toBeCloseTo(1.7);
   });
 });

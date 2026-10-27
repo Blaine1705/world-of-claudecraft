@@ -184,8 +184,10 @@ describe('large dungeon creature reach (bodyRadius)', () => {
   }
 
   // [template, level, the drawn half-width, the bodyRadius]
+  // turretback_hermit left this table when the spectral crew rework
+  // (77f963ed225, landed with the five-dungeon rework merge 106a086b617) made
+  // it the humanoid Shipwreck Captain; its own case below pins the new body.
   const CREATURES = [
-    ['turretback_hermit', 13, 4.3, 4.5],
     ['mere_hydra_head_left', 17, 3, 3],
     ['mere_hydra_head_center', 17, 3, 3],
     ['mere_hydra_head_right', 17, 3, 3],
@@ -212,12 +214,19 @@ describe('large dungeon creature reach (bodyRadius)', () => {
     },
   );
 
-  it('the Turretback Hermit: Shell Slam and Claw Sweep still cover its melee ring', () => {
+  it('the Shipwreck Captain (turretback_hermit): a humanoid body, so the stock reach stands', () => {
+    // The crab's 8.6 yd shell (bodyRadius 4.5, reached from 7.5 yd under its
+    // Shell Slam and Claw Sweep) is gone: the captain is a tall humanoid with
+    // a 1.5 yd body, whose edge reach falls inside the stock 5 yd swing, and
+    // the shell kit's cone and gust left with the crab (his broadsides and
+    // anchor ride encounter objects, encounters/sunken_bastion/ghost_captain.ts).
     const hermit = MOBS.turretback_hermit;
+    expect(hermit.bodyRadius).toBe(1.5);
+    expect(1.5 + BODY_EDGE_MELEE_REACH).toBeLessThan(MELEE_RANGE);
     const reach = effectivePlayerAttackRange({ kind: 'mob', templateId: hermit.id }, MELEE_RANGE);
-    expect(reach).toBe(7.5);
-    expect(hermit.trashKit?.wingGust?.radius).toBeGreaterThanOrEqual(reach);
-    expect(hermit.breathCone?.range).toBeGreaterThanOrEqual(reach);
+    expect(reach).toBe(MELEE_RANGE);
+    expect(hermit.breathCone).toBeUndefined();
+    expect(hermit.trashKit).toBeUndefined();
   });
 
   it('the Snarlvine Lasher needs none: stock reach already stands outside its 2.6 yd body', () => {

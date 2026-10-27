@@ -34,9 +34,10 @@ export class LanceWireState extends QuestWorldWireState {
       lguide?: unknown;
     },
     simTime?: unknown,
-  ): void {
-    super.applyQuestSelfSnapshot(self, simTime);
+  ): boolean {
+    const changed = super.applyQuestSelfSnapshot(self, simTime);
     this.applyLanceSelfWire(self);
+    return changed;
   }
 
   /** The self record's three lance keys, each delta-guarded like `corpse`. */

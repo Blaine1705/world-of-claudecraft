@@ -175,7 +175,8 @@ const UI_ROOT_TOUCHERS: Record<string, string> = {
   'src/ui/frame_context_menu.ts': 'transient right-click menu for the frame editor',
   'src/ui/focus_targets_controller.ts':
     'mounts the focusTargets frame registered with the shared editor',
-  'src/main.ts': 'mounts the breath bar (transient survival meter, exempt for now) into #ui',
+  'src/main.ts':
+    'mounts the breath bar (transient survival meter, exempt for now) and the graphics restore note (a pointer-inert status line shown only while a WebGL context restore holds the world draw) into #ui',
   'src/ui/hud/referral_cards/referral_cards_hud_controller.ts':
     'mounts the referral card window and launcher; the shared window focus and close bridge owns its lifecycle',
   'src/ui/hud.ts': 'the HUD coordinator: mounts the proc overlay, FCT pool, match strips',
@@ -219,8 +220,10 @@ const RUNTIME_MOUNTED_FRAME_IDS = [
   'tracker-group',
   'aura-track-group',
 ];
-// The compact target frame starts nested inside #target-frame and detaches on drag.
-const NESTED_FRAME_IDS = ['totarget-frame'];
+// The compact target frame starts nested inside #target-frame and detaches on drag;
+// the player's resource bar wrapper starts inside #player-frame and detaches
+// while the Detach Resource Bar option is on.
+const NESTED_FRAME_IDS = ['totarget-frame', 'pf-resource-frame'];
 
 interface Harvest {
   ids: string[];

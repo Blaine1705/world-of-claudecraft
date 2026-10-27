@@ -3,14 +3,15 @@
 // The WOC face builder's PAINTER (src/ui/woc_head_builder.ts) over a real DOM:
 // the keyboard model (one Tab stop per radio group, arrows roving and checking),
 // focus riding a repaint through the shared focus_restore seam, the sliders'
-// formatter readouts, the skin custom colour control, and the decorative
-// body-type letter. The rules themselves are pinned in
-// tests/woc_head_builder_model.test.ts; this file pins what the painter draws.
+// formatter readouts, the skin custom colour control, the decorative
+// body-type letter, and the Share page (Copy, Import, the footer button). The
+// rules themselves are pinned in tests/woc_head_builder_model.test.ts; this
+// file pins what the painter draws.
 
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ModularAppearance } from '../src/render/characters/modular';
 import { mountWocHeadBuilder, type WocHeadBuilder } from '../src/ui/woc_head_builder';
-import { WOC_SKIN_TONES } from '../src/ui/woc_head_builder_model';
+import { faceCode, readFace, WOC_SKIN_TONES } from '../src/ui/woc_head_builder_model';
 
 let host: HTMLElement;
 let builder: WocHeadBuilder;
@@ -417,5 +418,364 @@ describe('Reset and Random', () => {
     random.click();
     expect(last().gender).toBe('male');
     expect(last().bodyScale).toBe(1.03);
+  });
+});
+
+describe('Share', () => {
+  const footShare = () => host.querySelector<HTMLButtonElement>('.whb-foot-share')!;
+  const box = () => host.querySelector<HTMLTextAreaElement>('.whb-panel-body .whb-share-code')!;
+  const copyBtn = () => host.querySelector<HTMLButtonElement>('.whb-share-copy')!;
+  const importBtn = () =>
+    host.querySelector<HTMLButtonElement>('.whb-share-btn[data-focus-key="share:import"]')!;
+  const status = () => host.querySelector<HTMLElement>('.whb-share-status')!;
+  const paste = (text: string) => {
+    box().value = text;
+    box().dispatchEvent(new Event('input'));
+  };
+  // a face with every piece the code carries moved, on the other body type
+  const theirs = readFace({
+    gender: 'female',
+    bodyScale: 0.97,
+    skinHue: 21,
+    skinSat: 0.42,
+    skinLight: 0.38,
+    hairHue: 6,
+    hairSat: 0.7,
+    hairLight: 0.38,
+    headPiercing: 'septum',
+    headShape: { eyeSpacing: -0.4, eyeSize: 0.25, eyeTilt: 0, browHeight: 0, chinWidth: 0.2 },
+  });
+
+  let clipboard: PropertyDescriptor | undefined;
+  beforeEach(() => {
+    clipboard = Object.getOwnPropertyDescriptor(navigator, 'clipboard');
+  });
+  afterEach(() => {
+    if (clipboard) Object.defineProperty(navigator, 'clipboard', clipboard);
+    else delete (navigator as { clipboard?: unknown }).clipboard;
+  });
+  const stubClipboard = (value: unknown) =>
+    Object.defineProperty(navigator, 'clipboard', { value, configurable: true });
+
+  /** The tab panel (a category's options) and the Share region beside it. */
+  const panel = () => host.querySelector<HTMLElement>('.whb-panel:not(.whb-share-panel)')!;
+  const sharePanel = () => host.querySelector<HTMLElement>('.whb-share-panel')!;
+  const titleOf = (p: HTMLElement) => p.querySelector<HTMLElement>('.whb-panel-title')!;
+  const selectedTabs = () =>
+    [...host.querySelectorAll<HTMLButtonElement>('.whb-cat')].filter(
+      (b) => b.getAttribute('aria-selected') === 'true',
+    );
+  const tabStopsOf = () =>
+    [...host.querySelectorAll<HTMLButtonElement>('.whb-cat')].filter((b) => b.tabIndex === 0);
+
+  it('puts a gold Share toggle in the footer, after Random and Reset, never in the menu', () => {
+    mount();
+    const foot = [...host.querySelectorAll<HTMLButtonElement>('.whb-foot-btn')];
+    expect(foot).toHaveLength(3);
+    expect(foot[2]).toBe(footShare());
+    expect(footShare().textContent).toBe('Share');
+    expect(footShare().getAttribute('aria-pressed')).toBe('false');
+    expect(footShare().getAttribute('aria-controls')).toBe(sharePanel().id);
+    // decorative glyph: the word names the button
+    expect(footShare().querySelector('svg')?.getAttribute('aria-hidden')).toBe('true');
+    expect(footShare().classList.contains('sel')).toBe(false);
+    expect(host.querySelector('.whb-cat[data-cat="share"]')).toBeNull();
+    // the Share region waits, hidden and empty, beside the tab panel
+    expect(sharePanel().hidden).toBe(true);
+    expect(sharePanel().querySelector('.whb-share-code')).toBeNull();
+    expect(panel().hidden).toBe(false);
+  });
+
+  it('opens the Share page as its own region, its title naming it, and lands on Copy', () => {
+    mount();
+    tab('hairstyle').click();
+    focuses.length = 0;
+    footShare().click();
+    expect(footShare().getAttribute('aria-pressed')).toBe('true');
+    expect(footShare().classList.contains('sel')).toBe(true);
+    // the region swaps in for the tab panel, whose role never changes
+    expect(sharePanel().hidden).toBe(false);
+    expect(panel().hidden).toBe(true);
+    expect(panel().getAttribute('role')).toBe('tabpanel');
+    expect(sharePanel().getAttribute('role')).toBe('region');
+    expect(titleOf(sharePanel()).textContent).toBe('Share');
+    expect(sharePanel().getAttribute('aria-labelledby')).toBe(titleOf(sharePanel()).id);
+    expect(document.getElementById(titleOf(sharePanel()).id)).toBe(titleOf(sharePanel()));
+    // the hidden tab panel holds no stale controls
+    expect(panel().querySelector('[role="radio"]')).toBeNull();
+    expect(selectedTabs()).toEqual([]);
+    expect(host.querySelectorAll('.whb-cat.sel')).toHaveLength(0);
+    // the tablist keeps one Tab stop, on the category the page goes back to
+    expect(tabStopsOf()).toEqual([tab('hairstyle')]);
+    // the camera turns to the face being shared, and focus lands on Copy
+    expect(focuses).toEqual(['face']);
+    expect(document.activeElement).toBe(copyBtn());
+    // every Copy and Import outcome is announced
+    expect(status().getAttribute('aria-live')).toBe('polite');
+    // nothing about the look changed by opening it
+    expect(emitted).toEqual([]);
+  });
+
+  it('pressed again goes back to the category the player was in; a tab leaves it too', () => {
+    const opened: string[] = [];
+    builder = mountWocHeadBuilder(host, {
+      value: { gender: 'male' },
+      onChange: (next) => emitted.push(next),
+      onFocus: (f) => focuses.push(f),
+      onOpen: (cat) => opened.push(cat),
+    });
+    tab('hairColor').click();
+    footShare().click();
+    // the Share page browses no head files: nothing to prefetch
+    expect(opened).toEqual(['hairColor']);
+    footShare().click();
+    // coming back opens the category again (its prefetch asks for files once)
+    expect(opened).toEqual(['hairColor', 'hairColor']);
+    expect(footShare().getAttribute('aria-pressed')).toBe('false');
+    expect(footShare().classList.contains('sel')).toBe(false);
+    expect(panel().hidden).toBe(false);
+    expect(sharePanel().hidden).toBe(true);
+    expect(titleOf(panel()).textContent).toBe('Hair Color');
+    expect(panel().getAttribute('role')).toBe('tabpanel');
+    expect(panel().getAttribute('aria-labelledby')).toBe(tab('hairColor').id);
+    expect(selectedTabs()).toEqual([tab('hairColor')]);
+    expect(host.querySelector('.whb-share-code')).toBeNull();
+    // and from the page, any tab takes the player straight to its category
+    footShare().click();
+    tab('piercings').click();
+    expect(footShare().getAttribute('aria-pressed')).toBe('false');
+    expect(selectedTabs()).toEqual([tab('piercings')]);
+    expect(tabStopsOf()).toEqual([tab('piercings')]);
+    expect(emitted).toEqual([]);
+  });
+
+  it("shows the face's code, labelled and described, and follows Random", () => {
+    mount({ gender: 'male' });
+    footShare().click();
+    expect(box().value).toBe(faceCode(readFace(builder.value)));
+    expect(box().getAttribute('aria-label')).toBe('Design code');
+    const hint = document.getElementById(box().getAttribute('aria-describedby')!);
+    expect(hint?.textContent).toMatch(/^Copy this code/);
+    const before = box().value;
+    [...host.querySelectorAll<HTMLButtonElement>('.whb-foot-btn')][0].click();
+    expect(box().value).toBe(faceCode(readFace(last())));
+    expect(box().value).not.toBe(before);
+  });
+
+  it('follows Reset to Default too', () => {
+    mount({ ...theirs } as Partial<ModularAppearance>);
+    footShare().click();
+    const before = box().value;
+    expect(before).toBe(faceCode(theirs));
+    [...host.querySelectorAll<HTMLButtonElement>('.whb-foot-btn')][1].click();
+    expect(box().value).toBe(faceCode(readFace(last())));
+    expect(box().value).not.toBe(before);
+  });
+
+  it('Copy puts the code on the clipboard and says so', async () => {
+    const writeText = vi.fn(async (_text: string) => {});
+    stubClipboard({ writeText });
+    mount();
+    footShare().click();
+    copyBtn().click();
+    await vi.waitFor(() => expect(status().textContent).toBe('Design code copied.'));
+    expect(writeText).toHaveBeenCalledWith(box().value);
+    expect(status().classList.contains('err')).toBe(false);
+  });
+
+  it('Copy copies what is in the box, trimmed, and the face on the stage when it is empty', () => {
+    const writeText = vi.fn(async (_text: string) => {});
+    stubClipboard({ writeText });
+    mount({ gender: 'male' });
+    footShare().click();
+    paste('  WOC1; body=female  ');
+    copyBtn().click();
+    expect(writeText).toHaveBeenLastCalledWith('WOC1; body=female');
+    // load another face, then empty the box: Copy takes the face loaded NOW,
+    // never the one the page was first painted with
+    paste(faceCode(theirs));
+    importBtn().click();
+    paste('   ');
+    copyBtn().click();
+    expect(writeText).toHaveBeenLastCalledWith(faceCode(theirs));
+    expect(writeText).toHaveBeenCalledTimes(2);
+  });
+
+  it('Copy with no clipboard selects the code so one keystroke copies it', () => {
+    stubClipboard(undefined);
+    mount();
+    footShare().click();
+    copyBtn().click();
+    expect(document.activeElement).toBe(box());
+    expect(box().selectionStart).toBe(0);
+    expect(box().selectionEnd).toBe(box().value.length);
+    expect(status().textContent).toMatch(/^Automatic copy is blocked here/);
+  });
+
+  it('Copy falls back the same way when the clipboard refuses', async () => {
+    const writeText = vi.fn(async () => Promise.reject(new Error('denied')));
+    stubClipboard({ writeText });
+    mount();
+    footShare().click();
+    copyBtn().click();
+    expect(writeText).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => expect(document.activeElement).toBe(box()));
+    expect(box().selectionStart).toBe(0);
+    expect(box().selectionEnd).toBe(box().value.length);
+    expect(status().textContent).toMatch(/^Automatic copy is blocked here/);
+  });
+
+  it('clears the error colour on a good import, and the copy fallback is never an error', () => {
+    stubClipboard(undefined);
+    mount();
+    footShare().click();
+    paste('WOC1; body');
+    importBtn().click();
+    expect(status().classList.contains('err')).toBe(true);
+    paste(faceCode(theirs));
+    importBtn().click();
+    expect(status().textContent).toBe('Design imported.');
+    expect(status().classList.contains('err')).toBe(false);
+    paste('nope');
+    importBtn().click();
+    expect(status().classList.contains('err')).toBe(true);
+    copyBtn().click();
+    expect(status().textContent).toMatch(/^Automatic copy is blocked here/);
+    expect(status().classList.contains('err')).toBe(false);
+  });
+
+  it('names an empty box and a newer code for what they are', () => {
+    mount();
+    footShare().click();
+    paste('   ');
+    importBtn().click();
+    expect(status().textContent).toBe('Paste a design code first.');
+    paste('WOC2; body=male');
+    importBtn().click();
+    expect(status().textContent).toBe('That design code comes from a newer game version.');
+    expect(emitted).toEqual([]);
+  });
+
+  it('an import onto the other body type says the face focus again; the same type does not', () => {
+    mount({ gender: 'male' });
+    footShare().click();
+    focuses.length = 0;
+    paste(faceCode(theirs)); // a Type B face
+    importBtn().click();
+    expect(readFace(last()).gender).toBe('female');
+    expect(focuses).toEqual(['face']);
+    focuses.length = 0;
+    paste(faceCode({ ...theirs, headPiercing: 'none' }));
+    importBtn().click();
+    expect(readFace(last()).headPiercing).toBe('none');
+    expect(focuses).toEqual([]);
+  });
+
+  it('Import loads a pasted face, keeps the body proportions, and leaves its status up', () => {
+    const body = { shoulders: 0.4 } as unknown as ModularAppearance['body'];
+    mount({ gender: 'male', body } as Partial<ModularAppearance>);
+    const bodyBefore = builder.value.body;
+    footShare().click();
+    const shown = box();
+    paste(`My ranger: \`${faceCode(theirs)}\``);
+    importBtn().click();
+    const got = readFace(last());
+    expect(got.gender).toBe('female');
+    expect(got.headPiercing).toBe('septum');
+    expect(got.bodyScale).toBeCloseTo(0.97, 6);
+    expect(got.headShape.chinWidth).toBeCloseTo(0.2, 6);
+    expect(faceCode(got)).toBe(faceCode(theirs));
+    // body proportions are not part of a face: the character keeps its own
+    expect(last().body).toEqual(bodyBefore);
+    // the page was not rebuilt under the status, and the box now holds the
+    // clean code of what was loaded (the chat wrapping gone)
+    expect(box()).toBe(shown);
+    expect(box().value).toBe(faceCode(theirs));
+    expect(status().textContent).toBe('Design imported.');
+    expect(status().classList.contains('err')).toBe(false);
+  });
+
+  it('Import of something that is not a code says why and changes nothing', () => {
+    mount();
+    footShare().click();
+    paste('a lovely face');
+    importBtn().click();
+    expect(emitted).toEqual([]);
+    expect(status().textContent).toBe('That does not look like a design code.');
+    expect(status().classList.contains('err')).toBe(true);
+    paste('WOC1; body');
+    importBtn().click();
+    expect(emitted).toEqual([]);
+    expect(status().textContent).toBe(
+      'That design code is damaged. Copy the whole code and try again.',
+    );
+  });
+
+  it('says so when an import had to skip something', () => {
+    mount();
+    footShare().click();
+    paste(`${faceCode(theirs)}; sparkle=9`);
+    importBtn().click();
+    expect(readFace(last()).gender).toBe('female');
+    expect(status().textContent).toBe(
+      'Design imported. Values this version does not know were skipped.',
+    );
+  });
+
+  it('keeps a pasted code through the host repainting the panel, again and again', () => {
+    mount();
+    footShare().click();
+    paste('WOC1; body=female; headpiercing=septum');
+    // the host pokes set() on a class switch: the page repaints, the paste stays,
+    // through a second repaint that changes the face too
+    builder.set({});
+    builder.set({ gender: 'female' });
+    expect(box().value).toBe('WOC1; body=female; headpiercing=septum');
+    expect(footShare().getAttribute('aria-pressed')).toBe('true');
+    // and it is still what Import reads
+    importBtn().click();
+    expect(readFace(last()).headPiercing).toBe('septum');
+    // an untouched box follows the look the host hands in
+    builder.set({ gender: 'male' });
+    expect(box().value).toBe(faceCode(readFace(builder.value)));
+    expect(readFace(builder.value).gender).toBe('male');
+  });
+
+  /** A clipboard whose write settles when the test says so. */
+  function heldClipboard() {
+    let settle: () => void = () => {};
+    const writeText = vi.fn(() => new Promise<void>((r) => (settle = r)));
+    stubClipboard({ writeText });
+    return { writeText, settle: () => settle() };
+  }
+  /** The ticks a settled write takes to reach the status line. */
+  const ticks = async () => {
+    await Promise.resolve();
+    await Promise.resolve();
+  };
+
+  it('writes the copied line once the clipboard answers (the control for the next case)', async () => {
+    const clip = heldClipboard();
+    mount();
+    footShare().click();
+    copyBtn().click();
+    expect(clip.writeText).toHaveBeenCalledTimes(1);
+    expect(status().textContent).toBe('');
+    clip.settle();
+    await ticks();
+    expect(status().textContent).toBe('Design code copied.');
+  });
+
+  it('wires nothing to a torn-down builder: a late clipboard answer writes no status', async () => {
+    const clip = heldClipboard();
+    mount();
+    footShare().click();
+    const line = status();
+    copyBtn().click();
+    expect(clip.writeText).toHaveBeenCalledTimes(1);
+    builder.destroy();
+    clip.settle();
+    await ticks();
+    expect(line.textContent).toBe('');
   });
 });

@@ -124,6 +124,17 @@ const PROVEN_SAFE_BASES: ProvenSafeBase[] = [
     anchor: /slot\.progress = easeOutQuart\(t\)/,
     why: 'uProgress is written from JS from slot.progress, which is easeOutQuart(min(1, age / dur)), never above 1',
   },
+  {
+    file: 'src/render/drowned_temple_entrance.ts',
+    base: 'smoothstep(0.72, 1.0, fr)',
+    sites: 1,
+    // smoothstep clamps its interpolant to [0, 1] and returns t * t * (3 - 2t),
+    // a product of non-negative factors, so it is never below zero. The bound
+    // only holds while the edges are ordered literals (GLSL leaves a reversed
+    // or equal pair undefined), so the anchor pins the literal pair at the site.
+    anchor: /pow\(smoothstep\(0\.72, 1\.0, fr\), 2\.0\)/,
+    why: 'the moon-ring pool glow: smoothstep with ordered literal edges is clamped to [0, 1]',
+  },
 ];
 
 /** Every file that currently holds at least one pow(), and how many. Pinned as a
@@ -133,6 +144,7 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/battleground_lantern_fx.ts': 1,
   'src/render/battleground_rune_vfx.ts': 3,
   'src/render/battleground_ward.ts': 1,
+  'src/render/sprites_buddy_flame.ts': 1,
   'scripts/asset_pipeline/weapon_vfx.js': 4,
   // Authored Warrior materials are part of the same fail-closed domain scan.
   'src/render/ability_vfx/baked_impact_layers.ts': 1,
@@ -157,6 +169,8 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/campfire_flame.ts': 1,
   // the brazier flame's taper ramp
   'src/render/placed_assets.ts': 1,
+  // the spirit veil's fresnel rim (base 1.0 - clamp(x, 0.0, 1.0))
+  'src/render/characters/ghost_veil.ts': 1,
   'src/render/foliage_shader_core.ts': 1,
   'src/render/hoard_entrance.ts': 3,
   // the Buried Hoard glow cards, sparks, reward-chest rays and column (bases
@@ -199,7 +213,7 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/drowned_temple/temple_tsunami_fx.ts': 3,
   'src/render/floor_telegraph/telegraph_material.ts': 1,
   'src/render/gravewyrm_sanctum/sanctum_air.ts': 2,
-  'src/render/gravewyrm_sanctum/sanctum_face.ts': 2,
+  'src/render/gravewyrm_sanctum/sanctum_face.ts': 3,
   'src/render/gravewyrm_sanctum/sanctum_fire.ts': 2,
   'src/render/gravewyrm_sanctum/sanctum_lake.ts': 3,
   'src/render/gravewyrm_sanctum/sanctum_sky.ts': 3,
@@ -233,7 +247,7 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/sunken_bastion/bastion_trash_fx_kit.ts': 3,
   'src/render/sunken_bastion/bastion_water.ts': 2,
   'src/render/wildheart_basin/basin_air.ts': 1,
-  'src/render/wildheart_basin/basin_boss_fx.ts': 5,
+  'src/render/wildheart_basin/basin_boss_fx.ts': 2,
   'src/render/wildheart_basin/basin_falls.ts': 3,
   'src/render/wildheart_basin/basin_fire.ts': 1,
   'src/render/wildheart_basin/basin_seedpod.ts': 1,
@@ -241,6 +255,9 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/wildheart_basin/basin_thorns.ts': 1,
   'src/render/wildheart_basin/basin_water.ts': 4,
   'src/render/wildheart_basin/bond_cord.ts': 2,
+  // Zulgar's sun glyphs: the cold cracks and the lit rays, moved out of the
+  // boss FX file, every base wrapped in max(0.0, cos(...)).
+  'src/render/wildheart_basin/zulgar_glyph_fx.ts': 3,
   // The dungeon trash pass: the Temple kit's shells, the Sanctum kit's brazier
   // and the trash engine's pools, orbs, walls, novas and body marks, every
   // base wrapped in max(x, 0.0).
@@ -263,6 +280,17 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/temple_water_shader.ts': 1,
   'src/render/triplanar_maps.ts': 1,
   'src/render/wall_finishes.ts': 1,
+  // the three dungeon entrances' shaft, film, fresnel and flame shaders
+  // (41da06f9a7d, a38282db9f6 and their integration merge 7848da76b21) and the
+  // Studio's per-part material finishes (37a8a730640): every base is a clamp,
+  // max(x, 0.0) or abs(), except the moon-ring pool's smoothstep (a
+  // PROVEN_SAFE_BASES row); the Jaguar Maw flame tongue's 1.0 - v took
+  // max(x, 0.0) (sprite key bumped to v3) and the ghost discharge's collar
+  // Gaussian above took abs(), in the change that listed them here
+  'src/render/drowned_temple_entrance.ts': 8,
+  'src/render/sunken_bastion_entrance.ts': 6,
+  'src/render/wildheart_basin_entrance.ts': 6,
+  'src/render/material_finishes.ts': 1,
 };
 
 // Generated locale bundles are megabytes of prose with no shader in them; a

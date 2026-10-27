@@ -135,11 +135,20 @@ describe('the sway gate uniform', () => {
     // In the Studio the sim's dummy player rides the CAMERA, so a maker
     // inspecting a tree from 120 yards out saw it frozen: both call sites rank
     // from the free-cam look-at while the editor hosts the renderer (the same
-    // rule the point-light budget uses).
-    const lookAtCalls =
-      renderer.match(
-        /updateTreeSwayPlayer\(\s*this\.editorCam \? this\.cameraLookAt\.x : [\w.]+,\s*this\.editorCam \? this\.cameraLookAt\.z : [\w.]+,?\s*\)/g,
-      ) ?? [];
-    expect(lookAtCalls.length).toBe(calls.length);
+    // rule the point-light budget uses). Since 8bff2cec638 each frame path
+    // derives that position once as `focusX`/`focusZ` (the editor camera's
+    // target, which is what `cameraLookAt` copies each editor frame) and hands
+    // the same pair to the carpet ring and the sway gate.
+    const focusCalls = renderer.match(/updateTreeSwayPlayer\(focusX, focusZ\)/g) ?? [];
+    expect(focusCalls.length).toBe(calls.length);
+    const focusX =
+      renderer.match(/const focusX = this\.editorCam \? this\.editorCam\.target\.x : [\w.]+;/g) ??
+      [];
+    const focusZ =
+      renderer.match(/const focusZ = this\.editorCam \? this\.editorCam\.target\.z : [\w.]+;/g) ??
+      [];
+    expect(focusX.length).toBe(calls.length);
+    expect(focusZ.length).toBe(calls.length);
+    expect(renderer).toContain('this.cameraLookAt.copy(this.editorCam.target);');
   });
 });

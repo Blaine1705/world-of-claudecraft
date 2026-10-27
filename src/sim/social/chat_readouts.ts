@@ -19,6 +19,7 @@ import {
   talentPointsAtLevel,
   talentsFor,
 } from '../content/talents';
+import { MEDALLION_USE_COOLDOWN_KEY } from '../content/trinkets';
 import {
   ABILITIES,
   abilitiesKnownAt,
@@ -438,7 +439,7 @@ function auraLabel(a: Aura): string {
 //
 export function cooldownsReadout(e: Entity): string {
   const parts = [...e.cooldowns]
-    .filter(([id]) => !isUnstuckSystemCooldown(id))
+    .filter(([id]) => !isUnstuckSystemCooldown(id) && id !== MEDALLION_USE_COOLDOWN_KEY)
     .sort((a, b) => a[1] - b[1])
     .map(([id, remaining]) => `${ABILITIES[id]?.name ?? id} (${Math.ceil(remaining)}s)`);
   if (parts.length === 0) return 'No abilities are on cooldown.';

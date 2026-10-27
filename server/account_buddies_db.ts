@@ -1,35 +1,31 @@
 // Permanent account ownership, separate from each character's pending reveal and
 // equipped companion. Keep forever: one bounded row per account, cascaded on delete.
 import type { PoolClient } from 'pg';
-import { type BuddyKey, buddyDef } from '../src/sim/content/buddies';
+import { BUDDY_KEYS, type BuddyKey, buddyDef } from '../src/sim/content/buddies';
 import type { CharacterState } from '../src/sim/sim';
 import { pool, saveCharacterStateOnClient } from './db';
 import { cancelDetachedBackend } from './db_backend_cancel';
 import { createDbTransactionDeadline } from './db_transaction_deadline';
 
+// The roster is BUDDY_KEYS, enforced by every writer here (normalizeAccountBuddies,
+// the $n::text[] key filters). It is not repeated in a CHECK: a CHECK inside
+// CREATE TABLE IF NOT EXISTS never reaches an existing database, so the old
+// key-list constraint is retired idempotently instead.
 export const ACCOUNT_BUDDIES_SCHEMA = `
 CREATE TABLE IF NOT EXISTS account_buddies (
   account_id INT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
-  owned TEXT[] NOT NULL DEFAULT '{}',
-  CONSTRAINT account_buddies_active_keys CHECK (
-    cardinality(owned) <= 4 AND owned <@ ARRAY['horse','crystal_lich','forgemaw','sapling']::text[])
+  owned TEXT[] NOT NULL DEFAULT '{}'
 );
--- CREATE IF NOT EXISTS does not widen existing CHECKs. The new predicate is a
--- superset of the old one, so existing validated rows already satisfy it.
--- NOT VALID enforces every new write without scanning the account book under
--- boot's ACCESS EXCLUSIVE lock. The catalog gate leaves subsequent boots alone.
-DO $account_buddies_active_keys_upgrade$ BEGIN
+-- Only the first boot after an upgrade needs the table lock. Later boots
+-- leave ownership reads and writes on other realms running normally.
+DO $account_buddies_active_keys_retire$ BEGIN
   IF EXISTS (
     SELECT 1 FROM pg_constraint
      WHERE conrelid = 'account_buddies'::regclass
-       AND conname = 'account_buddies_active_keys'
-       AND pg_get_constraintdef(oid) NOT LIKE '%''sapling''%') THEN
+       AND conname = 'account_buddies_active_keys') THEN
     ALTER TABLE account_buddies DROP CONSTRAINT account_buddies_active_keys;
-    ALTER TABLE account_buddies ADD CONSTRAINT account_buddies_active_keys CHECK (
-      cardinality(owned) <= 4 AND owned <@ ARRAY['horse','crystal_lich','forgemaw','sapling']::text[])
-      NOT VALID;
   END IF;
-END $account_buddies_active_keys_upgrade$;`;
+END $account_buddies_active_keys_retire$;`;
 
 export function normalizeAccountBuddies(raw: unknown): BuddyKey[] {
   return Array.isArray(raw)
@@ -74,7 +70,7 @@ async function migrateAndLoadAccountBuddies(accountId: number): Promise<BuddyKey
      ON CONFLICT (account_id) DO UPDATE SET owned = ARRAY(
        SELECT DISTINCT key FROM unnest(current.owned || EXCLUDED.owned) AS key ORDER BY key)
      RETURNING owned`,
-    [accountId, ['horse', 'crystal_lich', 'forgemaw', 'sapling']],
+    [accountId, BUDDY_KEYS],
   );
   return normalizeAccountBuddies(result.rows[0]?.owned);
 }

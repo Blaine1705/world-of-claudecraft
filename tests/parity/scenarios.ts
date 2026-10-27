@@ -3500,14 +3500,14 @@ function nythraxisFullPull(): Scenario {
       rec.snapshot('kings-wrath');
       parkRedoCadences();
 
-      // Bone Storm: hash-ranked charges (no shared rng), the whirl tick, a slam
-      // on arrival with its Gravefire line (no spike lands while he storms), then
-      // the top-threat pickup when it ends.
+      // Bone Storm is retired from play (NYTHRAXIS_BONE_STORM_ENABLED): the due
+      // timer starts nothing, and this window records phase 3 running on
+      // without a storm (the coverage test asserts none of it fires).
       nyx().boneStormTimer = DT;
-      step(1); // startNythraxisBoneStorm -> boneStormBegins + boneStormCharge callouts
-      step(20 * 8); // charges and slams, past the retired 6 s spike mark
-      rec.snapshot('bone-storm');
-      step(20 * 5); // the storm ends: pickup, Gravebreaker re-arm, the major gap
+      step(1);
+      step(20 * 8);
+      rec.snapshot('phase-three-no-storm');
+      step(20 * 5);
       parkRedoCadences();
       nyx().boneStormTimer = 999;
 
@@ -4354,10 +4354,10 @@ function c5AutoAttack(): Scenario {
       'player auto-attack driver updatePlayerAutoAttack (swingTimer cadence, facing/range gates)',
       'meleeSwing white-hit table: single rng.next() miss/dodge + crit + armor mitigation',
       'queuedOnSwing heroic_strike spend + bonus (warrior, cooldown 0)',
-      'instant raptor_strike weaponStrike mixed into the hunter melee lane',
+      'instant raptor_strike weaponStrike mixed into the point-blank hunter lane',
       'overpowerUntil window set on a melee dodge',
       'spiked-hide reflect tail of meleeSwing (wild_boar Bristled Hide)',
-      'rangedSwing Auto Shot (hunter, physical, armor-mitigated, 8yd dead zone)',
+      'rangedSwing Auto Shot (hunter, physical, armor-mitigated, no dead zone since v0.45)',
       'rangedSwing Wand (mage, arcane, no armor, no dead zone)',
       'stopAutoAttack public entry',
     ],
@@ -4397,7 +4397,8 @@ function c5AutoAttack(): Scenario {
         rec.track(m.id);
         return m;
       };
-      // dz 1.5 = melee; dz 20 = hunter Auto Shot band (> 8yd dead zone, <= 35);
+      // dz 1.5 = melee (Auto Shot for the hunter, which has no dead zone since v0.45);
+      // dz 20 = hunter Auto Shot band (<= 35);
       // dz 15 = wand band (no dead zone). wild_boar carries the spiked-hide thorns.
       const mobWarrior = spawnTarget(eWarrior, 'wild_boar', 1.5, 3);
       const mobRogue = spawnTarget(eRogue, 'forest_wolf', 1.5, 6);
@@ -4418,8 +4419,8 @@ function c5AutoAttack(): Scenario {
       for (const pid of ids) sim.startAutoAttack(pid);
 
       for (let round = 0; round < 12; round++) {
-        // Re-pin each target to its lane distance + re-face so the ranged dead-zone
-        // (Auto Shot) vs no-dead-zone (Wand) branches stay deterministically exercised.
+        // Re-pin each target to its lane distance + re-face so the melee and ranged
+        // (Auto Shot, Wand) branches stay deterministically exercised.
         for (const [, e, m, dz] of pairs) {
           teleport(sim, m, e.pos.x, e.pos.z + dz);
           face(e, m);
@@ -4561,7 +4562,7 @@ function marketRoundTrip(): Scenario {
 // that returns the old piece to the bags via addItemSilent + recalcPlayerStats),
 // unequipItem (piece back to bags + recalc), useItem (food/drink sit, potion heal +
 // cooldown, elixir aura), discardItem, sellItem (vendorInRange gate + recordVendorBuyback
-// + meta.copper payout), sellAllJunk (bulk gray sweep + per-stack buyback record), and
+// + meta.copper payout), sellAllJunk (bulk gray sweep; plain grays record no buyback), and
 // buyBackItem (meta.copper spend + addItemSilent + onInventoryChangedForQuests). Pins
 // copper / inventory / equipment / vendorBuyback in samplePlayerMeta so the W2 move stays
 // byte-identical. None of these commands draw rng, so the draw-order log must be UNCHANGED
@@ -4577,7 +4578,7 @@ function inventoryVendor(): Scenario {
       'useItem food/drink (sit + eating/drinking slot), potion (heal + cooldown), elixir (applyAura)',
       'discardItem: removeItem the discarded count',
       'sellItem: vendorInRange gate + recordVendorBuyback + meta.copper payout',
-      'sellAllJunk: bulk gray sweep, per-stack buyback record, one summary line',
+      'sellAllJunk: bulk gray sweep, plain grays skip buyback, one summary line',
       'buyBackItem: meta.copper spend + addItemSilent + onInventoryChangedForQuests',
     ],
     build: () => new Sim({ seed: 5150, playerClass: 'warrior', noPlayer: true }),
@@ -4640,7 +4641,7 @@ function inventoryVendor(): Scenario {
       sim.sellItem('wolf_fang', 1, buyer);
       rec.snapshot('sold');
 
-      // 7) bulk-sell the remaining gray (sellAllJunk: one summary line + per-stack buyback).
+      // 7) bulk-sell the remaining gray (sellAllJunk: one summary line; plain grays skip buyback).
       // bandit_bandana was the fodder here until phase 11l promoted it to a
       // common trophy reagent; soggy_moccasin keeps the junk-sold beat live.
       sim.addItem('soggy_moccasin', 1, buyer);
@@ -4737,7 +4738,7 @@ function bankRoundTrip(): Scenario {
       // The Materials Vault arm, at the same bursar (nearBanker is already
       // satisfied). Count-only storage: PlayerMeta.vault holds one number per
       // material id plus the rung ladder, both already sampled by samplePlayerMeta.
-      // 6) stock the purse and the bags for the vault ladder: 20000 + 50000 for
+      // 6) stock the purse and the bags for the vault ladder: 20000 + 40000 for
       //    the two rungs, plus a 1000 REMAINDER on purpose. An exact 0 balance
       //    is inert to the canonicalizer (trace.ts drops inert keys), so the
       //    copper key would VANISH from the last snapshots and the second
@@ -4746,7 +4747,7 @@ function bankRoundTrip(): Scenario {
       //    TWO material ids, not one: a single-key stock cannot show two counts
       //    reconciling independently (the deposit of one leaving the other
       //    untouched, and the later withdraw moving only its own).
-      meta.copper = 71000;
+      meta.copper = 61000;
       sim.addItem('copper_ore', 10, pid);
       sim.addItem('ashwood_log', 4, pid);
       rec.snapshot('vault-setup');
@@ -4776,7 +4777,7 @@ function bankRoundTrip(): Scenario {
       sim.vaultWithdraw('copper_ore', 2, pid);
       rec.snapshot('vault-withdrew-partial');
 
-      // 11) the second rung: copper - 50000, upgrades 1 -> 2.
+      // 11) the second rung: copper - 40000, upgrades 1 -> 2.
       sim.vaultBuyUpgrade(pid);
       rec.snapshot('vault-bought-rung');
 
@@ -6496,16 +6497,16 @@ function bankSocketRoundTrip(): Scenario {
       const pid = sim.addPlayer('warrior', 'Socketwright');
       const meta = sim.players.get(pid) as PlayerMeta;
       // Stand at a bursar so the nearBanker gate passes (the bank_round_trip
-      // idiom); fund exactly two unlocks (1000000 + 2000000) plus 500000 over.
+      // idiom); fund exactly two unlocks (750000 + 1000000) plus 500000 over.
       const banker = sim.entities.get(sim.bankerIds[0]) as AnyEntity;
       teleport(sim, sim.entities.get(pid) as AnyEntity, banker.pos.x, banker.pos.z);
       rec.notes.pid = pid;
-      meta.copper = 3500000;
+      meta.copper = 2250000;
       sim.addItem('linen_pouch', 1, pid);
       sim.addItem('burlap_reagent_pouch', 1, pid);
 
-      // 1) two unlocks, cheapest first: the ladder charges 1000000 then
-      //    2000000, leaving 500000, with all sockets still empty.
+      // 1) two unlocks, cheapest first: the ladder charges 750000 then
+      //    1000000, leaving 500000, with all sockets still empty.
       sim.bankUnlockSocket(pid);
       sim.bankUnlockSocket(pid);
       rec.snapshot('two-sockets-unlocked');
@@ -6526,7 +6527,7 @@ function bankSocketRoundTrip(): Scenario {
       sim.bankUnsocketBag(0, pid);
       rec.snapshot('satchel-unsocketed');
 
-      // 5) the refusal arm: the third socket costs 3500000 and the purse
+      // 5) the refusal arm: the third socket costs 1250000 and the purse
       //    holds 500000, so nothing moves and nothing is charged.
       sim.bankUnlockSocket(pid);
       rec.snapshot('third-unlock-refused');
@@ -6761,17 +6762,18 @@ function grixRespawnWindow(): Scenario {
 
 // Cat Form AUTO attacks, the arm druid_engines deliberately does not drive
 // (it scripts specials only): the fixed 1.0s cat cadence swings against a
-// bear-form control on the same staff swinging at the weapon speed. The cat
-// lane lands ~1.8x the swings (and rng draws) of the bear lane over the same
-// window, so a regression in the cat swing timer or the normalized mainhand
-// roll moves this golden's draw digest, not just its state hashes.
+// bear-form control on the same staff swinging at HALF the weapon speed (the
+// Groveheart rework pass 2 Bruin cadence, half damage per swing). The two
+// lanes swing at different fixed cadences, so a regression in either swing
+// timer or in the normalized mainhand roll moves this golden's draw digest,
+// not just its state hashes.
 function catFormAutoSwing(): Scenario {
   return {
     name: 'cat_form_auto_swing',
     coverage: [
       'class:druid (Wildfang cat + Bruin control)',
       'Cat Form fixed-cadence auto-attack: 1.0s swing timer, normalized mainhand weapon roll',
-      'bear-form control swinging at the equipped weapon speed on the same loadout',
+      'bear-form control swinging at half the equipped weapon speed on the same loadout',
     ],
     sampleEvery: 5,
     build: () => new Sim({ seed: 2931, playerClass: 'druid', noPlayer: true, autoEquip: true }),

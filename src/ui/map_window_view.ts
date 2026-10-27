@@ -47,10 +47,10 @@ import type {
 import type { Decoration } from '../sim/world';
 import { WORLD_BOSSES, worldBossLockoutId } from '../sim/world_boss';
 import { playerActiveWorldQuests } from '../sim/world_quest_reroll';
-import { activeWorldQuestsForCycle } from '../sim/world_quest_rotation';
 import type { FriendInfo, IWorld } from '../world_api';
 import { buildCastlePlanMarkers, type CastlePlanMarker } from './castle_plan_core';
 import { dungeonMapActive } from './dungeon_map_view';
+import { FERRY_PORTS, type FerryPortMapMarker } from './ferry_port_map_core';
 import { viewerUsableToolTier } from './hud/professions/gathering_view';
 import { dawnholdMapActive, lastKeepMapActive } from './lastkeep_map_view';
 import { overworldDungeonPortals } from './map_dungeon_portals';
@@ -70,6 +70,7 @@ import {
   type MapAtlasFilters,
   type MapAtlasRoute,
 } from './map_sidebar_view';
+import { worldQuestReadsActive, worldQuestReadsCompleted } from './world_quest_progress_state';
 
 // World-map zoom band. zoom 1 = the whole current zone framed square;
 // MAP_MAX_ZOOM is a close local view. The view scales uniformly between the two,
@@ -342,6 +343,7 @@ export interface MapServiceMarker {
  * identities come from authored content; Rift name/rank come only from a live
  * entity inside the host-fair disclosure range. */
 export type MapNavigationMarker =
+  | FerryPortMapMarker
   | { kind: 'hoard-entrance'; mx: number; my: number }
   | {
       kind: 'delve-entrance';
@@ -857,6 +859,7 @@ export interface OverworldMapModel {
   questAreas: MapQuestAreaMarker[];
   worldQuests: MapWorldQuestMarker[];
   worldBosses: MapWorldBossMarker[];
+  hill: { mx: number; my: number; phase: 'warning' | 'active' } | null;
   /** Gather nodes in the committed zone (all zoom levels). Empty only when
    *  the zone has no authored nodes in view. */
   gatherNodes: MapGatherNodeMarker[];
@@ -943,6 +946,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   const filters = input.filters ?? DEFAULT_MAP_ATLAS_FILTERS;
   const landmarkPlacement = MAP_LANDMARK_PLACEMENT_BY_PROFILE[input.markerProfile ?? 'standard'];
   const p = world.player;
+  const hill = world.hillInfo;
 
   // Inside a rift the overworld zone (the current-zone frame below still keys
   // off `zone`, which the player's far-off rift x displaces past any real
@@ -1108,7 +1112,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   })) {
     if (quest.zoneId !== zone.id || playerLevel < quest.minLevel) continue;
     const progress = world.worldQuestLog?.get(quest.id);
-    if (progress?.state === 'completed') continue;
+    if (worldQuestReadsCompleted(progress)) continue;
     const isGlider = quest.objective.type === 'glider';
     const position = isGlider ? GLIDER_NPC_DEF.pos : quest.area;
     if (!inView(position.x, position.z)) continue;
@@ -1118,7 +1122,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
       mx,
       my,
       radius: isGlider ? 0 : (quest.area.radius / spanX) * S,
-      state: progress?.state === 'active' ? 'active' : 'available',
+      state: worldQuestReadsActive(progress) ? 'active' : 'available',
       areaVisible: !isGlider && input.selectedWorldQuestId === quest.id,
     });
   }
@@ -1245,6 +1249,13 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
         portalId: site.id,
         destinationZoneId: site.destinationZoneId,
       });
+    }
+  }
+  if (world.ferryView?.()) {
+    for (const port of FERRY_PORTS) {
+      if (port.zoneId !== zone.id) continue;
+      const placed = placeNavigation(port.x, port.z);
+      if (placed) navigation.push({ ...port, ...placed });
     }
   }
   for (const entity of world.entities.values()) {
@@ -1437,6 +1448,10 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     questAreas,
     worldQuests,
     worldBosses,
+    hill:
+      hill && hill.zoneId === zone.id && inView(hill.x, hill.z)
+        ? { ...toMap(hill.x, hill.z), phase: hill.phase }
+        : null,
     gatherNodes,
     stations,
     services,

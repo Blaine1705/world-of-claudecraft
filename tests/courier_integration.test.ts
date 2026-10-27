@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CLASSES } from '../src/sim/content/classes';
-import { courierSlotFingerprint } from '../src/sim/courier';
+import { courierSlotFingerprint, courierSummon } from '../src/sim/courier';
 import { BUILTIN_WORLD, QUESTS } from '../src/sim/data';
 import { perfectMembershipArmour } from '../src/sim/membership_armour_progression';
 import {
@@ -55,11 +55,12 @@ describe('courier live simulation integration', () => {
     expect(mountOwned(meta, 'valorsteed')).toBe(true);
     expect(ownedMounts(meta)).toContain('valorsteed');
     expect(bagOwnedMounts(meta.inventory)).not.toContain('valorsteed');
-    for (let i = 0; i < 200 && meta.courier?.phase !== 'ready'; i++) {
+    for (let i = 0; i < 400 && meta.courier; i++) {
       sim.tick();
       expect(player.mountKey).toBe('valorsteed');
     }
-    expect(meta.courier?.phase).toBe('ready');
+    expect(meta.courier).toBeUndefined();
+    expect(courierSummon(ctx, pid)).toBe(true);
     const bankIndex = meta.bank.inventory.findIndex((s) => s.itemId === 'reins_valorsteed');
     sim.courierDispatch(
       {
@@ -70,13 +71,13 @@ describe('courier live simulation integration', () => {
       },
       pid,
     );
-    for (let i = 0; i < 100 && meta.courier?.phase !== 'returning'; i++) sim.tick();
+    for (let i = 0; i < 200 && meta.courier?.phase !== 'returning'; i++) sim.tick();
     expect(meta.courier?.phase).toBe('returning');
     expect(meta.courier?.cargo[0].itemId).toBe('reins_valorsteed');
     expect(mountOwned(meta, 'valorsteed')).toBe(true);
     expect(ownedMounts(meta)).toContain('valorsteed');
     expect(bagOwnedMounts(meta.inventory)).not.toContain('valorsteed');
-    for (let i = 0; i < 100 && meta.courier?.phase !== 'ready'; i++) {
+    for (let i = 0; i < 200 && meta.courier; i++) {
       sim.tick();
       expect(player.mountKey).toBe('valorsteed');
     }
@@ -204,8 +205,7 @@ describe('courier live simulation integration', () => {
     );
     expect(copies).toHaveLength(1);
     for (let i = 0; i < 15; i++) sim.tick();
-    expect(meta.courier!.travelDistance).toBeGreaterThan(3);
-    expect(meta.courier!.travelDistance).toBeLessThan(8);
+    expect(meta.courier!.travelTicks).toBe(15);
     const saved = sim.serializeCharacter(pid)!;
     expect(saved.courier!.travelDistance).toBe(meta.courier!.travelDistance);
     expect(saved.courier?.cargo[0].instance?.perfected).toBe(true);

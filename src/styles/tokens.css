@@ -14,6 +14,11 @@
    written per element by the HUD, never on :root. */
 @layer tokens {
   :root {
+    --color-membership-border: #6f592d;
+    --color-membership-highlight: rgb(200 163 74 / 10%);
+    --color-membership-surface: rgb(5 10 15 / 60%);
+    --color-membership-current: #c8a34a;
+    --color-membership-heading: #f3dfaa;
     --color-vehicle-integrity: #2f8c4a;
     --color-vehicle-danger: #b72b27;
     --color-vehicle-text: #ffffff;
@@ -123,6 +128,22 @@
     /* Typography, Cinzel (heraldic display/headings), Alegreya Sans (UI + body),
        Alegreya (serif flavour prose). Legacy token names alias the canonical set
        so every existing usage resolves to the new system. */
+    --color-finder-ink: #0b1421;
+    --color-finder-surface: #142638;
+    --color-finder-surface-raised: #213a50;
+    --color-finder-line: #3f596b;
+    --color-finder-text: #f4f0e5;
+    --color-finder-muted: #bdcbd5;
+    --color-finder-gold: #f0cd87;
+    --color-finder-gold-deep: #6c4b24;
+    --color-finder-teal: #79dccb;
+    --color-finder-tank: #8dcaff;
+    --color-finder-healer: #8ae2b2;
+    --color-finder-dps: #ffaa91;
+    --color-finder-violet: #d5b5ff;
+    --color-finder-accept-hi: #245f48;
+    --color-finder-accept-lo: #123e30;
+    --dur-finder-reveal: 440ms;
     --font-display: "Cinzel", "Palatino Linotype", Palatino, Georgia, serif;
     --font-ui: "Alegreya Sans", "Segoe UI", system-ui, "Helvetica Neue", sans-serif;
     --font-serif: "Alegreya", "Palatino Linotype", Palatino, Georgia, serif;
@@ -134,6 +155,9 @@
 
     /* --gold is the single source of truth for the primary accent */
     --color-primary: var(--gold);
+    --color-queue-bell-bronze: #c98c55;
+    --color-queue-bell-silver: #ccd2d6;
+    --color-queue-bell-gold: #e5c15a;
     --color-primary-dim: var(--gold-dim);
     --color-primary-glow: rgba(255, 209, 0, 0.2);
     --color-primary-glow-heavy: rgba(255, 209, 0, 0.4);
@@ -311,6 +335,7 @@
     --color-rbg-hero-end: #0d0b0a;
     --color-rbg-shadow-soft: #0009;
     --color-rbg-shadow: #000;
+    --color-store-promo-dot-shadow: #000;
     --color-rbg-model-border: #8c6b31;
     --color-rbg-model-start: #4b2814;
     --color-rbg-model-end: #0d0907;
@@ -356,6 +381,12 @@
     --color-rbg-cleansable-text: #85d2ff;
     --color-rbg-detail-border: #a77830;
     --color-rbg-detail-bg: #080706a8;
+    /* The dungeon pages' extra sections (src/ui/boss_journal/): the trade-off
+       card's gain side, the Heroic callout's ember wash, and the summary prose. */
+    --color-rbg-gain-border: #3f8a52;
+    --color-rbg-gain-text: #9fe3ad;
+    --color-rbg-heroic-bg: #2a0e0bcc;
+    --color-rbg-summary-text: #cfc3a6;
     /* Item-name color for an item with no quality (bags_window.ts uses this token
        as the fallback when QUALITY_COLOR has no entry, so the painter carries no
        raw hex). Exact pre-existing value. */
@@ -841,6 +872,8 @@
     --color-text-on-medal: #ffd100;
     --color-socket-rim: #4a3d1d;
     --color-socket-hi: #2c2c3a;
+    --color-instance-difficulty-mid: #15131a;
+    --color-instance-difficulty-bg: #121016;
     --color-panel-hi: #1c1c29;
     --color-chrome-ground: #1a1410;
     --color-chrome-glyph: #c9b27a;
@@ -893,6 +926,19 @@
     --color-quality-rare: #0070dd;
     --color-quality-epic: #a335ee;
     --color-quality-legendary: #ff8000;
+    /* Collections window (components.css "Collections (buddies, mounts, item
+       sets)") and the Book of Deeds buddy shelf's icon frame: the values those
+       sections shipped with, homed here so the sections compose tokens. */
+    --color-collections-tab-hi: #2a2418;
+    --color-collections-tab-lo: #1d1811;
+    --color-collections-tab-on-hi: #4a3c1c;
+    --color-collections-tab-on-lo: #302713;
+    --color-collections-row-active: #ffffff0f;
+    --color-collections-art-empty: #ffffff0a;
+    --color-collections-lore: #ded6c2;
+    --color-collections-ilvl: #c9c1a8;
+    --color-collections-owned: #4fdc6a;
+    --color-deed-buddy-icon-border: #4a3d26;
     /* Treasure map parchment and its X (src/ui/hud/treasure/). */
     --color-treasure-parchment: #d8c59a;
     --color-treasure-ink: #a01818;
@@ -955,6 +1001,7 @@
     --edge-glint: inset 0 1px 0 color-mix(in srgb, var(--color-glint) 16%, transparent);
     --edge-hairline: inset 0 0 0 1px color-mix(in srgb, var(--color-glint) 12%, transparent);
     --shadow-lift: 0 2px 4px color-mix(in srgb, var(--color-keyline) 56%, transparent);
+    --shadow-instance-difficulty: 0 2px 6px rgb(0 0 0 / 90%);
     --shadow-socket:
       0 0 0 1px var(--color-keyline),
       inset 0 1px 0 color-mix(in srgb, var(--color-white) 10%, transparent), var(--edge-hairline),
@@ -1281,6 +1328,31 @@
     --color-fct-honor: #ffd100;
     /* Self-note combat text keeps the shipped warm warning hue. */
     --color-fct-self-note: #ff8c66;
+    /* Vivid combat text (the default; Classic Combat Text keeps the rows above).
+       Ability damage moves from the pale parchment highlight to a saturated gold so it
+       separates from the white auto-attacks at a glance. */
+    --color-fct-vivid-ability: #ffc933;
+    /* The hot underglow of a hit well above your usual (the big-hit flag). */
+    --color-fct-big-flare: #ff7a1a;
+    /* A solid two-pixel keyline plus a soft drop, so a number holds its colour over
+       bright snow, grey stone and dark dungeon floor alike (the thin shared outline
+       lets it wash out against a mid-grey scene). */
+    --fct-vivid-outline:
+      -1.5px -1.5px 0 var(--color-keyline), 1.5px -1.5px 0 var(--color-keyline),
+      -1.5px 1.5px 0 var(--color-keyline), 1.5px 1.5px 0 var(--color-keyline),
+      0 -2px 0 var(--color-keyline), 0 2px 0 var(--color-keyline),
+      -2px 0 0 var(--color-keyline), 2px 0 0 var(--color-keyline),
+      0 3px 4px var(--color-keyline);
+    /* A crit flares in its own colour (currentColor), so an ability crit burns gold and
+       an incoming crit glows red. Only these decorative glow blurs ride the effect tier
+       (the --glow-* family); the keyline above is legibility, identical on every tier. */
+    --glow-fct-crit:
+      var(--fct-vivid-outline), 0 0 calc(8px * var(--fx-shadow, 1)) currentColor,
+      0 0 calc(18px * var(--fx-shadow, 1)) color-mix(in srgb, currentColor 55%, transparent);
+    --glow-fct-big:
+      var(--fct-vivid-outline), 0 0 calc(10px * var(--fx-shadow, 1)) var(--color-fct-big-flare);
+    --glow-fct-big-crit:
+      var(--glow-fct-crit), 0 0 calc(24px * var(--fx-shadow, 1)) var(--color-fct-big-flare);
     /* Fire aura overlays keep their shipped orange school identity. */
     --color-aura-overlay-fire: #ff8a33;
     /* Frost aura overlays keep their shipped cyan school identity. */
@@ -1458,7 +1530,8 @@
     /* Distance from the bottom of #ui to the TOP of that stock seat: the 6px
        bottom-bar inset, the XP rail, the action row and its gap, the bar gap,
        then the docked player frame's 64px height, so the stock target frame
-       lands level with the player frame. */
+       lands level with the player frame (one aura strip row higher with
+       targetAurasBelowFrame, hud.css). */
     --unit-frame-seat-offset: calc(
       var(--xp-rail-h) +
       var(--socket-row-gap) +
@@ -1466,6 +1539,68 @@
       var(--unit-frame-bar-gap) +
       70px
     );
+    /* Lantern Hall's guild window (src/ui/hud/guild_hall/): the Highwatch slate blue under
+       lamplit amber and gilt, named here so the sheet holds no raw literal. */
+    --gh-sheet-top: #1b2640;
+    --gh-sheet-bottom: #0c1222;
+    --gh-card: #15203a;
+    --gh-card-done: #1a2d22;
+    --gh-edge: #9a7432;
+    --gh-amber: #f0b45a;
+    --gh-amber-glow: #f0b45a33;
+    --gh-ink: #d9dfee;
+    --gh-muted: #96a2c0;
+    --gh-done-text: #8fdc7a;
+    --gh-shadow: #000b;
+    --gh-edge-dim: #9a743266;
+    --gh-tab-lit: #24345a;
+    --gh-chip-bg: #0c1222cc;
+    --gh-gilt: #f2d998;
+    --gh-title-ink: #f4ead2;
+    --gh-btn-ink: #1b1206;
+    --gh-short: #e58f7a;
+    /* the notice board's oak, its frame and the parchment pinned to it */
+    --gh-wood-1: #3a2617;
+    --gh-wood-2: #33210f;
+    --gh-wood-seam: #1d1208;
+    --gh-wood-glow: #f0b45a1f;
+    --gh-frame: #24170c;
+    --gh-paper-1: #efe0bd;
+    --gh-paper-2: #dcc597;
+    --gh-paper-hi: #fbf2dccc;
+    --gh-paper-burn: #8a5a2a8c;
+    --gh-paper-edge: #b08a5266;
+    --gh-paper-ink: #2c1d0e;
+    --gh-paper-muted: #5e4a30;
+    --gh-paper-rule: #8a6a3e;
+    --gh-paper-track: #c9b285;
+    --gh-pip-empty: #0c1222;
+    --gh-pin: #6b4a22;
+    --gh-pin-hi: #f6d98a;
+    --gh-ribbon-text: #fbf2dc;
+    --gh-kind-boss: #7d2620;
+    --gh-kind-heroic: #4b2d6e;
+    --gh-kind-task: #1f5254;
+    --gh-done-bar: #6fbf5a;
+    --gh-done-deep: #2f6b22;
+    /* the guild's wax seal and the done stamp's red ink */
+    --gh-wax: #9c2320;
+    --gh-wax-hi: #d8584a;
+    --gh-wax-deep: #5a0e0c;
+    --gh-wax-rim: #7a1715;
+    --gh-wax-gilt: #f6d98a;
+    --gh-stamp: #a0261fcc;
+    /* the quartermaster's nameplate preview: a dusk sky behind the name */
+    --gh-plate-sky-1: #101a33;
+    --gh-plate-sky-2: #2a2d44;
+    --gh-plate-glow: #f0b45a2e;
+    --gh-plate-name: #ffffff;
+    --gh-plate-title: #f2d998;
+    /* The stock pair's shared BOTTOM edge, measured from the bottom of #ui:
+       the seat offset above minus the docked player frame's 64px height. The
+       target seat anchors here when its aura strip hangs below the frame
+       (targetAurasBelowFrame), so the frame grows upward, not into the bar. */
+    --unit-frame-seat-floor: calc(var(--unit-frame-seat-offset) - 64px);
     /* The weekly emissary window (src/ui/weekly_quests_window.ts): its own
        violet-and-gilt palette, named here so the sheet holds no raw literal. */
     --wk-black: #000;

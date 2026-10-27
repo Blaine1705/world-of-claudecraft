@@ -22,6 +22,12 @@ describe.skipIf(!url)('membership token delivery (real Postgres)', () => {
     await db.query(
       'CREATE TABLE characters (id BIGINT PRIMARY KEY, account_id BIGINT NOT NULL, realm TEXT NOT NULL)',
     );
+    await db.query(
+      `CREATE TABLE account_mount_cosmetics (
+         account_id BIGINT PRIMARY KEY,
+         skin_ids JSONB NOT NULL DEFAULT '[]'::jsonb,
+         updated_at TIMESTAMPTZ NOT NULL DEFAULT now())`,
+    );
     await db.query(MEMBERSHIP_TOKEN_RECEIPTS_SCHEMA);
     await db.query(MAIL_CUSTODY_PARCELS_SCHEMA);
     await db.query('INSERT INTO accounts VALUES (7), (8)');
@@ -85,7 +91,7 @@ describe.skipIf(!url)('membership token delivery (real Postgres)', () => {
       ),
     ).rejects.toThrow('character missing');
   });
-  it('annual reward retries create one permanent soulbound tank parcel and cannot cross token identity', async () => {
+  it('annual reward retries create one permanent soulbound Chimaera parcel and cannot cross token identity', async () => {
     const recipient = { characterId: 13, name: 'Alice' };
     const receipt = 'annual-receipt-race-123456';
     const result = await Promise.all([
@@ -95,7 +101,7 @@ describe.skipIf(!url)('membership token delivery (real Postgres)', () => {
     expect(result.filter(Boolean)).toHaveLength(1);
     expect(result.find(Boolean)).toMatchObject({
       letter: 'membership_annual',
-      items: [{ itemId: 'reins_terrorspark_groundshaker', count: 1 }],
+      items: [{ itemId: 'reins_nightwing_chimera', count: 1 }],
     });
     await expect(persistMembershipTokenDelivery(7, recipient, receipt, db)).rejects.toThrow(
       'identity mismatch',
@@ -114,6 +120,42 @@ describe.skipIf(!url)('membership token delivery (real Postgres)', () => {
         ])
       ).rows,
     ).toEqual([]);
+  });
+  it('unlocks the annual mount account-wide and mails the reins only for the first receipt', async () => {
+    const recipient = { characterId: 14, name: 'Bob' };
+    const mounts = async () =>
+      (await db.query('SELECT skin_ids FROM account_mount_cosmetics WHERE account_id = 8')).rows[0]
+        ?.skin_ids;
+    expect(
+      await persistMembershipAnnualDelivery(8, recipient, 'annual-receipt-first-123456', db),
+    ).toMatchObject({ items: [{ itemId: 'reins_nightwing_chimera', count: 1 }] });
+    expect(await mounts()).toEqual(['nightwing_chimera']);
+    // A stacked annual purchase adds time only: no second reins, no duplicate unlock.
+    expect(
+      await persistMembershipAnnualDelivery(8, recipient, 'annual-receipt-stack-123456', db),
+    ).toBeNull();
+    expect(await mounts()).toEqual(['nightwing_chimera']);
+    expect(
+      (
+        await db.query('SELECT custody_ref FROM mail_custody_parcels WHERE custody_ref = $1', [
+          'membership-annual:annual-receipt-stack-123456',
+        ])
+      ).rows,
+    ).toEqual([]);
+  });
+  it('backfills the mount entitlement idempotently for every account with an annual receipt', async () => {
+    await db.query('DELETE FROM account_mount_cosmetics');
+    await db.query(
+      `INSERT INTO account_mount_cosmetics (account_id, skin_ids) VALUES (8, '["rickshaw_mount"]')`,
+    );
+    await db.query(MEMBERSHIP_TOKEN_RECEIPTS_SCHEMA);
+    await db.query(MEMBERSHIP_TOKEN_RECEIPTS_SCHEMA);
+    expect(
+      (await db.query('SELECT account_id, skin_ids FROM account_mount_cosmetics ORDER BY 1')).rows,
+    ).toEqual([
+      { account_id: '7', skin_ids: ['nightwing_chimera'] },
+      { account_id: '8', skin_ids: ['rickshaw_mount', 'nightwing_chimera'] },
+    ]);
   });
   it('recovers live delivery after PostgreSQL commits but the acknowledgement is lost', async () => {
     let loseCommit = true;

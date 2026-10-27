@@ -107,6 +107,34 @@ describe('classifyDiff', () => {
     }
   });
 
+  it('maps the item history door core to its four surfaces, low preset, touch legs where the door differs', () => {
+    const specific = classifyDiff(['src/ui/item_history_access_view.ts']).specific;
+    const legs = Object.fromEntries(
+      specific
+        .filter((t: { key: string }) => t.key.startsWith('item-history-'))
+        .map((t: { key: string; variants: { key: string }[] }) => [
+          t.key,
+          t.variants.map((v) => v.key),
+        ]),
+    );
+    expect(legs).toEqual({
+      'item-history-trade': ['desktop', 'dialog'],
+      'item-history-guild-bank': ['desktop', 'mobile'],
+      'item-history-market': ['desktop', 'dialog', 'mobile'],
+      'item-history-inspect': ['desktop', 'mobile'],
+    });
+    for (const target of specific.filter((t: { key: string }) =>
+      t.key.startsWith('item-history-'),
+    )) {
+      for (const variant of target.variants) {
+        expect(typeof variant.beforeLoad, `${target.key}/${variant.key}`).toBe('function');
+        expect(variant.mobile === true, `${target.key}/${variant.key}`).toBe(
+          variant.key === 'mobile',
+        );
+      }
+    }
+  });
+
   it('maps the Hide Interface core to its shown/hidden desktop legs', () => {
     const plan = classifyDiff(['src/ui/interface_visibility_core.ts']);
     expect(plan.isVisual).toBe(true);
@@ -1224,5 +1252,44 @@ describe('the Materials Vault evidence target', () => {
     expect(target.capture.toString()).toContain("matchMedia('(forced-colors: active)').matches");
     expect(target.capture.toString()).toContain("getElementById('tutorial-greeting')");
     expect(target.capture.toString()).toContain('signedSpecial');
+  });
+});
+
+describe('the Drowned Gate Tower night target', () => {
+  it('routes both entrance halves and seeds the medium preset, the lowest that draws the whole gate layer', async () => {
+    for (const path of [
+      'src/render/sunken_bastion_entrance.ts',
+      'src/render/sunken_bastion_entrance_core.ts',
+    ]) {
+      expect(
+        classifyDiff([path]).specific.map((target: { key: string }) => target.key),
+        path,
+      ).toEqual(['sunken-bastion-entrance-night']);
+    }
+    const target = classifyDiff(['src/render/sunken_bastion_entrance_core.ts']).specific[0];
+    expect(target.variants.map((variant: { key: string }) => variant.key)).toEqual([
+      'gate-at-the-crest',
+      'from-the-east-ridge',
+    ]);
+    // the gate leg at the beacon's crest, the ridge leg where the beam rose
+    expect(target.variants.map((variant: { spot: { turn: number } }) => variant.spot.turn)).toEqual(
+      [0, 255],
+    );
+    for (const variant of target.variants) {
+      const storageSeeds: string[] = [];
+      await variant.beforeLoad({
+        async evaluateOnNewDocument(script: string) {
+          storageSeeds.push(script);
+        },
+      });
+      expect(storageSeeds.join('\n').match(/graphicsPreset = \d/g), variant.key).toEqual([
+        'graphicsPreset = 2',
+      ]);
+    }
+    // night, after the zone-entry vista, held at one turn of the beacon
+    const capture = target.capture.toString();
+    expect(capture).toContain('setDayNightPhaseOverride(0)');
+    expect(capture).toContain('camDirector?.kind == null');
+    expect(capture).toContain('BASTION_BEACON.period');
   });
 });

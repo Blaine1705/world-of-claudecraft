@@ -7,7 +7,10 @@ import { BROWSER_PATH } from './browser_path.mjs';
 import { enterOfflineGame } from './enter_offline_game.mjs';
 
 const base = process.env.GAME_URL ?? 'http://localhost:5173';
-const output = path.resolve('docs/screenshots/referral-cards');
+const output = path.resolve(
+  process.argv.find((arg) => arg.startsWith('--output='))?.slice('--output='.length) ??
+    'docs/screenshots/referral-cards',
+);
 const fixture = path.resolve('tmp/referral-cards-preview.html');
 await fs.mkdir(path.dirname(fixture), { recursive: true });
 await fs.mkdir(output, { recursive: true });
@@ -39,10 +42,11 @@ const browser = await puppeteer.launch({
   headless: true,
   args: ['--no-sandbox', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
 });
+const timeoutMs = process.argv.includes('--real-hud') ? 300000 : 180000;
 const deadline = setTimeout(() => {
-  console.error('Referral browser evidence exceeded 180 seconds');
+  console.error(`Referral browser evidence exceeded ${timeoutMs / 1000} seconds`);
   void browser.close();
-}, 180000);
+}, timeoutMs);
 try {
   const page = await browser.newPage();
   page.setDefaultNavigationTimeout(90000);
@@ -58,8 +62,9 @@ try {
   await page.waitForFunction(() => document.activeElement?.closest('#referral-cards-window'));
   await page.keyboard.press('Tab');
   await page.waitForFunction(() => document.activeElement?.closest('#referral-cards-window'));
-  for (const [name, width, height, touch] of [
+  for (const [name, width, height, touch, scale = 1] of [
     ['desktop', 1440, 1000, false],
+    ['desktop-scaled', 1024, 768, false, 1.25],
     ['mobile-portrait', 390, 844, true],
     ['mobile-landscape', 844, 390, true],
   ]) {
@@ -71,12 +76,13 @@ try {
       isMobile: touch,
     });
     await page.evaluate(
-      ({ width, height, touch }) => {
+      ({ width, height, touch, scale }) => {
         document.body.classList.toggle('mobile-touch', touch);
         document.documentElement.style.setProperty('--app-vw', `${width}px`);
         document.documentElement.style.setProperty('--app-vh', `${height}px`);
+        document.documentElement.style.setProperty('--ui-scale', String(scale));
       },
-      { width, height, touch },
+      { width, height, touch, scale },
     );
     await page.waitForFunction(
       () => document.querySelector('[data-referral-action="redeem"]')?.disabled === false,
@@ -92,15 +98,61 @@ try {
           return rect.width > 0 && (rect.width < 40 || rect.height < 40);
         })
         .map((button) => button.textContent);
-      return { clipped, undersized, actions: window.referralFixture.actions };
+      const main = root.querySelector('.referral-main').getBoundingClientRect();
+      const sidebar = root.querySelector('.referral-sidebar').getBoundingClientRect();
+      const stacked = Math.abs(main.left - sidebar.left) < 1;
+      const body = root.querySelector('.ui-win-body').getBoundingClientRect();
+      const clippedTooltips = [...root.querySelectorAll('.referral-stamp-inspect')].flatMap(
+        (control, index) => {
+          control.focus();
+          const tip = control.parentElement
+            .querySelector('[role="tooltip"]')
+            .getBoundingClientRect();
+          return tip.top < body.top - 1 ||
+            tip.bottom > body.bottom + 1 ||
+            tip.left < body.left - 1 ||
+            tip.right > body.right + 1
+            ? [index]
+            : [];
+        },
+      );
+      root.querySelector('[data-referral-action="close"]').focus({ preventScroll: true });
+      return {
+        clipped,
+        undersized,
+        stacked,
+        clippedTooltips,
+        actions: window.referralFixture.actions,
+      };
     });
     if (result.clipped || (touch && result.undersized.length))
       throw new Error(`${name}: ${JSON.stringify(result)}`);
     if (result.actions.some((action) => action.type === 'redeem'))
       throw new Error('Opening or animating a stamp sent a reward action');
+    if (result.clippedTooltips.length || (name === 'desktop-scaled' && !result.stacked))
+      throw new Error(
+        `${name}: reward details or scaled columns clipped: ${JSON.stringify(result)}`,
+      );
+    if (name === 'desktop') {
+      await page.hover('.referral-stamp');
+      await page.waitForFunction(
+        () => getComputedStyle(document.querySelector('.referral-stamp')).transform !== 'none',
+      );
+      await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+      const transform = await page.$eval('.referral-stamp', (el) => getComputedStyle(el).transform);
+      if (transform !== 'none')
+        throw new Error(`Reduced-motion hover moved a reward: ${transform}`);
+      await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'no-preference' }]);
+      await page.hover('[data-referral-action="close"]');
+      console.log('Reward hover lifts normally and stays still with reduced motion.');
+    }
+    // The keyboard trap check can scroll to the final control; capture the opening view.
+    await page.$eval('#referral-cards-window .ui-win-body', (body) => {
+      body.scrollTop = 0;
+    });
     await page.screenshot({ path: path.join(output, `${name}.png`) });
     console.log(
-      `${name}: fits viewport; ${touch ? '40px touch targets; ' : ''}no automatic redemption`,
+      `${name}: fits viewport; focused reward details visible; ${touch ? '40px touch targets; ' : ''}no automatic redemption`,
     );
   }
   const cdp = await page.createCDPSession();
@@ -338,6 +390,7 @@ try {
     });
     await page.close();
     const game = await browser.newPage();
+    game.setDefaultNavigationTimeout(90000);
     await game.setViewport({ width: 1440, height: 1000, deviceScaleFactor: 1 });
     await game.goto(`${base}/?gfx=low`, { waitUntil: 'domcontentloaded' });
     if (
@@ -368,6 +421,7 @@ try {
     );
     await game.close();
     const mobile = await browser.newPage();
+    mobile.setDefaultNavigationTimeout(90000);
     await mobile.setViewport({
       width: 844,
       height: 390,

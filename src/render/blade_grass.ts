@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import {
-  BUILTIN_WORLD,
   getActiveWorldContent,
   isBuiltinWorldActive,
+  isBuiltinWorldContent,
   WORLD_MAX_X,
   WORLD_MAX_Z,
   WORLD_MIN_Z,
@@ -27,6 +27,20 @@ import {
 import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
 import { foliageShoreSkip } from './foliage_shore_gate_core';
 import { GFX, sharedUniforms } from './gfx';
+import {
+  createGrassEdgeTaperContext,
+  GRASS_HUB_INNER_RADIUS,
+  GRASS_ROAD_INNER_RADIUS,
+  grassEdgeCoverageScale,
+  grassEdgeHeightScale,
+  grassEdgeTaperAt,
+  grassEdgeWidthScale,
+} from './grass_edge_taper_core';
+import {
+  attachGrassInteractionUniforms,
+  grassBladeInteractionGlsl,
+  stepSharedGrassInteraction,
+} from './grass_interaction_core';
 import { MEADOW_MAX_STRETCH } from './meadow_fullness_core';
 import {
   MEADOW_CAMERA_CLEAR_FAR,
@@ -289,7 +303,12 @@ export function buildBladeGrass(
   if (RADIUS <= 0 || renderLayerDisabled('bladegrass')) {
     // A tier without the carpet still replaces the live view, so a rebuild
     // never keeps the old carpet's buffers reachable from here.
-    liveView = { group, update: () => undefined, recolor: () => undefined };
+    liveView = {
+      group,
+      update: (px: number, pz: number) =>
+        stepSharedGrassInteraction(px, pz, sharedUniforms.uTime.value),
+      recolor: () => undefined,
+    };
     return liveView;
   }
   const GRID_W = Math.ceil((RADIUS * 2) / CELL); // slots per axis
@@ -314,12 +333,15 @@ export function buildBladeGrass(
   mat.onBeforeCompile = (sh) => {
     sh.uniforms.uTime = sharedUniforms.uTime;
     sh.uniforms.uPlayerPos = uPlayerPos;
+    attachGrassInteractionUniforms(sh.uniforms);
     sh.vertexShader = sh.vertexShader
       .replace(
         '#include <common>',
         `#include <common>
         uniform float uTime;
-        uniform vec2 uPlayerPos;`,
+        uniform vec2 uPlayerPos;
+        uniform vec4 uGrassMove;
+        uniform vec4 uGrassWake;`,
       )
       .replace(
         '#include <begin_vertex>',
@@ -336,6 +358,7 @@ export function buildBladeGrass(
           transformed *= smoothstep(${MEADOW_CAMERA_CLEAR_NEAR.toFixed(1)}, ${MEADOW_CAMERA_CLEAR_FAR.toFixed(1)},
             distance(bgOrigin, cameraPosition));
           ${bladeSwayGlsl(classicSway)}
+          ${grassBladeInteractionGlsl()}
         #endif`,
       );
     sh.vertexShader = patchConstantUpNormalVertexShader(sh.vertexShader);
@@ -382,8 +405,14 @@ export function buildBladeGrass(
   const activeContent = getActiveWorldContent();
   const townExclusions = eastbrookGrassExclusions(
     activeContent.props.buildings,
-    activeContent === BUILTIN_WORLD,
+    isBuiltinWorldContent(activeContent),
     activeContent.services?.noticeboards ?? [],
+  );
+  const edgeTaperCtx = createGrassEdgeTaperContext(
+    activeContent.zones,
+    townExclusions,
+    activeContent.props.buildings,
+    activeContent.grassClear,
   );
 
   function placeSlot(slot: number, ci: number, cj: number): void {
@@ -396,17 +425,19 @@ export function buildBladeGrass(
       // bare between them (squared for hard patch edges)
       const lush = groundLushnessAt(x, z, seed);
       const biomeDensity = GRASS_BIOME_DENSITY[zoneBiomeAt(x, z)] ?? 1;
+      const baseCoverage = meadowCoverage(lush) * Math.min(biomeDensity, 1.2);
+      const rd = roadDistance(x, z);
       // higher floor + gain than the tufts: coverage is the carpet's job,
       // the patch structure just modulates it
-      ok = r1 < meadowCoverage(lush) * Math.min(biomeDensity, 1.2);
-      if (ok) ok = roadDistance(x, z) > 2.4;
+      ok = r1 < baseCoverage;
+      if (ok) ok = rd > GRASS_ROAD_INNER_RADIUS;
       // The maker's painted no-grass discs (sim/grass_clear.ts). They had a
       // spatial index, a document field, an editor brush and a sanitizer, and
       // no consumer anywhere in the render, so a paved plaza still grew a
       // meadow through it. This is that consumer: the blade carpet is what
       // actually shows on a city floor.
       if (ok) ok = !grassClearedAt(activeContent.grassClear, x, z);
-      if (ok) ok = !insideGrassHubExclusion(activeContent.zones, x, z);
+      if (ok) ok = !insideGrassHubExclusion(activeContent.zones, x, z, GRASS_HUB_INNER_RADIUS);
       if (ok) ok = !insidePavedGrassExclusion(x, z);
       if (ok) ok = !insideEastbrookGrassExclusion(townExclusions, x, z, 0.85);
       if (ok) ok = !insideAnyBuildingFootprint(activeContent.props.buildings, x, z, 0.85);
@@ -420,22 +451,28 @@ export function buildBladeGrass(
         // shader fades its relief (planar smear territory)
         if (ok) ok = Math.abs(terrainHeight(x + 0.9, z, seed) - h) < 0.55;
         if (ok) {
-          const s = meadowClusterScale(lush, hash(ci, cj, 3), hash(ci, cj, 4));
-          q.setFromAxisAngle(up, r1 * 12.9);
-          // whole-cluster lean, a hashed direction and up to ~12 degrees:
-          // neighbouring tufts tip different ways instead of standing in a
-          // uniform vertical crop
-          const rLean = hash(ci, cj, 5);
-          leanAxis.set(Math.sin(rLean * 41.3), 0, Math.cos(rLean * 41.3));
-          q.premultiply(qLean.setFromAxisAngle(leanAxis, rLean * 0.21));
-          const sy = meadowClusterHeight(s, lush, hash(ci, cj, 6));
-          m.compose(v.set(x, h - 0.02, z), q, sv.set(s, sy, s));
-          groundGrassColorAt(x, z, seed, c);
-          // slight lift over the raw ground tint: blades catch more sky
-          // than the soil they stand on
-          c.multiplyScalar(1.18);
-          sectorPool.place(slot, m, c);
-          return;
+          const edgeTaper = grassEdgeTaperAt(edgeTaperCtx, x, z, rd);
+          if (r1 < baseCoverage * grassEdgeCoverageScale(edgeTaper)) {
+            const baseScale = meadowClusterScale(lush, hash(ci, cj, 3), hash(ci, cj, 4));
+            const s = baseScale * grassEdgeWidthScale(edgeTaper);
+            q.setFromAxisAngle(up, r1 * 12.9);
+            // whole-cluster lean, a hashed direction and up to ~12 degrees:
+            // neighbouring tufts tip different ways instead of standing in a
+            // uniform vertical crop
+            const rLean = hash(ci, cj, 5);
+            leanAxis.set(Math.sin(rLean * 41.3), 0, Math.cos(rLean * 41.3));
+            q.premultiply(qLean.setFromAxisAngle(leanAxis, rLean * 0.21));
+            const sy =
+              meadowClusterHeight(baseScale, lush, hash(ci, cj, 6)) *
+              grassEdgeHeightScale(edgeTaper);
+            m.compose(v.set(x, h - 0.02, z), q, sv.set(s, sy, s));
+            groundGrassColorAt(x, z, seed, c);
+            // slight lift over the raw ground tint: blades catch more sky
+            // than the soil they stand on
+            c.multiplyScalar(1.18);
+            sectorPool.place(slot, m, c);
+            return;
+          }
         }
       }
     }
@@ -496,6 +533,7 @@ export function buildBladeGrass(
     },
     update(px: number, pz: number): void {
       uPlayerPos.value.set(px, pz);
+      stepSharedGrassInteraction(px, pz, sharedUniforms.uTime.value);
       // target cell block: the GRID_W x GRID_W square centred on the player
       const baseI = Math.floor(px / CELL) - (GRID_W >> 1);
       const baseJ = Math.floor(pz / CELL) - (GRID_W >> 1);

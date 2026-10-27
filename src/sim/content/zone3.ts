@@ -1416,9 +1416,8 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     // delegates to learnRiding) and the Valorsteed reins for riders who have
     // learned. The riding-skill gate (ridingTrained) is enforced in buyItem
     // (items.ts). She sells NO buddy whistle (2026-09-04 owner call): the
-    // stables are a mount counter, and every common companion is a drop now
-    // (loot/global_drops.ts rolls the whole common tier at 1.5% a kill). The
-    // three currency companions still have their own vendors in Highwatch.
+    // stables are a mount counter. Companions come from the boss rolls and the
+    // honor vendors instead (content/buddy_sources.ts).
     vendorItems: ['riding_training', 'reins_valorsteed'],
     greeting:
       'Every rider walks in on two legs, $C. I will not hand you the reins until you can sit the Valorsteed without kissing the dirt, and the Galecrest wind shows no mercy to a bad seat.',
@@ -1853,7 +1852,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     ],
     xpReward: 4300,
     copperReward: 2200,
-    itemRewards: {},
+    itemRewards: { warrior: 'barrowfield_tower_shield' },
     minLevel: 18,
   },
   q_revenant_vanguard: {

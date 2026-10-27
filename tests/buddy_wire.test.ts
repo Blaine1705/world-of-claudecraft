@@ -61,7 +61,7 @@ describe('client mirror decode (src/net/buddy_wire.ts)', () => {
     expect(three.owned).toEqual(['crystal_lich']);
   });
 
-  it('retains restored Sapling but drops retired companions and looks from an older snapshot', () => {
+  it('drops Sapling, other retired companions and looks from an older snapshot', () => {
     const decoded = decodeBuddySelf(
       {
         budOwn: ['horse', 'stag', 'sapling'],
@@ -76,7 +76,7 @@ describe('client mirror decode (src/net/buddy_wire.ts)', () => {
       },
       emptyBuddySelfMirror(),
     );
-    expect(decoded.owned).toEqual(['horse', 'sapling']);
+    expect(decoded.owned).toEqual(['horse']);
     expect(decoded).not.toHaveProperty('cosmetics');
     expect(decoded).not.toHaveProperty('equipped');
     expect(decoded.pending).toEqual(['forgemaw']);
@@ -148,7 +148,7 @@ describe('server wire (server/buddy_wire.ts)', () => {
     expect(buddyGrantBodyError({ cosmeticId: 'crystal_lich_frostbound' })).toBe(
       'unknown cosmetic id',
     );
-    expect(buddyGrantBodyError({ buddyKey: 'sapling' })).toBeNull();
+    expect(buddyGrantBodyError({ buddyKey: 'sapling' })).toBe('unknown buddy key');
     expect(buddyGrantBodyError({ buddyKey: 'horse', cosmeticId: null })).toBe(
       'unknown cosmetic id',
     );

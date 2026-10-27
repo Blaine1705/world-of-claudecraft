@@ -34,6 +34,8 @@ function serviceHarness() {
     removeFriend: vi.fn(async () => 'bound'),
   };
   const tx = {
+    isOnline: vi.fn(() => true),
+    onAccountFriendsChanged: vi.fn(async () => {}),
     onlineFriendForAccount: vi.fn(() => live),
     locationOf: vi.fn((id: number) =>
       id === live.id ? { zone: 'zone', status: 'online', x: 42, z: 12 } : null,

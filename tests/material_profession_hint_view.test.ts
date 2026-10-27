@@ -6,7 +6,15 @@
 // texts are pinned as EXACT strings (not per-name toContain), so the view
 // cannot silently reorder or re-sort what the sim derived in ring order.
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { inertCharacters } from './helpers/inert_characters';
+
+// Hud reaches the character model preload; keep it inert
+// (tests/helpers/inert_characters.ts has the why).
+vi.mock('../src/render/characters', () => inertCharacters.barrel());
+vi.mock('../src/render/characters/assets', () => inertCharacters.assets());
+vi.mock('../src/render/characters/portrait', () => inertCharacters.portrait());
+
 import { RAW_COOKING_CATCH_IDS } from '../src/sim/content/items';
 import { ITEMS } from '../src/sim/data';
 import { craftIdsForMaterialItem } from '../src/sim/material_profession_affinity';
@@ -164,14 +172,13 @@ describe('materialProfessionHintText', () => {
 
   it('a fineGrade hint never supersedes: single-craft fine grades keep their line', () => {
     // fine_ironbark_log carries materialHintKey (the shared fineGrade
-    // sentence, which names no craft) and inherits its base's consumers:
-    // Weaponcrafting, plus Leatherworking since the buddy charm recipe
-    // (content/recipes.ts BUDDY_CHARM_RECIPES) eats plain ironbark. This is
-    // the counterpart pin for the === 'enchanting' comparison in
+    // sentence, which names no craft) and exactly one consumer. This is the
+    // counterpart pin for the === 'enchanting' comparison in
     // hasSupersedingPurposeHint: dropping it would silently blank this line.
-    expect(materialProfessionHintText('fine_ironbark_log')).toBe(
-      'Used by Leatherworking and Weaponcrafting.',
-    );
+    // (The buddy charm recipe that briefly made Leatherworking a second
+    // consumer left with the account-wide buddy rework: BUDDY_CHARM_RECIPES
+    // in content/recipes.ts is empty since 1896839827c.)
+    expect(materialProfessionHintText('fine_ironbark_log')).toBe('Used by Weaponcrafting.');
   });
 
   it('CRAFT_NAMING_HINT_KEYS equals the set of hint keys whose English lead names the craft', async () => {

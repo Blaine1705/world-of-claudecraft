@@ -1,3 +1,4 @@
+import { membershipWeaponDisplayId } from '../src/sim/membership_weapon';
 // Owner-gated character surface, ported onto RouteDefs.
 //
 // The account-scoped character endpoints move off the inline handleApi ladder in
@@ -353,7 +354,8 @@ export function withCreationHelm(state: CharacterState, helmHidden: boolean): Ch
   return state;
 }
 
-/** Whether this character still holds its one-shot redesign token. Two ways in,
+/** Whether this character still holds its one-shot redesign token. An explicit
+ *  release grant overrides an earlier spend. Otherwise there are two legacy ways in,
  *  and the token is what makes it one-shot either way:
  *   - CREATED INSIDE THE FREE WINDOW (before APPEARANCE_REROLL_CUTOFF). Every
  *     character that existed when the creator shipped gets one redesign on the
@@ -366,6 +368,7 @@ export function withCreationHelm(state: CharacterState, helmHidden: boolean): Ch
  *  Mirrors consumeAppearanceReroll's WHERE arm, which is the authority; decided
  *  server-side so the list payload is the single truth the roster button reads. */
 function appearanceRerollAvailable(c: CharacterRow): boolean {
+  if (c.appearance_reroll_granted) return true;
   if (c.appearance_reroll_used) return false;
   if (c.appearance === null || c.appearance === undefined) return true;
   const created = c.created_at ? new Date(c.created_at).getTime() : Number.NaN;
@@ -415,18 +418,34 @@ export function buildCharacterList(
       // Keep the migrated RouteDef byte-identical with the retained legacy arm:
       // character select renders the same body and held items as the live world.
       skinCatalog: c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
-      mainhandItemId: c.state?.equipment?.mainhand ?? null,
-      offhandItemId: c.state?.equipment?.offhand ?? null,
+      mainhandItemId: membershipWeaponDisplayId(
+        c.state?.equipment?.mainhand ?? null,
+        c.class,
+        c.state?.talents?.spec,
+      ),
+      offhandItemId: membershipWeaponDisplayId(
+        c.state?.equipment?.offhand ?? null,
+        c.class,
+        c.state?.talents?.spec,
+      ),
       // The account's active Armory weapon skin for THIS character's class and
       // held hands (the same shared rule the world and paperdoll use), so
       // the char-select turntable matches the in-world render. Loadout is
       // account state; resolution is per character.
       weaponSkinId: resolveActiveWeaponSkin(
         c.class,
-        c.state?.equipment?.mainhand ?? null,
+        membershipWeaponDisplayId(
+          c.state?.equipment?.mainhand ?? null,
+          c.class,
+          c.state?.talents?.spec,
+        ),
         weaponSkinLoadout,
         c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
-        c.state?.equipment?.offhand ?? null,
+        membershipWeaponDisplayId(
+          c.state?.equipment?.offhand ?? null,
+          c.class,
+          c.state?.talents?.spec,
+        ),
       ),
       // The authored modular look (null = pre-creator character, legacy rig).
       // Re-validated here the same way the join path does (ws_auth.ts

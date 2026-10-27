@@ -4,6 +4,7 @@
 // touches again. The one parameter is the perfLap hook, which must stay a
 // game.ts closure because it reads the GameServer's live tick-profiler state.
 
+import { randomUUID } from 'node:crypto';
 import {
   PLAYER_INTEREST_DROP_RADIUS,
   type SimConfig,
@@ -24,6 +25,7 @@ export function buildRealmSimConfig(
   perfLap: SimConfig['perfLap'],
   vaultConsumptionAdmission: VaultConsumptionAdmission,
   courierBankExchange: NonNullable<SimConfig['courierBankExchange']>,
+  courierAccountExchange: NonNullable<SimConfig['courierAccountExchange']>,
 ): SimConfig {
   return {
     seed: WORLD_SEED,
@@ -61,6 +63,9 @@ export function buildRealmSimConfig(
     // pulled someone.
     idleMobTickRadius: PLAYER_INTEREST_DROP_RADIUS,
     lockoutNowMs: () => Date.now(),
+    // Tracked (epic/legendary) copies get a real UUID from the host
+    // (src/sim/item_tracking.ts); never the deterministic fallback online.
+    mintItemGuid: randomUUID,
     // The day/night cycle the clients draw is UTC-anchored (src/sim/day_night.ts), so
     // the realm hands the sim the same clock: the boss who sleeps at night lies down
     // under the very sky every player sees darken, with no wire traffic to agree on it.
@@ -75,6 +80,7 @@ export function buildRealmSimConfig(
     perfLap,
     vaultConsumptionAdmission,
     courierBankExchange,
+    courierAccountExchange,
     // Boot-time construction input: the optional STORAGE_PRICES env override
     // (server/storage_prices.ts), resolved once by the Sim ctor.
     storagePrices: STORAGE_PRICES,

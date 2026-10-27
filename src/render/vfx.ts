@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { loadTexture, releaseTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { tagCastVfxEngine } from './cast_vfx_family';
+import { registerContextRestoreReset } from './context_restore_registry';
 import {
   type DrainLifeParticleKind,
   type DrainLifeParticleSink,
@@ -9,6 +10,14 @@ import {
 } from './drain_life_vfx';
 import { GFX } from './gfx';
 import { type GloamCompileGate, GloamField } from './gloam_field';
+import {
+  type HutFireBody,
+  type HutFireKind,
+  type HutFireParticle,
+  sampleHutFireParticle,
+} from './hut_fire_core';
+import { HutFireFx } from './hut_fire_fx';
+import { buildHutSmoke, type HutSmokeView, hutSmokeEnabled } from './hut_smoke';
 import {
   type IgnivarJudgmentFireSample,
   ignivarJudgmentFireAllowsSmoke,
@@ -23,6 +32,7 @@ import {
   LEGENDARY_REGALIA_RATE_PER_SEC,
 } from './legendary_regalia_core';
 import { PaladinSpellVfxController, type PaladinSpellVfxSprite } from './paladin_spell_vfx';
+import { spellEffectsMuted } from './spell_effects_switch';
 import { SwimWakeVfx } from './swim_wake_vfx';
 import type { VfxAnchorResolver, VfxOffsetAnchorResolver } from './vfx_anchor';
 import { bubbleBeamMaterialOptions } from './vfx_basic_materials';
@@ -322,6 +332,9 @@ interface Projectile {
   // trail and impact flash; mechanics and speed are untouched.
   scale?: number;
   onImpact?: (position: THREE.Vector3) => void;
+  // Spell Effects was off at launch: the flight keeps its timing so onImpact
+  // fires when it would have, but nothing is drawn along the way or at impact.
+  hidden?: boolean;
 }
 
 interface BubbleBeam {
@@ -389,11 +402,34 @@ export class Vfx {
   // no Color objects.
   private fwCols: THREE.Color[] = [];
   private fwFlash = new THREE.Color();
+  // scratch colours for the per-frame mount embers (spawn copies the colour, so reuse is safe)
+  private emberSpark = new THREE.Color();
+  private emberFlame = new THREE.Color();
   private rocketExhaustSide = 0;
   private quality = 1;
   /** Gloamveil's pool and dark smoke, which an additive cloud cannot draw. The
    *  renderer reports its wearers and closes its frame (gloam_field.ts). */
   readonly gloam: GloamField;
+  /** Torched mudfin huts burning (hut_fire_fx.ts): the renderer hands it the
+   *  `worldObjectBurning` events and update() ticks it. */
+  readonly hutFires: HutFireFx;
+  /** Their lit smoke plumes (hut_smoke.ts), which an additive cloud cannot draw;
+   *  null on the low effects tier. */
+  private readonly hutSmoke: HutSmokeView | null;
+  private readonly hutFireParticle: HutFireParticle = {
+    x: 0,
+    y: 0,
+    z: 0,
+    vx: 0,
+    vy: 0,
+    vz: 0,
+    color: 0,
+    size: 0,
+    life: 0,
+    gravity: 0,
+    sprite: 'flame',
+    spin: 0,
+  };
   private paladinSpellFx: PaladinSpellVfxController;
   private swimWakeVfx: SwimWakeVfx;
   private disposed = false;
@@ -532,6 +568,7 @@ export class Vfx {
       if (this.points.geometry.drawRange.count === 0) this.points.visible = false;
     };
     scene.add(this.points);
+    registerContextRestoreReset('vfx-cloud', this, (owner) => owner.onContextRestored());
     this.paladinSpellFx = new PaladinSpellVfxController(anchor, (particle) => {
       const essential =
         particle.tag.includes('core') ||
@@ -599,6 +636,9 @@ export class Vfx {
       compileGate,
     );
     this.swimWakeVfx = new SwimWakeVfx(scene);
+    this.hutSmoke = hutSmokeEnabled() ? buildHutSmoke() : null;
+    if (this.hutSmoke) scene.add(this.hutSmoke.mesh);
+    this.hutFires = new HutFireFx(this, groundY, this.hutSmoke);
   }
 
   setViewportScale(heightPx: number, fovDeg: number): void {
@@ -721,6 +761,31 @@ export class Vfx {
     }
   }
 
+  /** A torched mudfin hut's fire (hut_fire_fx.ts): `rate` particles a second
+   *  of one kind, sampled over the hut by hut_fire_core.ts. Frame-rate
+   *  independent and scaled by the quality level, like the steady auras. */
+  hutFire(kind: HutFireKind, body: HutFireBody, rate: number, dt: number): void {
+    const p = this.hutFireParticle;
+    const count = this.emitCount(rate, dt);
+    for (let i = 0; i < count; i++) {
+      sampleHutFireParticle(kind, body, Math.random, p);
+      this.spawn(
+        p.x,
+        p.y,
+        p.z,
+        p.vx,
+        p.vy,
+        p.vz,
+        p.color,
+        p.size,
+        p.life,
+        p.gravity,
+        SPR[p.sprite],
+        p.spin,
+      );
+    }
+  }
+
   prewarm(at: THREE.Vector3): void {
     const sprites = Object.values(SPR);
     for (let i = 0; i < sprites.length; i++) {
@@ -751,6 +816,7 @@ export class Vfx {
     for (let i = this.bubbleBeams.length - 1; i >= 0; i--) this.removeBubbleBeam(i);
     this.drainLifeVfx.clear();
     this.gloam.clear();
+    this.hutFires.clear();
     this.swimWakeVfx.clear();
     this.life.fill(0);
     this.size.fill(0);
@@ -772,6 +838,7 @@ export class Vfx {
     this.drainLifeVfx.dispose();
     this.gloam.dispose();
     this.swimWakeVfx.dispose();
+    this.hutSmoke?.dispose();
     this.points.removeFromParent();
     const material = this.points.material as THREE.ShaderMaterial;
     const atlas = material.uniforms.uAtlas?.value;
@@ -917,6 +984,9 @@ export class Vfx {
   prepareDraw(camera: THREE.Camera): void {
     if (this.disposed) return;
     this.packRenderCloud(camera);
+    // the hut smoke plumes face this frame's camera (hut_smoke.ts)
+    const eye = camera.matrixWorld.elements;
+    this.hutFires.prepareDraw(eye[12], eye[14]);
   }
 
   private drainParticleSprite(kind: DrainLifeParticleKind): number {
@@ -938,6 +1008,7 @@ export class Vfx {
   // ---------------------------------------------------------------------
 
   projectile(sourceId: number, targetId: number, school: string, scale = 1, color?: number): void {
+    if (spellEffectsMuted(sourceId)) return;
     const from = this.anchor(sourceId, 0.62);
     if (!from) return;
     this.projectileFrom(from, targetId, school, scale, 26, undefined, color);
@@ -953,6 +1024,11 @@ export class Vfx {
     color?: number,
   ): void {
     if (this.disposed) return;
+    // A muted source (spell_effects_switch.ts): a flight nothing waits on is
+    // skipped outright; one with an impact callback (the soul-consume sound)
+    // still flies, unseen, so the callback keeps its timing.
+    const hidden = spellEffectsMuted();
+    if (hidden && !onImpact) return;
     const colors = projectileSchoolColors(school, color);
     const sprites = projectileSprites(school);
     this.projectiles.push({
@@ -967,12 +1043,14 @@ export class Vfx {
       trailSprite: sprites.trail,
       scale,
       onImpact,
+      hidden,
     });
   }
 
   deathBolt(leftHand: THREE.Vector3, rightHand: THREE.Vector3, targetId: number): void {
     this.projectileFrom(leftHand, targetId, 'shadow', 1.28, 31);
     this.projectileFrom(rightHand, targetId, 'shadow', 1.28, 31);
+    if (spellEffectsMuted()) return;
     for (const hand of [leftHand, rightHand]) {
       for (let i = 0; i < this.scaledCount(7); i++) {
         const angle = (i / 7) * Math.PI * 2;
@@ -1001,6 +1079,7 @@ export class Vfx {
     onImpact?: (position: THREE.Vector3) => void,
   ): void {
     this.projectileFrom(new THREE.Vector3(x, y, z), targetId, 'shadow', 1.2, 14, onImpact);
+    if (spellEffectsMuted()) return;
     for (let i = 0; i < this.scaledCount(14); i++) {
       const angle = (i / 14) * Math.PI * 2;
       this.spawn(
@@ -1020,6 +1099,7 @@ export class Vfx {
   }
 
   lichTransform(entityId: number): void {
+    if (spellEffectsMuted(entityId)) return;
     const feet = this.anchor(entityId, 0.08);
     const center = this.anchor(entityId, 0.48);
     if (!feet || !center) return;
@@ -1046,6 +1126,7 @@ export class Vfx {
   }
 
   beam(sourceId: number, targetId: number, school: string, colorOverride?: number): void {
+    if (spellEffectsMuted(sourceId)) return;
     const from = this.anchor(sourceId, 0.62);
     const to = this.anchor(targetId, 0.55);
     if (!from || !to) return;
@@ -1072,6 +1153,9 @@ export class Vfx {
    * ring-shaped bubbles that rise as they travel between both moving anchors. */
   bubbleBeam(sourceId: number, targetId: number, duration: number): void {
     if (this.disposed) return;
+    // A muted source: every start reads as a stop, which also ends a stream
+    // already running when the option was switched off.
+    if (spellEffectsMuted(sourceId)) duration = 0;
     const existing = this.bubbleBeams.find((b) => b.sourceId === sourceId);
     if (duration <= 0) {
       if (existing) {
@@ -1117,24 +1201,25 @@ export class Vfx {
    * from the victim back toward the caster. */
   drainBeam(sourceId: number, targetId: number, duration: number): void {
     if (this.disposed) return;
-    this.drainLifeVfx.drain(sourceId, targetId, duration);
+    this.drainLifeVfx.drain(sourceId, targetId, spellEffectsMuted(sourceId) ? 0 : duration);
   }
 
   /** Possessed companion contribution to Drain Life, from the Eye beside the
    * caster to the same victim as the caster's ordinary tether. */
   demonicDrainBeam(casterId: number, targetId: number, duration: number): void {
     if (this.disposed) return;
-    this.drainLifeVfx.demonicDrain(casterId, targetId, duration);
+    this.drainLifeVfx.demonicDrain(casterId, targetId, spellEffectsMuted(casterId) ? 0 : duration);
   }
 
   /** The Affliction companion's own attack: a very brief sickly-green ray
    * wrapped in violet shadow, fired from the Eye rather than the caster. */
   evilEyeGaze(casterId: number, targetId: number, duration = 0.28): void {
-    if (this.disposed) return;
+    if (this.disposed || spellEffectsMuted(casterId)) return;
     this.drainLifeVfx.evilEyeGaze(casterId, targetId, duration);
   }
 
   drainLifeTick(casterId: number): void {
+    if (spellEffectsMuted(casterId)) return;
     if (this.disposed) return;
     this.drainLifeVfx.tick(casterId);
   }
@@ -1145,6 +1230,7 @@ export class Vfx {
   // chain emits one; the per-target heal glow (healGlow, on the heal2 event) lands
   // the burst at each ally, so this method only draws the connecting cord.
   chainHealArc(sourceId: number, targetId: number): void {
+    if (spellEffectsMuted(sourceId)) return;
     const from = this.anchor(sourceId, 0.62);
     const to = this.anchor(targetId, 0.55);
     if (!from || !to) return;
@@ -1205,6 +1291,7 @@ export class Vfx {
   // blue-white electric streak instead of a round glowing comet (the shape is
   // drawn in the projectile update loop). Original procedural effect (no assets).
   lightningProjectile(sourceId: number, targetId: number, color?: number): void {
+    if (spellEffectsMuted(sourceId)) return;
     const from = this.anchor(sourceId, 0.62);
     if (!from) return;
     // A color override tints the bolt per ability: the head stays pushed toward
@@ -1231,6 +1318,7 @@ export class Vfx {
   // the caster with a star flash at the chest. Reads as "your next cast is
   // charged" without covering the character. Original procedural effect.
   procSurge(entityId: number, school: string): void {
+    if (spellEffectsMuted(entityId)) return;
     const at = this.anchor(entityId, 0.5);
     if (!at) return;
     const core = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffe9a0).multiplyScalar(hdr(2.6));
@@ -1264,6 +1352,7 @@ export class Vfx {
   // slow rain of glints along its shell. Used for absorb procs and the
   // cheat-death save. Original procedural effect.
   wardBloom(entityId: number, school: string): void {
+    if (spellEffectsMuted(entityId)) return;
     const at = this.anchor(entityId, 0.55);
     if (!at) return;
     const core = new THREE.Color(SCHOOL_COLORS[school] ?? 0xffdf80).multiplyScalar(hdr(2.2));
@@ -1312,6 +1401,7 @@ export class Vfx {
     targetId: number,
     impact: 'healing' | 'defensive' | 'offensive' | 'area' = 'offensive',
   ): void {
+    if (spellEffectsMuted(sourceId)) return;
     const anchorId = impact === 'area' ? sourceId : targetId;
 
     if (impact === 'healing') {
@@ -1354,10 +1444,12 @@ export class Vfx {
   }
 
   paladinHolyShock(sourceId: number, targetId: number, mode: 'heal' | 'damage'): void {
+    if (spellEffectsMuted(sourceId)) return;
     this.paladinSpellFx.holyShock({ mode, sourceId, targetId });
   }
 
   paladinSunwardDisc(sourceId: number, targetId: number, hopIndex: number, totalHits = 3): void {
+    if (spellEffectsMuted(sourceId)) return;
     this.paladinSpellFx.sunwardDisc({
       sourceId,
       targetId,
@@ -1373,10 +1465,12 @@ export class Vfx {
     hopIndex: number,
     totalHits = 3,
   ): void {
+    if (spellEffectsMuted(sourceId)) return;
     this.paladinSpellFx.sunwardDiscImpact(sourceId, targetId, hopIndex, totalHits);
   }
 
   paladinBastionSweep(sourceId: number, radius: number, arcDegrees: number, facing: number): void {
+    if (spellEffectsMuted(sourceId)) return;
     this.paladinSpellFx.bastionSweep({
       sourceId,
       radius,
@@ -1386,12 +1480,14 @@ export class Vfx {
   }
 
   paladinBastionSweepImpact(targetId: number): void {
+    if (spellEffectsMuted(targetId)) return;
     this.paladinSpellFx.bastionSweepTarget(targetId);
   }
 
   // Dawnfall uses a timed dawn rune, circular slash, six short-lived radiant
   // blades, and a shockwave clamped to the supplied gameplay radius.
   paladinDawnfall(sourceId: number, radius: number): void {
+    if (spellEffectsMuted(sourceId)) return;
     this.paladinSpellFx.dawnfall({
       casterId: sourceId,
       radius,
@@ -1400,12 +1496,14 @@ export class Vfx {
   }
 
   paladinDawnfallImpact(targetId: number): void {
+    if (spellEffectsMuted(targetId)) return;
     this.paladinSpellFx.dawnfallTarget(targetId);
   }
 
   // Final Edict is deliberately tighter than Dawnfall: one descending blade,
   // a compact seal under the victim, and a dense vertical impact shower.
   paladinFinalEdict(sourceId: number, targetId: number): void {
+    if (spellEffectsMuted(sourceId)) return;
     const target = this.anchor(targetId, 0.08);
     if (!target) return;
     const source = this.anchor(sourceId, 0.45);
@@ -1482,6 +1580,7 @@ export class Vfx {
   // A stored heal-echo firing: a fountain of life-green motes bursting upward
   // from the saved ally, collapsing back like a heartbeat. Original effect.
   echoBurst(entityId: number, school: string): void {
+    if (spellEffectsMuted(entityId)) return;
     const at = this.anchor(entityId, 0.4);
     if (!at) return;
     const green = new THREE.Color(0x9cf58e).multiplyScalar(hdr(2.4));
@@ -1511,6 +1610,7 @@ export class Vfx {
   // A DoT detonation (Earthen Jolt eating Cinder Jolt): a fast ground-level
   // shockwave ring plus an ember shower in the DoT's school color. Original.
   detonate(entityId: number, school: string): void {
+    if (spellEffectsMuted(entityId)) return;
     const at = this.anchor(entityId, 0.15);
     if (!at) return;
     const hot = new THREE.Color(SCHOOL_COLORS[school] ?? 0xff8844).multiplyScalar(hdr(2.8));
@@ -1738,6 +1838,7 @@ export class Vfx {
   }
 
   tick(targetId: number, school: string, color?: number): void {
+    if (spellEffectsMuted(targetId)) return;
     const at = this.anchor(targetId, 0.55);
     if (at) this.burst(at, school, 7, 0.6, color);
   }
@@ -1769,6 +1870,7 @@ export class Vfx {
   }
 
   shoutwave(centerId: number, colorHex: number): void {
+    if (spellEffectsMuted(centerId)) return;
     const at = this.anchor(centerId, 0.12);
     if (!at) return;
     const bright = new THREE.Color(colorHex).multiplyScalar(hdr(1.7));
@@ -1798,6 +1900,7 @@ export class Vfx {
   }
 
   recklessFlame(entityId: number, dt: number): void {
+    if (spellEffectsMuted(entityId)) return;
     if (!this.emitChance(26, dt)) return;
     const at = this.anchor(entityId, 0.25);
     if (!at) return;
@@ -1904,9 +2007,13 @@ export class Vfx {
   /** A quick yellow-orange shimmer ringing a rider as a mount is summoned (and on
    *  a dismount/live swap): tighter and shorter-lived than levelUpPillar so it
    *  reads as a conjure sparkle, not a level-up. Fired on the mountKey-change edge. */
-  mountSummonGlow(targetId: number): void {
+  mountSummonGlow(targetId: number, summonFx: 'shimmer' | 'lanternBurst' = 'shimmer'): void {
     const at = this.anchor(targetId, 0);
     if (!at) return;
+    if (summonFx === 'lanternBurst') {
+      this.mountLanternBurst(at);
+      return;
+    }
     const cream = new THREE.Color(0xffe0a0).multiplyScalar(hdr(1.8));
     const amber = new THREE.Color(0xffb347).multiplyScalar(hdr(1.8));
     const ember = new THREE.Color(0xff9a3c).multiplyScalar(hdr(1.8));
@@ -1925,6 +2032,142 @@ export class Vfx {
         0.75 + Math.random() * 0.3,
         -1,
         i % 3 === 0 ? SPR.star : SPR.sparkle,
+      );
+    }
+  }
+
+  /** Lantern Hall's destrier arriving: the lanterns flare all at once. A hot flash at the
+   *  rider, a ring of sparks thrown out along the ground, a column of embers and warm light
+   *  climbing the rider, and slow cinders settling after. Louder than the shared shimmer on
+   *  purpose (the mount carries its own fire); every count goes through scaledCount, so a
+   *  low graphics tier sheds it first. */
+  private mountLanternBurst(at: THREE.Vector3): void {
+    const white = new THREE.Color(0xfff1d0).multiplyScalar(hdr(2.6));
+    const hot = new THREE.Color(0xffb45e).multiplyScalar(hdr(2.2));
+    const amber = new THREE.Color(0xff8a2a).multiplyScalar(hdr(2.0));
+    const coal = new THREE.Color(0xff5210).multiplyScalar(hdr(1.8));
+    // the flare: stacked flashes, a tight white core over a wide amber bloom, and a low warm
+    // wash over the ground the horse lands on (its lanterns flare with it: mount_lamps.ts)
+    this.spawn(at.x, at.y + 1.6, at.z, 0, 0.4, 0, white, 3.8, 0.4, 0, SPR.flash);
+    this.spawn(at.x, at.y + 1.3, at.z, 0, 0.2, 0, amber, 8, 0.75, 0, SPR.glowSoft);
+    this.spawn(at.x, at.y + 0.3, at.z, 0, 0, 0, hot, 7, 0.9, 0, SPR.glowSoft);
+    // a ring of flame licks round the hooves, rising as they fade
+    for (let i = 0, n = this.scaledCount(16); i < n; i++) {
+      const a = (i / n) * Math.PI * 2;
+      this.spawn(
+        at.x + Math.sin(a) * 1.2,
+        at.y + 0.2,
+        at.z + Math.cos(a) * 1.2,
+        Math.sin(a) * 0.8,
+        1.6 + Math.random() * 0.8,
+        Math.cos(a) * 0.8,
+        i % 2 ? amber : hot,
+        0.9 + Math.random() * 0.4,
+        0.55 + Math.random() * 0.2,
+        -0.4,
+        SPR.flame,
+      );
+    }
+    // the ground ring: sparks thrown outward low along the ground, falling
+    for (let i = 0, n = this.scaledCount(60); i < n; i++) {
+      const a = (i / n) * Math.PI * 2 + Math.random() * 0.2;
+      const speed = 4.5 + Math.random() * 2.5;
+      this.spawn(
+        at.x + Math.sin(a) * 0.4,
+        at.y + 0.15,
+        at.z + Math.cos(a) * 0.4,
+        Math.sin(a) * speed,
+        1.2 + Math.random() * 1.6,
+        Math.cos(a) * speed,
+        i % 2 ? hot : amber,
+        0.3 + Math.random() * 0.15,
+        0.45 + Math.random() * 0.25,
+        7,
+        SPR.sparkBurst,
+      );
+    }
+    // the column: embers and flame licks climbing the rider and horse
+    for (let i = 0, n = this.scaledCount(80); i < n; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const r = 0.3 + Math.random() * 1.1;
+      const flame = i % 4 === 0;
+      this.spawn(
+        at.x + Math.sin(a) * r,
+        at.y + Math.random() * 1.4,
+        at.z + Math.cos(a) * r,
+        Math.sin(a) * 0.4,
+        2.4 + Math.random() * 2.6,
+        Math.cos(a) * 0.4,
+        flame ? amber : i % 3 === 0 ? coal : hot,
+        flame ? 0.7 + Math.random() * 0.4 : 0.22 + Math.random() * 0.16,
+        flame ? 0.5 + Math.random() * 0.3 : 0.9 + Math.random() * 0.6,
+        flame ? -0.5 : -1.2,
+        flame ? SPR.flame : i % 3 === 0 ? SPR.star : SPR.sparkle,
+      );
+    }
+    // the settle: slow cinders drifting down after the flare
+    for (let i = 0, n = this.scaledCount(26); i < n; i++) {
+      this.spawn(
+        at.x + (Math.random() - 0.5) * 2.4,
+        at.y + 2.4 + Math.random() * 1.2,
+        at.z + (Math.random() - 0.5) * 2.4,
+        (Math.random() - 0.5) * 0.3,
+        0.2,
+        (Math.random() - 0.5) * 0.3,
+        coal,
+        0.16 + Math.random() * 0.1,
+        1.6 + Math.random() * 0.8,
+        0.6,
+        SPR.glowSoft,
+      );
+    }
+  }
+
+  /** Sparks struck off a hoof (Lantern Hall's destrier at a gallop, mount_embers.ts): hot
+   *  points kicked up and back that fall fast, now and then a brief flame puff. */
+  mountHoofSparks(at: THREE.Vector3, ratePerSec: number, dt: number): void {
+    const n = this.emitCount(ratePerSec, dt);
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const lateral = 0.8 + Math.random() * 1.8;
+      const puff = Math.random() < 0.22;
+      this.spawn(
+        at.x + (Math.random() - 0.5) * 0.15,
+        at.y + 0.05,
+        at.z + (Math.random() - 0.5) * 0.15,
+        Math.sin(a) * lateral,
+        puff ? 0.7 : 2 + Math.random() * 2.6,
+        Math.cos(a) * lateral,
+        puff
+          ? this.emberFlame.setHex(0xff8a2a).multiplyScalar(hdr(1.7))
+          : this.emberSpark
+              .setHex(Math.random() < 0.5 ? 0xffc070 : 0xff7a1e)
+              .multiplyScalar(hdr(2.2)),
+        puff ? 0.55 + Math.random() * 0.25 : 0.18 + Math.random() * 0.13,
+        puff ? 0.32 : 0.4 + Math.random() * 0.35,
+        puff ? -0.6 : 9,
+        puff ? SPR.firePuff : SPR.sparkBurst,
+      );
+    }
+  }
+
+  /** Cinders shaken out of a carried lantern: they rise, wander and fade; at speed they
+   *  stream back behind the glass because the lantern itself is moving on. */
+  mountLanternCinders(at: THREE.Vector3, ratePerSec: number, dt: number, moving: boolean): void {
+    const n = this.emitCount(ratePerSec, dt);
+    for (let i = 0; i < n; i++) {
+      this.spawn(
+        at.x + (Math.random() - 0.5) * 0.12,
+        at.y + 0.08,
+        at.z + (Math.random() - 0.5) * 0.12,
+        (Math.random() - 0.5) * 0.5,
+        (moving ? 0.5 : 0.8) + Math.random() * 0.6,
+        (Math.random() - 0.5) * 0.5,
+        this.emberSpark.setHex(Math.random() < 0.6 ? 0xffa040 : 0xffd27a).multiplyScalar(hdr(2.2)),
+        0.11 + Math.random() * 0.09,
+        0.9 + Math.random() * 0.8,
+        -0.4,
+        Math.random() < 0.3 ? SPR.star : SPR.sparkle,
       );
     }
   }
@@ -1997,6 +2240,31 @@ export class Vfx {
   }
 
   // continuous emitters (called per frame)
+  // Spell-sourced twins of the shared emitters. nova, burst, healGlow,
+  // buffSwirl and castSparkle also carry reads that are not spell effects (a
+  // delve shrine's sequence pulse, a lit wardstone, a minigame power-up), so
+  // they never consult the Spell Effects option; a SPELL call site uses the
+  // twin, which skips a muted source (spell_effects_switch.ts).
+  spellNova(centerId: number, school: string, color?: number): void {
+    if (!spellEffectsMuted(centerId)) this.nova(centerId, school, color);
+  }
+
+  spellBurst(at: THREE.Vector3, school: string, count?: number, power?: number): void {
+    if (!spellEffectsMuted()) this.burst(at, school, count, power);
+  }
+
+  spellHealGlow(targetId: number): void {
+    if (!spellEffectsMuted(targetId)) this.healGlow(targetId);
+  }
+
+  spellBuffSwirl(targetId: number, color?: number): void {
+    if (!spellEffectsMuted(targetId)) this.buffSwirl(targetId, color);
+  }
+
+  spellCastSparkle(entityId: number, school: string, dt: number, color?: number): void {
+    if (!spellEffectsMuted(entityId)) this.castSparkle(entityId, school, dt, color);
+  }
+
   castSparkle(entityId: number, school: string, dt: number, color?: number): void {
     if (!this.emitChance(30, dt)) return;
     const at = this.anchor(entityId, 0.66);
@@ -2020,8 +2288,15 @@ export class Vfx {
 
   // Shapeshift-form aura (continuous, called per frame while the form aura is
   // on). Each form reads distinctly at a glance: metamorph = flame tongues +
-  // stray embers, moonkin = drifting star motes. Shadowform is gloam_field.ts.
-  formAura(entityId: number, form: 'metamorph' | 'moonkin', dt: number): void {
+  // stray embers, moonkin = drifting star motes, shadowform = gloom wisps +
+  // smoke curls, sporemender = tiny spores lifting off the ground into the sky,
+  // sporemending = the same spores, sparser, on a Sporemending HoT target.
+  formAura(
+    entityId: number,
+    form: 'metamorph' | 'moonkin' | 'sporemender' | 'sporemending',
+    dt: number,
+  ): void {
+    if (spellEffectsMuted(entityId)) return;
     if (form === 'metamorph') {
       const n = this.emitCount(48, dt);
       if (!n) return;
@@ -2070,6 +2345,36 @@ export class Vfx {
           1.1 + Math.random() * 0.5,
           -0.15,
           SPR.star,
+        );
+      }
+      return;
+    }
+    if (form === 'sporemender' || form === 'sporemending') {
+      // Small spores shaken loose at the druid's feet, rising slowly and
+      // gathering speed as they climb past the cap toward the sky; most are
+      // pale cream specks, a few glow a soft spring green. A HoT target gets a
+      // sparser, shorter drift: a raid can carry the HoT on every member.
+      const hot = form === 'sporemending';
+      const n = this.emitCount(hot ? 9 : 26, dt);
+      if (!n) return;
+      const at = this.anchor(entityId, 0.03);
+      if (!at) return;
+      for (let k = 0; k < n; k++) {
+        const a = Math.random() * Math.PI * 2;
+        const r = 0.2 + Math.random() * 0.9;
+        const glow = Math.random() < 0.3;
+        this.spawn(
+          at.x + Math.sin(a) * r,
+          at.y + Math.random() * 0.2,
+          at.z + Math.cos(a) * r,
+          (Math.random() - 0.5) * 0.14,
+          0.5 + Math.random() * 0.4,
+          (Math.random() - 0.5) * 0.14,
+          glow ? 0xc8f77a : 0xf6efcf,
+          glow ? 0.36 + Math.random() * 0.1 : 0.22 + Math.random() * 0.08,
+          (hot ? 2.2 : 2.8) + Math.random() * (hot ? 0.8 : 1.2),
+          -0.3,
+          SPR.flash,
         );
       }
       return;
@@ -2566,6 +2871,7 @@ export class Vfx {
   }
 
   lichAura(entityId: number, dt: number, soulFragments: number): void {
+    if (spellEffectsMuted(entityId)) return;
     const full = soulFragments >= 5;
     const count = this.emitCount(full ? 42 : 26, dt);
     if (!count) return;
@@ -2635,6 +2941,7 @@ export class Vfx {
   update(dt: number, reducedMotion = false): void {
     if (this.disposed) return;
     this.drainLifeVfx.update(dt, reducedMotion);
+    this.hutFires.update(dt, reducedMotion);
 
     for (let i = this.pendingBursts.length - 1; i >= 0; i--) {
       const pending = this.pendingBursts[i];
@@ -2720,6 +3027,11 @@ export class Vfx {
       const dist = dir.length();
       const step = pr.speed * dt;
       if (dist <= Math.max(0.7, step)) {
+        if (pr.hidden) {
+          this.projectiles.splice(i, 1);
+          pr.onImpact?.(target);
+          continue;
+        }
         // impact: school-tinted cross-flash + burst that survives a 30fps frame
         this.tmpColor.copy(pr.color).multiplyScalar(hdr(1.6));
         const sc = pr.scale ?? 1;
@@ -2767,6 +3079,7 @@ export class Vfx {
       const uz = dir.z / dist;
       dir.multiplyScalar(step / dist);
       pr.pos.add(dir);
+      if (pr.hidden) continue;
       if (pr.lightning) {
         // The flying head is a short jagged electric streak trailing back along
         // the travel direction: a few segments, each kicked perpendicular for the

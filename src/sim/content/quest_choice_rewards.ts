@@ -1090,12 +1090,12 @@ export const QUEST_CHOICE_REWARDS: Readonly<Record<string, readonly string[]>> =
     'trailwarden_mitts',
   ],
   q_revenants: [
-    'trailwarden_hood',
-    'trailwarden_cap',
-    'trailwarden_headguard',
-    'trailwarden_helm',
-    'trailwarden_coif',
-    'trailwarden_cowl',
+    'cairnking_mantle',
+    'cairnking_shoulderpads',
+    'cairnking_shoulderguards',
+    'cairnking_pauldrons',
+    'cairnking_spaulders',
+    'cairnking_epaulets',
   ],
   q_riding_lessons: [
     'highgale_robe',

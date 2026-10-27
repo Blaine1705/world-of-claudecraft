@@ -867,6 +867,14 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.className': 8, '.setAttribute': 3 },
     reflowAllow: {},
   },
+  // The death screen's PvP Resurrect button and note (hud/death/): every write,
+  // the countdown text, the disabled attribute and the two displays, rides the
+  // elided writers; the press is bound once at construction.
+  {
+    file: 'hud/death/pvp_resurrect_painter.ts',
+    allow: {},
+    reflowAllow: {},
+  },
   // The bg kill feed rebuilds its tiny stack in ONE innerHTML write, on a
   // death or an expiry only (the per-frame update elides on the pure core's
   // reference equality); the setAttribute runs once at mount.
@@ -934,6 +942,8 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
 // element at all: it is the mark read the M-map plate and the minimap's cached battleground
 // raster share, so it resolves nothing and reads nothing.
 const CANVAS_PAINTERS: ReadonlyArray<ScannedPainter> = [
+  { file: 'hill_map_marker_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'ferry_port_map_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'continent_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'hud/delve/delve_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
   { file: 'hud/rift/rift_map_painter.ts', allow: {}, reflowAllow: { getComputedStyle: 1 } },
@@ -1044,6 +1054,15 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     reflowAllow: { '.getBoundingClientRect': 1, '.scrollTop': 4 },
     driverAllow: {},
   },
+  // The Social window's row right-click: ONE row rect, read lazily and only when a
+  // contextmenu arrives at 0,0 (a keyboard or synthetic open), to seat the player
+  // menu under the row. A pointer right-click uses its own coords and reads nothing;
+  // no repaint or clock ever reaches it.
+  {
+    file: 'social_window.ts',
+    reflowAllow: { '.getBoundingClientRect': 1 },
+    driverAllow: {},
+  },
   // The two touch gesture layers of the mobile action ring, one entry each because they
   // are twins: ONE button/seat rect plus ONE computed-style read, taken when a press
   // OPENS the overlay (the radial's reveal, the strip's pointerdown measure) and never
@@ -1146,12 +1165,9 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // cost with one of each too. Interleaving a read BETWEEN the writes is what
   // would make this thrash, and nothing here does.)
   { file: 'bank_window.ts', reflowAllow: { '.scrollTop': 6 }, driverAllow: {} },
-  // Preserve the single courier body scroll offset only across a changed render.
-  { file: 'hud/courier/courier_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
-  // The Hunting pane keeps the catalog list's scroll offset across its full
-  // innerHTML repaint (one read before the rebuild, one write after), so a row
-  // click two screens down never snaps the player back to the top.
-  { file: 'collections/collections_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  // Preserve the courier body and its two storage grids' scroll offsets (one
+  // read and one write each) only across a changed render, never per frame.
+  { file: 'hud/courier/courier_window.ts', reflowAllow: { '.scrollTop': 4 }, driverAllow: {} },
   // The scroll pair and the rAF both belonged to the mount picker's
   // scroll-the-selected-card-into-view path, which went away when reins became
   // usable items and the picker was deleted. The sheet now reads nothing and
@@ -1307,7 +1323,12 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   },
   { file: 'reliquary_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
   { file: 'hud/cosmetics/cosmetics_window.ts', reflowAllow: {}, driverAllow: {} },
-  { file: 'dungeon_finder_window.ts', reflowAllow: { '.scrollTop': 2 }, driverAllow: {} },
+  // Cold rebuild only, after the unchanged-signature return: preserve the rail
+  // and detail scroll positions plus the unified Groups body across structural updates.
+  // The remote Vault adds one scroll read/restore pair when a changed signature
+  // rebuilds its nested panel. Unchanged frames return before these accesses;
+  // the countdown updates in place without reading scroll position.
+  { file: 'dungeon_finder_window.ts', reflowAllow: { '.scrollTop': 8 }, driverAllow: {} },
   // The lockpick clock: a 100ms tick that repaints the remaining-time bar for the duration
   // of one attempt, generation-guarded and cleared on stop. The fastest module-owned driver
   // in the bucket, and the reason setInterval is counted rather than banned.
@@ -3108,6 +3129,7 @@ function buildHarnesses(shape: WorldShape, facet: PainterHostWriters): PainterHa
           kind: 'ability',
           abilityId: 'x',
           itemId: null,
+          petCommand: null,
           iconKey: 'ability:x',
           cooldownRemaining: 0,
           cooldownTotal: 0,

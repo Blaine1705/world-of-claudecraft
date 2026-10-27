@@ -2233,6 +2233,63 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     },
     props: 'none',
   },
+  // The Highwatch guild's residents (sim/content/highwatch_guild.ts). Hesper Dunmore, the
+  // guildmaster: a veteran adventurer gone grey at the temples, a scar of a smile.
+  guildmaster_hesper_dunmore: {
+    cls: 'warrior',
+    app: {
+      gender: 'female',
+      ...head('braid', 'none', 'relaxed', 'default', 'default', 'default'),
+      ...skin(8, 0.36, 0.42),
+      ...hair(4, 0.02, 0.58),
+      ...eyes(30, 0.4, 0.3),
+      headShape: shape({ eyeSpacing: 0.2, eyeSize: -0.2, browHeight: -0.1, chinWidth: 0.3 }),
+      bodyScale: 1.04,
+    },
+    props: 'none',
+  },
+  // Tobias Wren, the contract clerk: ink on his fingers, spectacles' patience in his face.
+  contract_clerk_tobias_wren: {
+    cls: 'mage',
+    app: {
+      gender: 'male',
+      ...head('swept', 'none', 'relaxed', 'default', 'default', 'default'),
+      ...skin(5, 0.3, 0.5),
+      ...hair(2, 0.08, 0.3),
+      ...eyes(120, 0.35, 0.35),
+      headShape: shape({ eyeSpacing: 0.1, eyeSize: -0.3, browHeight: 0.1, chinWidth: 0.35 }),
+      bodyScale: 0.96,
+    },
+    props: 'none',
+  },
+  // Garrick Holt, the quartermaster: broad, bearded, a trader's eye for a fair price.
+  guild_quartermaster_garrick_holt: {
+    cls: 'paladin',
+    app: {
+      gender: 'male',
+      ...head('bald', 'boxed', 'relaxed', 'default', 'broad', 'default'),
+      ...skin(14, 0.4, 0.38),
+      ...hair(6, 0.05, 0.4),
+      ...eyes(200, 0.4, 0.3),
+      headShape: shape({ eyeSpacing: 0.25, eyeSize: -0.35, browHeight: 0.0, chinWidth: 0.55 }),
+      bodyScale: 1.05,
+    },
+    props: 'none',
+  },
+  // Mira Fairweather, the recruiter: quick, friendly, a ranger's boots under the map table.
+  guild_recruiter_mira_fairweather: {
+    cls: 'hunter',
+    app: {
+      gender: 'female',
+      ...head('ponytail', 'none', 'relaxed', 'almond', 'default', 'default'),
+      ...skin(10, 0.34, 0.46),
+      ...hair(11, 0.04, 0.5),
+      ...eyes(90, 0.4, 0.35),
+      headShape: shape({ eyeSpacing: 0.15, eyeSize: 0.1, browHeight: 0.05, chinWidth: 0.45 }),
+      bodyScale: 0.98,
+    },
+    props: 'none',
+  },
   // Reeve Ottoline, Reeve of Lanternmere.
   reeve_ottoline: {
     cls: 'druid',

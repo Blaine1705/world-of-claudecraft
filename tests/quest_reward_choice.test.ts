@@ -237,6 +237,25 @@ describe('choose-one quest rewards: the turn-in grant', () => {
     expect(sim.questLog.has(questId)).toBe(false);
   });
 
+  it.each(['fixed', 'choice'])('records the quest origin on a tracked %s reward', (kind) => {
+    const itemId = 'duskforged_warblade';
+    QUESTS[questId].choiceRewards = kind === 'choice' ? [itemId] : undefined;
+    QUESTS[questId].itemRewards = kind === 'fixed' ? { warrior: itemId } : {};
+    const sim = readyAtTurnIn('warrior');
+    sim.turnInQuest(questId, kind === 'choice' ? itemId : undefined);
+    const copy = sim.players.get(sim.playerId)!.inventory.find((s) => s.itemId === itemId);
+    expect(copy?.instance?.guid).toMatch(/^[0-9a-f-]{36}$/);
+    expect(copy?.instance?.provenance?.source).toBe(`quest:${questId}`);
+    expect(sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'itemTracked',
+        kind: 'mint',
+        guid: copy?.instance?.guid,
+        source: `quest:${questId}`,
+      }),
+    );
+  });
+
   it('grants the spec default when the turn-in names no pick', () => {
     QUESTS[questId].choiceRewards = CHOICES;
     const sim = readyAtTurnIn('mage');

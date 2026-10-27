@@ -65,7 +65,7 @@ describe('night floor', () => {
     );
     expect(renderer).toContain('dayNightGrade(lifted, biome, moonLit)');
     // the lamps/aurora clock is NOT lifted: it still reads the world's night
-    expect(renderer).toContain('this.dnGlobalNight = nightLightAmount(1 - gday, !this.lowGfx)');
+    expect(renderer).toContain('this.dnGlobalNight = nightLightAmount(1 - gday, true)');
     const inspector = sourceOf('../src/editor/inspector.ts');
     expect(inspector).toContain("live('editor.lighting.nightFloor', p.nightFloor ?? 0, 0, 1, 0.05");
   });

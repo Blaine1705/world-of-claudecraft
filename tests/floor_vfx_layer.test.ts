@@ -156,6 +156,10 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   // The trash pass's second wave: the Siren's tether, ring and halo, and the
   // Sergeant's crosshair, aiming lines and bolts, all on the encounter band.
   { file: 'src/render/drowned_temple/temple_lure_fx.ts', layer: 'encounter', strict: true },
+  // Selthe's Score: the moon tiles' discs, the ripples and her ward's foot on
+  // the floor, and the numerals, pillars, thread and burst in the air above
+  // them, all on the encounter band (the tiles are the order to step).
+  { file: 'src/render/drowned_temple/temple_score_fx.ts', layer: 'encounter', strict: true },
   { file: 'src/render/sunken_bastion/bastion_order_fx.ts', layer: 'encounter', strict: true },
   // The Mere Hydra's Combined Breath: the frozen lane, the wall's frosted foot
   // and lee shimmer, the venom arrows and the rime crystals' rings lie on the
@@ -194,6 +198,12 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/wildheart_basin/basin_splash.ts', layer: 'ground', strict: true },
   // The Pack Bond's ground glows under master and jaguar (the lowest encounter rung).
   { file: 'src/render/wildheart_basin/bond_cord.ts', layer: 'encounter', strict: true },
+  // Zulgar's sun glyphs: the ash veil and the light over the carved floor (the
+  // Sunstruck ring is the shared kit's).
+  { file: 'src/render/wildheart_basin/zulgar_glyph_fx.ts', layer: 'encounter', strict: true },
+  // The Idol's Breath: the warned half of the terrace, the breath over it and
+  // the curtain on the centre line.
+  { file: 'src/render/wildheart_basin/idol_breath_fx.ts', layer: 'encounter', strict: true },
   // The Gravewyrm Sanctum's telegraphs (the shared kit), the soulfire patches'
   // glow and flames, the shock rings and the particle pools.
   { file: 'src/render/gravewyrm_sanctum_fx/sanctum_fx.ts', layer: 'encounter', strict: true },
@@ -252,6 +262,9 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/paladin_ascension_visual.ts', layer: 'player', strict: true },
   { file: 'src/render/ring_of_frost_visual.ts', layer: 'player', strict: true },
   { file: 'src/render/frost_nova_root_visual.ts', layer: 'player', strict: true },
+  // Spore Burst's splash ring and fill; its floating countdown is a named
+  // overlay order, not a floor piece.
+  { file: 'src/render/spore_burst_visual.ts', layer: 'player', strict: true },
   { file: 'src/render/glacial_front_visual.ts', layer: 'player', strict: true },
   { file: 'src/render/abyssal_rift_fx.ts', layer: 'player', strict: true },
   { file: 'src/render/umbral_anchor_marker.ts', layer: 'player', strict: true },
@@ -399,9 +412,7 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/ability_vfx/spirits.ts',
   'src/render/vfx.ts',
   // Warrior kit volumes (crest fans, rupture masses, impact volumes): depth-tested
-  // 3D shapes on fixed orders 4 and 5. The one flat kind (the baked shockwave)
-  // rides the same pooled slots on order 5, under every player and encounter
-  // rung, so a boss telegraph still paints over it.
+  // 3D shapes on fixed orders 4 and 5.
   'src/render/ability_vfx/baked_impact_layers.ts',
   'src/render/ability_vfx/signature_crests.ts',
   // The Mirefen world boss Balgath (open world, alone on his crater, never on a raid
@@ -971,6 +982,7 @@ describe('floor VFX ladder (end to end on the real builders)', () => {
   });
 
   it("puts a boss sigil flare or a mob windup rune on the encounter band and the mage's own Rune of Power on the player band", () => {
+    const fills: number[] = [];
     const runeOrders = (spawn: RuneCircleSpawn): number[] => {
       const scene = new THREE.Scene();
       const fx = new MageGroundFx(scene, () => 0, vi.fn());
@@ -978,12 +990,14 @@ describe('floor VFX ladder (end to end on the real builders)', () => {
       const rune = scene.getObjectByName('mage-rune-power');
       expect(rune).toBeDefined();
       const orders: number[] = [];
+      fills.length = 0;
       (rune as THREE.Object3D).traverse((object) => {
         // the terrain-draped inscription (rings, spokes, glow); the orbiting
-        // motes are airborne spheres and deliberately outside the ladder
-        if (isRenderable(object) && object.name.startsWith('mage-rune-power-')) {
-          orders.push(object.renderOrder);
-        }
+        // motes are airborne spheres and deliberately outside the ladder. A mob
+        // windup's danger fill is checked on its own below.
+        if (!isRenderable(object) || !object.name.startsWith('mage-rune-power-')) return;
+        if (object.name === 'mage-rune-power-danger-fill') fills.push(object.renderOrder);
+        else orders.push(object.renderOrder);
       });
       expect(orders.length).toBeGreaterThan(3);
       return orders;
@@ -999,6 +1013,7 @@ describe('floor VFX ladder (end to end on the real builders)', () => {
       school: 'arcane',
       ability: 'rune_of_power',
     });
+    expect(fills).toHaveLength(0);
     const sigil = runeOrders({
       x: 0,
       z: 0,
@@ -1007,8 +1022,14 @@ describe('floor VFX ladder (end to end on the real builders)', () => {
       school: 'arcane',
       ability: NYTHRAXIS_SIGIL_CAST_ID,
     });
+    expect(fills).toHaveLength(0);
     // a rift mob's stomp or pulse windup arrives with a school and no ability
     const windup = runeOrders({ x: 0, z: 0, radius: 5, duration: 3, school: 'fire' });
+    // Only the windup washes its whole blast disc, on the encounter band and
+    // UNDER every stroke of the inscription.
+    expect(fills).toHaveLength(1);
+    expect(floorVfxLayerOf(fills[0])).toBe('encounter');
+    expect(fills[0]).toBeLessThan(Math.min(...windup));
     for (const order of own) expect(floorVfxLayerOf(order), `own ${order}`).toBe('player');
     for (const order of sigil) expect(floorVfxLayerOf(order), `sigil ${order}`).toBe('encounter');
     for (const order of windup) expect(floorVfxLayerOf(order), `windup ${order}`).toBe('encounter');

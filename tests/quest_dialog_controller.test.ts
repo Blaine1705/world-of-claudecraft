@@ -1,6 +1,28 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { GUILDMASTER_NPC_ID, HIGHWATCH_GUILD_ENTITY_IDS } from '../src/sim/content/highwatch_guild';
+import { inertCharacters } from './helpers/inert_characters';
+
+// char_window's portrait chip reaches the character model preload; keep it
+// inert (tests/helpers/inert_characters.ts has the why).
+vi.mock('../src/render/characters', () => inertCharacters.barrel());
+vi.mock('../src/render/characters/assets', () => inertCharacters.assets());
+vi.mock('../src/render/characters/portrait', () => inertCharacters.portrait());
+
+// This suite drives the quest dialog DOM, not WebGL portraits. char_window and
+// craft-name helpers can reach the portrait chip; keep that unrelated renderer
+// boundary inert so asset loads cannot outlive happy-dom teardown.
+vi.mock('../src/ui/portrait_chip', () => ({
+  crestUrl: () => '',
+  hydrateComposedChips: () => undefined,
+  hydratePortraits: () => undefined,
+  isComposedPortraitKey: () => false,
+  modularLookFor: () => null,
+  onPortraitUpdate: () => undefined,
+  portraitChipHtml: () => '',
+}));
+
 import {
   INVESTIGATION_CLUES,
   INVESTIGATION_NPC_IDS,
@@ -353,6 +375,23 @@ describe('QuestDialogController', () => {
     expect(keeper.targetEntity).toHaveBeenCalledWith(WEEKLY_KEEPER_ENTITY_ID);
     expect(keeper.interact).toHaveBeenCalledTimes(1);
     expect(keeper.element.style.display).not.toBe('block');
+  });
+
+  it("routes Lantern Hall's working residents to their windows, the guildmaster to gossip", () => {
+    // The 2026-10-16 playtest bug: talking to Garrick Holt showed only his greeting, because the
+    // gossip menu never sent the interact that makes the sim emit guildHallOpen.
+    for (const [templateId, entityId] of Object.entries(HIGHWATCH_GUILD_ENTITY_IDS)) {
+      const resident = harness(npc(entityId, templateId));
+      resident.controller.open(entityId);
+      if (templateId === GUILDMASTER_NPC_ID) {
+        expect(resident.interact, templateId).not.toHaveBeenCalled();
+        expect(resident.element.style.display, templateId).toBe('block');
+      } else {
+        expect(resident.targetEntity, templateId).toHaveBeenCalledWith(entityId);
+        expect(resident.interact, templateId).toHaveBeenCalledTimes(1);
+        expect(resident.element.style.display, templateId).not.toBe('block');
+      }
+    }
   });
 
   it('a clue hand-over at an ordinary quest giver renders the row and the click sends the interact', () => {

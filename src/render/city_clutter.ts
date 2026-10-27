@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { CLUTTER_KINDS, type ClutterStamp, clutterStampsNear } from '../sim/city_clutter';
 import { getActiveWorldContent, isBuiltinWorldActive } from '../sim/data';
 import { terrainHeight } from '../sim/world';
+import type { LoadedGltf } from './assets/loader';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { clutterItemsForStamp } from './city_clutter_core';
@@ -34,7 +34,7 @@ export interface CityClutterView {
   invalidate(): void;
 }
 
-const loadedModels: GLTF[] = [];
+const loadedModels: LoadedGltf[] = [];
 let modelsReady: Promise<void> | null = null;
 function loadModels(): Promise<void> {
   if (loadedModels.length === MODEL_URLS.length) return Promise.resolve();

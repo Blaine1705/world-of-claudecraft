@@ -13,7 +13,7 @@ export const LOW_SCENERY_BUDGET = {
   palmMiddleTriangles: 256,
   farTriangles: 32,
   outerTriangles: 12,
-  giantViews: 4,
+  giantViews: 16,
   giantCellPixels: 256,
 } as const;
 
@@ -42,11 +42,12 @@ export function lowSceneryRepresentation(
   x: number,
   z: number,
   giant: boolean,
+  maxDistance: number = LOW_SCENERY_BUDGET.fadeEnd,
 ): LowSceneryRepresentation {
   const distance = placementDistance(item, x, z);
   const near = LOW_SCENERY_BUDGET.full + (item.kind === 'foliage' ? 0 : 4);
   if (distance <= near) return 'source';
-  if (distance > LOW_SCENERY_BUDGET.fadeEnd) return 'absent';
+  if (distance > Math.min(LOW_SCENERY_BUDGET.fadeEnd, maxDistance)) return 'absent';
   if (giant) return 'sprite';
   if (distance <= LOW_SCENERY_BUDGET.middle) return 'middle';
   if (distance <= LOW_SCENERY_BUDGET.far) return 'far';

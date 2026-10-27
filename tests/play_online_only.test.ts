@@ -79,10 +79,12 @@ describe('/play login panel carries Continue with Discord', () => {
 
 describe('/play footer carries the legal links', () => {
   it('play.html links the Terms of Service and Privacy Policy', () => {
-    expect(playHtml).toContain('href="/terms"');
-    expect(playHtml).toContain('data-i18n="footer.terms"');
-    expect(playHtml).toContain('href="/privacy"');
-    expect(playHtml).toContain('data-i18n="footer.privacy"');
+    expect(playHtml).toContain(
+      'href="/terms" class="footer-link" target="_blank" rel="noopener noreferrer" data-i18n="footer.terms"',
+    );
+    expect(playHtml).toContain(
+      'href="/privacy" class="footer-link" target="_blank" rel="noopener noreferrer" data-i18n="footer.privacy"',
+    );
   });
 });
 
@@ -92,7 +94,8 @@ describe('/play uses the landing hero backdrop', () => {
     // eager <source>, no autoplay, preload="none" (applyLandingBackdrop attaches
     // and plays the trailer only on capable devices).
     expect(playHtml).toContain('data-trailer-src="/home-bg.mp4"');
-    expect(playHtml).toContain('poster="/home-bg.png"');
+    expect(playHtml).toContain('data-poster="/home-bg.webp"');
+    expect(playHtml).not.toContain(' poster="');
     expect(playHtml).not.toContain('<source src="/home-bg.mp4"');
     const playVideoTag = /<video id="bg-home"[^>]*>/.exec(playHtml)?.[0] ?? '';
     const indexVideoTag = /<video id="bg-home"[^>]*>/.exec(indexHtml)?.[0] ?? '';

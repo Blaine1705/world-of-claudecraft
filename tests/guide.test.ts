@@ -80,7 +80,11 @@ import {
   STATION_TYPE_BY_CRAFT,
   STATIONS,
 } from '../src/sim/content/professions';
-import { WARFARE_ITEMS, WARFARE_TRINKET_STOCK } from '../src/sim/content/pvp_honor';
+import {
+  WARFARE_ITEMS,
+  WARFARE_TRINKET_STOCK,
+  WORLD_PVP_GOODS_STOCK,
+} from '../src/sim/content/pvp_honor';
 import { SEASON2_STOCK } from '../src/sim/content/pvp_honor_season2';
 import {
   ALL_RECIPES,
@@ -229,6 +233,11 @@ const serverMain = readFileSync(new URL('../server/main.ts', import.meta.url), '
   /\r\n/g,
   '\n',
 );
+// The server's pretty-URL alias table (STATIC_PAGE_ALIASES), imported by server/main.ts.
+const serverAliases = readFileSync(
+  new URL('../server/static_fallback.ts', import.meta.url),
+  'utf8',
+);
 const sitemapXml = readFileSync(new URL('../public/sitemap.xml', import.meta.url), 'utf8').replace(
   /\r\n/g,
   '\n',
@@ -316,7 +325,7 @@ describe('Guide routes', () => {
 describe('Guide entry wiring', () => {
   it('registers the /wiki pretty URL in BOTH alias tables (kept in sync)', () => {
     expect(viteConfig).toContain("['/wiki', '/guide.html']");
-    expect(serverMain).toContain("['/wiki', '/guide.html']");
+    expect(serverAliases).toContain("['/wiki', '/guide.html']");
   });
 
   it('falls back deep /wiki paths to the guide shell in dev and prod', () => {
@@ -1812,10 +1821,16 @@ describe('Guide model stills', () => {
     );
   });
 
-  it('publishes exactly the three named druid forms (the gallery label map mirrors this)', () => {
-    // models.ts labels forms through its FORM_NAME literal map; a fourth form added in
+  it('publishes exactly the four named druid forms (the gallery label map mirrors this)', () => {
+    // models.ts labels forms through its FORM_NAME literal map; a fifth form added in
     // the generator would silently render as "Druid Forms" unless this pin reds first.
-    expect(GUIDE_DRUID_FORMS.map((d) => d.id)).toEqual(['form_bear', 'form_cat', 'form_travel']);
+    // Groveheart's Sporemender Form is the fourth (Moonwing has no model, so it is prose).
+    expect(GUIDE_DRUID_FORMS.map((d) => d.id)).toEqual([
+      'form_bear',
+      'form_cat',
+      'form_travel',
+      'form_sporemender',
+    ]);
   });
 });
 
@@ -6018,12 +6033,13 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     // outside WARFARE_ITEMS (defs in content/trinkets.ts), with the same
     // soulbound, no-sell-value shape.
     for (const id of honorRows) {
-      // The Warfare tier: the entry tier, the two honor trinkets and Warfare Season 2.
+      // The Warfare tier: the entry tier, the two honor trinkets, the World PvP
+      // goods (the Skull Bag) and Warfare Season 2.
       expect(
         id in WARFARE_ITEMS ||
           WARFARE_TRINKET_STOCK.includes(id) ||
-          SEASON2_STOCK.includes(id) ||
-          id === 'whistle_horse',
+          WORLD_PVP_GOODS_STOCK.includes(id) ||
+          SEASON2_STOCK.includes(id),
         id,
       ).toBe(true);
       expect(ITEMS[id].soulbound, id).toBe(true);
@@ -6283,6 +6299,14 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
         if (proc) expect(proc.pvpOnly, `${setId} ${tier.pieces}pc proc`).toBe(true);
         for (const [key, value] of Object.entries(rest)) {
           if (value === undefined) continue;
+          // The one tier that works everywhere: every family's 2-piece
+          // pushback immunity, which the prose names as its exception.
+          if (key === 'castPushbackReduction' && tier.pieces === 2) {
+            expect(body).toContain(
+              'two pieces of any of these sets also stop damage from delaying',
+            );
+            continue;
+          }
           expect(
             ['pvpOffenseRating', 'pvpDefenseRating', 'ccDurationReduction'],
             `${setId} ${tier.pieces}pc ${key}`,
@@ -6726,6 +6750,9 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       shardpikeBar: 'the Shardpike bar',
       // guide.interfacePage.framesGovernedUnitTooltip, named by its live chip.
       unitTooltip: `the ${t('hudChrome.interfaceUnlock.frameNames.unitTooltip')} frame`,
+      // guide.interfacePage.framesGovernedResourceAndHill.
+      playerResource: 'your resource bar',
+      hillBar: 'the King of the Hill bar',
     };
     expect(Object.keys(phraseFor).sort()).toEqual(HUD_FRAME_SPECS.map((s) => s.id).sort());
     for (const spec of HUD_FRAME_SPECS) {
@@ -6788,6 +6815,7 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       // page does not describe yet, on the same recorded-follow-up footing.
       worldQuests: null,
       worldBosses: null,
+      hill: null,
       player: 'with your own arrow on it',
       pois: 'the points of interest around you',
       npcs: 'the quest givers with their marks',

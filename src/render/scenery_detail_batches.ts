@@ -128,6 +128,8 @@ export class SceneryDetailBatches {
       for (const pool of this.pools) {
         pool.mesh.visible = false;
         pool.parent.add(pool.mesh);
+        // The gate may have baked this mesh before it had its final parent.
+        pool.mesh.updateMatrixWorld(true);
       }
       this.ready = true;
     } finally {

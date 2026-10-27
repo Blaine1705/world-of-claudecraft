@@ -210,10 +210,10 @@ describe('installBoundedRelatedFilter', () => {
   });
 
   it('refuses any vitest release but the verified one', () => {
-    expect(VERIFIED_VITEST_VERSION).toBe('4.1.11');
+    expect(VERIFIED_VITEST_VERSION).toBe('4.1.12');
     expect(() =>
       installBoundedRelatedFilter(fakeVitest(), { ...quiet, vitestVersion: '4.2.0' }),
-    ).toThrow(/verified against vitest 4\.1\.11, found 4\.2\.0/);
+    ).toThrow(/verified against vitest 4\.1\.12, found 4\.2\.0/);
     // The installed release is the verified one, or every run would throw.
     const pkg = JSON.parse(
       readFileSync(path.resolve(__dirname, '../node_modules/vitest/package.json'), 'utf8'),

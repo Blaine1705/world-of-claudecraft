@@ -1,3 +1,10 @@
+import {
+  liveWorldCottagesChanged,
+  liveWorldPreview,
+  newLiveWorldMap,
+  refreshLiveWorldTerrain,
+} from './live_world_core';
+import { showLiveWorldNotice } from './live_world_notice';
 // The map-editor application coordinator. Thin by design: layout assembly,
 // tool state, the undo stack, and event routing live here; everything with a
 // nameable responsibility is a sibling module (topbar, toolbar, inspector,
@@ -105,6 +112,9 @@ const DEFAULT_CAVE_VARIANCE = 0.35;
 // the Mob tool's route-preview colour, kept distinct from City Build's amber.
 const DEFAULT_ROUTE_SPEED = 2.2;
 const MOB_ROUTE_PREVIEW_COLOR = 0xff7a59;
+// The road selected in the Roads tab's Edit mode: a cool blue, apart from the
+// amber of a road being drawn.
+const ROAD_EDIT_PREVIEW_COLOR = 0x6fd0ff;
 
 /** Clamp a number into an inclusive range. */
 function clampNum(value: number, lo: number, hi: number): number {
@@ -340,7 +350,7 @@ import {
   wallTowerFit,
   withoutLastPathPoint,
 } from './city_build_core';
-import type { CityBuildPanelDeps, CitySubtool } from './city_build_panel';
+import type { CityBuildPanelDeps, CityRoadSelection, CitySubtool } from './city_build_panel';
 import {
   applyClutterBrush,
   type ClutterBrush,
@@ -392,6 +402,7 @@ import {
   newCustomMap,
   newFlatCustomMap,
   promotedSceneryFor,
+  zoneGraveyards,
 } from './custom_map';
 import {
   applyCutChange,
@@ -425,6 +436,7 @@ import {
   splitCampIntoIndividuals,
   toggledMobSelection,
 } from './entity_edit_core';
+import { type EntityPasteHost, pasteMobs, pasteNpcs } from './entity_paste';
 import {
   bundleDependencyRefs,
   ExportCompatibilityError,
@@ -553,6 +565,14 @@ import {
   regionExportFromMap,
   regionModulePath,
 } from './regions/region_export_core';
+import { RoadEditController } from './road_edit_controller';
+import {
+  applyRoadEdits,
+  builtinRoadState,
+  type RoadLayers,
+  type RoadRef,
+  roadPoints,
+} from './road_edit_core';
 import { EditGeneration, shouldAutosave } from './save_lifecycle_core';
 import {
   type CopiedNpc,
@@ -561,8 +581,6 @@ import {
   copyNpcSelection,
   copyPlacementSelection,
   marqueePlacementSelection,
-  pasteCampSelection,
-  pasteNpcSelection,
   pastePlacementSelection,
   toggledKeySelection,
 } from './selection_clipboard';
@@ -1017,6 +1035,14 @@ export class EditorApp {
   // Road drawing state.
   private cityRoadKind: 'road' | 'path' = 'road';
   private cityRoadPoints: Vec2[] = [];
+  // Roads tab mode: draw a new road, or edit the roads already on the map.
+  private cityRoadMode: 'draw' | 'edit' = 'draw';
+  // What the Edit mode handles last drew (skips identical hover redraws).
+  private roadPreviewDrawn: {
+    points: readonly { x: number; z: number }[];
+    highlight: number | null;
+    r: number;
+  } | null = null;
   // Prefab library (localStorage) + the prefab armed for stamping.
   private cityPrefabs: CityPrefab[] = sanitizeCityPrefabs(readJsonPref(CITY_PREFABS_PREF_KEY));
   private cityArmedPrefab: string | null = null;
@@ -1219,6 +1245,24 @@ export class EditorApp {
       invalidateStaticColliders();
       this.map.meta.updatedAt = now();
       this.markDirty();
+      this.inspector.refresh();
+    },
+  });
+  /** City Build Roads tab, Edit mode: reshape or remove the map's roads,
+   *  authored and legacy (road_edit_controller.ts). */
+  private readonly roadEdit = new RoadEditController({
+    layers: () => this.cityRoadLayers(),
+    write: (next) => {
+      if (next.edits) this.map.roadEdits = next.edits;
+      else delete this.map.roadEdits;
+      if (next.defs) this.map.roadDefs = next.defs;
+      else delete this.map.roadDefs;
+    },
+    refresh: (region) => this.cityRoadsChanged(region),
+    preview: (points, highlight) => this.cityRoadEditPreview(points, highlight),
+    pushUndo: (entry) => this.pushUndo(entry),
+    committed: () => {
+      this.map.meta.updatedAt = now();
       this.inspector.refresh();
     },
   });
@@ -1509,6 +1553,9 @@ export class EditorApp {
   /** Pixels dragged since the 2D paint press; gates jitter, see pointermove. */
   private paint2dDragPx = 0;
   private cursorWorld: Vec2 | null = null;
+  /** The ground under the cursor in the 3D view (null off the map): where a
+   *  pasted mob or NPC group lands. */
+  private hover3dWorld: Vec2 | null = null;
   private canvasDirty = true;
 
   private readonly io = new MapIO();
@@ -1547,17 +1594,22 @@ export class EditorApp {
     // the quota that used to block every save). The constructor proceeds on
     // the built-in default; finishBoot loadMap()s the maker's real map the
     // moment the store is ready.
-    promoteMajorWorldProps(this.map as CustomMap);
-    promoteEditablePalms(this.map as CustomMap);
-    promoteStreetlamps(this.map as CustomMap);
-    promoteWillows(this.map as CustomMap);
-    promoteFarshorePalms(this.map as CustomMap);
-    promoteFeatureDressing(this.map as CustomMap);
-    repairLegacyWorldPropFit(this.map as CustomMap);
-    repairStretchedWorldProps(this.map);
-    repairPlacedAssetShapes(this.map);
-    repairMissingTreeCollision(this.map, applyDefaultCollision);
-    repairDecorBuildingCollision(this.map);
+    if (new URLSearchParams(location.search).get('liveWorld') === '1') {
+      this.map = newLiveWorldMap(t('editor.liveWorld.name'));
+      this.content = this.map.content;
+    } else {
+      promoteMajorWorldProps(this.map as CustomMap);
+      promoteEditablePalms(this.map as CustomMap);
+      promoteStreetlamps(this.map as CustomMap);
+      promoteWillows(this.map as CustomMap);
+      promoteFarshorePalms(this.map as CustomMap);
+      promoteFeatureDressing(this.map as CustomMap);
+      repairLegacyWorldPropFit(this.map as CustomMap);
+      repairStretchedWorldProps(this.map);
+      repairPlacedAssetShapes(this.map);
+      repairMissingTreeCollision(this.map, applyDefaultCollision);
+      repairDecorBuildingCollision(this.map);
+    }
     this.entities = buildEntities(this.content);
     this.base = snapshot(this.entities);
     this.rebuildActiveWorld();
@@ -1667,7 +1719,7 @@ export class EditorApp {
     // there). Set it at construction, not only on the map-load path: the
     // most-recent-save boot never went through that path, so the button stayed
     // hidden (SPACEY 2026-09-07: "I don't have that button").
-    this.topbar.setPublishEnabled(import.meta.env.DEV);
+    this.topbar.setPublishEnabled(import.meta.env.DEV && !this.map.meta.overworldBase);
     // Autosave preference: default off; a blocked storage read stays off.
     try {
       this.autosaveOn = localStorage.getItem(AUTOSAVE_PREF_KEY) === '1';
@@ -2102,7 +2154,12 @@ export class EditorApp {
     // shipped version is still seeded into the store in the background (kept
     // alongside their maps, never opened over them), so an updated default
     // is one click away in Open rather than hijacking the boot.
-    let autoloaded = resumed ? null : await this.seedDefaultMap();
+    const liveWorld = new URLSearchParams(location.search).get('liveWorld') === '1';
+    let autoloaded = resumed
+      ? null
+      : liveWorld
+        ? (this.io.store.load(this.map.meta.id) ?? this.map)
+        : await this.seedDefaultMap();
     if (!resumed && !autoloaded) autoloaded = this.loadMostRecentSave();
     const opened = resumed ?? autoloaded;
     if (opened) {
@@ -2317,8 +2374,13 @@ export class EditorApp {
       camps: map.content.camps as WorldContent['camps'],
       npcs: map.content.npcs as WorldContent['npcs'],
       groundObjects: map.content.objects as WorldContent['groundObjects'],
-      roads: (map.roadDefs?.length
-        ? combinedRoads(map.content.roads ?? BUILTIN_WORLD.roads, map.roadDefs)
+      // The legacy roads (this map's moves and removals applied) plus the
+      // authored ones; shared with the document while there are neither.
+      roads: (map.roadDefs?.length || map.roadEdits
+        ? combinedRoads(
+            applyRoadEdits(map.content.roads ?? BUILTIN_WORLD.roads, map.roadEdits),
+            map.roadDefs,
+          )
         : (map.content.roads ?? BUILTIN_WORLD.roads)) as WorldContent['roads'],
       // Fork: propsMode drives the editable-foliage tiers. v0.31's
       // clonePropsWithoutEastbrookLayout is threaded through every branch, so a
@@ -2347,6 +2409,11 @@ export class EditorApp {
     // Moved gameplay objects: the same frozen record the document holds, so
     // the viewport's Sim, colliders and renderer read the live edits.
     if (map.objectMoves) world.objectMoves = map.objectMoves;
+    // The zone graveyards the viewport's Sim spawns its Spirit Healers at: the
+    // active content must carry the same record (sim.ts world invariant), or
+    // the collider build's healer-spot veto forks from the Sim's.
+    const graveyards = zoneGraveyards(world.zones);
+    if (graveyards.length > 0) world.services = { graveyards };
     if (map.blockers) world.blockers = map.blockers;
     if (map.caves) world.caves = map.caves;
     if (map.holes) world.holes = map.holes;
@@ -2402,6 +2469,7 @@ export class EditorApp {
     // the engine reload setZoneIsolate triggers) is what actually unloads them
     //, without it the terrain vanishes and every building keeps standing.
     // Safe to filter in place: props above is already a fresh clone per call.
+    if (map.meta.overworldBase) Object.assign(world, liveWorldPreview(map));
     const isolate = this.isolateRect();
     if (isolate) world.props = propsWithinRect(world.props, isolate);
     this.activeWorld = world;
@@ -3627,6 +3695,9 @@ export class EditorApp {
           this.canvasDirty = true;
         }
         break;
+      case 'city':
+        if (this.citySubtool === 'road' && this.cityRoadMode === 'edit') this.roadEdit.dragTo(w);
+        break;
       case 'region':
         if (this.regionStart) {
           this.regionBox = {
@@ -3808,6 +3879,9 @@ export class EditorApp {
       case 'spawn':
         if (!this.markerPlaceMode) this.finishSpawnArea();
         break;
+      case 'city':
+        this.roadEdit.endDrag();
+        break;
       case 'region': {
         // A click (no real drag) with a clipboard pastes at the click point.
         const b = this.regionBox;
@@ -3830,6 +3904,7 @@ export class EditorApp {
   }
 
   private hover3d(w: Vec2 | null): void {
+    this.hover3dWorld = w ? { x: w.x, z: w.z } : null;
     if (this.tool === 'building') {
       if (w) this.buildingWorkspace.hover(w);
       return;
@@ -6419,6 +6494,7 @@ export class EditorApp {
    * grid and the sim's terrain-edit spatial index are both stale.
    */
   private terrainEditsMutated(): void {
+    refreshLiveWorldTerrain(this.activeWorld, this.map);
     invalidateStaticColliders();
     invalidateTerrainEditIndex();
     // The zone-build workers mesh from a CLONE of the content, refreshed only
@@ -8201,7 +8277,8 @@ export class EditorApp {
         this.cityAddPathPoint(this.cityWallPoints, w, ev, true);
         break;
       case 'road':
-        this.cityAddPathPoint(this.cityRoadPoints, w, ev, false);
+        if (this.cityRoadMode === 'edit') this.cityRoadEditPress(w);
+        else this.cityAddPathPoint(this.cityRoadPoints, w, ev, false);
         break;
       case 'prefab':
         this.cityStampArmedPrefab(w);
@@ -8344,6 +8421,10 @@ export class EditorApp {
   private citySyncPathPreview(cursor?: Vec2): void {
     const v = this.viewport3d;
     if (!v) return;
+    if (this.citySubtool === 'road' && this.cityRoadMode === 'edit') {
+      this.roadEdit.syncPreview();
+      return;
+    }
     let pts: { x: number; z: number }[] | null = null;
     let color = 0xf3c96b;
     if (this.citySubtool === 'wall' && this.cityWallPoints.length > 0) {
@@ -8700,49 +8781,116 @@ export class EditorApp {
       points: points.map((p) => ({ x: p.x, z: p.z })),
       kind: this.cityRoadKind,
     };
-    if (!map.roadDefs) map.roadDefs = [];
-    const defs = map.roadDefs;
-    defs.push(def);
-    map.meta.updatedAt = now();
     this.cityRoadPoints = [];
     this.viewport3d?.setCityPathPreview(null);
-    this.cityRoadsChanged(def.points);
-    this.pushUndo({
-      label: 'city-road',
-      undo: () => {
-        const at = defs.indexOf(def);
-        if (at >= 0) defs.splice(at, 1);
-        this.cityRoadsChanged(def.points);
-      },
-      redo: () => {
-        defs.push(def);
-        this.cityRoadsChanged(def.points);
-      },
-    });
+    // The same snapshot undo every road edit uses, so a redo can never land
+    // in a roadDefs array the document has since replaced.
+    this.roadEdit.addAuthored(def);
     this.toasts.success(t('editor.city.roadPlaced'));
     this.inspector.refresh();
   }
 
   private cityDeleteRoad(id: string): void {
-    const defs = this.map.roadDefs ?? [];
-    const at = defs.findIndex((r) => r.id === id);
-    if (at < 0) return;
-    const def = defs[at];
-    defs.splice(at, 1);
-    this.map.meta.updatedAt = now();
-    this.cityRoadsChanged(def.points);
-    this.pushUndo({
-      label: 'city-road-delete',
-      undo: () => {
-        defs.push(def);
-        this.cityRoadsChanged(def.points);
-      },
-      redo: () => {
-        const i = defs.indexOf(def);
-        if (i >= 0) defs.splice(i, 1);
-        this.cityRoadsChanged(def.points);
-      },
+    this.roadEdit.remove({ kind: 'authored', id });
+  }
+
+  /** The document's road layers, as the road editor reads them. */
+  private cityRoadLayers(): RoadLayers {
+    return {
+      legacy: this.map.content.roads ?? BUILTIN_WORLD.roads,
+      edits: this.map.roadEdits,
+      defs: this.map.roadDefs,
+    };
+  }
+
+  /** Edit mode press: grab a waypoint or the line of the selected road, or
+   *  select the road under the cursor. Pick reach scales with zoom. */
+  private cityRoadEditPress(w: Vec2): void {
+    const wpp =
+      this.viewMode === '3d'
+        ? (this.viewport3d?.worldPerPixel(w.x, w.z) ?? 0.1)
+        : 1 / Math.max(1e-3, this.cam.pxPerYard);
+    const result = this.roadEdit.press(w, {
+      waypoint: Math.max(1.5, wpp * 12),
+      road: Math.max(4, wpp * 10),
     });
+    if (result.refusal === 'tooLong') this.toasts.info(t('editor.city.roadPointLimit'));
+    this.inspector.refresh();
+  }
+
+  /** The selected road's handles: a dot per waypoint sized to stay
+   *  clickable at any zoom, the held one highlighted. */
+  private cityRoadEditPreview(
+    points: readonly { x: number; z: number }[] | null,
+    highlight: number | null,
+  ): void {
+    const v = this.viewport3d;
+    // The path preview group is shared (wall and road drafts, the Mob tool's
+    // patrol route): only the Roads tab's Edit mode may draw or clear it.
+    if (!v || this.tool !== 'city' || this.citySubtool !== 'road' || this.cityRoadMode !== 'edit') {
+      this.roadPreviewDrawn = null;
+      return;
+    }
+    if (!points) {
+      if (this.roadPreviewDrawn) v.setCityPathPreview(null);
+      this.roadPreviewDrawn = null;
+      return;
+    }
+    const mid = points[Math.floor(points.length / 2)];
+    // Quantized so a hover that does not change the zoom redraws nothing.
+    const dotRadius =
+      Math.round(Math.min(6, Math.max(0.45, v.worldPerPixel(mid.x, mid.z) * 6)) * 20) / 20;
+    const last = this.roadPreviewDrawn;
+    if (last && last.points === points && last.highlight === highlight && last.r === dotRadius) {
+      return;
+    }
+    this.roadPreviewDrawn = { points, highlight, r: dotRadius };
+    v.setCityPathPreview(points, ROAD_EDIT_PREVIEW_COLOR, { highlight, dotRadius });
+  }
+
+  private cityDeleteRoadPoint(): void {
+    if (this.roadEdit.deleteWaypoint() === 'tooShort') {
+      this.toasts.info(t('editor.city.roadPointTooShort'));
+    }
+  }
+
+  /** The Edit mode inspector's view of the selected road. */
+  private cityRoadSelection(): CityRoadSelection | null {
+    const ref = this.roadEdit.selected;
+    const points = ref ? roadPoints(this.cityRoadLayers(), ref) : null;
+    if (!ref || !points) return null;
+    const waypoint = this.roadEdit.selectedWaypoint;
+    if (ref.kind === 'authored') {
+      const n = (this.map.roadDefs ?? []).findIndex((d) => d.id === ref.id) + 1;
+      return {
+        ref,
+        label: t('editor.city.roadAuthored', { n: formatNumber(n) }),
+        points: points.length,
+        waypoint,
+        edited: false,
+      };
+    }
+    return {
+      ref,
+      label: t('editor.city.roadBuiltin', { n: formatNumber(ref.index + 1) }),
+      points: points.length,
+      waypoint,
+      edited: builtinRoadState(this.map.roadEdits, ref.index) === 'edited',
+    };
+  }
+
+  /** Select a road from the panel list and frame it in the viewport. */
+  private citySelectRoad(ref: RoadRef): void {
+    this.roadEdit.select(ref);
+    const points = this.roadEdit.selectedPoints();
+    const b = points ? polylineBounds(points, 0) : null;
+    if (b) {
+      const extent = Math.max(15, Math.max(b.maxX - b.minX, b.maxZ - b.minZ) * 0.35);
+      this.viewport3d?.focusOn((b.minX + b.maxX) / 2, (b.minZ + b.maxZ) / 2, extent);
+      // The handles size from the camera, which lands on the next frame.
+      requestAnimationFrame(() => requestAnimationFrame(() => this.roadEdit.syncPreview()));
+    }
+    this.inspector.refresh();
   }
 
   private citySavePrefab(name: string): boolean {
@@ -8991,6 +9139,31 @@ export class EditorApp {
           points: r.points.length,
         })),
       deleteRoad: (id) => this.cityDeleteRoad(id),
+      getRoadMode: () => this.cityRoadMode,
+      setRoadMode: (mode) => {
+        if (mode === this.cityRoadMode) return;
+        this.cityRoadPoints = [];
+        this.roadEdit.select(null);
+        this.cityRoadMode = mode;
+        this.viewport3d?.setCityPathPreview(null);
+        this.roadPreviewDrawn = null;
+        this.citySyncPathPreview();
+      },
+      roadSelection: () => this.cityRoadSelection(),
+      selectRoad: (ref) => this.citySelectRoad(ref),
+      deleteRoadPoint: () => this.cityDeleteRoadPoint(),
+      removeSelectedRoad: () => {
+        if (this.roadEdit.removeSelected()) this.toasts.info(t('editor.city.roadRemoved'));
+      },
+      resetRoad: (index) => {
+        this.roadEdit.resetBuiltin(index);
+      },
+      builtinRoadList: () =>
+        (this.map.content.roads ?? BUILTIN_WORLD.roads).map((_road, index) => ({
+          index,
+          label: t('editor.city.roadBuiltin', { n: formatNumber(index + 1) }),
+          state: builtinRoadState(this.map.roadEdits, index),
+        })),
       prefabList: () => this.cityPrefabs.map((p) => ({ name: p.name, count: p.items.length })),
       savePrefab: (name) => this.citySavePrefab(name),
       armedPrefab: () => this.cityArmedPrefab,
@@ -9025,6 +9198,9 @@ export class EditorApp {
   private cityToolReset(): void {
     this.cityWallPoints = [];
     this.cityRoadPoints = [];
+    this.roadEdit.endDrag();
+    this.roadEdit.reset();
+    this.roadPreviewDrawn = null;
     this.cityRouteNpcKey = null;
     this.cityRoutePoints = [];
     this.cityArmedPrefab = null;
@@ -9530,7 +9706,7 @@ export class EditorApp {
           maxZ: z.zMax,
         })),
       sceneOverlay: () => ({
-        roads: this.map.content.roads ?? [],
+        roads: this.activeWorld.roads,
         placements: this.map.placements.map((placement) => ({
           x: placement.x,
           z: placement.z,
@@ -10381,6 +10557,7 @@ export class EditorApp {
   /** A moved placement's seat: detached to float where it is (the default),
    *  or re-seated on the ground under its new spot when snapping is on. */
   private moveSeat(index: number): void {
+    if (this.map.meta.overworldBase && !this.snapToGroundOnMove) return;
     if (!this.snapToGroundOnMove) {
       this.detachPlacement(index);
       return;
@@ -13958,57 +14135,70 @@ export class EditorApp {
       this.toasts.success(t('editor.status.selectionPasted', { count: added }));
       return;
     }
+    // Mobs and NPCs land centred on the cursor (entity_paste.ts) and update
+    // the editor in place, never with a whole-world reload.
+    const target = this.hover3dWorld ?? this.cursorWorld;
     if (clipboard.kind === 'mobs') {
-      const room = capRoom(this.camps().length, MAX_CAMPS);
-      const accepted = pasteCampSelection(clipboard.items.slice(0, room), 2, 2);
-      if (accepted.length < clipboard.items.length) {
-        this.toasts.error(t('editor.status.entityCapReached'));
-      }
-      if (accepted.length === 0) return;
-      const start = appendSpan(this.camps(), accepted);
       this.clearMobSelection();
+      const done = pasteMobs(this.entityPasteHost(), clipboard.items, target, MAX_CAMPS);
+      if (!done || done.capped) this.toasts.error(t('editor.status.entityCapReached'));
+      if (!done) return;
       this.map.meta.updatedAt = now();
-      this.refreshEntityWorld();
-      this.pushUndo({
-        label: 'paste-mobs',
-        undo: () => {
-          removeSpan(this.camps(), start, accepted);
-          this.refreshEntityWorld();
-        },
-        redo: () => {
-          this.camps().push(...accepted);
-          this.refreshEntityWorld();
-        },
-      });
+      this.pushUndo({ label: 'paste-mobs', undo: done.undo, redo: done.redo });
       this.inspector.refresh();
-      this.toasts.success(t('editor.status.selectionPasted', { count: accepted.length }));
+      this.toasts.success(t('editor.status.selectionPasted', { count: done.count }));
       return;
     }
 
-    const npcs = this.map.content.npcs as Record<string, NpcDef>;
-    const room = capRoom(Object.keys(npcs).length, MAX_NPCS);
-    const accepted = pasteNpcSelection(npcs, clipboard.items.slice(0, room), 2, 2);
-    if (accepted.length < clipboard.items.length) {
-      this.toasts.error(t('editor.status.entityCapReached'));
-    }
-    if (accepted.length === 0) return;
-    const insert = (): void => {
-      for (const { key, npc } of accepted) npcs[key] = npc;
-      this.selectedNpcKeys = new Set(accepted.map(({ key }) => `npc:${key}`));
-      this.selectedKey = `npc:${accepted[accepted.length - 1].key}`;
-      this.refreshEntityWorld();
+    const done = pasteNpcs(this.entityPasteHost(), clipboard.items, target, MAX_NPCS);
+    if (!done || done.capped) this.toasts.error(t('editor.status.entityCapReached'));
+    if (!done) return;
+    const select = (): void => {
+      this.selectedNpcKeys = new Set(done.keys.map((key) => `npc:${key}`));
+      this.selectedKey = `npc:${done.keys[done.keys.length - 1]}`;
+      this.viewport3d?.setSelectedRuntimeNpcs(this.selectedNpcKeys);
     };
-    const remove = (): void => {
-      for (const { key } of accepted) delete npcs[key];
-      this.selectedKey = null;
-      this.clearNpcSelection();
-      this.refreshEntityWorld();
-    };
-    insert();
+    select();
     this.map.meta.updatedAt = now();
-    this.pushUndo({ label: 'paste-npcs', undo: remove, redo: insert });
+    this.pushUndo({
+      label: 'paste-npcs',
+      undo: () => {
+        this.selectedKey = null;
+        this.clearNpcSelection();
+        done.undo();
+      },
+      redo: () => {
+        done.redo();
+        select();
+      },
+    });
     this.inspector.refresh();
-    this.toasts.success(t('editor.status.selectionPasted', { count: accepted.length }));
+    this.toasts.success(t('editor.status.selectionPasted', { count: done.count }));
+  }
+
+  /** The in-place camp and NPC updates a mob or NPC paste runs through. */
+  private entityPasteHost(): EntityPasteHost {
+    return {
+      camps: () => this.camps(),
+      npcs: () => this.map.content.npcs as Record<string, NpcDef>,
+      campsChanged: () => this.afterCampsChanged(),
+      npcAdded: (npc) => {
+        this.viewport3d?.addMapNpc(npc);
+        this.afterNpcListChanged();
+      },
+      npcRemoved: (id) => {
+        this.viewport3d?.removeMapNpc(id);
+        this.afterNpcListChanged();
+      },
+    };
+  }
+
+  /** An NPC joined or left the map: refresh the handles, not the 3D world. */
+  private afterNpcListChanged(): void {
+    this.entities = buildEntities(this.content);
+    this.base = snapshot(this.entities);
+    this.canvasDirty = true;
+    this.markDirty();
   }
 
   private duplicateSelectedPlacement(): void {
@@ -15556,6 +15746,7 @@ export class EditorApp {
     // An open transform burst commits first, so Ctrl+Z reverts THAT burst.
     this.flushTransformCommit();
     this.objectMoves.commitPending();
+    this.roadEdit.endDrag();
     if (this.undo.undo()) {
       this.markDirty();
       this.inspector.refresh();
@@ -15567,6 +15758,7 @@ export class EditorApp {
     this.buildingWorkspace?.cancel();
     this.flushTransformCommit();
     this.objectMoves.commitPending();
+    this.roadEdit.endDrag();
     if (this.undo.redo()) {
       this.markDirty();
       this.inspector.refresh();
@@ -15575,6 +15767,10 @@ export class EditorApp {
   }
 
   private markDirty(): void {
+    if (liveWorldCottagesChanged(this.activeWorld, this.map)) {
+      this.terrainEditsMutated();
+      this.refreshTerrain(null);
+    }
     this.dirty = true;
     this.editGen.bump();
     this.topbar.setDirty(true);
@@ -15873,6 +16069,16 @@ export class EditorApp {
    * zip, which Import reads back on any computer.
    */
   private async exportBundle(): Promise<void> {
+    if (this.map.meta.overworldBase) {
+      try {
+        downloadMap(this.map);
+        this.toasts.success(t('editor.status.exported', { name: this.map.meta.name }));
+      } catch (error) {
+        console.error('Live-world export rejected', error);
+        this.toasts.error(t('editor.status.exportBlockedInvalid'));
+      }
+      return;
+    }
     this.map.meta.updatedAt = now();
     const safe = this.map.meta.name.replace(/[^a-z0-9-_]+/gi, '-').toLowerCase() || 'map';
     try {
@@ -16526,11 +16732,14 @@ export class EditorApp {
     // A region map (Open -> Shipped -> Ravenrift) can be written back to the
     // game; every other document cannot, so the action only exists for it.
     this.topbar.setRegionExport(import.meta.env.DEV && map.regionSource !== undefined);
-    this.topbar.setPublishEnabled(import.meta.env.DEV);
+    this.topbar.setPublishEnabled(import.meta.env.DEV && !this.map.meta.overworldBase);
     this.cityActiveWallId = null;
     this.cityWallRuntime.clear();
     this.cityWallUpdateRevision++;
     this.cityWallFinishing = false;
+    // The open road gesture belonged to the previous document: drop it
+    // before cityToolReset would commit it against this one.
+    this.roadEdit.reset();
     this.cityToolReset();
     this.content = map.content;
     this.entities = buildEntities(map.content);
@@ -16565,6 +16774,7 @@ export class EditorApp {
     if (!preserveViewportTerrain) this.rebuildActiveWorld();
     this.applySkybox();
     this.topbar.setMapName(map.meta.name);
+    showLiveWorldNotice(this.root, !!map.meta.overworldBase);
     this.topbar.setDirty(false);
     this.syncUndoUi();
     this.topbar.setForkEnabled(this.io.linkFor(map.meta.id) !== null);
@@ -16797,6 +17007,27 @@ export class EditorApp {
     // City Build: Enter finishes the in-progress wall/road/route, Delete or
     // Backspace removes one node, Escape cancels, and R rotates the kit piece.
     if (this.tool === 'city') {
+      // Roads Edit mode: Delete removes the selected waypoint, Escape lets go
+      // of the selected road.
+      if (this.citySubtool === 'road' && this.cityRoadMode === 'edit') {
+        if ((ev.key === 'Delete' || ev.key === 'Backspace') && this.roadEdit.selected) {
+          // The held waypoint, else the whole road (undo brings it back).
+          ev.preventDefault();
+          if (this.roadEdit.selectedWaypoint !== null) this.cityDeleteRoadPoint();
+          else if (this.roadEdit.removeSelected()) {
+            this.toasts.info(t('editor.city.roadRemoved'));
+          }
+          this.inspector.refresh();
+          return;
+        }
+        // Nothing to finish in Edit mode.
+        if (ev.key === 'Enter') return;
+        if (ev.key === 'Escape' && this.roadEdit.selected) {
+          this.roadEdit.select(null);
+          this.inspector.refresh();
+          return;
+        }
+      }
       if (ev.key === 'Enter') {
         ev.preventDefault();
         this.cityFinishActivePath();
@@ -18359,7 +18590,7 @@ export class EditorApp {
     if (this.canvasDirty && this.viewMode === '2d') {
       draw(this.ctx, this.cam, this.vp(), {
         entities: this.visibleEntities(),
-        roads: this.map.content.roads ?? [],
+        roads: this.activeWorld.roads,
         selectedKey: this.selectedKey,
         hoverKey: this.hoverKey,
         terrainEdits: this.map.terrainEdits,

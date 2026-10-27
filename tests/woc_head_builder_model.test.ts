@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { encodeDesignCode } from '../src/render/characters/design_code_core';
 import { DEFAULT_APPEARANCE, WOC_BODY_SCALE_RANGE } from '../src/render/characters/modular';
 import {
   creationFocusPose,
@@ -19,10 +20,14 @@ import {
   categoryLabelKey,
   categorySections,
   EYE_BROW_MORPHS,
+  FACE_CODE_ERROR_KEYS,
   FACE_MORPHS,
+  faceCode,
   focusForCategory,
   hexToHsl,
   hslToCss,
+  importedStatusKey,
+  importFaceCode,
   matchBrowsToHair,
   matchSwatch,
   morphShown,
@@ -67,6 +72,7 @@ const sliders = (ss: readonly WocBuilderSection[]) =>
 
 describe('menu', () => {
   it('lists the categories in the creator order, Facial Hair after Hairstyle', () => {
+    // Share is not among them: the footer button opens its page
     expect(WOC_BUILDER_CATEGORIES).toEqual([
       'bodyType',
       'skinTone',
@@ -88,6 +94,8 @@ describe('menu', () => {
       expect(focusForCategory(c)).toBe('face');
     }
     expect(focusForCategory('facialHair')).toBe('face');
+    // the face being shared (or loaded) is what the camera shows
+    expect(focusForCategory('share')).toBe('face');
   });
 
   it('roves the menu with arrows, Home and End, wrapping at the ends', () => {
@@ -98,6 +106,11 @@ describe('menu', () => {
     expect(stepCategory('face', 'Home')).toBe('bodyType');
     expect(stepCategory('face', 'End')).toBe('piercings');
     expect(stepCategory('face', 'a')).toBeNull();
+  });
+
+  it("labels the Share page with the creator's existing Share word", () => {
+    expect(categoryLabelKey('share')).toBe('auth.shareTab');
+    expect(categoryLabelKey('piercings')).toBe('auth.wocBuilder.cat.piercings');
   });
 
   it('parks a radio group Tab stop on the checked radio', () => {
@@ -618,6 +631,7 @@ describe('every key the builder renders exists in the English catalog', () => {
       const a: WocFaceAppearance = readFace({ gender });
       for (const cat of WOC_BUILDER_CATEGORIES) {
         for (const s of categorySections(cat, a)) {
+          if (s.kind === 'share') continue; // its fixed strings are added below
           if (s.labelKey) keys.add(s.labelKey);
           if (s.kind === 'options') {
             for (const o of s.options) {
@@ -637,6 +651,21 @@ describe('every key the builder renders exists in the English catalog', () => {
       keys.add(def.labelKey);
       for (const slot of WOC_HEAD_SLOTS) for (const v of def.slots[slot]) keys.add(v.labelKey);
     }
+    // the Share page: its title, its fixed strings, every status line it can show
+    for (const k of [
+      categoryLabelKey('share'),
+      'auth.designCode',
+      'auth.designCodeHint',
+      'auth.copyCode',
+      'auth.importCode',
+      'auth.designCodeCopied',
+      'auth.designCodeCopyManual',
+      importedStatusKey(false),
+      importedStatusKey(true),
+      ...Object.values(FACE_CODE_ERROR_KEYS),
+    ]) {
+      keys.add(k);
+    }
     const missing = [...keys].filter((k) => !hasTranslation(k, 'en'));
     expect(missing).toEqual([]);
     // anti-vacuity: the new labels are among the ones checked
@@ -649,9 +678,150 @@ describe('every key the builder renders exists in the English catalog', () => {
       'auth.wocHead.hair.curls',
       'auth.wocHead.mouth.cupids_bow',
       'auth.wocHead.brows.soft_arch',
+      'auth.shareTab',
+      'auth.designCodeErrMalformed',
+      'auth.designCodeImportedPartial',
     ]) {
       expect(keys.has(k), k).toBe(true);
     }
+  });
+});
+
+describe('the Share category (the face code)', () => {
+  // the Type B head's first variant that is not its default, per slot
+  const typeB = WOC_HEAD_TYPES.b;
+  const offDefault = (slot: (typeof WOC_HEAD_SLOTS)[number]): string =>
+    (typeB.slots[slot].find((x) => x.id !== typeB.defaults[slot]) ?? typeB.slots[slot][0]).id;
+  // a face with every field off its default, so a field the code dropped shows
+  const styled = (): WocFaceAppearance =>
+    readFace({
+      gender: 'female',
+      bodyScale: 0.97,
+      skinHue: 21,
+      skinSat: 0.42,
+      skinLight: 0.38,
+      eyeHue: 176,
+      eyeSat: 0.45,
+      eyeLight: 0.34,
+      hairHue: 6,
+      hairSat: 0.7,
+      hairLight: 0.38,
+      browHue: 220,
+      browSat: 0.1,
+      browLight: 0.07,
+      headHair: offDefault('hair'),
+      headBeard: offDefault('beard'),
+      headNose: offDefault('nose'),
+      headMouth: offDefault('mouth'),
+      headBrows: offDefault('brows'),
+      headEars: offDefault('ears'),
+      headEyes: offDefault('eyes'),
+      headPiercing: WOC_PIERCING_IDS.find((id) => id !== typeB.defaults.piercing),
+      headShape: {
+        eyeSpacing: -0.4,
+        eyeSize: 0.25,
+        eyeTilt: 0.3,
+        browHeight: -0.5,
+        chinWidth: 0.2,
+      },
+    });
+
+  it('shows one share section carrying the face as a face code', () => {
+    const a = styled();
+    const ss = categorySections('share', a);
+    expect(ss).toHaveLength(1);
+    const s = only(ss[0], 'share');
+    expect(s.code).toBe(faceCode(a));
+    expect(s.code.startsWith('WOC1; body=female; size=97;')).toBe(true);
+  });
+
+  it('round-trips a face through its code, every field the builder edits', () => {
+    const a = styled();
+    // anti-vacuity: the styled face really is off the default in every field
+    // (the body type against the default look's, the rest against its own type's)
+    expect(a.gender).not.toBe(DEFAULT_APPEARANCE.gender);
+    const plain = readFace({ gender: 'female' });
+    for (const k of Object.keys(a) as (keyof WocFaceAppearance)[]) {
+      if (k !== 'gender') expect(a[k], k).not.toEqual(plain[k]);
+    }
+    const r = importFaceCode(faceCode(a));
+    if (!r.ok) throw new Error(r.reason);
+    expect(r.partial).toBe(false);
+    expect(r.face.gender).toBe(a.gender);
+    expect(r.face.bodyScale).toBeCloseTo(a.bodyScale, 6);
+    for (const k of ['headHair', 'headBeard', 'headNose', 'headMouth', 'headBrows'] as const) {
+      expect(r.face[k], k).toBe(a[k]);
+    }
+    expect(r.face.headEars).toBe(a.headEars);
+    expect(r.face.headEyes).toBe(a.headEyes);
+    expect(r.face.headPiercing).toBe(a.headPiercing);
+    for (const k of [
+      'skinHue',
+      'skinSat',
+      'skinLight',
+      'eyeHue',
+      'eyeSat',
+      'eyeLight',
+      'hairHue',
+      'hairSat',
+      'hairLight',
+      'browHue',
+      'browSat',
+      'browLight',
+    ] as const) {
+      expect(r.face[k], k).toBeCloseTo(a[k], 2);
+    }
+    for (const k of WOC_HEAD_MORPH_KEYS) {
+      expect(r.face.headShape[k], k).toBeCloseTo(a.headShape[k], 6);
+    }
+    // and the code of what came back is the code that went in
+    expect(faceCode(r.face)).toBe(faceCode(a));
+  });
+
+  it('imports a full design code too: it is the same format', () => {
+    const a = styled();
+    const full = encodeDesignCode({ ...DEFAULT_APPEARANCE, ...a });
+    expect(full.length).toBeGreaterThan(faceCode(a).length);
+    const r = importFaceCode(full);
+    if (!r.ok) throw new Error(r.reason);
+    expect(r.partial).toBe(false);
+    expect(faceCode(r.face)).toBe(faceCode(a));
+  });
+
+  it('marks an import partial when the code named something it could not keep', () => {
+    const unknown = importFaceCode(`${faceCode(styled())}; sparkle=9`);
+    expect(unknown.ok && unknown.partial).toBe(true);
+    const offCatalog = importFaceCode('WOC1; body=male; headhair=dreadlocks');
+    expect(offCatalog.ok && offCatalog.partial).toBe(true);
+    if (offCatalog.ok) expect(offCatalog.face.headHair).toBe(readFace({}).headHair);
+  });
+
+  it('fails a paste that is not a face code, with the reason the status line reads', () => {
+    for (const [raw, reason] of [
+      ['', 'empty'],
+      ['hello there', 'header'],
+      ['WOC2; body=male', 'version'],
+      ['WOC1; body', 'malformed'],
+    ] as const) {
+      const r = importFaceCode(raw);
+      expect(r, raw).toEqual({ ok: false, reason });
+    }
+    // each reason reads its own line (an empty box never says "a newer version")
+    expect(FACE_CODE_ERROR_KEYS).toEqual({
+      empty: 'auth.designCodeErrEmpty',
+      header: 'auth.designCodeErrHeader',
+      version: 'auth.designCodeErrVersion',
+      malformed: 'auth.designCodeErrMalformed',
+    });
+    expect(importedStatusKey(false)).toBe('auth.designCodeImported');
+    expect(importedStatusKey(true)).toBe('auth.designCodeImportedPartial');
+  });
+
+  it('reads a code a chat message wrapped in backticks, behind a label', () => {
+    const a = styled();
+    const r = importFaceCode(`Here is my ranger: \`${faceCode(a)}\``);
+    if (!r.ok) throw new Error(r.reason);
+    expect(faceCode(r.face)).toBe(faceCode(a));
   });
 });
 

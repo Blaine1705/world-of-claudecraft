@@ -193,6 +193,7 @@ export class WocAtlasSwap {
   private drop(): void {
     this.generation++;
     this.settled = false;
+    this.prepared = false;
     this.scratch?.removeFromParent();
     this.scratch = null;
     if (this.claims) releaseTintedMaterials(this.claims);

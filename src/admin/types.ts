@@ -561,6 +561,9 @@ export interface AccountDetail {
   online: boolean;
   bannedAt: string | null;
   suspendedUntil: string | null;
+  // Set when the player deactivated the account themselves; the moderation
+  // actions offer the audited reactivate while it is non-null.
+  deactivatedAt: string | null;
   moderationReason: string;
   chatMutedUntil: string | null;
   chatMuteReason: string;
@@ -571,6 +574,9 @@ export interface AccountDetail {
   // The operator-applied Cheater mark: remaining played-second budget, audited
   // reason, and when it was applied. Null when the account is not marked.
   cheaterMark?: { secondsRemaining: number; reason: string; setAt: string | null } | null;
+  // The operator world quest block: audited reason and when it was applied. Null
+  // when the account is not blocked.
+  worldQuestBlock?: { reason: string; blockedAt: string } | null;
   lastLoginIp: string | null;
   playtimeSeconds: number;
   characters: {
@@ -707,6 +713,38 @@ export interface UnstuckHotspot {
   cancelled: number;
   failed: number;
   lastUsedAt: string;
+}
+
+/** One item_ledger row (server/item_ledger_db.ts). */
+export interface ItemLedgerEvent {
+  id: number;
+  guid: string;
+  itemId: string;
+  quality: string;
+  kind: 'mint' | 'transfer' | 'modify' | 'consume' | 'derive';
+  characterId: number | null;
+  accountId: number | null;
+  characterName: string;
+  source: string;
+  zone: string | null;
+  /** The step's short note (a rank, an enchant id, what the copy became). */
+  detail: string | null;
+  /** The other copy a swap or derivation names. */
+  relatedGuid: string | null;
+  occurredAt: string;
+  createdAt: string;
+}
+
+export interface ItemLedgerPage {
+  events: ItemLedgerEvent[];
+  limit: number;
+  hasMore: boolean;
+  nextBeforeId: number | null;
+}
+
+export interface ItemLedgerHistory {
+  guid: string;
+  events: ItemLedgerEvent[];
 }
 
 export interface UnstuckReportsData {
@@ -930,6 +968,8 @@ export interface PerfCaptureResult {
   movementRejectedAnchoredWindowTotal: number;
   movementRejectedSanityBoundTotal: number;
   movementResyncsTotal: number;
+  movementPlayoutGrowthsTotal: number;
+  movementPlayoutShrinksTotal: number;
   profile: {
     samples: number;
     windowTicks: number;

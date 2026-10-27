@@ -21,6 +21,7 @@ import { isPlayerRemovableAura } from '../aura_classify';
 import {
   GAMBLE,
   GAMBLE_FORTUNES,
+  MEDALLION_USE_COOLDOWN_KEY,
   TRINKET_AURA,
   TRINKET_SPECS,
   type TrinketPassive,
@@ -573,6 +574,7 @@ export function useWornTrinket(
     }
   }
   p.cooldowns.set(key, cooldown);
+  if (use.kind === 'defiance') p.cooldowns.set(MEDALLION_USE_COOLDOWN_KEY, cooldown);
   return true;
 }
 

@@ -676,11 +676,12 @@ export function farGroundColor(
     }
   }
 
-  // marsh mud: pull the ground toward dark wet earth where the marsh blends in
+  // marsh mud: keep only a subtle warm-earth hint so distant marsh hills hold
+  // the vale meadow green
   const marshW = biomeWeightAt('marsh', x, z);
   if (marshW > 0) {
-    lerp3(out, TONE.dirtDark, marshW * 0.45);
-    grassW *= 1 - marshW * 0.45;
+    lerp3(out, TONE.dirtDark, marshW * 0.08);
+    grassW *= 1 - marshW * 0.08;
   }
 
   // far forest mass: clumped canopy paint over gentle, dry, low ground

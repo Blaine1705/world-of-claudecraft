@@ -14,12 +14,10 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import {
-  createMoonkinEffectMaterial,
   createShadowformEffectMaterial,
   createShadowformStandInMaterial,
 } from '../src/render/characters/effect_materials';
 import { applyEnvSheen } from '../src/render/characters/env_sheen';
-import { applySoulRendOverlay } from '../src/render/characters/soul_rend_overlay';
 import {
   createSurfaceResponseMaterial,
   surfaceResponseUniforms,
@@ -443,13 +441,12 @@ describe('the hair and brow transfer reads a texel by its luminance alone', () =
   const AUBURN: Rgb = hexToLinear(0x8a4a2a);
   const GREY: Rgb = [lum(AUBURN), lum(AUBURN), lum(AUBURN)];
   // the colours a hair material draws with: white on every normal draw (the packs' hair
-  // materials are white, and the low tier's lift lerps toward white), and each effect overlay
-  // that recolours it. Shadowform is no longer one: it keeps the material's own colour and
+  // materials are white, and the low tier's lift lerps toward white), and arbitrary coloured inputs for the transfer regression. Shadowform is no longer one: it keeps the material's own colour and
   // darkens in the shader, by height (the last test of this block pins that it stays white).
   const NORMAL: Rgb = [1, 1, 1];
   const OVERLAYS: Record<string, Rgb> = {
-    moonkin: colourOf(createMoonkinEffectMaterial(new THREE.MeshStandardMaterial())),
-    soulRend: colourOf(applySoulRendOverlay(new THREE.MeshStandardMaterial())),
+    violet: hexToLinear(0x9d6bff),
+    blue: hexToLinear(0x287bcf),
   };
   const TARGETS: Rgb[] = [hexToLinear(0x2b1a12), hexToLinear(0xe6cc8a), hexToLinear(0xb0381e)];
   const REFS = [

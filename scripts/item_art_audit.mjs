@@ -163,15 +163,22 @@ const build = await buildItemArtAudit({
     // sheet pages, re-measured with `--verify-only` (116 generated Heroic definitions,
     // 86 with their own WebP, 30 weapon art aliases).
     // Buddy restoration adds 34 painted owners and two enumerated pending whistles.
-    catalogCount: 2039,
-    liveItemCount: 2068,
-    // Five referral rewards reuse existing art until their own paintings land.
-    pendingArtCount: 142,
+    // + the membership Staff of Changing (PR 4281): 2040 / 2069, re-measured with
+    // `--verify-only`.
+    // Completed Season 2 painted armor leaves the pending ledger, plus Nightwing Chimaera mount.
+    // Wobbles the Slime's reins add one owner and one live definition.
+    // + the sprite whistle and Lantern Hall seal/reins: 2186 owners / 2215 live items.
+    // Recovered Season 2 feral staff and eight jewelry items, each with its own art.
+    catalogCount: 2164,
+    liveItemCount: 2193,
+    // Companion items are removed; only the Infernal Quiver awaits artwork.
+    pendingArtCount: 1,
     generatedHeroicDefinitions: 116,
     heroicDefinitionsWithOwnWebp: 86,
     heroicWeaponArtAliases: 30,
-    sheetPageCount: 44,
-    groupCount: 28,
+    // Completed Season 2 icons add pages to the grouped review sheets.
+    sheetPageCount: 45,
+    groupCount: 26,
   },
 });
 assertItemArtAuditPass(build);

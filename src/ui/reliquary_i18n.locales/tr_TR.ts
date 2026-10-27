@@ -44,9 +44,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_wildheart_basin: {
     name: 'Yaban Yürek Çukuru',
+    desc: "Diş Lordu Canavar Efendisi, Obur Çiçek ve Zulgar'dan kendilerine özgü silahlar.",
   },
   conquerors_wildheart_basin_heroic: {
     name: 'Kahramanca: Yaban Yürek Çukuru',
+    desc: "Diş Lordu Canavar Efendisi, Obur Çiçek ve Çukurun Sesi Zulgar'dan yalnızca Kahramanca zorlukta düşen destansı eşyalar ve biblolar.",
   },
   conquerors_nythraxis: {
     name: 'Nythraxis Baskını',
@@ -142,11 +144,11 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_warfare_gallery: {
     name: 'Savaş Galerisi',
-    desc: 'Beş Savaş muharebe takımı, şerefle parça parça kazanılır.',
+    desc: 'Birinci sezonun beş Savaş muharebe takımı, şimdi altın karşılığında parça parça satılmaktadır.',
   },
   conquerors_warfare_armory: {
     name: 'Savaş Cephaneliği',
-    desc: 'Zorlukla kazanılmış şerefle satın alınan Savaş takıları ve silahları.',
+    desc: 'Zorlukla kazanılmış şerefle satın alınan Savaş takıları, silahları ve eşyaları.',
   },
   conquerors_vanguard_gallery: {
     name: 'Öncü Galerisi',

@@ -20,7 +20,7 @@ import {
   BUILTIN_WORLD,
   DUNGEON_X_THRESHOLD,
   DUNGEONS,
-  GATHER_NODES,
+  gatherNodesInActiveWorld,
   instanceOrigin,
   NPCS,
   setActiveWorldContent,
@@ -249,7 +249,7 @@ describe('interactable landmarks are solid (the v0.31 walk-through sweep)', () =
     let ore = 0;
     let wood = 0;
     let herb = 0;
-    for (const node of GATHER_NODES) {
+    for (const node of gatherNodesInActiveWorld()) {
       const body = GATHER_NODE_BODIES[node.type];
       if (!body) {
         expect(node.type).toBe('herb');

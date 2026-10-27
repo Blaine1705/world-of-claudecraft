@@ -141,7 +141,7 @@ describe.skipIf(!url)('referral card PostgreSQL transactions', () => {
   });
   it('settles tier five through the upgraded production buddy constraint exactly once', async () => {
     await pool.query(
-      "INSERT INTO account_buddies VALUES(10,ARRAY['horse','crystal_lich','forgemaw'])",
+      "INSERT INTO account_buddies VALUES(10,ARRAY['horse','crystal_lich','forgemaw','sapling'])",
     );
     await pool.query('INSERT INTO referral_progress(account_id,completed_count) VALUES(10,5)');
     await pool.query(
@@ -154,7 +154,7 @@ describe.skipIf(!url)('referral card PostgreSQL transactions', () => {
       FROM account_buddies b JOIN referral_progress p USING(account_id)
       JOIN referral_reward_outbox o USING(account_id) WHERE b.account_id=10`);
     const settled = (await read()).rows[0];
-    expect(settled.owned).toEqual(['crystal_lich', 'forgemaw', 'horse', 'sapling']);
+    expect(settled.owned).toEqual(['crystal_lich', 'forgemaw', 'horse', 'sapling', 'sprites']);
     expect(settled.rewarded_mask).toBe(16);
     expect(settled.delivered_at).toBeInstanceOf(Date);
     expect(await store.settleReward(row)).toBe(16);

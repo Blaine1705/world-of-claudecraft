@@ -1,12 +1,11 @@
 import * as THREE from 'three';
-import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { STABLE_PADDOCK } from '../sim/content/mounts';
 import {
-  BUILTIN_WORLD,
   DUNGEON_X_THRESHOLD,
   getActiveWorldContent,
   isBuiltinWorldActive,
+  isBuiltinWorldContent,
   WORLD_MAX_X,
   WORLD_MAX_Z,
   WORLD_MIN_Z,
@@ -26,7 +25,7 @@ import {
   WATER_LEVEL,
   zoneBiomeAt,
 } from '../sim/world';
-import { loadGltf, releaseGltf } from './assets/loader';
+import { type LoadedGltf, loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { attachBiomeHaze } from './biome_haze_field';
 import { applyCanopyDetail } from './canopy_detail';
@@ -117,7 +116,6 @@ import {
 import {
   gardenLushGrassAt,
   gardenMeadowTintAt,
-  inParterrePlot,
   parterreBushSpots,
   parterreFlowerTintAt,
 } from './garden_parterre_core';
@@ -134,6 +132,12 @@ import {
   grassCardProgramCacheKey,
   grassCollapseBandFor,
 } from './grass_cap_collapse_core';
+import { createWorldGrassEdgeTaperContext, taperTuftScales } from './grass_edge_taper_core';
+import {
+  attachGrassInteractionUniforms,
+  grassTuftInteractionGlsl,
+  stepSharedGrassInteraction,
+} from './grass_interaction_core';
 import { grassTuftCards, grassTuftHasCap } from './grass_tuft_cards_core';
 import { grassTuftWindGlsl, windGustGlsl } from './grass_tuft_wind';
 import {
@@ -301,7 +305,7 @@ const collapseRoleForUrl = (url: string): CollapseRole =>
       : 'plain';
 
 // kick off fetches at import; buildFoliage assumes the cache is populated
-const loadedModels = new Map<string, GLTF>();
+const loadedModels = new Map<string, LoadedGltf>();
 const extractedParts = new Map<string, ModelPart[]>();
 const foliageLoadTasks = new Map<string, Promise<void>>();
 
@@ -395,7 +399,7 @@ export const foliagePreloadInternalsForTest = {
 // (raw tints multiply into the albedo and read as grime).
 const PINE_TINT: Record<BiomeId, number> = {
   vale: 0x5c9e44,
-  marsh: 0x87966b,
+  marsh: 0x5c9e44,
   peaks: 0x629e74,
   beach: 0x92d462,
   desert: 0xa8a468,
@@ -414,7 +418,7 @@ const PINE_TINT: Record<BiomeId, number> = {
 };
 const OAK_TINT: Record<BiomeId, number> = {
   vale: 0x64be4a,
-  marsh: 0x8d9865,
+  marsh: 0x64be4a,
   peaks: 0x7eb46e,
   beach: 0x98d25e,
   desert: 0xb0a468,
@@ -433,7 +437,7 @@ const OAK_TINT: Record<BiomeId, number> = {
 };
 const ROCK_TINT: Record<BiomeId, number> = {
   vale: 0x989a94,
-  marsh: 0x565c4e,
+  marsh: 0x989a94,
   peaks: 0x949ca8,
   beach: 0xc2b89e,
   desert: 0xb08d6a,
@@ -452,7 +456,7 @@ const ROCK_TINT: Record<BiomeId, number> = {
 };
 const TRUNK_TINT: Record<BiomeId, number> = {
   vale: 0xecdfcc,
-  marsh: 0xd2d8bc,
+  marsh: 0xecdfcc,
   peaks: 0xd9dde4,
   beach: 0xf2e4c8,
   desert: 0xe6d2ac,
@@ -474,7 +478,7 @@ const TRUNK_TINT: Record<BiomeId, number> = {
 // then multiplies in the biome accent so authored casts survive.
 const GRASS_TINT: Record<BiomeId, number> = {
   vale: 0xc2e29a,
-  marsh: 0xbfc492,
+  marsh: 0xc2e29a,
   peaks: 0xc2cec8,
   beach: 0xecf0b4,
   desert: 0xdcc890,
@@ -516,7 +520,7 @@ const GRASS_ACCENT: Partial<Record<BiomeId, [number, number, number]>> = (() => 
 // GRASS_TINT_GAIN); above 1 because the kit albedo is much darker than the
 // meadow it stands in.
 const DRESS_GROUND_GAIN: readonly [number, number, number] = [1.82, 1.72, 1.18];
-const SWAMP_CANOPY_TINT = 0x7e8b58;
+const SWAMP_CANOPY_TINT = 0x64be4a;
 // Flowering-bush bloom colorways for the dusk realm (picked per instance).
 const DUSK_BLOOM_TINTS = [0x9e94ba, 0xd88fb0, 0xe8d8a0, 0x8fb8d8, 0xc88fd8];
 // the fen blooms brighter: rose, butter, white, sky, coral
@@ -534,7 +538,7 @@ const GARDEN_BLOOM_TINTS = [0xe84a6a, 0xf2a8c8, 0xffffff, 0xf2d0a0, 0xf2c94c, 0x
 const GALE_BLOOM_TINTS = [0xf29ab0, 0xffffff, 0xd8b0f2];
 const DRESS_TINT: Record<BiomeId, number> = {
   vale: 0x8ed25c,
-  marsh: 0x8d9865,
+  marsh: 0x8ed25c,
   peaks: 0x84b67c,
   beach: 0xa4d668,
   desert: 0xc0aa74,
@@ -1713,15 +1717,7 @@ function buildTrees(
   session: ImpostorSession | null,
 ): void {
   const modelUrls = foliageModelUrls();
-  // The Evergarden curates its trees: no random trees or boulders inside a
-  // parterre bed, and NO wild pines anywhere on the lawns (kind 'tree' is
-  // the pine; the realm keeps its oaks, topiary, and specimen elders)
-  const decos = generateDecorations(seed).filter(
-    (d) =>
-      !outsideFoliageBounds(d.x, d.z) &&
-      !inParterrePlot(d.x, d.z, 6) &&
-      !(d.kind === 'tree' && zoneBiomeAt(d.x, d.z) === 'garden'),
-  );
+  const decos = generateDecorations(seed).filter((d) => !outsideFoliageBounds(d.x, d.z));
   appendFarPlacementDecos(decos);
   const sourceDecos = !GFX.leanFoliage
     ? decos
@@ -2362,6 +2358,7 @@ function applyGrassShader(
     sh.uniforms.uTime = sharedUniforms.uTime;
     sh.uniforms.uPlayerPos = uniforms.uPlayerPos;
     sh.uniforms.uFadeFar = uniforms.uFadeFar;
+    attachGrassInteractionUniforms(sh.uniforms);
     const capDecl = hasCap
       ? `
         attribute float aCap;`
@@ -2374,6 +2371,8 @@ function applyGrassShader(
         `#include <common>
         uniform float uTime;
         uniform vec2 uPlayerPos;
+        uniform vec4 uGrassMove;
+        uniform vec4 uGrassWake;
         uniform float uFadeFar;
         varying vec2 vTuftWorld;${capDecl}`,
       )
@@ -2385,7 +2384,7 @@ function applyGrassShader(
         #else
           vec2 tuftBase = vec2(0.0);
         #endif${capCollapse}
-        ${wind}
+        ${wind}${grassTuftInteractionGlsl()}
         vTuftWorld = tuftBase;`,
       );
     // Every card used the exact up value here already. Keeping it as a shader
@@ -2558,8 +2557,15 @@ function buildGrassRing(
   const activeContent = getActiveWorldContent();
   const townExclusions = eastbrookGrassExclusions(
     activeContent.props.buildings,
-    activeContent === BUILTIN_WORLD,
+    isBuiltinWorldContent(activeContent),
     activeContent.services?.noticeboards ?? [],
+  );
+  const edgeTaperCtx = createWorldGrassEdgeTaperContext(
+    activeContent,
+    townExclusions,
+    GRASS_BUILDING_PADDING,
+    2.2,
+    15,
   );
 
   // high tier reads as a lush meadow: wider tufts with more blades; low keeps
@@ -2882,7 +2888,8 @@ function buildGrassRing(
         // The maker's painted no-grass discs. Third and last consumer of the
         // layer (sim/grass_clear.ts), which until now had none at all.
         if (grassClearedAt(activeContent.grassClear, x, z)) continue;
-        if (roadDistance(x, z) < 2.2 || insidePavedGrassExclusion(x, z)) continue;
+        const rd = roadDistance(x, z);
+        if (rd < 2.2 || insidePavedGrassExclusion(x, z)) continue;
         if (insideEastbrookGrassExclusion(townExclusions, x, z, GRASS_BUILDING_PADDING)) continue;
         if (insideAnyBuildingFootprint(activeContent.props.buildings, x, z, 0.85)) continue;
         // the stable yard is worked dirt; deck planks grow nothing through
@@ -2896,8 +2903,7 @@ function buildGrassRing(
         // anchors too, the frost/garden idiom, which is not what fen wants)
         const fenTuft = tuftBiome === 'fen';
         if (!fenTuft) {
-          const sx = ((lush ? 0.74 : 0.82) + r * (lush ? 0.96 : 1.04)) * (0.75 + lushness * 0.55);
-          const sy = sx * (0.75 + lushness * 0.25);
+          const [sx, sy] = taperTuftScales(edgeTaperCtx, x, z, rd, r, lush, lushness);
           q.setFromAxisAngle(up, r * 12.4);
           m.compose(v.set(x, h, z), q, sv.set(sx, sy, sx));
           im.setMatrixAt(n, m);
@@ -3347,6 +3353,7 @@ function buildGrassRing(
     ): void {
       uniforms.uPlayerPos.value.set(px, pz);
       uniforms.uFadeFar.value = activeRadius();
+      stepSharedGrassInteraction(px, pz, sharedUniforms.uTime.value);
       if (px > DUNGEON_X_THRESHOLD) {
         // dungeon instances live far outside the strip: no meadow indoors.
         // This branch returns before buildQueuedChunks, so a build paused

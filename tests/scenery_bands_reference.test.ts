@@ -25,7 +25,7 @@ describe('selected scenery prototype production parity', () => {
       palmMiddleTriangles: 256,
       farTriangles: 32,
       outerTriangles: 12,
-      giantViews: 4,
+      giantViews: 16,
       giantCellPixels: 256,
     });
     for (const kind of ['foliage', 'zone-instance', 'landmark'] as const) {
@@ -45,6 +45,8 @@ describe('selected scenery prototype production parity', () => {
         expect(giant === 'sprite').toBe(
           distance > (kind === 'foliage' ? 60 : 64) && distance <= 560,
         );
+        expect(lowSceneryRepresentation(item, 0, 0, false, 340) === 'absent').toBe(distance > 340);
+        expect(lowSceneryRepresentation(item, 0, 0, true, 340) === 'absent').toBe(distance > 340);
       }
     }
   });
@@ -116,5 +118,36 @@ describe('selected scenery prototype production parity', () => {
     expect(projection(port)).toEqual(projection(collectMiddleBandScenery({ scene, camera }, 630)));
     expect(port).toHaveLength(6);
     expect(port.every((item) => item.parts.length === 2)).toBe(true);
+
+    // Wraithwood ('haunt-features') and Veiled Hollow ('realm-flora') collect static
+    // TwistedTree_1 landmarks while skipping realm-flora instanced mushrooms/crystals
+    // and animated mist/foam children.
+    for (const rootName of ['haunt-features', 'realm-flora']) {
+      const root = new THREE.Group();
+      root.name = rootName;
+      const instanced = new THREE.InstancedMesh(new THREE.BoxGeometry(8, 8, 8), material, 2);
+      instanced.setMatrixAt(0, new THREE.Matrix4().makeTranslation(90, 0, 0));
+      instanced.setMatrixAt(1, new THREE.Matrix4().makeTranslation(120, 0, 0));
+      if (rootName === 'realm-flora') root.add(instanced);
+      const animated = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10), material);
+      animated.position.set(80, 0, 0);
+      animated.matrixAutoUpdate = true;
+      root.add(animated);
+      const tree = new THREE.Group();
+      const twisted = new THREE.Group();
+      twisted.name = 'TwistedTree_1';
+      const trunk = new THREE.Mesh(new THREE.BoxGeometry(12, 30, 12), material);
+      trunk.position.set(100, 15, 0);
+      twisted.add(trunk);
+      tree.add(twisted);
+      tree.updateWorldMatrix(true, true);
+      tree.traverse((node) => {
+        node.matrixAutoUpdate = false;
+      });
+      root.add(tree);
+      scene.add(root);
+    }
+    const withGiants = collectSceneryPlacements(scene.children, 0, 0, 630);
+    expect(withGiants).toHaveLength(8);
   });
 });

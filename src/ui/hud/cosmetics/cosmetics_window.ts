@@ -132,9 +132,13 @@ export class CosmeticsWindow {
     return {
       tab: this.tab,
       buddies: { owned: w.ownedBuddies(), pending: w.pendingBuddies(), active: p?.buddyKey ?? '' },
-      ownedMountSkins: c.mountSkinIds,
+      ownedMountSkins: [
+        ...c.mountSkinIds,
+        ...(c.collectibleMountSkinIds ?? []),
+        ...w.ownedMounts(),
+      ],
       wornMountSkin: p?.mountSkinId ?? null,
-      ownsAnyMount: w.ownedMounts().length > 0,
+      ownsAnyMount: true,
       weaponSkinIds: c.weaponSkinIds,
       weaponSkinLoadout: c.weaponSkinLoadout,
       applicableWeaponTypes: p

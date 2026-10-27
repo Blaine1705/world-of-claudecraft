@@ -13,6 +13,12 @@ vi.mock('../../src/render/gfx', () => ({
   sharedUniforms: { uTime: { value: 0 } },
 }));
 vi.mock('../../src/render/cel_shading', () => ({ celShadingSettings: () => state.look }));
+// The palette lab look is on by default since the genshin overhaul
+// (8bff2cec638), so importing post.ts boots its runtime chunk, whose graph
+// needs more of gfx.ts than this mock serves: the import then rejects
+// (an unhandled SyntaxError) while a case is rendering. The runtime only acts
+// on a live world, so this composer test runs without it.
+vi.mock('../../src/render/palette_lab/palette_lab_boot', () => ({}));
 vi.mock('../../src/render/render_dev_flags', () => ({
   renderLayerDisabled: (name: string) => name === 'n8ao' && state.aoOff,
 }));
@@ -55,14 +61,19 @@ describe('cel scene depth through the real composer', () => {
             expect(post.composer.renderTarget1.depthTexture).toBeNull();
             expect(post.composer.renderTarget2.depthTexture).toBeNull();
           }
-          // SMAA loads its two embedded lookup images asynchronously.
+          // SMAA loads its two embedded lookup images asynchronously, and flags
+          // the upload from the image's load EVENT, a task that can land after
+          // decode() resolves on a busy main thread: wait for the flag itself
+          // (three bumps `version`), or a first frame can draw with no lookups.
           for (const pass of post.composer.passes) {
             const smaa = pass as unknown as {
               _areaTexture?: THREE.Texture;
               _searchTexture?: THREE.Texture;
             };
             for (const texture of [smaa._areaTexture, smaa._searchTexture]) {
-              if (texture) await (texture.image as HTMLImageElement).decode();
+              if (!texture) continue;
+              await (texture.image as HTMLImageElement).decode();
+              await vi.waitFor(() => expect(texture.version).toBeGreaterThan(0));
             }
           }
           post.render();

@@ -6,6 +6,8 @@ import {
   DESIGN_FIELDS,
   decodeDesignCode,
   encodeDesignCode,
+  encodeWocFaceCode,
+  WOC_FACE_CODE_FIELDS,
 } from '../src/render/characters/design_code_core';
 import {
   BEARD_STYLES,
@@ -98,6 +100,92 @@ describe('design code field registry', () => {
     expect(code).toContain('body=male');
     expect(code).toContain('hair=crew');
     expect(code).toContain('skin=27/46/68');
+  });
+});
+
+describe('face code (the WOC face builder Share page)', () => {
+  /** The field ids a code lists, in order. */
+  const idsOf = (code: string) =>
+    code
+      .split('; ')
+      .slice(1)
+      .map((t) => t.slice(0, t.indexOf('=')));
+
+  it('carries exactly the fields the face builder edits, in a pinned order', () => {
+    // Same ids as the full code (a subset of the one wire format): a face code
+    // shared today must keep importing, so this list only ever grows.
+    expect(WOC_FACE_CODE_FIELDS).toEqual([
+      'body',
+      'size',
+      'skin',
+      'eyecol',
+      'haircol',
+      'browcol',
+      'headhair',
+      'headbeard',
+      'headnose',
+      'headmouth',
+      'headbrows',
+      'headears',
+      'headeyes',
+      'headpiercing',
+      'headshape',
+    ]);
+    const known = new Set(DESIGN_FIELDS.map((f) => f.id));
+    for (const id of WOC_FACE_CODE_FIELDS) expect(known.has(id), id).toBe(true);
+    const code = encodeWocFaceCode(DEFAULT_APPEARANCE);
+    expect(code.startsWith(`${DESIGN_CODE_HEADER}; `)).toBe(true);
+    expect(idsOf(code)).toEqual(WOC_FACE_CODE_FIELDS);
+    // nothing the face builder cannot show (the KayKit face, the outfit, makeup)
+    for (const id of ['eyes', 'brows', 'hair', 'beard', 'outfit', 'lips', 'face', 'lashes']) {
+      expect(idsOf(code), id).not.toContain(id);
+    }
+    expect(code.length).toBeLessThan(encodeDesignCode(DEFAULT_APPEARANCE).length);
+  });
+
+  it('spells every value exactly as the full code does', () => {
+    const app = normalizeAppearance({
+      ...DEFAULT_APPEARANCE,
+      gender: 'female',
+      headHair: 'ponytail',
+      headPiercing: 'septum',
+      browHue: 210,
+      browSat: 0.3,
+      browLight: 0.62,
+      bodyScale: 0.96,
+      headShape: { ...DEFAULT_APPEARANCE.headShape, eyeSize: 0.25 },
+    });
+    const full = encodeDesignCode(app).split('; ');
+    for (const token of encodeWocFaceCode(app).split('; ').slice(1)) {
+      expect(full, token).toContain(token);
+    }
+  });
+
+  it('round-trips the face through the one decoder', () => {
+    const app = normalizeAppearance({
+      ...DEFAULT_APPEARANCE,
+      gender: 'female',
+      headHair: 'ponytail',
+      headNose: 'button',
+      headEyes: 'hooded',
+      headPiercing: 'septum',
+      headBeard: 'none',
+      skinHue: 21,
+      skinSat: 0.46,
+      skinLight: 0.38,
+      browHue: 210,
+      browSat: 0.3,
+      browLight: 0.62,
+      bodyScale: 1.03,
+      headShape: { ...DEFAULT_APPEARANCE.headShape, eyeSize: 0.25, chinWidth: 0.2 },
+    });
+    const r = decodeOk(encodeWocFaceCode(app));
+    expect(r.ignored).toEqual([]);
+    expect(r.coerced).toEqual([]);
+    expect(encodeWocFaceCode(r.appearance)).toBe(encodeWocFaceCode(app));
+    expect(r.appearance.headHair).toBe('ponytail');
+    expect(r.appearance.bodyScale).toBeCloseTo(1.03, 6);
+    expect(r.appearance.headShape.chinWidth).toBeCloseTo(0.2, 6);
   });
 });
 
@@ -505,6 +593,43 @@ describe('design code import tolerance', () => {
     const r = decodeOk('WOC1; skin=27/46/5');
     expect(r.coerced).toEqual(['skin']);
     expect(r.appearance.skinLight).toBe(0.12);
+  });
+
+  // A code shared in a chat comes back wrapped: Discord's inline code and code
+  // blocks, quotes, a name in front, a full stop after it. Curly and angled
+  // quotes come from their code points, so this file stays plain ASCII.
+  const quoted = (open: number, close: number) =>
+    `${String.fromCodePoint(open)}WOC1; body=female; size=97${String.fromCodePoint(close)}`;
+  it.each([
+    ['inline code', '`WOC1; body=female; size=97`'],
+    ['a code block', '```\nWOC1; body=female; size=97\n```'],
+    ['a code block with a language tag', '```text\nWOC1; body=female; size=97```'],
+    ['double quotes', '"WOC1; body=female; size=97"'],
+    ['single quotes', "'WOC1; body=female; size=97'"],
+    ['curly double quotes', quoted(0x201c, 0x201d)],
+    ['curly single quotes', quoted(0x2018, 0x2019)],
+    ['angled quotes', quoted(0xab, 0xbb)],
+    // these two CLOSE on an opening-type mark (German low-high, Danish reversed)
+    ['German quotes', quoted(0x201e, 0x201c)],
+    ['Danish quotes', quoted(0xbb, 0xab)],
+    ['a label in front', "Ysolde's face: WOC1; body=female; size=97"],
+    ['a label and inline code', 'mine -> `WOC1; body=female; size=97`'],
+    ['a full stop after it', 'WOC1; body=female; size=97.'],
+  ])('reads a code wrapped in %s', (_label, raw) => {
+    const r = decodeOk(raw);
+    expect(r.appearance.gender).toBe('female');
+    expect(r.appearance.bodyScale).toBeCloseTo(0.97, 6);
+    expect(r.ignored).toEqual([]);
+    expect(r.coerced).toEqual([]);
+  });
+
+  it('still refuses what holds no code, or a newer one, inside the wrapping', () => {
+    expect(decodeDesignCode('`not a face code`')).toEqual({ ok: false, reason: 'header' });
+    // a header glued to a word is not a header
+    expect(decodeDesignCode('xwoc1; body=female')).toEqual({ ok: false, reason: 'header' });
+    expect(decodeDesignCode('`WOC2; body=female`')).toEqual({ ok: false, reason: 'version' });
+    // the wrapping is lifted; damage inside it still fails the paste
+    expect(decodeDesignCode('`WOC1; body`')).toEqual({ ok: false, reason: 'malformed' });
   });
 });
 

@@ -48,6 +48,14 @@ viewport, the 2D canvas/view/model trio).
   `object_moves_core.ts` (roster, record edit, pick) and
   `object_move_controller.ts` (select, drag, nudge, Reset, one undo per
   gesture) own the editor half; `3d/movable_objects_view.ts` the live preview.
+- **Legacy roads change by index, never in place**: a world-seeded map carries the
+  shipped dirt roads in `content.roads`, which the editor never rewrites; a moved
+  or removed one is a `MapDoc.roadEdits` entry keyed by its index, applied by
+  `road_edit_core.ts` `applyRoadEdits` in the active world and the projection
+  (`custom_map.ts`), and merged per key by the change-only push. Authored roads
+  (`MapDoc.roadDefs`) are edited by id. `road_edit_controller.ts` (select, drag,
+  bend, delete, remove, Reset, one undo per gesture) owns the City Build Roads
+  tab's Edit mode.
 - **The tutorial can never block**: `tutorial.ts` drives the pure `TutorialModel`
   (`tutorial_core.ts`) over real UI anchors; Skip is always available, a
   missing/hidden anchor step is skipped, Esc bails, and a blocked localStorage

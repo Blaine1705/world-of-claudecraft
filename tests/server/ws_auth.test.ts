@@ -142,7 +142,6 @@ function setup() {
     // meta. The default returns an empty grant so every existing case reaches game.join
     // unchanged; the stamp/resume branches are pinned in the bank-bonus block below.
     bankBonusForAccount: vi.fn(async () => ({ bonusSlots: 0, sources: [] })),
-    guestPayoutsForCycle: vi.fn(async () => 0),
     isConnectionRefused: vi.fn(() => false),
     bufferHandshakeMessages,
     requestMetadata: vi.fn(() => ({ ip: '1.2.3.4', userAgent: 'ua' })),
@@ -165,10 +164,12 @@ const authRaw = (over: Record<string, unknown> = {}) =>
   JSON.stringify({ t: ONLINE_WORLD_AUTH_TYPE, token: 'tok', character: 7, ...over });
 
 const errorFrame = (error: string) => JSON.stringify({ t: 'error', error });
+// rejectHandshake sends its frame uncompressed (no deflate stream for a rejected socket).
+const NO_COMPRESS = { compress: false };
 
 function expectSendThenClose(ws: FakeWs, frame: string) {
   expect(ws.send).toHaveBeenCalledTimes(1);
-  expect(ws.send).toHaveBeenCalledWith(frame);
+  expect(ws.send).toHaveBeenCalledWith(frame, NO_COMPRESS);
   expect(ws.close).toHaveBeenCalledTimes(1);
   // ws.send must fire before ws.close on every reject path.
   expect(ws.send.mock.invocationCallOrder[0]).toBeLessThan(ws.close.mock.invocationCallOrder[0]);
@@ -304,16 +305,17 @@ describe('membership character admission', () => {
     let now = 1000;
     const clock = vi.spyOn(Date, 'now').mockImplementation(() => now);
     try {
-      vi.mocked(deps.getCharacter).mockResolvedValue(baseChar({ membership_slot: true }));
+      vi.mocked(deps.getCharacter)
+        .mockResolvedValueOnce(baseChar({ membership_slot: true }))
+        .mockImplementationOnce(async () => {
+          now = 2000;
+          return baseChar({ membership_slot: true });
+        });
       deps.getMembership = async () => ({
         active: true,
         expiresAt: 1500,
         authorizedUntil: 31_000,
         recurringExpiresAt: null,
-      });
-      vi.mocked(deps.guestPayoutsForCycle).mockImplementation(async () => {
-        now = 2000;
-        return 0;
       });
       await createWsAuth(deps).authenticateWebSocket(asWs(ws), authRaw(), req);
       expectSendThenClose(ws, errorFrame('membership required for this character'));
@@ -449,6 +451,9 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     'auth-world',
     'auth-world-42', // previous Farshore salvage layout and model mapping
     'auth-world-43', // hull was still a collectible entity
+    'auth-world-45', // predates chunked Materials Vault snapshots
+    'auth-world-46', // withdrawn stone-foot collision and no vault chunks
+    'auth-world-47', // vault chunks, but still the withdrawn stone-foot collision
     // one epoch AHEAD of the live discriminator, derived so a layout-version
     // bump can never turn this row into the current epoch by accident (the
     // hardcoded 'auth-world-21' row did exactly that when 20 became 21)
@@ -489,16 +494,6 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     expect(resume.game.join).toHaveBeenCalledTimes(1);
     expect(resume.deps.acquireCharacterLease).not.toHaveBeenCalled();
     expect(resume.ws.send).not.toHaveBeenCalled();
-    expect(fresh.deps.guestPayoutsForCycle).toHaveBeenCalledTimes(1);
-    expect(resume.deps.guestPayoutsForCycle).not.toHaveBeenCalled();
-  });
-
-  it('passes the ledger guest usage into a fresh join before admission', async () => {
-    const { ws, game, deps, req } = setup();
-    vi.mocked(deps.guestPayoutsForCycle).mockResolvedValue(3);
-    await createWsAuth(deps).authenticateWebSocket(asWs(ws), authRaw(), req);
-    expect(deps.guestPayoutsForCycle).toHaveBeenCalledWith(7, 'wq1_24');
-    expect(joinedMeta(game).vaultGuestUsage).toEqual({ cycle: 'wq1_24', payouts: 3 });
   });
 
   it('3. rejects a null account with "not authenticated"', async () => {
@@ -633,7 +628,10 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     await authenticateWebSocket(asWs(ws), authRaw(), req);
     // isAdmin short-circuits the gate, so the join proceeds and no refusal frame is sent.
     expect(game.join).toHaveBeenCalledTimes(1);
-    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('too many connections from your network'));
+    expect(ws.send).not.toHaveBeenCalledWith(
+      errorFrame('too many connections from your network'),
+      NO_COMPRESS,
+    );
   });
 
   it('9. forwards a game.join error frame', async () => {
@@ -792,7 +790,7 @@ describe('createWsAuth: realm admission cap', () => {
     const { authenticateWebSocket } = createWsAuth(deps);
     await authenticateWebSocket(asWs(ws), authRaw(), req);
     expect(game.join).toHaveBeenCalledTimes(1);
-    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'), NO_COMPRESS);
   });
 
   it('c. a cap of 0 disables the gate even far past any count', async () => {
@@ -802,7 +800,7 @@ describe('createWsAuth: realm admission cap', () => {
     const { authenticateWebSocket } = createWsAuth(deps);
     await authenticateWebSocket(asWs(ws), authRaw(), req);
     expect(game.join).toHaveBeenCalledTimes(1);
-    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'), NO_COMPRESS);
   });
 
   it('d. staff bypass the cap, mirroring the per-IP exemption', async () => {
@@ -813,7 +811,7 @@ describe('createWsAuth: realm admission cap', () => {
     const { authenticateWebSocket } = createWsAuth(deps);
     await authenticateWebSocket(asWs(ws), authRaw(), req);
     expect(game.join).toHaveBeenCalledTimes(1);
-    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'), NO_COMPRESS);
   });
 
   it('e. admits a fresh join one below the cap (the boundary just under refusal)', async () => {
@@ -823,7 +821,7 @@ describe('createWsAuth: realm admission cap', () => {
     const { authenticateWebSocket } = createWsAuth(deps);
     await authenticateWebSocket(asWs(ws), authRaw(), req);
     expect(game.join).toHaveBeenCalledTimes(1);
-    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'), NO_COMPRESS);
   });
 
   it('f. admits exactly one of two concurrent fresh joins racing for the last slot', async () => {
@@ -852,7 +850,7 @@ describe('createWsAuth: realm admission cap', () => {
     // admission the winner holds fills the last slot before the loser's cap check.
     expect(game.join).toHaveBeenCalledTimes(1);
     expectSendThenClose(ws2, errorFrame('realm is full'));
-    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('realm is full'), NO_COMPRESS);
     logSpy.mockRestore();
   });
 
@@ -1028,7 +1026,7 @@ describe('createWsAuth: realm admission cap', () => {
     const ws3 = new FakeWs();
     await authenticateWebSocket(asWs(ws3), authRaw({ character: 23 }), req);
     expect(game.join).toHaveBeenCalledTimes(1);
-    expect(ws3.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+    expect(ws3.send).not.toHaveBeenCalledWith(errorFrame('realm is full'), NO_COMPRESS);
     logSpy.mockRestore();
   });
 
@@ -1045,10 +1043,10 @@ describe('createWsAuth: realm admission cap', () => {
     const { authenticateWebSocket } = createWsAuth(deps);
     const ws1 = new FakeWs();
     await authenticateWebSocket(asWs(ws1), authRaw({ character: 31 }), req);
-    expect(ws1.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+    expect(ws1.send).not.toHaveBeenCalledWith(errorFrame('realm is full'), NO_COMPRESS);
     const ws2 = new FakeWs();
     await authenticateWebSocket(asWs(ws2), authRaw({ character: 32 }), req);
-    expect(ws2.send).not.toHaveBeenCalledWith(errorFrame('realm is full'));
+    expect(ws2.send).not.toHaveBeenCalledWith(errorFrame('realm is full'), NO_COMPRESS);
     expect(game.join).toHaveBeenCalledTimes(2);
     logSpy.mockRestore();
   });
@@ -1530,7 +1528,7 @@ describe('createWsAuth: onConnection', () => {
     expect(game.join).toHaveBeenCalledTimes(1);
     // The timer was cleared, so advancing past it produces no timeout frame.
     vi.advanceTimersByTime(10_000);
-    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('authentication timed out'));
+    expect(ws.send).not.toHaveBeenCalledWith(errorFrame('authentication timed out'), NO_COMPRESS);
   });
 
   it('converts a rejected handshake into the retryable authTimedOut frame while the socket is open, then flushes', async () => {

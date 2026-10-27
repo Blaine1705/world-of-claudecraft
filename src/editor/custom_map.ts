@@ -1,6 +1,7 @@
 import { cloneMaterialFinishes } from '../sim/material_finishes';
 import { cloneWallFinishes } from '../sim/wall_finishes';
 import { WORLD_SEED } from '../sim/world_seed';
+import { compileLiveWorldDocument } from './live_world_core';
 // The CustomMap document: the editor's canonical, serializable map. The type and
 // its sanitizer live in src/sim/map_doc.ts (shared with the server, which
 // validates uploaded documents with the SAME code); this module adapts the
@@ -10,7 +11,14 @@ import { WORLD_SEED } from '../sim/world_seed';
 import { autoCollideRadius } from '../sim/asset_collision';
 import { colliderVolumesFromPlacements } from '../sim/collider_volumes';
 import { clonePropsKeepingAuthoredTowns } from '../sim/custom_world_props';
-import { BUILTIN_WORLD, PLAYER_START, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
+import {
+  BASE_WORLD,
+  BUILTIN_WORLD,
+  PLAYER_START,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_Z,
+} from '../sim/data';
 import { fluidVolumesFromPlacements } from '../sim/fluid_volumes';
 import {
   type AssetCollisionBox,
@@ -38,15 +46,18 @@ import { mapObjectivesFromPlacements } from '../sim/map_objectives';
 import { freezeObjectMoves } from '../sim/moved_objects';
 import {
   emptyZoneProps,
+  type GraveyardDef,
   type PlacedAsset,
   type PromotedScenery,
   type WorldContent,
+  type ZoneDef,
 } from '../sim/types';
 import { WATER_LEVEL } from '../sim/world';
 import { assetById } from './asset_catalog.generated';
 import { FEATURE_PROMOTIONS } from './feature_prop_placements';
 import { isLocalAssetId, localAssetUrl } from './local_assets';
 import type { ZoneContent } from './model';
+import { applyRoadEdits } from './road_edit_core';
 import { userAssetPath } from './user_assets';
 import {
   decorPropPlacements,
@@ -143,19 +154,19 @@ export function newCustomMap(name: string, id: string, now: number): CustomMap {
       parentId: '',
     },
     content: {
-      zones: deepClone(BUILTIN_WORLD.zones as CustomMap['content']['zones']),
-      camps: deepClone(BUILTIN_WORLD.camps as CustomMap['content']['camps']),
-      npcs: deepClone(BUILTIN_WORLD.npcs as CustomMap['content']['npcs']),
-      objects: deepClone(BUILTIN_WORLD.groundObjects as CustomMap['content']['objects']),
-      roads: deepClone(BUILTIN_WORLD.roads as CustomMap['content']['roads']),
+      zones: deepClone(BASE_WORLD.zones as CustomMap['content']['zones']),
+      camps: deepClone(BASE_WORLD.camps as CustomMap['content']['camps']),
+      npcs: deepClone(BASE_WORLD.npcs as CustomMap['content']['npcs']),
+      objects: deepClone(BASE_WORLD.groundObjects as CustomMap['content']['objects']),
+      roads: deepClone(BASE_WORLD.roads as CustomMap['content']['roads']),
     },
     terrainEdits: [],
     placements: [
-      ...worldMajorPropPlacements(BUILTIN_WORLD.props, DEFAULT_SEED, true),
+      ...worldMajorPropPlacements(BASE_WORLD.props, DEFAULT_SEED, true),
       // The realms' authored dressing (flower beds, iron fences, torches, hex
       // homes): renderer-owned until now, which is why a maker could see them
       // and not move them.
-      ...decorPropPlacements(BUILTIN_WORLD.props),
+      ...decorPropPlacements(BASE_WORLD.props),
       // The road network's lamp posts (empty when the builtin plan has not
       // been cached yet and the builtin world is not active to plan it;
       // promoteStreetlamps then upgrades the map on a later boot).
@@ -473,6 +484,16 @@ export function promotedSceneryFor(
   };
 }
 
+/** A custom world's respawn graveyards: one per zone, at its graveyard point. */
+export function zoneGraveyards(zones: readonly ZoneDef[]): GraveyardDef[] {
+  return zones.map((zone) => ({
+    id: `gy_${zone.id}`,
+    name: zone.name,
+    x: zone.graveyard.x,
+    z: zone.graveyard.z,
+  }));
+}
+
 // Project a CustomMap onto the engine's WorldContent for play-testing. The
 // editor does not author structured ZoneProps yet, so custom worlds retain an
 // independent clone of reusable built-in props outside Eastbrook, filtered by
@@ -480,6 +501,9 @@ export function promotedSceneryFor(
 // placements carry their collide footprint so the Sim's colliders and the
 // renderer read the SAME records.
 export function customMapToWorldContent(map: CustomMap): WorldContent {
+  if (map.meta.overworldBase) {
+    return { ...compileLiveWorldDocument(map).world, liveWorldPreview: true };
+  }
   // LINKED map: the maker anchored this map into the world, project its
   // layers into the FULL built-in world at that offset instead of booting the
   // standalone authored slate.
@@ -490,11 +514,12 @@ export function customMapToWorldContent(map: CustomMap): WorldContent {
     camps: deepClone(map.content.camps as WorldContent['camps']),
     npcs: deepClone(map.content.npcs as WorldContent['npcs']),
     groundObjects: deepClone(map.content.objects as WorldContent['groundObjects']),
-    roads: deepClone(
-      (map.roadDefs?.length
-        ? [...(map.content.roads ?? BUILTIN_WORLD.roads), ...map.roadDefs.map((def) => def.points)]
-        : (map.content.roads ?? BUILTIN_WORLD.roads)) as WorldContent['roads'],
-    ),
+    // The legacy roads with this map's moves and removals applied, then the
+    // authored roads: the same table the editor viewport builds.
+    roads: deepClone([
+      ...applyRoadEdits(map.content.roads ?? BUILTIN_WORLD.roads, map.roadEdits),
+      ...(map.roadDefs ?? []).map((def) => def.points),
+    ] as WorldContent['roads']),
     // clonePropsWithoutEastbrookLayout already returns an independent clone, so
     // it replaces the deepClone the fork branches used to take.
     props:
@@ -520,6 +545,12 @@ export function customMapToWorldContent(map: CustomMap): WorldContent {
   // the same frozen record the editor viewport does (sim/moved_objects.ts).
   const objectMoves = freezeObjectMoves(map.objectMoves);
   if (objectMoves) world.objectMoves = objectMoves;
+  // Every zone's graveyard point (the editor's graveyard handle) is a respawn:
+  // a released spirit appears at the nearest one and a Spirit Healer hovers
+  // there. Without this record a custom world has no graveyards at all and
+  // every death released to the map's start point.
+  const graveyards = zoneGraveyards(world.zones);
+  if (graveyards.length > 0) world.services = { graveyards };
   if (map.blockers && map.blockers.length > 0) world.blockers = deepClone(map.blockers);
   // Imported-model collision bakes ride into the play world so the sim's
   // placement colliders resolve 'local/<sha>' / 'user/<sha>' paths.
@@ -659,7 +690,7 @@ function linkedWorldContent(map: CustomMap, anchor: { x: number; z: number }): W
     ] as WorldContent['groundObjects'],
     roads: [
       ...deepClone(BUILTIN_WORLD.roads),
-      ...(map.content.roads ?? []).map((road) =>
+      ...applyRoadEdits(map.content.roads ?? [], map.roadEdits).map((road) =>
         road.map((pt) => ({ x: pt.x + ax, z: pt.z + az })),
       ),
       ...(map.roadDefs ?? []).map((def) =>

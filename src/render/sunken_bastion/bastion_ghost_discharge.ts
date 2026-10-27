@@ -44,7 +44,7 @@ void main() {
     float rays = pow(abs(cos(angle * 7.0 + vFx.y)), 12.0);
     float flame = max(0.0, 1.0 - radius * (2.2 - rays * 1.35));
     float core = pow(max(0.0, 1.0 - radius), 5.0);
-    float collar = exp(-pow((radius - 0.68 - curl * 0.045) * 18.0, 2.0));
+    float collar = exp(-pow(abs((radius - 0.68 - curl * 0.045) * 18.0), 2.0));
     float shape = mix(flame + core, collar, vFx.z);
     alpha = shape * vFx.w;
     color = mix(vec3(0.12, 1.35, 0.85), vec3(2.8, 3.0, 2.3), min(1.0, core * 2.5));

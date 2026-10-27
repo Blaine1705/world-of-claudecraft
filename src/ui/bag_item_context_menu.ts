@@ -17,11 +17,11 @@
 
 import { ENCHANTS } from '../sim/content/enchants';
 import { isItemLocked } from '../sim/item_lock';
-import { isMaterialItemId } from '../sim/material_ids';
 import type { MaterialComposition } from '../sim/material_sources';
 import { isDisenchantable, isEnchantedInstance } from '../sim/professions/enchanting';
 import { isSalvageable } from '../sim/professions/salvage';
 import { isSunderable } from '../sim/professions/sundering';
+import { isStackProvenanceItemId } from '../sim/stack_provenance_ids';
 import type { ItemDef, ItemInstancePayload } from '../sim/types';
 import type { TranslationKey } from './i18n.catalog';
 import { separableMaterialSources } from './material_sources_view';
@@ -49,7 +49,8 @@ export type BagItemNewActionId =
   | 'viewSources'
   | 'separateByGatherer'
   | 'takeChosenQuantity'
-  | 'combine';
+  | 'combine'
+  | 'itemHistory';
 export type BagItemContextActionId = 'default' | 'sellAll' | 'destroy' | BagItemNewActionId;
 
 export interface BagItemContextAction {
@@ -71,6 +72,7 @@ const NEW_ACTION_LABEL_KEY: Record<BagItemNewActionId, TranslationKey> = {
   separateByGatherer: 'hudChrome.itemMenu.separateByGatherer',
   takeChosenQuantity: 'hudChrome.itemMenu.takeChosenQuantity',
   combine: 'hudChrome.itemMenu.combine',
+  itemHistory: 'hudChrome.itemMenu.itemHistory',
 };
 
 /** The classic left-click verb for the default (first) menu row, so the menu's
@@ -106,7 +108,7 @@ export function bagItemNewActions(
   if (isSalvageable(def) && !isItemLocked(instance)) out.push('salvage');
   if (isSunderable(def)) out.push('sunder');
   if (isEnchantReagentItem(itemId)) out.push('applyEnchant');
-  if (includeMaterialActions && isMaterialItemId(itemId)) {
+  if (includeMaterialActions && isStackProvenanceItemId(itemId)) {
     if (materialSources !== undefined && materialSources.length > 0) {
       out.push('viewSources');
       if (separableMaterialSources(materialSources)) out.push('separateByGatherer');
@@ -114,6 +116,10 @@ export function bagItemNewActions(
     }
     out.push('combine');
   }
+  // A tracked epic/legendary copy (src/sim/item_tracking.ts) offers its
+  // history: the origin and every hand it passed through. The item ID itself
+  // never renders (item_history_view.ts).
+  if (instance?.provenance !== undefined) out.push('itemHistory');
   out.push(isItemLocked(instance) ? 'unlock' : 'lock');
   return out;
 }

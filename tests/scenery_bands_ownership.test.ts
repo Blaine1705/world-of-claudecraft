@@ -528,4 +528,43 @@ describe('scenery replacement ownership', () => {
     expect(material.customProgramCacheKey()).toBe('existing-canopy|scenery-merged-local-v1');
     expect(source.onBeforeCompile).toBe(callback);
   });
+
+  it('syncs outer scenery selection to the live terrain fog far distance', async () => {
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.Fog(0, 120, 340);
+    const camera = new THREE.PerspectiveCamera();
+    const webgl = {
+      shadowMap: { enabled: false },
+      render: vi.fn(),
+    } as unknown as THREE.WebGLRenderer;
+    const session = new LowSceneryBands({ run: async (work) => work() }, () => ({
+      scene,
+      camera,
+      webgl,
+      gate: async () => undefined,
+      outdoor: () => true,
+    }));
+    try {
+      const root = new THREE.Group();
+      root.name = 'jungle-features';
+      const material = new THREE.MeshStandardMaterial({ color: 0x458822 });
+      const mesh = new THREE.InstancedMesh(new THREE.BoxGeometry(8, 12, 8), material, 2);
+      mesh.setMatrixAt(0, new THREE.Matrix4().makeTranslation(300, 0, 0));
+      mesh.setMatrixAt(1, new THREE.Matrix4().makeTranslation(420, 0, 0));
+      root.add(mesh);
+      scene.add(root);
+      session.registerRoot(root);
+      session.update(0, 0);
+      await vi.waitFor(() => expect(session.snapshot()).toMatchObject({ stage: 'ready' }));
+      session.update(0, 0);
+      const outer =
+        scene.children.find((node) => node.name === 'scenery-band:outer') ?? new THREE.Group();
+      expect((outer.children[0] as THREE.Mesh).geometry.drawRange.count).toBe(36);
+      (scene.fog as THREE.Fog).far = 560;
+      session.update(0, 0);
+      expect((outer.children[0] as THREE.Mesh).geometry.drawRange.count).toBe(72);
+    } finally {
+      session.dispose();
+    }
+  });
 });

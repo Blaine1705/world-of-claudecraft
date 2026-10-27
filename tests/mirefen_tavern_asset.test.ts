@@ -29,8 +29,10 @@ import {
   TAVERN_OPTIONAL_PARTS,
   TAVERN_SHELL_PARTS,
   TAVERN_TRIM_PARTS,
+  tavernShellVolumes,
 } from '../src/render/mirefen_tavern_core';
 import { TAVERN_HALL_AIR_TOP } from '../src/render/mirefen_tavern_interior_core';
+import { TAVERN_SMOKE_SOURCES } from '../src/render/mirefen_tavern_smoke_core';
 import { placedTextureTierPath } from '../src/render/placed_texture_tier_core';
 import {
   TAVERN_DOOR,
@@ -52,8 +54,9 @@ import { WORLD_SEED } from '../src/sim/world_seed';
 // named tier and shell parts the runtime keeps, sheds and cuts away, the painted maps on the
 // painted materials (the Fenrire look of the painted town, scripts/assets/mirefen_tavern/
 // textures.json) and the untextured rest, the painted vertex colours stored under their
-// headroom, the texture-tier files beside the model, the triangle and size budgets, and the
-// model's stamped numbers against the sim. Re-pin the
+// headroom, the texture-tier files beside the model, the triangle and size budgets, the model's
+// stamped numbers against the sim, and the shell against the volumes the runtime ghosts it by
+// and the plumes against the pots they rise from. Re-pin the
 // sha256, size and triangle literals only with a re-export (docs/design/mirefen-tavern.md).
 
 const ROOT = path.join(__dirname, '..');
@@ -61,44 +64,44 @@ const GLB = path.join(ROOT, MIREFEN_TAVERN_ASSET.target);
 /** Each texture tier's file: its bytes and sha256 (the model first). */
 const SHIPPED: Record<MirefenTavernTier, { bytes: number; sha256: string }> = {
   full: {
-    bytes: 3576888,
-    sha256: 'fd13e5345871a6aea696012e37b2ce8638bc300ae4372fa6a888510ed3816099',
+    bytes: 4925048,
+    sha256: 'bae959685a39caba2f939168544b06a52e952c0139b8052899bdffb870a4beee',
   },
   half: {
-    bytes: 2622988,
-    sha256: '9b3ffb9bd2057451495da080c110dddfefc0715441c08d79d012e5f3d855622d',
+    bytes: 2748272,
+    sha256: 'a2b207dc9b853fd9e33bbd7283cb65c7479003408c581293f5302c96290d865d',
   },
   quarter: {
-    bytes: 2336820,
-    sha256: '68b42389c65cdafdbf6b221552d8a835e665d73e070313d63e8fe94c13bf786e',
+    bytes: 2129852,
+    sha256: 'c2dc972d582a50609229d252d8ed61cb2e92ff343f3b946add37413d33732ceb',
   },
 };
 const TIERS = Object.keys(SHIPPED) as MirefenTavernTier[];
 const tierFile = (tier: MirefenTavernTier) => path.join(ROOT, tierTarget(tier));
 /** Triangles per named part, from the Blender build report. */
 const TRIANGLES: Record<string, number> = {
-  TavernFrame: 10976,
-  TavernFurnishings: 8264,
-  TavernLights: 4680,
-  TavernGrounds: 11438,
+  TavernFrame: 7743,
+  TavernFurnishings: 10654,
+  TavernLights: 8733,
+  TavernGrounds: 5070,
   TavernDog: 374,
-  HallWallFront: 1272,
-  HallWallFrontLeft: 4565,
-  HallWallFrontRight: 4547,
-  HallWallBack: 2612,
-  HallWallLeft: 4105,
-  HallWallRight: 5795,
-  HallRoof: 12864,
-  WingWallEast: 2064,
-  WingWallBack: 2036,
-  WingWallWest: 976,
-  WingRoof: 1812,
-  TowerWall: 4370,
-  TowerRoof: 2000,
-  HallPorch: 2228,
-  BarPillar: 784,
-  TavernTrim: 8804,
-  TavernClutter: 12350,
+  HallWallFront: 1080,
+  HallWallFrontLeft: 2080,
+  HallWallFrontRight: 2070,
+  HallWallBack: 1836,
+  HallWallLeft: 4839,
+  HallWallRight: 3876,
+  HallRoof: 3773,
+  WingWallEast: 1096,
+  WingWallBack: 914,
+  WingWallWest: 672,
+  WingRoof: 1018,
+  TowerWall: 2567,
+  TowerRoof: 1092,
+  HallPorch: 656,
+  BarPillar: 772,
+  TavernTrim: 20013,
+  TavernClutter: 12032,
 };
 /** The player model, pivot to crown (HUMANOID_H in render/characters/manifest.ts). */
 const PLAYER_H = 2.6;
@@ -164,6 +167,27 @@ function images({ json, bin }: { json: GlbJson; bin: Buffer }) {
   });
 }
 
+/** Every corner of a named part, in the tavern's local frame. */
+function corners(name: string): [number, number, number][] {
+  const n = node(name);
+  const m = n.getWorldMatrix();
+  const v = [0, 0, 0];
+  const out: [number, number, number][] = [];
+  for (const prim of n.getMesh()?.listPrimitives() ?? []) {
+    const pos = prim.getAttribute('POSITION');
+    if (!pos) continue;
+    for (let k = 0; k < pos.getCount(); k++) {
+      pos.getElement(k, v);
+      out.push([
+        m[0] * v[0] + m[4] * v[1] + m[8] * v[2] + m[12],
+        m[1] * v[0] + m[5] * v[1] + m[9] * v[2] + m[13],
+        m[2] * v[0] + m[6] * v[1] + m[10] * v[2] + m[14],
+      ]);
+    }
+  }
+  return out;
+}
+
 function node(name: string): GltfNode {
   const found = doc
     .getRoot()
@@ -204,7 +228,17 @@ const TEXTURES = JSON.parse(
   readFileSync(path.join(ROOT, 'scripts/assets/mirefen_tavern/textures.json'), 'utf8'),
 ) as {
   headroom: number;
-  materials: Record<string, { color: string; normal?: string; roughness: number }>;
+  materials: Record<
+    string,
+    {
+      color: string;
+      normal?: string;
+      roughness: number;
+      yards?: number;
+      atlas?: boolean;
+      scale?: [number, number];
+    }
+  >;
 };
 
 /** sRGB to linear, one channel. */
@@ -287,17 +321,22 @@ describe('mirefen tavern GLB', () => {
     const root = doc.getRoot();
     const materials = root.listMaterials();
     expect(materials.map((m) => m.getName()).sort()).toEqual(MIREFEN_TAVERN_ASSET.materials);
-    // the seven painted materials of the map table, and the metal, the glow and the plain rest
+    // the eight painted materials of the map table (the seven tiling maps and the props' atlas),
+    // and the metal, the glow and the plain rest
     expect(MIREFEN_TAVERN_ASSET.painted).toEqual(Object.keys(TEXTURES.materials).sort());
     expect(MIREFEN_TAVERN_ASSET.painted).toEqual([
       'TavernCloth',
       'TavernDressed',
       'TavernFloor',
       'TavernPlaster',
+      'TavernProps',
       'TavernRoof',
       'TavernStone',
       'TavernTimber',
     ]);
+    expect(
+      Object.keys(TEXTURES.materials).filter((name) => TEXTURES.materials[name].atlas),
+    ).toEqual(['TavernProps']);
     const full = MIREFEN_TAVERN_ASSET.tiers.full;
     for (const m of materials) {
       const name = m.getName();
@@ -319,7 +358,10 @@ describe('mirefen tavern GLB', () => {
       const color = m.getBaseColorTexture();
       expect(color?.getName(), name).toBe(`${name}_color`);
       expect(color?.getMimeType(), name).toBe('image/ktx2');
-      expect(color?.getSize(), name).toEqual([full.color, full.color]);
+      // (the props' atlas packs forty 512 tiles: twice the tier's colour size across and five
+      // times down, textures.json `scale`)
+      const [sx, sy] = spec.scale ?? [1, 1];
+      expect(color?.getSize(), name).toEqual([full.color * sx, full.color * sy]);
       expect(m.getRoughnessFactor(), name).toBeCloseTo(spec.roughness, 5);
       expect(m.getMetallicFactor(), name).toBe(0);
       const normal = m.getNormalTexture();
@@ -354,9 +396,12 @@ describe('mirefen tavern GLB', () => {
   it('lays each painted map at its kit repeat on its faces, never across the whole tavern', () => {
     // a painted face's UVs advance a repeat per textures.json `yards` along the face: sampled
     // over every painted triangle, the UV distance per yard stays at the material's own rate
-    // (planar per face, so never more than it), and is that rate on most of them
-    const uvPerYard = (name: string) =>
-      1 / (TEXTURES.materials[name] as unknown as { yards: number }).yards;
+    // (each smooth sheet laid flat on its plane, so never more than it), and is that rate on most
+    // of them. The tower's hat is the one cone: its slates are laid round it in whole repeats with
+    // their courses following its slope (tavern_texture.lay_sheet), so they close up toward its
+    // tip and only their median holds to the kit's rate. The props' atlas has no repeat: its
+    // pieces carry their own UVs into it (the next test)
+    const uvPerYard = (name: string) => 1 / (TEXTURES.materials[name].yards ?? Number.NaN);
     const v = [0, 0, 0];
     const a = [0, 0];
     const b = [0, 0];
@@ -379,8 +424,11 @@ describe('mirefen tavern GLB', () => {
         const uv = prim.getAttribute('TEXCOORD_0');
         const pos = prim.getAttribute('POSITION');
         const idx = prim.getIndices();
-        if (!uv || !pos || !idx) continue;
+        if (!uv || !pos || !idx || TEXTURES.materials[name]?.atlas) continue;
         const want = uvPerYard(name);
+        const label = `${n.getName()} ${name}`;
+        const cone = n.getName() === 'TowerRoof';
+        const rates: number[] = [];
         let onRate = 0;
         let edges = 0;
         for (let t = 0; t < idx.getCount(); t += 3) {
@@ -393,15 +441,199 @@ describe('mirefen tavern GLB', () => {
           const yards = Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]);
           if (yards < 0.25) continue;
           const rate = Math.hypot(a[0] - b[0], a[1] - b[1]) / yards;
-          expect(rate, `${n.getName()} ${name}`).toBeLessThan(want * 1.05);
+          if (!cone) expect(rate, label).toBeLessThan(want * 1.05);
+          rates.push(rate);
           edges++;
           if (Math.abs(rate - want) < want * 0.05) onRate++;
         }
-        if (edges > 20) expect(onRate / edges, `${n.getName()} ${name}`).toBeGreaterThan(0.6);
+        if (cone && edges > 20) {
+          rates.sort((x, y) => x - y);
+          expect(Math.abs(rates[Math.floor(edges / 2)] / want - 1), label).toBeLessThan(0.05);
+        } else if (edges > 20) {
+          expect(onRate / edges, label).toBeGreaterThan(0.6);
+        }
         checked += edges;
       }
     }
     expect(checked).toBeGreaterThan(10000);
+  });
+
+  it("lays the props' pieces inside their atlas tiles, on the trim, the clutter and the lights", () => {
+    // the textured props (scripts/assets/mirefen_tavern/inn_props.py) carry their own UVs into
+    // the atlas props/build_atlas.mjs packs from props/props.json: every corner inside one of
+    // the pieces' tiles (never in a tile's padding, nor off the map). The dressing is trim and
+    // clutter (shed below medium and high); a light fitting (the chandelier, the sconces) rides
+    // in the lights with the flames on its wicks, so no tier draws a flame without its candle;
+    // a piece the sim collides with (the dresser, the barrels, the crates, the sacks, the
+    // firewood: `dressing` records) rides with the furniture and the barrels in its racks, and
+    // the copper hood over the hearth with the frame, so every tier draws what it stands for.
+    // Never on a shell part, which fades for the camera.
+    const atlas = JSON.parse(
+      readFileSync(path.join(ROOT, 'scripts/assets/mirefen_tavern/props/props.json'), 'utf8'),
+    ) as {
+      atlas: { width: number; height: number; pad: number };
+      props: { id: string; tile: number[] }[];
+    };
+    const { width, height, pad } = atlas.atlas;
+    // (the shipped UVs are quantized: a texel of slack; glTF's UV origin is the map's top-left,
+    // as the tiles' pixels are)
+    const su = 1 / width;
+    const sv = 1 / height;
+    const inTile = (u: number, v: number) =>
+      atlas.props.some(
+        ({ tile: [x, y, side] }) =>
+          u >= (x + pad) / width - su &&
+          u <= (x + side - pad) / width + su &&
+          v >= (y + pad) / height - sv &&
+          v <= (y + side - pad) / height + sv,
+      );
+    const uv = [0, 0];
+    const parts = new Set<string>();
+    let count = 0;
+    for (const n of doc.getRoot().listNodes()) {
+      for (const prim of n.getMesh()?.listPrimitives() ?? []) {
+        if (prim.getMaterial()?.getName() !== 'TavernProps') continue;
+        parts.add(n.getName());
+        const tc = prim.getAttribute('TEXCOORD_0');
+        expect(tc, n.getName()).not.toBeNull();
+        for (let i = 0; i < (tc?.getCount() ?? 0); i++) {
+          tc?.getElement(i, uv);
+          expect(inTile(uv[0], uv[1]), `${n.getName()} corner ${i} at ${uv}`).toBe(true);
+          count++;
+        }
+      }
+    }
+    for (const part of parts) {
+      expect(
+        ['TavernTrim', 'TavernClutter', 'TavernLights', 'TavernFurnishings', 'TavernFrame'],
+        part,
+      ).toContain(part);
+    }
+    expect(parts.has('TavernTrim')).toBe(true);
+    expect(parts.has('TavernLights')).toBe(true);
+    expect(parts.has('TavernFurnishings')).toBe(true);
+    expect(TAVERN_TRIM_PARTS).toContain('TavernTrim');
+    // some forty pieces of a few hundred triangles each, the tankards, candles and boards many
+    // times over: tens of thousands of corners in all
+    expect(count).toBeGreaterThan(20000);
+  });
+
+  it('names a piece of the atlas for every dressing record, and only for those', () => {
+    // a `dressing` record is drawn by the model it names (inn_props.py stands it from
+    // layout.json), so a missing or misspelled name would surface only in the Blender build
+    const atlas = JSON.parse(
+      readFileSync(path.join(ROOT, 'scripts/assets/mirefen_tavern/props/props.json'), 'utf8'),
+    ) as { props: { id: string }[] };
+    const ids = new Set(atlas.props.map((p) => p.id));
+    const dressing = TAVERN_PROPS.filter((p) => p.kind === 'dressing');
+    expect(dressing.map((p) => p.model).sort()).toEqual([
+      'barrel_stack',
+      'crate_stack',
+      'dresser',
+      'firewood_basket',
+      'grain_sacks',
+    ]);
+    for (const p of dressing) expect(ids.has(p.model ?? ''), p.model).toBe(true);
+    for (const p of TAVERN_PROPS) {
+      if (p.kind !== 'dressing') expect(p.model, p.kind).toBeUndefined();
+    }
+  });
+
+  it('draws every collider-backed dressing piece on every tier, with the furniture', () => {
+    // the sim collides with a `dressing` record whatever the tier, so its painted model rides a
+    // part every tier keeps (TavernFurnishings), never the trim or the clutter the lower tiers
+    // shed: inside each record's footprint the furniture's painted corners rise from its floor
+    // to its full height (the model stands scaled to the record's height)
+    expect(TAVERN_CRITICAL_PARTS).toContain('TavernFurnishings');
+    const furniture = node('TavernFurnishings');
+    const m = furniture.getWorldMatrix();
+    const v = [0, 0, 0];
+    const painted: [number, number, number][] = [];
+    for (const prim of furniture.getMesh()?.listPrimitives() ?? []) {
+      if (prim.getMaterial()?.getName() !== 'TavernProps') continue;
+      const pos = prim.getAttribute('POSITION');
+      for (let k = 0; k < (pos?.getCount() ?? 0); k++) {
+        pos?.getElement(k, v);
+        painted.push([
+          m[0] * v[0] + m[4] * v[1] + m[8] * v[2] + m[12],
+          m[1] * v[0] + m[5] * v[1] + m[9] * v[2] + m[13],
+          m[2] * v[0] + m[6] * v[1] + m[10] * v[2] + m[14],
+        ]);
+      }
+    }
+    const dressing = TAVERN_PROPS.filter((p) => p.kind === 'dressing');
+    expect(dressing).toHaveLength(5);
+    for (const p of dressing) {
+      const base = tavernPropBaseY(p);
+      // (the footprint's box square to the tavern's axes: every record is turned a quarter)
+      const c = Math.abs(Math.cos(p.rot));
+      const s = Math.abs(Math.sin(p.rot));
+      const ex = c * (p.hw ?? 0) + s * (p.hd ?? 0) + 0.02;
+      const ez = s * (p.hw ?? 0) + c * (p.hd ?? 0) + 0.02;
+      const inside = painted.filter(
+        ([x, y, z]) =>
+          Math.abs(x - p.x) <= ex &&
+          Math.abs(z - p.z) <= ez &&
+          y >= base - 0.05 &&
+          y <= base + p.height + 0.3,
+      );
+      expect(inside.length, p.model).toBeGreaterThan(50);
+      expect(Math.max(...inside.map(([, y]) => y)), p.model).toBeGreaterThan(base + 0.9 * p.height);
+    }
+  });
+
+  it('keeps every texture tier under its texel budget', () => {
+    // the size pins below bound the downloads, not what the GPU holds: every map's texels with
+    // its mip chain, per tier, the props' atlas the biggest of them (2048 by 5120 at full, half
+    // and a quarter of that on the lower tiers), and no map past that size on a side
+    const budget: Record<string, number> = { full: 24.5e6, half: 6.2e6, quarter: 1.6e6 };
+    const side: Record<string, number> = { full: 5120, half: 2560, quarter: 1280 };
+    expect(TIERS.slice().sort()).toEqual(['full', 'half', 'quarter']);
+    for (const tier of TIERS) {
+      const maps = images(readGlb(tierFile(tier)));
+      const texels = maps.reduce((n, { w, h }) => n + (w * h * 4) / 3, 0);
+      expect(texels, tier).toBeLessThan(budget[tier]);
+      for (const { name, w, h } of maps) {
+        expect(Math.max(w, h), `${tier} ${name}`).toBeLessThanOrEqual(side[tier]);
+      }
+    }
+  });
+
+  it("was packed from the live props manifest: each piece's source, budget and tile", () => {
+    // props_data.json and the atlas are what props/build_atlas.mjs made of props/props.json (its
+    // sources are a maintainer-local pack under tmp/asset_src, never checked in): a piece added,
+    // dropped, re-sourced, over its budget or moved to another tile without re-running it
+    // fails here
+    const dir = path.join(ROOT, 'scripts/assets/mirefen_tavern/props');
+    const manifest = JSON.parse(readFileSync(path.join(dir, 'props.json'), 'utf8')) as {
+      atlas: { width: number; height: number; pad: number; out: string };
+      props: { id: string; source: string; dense?: string; triangles: number; tile: number[] }[];
+    };
+    const data = JSON.parse(readFileSync(path.join(dir, 'props_data.json'), 'utf8')) as {
+      atlas: string;
+      props: Record<string, { source: string; uvs: number[][]; faces: number[][] }>;
+    };
+    expect(data.atlas).toBe(manifest.atlas.out);
+    expect(Object.keys(data.props).sort()).toEqual(manifest.props.map((p) => p.id).sort());
+    const { width, height, pad } = manifest.atlas;
+    // (UVs rounded to 1e-4, stored with Blender's bottom-left origin)
+    const slack = 2e-4;
+    for (const p of manifest.props) {
+      const piece = data.props[p.id];
+      expect(piece.source, p.id).toBe(p.source);
+      expect(piece.faces.length, p.id).toBeGreaterThan(0);
+      // a piece baked from its `dense` model (bake_low.py) arrives at its budget; one simplified
+      // here keeps its UV seams, so it stops where they let it, within a third over (the stag)
+      const cap = p.dense ? p.triangles : Math.ceil((p.triangles * 4) / 3);
+      expect(piece.faces.length, p.id).toBeLessThanOrEqual(cap);
+      const [left, top, side] = p.tile;
+      const u0 = (left + pad) / width - slack;
+      const u1 = (left + side - pad) / width + slack;
+      const v0 = 1 - (top + side - pad) / height - slack;
+      const v1 = 1 - (top + pad) / height + slack;
+      const outside = piece.uvs.filter(([u, v]) => u < u0 || u > u1 || v < v0 || v > v1);
+      expect(outside.length, `${p.id} corners off its tile`).toBe(0);
+    }
   });
 
   it('stores the painted colours under the headroom, so the warm light lifts the paint unclamped', () => {
@@ -415,13 +647,16 @@ describe('mirefen tavern GLB', () => {
     // (1 / VERTEX_COLOUR_SCALE, about 0.4: tints, the dim far corners, the shaded feet of the
     // walls), the warm light and shiplib's wear lift the brightest well above the map, and
     // almost none reaches the clamp (with no headroom a tint of 1 sat AT the clamp, and every
-    // lift was cut off: the light could only shift the hue)
+    // lift was cut off: the light could only shift the hue). The props are left out: their
+    // corners are a white tint with only a touch of the warmth (build_tavern.py PROPS_WARM),
+    // their paint carrying its own light and shade
     const values: number[] = [];
     const c = [0, 0, 0, 0];
     for (const mesh of doc.getRoot().listMeshes()) {
       for (const prim of mesh.listPrimitives()) {
         const colour = prim.getAttribute('COLOR_0');
         if (!colour || !prim.getMaterial()?.getBaseColorTexture()) continue;
+        if (prim.getMaterial()?.getName() === 'TavernProps') continue;
         for (let i = 0; i < colour.getCount(); i++) {
           colour.getElement(i, c);
           values.push(Math.max(c[0], c[1], c[2]));
@@ -429,19 +664,26 @@ describe('mirefen tavern GLB', () => {
       }
     }
     values.sort((x, y) => x - y);
-    expect(values.length).toBeGreaterThan(100000);
+    // (the painted rebuild is about half the old triangles, its detail in the maps: still tens
+    // of thousands of painted corners to read the spread from)
+    expect(values.length).toBeGreaterThan(60000);
     const at = (f: number) => values[Math.floor((values.length - 1) * f)];
     const mapLevel = 1 / VERTEX_COLOUR_SCALE;
     expect(at(0.5)).toBeGreaterThan(mapLevel * 0.4);
     expect(at(0.5)).toBeLessThan(mapLevel);
-    expect(at(0.99) * VERTEX_COLOUR_SCALE).toBeGreaterThan(1.3);
+    // (1.25: the oak lining the lower walls now takes the flames' brightest light off the
+    // limewash there, inn_hall.py)
+    expect(at(0.99) * VERTEX_COLOUR_SCALE).toBeGreaterThan(1.25);
     expect(values.filter((v) => v >= 0.995).length / values.length).toBeLessThan(0.001);
   });
 
-  it("keeps the roofs' covering out of the warm bake: every slate the moss map's own grey", () => {
-    // the slates tint by brightness alone (the moss is in the map), and the roof is all
+  it("keeps the roofs' covering out of the warm bake: every slate the map's own grey", () => {
+    // the slates tint by brightness alone (the lichen is in the map), and the roof is all
     // outside: the hall's bake box reaches up under the ridge, and its lanterns once warmed
-    // the slates through the sarking, wearing the grey moss slates brick red from the road
+    // the slates through the sarking, wearing the grey slates brick red from the road. The
+    // painted rebuild lays its slates as a few big bowed faces wearing the slate map (no
+    // modelled shingles), each slope one smooth sheet sharing its corners across its faces, so its
+    // roofs carry a couple of thousand corners, not tens of thousands
     const c = [0, 0, 0, 0];
     let corners = 0;
     let worst = { off: 0, mesh: '' };
@@ -458,14 +700,15 @@ describe('mirefen tavern GLB', () => {
         }
       }
     }
-    expect(corners).toBeGreaterThan(20000);
+    expect(corners).toBeGreaterThan(2000);
     expect(worst.off, worst.mesh).toBeLessThan(1 / 255);
   });
 
   it('ships its texture tiers: the same model with every map at half and a quarter of its size', () => {
     const base = readGlb(GLB);
     const baseImages = images(base);
-    expect(baseImages).toHaveLength(13);
+    // the seven tiling colour maps, the props' atlas and the six normal maps
+    expect(baseImages).toHaveLength(14);
     for (const tier of TIERS.filter((t) => t !== 'full')) {
       const file = readGlb(tierFile(tier));
       expect(shape(file), tier).toBe(shape(base));
@@ -475,8 +718,9 @@ describe('mirefen tavern GLB', () => {
         tier,
       ).toEqual(
         baseImages.map((img) => {
-          const size = img.name.endsWith('_normal') ? sizes.normal : sizes.color;
-          return { ...img, w: size, h: size };
+          if (img.name.endsWith('_normal')) return { ...img, w: sizes.normal, h: sizes.normal };
+          const [sx, sy] = TEXTURES.materials[img.name.replace(/_color$/, '')]?.scale ?? [1, 1];
+          return { ...img, w: sizes.color * sx, h: sizes.color * sy };
         }),
       );
       expect(readFileSync(tierFile(tier)).length, tier).toBeLessThan(readFileSync(GLB).length);
@@ -508,30 +752,33 @@ describe('mirefen tavern GLB', () => {
       total += count;
     }
     expect(trianglesUnder(node('MirefenTavern_ROOT'))).toBe(total);
-    // a whole inn with its booths, stage, nook, kitchen and hammerbeam roof, and since the
-    // exterior pass its grounds: under 112k in all, the low tier under 90k, the shipped file
-    // under 1600 KiB. Raised from 72.5k, 58k and 1100 KiB for the exterior the road sees: the
-    // jettied upper storey with its bressumer, joists and carved brackets (the front's parts),
-    // leaded diamond panes on every window, four dormers, a roof of irregular mossy shingles
-    // with deep eaves (HallRoof, about 6k over the old slates), the weathering decals, and the
-    // grounds (TavernGrounds, about 11k: the forecourt's bed, the terrace's tables, benches,
-    // posts and lantern strings, the open stable, the trough, the hay, the cart and the
-    // woodpile), all of it outside, merged per material (one mesh per material and one per
-    // material of each shell part). The cobbles (trim), straw, sacks and moss cushions
-    // (clutter) are shed below medium and high.
-    expect(total).toBeLessThan(112000);
+    // a whole inn with its booths, stage, nook, kitchen, hammerbeam roof and grounds, rebuilt
+    // in the painted town's hand-built style (scripts/assets/mirefen_tavern/inn_*.py): big
+    // bowed faces wearing the painted maps, the stones, slates and grain in the paint rather
+    // than the geometry, so under the triangles of the modelled build it replaced (108.9k, with
+    // mossy modelled shingles and leaded panes). Raised from 74k in all and 54k on the low tier
+    // for the dressing remade from painted multi-view models (some forty pieces baked to a few
+    // hundred triangles each by props/bake_low.py, the trophies, the chandelier and the sign's
+    // tankard to 800 to 1100; the dresser, barrels, crates, sacks and firewood the sim collides
+    // with, the barrels in the racks and the light fittings on every tier) and for the oak
+    // wainscot and exposed frame the common room's walls are lined with (inn_hall.py, about
+    // 3.4k on the shell): under 99k in all and the low tier under 65k, so a later pass cannot
+    // quietly grow them. Merged per material at runtime (one mesh per material and one per
+    // material of each shell part); the trim and the clutter are shed below medium and high.
+    expect(total).toBeLessThan(99000);
     const low = TAVERN_CRITICAL_PARTS.reduce((n, p) => n + TRIANGLES[p], 0);
-    expect(low).toBeLessThan(90000);
-    // The files: the model under 3600 KiB, its .half under 2600 KiB and its .quarter (what a
-    // phone loads) under 2350 KiB. Raised from 1600 KiB for the painted maps, the triangles
-    // unchanged: the full tier's seven colour maps at 1024 and six normal maps at 128 (KTX2,
-    // about 1.35 MB; 0.40 MB at half, 0.11 MB at a quarter) and the float UVs every painted
-    // face carries in every tier (they repeat far past [0, 1], so they cannot be normalized,
-    // and a texture transform to quantize them would clone each map: about 0.64 MB over the
-    // texture-free model after meshopt).
-    expect(readFileSync(GLB).length).toBeLessThan(3600 * 1024);
-    expect(readFileSync(tierFile('half')).length).toBeLessThan(2600 * 1024);
-    expect(readFileSync(tierFile('quarter')).length).toBeLessThan(2350 * 1024);
+    expect(low).toBeLessThan(65000);
+    // The files: the model under 5000 KiB, its .half under 2850 KiB and its .quarter (what a
+    // phone loads) under 2250 KiB, raised from 3600, 2150 and 1700 KiB for that dressing (the
+    // props' atlas now 2048 by 5120 at the full tier, forty tiles, and the extra geometry);
+    // raised from 2700, 1800 and 1500 KiB for the first dressing before that, and lowered from
+    // 3600, 2600 and 2350 KiB with the rebuild. The full tier's seven tiling colour maps at 1024
+    // and the props' atlas, six normal maps at 128 (KTX2), and the float UVs every tiling face
+    // carries in every tier (they repeat far past [0, 1], so they cannot be normalized, and a
+    // texture transform to quantize them would clone each map; the atlas's are normalized).
+    expect(readFileSync(GLB).length).toBeLessThan(5000 * 1024);
+    expect(readFileSync(tierFile('half')).length).toBeLessThan(2850 * 1024);
+    expect(readFileSync(tierFile('quarter')).length).toBeLessThan(2250 * 1024);
   });
 
   it("stamps the sim's numbers, all generous next to the player", () => {
@@ -552,8 +799,9 @@ describe('mirefen tavern GLB', () => {
     // no beam, brace, joist or hung thing crosses the room where the camera flies: over the
     // floor's furniture (the settles' backs, the candles) and under the camera's air top
     // (render/mirefen_tavern_interior_core.ts), inside the hall clear of its walls, only the bar
-    // (its pillar, which cuts away, the kegs and the racks behind it), the wall fire and the
-    // trophies an arm's length off the walls stand
+    // (its pillar, which cuts away, the kegs and the racks behind it), the wall fire, the
+    // trophies an arm's length off the walls and the great stag over the front door, two yards
+    // out over the doorway's head (scripts/assets/mirefen_tavern/inn_props.py HUNG), stand
     const lo = 2.9;
     const hi = TAVERN_HALL_AIR_TOP;
     const offenders: string[] = [];
@@ -587,6 +835,7 @@ describe('mirefen tavern GLB', () => {
           if (z > TAVERN_HALL.z1 - TAVERN_HALL.wall - 1.2) continue;
           if (x > 2.0 && z < -4.0) continue; // the bar
           if (x > 13.2 && Math.abs(z - 2.5) < 2.6) continue; // the wall fire and its jawbone
+          if (Math.abs(x) < 1.8 && z > 10.6 && y > 5.5) continue; // the great stag over the door
           offenders.push(`${n.getName()} at ${x.toFixed(1)}, ${y.toFixed(1)}, ${z.toFixed(1)}`);
         }
       }
@@ -629,11 +878,10 @@ describe('mirefen tavern GLB', () => {
   });
 
   it('stands every piece outside on the terrain, colliding there', () => {
-    // a piece outside on the terrain (the steps' and the terrace's flower tubs, and everything
-    // on the grounds but the dog on the porch) carries the ground's height under its middle
-    // (baseY): the model seats it there and the sim's collider tops it there
+    // a piece outside on the terrain (everything on the grounds but the dog on the porch)
+    // carries the ground's height under its middle (baseY): the model seats it there and the
+    // sim's collider tops it there
     const outside = TAVERN_PROPS.filter((p) => p.baseY !== undefined);
-    expect(outside.filter((p) => p.kind === 'planter')).toHaveLength(4);
     expect(outside.length).toBeGreaterThan(20);
     const layout = mirefenTavernLayout().props;
     for (const p of outside) {
@@ -660,5 +908,51 @@ describe('mirefen tavern GLB', () => {
     expect(max[1]).toBeGreaterThan(TAVERN_TOWER.peak + 1.5);
     expect(max[1]).toBeGreaterThan(TAVERN_HOOD.flueTop);
     expect(max[1]).toBeLessThan(TAVERN_TOWER.peak + 3);
+  });
+
+  it('keeps every wall, the porch and its sign inside the volumes the cutaway ghosts them by', () => {
+    // a piece of the outside shell standing out of its part's fade volumes would stay solid while
+    // the part ghosts round it (mirefen_tavern_core.ts tavernShellVolumes): every corner of each
+    // box-shaped shell part outside the hall's room lies in one of its volumes (a hand of
+    // slack). What hangs inside on a wall goes with the wall, seen only through it.
+    const slack = 0.2;
+    const H = TAVERN_HALL;
+    const inRoom = (x: number, z: number) =>
+      Math.abs(x) < H.x1 - H.wall && z > H.z0 + H.wall && z < H.z1 - H.wall;
+    for (const part of TAVERN_SHELL_PARTS) {
+      const vols = tavernShellVolumes(part);
+      if (!vols) continue;
+      const out: string[] = [];
+      for (const [x, y, z] of corners(part)) {
+        if (inRoom(x, z)) continue;
+        const held = vols.some(
+          (q) =>
+            x >= q[0] - slack &&
+            x <= q[1] + slack &&
+            y >= q[2] - slack &&
+            y <= q[3] + slack &&
+            z >= q[4] - slack &&
+            z <= q[5] + slack,
+        );
+        if (!held) out.push(`${x.toFixed(2)}, ${y.toFixed(2)}, ${z.toFixed(2)}`);
+      }
+      expect(out.slice(0, 5), part).toEqual([]);
+    }
+  });
+
+  it('smokes out of the chimney pots and from under the flue cowl', () => {
+    // each plume's mouth (mirefen_tavern_smoke_core.ts) where its smoke leaves the model: the
+    // wall fire's at the top of its two pots, the hearth's between the flue's pipe and its cowl
+    const top = (part: string, x0: number, z0: number, r: number) =>
+      Math.max(
+        ...corners(part)
+          .filter(([x, , z]) => Math.hypot(x - x0, z - z0) < r)
+          .map(([, y]) => y),
+      );
+    const [stack, flue] = TAVERN_SMOKE_SOURCES;
+    expect(Math.abs(top('HallWallRight', stack.x, stack.z, 0.9) - stack.y)).toBeLessThan(0.2);
+    const cowl = top('HallRoof', flue.x, flue.z, 0.9);
+    expect(cowl).toBeGreaterThan(flue.y + 0.3);
+    expect(cowl).toBeLessThan(flue.y + 1.2);
   });
 });

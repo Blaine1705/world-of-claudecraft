@@ -319,6 +319,8 @@ describe('v0.36 placeholder-art completion evidence', () => {
       'vanguard_oath_blade',
       'vanguard_fang_dagger',
       'vanguard_warstaff',
+      // Restored Season 2 feral staff has its own September art batch.
+      'vanguard_feral_staff',
       // The Mirefen world boss's maul (balgath-boss-icons-2026-08-18) and
       // Skerrit's Shardpike (shardpike-mechanic-icons-2026-08-20) postdate
       // the campaign the same way, each painted in its own later batch.
@@ -344,6 +346,15 @@ describe('v0.36 placeholder-art completion evidence', () => {
       'sextons_spadehaft',
       'sextons_burial_spade',
       'rimeweb_fang',
+      // The lower dungeons' normal blues (lower-dungeon-blues-icons-2026-10-08,
+      // PR 4352 on the v0.45.0 integration).
+      'fogbinders_rod',
+      'gravecallers_rod',
+      'merecleaver',
+      'moonwrack_stave',
+      'turnkeys_shank',
+      // The membership Staff of Changing (membership-weapon-2026-10-14, PR 4281).
+      'membership_staff',
     ];
     expect(targets.weaponItems).toEqual(
       sorted(

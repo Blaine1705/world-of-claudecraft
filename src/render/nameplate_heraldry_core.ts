@@ -23,22 +23,9 @@ export const NAMEPLATE_HERALDRY_TITLE_STEP = 11;
 export const NAMEPLATE_HERALDRY_TITLE_BASELINE = 9;
 export const NAMEPLATE_HERALDRY_NAME_BASELINE_FROM_CENTER = 5;
 
-/** Extra collision and anchor lift for a slug that can paint world heraldry. */
+/** Extra anchor lift for a slug that can paint world heraldry. */
 export function nameplateHeraldryLift(slug: string): number {
   return borderAccent(slug) ? NAMEPLATE_HERALDRY_EXTRA_LIFT : 0;
-}
-
-/** A cast bar's row under the health bar (nameplate_canvas.ts drawBase steps 10
- *  for it) and a boss frame's heavier, wider health bar: both push a plate's name
- *  row up past the bare label the declutter's envelope was set for, so they count
- *  in its lift. Two bosses fighting side by side (the Hammer Council round one
- *  tank, casting) otherwise printed one's name across the other's bars. */
-export const NAMEPLATE_CAST_ROW_STEP = 10;
-/** A boss plate's heavier bar and the elite marker its name always carries. */
-export const NAMEPLATE_BOSS_FRAME_LIFT = 14;
-
-export function nameplateBarsLift(castVisible: boolean, boss: boolean): number {
-  return (castVisible ? NAMEPLATE_CAST_ROW_STEP : 0) + (boss ? NAMEPLATE_BOSS_FRAME_LIFT : 0);
 }
 
 /** The `<guild>` / `<role>` row's step under the name row (taller on the current target's

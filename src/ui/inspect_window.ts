@@ -14,16 +14,19 @@
 // quality-glow helper as the character sheet; the paperdoll columns come from
 // char_view's arrays via the pure core, so inspect inherits the sheet's 6/6 split.
 
+import { TALENTS } from '../sim/content/talents';
 import { ITEMS } from '../sim/data';
 import type {
   EquipSlot,
   ItemDef,
   ItemInstancePayload,
+  ItemProvenance,
   PlayerClass,
   SkinCatalog,
 } from '../sim/types';
+import type { CharacterProfile } from '../world_api';
 import { attachAvatarFallback } from './avatar_fallback';
-import type { PaperdollSlot } from './char_view';
+import type { PaperdollSlot, PaperdollView } from './char_view';
 import { CURATOR_SIGIL_GLOW, curatorSigilBadgeClass, curatorSigilDataUrl } from './curator_sigil';
 import {
   DEED_HERALDRY_ATTR,
@@ -62,10 +65,18 @@ import {
   type InspectHeaderModel,
   type InspectHolderModel,
 } from './inspect_view';
+import { type ItemHistoryHolder, itemHistoryProvenanceFor } from './item_history_access_view';
+import {
+  appendItemHistoryActionAfter,
+  attachItemHistoryContextMenu,
+  closeItemHistoryDialogForOwner,
+  openItemHistoryDialog,
+} from './item_history_dialog';
 import type { PainterHostPresentation } from './painter_host';
 import { hydratePortraits, type ModularLook, portraitChipHtml } from './portrait_chip';
 import { qualityGlowShadow } from './quality_glow';
 import { curatorRankNameKey } from './reliquary_view';
+import { tTalent } from './talent_i18n';
 import { svgIcon } from './ui_icons';
 import { wornItemCellParts } from './worn_item_cell_view';
 
@@ -79,7 +90,6 @@ export interface InspectEntity {
   templateId: string;
   name: string;
   level: number;
-  specId?: string | null;
   membershipActive?: boolean;
   referralInviterName?: string;
   skin?: number;
@@ -89,6 +99,8 @@ export interface InspectEntity {
   title?: string | null;
   /** Active Book of Deeds border (a deed id, never a slug), if any. */
   border?: string | null;
+  /** The mirrored talent specialization id (null = none chosen). */
+  specId?: string | null;
   equippedItems: Partial<Record<EquipSlot, string>>;
   equippedInstances: Partial<Record<EquipSlot, ItemInstancePayload>>;
   /** The paperdoll eye (the wire helm bit): a WOC body on the stage hides its
@@ -122,6 +134,10 @@ export interface InspectRemoteProfile {
   cls: PlayerClass;
   skin: number;
   guild: string | null;
+  /** Specialization id; absent when the source does not know it. */
+  specId?: string | null;
+  /** Worn gear, only from a consented source (a group applicant's snapshot). */
+  gear?: Partial<Record<EquipSlot, string>>;
 }
 
 /** Hud-supplied glue. The presentation bag (icon/tooltip) plus world-free window
@@ -182,6 +198,7 @@ export class InspectWindow {
   close(): void {
     const el = this.deps.root();
     if (el.style.display !== 'block') return;
+    closeItemHistoryDialogForOwner(el);
     el.style.display = 'none';
     this.deps.hideTooltip();
     this.deps.restoreFocus(this.openerFocus);
@@ -220,6 +237,7 @@ export class InspectWindow {
         name: e.name,
         level: e.level,
         cls,
+        specId: e.specId ?? null,
         skin: e.skin ?? 0,
         skinCatalog: e.skinCatalog ?? 'class',
         deedTitleText: e.title ? deedTitleText(e.title) : '',
@@ -253,7 +271,7 @@ export class InspectWindow {
         level: formatNumber(header.level, { maximumFractionDigits: 0 }),
         className: classDisplayName(cls),
       }),
-    )}</div>${this.curatorLineHtml(model.curator)}`;
+    )}</div>${specChipHtml(cls, header.specId)}${this.curatorLineHtml(model.curator)}`;
     const honorHtml =
       this.holderHtml(model.badges.holder) +
       this.discordHtml(model.badges.discord) +
@@ -274,6 +292,7 @@ export class InspectWindow {
       `<div class="equip-col" id="inspect-equip-left"></div>` +
       `<div class="char-model-panel inspect-model-panel" style="--inspect-class-color:${header.classColor}">` +
       `<div id="inspect-model-preview" class="char-model-preview" role="img" aria-label="${esc(t('hudChrome.character.modelPreview'))}"></div>` +
+      this.gearScoreHtml(model.gearScore) +
       `</div>` +
       `<div class="equip-col equip-col-right" id="inspect-equip-right"></div>` +
       `<div class="equip-row-weapons" id="inspect-equip-weapons"></div>` +
@@ -288,12 +307,12 @@ export class InspectWindow {
         img.src = discordStatusBadgeDataUrl(e.discordTier ?? 0);
       });
     }
-    const leftCol = el.querySelector('#inspect-equip-left');
-    const rightCol = el.querySelector('#inspect-equip-right');
-    for (const cell of model.gear.left) leftCol?.appendChild(this.buildSlotRow(cell, e));
-    for (const cell of model.gear.right) rightCol?.appendChild(this.buildSlotRow(cell, e));
-    const weaponsRow = el.querySelector('#inspect-equip-weapons');
-    for (const cell of model.gear.weapons) weaponsRow?.appendChild(this.buildSlotRow(cell, e));
+    // A worn tracked copy's Item history reads the RAW worn payload (the cell's
+    // instance is the stripped tooltip trim): the public projection for another
+    // player's gear, the viewer's own record on a self-inspect.
+    const worn = selfEquippedInstances ?? e.equippedInstances;
+    const holder: ItemHistoryHolder = selfEquippedInstances ? 'self' : 'other';
+    this.paintGear(el, model.gear, e, (cell) => itemHistoryProvenanceFor(worn[cell.slot], holder));
     const stage = el.querySelector<HTMLElement>('#inspect-model-preview');
     if (stage) {
       this.deps.mountPreview(stage, {
@@ -319,7 +338,7 @@ export class InspectWindow {
     const el = this.deps.root();
     this.captureOpener();
     this.deps.closeOthers();
-    const model = buildInspectRemoteView(profile);
+    const model = buildInspectRemoteView(profile, ITEMS);
     markDialogRoot(el, { labelledBy: 'inspect-window-title' });
     const guildHtml = model.guild
       ? `<div class="inspect-meta ui-meta ui-muted">${esc(model.guild)}</div>`
@@ -335,11 +354,108 @@ export class InspectWindow {
           className: classDisplayName(model.cls),
         }),
       )}</div>` +
+      (profile.specId === undefined ? '' : specChipHtml(model.cls, model.specId)) +
       guildHtml +
-      `</div>`;
+      `</div>` +
+      (model.gear
+        ? `<div class="inspect-equip inspect-equip--remote">` +
+          `<div class="inspect-equip-title ui-h">${esc(t('classDetails.sections.equipment'))}</div>` +
+          `<div class="paperdoll inspect-paperdoll inspect-paperdoll--remote">` +
+          `<div class="equip-col" id="inspect-equip-left"></div>` +
+          `<div class="equip-col equip-col-right" id="inspect-equip-right"></div>` +
+          `<div class="equip-row-weapons" id="inspect-equip-weapons"></div>` +
+          `</div></div>`
+        : '');
     hydratePortraits(el);
+    if (model.gear)
+      this.paintGear(el, model.gear, {
+        templateId: profile.cls,
+        name: profile.name,
+        level: profile.level,
+        specId: profile.specId,
+        equippedItems: profile.gear ?? {},
+        equippedInstances: {},
+      });
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     el.style.display = 'block';
+  }
+
+  // The Item history doors on a worn tracked copy's row (the bank cell rule,
+  // item_history_access_view.ts 'gridCell'): the row becomes focusable so the
+  // Context Menu key reaches it, right-click opens it on desktop, and touch
+  // layouts get the visible button beneath it. A paperdoll column has no room
+  // for a desktop button per slot.
+  private attachSlotHistory(
+    row: HTMLElement,
+    cell: PaperdollSlot,
+    history: ItemProvenance | null,
+  ): void {
+    if (!cell.item || history === null) return;
+    const name = wornItemCellParts(cell.item, cell.instance).name;
+    row.tabIndex = 0;
+    // A focus stop must do something on every keyboard: Enter and Space open
+    // the history too (no Context Menu key on a Mac keyboard), and the row
+    // announces what it opens.
+    row.setAttribute('role', 'button');
+    row.setAttribute('aria-haspopup', 'dialog');
+    row.setAttribute('aria-label', t('hudChrome.itemHistory.openAria', { item: name }));
+    row.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      openItemHistoryDialog({ itemName: name, provenance: history, opener: row });
+    });
+    attachItemHistoryContextMenu(row, name, history);
+    appendItemHistoryActionAfter(row, name, history, 'gridCell');
+  }
+
+  /** Player Info from the public character sheet (a chat-name lookup): no gear.
+   *  The sheet names the spec in English, so it maps back to the spec id. */
+  openProfile(profile: CharacterProfile): void {
+    const cls = profile.cls as PlayerClass;
+    const spec = TALENTS[cls]?.specs.find((entry) => entry.name === profile.spec);
+    this.openRemote({
+      name: profile.name,
+      level: profile.level,
+      cls,
+      skin: profile.skin,
+      guild: profile.guild,
+      specId: spec?.id ?? null,
+    });
+  }
+
+  // `historyFor` names a worn tracked copy's Item history record, if any
+  // (attachSlotHistory); the remote profile card passes none (no payloads).
+  private paintGear(
+    el: HTMLElement,
+    gear: PaperdollView,
+    wearer: InspectEntity,
+    historyFor?: (cell: PaperdollSlot) => ItemProvenance | null,
+  ): void {
+    const columns: [Element | null, readonly PaperdollSlot[]][] = [
+      [el.querySelector('#inspect-equip-left'), gear.left],
+      [el.querySelector('#inspect-equip-right'), gear.right],
+      [el.querySelector('#inspect-equip-weapons'), gear.weapons],
+    ];
+    for (const [col, cells] of columns) {
+      for (const cell of cells) {
+        const row = this.buildSlotRow(cell, wearer);
+        col?.appendChild(row);
+        if (historyFor) this.attachSlotHistory(row, cell, historyFor(cell));
+      }
+    }
+  }
+
+  // The Gearscore readout, painted inside the model stage just under its
+  // class-colored floor line (the stage's ::after). Omitted when nothing worn
+  // has an item level.
+  private gearScoreHtml(score: number | null): string {
+    if (score === null) return '';
+    return (
+      `<div class="inspect-gearscore ui-num">` +
+      `<span class="inspect-gearscore-label">${esc(t('hudChrome.charSheet.gearScore'))}</span>` +
+      `<b>${esc(formatNumber(score, { minimumFractionDigits: 1, maximumFractionDigits: 1 }))}</b>` +
+      `</div>`
+    );
   }
 
   private panelTitleHtml(): string {
@@ -531,4 +647,13 @@ export class InspectWindow {
       `</div></div>`
     );
   }
+}
+
+/** The specialization chip: the localized spec name, or "no specialization". */
+function specChipHtml(cls: PlayerClass, specId: string | null): string {
+  const spec = specId ? TALENTS[cls]?.specs.find((entry) => entry.id === specId) : undefined;
+  const label = spec
+    ? tTalent({ kind: 'talentSpec', spec, field: 'name' })
+    : t('game.talents.noSpec');
+  return `<div class="inspect-meta inspect-spec ui-chip">${esc(label)}</div>`;
 }

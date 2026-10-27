@@ -224,7 +224,7 @@ describe('the Fenrire look', () => {
 // the same model with other pictures and nothing else, since the town's
 // collision boxes, its seat and the Studio's baked rows read the default
 // model's numbers.
-const HIGHWATCH_BUILDINGS = ['hall', 'house_c', 'shop_a', 'smithy', 'tavern_b'];
+const HIGHWATCH_BUILDINGS = ['bank', 'hall', 'house_c', 'shop_a', 'smithy', 'tavern_b'];
 
 describe('the Highwatch look', () => {
   it.each(

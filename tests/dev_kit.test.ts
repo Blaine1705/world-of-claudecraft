@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { DEV_KIT_ROLE_COUNT, DEV_KIT_ROLES, devKitRole } from '../src/sim/content/dev_kit_roles';
+import {
+  DEV_KIT_ROLE_COUNT,
+  DEV_KIT_ROLES,
+  type DevKitRole,
+  devKitRole,
+} from '../src/sim/content/dev_kit_roles';
 import { HEROIC_ITEMS, RETIRED_HEROIC_ITEMS } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_ITEMS } from '../src/sim/content/heroic_vendor';
 import { WARFARE_ITEMS } from '../src/sim/content/pvp_honor';
@@ -7,19 +12,22 @@ import { talentsFor } from '../src/sim/content/talents';
 import { ITEMS } from '../src/sim/data';
 import {
   applyDevKit,
+  bestBy,
   bestKitBag,
   buildDevKit,
   DEV_KIT_EXCLUDED_DUNGEON,
   DEV_KIT_LEVEL,
+  devKitTieScore,
   dungeonLootIds,
   isFreshTwentyItem,
   QUALITY_TIE_RANK,
   QUALITY_TIE_SCALE,
+  roleItemScore,
 } from '../src/sim/dev_kit';
 import { canDualWield, isShieldItem } from '../src/sim/equipment_rules';
 import { itemFromRaid } from '../src/sim/item_level';
 import { Sim } from '../src/sim/sim';
-import { ALL_CLASSES, type PlayerClass } from '../src/sim/types';
+import { ALL_CLASSES, type ItemDef, type PlayerClass } from '../src/sim/types';
 
 // These presets exist so a tester can gear up in one click instead of being kitted
 // out through the database, and so a Gravewyrm Sanctum balance run measures the
@@ -297,6 +305,8 @@ describe('kit construction', () => {
       'warrior/prot',
       'paladin/protection',
       'paladin/retribution',
+      'shaman/enhancement',
+      'druid/feral',
     ];
     const AGI_SPECS = [
       'hunter/beast_mastery',
@@ -305,7 +315,6 @@ describe('kit construction', () => {
       'rogue/assassination',
       'rogue/combat',
       'rogue/subtlety',
-      'shaman/enhancement',
     ];
     const CASTER_SPECS = [
       'paladin/holy',
@@ -324,18 +333,17 @@ describe('kit construction', () => {
       'druid/restoration',
     ];
     // druid/feral used to take the str ring and then the rung-50 INT ring,
-    // because it is the one TANK_AGI role (sta 1.0) and the int loop's 3
+    // because it was the one TANK_AGI role (sta 1.0) and the int loop's 3
     // stamina beat everything else in the pool. The Wage band carries 3
     // stamina AND 2 strength, so it clears the loop on the same weights
     // (3.6 against 3.0) and this camp stops being the odd one out: the tank
-    // no longer wears an intellect ring. Not a rule change, the same scorer
-    // with one more candidate in the pool.
+    // no longer wears an intellect ring. Feral and Enhancement are Strength
+    // roles now (content/spec_primary_stat.ts), filed with the other STR_SPECS.
 
     const expected = new Map<string, readonly [string, string]>();
     for (const key of STR_SPECS) expected.set(key, STR_RINGS);
     for (const key of AGI_SPECS) expected.set(key, AGI_RINGS);
     for (const key of CASTER_SPECS) expected.set(key, CASTER_RINGS);
-    expected.set('druid/feral', AGI_RINGS);
     const casterSpecs = new Set(CASTER_SPECS);
     // Cross-check against the role table, so a spec added there without a row here
     // fails rather than going unpinned.
@@ -396,8 +404,12 @@ describe('kit construction', () => {
     // contributes zero tomes (holy and protection take shields, retribution a
     // two-hander, the thirteenth two-hander counted below). A pool or picker
     // change that moves ANY of them must be admitted here.
-    expect(pinned).toBe(1);
-    expect(staffCasters).toBe(13);
+    // Admitted: Feral's weights turned Strength-led (Feral is a Strength spec,
+    // content/spec_primary_stat.ts), so it now takes the Cragthorn Greatstaff,
+    // the fourteenth two-hander, and no spec holds the tome. The per-spec check
+    // above stays armed for any spec that moves back to a held offhand.
+    expect(pinned).toBe(0);
+    expect(staffCasters).toBe(14);
   });
 
   it('never puts the same ring in both ring slots', () => {
@@ -418,22 +430,43 @@ describe('kit construction', () => {
   });
 
   it('an in-band tie prefers quality over id (the masterwrought Phase 11o tiebreak)', () => {
-    // The regression this pins: feral weights no int or spi, so the rare
-    // sunpetal_grimoire and the uncommon copperlens_ocular tie on identity
-    // (sta 2 each) inside the epsilon band, and before the quality term the
-    // alphabet handed the kit the strictly weaker uncommon the day its lower
-    // id shipped. The tome must win on quality.
-    // Since the Drowned Temple rework the Chorus Conch (rare, the tome's exact
-    // line) ties the tome on identity AND quality and wins on id; the pick is
-    // still a rare, never the weaker uncommon.
-    expect(buildDevKit('druid', 'feral')?.equip.offhand).toBe('chorus_conch');
-    expect(ITEMS.chorus_conch.quality).toBe('rare');
-    // The dominance order's other half: quality never outranks identity (a
-    // caster spec whose weights the tome's int/spi DO count keeps it too,
-    // trivially, and a role-stat edge beats any quality edge by construction;
-    // the integer-stat premise that construction rests on is pinned below).
-    // A caster spec whose weights the tome's int/spi count now takes the
-    // Falls-Blessed Staff two-hander instead, so feral is the live probe.
+    // The regression this pins: two held offhands on the same weighted line tie
+    // inside the epsilon band, and before the quality term the alphabet handed
+    // the kit the strictly weaker uncommon the day its lower id shipped. Feral
+    // was the live probe (sunpetal_grimoire against copperlens_ocular, later
+    // chorus_conch) until its Strength weights moved it to a two-hander and no
+    // kit pick rode a quality tie any more, so the picker is pinned directly.
+    const role: DevKitRole = {
+      spec: 'probe',
+      weights: { sta: 1, str: 0.7, agi: 0.4 },
+      melee: true,
+    };
+    const offhand = (id: string, quality: ItemDef['quality'], stats: ItemDef['stats']) =>
+      ({
+        id,
+        name: id,
+        kind: 'held_offhand',
+        slot: 'offhand',
+        quality,
+        sellValue: 0,
+        stats,
+      }) as ItemDef;
+    const pick = (items: ItemDef[]) =>
+      bestBy(
+        items,
+        (item) => roleItemScore(role, item),
+        (item) => devKitTieScore(role, item),
+      )?.id;
+    // Same line, same identity: the rare wins although the uncommon sorts first.
+    expect(
+      pick([offhand('a_uncommon', 'uncommon', { sta: 2 }), offhand('b_rare', 'rare', { sta: 2 })]),
+    ).toBe('b_rare');
+    // The dominance order's other half: quality never outranks identity. Str 4
+    // and agi 7 tie in band (0.7 x 4 = 0.4 x 7 = 2.8), and the larger role-stat
+    // sum wins however low its quality (the integer-stat premise is pinned below).
+    expect(
+      pick([offhand('a_epic', 'epic', { str: 4 }), offhand('b_common', 'common', { agi: 7 })]),
+    ).toBe('b_common');
   });
 
   it('the tiebreak scale strictly exceeds the quality ladder top rank (dominance property)', () => {

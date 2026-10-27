@@ -43,6 +43,12 @@ import { Sim } from '../src/sim/sim';
 // tables (they drop on Normal only): eight bosses lost their greens from
 // gearIds. Receipt: each boss's previous gearIds still hashed to its previous
 // gearDigest against the current defs, so no item definition or level moved.
+// Those four digests were refreshed again when non-PvP trinkets became tradable.
+// Restoring only their soulbound flags reproduces every previous digest; item
+// stats, levels, equipment ids and loot chances remain unchanged.
+// Release merge: all eleven changed gear digests are solely the removal of
+// soulbound from ordinary trinkets. Restoring that field reproduced every
+// previous digest exactly; acquisition ids, item levels and stats are unchanged.
 const BASELINE = {
   // Re-minted for the Hollow Crypt rework (docs/design/dungeon-rework/hollow_crypt.md
   // 8.1 and 8.2): every boss now carries its own table. Four shipped heroic epics
@@ -106,7 +112,7 @@ const BASELINE = {
       'morthens_cryptforged_hauberk',
     ],
     normalDigest: '5d6ae5399615ed65d1a72890bdec2dec6be1d1c0e4afa111a5418e21fb217bd7',
-    gearDigest: '2ecc80d8fbc40be313d72e79a03910874ea56e316e678a4ca1b890552ff060c7',
+    gearDigest: 'be60e19c7dd81b4029e0c03363e90006e11dc03f82acc3b6bf11fcf8b3bfa9b4',
   },
   // Re-minted for the Sunken Bastion rework (docs/design/dungeon-rework/
   // sunken_bastion.md 8.1 and 8.2): Olen's normal table gains the Longsword row
@@ -144,7 +150,7 @@ const BASELINE = {
       'sash_of_the_sunken_court',
     ],
     normalDigest: '9176140d149844688d4907a14694610d3ad6f475b52e0a130132325eae9de291',
-    gearDigest: 'c9d8b2f1852d0e51b6b9f9ba70b2bb3e58044a0231bafd3ef5efe95169f725d2',
+    gearDigest: '6a48109bde4457cbeab298fcdf1221b82f9d52141b159539d53695ce7e53328b',
   },
   vael_the_mistcaller: {
     gearIds: [
@@ -159,7 +165,7 @@ const BASELINE = {
       'tidebound_spaulders',
     ],
     normalDigest: '8917391dfc5e9fcd2da06099477d6b7b9a1444246f616b0aaf694276619c25fa',
-    gearDigest: 'b885ac64a58cca05122e3ce0d20082f5e57c4943f0ce893365b3b600bed5faab',
+    gearDigest: '0d22e897faf5637d46034e79371c49097ca2e22820f740ffa27c7a83ede25827',
   },
   // Re-minted for the Drowned Temple rework (docs/design/dungeon-rework/
   // drowned_temple.md section 8): Selthe's normal table gains a guaranteed
@@ -195,7 +201,7 @@ const BASELINE = {
       'tidewoven_trousers',
     ],
     normalDigest: '9d27de1f80a3039fdf7f9c830801bef379c3ea7378568dad38dee6acd51c723c',
-    gearDigest: '9b74b7040c66ec2fc57abd52f95d67c37ec507e6a4f2a4ec87a52c1ae36c3978',
+    gearDigest: '173ff1141413c2050bfb257982e5065bda83a1eedc81e98e09eed743f319f204',
   },
   ysolei: {
     gearIds: [
@@ -209,7 +215,7 @@ const BASELINE = {
       'menders_hourglass',
     ],
     normalDigest: 'a9976a6c091381043ffca9d95c2e6e735c5188fddcb11577d0a333ba7084c7d5',
-    gearDigest: '409eeb52fc34643e0c104ee73a25a2518713da20aabeca96badcce4b26931aad',
+    gearDigest: 'adad030672cca7c47b01d9665b2f5a27df74cc5484f440c63f9b02fe628c6eab',
   },
   // Re-minted for the Gravewyrm Sanctum rework (gravewyrm_sanctum.md 9.1 and
   // 9.2): Korgath and Velkhar drop their own normal trios (the shared
@@ -241,7 +247,7 @@ const BASELINE = {
       'heroic_wyrmshadow_treads',
     ],
     normalDigest: 'a0d9dfeea48e421978c3c1a27aa11c1aad7dc6d568cbf5d517c79bc85e663dbc',
-    gearDigest: '14ad38be49a5f4495f3c4f0670ee5007b5d5cf71b73e223d943929c394a57ff6',
+    gearDigest: '4757ea50735a04b44da9b5687fa57c481d82203c34693b4eb602be210659c6b1',
   },
   grand_necromancer_velkhar: {
     gearIds: [
@@ -266,7 +272,7 @@ const BASELINE = {
       'wyrmchoir_handwraps',
     ],
     normalDigest: '859a210340367eb11461edcb9857aa0b9937bbf25c81f99d2b4ec947eed83302',
-    gearDigest: '5742740a4b9d149b8a5af5f0b4745dde1efb2cad38c19d1553f0f3ffaf7958bc',
+    gearDigest: '4215163cdd4abc8c17b8342301031a6e2c6a94429a3f7919be66d93f09150a13',
   },
   korzul_the_gravewyrm: {
     gearIds: [
@@ -285,7 +291,7 @@ const BASELINE = {
       'wildsoul_maul',
     ],
     normalDigest: '4aed8727dccd1d8ad7f7e1027b40145472b282246b10dc3963772e95056a6b8d',
-    gearDigest: '5ada5de88b43c548d305ed10bce03b31b02c8fb63f3ec740c9df2990404944dc',
+    gearDigest: 'af7e4b4c7320cc96180e39b77a28fea6ed1a5daa962bb6685d980633e50bdd99',
   },
   // The Wildheart Basin rework (docs/design/dungeon-rework/wildheart_basin.md
   // 8.1 and 8.2): the promoted Fanglord Beastmaster and the Gorgebloom carry
@@ -309,7 +315,7 @@ const BASELINE = {
       'hunters_tally',
     ],
     normalDigest: '501676841dcaafeaa5c2b1b7d4538269c33e47e31d4eb309914536d903698c73',
-    gearDigest: '71f270d3831e04445d9223a92781888bd82055c90e038d9438f8ff0b448a3fc6',
+    gearDigest: '05311c7f59fd7645d1f57e3152b3f060457dd670218c2ee067ae2ed11405a20a',
   },
   the_gorgebloom: {
     gearIds: [
@@ -326,7 +332,7 @@ const BASELINE = {
     // Re-pinned when the Falls-Blessed Staff (and its heroic copy) joined the
     // shared caster-weapon set: paladins may wield it. requiredClass only; the
     // stats, level and acquisition are unchanged.
-    gearDigest: '4991bcb5ebcd160590900e16db94e5d4b29dea359714ea56cf712c5cacaa5bc5',
+    gearDigest: '45c47a8da15ec16a613476509251482c4844b4aed628559efbaca9faf56bdc9a',
   },
   wildheart_high_priest: {
     gearIds: [
@@ -343,7 +349,7 @@ const BASELINE = {
       'verdant_heart_vestment',
     ],
     normalDigest: 'a75b69d4c5bebc4bfd9990229e494df00a53aaa8b3372aa56e803f7b5d5fd224',
-    gearDigest: 'f1272ee3496342b19cb27e7e2b5695c462762ace475de0691237ba0b41c0d986',
+    gearDigest: '6f8a9457b706a08fef7a1c840865eaa8d2e5ac7e3b19b4a872e2776616307be9',
   },
   // The Gaol Turnkey gained a heroic roll on 2026-10-08 (two of Vael's epics,
   // its relocated Nythraxis piece, its blue roll's rare copies).

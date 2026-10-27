@@ -660,7 +660,7 @@ export class BankWindow {
         if (id !== 'personal' && id !== 'guild' && id !== 'vault' && id !== 'account') return;
         if (this.tab !== id) audio.click();
         this.tab = id;
-        if (id === 'account') accountBank.request(this.deps.world());
+        if (id === 'account') accountBank.openTab(this.deps.world());
         this.render();
         if (focusFollow) focusActiveTab(this.deps.root(), 'bank-tab', 'on');
       });

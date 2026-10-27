@@ -151,8 +151,10 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // (cmb_balgath and cmb_balgath_ten at 10, cmb_point_taken at 5: +25), at the
     // release/v0.45.0 merge over the Buried Hoards Coinsack catch.
     // + the five-dungeon rework (PR 4352) on the v0.45.0 integration: 346, 3810.
-    expect(DEED_ORDER.length).toBe(346);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3810);
+    // + Lantern Hall (the Highwatch guild): three contract milestones (5, 10, 25) and the
+    // quartermaster's three zero-Renown title feats: 352, 3850.
+    expect(DEED_ORDER.length).toBe(359);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(4010);
   });
 
   it('ships the audited per-category counts', () => {
@@ -170,8 +172,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // release/v0.41.0 merge (the release's own chain read 58), then
       // +1 the Phase 13 promotion capstone prog_legendmaker, then
       // +7 the faction standing ladder (a Trusted and a Champion deed per
-      // allied faction plus the all-factions meta).
-      progression: 75,
+      // allied faction plus the all-factions meta), then
+      // +1 the sixth lifetime-XP rung (prog_titan).
+      progression: 76,
       // +1 the Buried Hoard goblin catch (cmb_coinsack_caught).
       // +2 the Mirefen world boss pair, +1 the muster's pike drill.
       combat: 14,
@@ -184,7 +187,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +1 the Drowned Temple lore guide's The Last Verse.
       // +3 the Hollow Crypt wing bosses' encounter deeds.
       // +1 Morthen's Every Candle Lit.
-      dungeon: 60,
+      // +3 Lantern Hall's contract milestones.
+      dungeon: 63,
       delve: 13,
       // +4 farming first-harvest chronicles (chr_*_first_harvest).
       chronicle: 53,
@@ -194,15 +198,16 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // release side added independently. UNION MERGE: base plus both deltas.
       collection: 41,
       // Release's Thornhollow battlegrounds plus the WARFARE honor ladder.
-      pvp: 35,
+      pvp: 40,
       // +2 bank socket ladder deeds (soc_strongbox_outfitter,
       // soc_four_bags_deep; Bank Storage phase 06).
       social: 20,
       // +2 the Clue Scroll casket pair (exp_clue_first_casket and
       // exp_clue_ten_caskets, both on the clueCasketsOpened meter).
       // +1 the release's ferry round trip (exp_harbor_to_harbor).
-      exploration: 22,
-      feat: 3,
+      exploration: 23,
+      // +3 Lantern Hall's quartermaster titles (bought for Lantern Seals).
+      feat: 6,
       hidden: 10,
     });
   });
@@ -423,6 +428,13 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // release/v0.44.0 base merge.
       'exp_harbor_to_harbor',
       // The Mirefen world-boss branch, appended last over release/v0.44.0.
+      'prog_titan',
+      'pvp_flag_1h',
+      'pvp_flag_3h',
+      'pvp_flag_6h',
+      'pvp_flag_24h',
+      'pvp_flag_168h',
+      'exp_wisp_maze_hard',
       'cmb_balgath',
       'cmb_balgath_ten',
       'cmb_point_taken',
@@ -459,6 +471,13 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'dgn_ilvane_hush',
       // Morthen the Gravecaller's Rite (morthen.ts).
       'dgn_morthen_candlelight',
+      'dgn_guild_first_contract',
+      'dgn_guild_ten_contracts',
+      'dgn_guild_fifty_contracts',
+      'feat_guild_writ_runner',
+      'feat_guild_hallsworn',
+      'feat_guild_of_lantern_hall',
+      // The sixth lifetime-XP rung (10,000,000 lifetime XP, the Titan title).
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -856,12 +875,12 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // faction standing Champion titles (Riftwarden, Dawnkeeper, Forgemaster)
     // three more, and the Clue Scroll tenth-casket title (Treasure Hunter)
     // one more, and the Drowned Temple lore guide's Witness of the Choir
-    // (dgn_drowned_temple_cantor) one more.
-    expect(titles.length).toBe(52);
+    // (dgn_drowned_temple_cantor) one more, and Lantern Hall's quartermaster three more.
+    expect(titles.length).toBe(61);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(52);
+    expect(new Set(titleTexts).size).toBe(61);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -1099,7 +1118,11 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // down into PRE_APPEND_CATALOG_SHA256 the same auditable way. The rework's own
   // chain (765c2ea1... -> 299661d4... -> ... -> 4086f07c...) minted those deeds
   // without the Mirefen three ahead of them, so it does not apply on this branch.
-  const FROZEN_CATALOG_SHA256 = '9e4d4f506fe6510ad0da7fa87440a88ac57b199ec8e9b1e49258f8f37923d5e5';
+  // Re-baselined for Lantern Hall (the Highwatch guild): its six appended deeds, re-minted
+  // the auditable way (the 9e4d4f50... literal rotated down into PRE_APPEND_CATALOG_SHA256).
+  // Release merge: retain the release catalogue first and append integration's
+  // 33 deeds. Stripping them reproduces the release's frozen digest below.
+  const FROZEN_CATALOG_SHA256 = 'f0b1e522f87715f2ffbf812095ea6fb172aa9116d57c706a9fe65f945b1b482d';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1174,9 +1197,18 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // On the v0.45.0 integration the five-dungeon rework's 24 deeds append after
   // cmb_point_taken; the previous mint is the Mirefen branch's 505e3754... literal
   // (rotated down here), and stripping the 24 must reproduce it exactly.
+  // Lantern Hall (the Highwatch guild) appends six deeds after dgn_morthen_candlelight; the
+  // previous mint is the v0.45.0 integration's 9e4d4f50... literal (rotated down here), and
+  // stripping the six must reproduce it exactly.
+  //
+  // The hard Wisp Maze deed now appends after the World PvP title ladder.
+  // Stripping it reproduces the previous 325-deed mint.
   const PRE_APPEND_CATALOG_SHA256 =
-    '505e37543eb54133967e97b9b3a3fca889b3eddb11e24f9a0c053e029d8da694';
+    '848807438e0f05d13e50dc1a90d48ec07ce80a4d3942b6e2ca8cf5a8ccde9575';
   const APPENDED_SINCE: readonly string[] = [
+    'cmb_balgath',
+    'cmb_balgath_ten',
+    'cmb_point_taken',
     'dgn_olen_buttress',
     'dgn_ossick_moored',
     'dgn_vael_beacon',
@@ -1201,6 +1233,12 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     'dgn_lady_nobody_hanging',
     'dgn_ilvane_hush',
     'dgn_morthen_candlelight',
+    'dgn_guild_first_contract',
+    'dgn_guild_ten_contracts',
+    'dgn_guild_fifty_contracts',
+    'feat_guild_writ_runner',
+    'feat_guild_hallsworn',
+    'feat_guild_of_lantern_hall',
   ];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
@@ -1212,8 +1250,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     // the ferry round trip. Pin the two predecessors too: an append into a known seat,
     // never a scattered insert or a retro-edit (the digest below proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'cmb_balgath_ten',
-      'cmb_point_taken',
+      'pvp_flag_168h',
+      'exp_wisp_maze_hard',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1442,11 +1480,13 @@ describe('table shape', () => {
     // then the world-quest block, then the faction standing ladder, then the
     // Clue Scroll casket pair, then the release's ferry round trip, then the
     // Mirefen world-boss branch's three combat deeds, then (v0.45.0 integration) the
-    // five-dungeon rework's 24, Morthen's Every Candle Lit last.
-    expect(DEED_ORDER[DEED_ORDER.length - 28]).toBe('exp_harbor_to_harbor');
-    expect(DEED_ORDER[DEED_ORDER.length - 26]).toBe('cmb_balgath_ten');
-    expect(DEED_ORDER[DEED_ORDER.length - 25]).toBe('cmb_point_taken');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('dgn_morthen_candlelight');
+    // five-dungeon rework's 24, Morthen's Every Candle Lit, then Lantern Hall's six, the
+    // quartermaster's third title last.
+    expect(DEED_ORDER[DEED_ORDER.length - 41]).toBe('exp_harbor_to_harbor');
+    expect(DEED_ORDER[DEED_ORDER.length - 32]).toBe('cmb_balgath_ten');
+    expect(DEED_ORDER[DEED_ORDER.length - 31]).toBe('cmb_point_taken');
+    expect(DEED_ORDER[DEED_ORDER.length - 7]).toBe('dgn_morthen_candlelight');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('feat_guild_of_lantern_hall');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
@@ -2249,6 +2289,31 @@ describe('milestone unification', () => {
     expect(DEEDS.prog_paragon.reward).toEqual({ kind: 'title', text: 'Paragon' });
     expect(DEEDS.prog_mythic.reward).toEqual({ kind: 'title', text: 'Mythic' });
     expect(DEEDS.prog_eternal.reward).toEqual({ kind: 'title', text: 'Eternal' });
+  });
+
+  it('the sixth rung (Titan) is a deed-only title at 10,000,000 lifetime XP', () => {
+    const deed = DEEDS.prog_titan;
+    expect(deed.category).toBe('progression');
+    expect(deed.renown).toBe(50);
+    expect(deed.trigger).toEqual({ kind: 'lifetimeXp', amount: 10_000_000 });
+    expect(deed.reward).toEqual({ kind: 'title', text: 'Titan' });
+    expect(deed.hidden).toBeFalsy();
+    expect(deed.feat).toBeFalsy();
+    // Deed-only: the frozen legacy milestone mirror does not grow.
+    expect(MILESTONE_DEED_TO_LEGACY.prog_titan).toBeUndefined();
+    expect(MILESTONES.some((m) => m.lifetimeXp === 10_000_000)).toBe(false);
+    // The ladder stays strictly ascending: the new rung sits above Eternal.
+    const ladder = ALL.filter((d) => d.trigger.kind === 'lifetimeXp').map((d) =>
+      d.trigger.kind === 'lifetimeXp' ? [d.id, d.trigger.amount] : [d.id, 0],
+    );
+    expect(ladder).toEqual([
+      ['prog_veteran', 250000],
+      ['prog_champion', 500000],
+      ['prog_paragon', 1000000],
+      ['prog_mythic', 2500000],
+      ['prog_eternal', 5000000],
+      ['prog_titan', 10000000],
+    ]);
   });
 });
 
