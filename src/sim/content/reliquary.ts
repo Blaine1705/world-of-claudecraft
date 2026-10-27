@@ -300,9 +300,7 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   'referral_raptor',
   'referral_tank',
   // Gourdlight Eve's Emberbristle Broom: Hester's, for five of Old Thatchgrin's daily
-  // Emberwoven Sheaves. Its reins are event-bound (swept when the event closes), so the
-  // slot reads owned only while Gourdlight Eve runs and drops back to unowned after,
-  // like any lost reins.
+  // Emberwoven Sheaves. Earned reins remain owned after the event closes.
   'emberbristle_broom',
 ] as const;
 

@@ -34,6 +34,7 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { resolveScarecrowField } from '../sim/seasonal/scarecrow_field';
 import type { SpatialAudioSink } from './audio_sink';
+import { floorVfxRenderOrder } from './floor_vfx_layer_core';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { pullDecalTowardCamera } from './ground_decal_pull';
 import { cloneMaterialWithHooks } from './material_clone_hooks';
@@ -646,6 +647,7 @@ export class ScarecrowFx {
     const ringGeo = new THREE.RingGeometry(0.82, 1, 72);
     ringGeo.rotateX(-Math.PI / 2);
     this.ring = new THREE.Mesh(ringGeo, this.ringMaterial);
+    this.ring.renderOrder = floorVfxRenderOrder('encounter');
     this.ring.scale.setScalar(0.001);
     root.add(this.ring);
     // the landings' blast rings (round 10): one pooled additive draw, violet per instance
@@ -662,6 +664,7 @@ export class ScarecrowFx {
       this.blastRings.setColorAt(i, blastTint.setHex(GOURDFALL_PURPLE.rim));
     }
     this.blastRings.frustumCulled = false;
+    this.blastRings.renderOrder = floorVfxRenderOrder('encounter');
     this.blastRings.name = 'scarecrow-fx-blast-rings';
     root.add(this.blastRings);
     // the burst's fireball: one additive ball, blown out and faded (it shares the ring's clock)
@@ -1021,10 +1024,12 @@ export class ScarecrowFx {
     }
     pos.needsUpdate = true;
     const disc = new THREE.Mesh(geometry, this.discMaterial);
+    disc.renderOrder = floorVfxRenderOrder('encounter');
     disc.position.set(x, y, z);
     disc.visible = false;
     root.add(disc);
     const glow = new THREE.Mesh(geometry, this.discGlowMaterial ?? this.discMaterial);
+    glow.renderOrder = floorVfxRenderOrder('encounter', 1);
     glow.position.set(x, y + 0.01, z);
     glow.visible = false;
     root.add(glow);

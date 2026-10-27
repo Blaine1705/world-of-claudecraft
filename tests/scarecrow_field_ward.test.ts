@@ -29,15 +29,26 @@ function world(season: boolean): Sim {
   return sim;
 }
 
-/** Wild mobs (not his own adds) standing inside the ward right now, by template. */
-function intruders(sim: Sim, cx: number, cz: number): string[] {
-  const out: string[] = [];
-  for (const e of sim.entities.values()) {
-    if (e.kind !== 'mob' || e.dead || e.templateId.startsWith('gourdlight')) continue;
-    if (Math.hypot(e.pos.x - cx, e.pos.z - cz) < SCARECROW_FIELD_WARD_RADIUS)
-      out.push(e.templateId);
-  }
-  return out;
+/** Exercise an actual inward wander independently of nearby camp placement. */
+function inwardWildlife(sim: Sim): Entity[] {
+  const field = resolveScarecrowField(WORLD_SEED)!;
+  // Within interest range, outside aggro range of both the wildlife and boss.
+  sim.player.pos = sim.ctx.groundPos(field.x, field.z + 50);
+  return ['wild_boar', 'mogger'].map((id, i) => {
+    const mob = [...sim.entities.values()].find((e) => e.templateId === id && !e.dead)!;
+    expect(mob, id).toBeDefined();
+    const sign = i === 0 ? 1 : -1;
+    mob.pos = sim.ctx.groundPos(field.x + sign * (SCARECROW_FIELD_WARD_RADIUS + 0.5), field.z);
+    mob.spawnPos = { ...mob.pos };
+    mob.wanderTarget = sim.ctx.groundPos(
+      field.x + sign * (SCARECROW_FIELD_WARD_RADIUS - 3),
+      field.z,
+    );
+    mob.wanderTimer = 30;
+    mob.aiState = 'idle';
+    sim.ctx.grid.update(mob);
+    return mob;
+  });
 }
 
 describe('the ward geometry', () => {
@@ -113,34 +124,28 @@ describe('Boar Meadow round his field', () => {
     const sim = world(false);
     const field = resolveScarecrowField(WORLD_SEED);
     if (!field) throw new Error('no field');
-    let seen = 0;
-    for (let t = 0; t < 20 * 20; t++) {
-      sim.tick();
-      if (t % 20 === 0 && intruders(sim, field.x, field.z).length > 0) seen++;
-    }
-    expect(seen).toBeGreaterThan(0);
+    const mobs = inwardWildlife(sim);
+    for (let t = 0; t < 40; t++) sim.tick();
+    for (const mob of mobs)
+      expect(Math.hypot(mob.pos.x - field.x, mob.pos.z - field.z), mob.templateId).toBeLessThan(
+        SCARECROW_FIELD_WARD_RADIUS,
+      );
   });
 
   it('keeps every boar and Mogger out of it while the event runs', () => {
     const sim = world(true);
     const field = resolveScarecrowField(WORLD_SEED);
     if (!field) throw new Error('no field');
-    // the camp spawns that landed inside walk out first
-    for (let t = 0; t < 20 * 45; t++) sim.tick();
-    const seen = new Set<string>();
-    for (let t = 0; t < 20 * 30; t++) {
+    const mobs = inwardWildlife(sim);
+    for (let t = 0; t < 40; t++) {
       sim.tick();
-      if (t % 10 === 0) for (const id of intruders(sim, field.x, field.z)) seen.add(id);
+      for (const mob of mobs)
+        expect(
+          Math.hypot(mob.pos.x - field.x, mob.pos.z - field.z),
+          mob.templateId,
+        ).toBeGreaterThanOrEqual(SCARECROW_FIELD_WARD_RADIUS);
     }
-    expect([...seen]).toEqual([]);
-    // the meadow is still there, just round the edge
-    const near = [...sim.entities.values()].filter(
-      (e) =>
-        e.kind === 'mob' &&
-        (e.templateId === 'wild_boar' || e.templateId === 'mogger') &&
-        Math.hypot(e.pos.x - field.x, e.pos.z - field.z) < SCARECROW_FIELD_WARD_RADIUS + 15,
-    );
-    expect(near.length).toBeGreaterThan(0);
+    for (const mob of mobs) expect(mob.aiState).toBe('idle');
   });
 
   it('is deterministic: two worlds on one seed walk their wildlife identically', () => {

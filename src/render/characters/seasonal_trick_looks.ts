@@ -18,7 +18,14 @@ export function seasonalTrickLooks(
   const out: Record<string, VisualDef> = {};
   const bat = visuals.mob_hoard_bat_swarmling;
   if (bat)
-    out.form_trick_bat = { ...bat, height: 1.25, hover: 0.55, tint: 0x6a5a6a, tintStrength: 0.35 };
+    out.form_trick_bat = {
+      ...bat,
+      lazyPreload: true,
+      height: 1.25,
+      hover: 0.55,
+      tint: 0x6a5a6a,
+      tintStrength: 0.35,
+    };
   const skeleton = visuals.skel_minion;
   if (skeleton) out.form_trick_skeleton = { ...skeleton, height: 2.05, tint: undefined };
   // The ghost costume: the Veiled Hollow's spirit rig, drawn a player's height and floating,
@@ -37,7 +44,7 @@ export function seasonalTrickLooks(
   // Coinsack Scurrier, sack of stolen gold and all, on its own KayKit rig and clips (idle,
   // walk, run), drawn a head shorter than a player so the drinker reads as a goblin at once.
   const goblin = visuals.mob_hoard_coinsack_scurrier;
-  if (goblin) out.form_costume_goblin = { ...goblin, height: 1.75 };
+  if (goblin) out.form_costume_goblin = { ...goblin, lazyPreload: true, height: 1.75 };
   // Thatchbound's puppets (Old Thatchgrin's mind control, src/sim/seasonal/scarecrow_puppet.ts):
   // the first victim of a cast becomes a little straw scarecrow, his own strawling's rig a
   // touch shorter than a player (its ember eyes lit, the read that it is HIS), the second a

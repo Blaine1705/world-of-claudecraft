@@ -46,6 +46,7 @@ import {
   GOURDLIGHT_TOY_FX_PREFIX as TOY_FX_ABILITY_PREFIX,
 } from '../sim/content/gourdlight_eve';
 import type { SpatialAudioSink } from './audio_sink';
+import { floorVfxRenderOrder } from './floor_vfx_layer_core';
 import { attachSceneGroupGated } from './gated_scene_attach';
 import { pullDecalTowardCamera } from './ground_decal_pull';
 import { gourdlightAssets } from './seasonal_decor_assets';
@@ -1015,6 +1016,7 @@ export class SeasonalToysFx {
     const groundDisc = own(new THREE.CircleGeometry(1, 40));
     groundDisc.rotateX(-Math.PI / 2);
     this.mists = pool(groundDisc, mistMat, TOY_CAP, 'seasonal-toys-mists');
+    this.mists.renderOrder = floorVfxRenderOrder('ground');
     root.add(this.mists);
     const halo = haloTexture();
     if (halo) own(halo);
@@ -1034,7 +1036,7 @@ export class SeasonalToysFx {
     pullDecalTowardCamera(poolMat, 'seasonal-toys-light-pool');
     pullDecalTowardCamera(mistMat, 'seasonal-toys-mist');
     this.lightPools = pool(groundDisc, poolMat, TOY_CAP, 'seasonal-toys-light-pools');
-    this.lightPools.renderOrder = 1;
+    this.lightPools.renderOrder = floorVfxRenderOrder('ground');
     root.add(this.lightPools);
     // the dancing shadows: one pool per figure over one atlas and one material
     const atlas = shadowAtlasTexture();
@@ -1042,7 +1044,7 @@ export class SeasonalToysFx {
     const inkMat = own(shadowMaterial(atlas));
     this.shadows = CANDLE_SHADOW_FIGURES.map((figure, cell) => {
       const m = pool(own(shadowGeometry(cell)), inkMat, TOY_CAP, `seasonal-toys-shadow-${figure}`);
-      m.renderOrder = 2;
+      m.renderOrder = floorVfxRenderOrder('ground', 1);
       root.add(m);
       return m;
     });
