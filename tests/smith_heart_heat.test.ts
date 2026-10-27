@@ -599,6 +599,43 @@ describe('Guardian of the Heat: phase 3, the Rolling Cinders', () => {
     expect(cinder.hp).toBe(hp1);
   });
 
+  it('nothing wears it down: strikes, a sourceless hit and a wild mob land nothing lasting', () => {
+    const { f, cinder, quarry } = rolling();
+    const striker = f.players.find((p) => p.id !== quarry.id) as Entity;
+    const full = cinder.maxHp;
+    // Strikes worth nearly all its health in one tick: whole again after it.
+    for (let i = 0; i < full - 5; i++)
+      f.sim.ctx.dealDamage(striker, cinder, 900, false, 'physical', 'test', 'hit');
+    expect(cinder.hp).toBe(5);
+    f.tick(1);
+    expect(cinder.dead).toBe(false);
+    expect(cinder.hp).toBe(full);
+    // A hit with no source, or from a mob nobody owns, lands nothing.
+    expect(f.sim.ctx.dealDamage(null, cinder, 99999, false, 'fire', 'test', 'hit')).toBe(0);
+    expect(cinder.hp).toBe(full);
+    expect(f.sim.ctx.dealDamage(f.boss(), cinder, 99999, false, 'fire', 'test', 'hit')).toBe(0);
+    expect(cinder.dead).toBe(false);
+    expect(adds(f, HEAT_MOBS.cinder)).toHaveLength(1);
+  });
+
+  it('Hunted leaves a quarry who walks off the floor, and every player at the fight end', () => {
+    const { f, quarry } = rolling();
+    expect(has(quarry, HEAT_AURAS.hunted)).toBe(true);
+    // Off the Hearth's floor (back toward the forge): no longer a quarry.
+    f.put(quarry, -150, 0);
+    f.tick(2);
+    expect(has(quarry, HEAT_AURAS.hunted)).toBe(false);
+    // The cinder picks someone on the floor; one Hunted, never two.
+    f.tick(ticks(T.cinderRetarget + 0.2));
+    const huntedNow = f.players.filter((p) => has(p, HEAT_AURAS.hunted));
+    expect(huntedNow).toHaveLength(1);
+    expect(huntedNow[0].id).not.toBe(quarry.id);
+    // The fight ends far from the forge: the mark goes with it.
+    f.put(huntedNow[0], 40, 0);
+    expect(f.dev('/dev heart heat reset')).toBe(true);
+    for (const p of f.players) expect(has(p, HEAT_AURAS.hunted)).toBe(false);
+  });
+
   it('falls on its own clock through phase 3', () => {
     const f = pulled(3);
     f.dev('/dev heart heat phase 3');

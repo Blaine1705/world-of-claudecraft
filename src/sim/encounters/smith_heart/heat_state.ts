@@ -156,8 +156,6 @@ export interface HeatFightState {
   stageLeft: number;
   overflow: HeatOverflow | null;
   overflows: number;
-  /** The wellspring's claim object (found once). */
-  wellId: number | null;
   bar: HeatBar | null;
   /** Breath after a bar before the next begins. */
   gap: number;

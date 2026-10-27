@@ -855,7 +855,7 @@ export const SMITH_HEART_BLADE_OBJECTS: DungeonObjectSpawn[] = QUENCH_BLADE_SPOT
 
 /** The first wellspring at the foot of the Hearth's altar-stone (design doc
  *  7.4): spawned with the claim, its state in the template id (calm, the
- *  Hearth overflowing, torn by the guardian's leaving it); the Guardian of the
+ *  Hearth overflowing); the Guardian of the
  *  Heat stands half sunk in it (encounters/smith_heart/heat.ts). */
 export const SMITH_HEART_WELL_OBJECT: DungeonObjectSpawn = {
   itemId: '',

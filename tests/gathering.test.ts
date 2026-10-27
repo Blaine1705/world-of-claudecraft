@@ -398,7 +398,10 @@ describe('isHarvestableCorpse', () => {
     // the six bosses of the Council and the guardians, and the final boss: 315.
     expect(untagged).toContain(MOBS.wildheart_hunting_spear);
     expect(untagged).toContain(MOBS.heart_heat_guardian);
-    expect(untagged).toHaveLength(315);
+    // The Guardian of the Heat's four untagged adds (Wellspawn, Wellkeeper,
+    // Seedflame, Rolling Cinder): 319.
+    expect(untagged).toContain(MOBS.heart_heat_rolling_cinder);
+    expect(untagged).toHaveLength(319);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

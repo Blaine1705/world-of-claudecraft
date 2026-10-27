@@ -40,7 +40,7 @@ import type { SimContext } from '../../sim_context';
 import { clearThreat } from '../../threat';
 import { DT, type Entity } from '../../types';
 import { claimBoss, clearCastIf } from '../sunken_bastion/claim';
-import { callCinder, clearCinders, stepCinders, syncHunted } from './heat_cinders';
+import { callCinder, clearCinders, dropStrayHunted, stepCinders, syncHunted } from './heat_cinders';
 import { clearFist, landFist, startFist, stepSwells } from './heat_fist';
 import { flare, stepFlare, stepWellFire } from './heat_flare';
 import {
@@ -143,7 +143,6 @@ function freshState(difficulty: HeatDifficulty): HeatFightState {
     stageLeft: 0,
     overflow: null,
     overflows: 0,
-    wellId: null,
     bar: null,
     gap: 0,
     fistTimer: T.fistFirst,
@@ -426,6 +425,8 @@ function clearFight(
     if (e && HEAT_ADD_IDS.has(e.templateId)) dropHeatMob({ ctx, inst, boss }, id);
   }
   for (const p of hearthListeners(ctx, inst)) for (const id of PLAYER_MARKS) dropAura(p, id);
+  // Hunted is permanent: off everyone this guardian ever marked, wherever.
+  dropStrayHunted(ctx, boss.id, null);
   clearCastIf(boss, HEAT_CASTS.fist);
   dropAura(boss, HEAT_AURAS.state);
   boss.hostile = true;

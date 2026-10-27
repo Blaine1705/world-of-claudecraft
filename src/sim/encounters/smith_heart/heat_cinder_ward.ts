@@ -10,17 +10,18 @@ import type { Entity } from '../../types';
 import { HEAT_MOBS } from './heat_ids';
 
 /** Points a hit from `source` lands on a rolling cinder `target`, or null
- *  when the hit is not a ward hit (not a cinder, a dead one, or a
- *  wild mob's hit). Only a `direct` hit lands its point: a damage-over-time
- *  tick or a reflect lands nothing, so only a real strike knocks it back. */
+ *  when `target` is not a living cinder. Only a player's or a pet's
+ *  `direct` hit lands its point: a damage-over-time tick, a reflect, a
+ *  sourceless or a wild mob's hit lands nothing, so only a real strike
+ *  knocks it back and nothing can wear it down. */
 export function heatCinderHitPoints(
   source: Entity | null | undefined,
   target: Entity,
   direct: boolean,
 ): number | null {
-  if (!source || target.kind !== 'mob' || target.dead) return null;
+  if (target.kind !== 'mob' || target.dead) return null;
   if (target.templateId !== HEAT_MOBS.cinder) return null;
-  const helper = source.kind === 'player' || (source.kind === 'mob' && source.ownerId !== null);
-  if (!helper) return null;
-  return direct ? 1 : 0;
+  const helper =
+    !!source && (source.kind === 'player' || (source.kind === 'mob' && source.ownerId !== null));
+  return helper && direct ? 1 : 0;
 }

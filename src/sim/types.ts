@@ -6314,7 +6314,7 @@ export interface DungeonObjectSpawn {
     // id, and each (but a flying one) stands as a combat wall.
     | 'sh_quench_blade_sunk'
     // The first wellspring in the Hearth (encounters/smith_heart/heat.ts):
-    // calm, overflowing or torn rides the template id.
+    // calm or overflowing rides the template id.
     | 'sh_heat_well_calm';
   dungeonId?: string;
   /**

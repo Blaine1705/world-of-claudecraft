@@ -71,19 +71,37 @@ export function cinderLanding(n: number, quarry: HPoint | null): HPoint {
 }
 
 /** Every player a cinder or a Seedflame hunts wears Hunted (and nobody
- *  else). */
+ *  else: a quarry who left the floor loses it too). */
 export function syncHunted(s: HeatScope): void {
   const hunted = new Set<number>();
   for (const c of s.st.cinders) if (c.quarry !== null) hunted.add(c.quarry);
   for (const sp of s.st.sprouts) if (sp.quarry !== null) hunted.add(sp.quarry);
   for (const p of s.players) {
-    const has = auraOf(p, HEAT_AURAS.hunted) !== undefined;
-    if (hunted.has(p.id) && !has)
-      putMarker(p, HEAT_AURAS.hunted, HEAT_NAMES.hunted, 3600, s.boss.id, {
-        permanent: true,
-        school: 'fire',
-      });
-    else if (!hunted.has(p.id) && has) dropAura(p, HEAT_AURAS.hunted);
+    if (!hunted.has(p.id) || auraOf(p, HEAT_AURAS.hunted) !== undefined) continue;
+    putMarker(p, HEAT_AURAS.hunted, HEAT_NAMES.hunted, 3600, s.boss.id, {
+      permanent: true,
+      school: 'fire',
+    });
+  }
+  dropStrayHunted(s.ctx, s.boss.id, hunted, s.players);
+}
+
+/** Drop Hunted (this guardian's) from every player it no longer fits: not
+ *  hunted, or off the floor (`onFloor`). With no `keep`, from everyone
+ *  (the fight's end). */
+export function dropStrayHunted(
+  ctx: HeatScope['ctx'],
+  bossId: number,
+  keep: ReadonlySet<number> | null,
+  onFloor: readonly Entity[] = [],
+): void {
+  for (const meta of ctx.players.values()) {
+    const p = ctx.entities.get(meta.entityId);
+    if (!p) continue;
+    const a = auraOf(p, HEAT_AURAS.hunted);
+    if (!a || a.sourceId !== bossId) continue;
+    if (keep?.has(p.id) && onFloor.includes(p)) continue;
+    dropAura(p, HEAT_AURAS.hunted);
   }
 }
 
@@ -201,6 +219,8 @@ function stepCinder(s: HeatScope, c: HeatCinder): boolean {
   e.inCombat = true;
   e.swingTimer = Math.max(e.swingTimer, 0.6);
   if (e.hp < c.hpSeen - 1e-9) knockCinder(s, e, c);
+  // Nothing kills it: the points the ward let through come back once read.
+  e.hp = e.maxHp;
   c.hpSeen = e.hp;
   const quarry = liveEntity(s, c.quarry);
   if (!quarry || !s.players.includes(quarry)) {

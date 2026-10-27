@@ -2565,7 +2565,9 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // The Smith's Heart raid (content/smith_heart.ts) adds fifteen untagged
     // templates, like every dungeon template: eight vein warders and callers,
     // the six bosses of the Council and the guardians, and the final boss: 315.
-    expect(Object.keys(MOBS).length - tagged.length).toBe(315);
+    // The Guardian of the Heat's four untagged adds (Wellspawn, Wellkeeper,
+    // Seedflame, Rolling Cinder): 319.
+    expect(Object.keys(MOBS).length - tagged.length).toBe(319);
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(
