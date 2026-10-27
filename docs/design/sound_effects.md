@@ -444,6 +444,29 @@ the shared `cast_frost` sample, soft, until the fight has a take of its own.
 | `heart_quench_cross` | heroic: two blades cross the lake | a doubled whoosh, ice splintering in the wake |
 | `heart_quench_rim` | the shore ice heaves up (lower and slower: it falls at the end) | a short grinding crack of ice plates |
 
+### The Smith's Heart: the Guardian of the Heat (spatial one-shots, borrowed)
+Played by `src/game/smith_heart_heat_audio.ts` (plan: `smith_heart_heat_audio_core.ts`) off
+the fight's own cues, Shed Heat's bar, the channel's brimming, the heat passing three
+quarters and the local player's own Crystal Burn; the HUD's generic nova, beam and burst
+never double one (`heatSoundClaims`). The ElevenLabs credits ran out before this fight, so
+it has NO samples of its own yet: every cue is layered and pitched at runtime from samples
+the pack already ships. The prompts for its own takes wait in `scripts/sfx/sfx_prompts.mjs`
+`HEAT_SFX_TO_GENERATE` (kept out of `SFX` until each has its file).
+
+| cue | when | borrowed layers (rate) |
+|---|---|---|
+| a ray | a Kindled Ray strikes a player | `cast_fire` (1.3) at the player, `ui_aura_glass_ping` (1.5) at the crystal |
+| a ray sent back | nobody near: into the guardian | `proj_fire` (0.7), `ui_aura_glass_ping` (0.8) |
+| the pulse | every Hearth Pulse (soft, never tiring) | `scorch` (0.72) |
+| the wind-up | the heat passes 90 | `heart_council_wrath_charge` (0.8), `heart_breath_swell` (0.75) |
+| Hearthburst | the overheat | `heart_council_wrath_blast` (0.9), `meteor` (0.8), `pyroblast` (0.7) |
+| a crystal rises / burns out | Shed Heat lands / a crystal's life ends | `heart_council_pillar_rise` (1.25) and `ui_aura_glass_ping` (0.7) / `heart_quench_shatter` (1.3) |
+| Shed Heat | its bar starts (fitted to the bar) | `heart_council_echo_charge` |
+| the channel | it brims / it flows | `hoard_tide_build` (0.8) / `hoard_tide_rush` (0.75) and `flamestrike` (0.8) |
+| embers, stoking, the fall | heroic embers / Stoked Hearth / the guardian falls | `rift_lava_tick` (0.9) / `heart_council_pillar_pulse` (0.6) / `heart_council_pillar_collapse` (0.8) |
+| the heat rising | the heat passes 75, in the local player's ear | `heart_breath_swell` (0.7) |
+| a burn | the local player's own Crystal Burn gains a stack | `rift_lava_tick` (1.25) |
+
 ### Interface and personal event cues
 
 These cues are non-positional, preload at startup, and keep the existing

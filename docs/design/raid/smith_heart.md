@@ -1264,16 +1264,67 @@ Quenching Breath and Tempering Strike were already shipped.
 
 ### 7.4 Guardian of the Heat
 
-- Look: to be designed with the Hearth (phase 2I): no smith and no anvil (the Smith
-  never appears as a character); fights before the altar-stone, the Hearth's mouth
-  behind it, the seams of fire in the floor round it.
-- Phase 1 (`heart_heat_guardian`): Molten Pour (cast-bar line, step out); Searing
-  Knell (cast-bar stun on everyone close; its id keeps the old name,
-  `heart_anvil_clang`: phase 2I renamed only what the player reads, from "Anvil Clang").
-- Presentation (phase 2I, section 5.16): Molten Pour telegraphs its lane and Searing Knell
-  its ring on every tier, with the first flame's fire. Mechanics and numbers unchanged.
-- Target: growing pools that spread unless someone soaks them, a shared strike that
-  must be split among several players standing together, a heavy healing check.
+The Hearth's boss (`heart_heat_guardian`, id frozen: its death lights the Heat vein and the
+seal's quarter exactly as before), "the flame that grows". **A PROPOSAL, not an approved
+design:** the owner went to sleep before answering the last questions on this boss and gave
+free rein; it is built as a playable Normal and Heroic prototype for him to judge in game.
+Every number below is a SKETCH, unmeasured, and every tunable (heat rate, pulse, crystal
+count and life, the ray's reach and cool, burn stacks and decay, the channel, the embers)
+lives in one table, `HEAT_TUNING` and `HEAT_DIFFICULTY` in
+`src/sim/encounters/smith_heart/heat_ids.ts`, so a change is one number. The code is
+`src/sim/encounters/smith_heart/heat*.ts` (the geometry `heat_geometry.ts` is pure, for the
+bots to reuse: the floor, the channel and its halves, the crystal sockets, a ray's pick).
+
+One phase, no change at half health (the Breath and the Quench already change at 50 percent).
+It avoids the other fire bosses: no falling anvils, red-hot metal absorbing healing or fire
+fields that grow (Varkhul), no brand cleansed in water, meteors or cone (Ignivar), no strike
+split among a group (the Council's Falling Rock). The crystals are Baleroc's (Firelands) as a
+concept only; the overheat is inspired by Teostra's Supernova (Monster Hunter).
+
+| Piece | Rule | Where |
+|---|---|---|
+| The heat | 0 to 100 on the guardian (its resource: the target frame's bar), starting at 0 at the pull and rising 1 a second on its own. Every player on the Hearth's floor wears a quiet marker carrying it (its `value` the heat, `value2` the trend over the last second), which the heat gauge over the action bar reads | `heat_gauge.ts` |
+| Hearth Pulse | Every 3 s, Fire to everyone on the floor: 12 + 1.3 per point of heat (a tenth either way), so about 15 cold, about 90 at 60, about 130 at 90: the raid's healing check, heavy when the Hearth runs hot | `heat_gauge.ts` |
+| The wind-up | From 90 the guardian wears Overheating (the gauge flashes, the body burns white), with a raid warning and a line; it clears if the heat falls back under 85 | `heat_gauge.ts` |
+| Hearthburst | At 100 the Hearth overheats: 900 to 1,000 Fire to everyone on the floor on Normal (a near wipe against level-20 health, worse on a burned soaker), 2,400 to 2,600 on Heroic (a wipe). Then the Hearth has vented: the heat starts again from 0 | `heat_gauge.ts`, `HEAT_DIFFICULTY` |
+| Stoked Hearth (soft enrage) | Every 40 s the heat rises 20 percent faster, without end (a stack on the guardian) | `heat_gauge.ts` |
+| Shed Heat | Every 30 s (first at 14) a 2.5 s bar, planted: the guardian pours its heat into the floor and the rise spots show where crystals will tear up. Two crystals on Normal (one each side of the channel), three on Heroic (the third alternating sides wave by wave), from six hashed sockets | `heat_crystals.ts`, layout `HEARTH_CRYSTAL_SOCKETS` |
+| Kindled Crystals | Stand 20 s; objects, never bodies, so nothing can target or harm them. Every 2 s (first 1.5 s after rising) each fires a Kindled Ray at the NEAREST living player within 10 yd: 50 to 65 Fire, a stack of Crystal Burn, and 3 heat off the guardian. Nobody within 10 yd: the ray goes back into the guardian and adds 3 heat. So the raid keeps one soaker in every crystal's reach and rotates them as their burns stack | `heat_crystals.ts` |
+| Crystal Burn | 6 percent more spell damage taken a stack (Fire, Frost, Nature, Shadow and Arcane: a `spellvuln`, and all of the fight's fire is spell damage), at most 20; one stack fades 6 s after the last change on Normal, 10 s on Heroic. A soaker who takes every ray of one crystal ends its 20 s at 10 stacks (+60 percent) | `heat_crystals.ts` |
+| The channel | The wellspring's pour made part of the fight: a seam of the first flame across the Hearth's floor from its north wall to its south lip, through the hall's middle (layout `HEARTH_CHANNEL`, x = -215; the wellspring's own channel crosses the casting floor outside the Hearth, so the fight has its twin inside). Still the whole fight (a dull seam); every 26 s (first flow at 20) it brims 4 s (a raid warning), then flows 6 s: anyone within 3 yd of its line takes 90 to 110 Fire every half second. While it flows the floor is split in two, so a soaker can be cut off from their swap partner on the other side | `heat_channel.ts` |
+| Molten Pour | Kept: the trash kit's line (2 s bar every 12 s, first at 5, a 30 yd lane 6 yd wide, 240 to 280 Fire; step out) | content `trashKit.line` |
+| Searing Knell | Kept: the trash kit's screech (2.5 s bar every 20 s, first at 12, everyone within 10 yd stunned 2 s and struck for 140 to 170) | content `trashKit.screech` |
+| Heroic | Every fight damage 25 percent higher, three crystals, burns fade every 10 s, and Searing Knell leaves Knell Embers where each player it stunned stood (2.5 yd, 25 s, 70 to 85 Fire a second to anyone in them; at most 30 at once), so the melee and the tank move the fight after every knell | `HEAT_DIFFICULTY`, `heat_knell.ts` |
+| Mythic | Not now: one more `HEAT_DIFFICULTY` row, today heroic's whole, behind its own dev switch (`/dev heart heat mythic`), the seam for one later mythic-only mechanic | `heat.ts` `setHeatDevTier` |
+| One wipe | The fight ends when the guardian stops fighting: every bar, rise spot, crystal, burn, ember and heat marker gone, the heat back to 0, the channel's seam gone | `heat.ts` (`resetHeat`) |
+| Its fall | The Heat vein and the seal's quarter light as before (seal.ts reads the guardian's death); the Hearth settles and everything of the fight goes | `heat.ts` (`finishHeat`) |
+
+**Health (sketch, unmeasured).** 43,000 base (about 99,000 after the elite factor), the
+other guardians' anchor: a 4 to 5 minute fight at the bot raid's measured 400 to 460 a
+second (it was 30,000 as a phase-1 sketch).
+
+**The heat's arithmetic (sketch, unmeasured).** The heat rises 30 a cycle of 30 s; two
+crystals soaked perfectly take off 60 (20 rays of 3), so early on a good raid keeps the
+Hearth cool and the pulse light. Every missed ray costs 6 (3 not taken off, 3 added), the
+stoking adds 20 percent every 40 s, and the soakers' burns cap how long one player can
+stand in a ray, so the heat creeps up through the fight and Hearthburst is the hard end at
+about 6 to 7 minutes for a perfect raid, much sooner for a sloppy one. Heroic's third
+crystal cools faster but needs a third soaker, and the slower fading burns a real rotation.
+
+Role jobs: the tank keeps the guardian off the channel and turns Molten Pour away; one
+soaker per crystal stands within its 10 yd (nearest to it), handing the ray to a partner
+around 5 stacks; everyone else stays out of every crystal's reach unless soaking; nobody
+crosses the channel while it flows; healers carry the pulse, harder as the heat climbs, and
+everyone saves a defensive for Hearthburst if the heat gets away.
+
+IP check (2026-10-27, exact phrase plus coined token on the major game wikis): Kindled
+Crystal, Kindled Ray, Crystal Burn, Hearth Pulse, Stoked Hearth, Flowing Fire and Knell
+Embers returned no game use (CLEAR). Hearthburst (coined) returned no use; the nearest
+names are Hearthstone (the game), Skyrim's Hearthfire and Hearthstone's Spellburst, none in
+the same role (CLEAR, borderline noted). Shed Heat, Overheating and The Hearth's Heat are
+plain English (generic, kept). The brief's warnings were kept: no "Blaze of Glory", "Shards
+of Torment", "Torment", "Decimation Blade", "Supernova" or Ragnaros's coined names. Molten
+Pour and Searing Knell were already shipped.
 
 ### 7.5 The Masterless Strength (final)
 
@@ -1516,6 +1567,16 @@ on both difficulties (dungeon rework README, goal 4).
 | `/dev heart quench breath` | Quenching Breath now (echoed by every blade once they are awake) |
 | `/dev heart quench echo [strike]` | a breath (or a strike) echoed by every blade now; wakes the blades first if needed |
 | `/dev heart quench dance` | two blades cross the lake now, on any tier (wakes the blades first if needed) |
+| `/dev heart heat` | the Guardian of the Heat's readout (difficulty, health, heat and its trend, the stoking, crystals, the next Shed Heat, the channel's state, your burn, rays taken and sent back, overheats) |
+| `/dev heart heat pull` | set you down on the Hearth's floor beside the guardian (the door's side of the channel) and pull it |
+| `/dev heart heat reset` | the guardian whole, home and out of its fight; the Hearth calm (no heat, crystals, burns or embers) |
+| `/dev heart heat heroic [on, off]`, `mythic [on, off]` | this run's tier for the fight (mythic is heroic whole for now); a live fight takes it at once |
+| `/dev heart heat heat <n>` | set the Hearth's heat (the wind-up follows from 90) |
+| `/dev heart heat crystals`, `shed` | Kindled Crystals rise now; `shed` runs Shed Heat's 2.5 s bar first |
+| `/dev heart heat channel` | the channel brims now (it flows 4 s on) |
+| `/dev heart heat overheat` | Hearthburst now (the heat vents to 0) |
+| `/dev heart heat burn [n]` | n stacks of Crystal Burn on you (5 if none) |
+| `/dev heart heat embers` | Knell Embers under you (on any tier) |
 
 Pinned by `tests/smith_heart_dev.test.ts`, including the refusal without
 `devCommands` and the door refusing a non-dev world.
