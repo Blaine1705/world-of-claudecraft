@@ -383,7 +383,7 @@ describe("the Smith's Heart route", () => {
     expect(bad.slice(0, 10)).toEqual([]);
   });
 
-  it("opens the rim to the void only at the Storm Cornice's four gaps", () => {
+  it("opens the rim to the void only at the Storm Cornice's six gaps", () => {
     // With every gate open, the only void a body can step into from the
     // whole main map lies in a gap's throat; each gap opens onto it.
     const seen = flood(ALL_GATES);

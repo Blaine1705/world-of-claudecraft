@@ -149,8 +149,12 @@ export const BREATH_NAMES = {
 export type BreathDifficulty = 'normal' | 'heroic' | 'mythic';
 
 export interface BreathDifficultyRules {
-  /** The blow's speed (yards a second; a run is 7). */
+  /** The blow's speed (yards a second; a run is 7, so a walker against it
+   *  still makes headway). Heroic's wind is the harder one (Jose's playtest:
+   *  normal stays as it was, heroic and mythic push noticeably harder). */
   windSpeed: number;
+  /** The exhale (Bellows Gust) throws everyone this far outward (yards). */
+  gustThrow: number;
   /** Every mechanic's damage, on top of the claim's own multiplier. */
   damageMult: number;
   /** An anchor that ran out leaves its player spent (no circle for a while). */
@@ -166,6 +170,7 @@ export interface BreathDifficultyRules {
 export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficultyRules>> = {
   normal: {
     windSpeed: 3.2,
+    gustThrow: 18,
     damageMult: 1,
     calmSpent: false,
     looseGales: false,
@@ -173,7 +178,8 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
     cradleSoakers: 4,
   },
   heroic: {
-    windSpeed: 3.6,
+    windSpeed: 4.4,
+    gustThrow: 22,
     damageMult: 1.25,
     calmSpent: true,
     looseGales: true,
@@ -183,7 +189,8 @@ export const BREATH_DIFFICULTY: Readonly<Record<BreathDifficulty, BreathDifficul
   // Exactly heroic for now (the circle rule included): the seam for one
   // later mythic-only mechanic.
   mythic: {
-    windSpeed: 3.6,
+    windSpeed: 4.4,
+    gustThrow: 22,
     damageMult: 1.25,
     calmSpent: true,
     looseGales: true,
@@ -239,8 +246,6 @@ export const BREATH_TUNING = {
   gustCast: 1.5,
   gustMin: 160,
   gustMax: 200,
-  /** The exhale throws everyone this far outward (yards). */
-  gustThrow: 18,
   // Heroic: the loose gales after each indrawn breath.
   galeCount: 3,
   galeSeconds: 20,

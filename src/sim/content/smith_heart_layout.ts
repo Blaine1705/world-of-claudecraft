@@ -207,15 +207,19 @@ export const CORNICE_CHANNELS: readonly { deg: number; depth: number; halfDeg: n
   { deg: 78, depth: 16, halfDeg: 6 },
   { deg: 128, depth: 12, halfDeg: 7 },
   { deg: 182, depth: 13, halfDeg: 6 },
+  { deg: 228, depth: 12, halfDeg: 6 },
   { deg: 332, depth: 15, halfDeg: 6 },
 ];
 
 /** The Storm Cornice's broken gaps (the Guardian of the Breath's fight,
- *  design doc 7.2): the throats of four of the wind channels, where the rim's
- *  wall has fallen and the lip lies open to the void. A body walked or blown
- *  into one falls (the field builds no wall there: `lipOpenings`); everywhere
- *  else the rim stays walled. The eastern channel (78) keeps its wall. */
-export const CORNICE_GAP_DEGREES: readonly number[] = [22, 128, 182, 332];
+ *  design doc 7.2): the throats of all six wind channels, where the rim's
+ *  wall has fallen and the lip lies open to the void, on every difficulty
+ *  (Jose's playtest asked for more unsafe edges than the first four). A body
+ *  walked or blown into one falls (the field builds no wall there:
+ *  `lipOpenings`); everywhere else the rim stays walled. The west, where the
+ *  climb comes up past Captain Thessaly's post, keeps its wall: the corpse
+ *  run and the walk to the guardian never pass a gap. */
+export const CORNICE_GAP_DEGREES: readonly number[] = [22, 78, 128, 182, 228, 332];
 /** A gap's reach round its throat (yards): the lip inside it is open. */
 export const CORNICE_GAP_R = 6;
 export const CORNICE_GAPS: readonly { deg: number; x: number; z: number; r: number }[] =

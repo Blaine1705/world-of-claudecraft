@@ -30,6 +30,7 @@ import {
   smithHeartVeinWon,
   swellMult,
   BREATH_TUNING as T,
+  THESSALY_POST,
 } from '../src/sim/encounters/smith_heart';
 import { authoredFieldCliffRuns } from '../src/sim/instances/authored_field';
 import { DT, type Entity, type SimEvent } from '../src/sim/types';
@@ -290,7 +291,18 @@ describe('Guardian of the Breath: the push, the rim and the gaps', () => {
     expect(has(p, BREATH_AURAS.pinned)).toBe(false);
   });
 
-  it("the gaps are the rim's only open lips, four of them", () => {
+  it("the gaps are the rim's only open lips, six of them, the west walled", () => {
+    // Six on every difficulty (Jose's playtest), the climb's side whole.
+    expect(CORNICE_GAPS.map((g) => g.deg)).toEqual([22, 78, 128, 182, 228, 332]);
+    for (const g of CORNICE_GAPS) {
+      // Clear of Thessaly's post and of the walk from it to the guardian.
+      expect(dist(g, THESSALY_POST)).toBeGreaterThan(25);
+      for (let x = THESSALY_POST.x; x <= 0; x += 2) {
+        const z =
+          THESSALY_POST.z + ((196 - THESSALY_POST.z) * (x - THESSALY_POST.x)) / -THESSALY_POST.x;
+        expect(dist(g, { x, z })).toBeGreaterThan(g.r + 6);
+      }
+    }
     const open = authoredFieldCliffRuns(SMITH_HEART_FIELD).filter((r) => r.open);
     expect(open.length).toBeGreaterThan(0);
     for (const r of open) {
@@ -301,7 +313,7 @@ describe('Guardian of the Breath: the push, the rim and the gaps', () => {
       new Set(
         open.map((r) => CORNICE_GAPS.findIndex((g) => dist(g, { x: r.ax, z: r.az }) <= g.r + 0.5)),
       ).size,
-    ).toBe(4);
+    ).toBe(6);
   });
 });
 
@@ -572,6 +584,60 @@ describe('Guardian of the Breath: the Storm', () => {
 });
 
 describe('Guardian of the Breath: heroic', () => {
+  it('pins the push per tier: normal as it was, heroic and mythic harder and still walkable', () => {
+    // Normal is exactly what Jose played; the harder tiers in the table.
+    expect(BREATH_DIFFICULTY.normal.windSpeed).toBe(3.2);
+    expect(BREATH_DIFFICULTY.normal.gustThrow).toBe(18);
+    for (const tier of ['heroic', 'mythic'] as const) {
+      expect(BREATH_DIFFICULTY[tier].windSpeed).toBe(4.4);
+      expect(BREATH_DIFFICULTY[tier].gustThrow).toBe(22);
+    }
+  });
+
+  it('heroic blows the idle harder, a walker still makes headway, and the exhale throws further', () => {
+    const measure = (heroic: boolean) => {
+      const f = pulled(4);
+      if (heroic) f.dev('/dev heart breath heroic');
+      const [, idle, walker] = f.players;
+      f.put(idle, -20, 205);
+      f.put(walker, -20, 188);
+      f.tick(2);
+      f.dev('/dev heart breath blow 90');
+      f.tick(2);
+      const i0 = f.local(idle);
+      const w0 = f.local(walker);
+      walker.facing = -Math.PI / 2;
+      const meta = f.sim.players.get(walker.id);
+      if (!meta) throw new Error('meta');
+      meta.moveInput.forward = true;
+      f.tick(40);
+      meta.moveInput.forward = false;
+      const drift = (f.local(idle).x - i0.x) / 2;
+      const headway = (w0.x - f.local(walker).x) / 2;
+      // The exhale: a body beside the guardian, thrown outward.
+      f.dev('/dev heart breath calm');
+      f.tick(2);
+      f.dev('/dev heart breath inhale');
+      const boss = f.boss();
+      const aside = f.players[3];
+      until(f, () => boss.castingAbility === BREATH_CASTS.gust, 8);
+      const b = f.local(boss);
+      f.put(aside, b.x - 6, b.z);
+      const near = dist(f.local(aside), b);
+      f.tick(Math.round(T.gustCast / DT) + 2);
+      return { drift, headway, thrown: dist(f.local(aside), b) - near };
+    };
+    const normal = measure(false);
+    const heroic = measure(true);
+    expect(normal.drift).toBeCloseTo(BREATH_DIFFICULTY.normal.windSpeed, 0);
+    expect(heroic.drift).toBeCloseTo(BREATH_DIFFICULTY.heroic.windSpeed, 0);
+    expect(heroic.drift).toBeGreaterThan(normal.drift + 0.8);
+    // Against it a run still gains ground, with effort.
+    expect(heroic.headway).toBeGreaterThan(2);
+    expect(heroic.headway).toBeLessThan(normal.headway - 0.8);
+    expect(heroic.thrown).toBeGreaterThan(normal.thrown + 2);
+  });
+
   it('an anchor that ran out leaves its player spent; no circle takes them again (normal: none)', () => {
     for (const heroic of [false, true]) {
       const f = pulled(4);

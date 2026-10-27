@@ -246,6 +246,11 @@ export function planBreathDressing(): HeartKitPlacement[] {
   return out;
 }
 
+/** Two open runs whose ends lie this close make one stretch: a channel
+ *  whose V tip falls on an outline vertex (78, 228) leaves a sliver at the
+ *  tip no cliff sample walls, never a real end of the gap. */
+const GAP_END_JOIN = 0.75;
+
 /** Where the Cornice's rim wall breaks at its gaps (the field's
  *  lipOpenings: the open lip runs): each end of an open stretch, with its
  *  outward normal and the direction along the lip away from the gap. */
@@ -263,7 +268,8 @@ export function breathGapEnds(): {
     open.some(
       (r, i) =>
         i !== self &&
-        (Math.hypot(r.ax - x, r.az - z) < 0.05 || Math.hypot(r.bx - x, r.bz - z) < 0.05),
+        (Math.hypot(r.ax - x, r.az - z) < GAP_END_JOIN ||
+          Math.hypot(r.bx - x, r.bz - z) < GAP_END_JOIN),
     );
   open.forEach((r, i) => {
     const len = Math.hypot(r.bx - r.ax, r.bz - r.az) || 1;

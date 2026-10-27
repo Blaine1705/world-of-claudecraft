@@ -14,6 +14,7 @@
 
 import { THESSALY_POST } from '../encounters/smith_heart/breath_geometry';
 import {
+  BREATH_DIFFICULTY,
   BREATH_THESSALY_NPC,
   BREATH_TUNING,
   breathWindTemplate,
@@ -334,7 +335,7 @@ export const SMITH_HEART_MOBS: Record<string, MobTemplate> = {
         first: 999,
         school: 'nature',
         radius: 60,
-        knockback: BREATH_TUNING.gustThrow,
+        knockback: BREATH_DIFFICULTY.normal.gustThrow,
         min: BREATH_TUNING.gustMin,
         max: BREATH_TUNING.gustMax,
         encounterDriven: true,

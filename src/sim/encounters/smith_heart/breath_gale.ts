@@ -395,7 +395,7 @@ export function landGust(s: BreathScope): void {
       dz = Math.cos(b.facing);
       len = 1;
     }
-    throwPlayer(s, p, dx / len, dz / len, T.gustThrow);
+    throwPlayer(s, p, dx / len, dz / len, s.rules.gustThrow);
   }
   if (s.rules.looseGales) startGales(s);
   // The wind comes back: a calm, then the next blow's telegraph.

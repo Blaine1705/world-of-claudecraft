@@ -45,7 +45,7 @@ export function breathAuraEffectDescriptor(a: AuraEffectInput): AuraEffectDescri
           tick: T.vortexTick,
           gustMin: T.gustMin,
           gustMax: T.gustMax,
-          throw: T.gustThrow,
+          throw: BREATH_DIFFICULTY.normal.gustThrow,
         },
       };
     case BREATH_AURAS.pinned:
