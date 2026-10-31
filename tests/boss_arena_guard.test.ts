@@ -191,6 +191,39 @@ describe.each(CASES)('authored boss arena: $id', (c) => {
   });
 });
 
+describe('recesses just past the authored edge', () => {
+  const VELKHAR = CASES[1];
+  const KORZUL = CASES[2];
+  const at = (r: number, deg: number): [number, number] => [
+    Math.sin((deg * Math.PI) / 180) * r,
+    Math.cos((deg * Math.PI) / 180) * r,
+  ];
+  // Measured stopping points: walls and seals hold a player here, unmarked.
+  it.each([
+    ['Velkhar north door', VELKHAR, 0, 19.1],
+    ['Velkhar north door corner', VELKHAR, ...at(19.7, 15)],
+    ['Velkhar south door corner', VELKHAR, ...at(20.5, 165)],
+    ['Korzul south shelf', KORZUL, 0, -47.6],
+  ] as const)('keeps a player standing in the %s in the fight', (_name, c, dx, dz) => {
+    const { sim, boss, place } = setup(c);
+    place(sim.player, dx, dz);
+    const hp = boss.hp;
+    sim.ctx.dealDamage(sim.player, boss, 1, false, 'arcane', null, 'hit');
+    expect(boss.hp).toBeLessThan(hp);
+    sim.tick();
+    expect(boss.aiState).not.toBe('evade');
+    expect(boss.aggroTargetId).toBe(sim.player.id);
+  });
+
+  it('still refuses a player past the recess margin', () => {
+    const { sim, boss, place } = setup(KORZUL);
+    place(sim.player, 0, -(KORZUL.arena.r + 2.5));
+    const hp = boss.hp;
+    sim.ctx.dealDamage(sim.player, boss, 1, false, 'arcane', null, 'hit');
+    expect(boss.hp).toBe(hp);
+  });
+});
+
 describe('scripted arena reset cleanup', () => {
   it('clears Ysolei rising tide when the last opponent leaves', () => {
     const { sim, inst, boss, place } = setup(CASES[0]);

@@ -67,6 +67,17 @@ describe('Korgath arena boundaries through the live simulation', () => {
     expect(boss.castingAbility).toBeNull();
   });
 
+  it('keeps a player standing in the north gate recess in the fight', () => {
+    const { sim, boss, tank, place } = room();
+    place(tank, KORGATH_SPOT.x, KORGATH_SPOT.z + 22.6);
+    const hp = boss.hp;
+    sim.ctx.dealDamage(tank, boss, 100, false, 'arcane', 'test', 'hit');
+    expect(boss.hp).toBeLessThan(hp);
+    sim.tick();
+    expect(boss.aiState).not.toBe('evade');
+    expect(boss.aggroTargetId).toBe(tank.id);
+  });
+
   it('keeps an inside tank fighting while refusing damage from an outside party member', () => {
     const { sim, boss, tank, state, place } = room();
     const mageId = sim.addPlayer('mage', 'OutsideCaster');

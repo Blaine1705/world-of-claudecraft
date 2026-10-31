@@ -18,6 +18,11 @@ interface Arena {
 }
 
 const KORZUL_ARENA: Arena = { ...WYRMS_HOLLOW, r: WYRMS_HOLLOW.shelfR };
+// Door recesses and blocked exits hold a player up to 1.6 yd past the authored
+// edge with nothing marking it, so combatants get this much slack.
+const COMBATANT_EDGE_MARGIN = 2;
+// Velkhar's north door stands at the foot of a ramp 3.8 yd below his floor.
+const COMBATANT_FLOOR_DROP = 4;
 
 function arenaOf(boss: Entity): Arena | null {
   switch (boss.templateId) {
@@ -54,12 +59,20 @@ function combatantInside(
   arena: Arena,
   entity: Entity,
 ): boolean {
-  // Lower stairs are outside the fighting floor. Class flights above it are
+  // Floors further below are outside the fighting floor. Class flights above it are
   // legal: encounter damage and target selection resolve in two dimensions.
-  if (!inside(ctx, inst, arena, entity) || entity.pos.y < arena.h - 2) return false;
+  if (
+    !inside(ctx, inst, arena, entity, COMBATANT_EDGE_MARGIN) ||
+    entity.pos.y < arena.h - COMBATANT_FLOOR_DROP
+  )
+    return false;
   if (entity.ownerId !== null) {
     const owner = ctx.entities.get(entity.ownerId);
-    return !!owner && inside(ctx, inst, arena, owner) && owner.pos.y >= arena.h - 2;
+    return (
+      !!owner &&
+      inside(ctx, inst, arena, owner, COMBATANT_EDGE_MARGIN) &&
+      owner.pos.y >= arena.h - COMBATANT_FLOOR_DROP
+    );
   }
   return true;
 }
